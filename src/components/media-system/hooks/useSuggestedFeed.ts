@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { FeedPost, FeedRpcRow } from '../types/media';
-import { buildSuggestedFeed, deduplicatePosts, initSessionSeed } from '../utils/feedAlgorithm';
+import { deduplicatePosts, initSessionSeed } from '../utils/feedAlgorithm';
 import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
 
 const PAGE_SIZE = 60;
@@ -40,7 +40,6 @@ export function useSuggestedFeed(userId: string | undefined) {
         const rows = ((data ?? []) as unknown as FeedRpcRow[]);
         
         const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
-        const interleaved = buildSuggestedFeed(posts);
 
         // Track ALL fetched post IDs — including ones filtered out —
         // so the RPC doesn't waste candidate slots returning them again
@@ -58,11 +57,11 @@ export function useSuggestedFeed(userId: string | undefined) {
         // If rows came back but all were filtered, stop pagination to prevent
         // an infinite fetch loop burning through the entire posts table.
         const nextCursor: string | undefined =
-          rows.length > 0 && interleaved.length > 0
+          rows.length > 0 && posts.length > 0
             ? lastRow.post_created_at
             : undefined;
 
-        return { posts: interleaved, nextCursor };
+        return { posts, nextCursor };
       } catch (err) {
         console.error('[SuggestedFeed] Unexpected error:', err);
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
