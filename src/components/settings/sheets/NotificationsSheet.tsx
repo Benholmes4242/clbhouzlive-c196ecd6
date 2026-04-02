@@ -125,28 +125,39 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
         </div>
 
         {/* Temporary debug button */}
-        <button
+        <div
           onClick={() => {
             const os = (window as any).median?.onesignal;
-            if (!os) { toast.error('No onesignal bridge'); return; }
-            
-            // Try the newer 'info' method first
+            if (!os) { 
+              toast.error(`No onesignal. Median: ${!!(window as any).median}`); 
+              return; 
+            }
             if (os.info) {
               os.info((result: any) => {
-                toast.info(`INFO: ${JSON.stringify(result).slice(0, 120)}`);
+                toast.info(`${JSON.stringify(result).slice(0, 150)}`);
               });
             } else if (os.onesignalInfo) {
               os.onesignalInfo((result: any) => {
-                toast.info(`OSINFO: ${JSON.stringify(result).slice(0, 120)}`);
+                toast.info(`${JSON.stringify(result).slice(0, 150)}`);
               });
-            } else {
-              toast.error('Neither info nor onesignalInfo available');
             }
           }}
-          className="text-xs text-amber-500 mt-2 py-1"
+          style={{ 
+            padding: '14px 16px', 
+            background: '#F7931E', 
+            borderRadius: '12px', 
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: '600',
+            textAlign: 'center',
+            marginBottom: '12px',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+            userSelect: 'none',
+          }}
         >
           Debug OneSignal
-        </button>
+        </div>
 
         {/* In-app prefs */}
         <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-3">In-App</p>
