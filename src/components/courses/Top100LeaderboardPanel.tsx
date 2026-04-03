@@ -65,7 +65,7 @@ const Top100LeaderboardPanel = () => {
           <ChampionshipLeaderboardView />
         </TabsContent>
 
-        <TabsContent value="courses" className="mt-3">
+        <TabsContent value="courses" className="mt-3 -mx-4">
           <CoursesLeaderboardView />
         </TabsContent>
 
