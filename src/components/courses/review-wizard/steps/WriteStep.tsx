@@ -235,20 +235,18 @@ export function WriteStep({
   }, [selectedTags, onTagsChange]);
 
   // Voice transcript handler
-  const handleTranscript = useCallback((transcript: string) => {
-    onReviewChange(prev => {
-      const current = typeof prev === 'string' ? prev : review;
-      if (!current) {
-        return transcript.charAt(0).toUpperCase() + transcript.slice(1);
-      }
-      return current.endsWith(' ')
+  const handleVoiceTranscript = useCallback((transcript: string) => {
+    const current = review;
+    let newText: string;
+    if (!current) {
+      newText = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+    } else {
+      newText = current.endsWith(' ')
         ? current + transcript
         : current + ' ' + transcript;
-    });
+    }
+    onReviewChange(newText.slice(0, MAX_REVIEW_LENGTH));
   }, [review, onReviewChange]);
-
-  // Actually, onReviewChange takes a string not a function. Fix:
-  const handleVoiceTranscript = useCallback((transcript: string) => {
     const current = review;
     let newText: string;
     if (!current) {
