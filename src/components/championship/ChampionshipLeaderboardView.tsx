@@ -4,6 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import {
   useChampionshipLeaderboard,
@@ -83,31 +84,36 @@ const LeaderboardLoadingSkeleton = () => (
   </div>
 );
 
-/** Full-page skeleton for initial Championship tab load */
+/** Full-page skeleton for initial Championship tab load — green-tinted */
 const ChampionshipPageSkeleton = () => (
-  <div className="flex flex-col px-3 py-4 space-y-5 animate-pulse">
-    {/* Season status panel */}
-    <Skeleton className="h-[88px] w-full rounded-2xl" />
-    {/* Time toggle */}
-    <Skeleton className="h-9 w-48 rounded-full mx-auto" />
-    {/* Podium */}
-    <div className="flex items-end justify-center gap-2">
-      <Skeleton className="h-[110px] w-[30%] rounded-xl" />
-      <Skeleton className="h-[130px] w-[38%] rounded-xl" />
-      <Skeleton className="h-[110px] w-[30%] rounded-xl" />
-    </div>
-    {/* Leaderboard rows */}
-    {[...Array(6)].map((_, i) => (
-      <div key={i} className="flex items-center gap-3 px-3 py-3">
-        <Skeleton className="w-7 h-5 rounded" />
-        <Skeleton className="w-11 h-11 rounded-lg" />
-        <div className="flex-1 space-y-1.5">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-24" />
-        </div>
-        <Skeleton className="w-10 h-8 rounded" />
+  <div className="flex flex-col" style={{ background: '#F0F2F5', minHeight: '100%' }}>
+    {/* Green hero header skeleton */}
+    <div style={{ background: 'linear-gradient(160deg, #003D28, #006747)', padding: '18px 18px 0' }}>
+      <Skeleton className="h-3 w-40 rounded mb-4" style={{ background: 'rgba(255,255,255,0.15)' }} />
+      <Skeleton className="h-16 w-full rounded-[14px] mb-5" style={{ background: 'rgba(255,255,255,0.1)' }} />
+      <div className="flex gap-3">
+        <Skeleton className="h-10 flex-1 rounded-t-[10px]" style={{ background: 'rgba(255,255,255,0.12)' }} />
+        <Skeleton className="h-10 flex-1 rounded-t-[10px]" style={{ background: 'rgba(255,255,255,0.06)' }} />
       </div>
-    ))}
+    </div>
+    <div className="flex flex-col gap-3 p-4">
+      {/* Sponsor card skeleton */}
+      <Skeleton className="h-[180px] w-full rounded-[18px]" />
+      {/* Scope toggle skeleton */}
+      <Skeleton className="h-10 w-full rounded-[12px]" />
+      {/* Leaderboard rows */}
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-3 py-3">
+          <Skeleton className="w-7 h-5 rounded" />
+          <Skeleton className="w-11 h-11 rounded-lg" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+          <Skeleton className="w-10 h-8 rounded" />
+        </div>
+      ))}
+    </div>
   </div>
 );
 
@@ -136,6 +142,13 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
     </button>
   </div>
 );
+
+// ─── Helpers ────────────────────────────────────────────────────────
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
 
 // ─── Virtualization constants ───────────────────────────────────────
 const ROW_HEIGHT = 72; // 64px row (p-3 + h-10 avatar) + 8px gap (space-y-2)
@@ -653,14 +666,128 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return { totalHeight, visibleEntries, offsetY, startIndex };
   }, [useVirtualization, allEntries, scrollTop]);
 
+  // Get user's profile data for position band
+  const activeProfile = useMemo(() => {
+    if (!currentUserEntry) return null;
+    return {
+      avatarUrl: currentUserEntry.avatar_url,
+      name: currentUserEntry.display_name,
+    };
+  }, [currentUserEntry]);
+
   // Full-page skeleton for initial load
   if (leaderboardLoading && allEntries.length === 0) {
     return <ChampionshipPageSkeleton />;
   }
 
   return (
-    <div className={cn('flex flex-col px-3 py-4', className)} style={{ gap: 20 }}>
-      {/* 1. Season Status Panel — floats on page background, no card wrapper */}
+    <div className={cn('flex flex-col', className)} style={{ background: '#F0F2F5', minHeight: '100%' }}>
+      {/* ── GREEN HERO HEADER ── */}
+      <div
+        style={{
+          background: 'linear-gradient(160deg, #003D28, #006747, #005238)',
+          padding: 'clamp(14px,4vw,20px)',
+          paddingTop: "max(env(safe-area-inset-top, 0px), 47px)",
+          paddingBottom: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}
+      >
+        {/* Season info line */}
+        {currentSeason && (
+          <div className="flex items-center gap-2">
+            <span
+              style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: '#4ade80',
+                boxShadow: '0 0 6px #4ade80',
+                animation: 'pulse 2s infinite',
+              }}
+            />
+            <span
+              style={{
+                fontSize: 'clamp(9px,2.5vw,11px)',
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.7)',
+                letterSpacing: '0.04em',
+                fontFamily: 'DM Sans,system-ui,sans-serif',
+              }}
+            >
+              {getSeasonConfig(currentSeasonId).title} · Active · {currentSeason.days_remaining ?? 0} days left
+            </span>
+          </div>
+        )}
+
+        {/* Position band — frosted glass */}
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.1)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: 14,
+            padding: 'clamp(10px,3vw,14px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <SquircleAvatar
+            src={activeProfile?.avatarUrl ?? null}
+            size={38}
+            fallback={activeProfile?.name?.charAt(0) ?? '?'}
+            hideRing
+          />
+          <div style={{ flex: 1 }}>
+            <p style={{
+              fontSize: 10,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.6)',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              Your position
+            </p>
+            <p style={{
+              fontSize: 'clamp(15px,4vw,18px)',
+              fontWeight: 800,
+              color: '#FFFFFF',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              {currentRank ? `${ordinal(currentRank)} of ${allEntries.length}` : 'Not yet ranked'}
+            </p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{
+              fontSize: 10,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.6)',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              Courses logged
+            </p>
+            <p style={{
+              fontSize: 'clamp(18px,5vw,22px)',
+              fontWeight: 800,
+              color: '#FFFFFF',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              {currentUserEntry?.courses_this_season ?? 0}
+            </p>
+          </div>
+        </div>
+
+        {/* Inline Time Toggle — flush at bottom of green header */}
+        <TimeModeToggle
+          value={timeFilter}
+          onChange={setTimeFilter}
+          seasonYear={currentSeason ? new Date(currentSeason.start_date).getFullYear() : undefined}
+        />
+      </div>
+
+      {/* ── BODY CONTENT (below hero) ── */}
+      <div style={{ padding: 'clamp(12px,3vw,16px)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+      {/* Season Status Panel */}
       {timeFilter === 'seasonal' && currentSeason && (
         <SeasonStatusPanel
           currentSeasonId={currentSeasonId}
@@ -679,7 +806,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 1b. Season Race Card — live position in season race */}
+      {/* Season Race Card */}
       {timeFilter === 'seasonal' && currentSeason && (currentUserEntry?.courses_this_season ?? 0) > 0 && (
         <SeasonRaceCard
           seasonLabel={getSeasonConfig(currentSeasonId).title}
@@ -692,15 +819,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           majorsBonusActive={currentSeasonId === 'major'}
         />
       )}
-
-      {/* 2. Time Filter Toggle */}
-      <div>
-        <TimeModeToggle
-          value={timeFilter}
-          onChange={setTimeFilter}
-          seasonYear={currentSeason ? new Date(currentSeason.start_date).getFullYear() : undefined}
-        />
-      </div>
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
       <div className="overflow-visible">
@@ -832,9 +950,52 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 9. Leaderboard List */}
-      <div ref={listContainerRef} className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
-        {/* Loading overlay - doesn't unmount the list */}
+      {/* Empty state — season just started */}
+      {timeFilter === 'seasonal' && !leaderboardLoading && allEntries.length === 0 && (
+        <div
+          className="flex flex-col items-center justify-center py-12 px-4 text-center"
+          style={{
+            background: '#FFFFFF',
+            borderRadius: 18,
+            border: '1px solid rgba(0,0,0,0.07)',
+          }}
+        >
+          <span style={{ fontSize: 36 }}>⛳</span>
+          <p style={{
+            fontSize: 16,
+            fontWeight: 700,
+            color: '#0C0C0E',
+            fontFamily: 'DM Sans,system-ui,sans-serif',
+            marginTop: 12,
+          }}>
+            {getSeasonConfig(currentSeasonId).title} has begun
+          </p>
+          <p style={{
+            fontSize: 13,
+            color: '#6B7280',
+            fontFamily: 'DM Sans,system-ui,sans-serif',
+            marginTop: 6,
+            maxWidth: 260,
+          }}>
+            Log your first Top 100 course to appear on the leaderboard. Everyone starts from zero.
+          </p>
+        </div>
+      )}
+
+      {/* 9. Leaderboard List — wrapped in card */}
+      {(allEntries.length > 0 || leaderboardLoading || isError) && (
+      <div
+        ref={listContainerRef}
+        className="min-h-[200px] relative"
+        style={{
+          background: '#FFFFFF',
+          borderRadius: 'clamp(14px,4vw,18px)',
+          border: '1px solid rgba(0,0,0,0.07)',
+          overflow: 'hidden',
+          overflowAnchor: 'auto',
+        }}
+      >
+        {/* Loading overlay */}
         {leaderboardLoading && allEntries.length > 0 && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-background/80 backdrop-blur-sm rounded-full shadow-sm border border-border/50">
@@ -848,8 +1009,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {isError && allEntries.length === 0 ? (
           <InitialErrorState onRetry={() => refetch()} />
         ) : leaderboardLoading && allEntries.length === 0 ? (
-          // Initial loading skeleton
-          <div className="space-y-2">
+          <div className="space-y-2 p-2">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="py-3 px-4 flex items-center gap-3">
                 <Skeleton className="w-8 h-8 rounded" />
@@ -863,7 +1023,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             ))}
           </div>
         ) : allEntries.length === 0 && !leaderboardLoading ? (
-          // Contextual empty states based on arena mode
           arenaMode === 'friends' ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <Users className="w-12 h-12 text-muted-foreground/40 mb-3" />
@@ -886,13 +1045,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </div>
           )
         ) : useVirtualization && virtualizedContent ? (
-          // Virtualized list for large entry counts
           <div
             className={cn('relative transition-opacity duration-150', leaderboardLoading && 'opacity-60')}
             style={{ height: virtualizedContent.totalHeight }}
           >
             <div
-              className="absolute inset-x-0 space-y-2"
+              className="absolute inset-x-0"
               style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
             >
               {virtualizedContent.visibleEntries.map((entry) => (
@@ -904,15 +1062,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   homeClubName={entry.home_club}
                   courses={entry.courses_this_season}
                   isCurrentUser={entry.is_current_user}
-                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))'}
+                  leaderCourses={allEntries[0]?.courses_this_season ?? 0}
                   onClick={() => handleEntryClick(entry.user_id)}
                 />
               ))}
             </div>
           </div>
         ) : (
-          // Non-virtualized list for smaller entry counts
-          <div className={cn('transition-opacity duration-150 space-y-2', leaderboardLoading && 'opacity-60')}>
+          <div className={cn('transition-opacity duration-150', leaderboardLoading && 'opacity-60')}>
             {allEntries.map((entry) => (
               <LeaderboardRowV3
                 key={entry.user_id}
@@ -921,8 +1078,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 avatarUrl={entry.avatar_url}
                 homeClubName={entry.home_club}
                 courses={entry.courses_this_season}
-                  isCurrentUser={entry.is_current_user}
-                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))'}
+                isCurrentUser={entry.is_current_user}
+                leaderCourses={allEntries[0]?.courses_this_season ?? 0}
                 onClick={() => handleEntryClick(entry.user_id)}
               />
             ))}
@@ -931,15 +1088,15 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         
         {/* Short list invite CTA */}
         {allEntries.length > 0 && allEntries.length < 10 && !hasNextPage && !leaderboardLoading && (
-          <div className="mt-6 mx-4 py-5 px-4 rounded-2xl flex flex-col items-center gap-2 text-center"
-            style={{ border: '1.5px dashed hsl(var(--border) / 0.3)' }}
+          <div className="mt-2 mx-4 mb-4 py-5 px-4 rounded-2xl flex flex-col items-center gap-2 text-center"
+            style={{ border: '1.5px dashed rgba(0,0,0,0.1)' }}
           >
-            <p className="text-[14px] text-muted-foreground">
+            <p style={{ fontSize: 14, color: '#6B7280', fontFamily: 'DM Sans,system-ui,sans-serif' }}>
               Invite friends to climb the leaderboard
             </p>
             <button
-              className="text-[14px] font-semibold transition-opacity active:scale-[0.97] active:opacity-70"
-              style={{ color: 'hsl(var(--accent-amber))' }}
+              className="transition-opacity active:scale-[0.97] active:opacity-70"
+              style={{ fontSize: 14, fontWeight: 600, color: '#006747', fontFamily: 'DM Sans,system-ui,sans-serif' }}
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({ title: 'Join me on Clbhouz', url: window.location.origin });
@@ -968,6 +1125,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <LeaderboardLoadingSkeleton />
         )}
       </div>
+      )}
 
       {/* Rival Versus Panel (drawer) */}
       {userStatus && selectedRival && (
@@ -991,7 +1149,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           }}
         />
       )}
-
+      </div>{/* end body content */}
     </div>
   );
 }

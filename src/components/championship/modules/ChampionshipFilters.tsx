@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { PillToggle } from '@/components/ui/PillToggle';
 import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
 import { useDivisionConfig } from '@/hooks/championship';
 
@@ -12,15 +11,15 @@ interface ChampionshipFiltersProps {
   className?: string;
 }
 
-const scopeOptions = [
-  { id: 'global', label: 'Global' },
-  { id: 'division', label: 'Division' },
-  { id: 'friends', label: 'Friends' },
+const arenaOptions = [
+  { id: 'global', label: '🌍 Global' },
+  { id: 'division', label: '⚡ Division' },
+  { id: 'friends', label: '👥 Friends' },
 ];
 
 /**
  * ChampionshipFilters - Arena mode and division filter controls.
- * Uses Tier 2 pill toggles.
+ * Augusta green active state.
  */
 export function ChampionshipFilters({
   arenaMode,
@@ -32,7 +31,6 @@ export function ChampionshipFilters({
   const { data: divisions } = useDivisionConfig();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Ensure scroll starts at 0 so "Global" is always fully visible
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollLeft = 0;
@@ -41,14 +39,39 @@ export function ChampionshipFilters({
 
   return (
     <div className={cn('py-2 space-y-3 w-full', className)}>
-      {/* Arena Mode - Pill Toggle */}
-      <div ref={scrollRef} className="flex justify-center overflow-x-auto pb-1 scroll-pl-4">
-        <PillToggle 
-          options={scopeOptions} 
-          selected={arenaMode} 
-          onSelect={(id) => onArenaModeChange(id as ChampionshipArenaMode)}
-          size="default"
-        />
+      {/* Arena Mode - Inline buttons with green active */}
+      <div
+        ref={scrollRef}
+        className="flex"
+        style={{
+          background: 'rgba(0,0,0,0.06)',
+          borderRadius: 12,
+          padding: 3,
+        }}
+      >
+        {arenaOptions.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => onArenaModeChange(t.id as ChampionshipArenaMode)}
+            className="active:scale-[0.97] transition-all"
+            style={{
+              flex: 1,
+              padding: 'clamp(7px,2vw,9px) 4px',
+              borderRadius: 9,
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 'clamp(11px,3vw,13px)',
+              fontWeight: arenaMode === t.id ? 800 : 500,
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+              background: arenaMode === t.id ? '#FFFFFF' : 'none',
+              color: arenaMode === t.id ? '#006747' : '#6B7280',
+              boxShadow: arenaMode === t.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {/* Division Filter (only show in division mode) */}
