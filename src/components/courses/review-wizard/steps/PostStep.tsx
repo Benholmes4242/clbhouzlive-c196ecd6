@@ -184,10 +184,11 @@ export function PostStep({
                   <MediaThumbnail
                     item={item}
                     index={index}
-                    isActive={false}
-                    onTap={() => setPreviewMediaIndex(index)}
+                    isCover={item.id === coverMediaId}
+                    totalItems={media.length}
+                    onExpand={() => setPreviewMediaIndex(index)}
                     onRemove={() => onRemoveMedia(item.id)}
-                    size={72}
+                    onSetCover={() => onSetCover(item.id)}
                   />
                   {/* COVER badge */}
                   {item.id === coverMediaId && (
