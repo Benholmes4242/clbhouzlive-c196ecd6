@@ -18,7 +18,7 @@ import { GlobalGolfersMapStatsRow } from './GlobalGolfersMapStatsRow';
 import { ClubSearchBar } from './ClubSearchBar';
 import { usePlayedCourseCoordinates } from '@/hooks/usePlayedCourseCoordinates';
 import { ContinentBreakdownGrid } from './ContinentBreakdownGrid';
-import { ExplorerTierLadder } from './ExplorerTierLadder';
+import { ExplorerTierCard } from './ExplorerTierCard';
 import { CountryLeaderboard } from './CountryLeaderboard';
 import CountryFlag from '@/components/ui/country-flag';
 import { getUserTier, getNextTier, EXPLORER_TIERS } from '@/config/explorerTiers';
