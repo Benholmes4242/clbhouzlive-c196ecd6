@@ -225,6 +225,7 @@ export function PostStep({
             </p>
           </div>
         )}
+        </div>
       </div>
 
       {/* Inline review summary */}

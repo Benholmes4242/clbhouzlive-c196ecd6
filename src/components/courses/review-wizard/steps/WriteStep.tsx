@@ -51,7 +51,7 @@ const getSpeechRecognition = (): any => {
 /* ── VoiceMic sub-component ── */
 type VoiceState = 'idle' | 'listening' | 'processing';
 
-function VoiceMic({ onTranscript }: { onTranscript: (text: string) => void }) {
+function VoiceMic({ onTranscript, onStateChange }: { onTranscript: (text: string) => void; onStateChange?: (state: VoiceState) => void }) {
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const recognitionRef = useRef<any>(null);
   const SpeechRecognitionClass = getSpeechRecognition();
