@@ -33,7 +33,6 @@ interface UseReviewWizardOptions {
   isEditMode: boolean;
   existingRating?: ExistingRating;
   onSuccess?: (ratingId: string) => void;
-  onPreview?: (ratingId: string) => void;
   /** Pre-populated media files from Post Wizard bridge flow */
   initialMediaFiles?: File[];
 }
@@ -114,7 +113,6 @@ export function useReviewWizard({
   isEditMode,
   existingRating,
   onSuccess,
-  onPreview,
   initialMediaFiles,
 }: UseReviewWizardOptions) {
   

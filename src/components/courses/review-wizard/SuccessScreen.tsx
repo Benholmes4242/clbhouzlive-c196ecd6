@@ -47,7 +47,7 @@ export function SuccessScreen({
       particleCount: 60,
       spread: 60,
       origin: { y: 0.6 },
-      colors: ['#f59e0b', '#fbbf24', '#ffffff', '#d97706'],
+      colors: ['#F7931E', '#FBBC2E', '#ffffff', '#d97706'],
     });
   }, []);
 
@@ -90,8 +90,8 @@ export function SuccessScreen({
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
         style={{
-          background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
-          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.3)',
+          background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
+          boxShadow: '0 8px 32px rgba(247, 147, 30, 0.3)',
         }}
       >
         <Check className="w-10 h-10 text-white" strokeWidth={3} />
@@ -130,8 +130,8 @@ export function SuccessScreen({
           transition={{ delay: 0.6 }}
           className="mt-6 px-5 py-2.5 rounded-full"
           style={{
-            background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05))',
-            border: '1.5px solid rgba(245,158,11,0.2)',
+            background: 'linear-gradient(135deg, rgba(247,147,30,0.1), rgba(247,147,30,0.05))',
+            border: '1.5px solid rgba(247,147,30,0.2)',
           }}
         >
           <span className="text-xl font-bold" style={{ color: tierData.accent }}>

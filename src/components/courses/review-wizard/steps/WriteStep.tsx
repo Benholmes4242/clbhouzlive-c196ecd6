@@ -51,8 +51,9 @@ const getSpeechRecognition = (): any => {
 /* ── VoiceMic sub-component ── */
 type VoiceState = 'idle' | 'listening' | 'processing';
 
-function VoiceMic({ onTranscript }: { onTranscript: (text: string) => void }) {
+function VoiceMic({ onTranscript, onStateChange }: { onTranscript: (text: string) => void; onStateChange?: (state: VoiceState) => void }) {
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
+  const updateVoiceState = useCallback((s: VoiceState) => { setVoiceState(s); onStateChange?.(s); }, [onStateChange]);
   const recognitionRef = useRef<any>(null);
   const SpeechRecognitionClass = getSpeechRecognition();
 
@@ -68,27 +69,27 @@ function VoiceMic({ onTranscript }: { onTranscript: (text: string) => void }) {
         .map(r => r[0].transcript)
         .join('');
       if (transcript.trim()) {
-        setVoiceState('processing');
+        updateVoiceState('processing');
         onTranscript(transcript.trim());
-        setTimeout(() => setVoiceState('idle'), 400);
+        setTimeout(() => updateVoiceState('idle'), 400);
       }
     };
 
-    recognition.onerror = () => setVoiceState('idle');
+    recognition.onerror = () => updateVoiceState('idle');
     recognition.onend = () => {
-      if (voiceState === 'listening') setVoiceState('idle');
+      if (voiceState === 'listening') updateVoiceState('idle');
     };
 
     recognitionRef.current = recognition;
     recognition.start();
-    setVoiceState('listening');
-  }, [SpeechRecognitionClass, onTranscript, voiceState]);
+    updateVoiceState('listening');
+  }, [SpeechRecognitionClass, onTranscript, voiceState, updateVoiceState]);
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
     recognitionRef.current = null;
-    setVoiceState('idle');
-  }, []);
+    updateVoiceState('idle');
+  }, [updateVoiceState]);
 
   useEffect(() => {
     return () => {
@@ -167,6 +168,7 @@ export function WriteStep({
   const titleLength = countGraphemes(title);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
+  const [currentVoiceState, setCurrentVoiceState] = useState<VoiceState>('idle');
 
   // Mention state
   const [showMentions, setShowMentions] = useState(false);
@@ -368,9 +370,9 @@ export function WriteStep({
             className="flex items-center gap-3 px-4 py-2.5"
             style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
           >
-            <VoiceMic onTranscript={handleVoiceTranscript} />
+            <VoiceMic onTranscript={handleVoiceTranscript} onStateChange={setCurrentVoiceState} />
             <span className="text-[12px] text-muted-foreground flex-1">
-              Tap mic to speak
+              {currentVoiceState === 'listening' ? 'Listening… tap to stop' : 'Tap mic to speak'}
             </span>
             {reviewLength > 0 && (
               <span className={cn(
