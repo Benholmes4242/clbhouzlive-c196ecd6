@@ -540,7 +540,6 @@ export function CoursesLeaderboardView() {
           {/* Stat pills */}
           {[
             { val: `${userPlayedPct}%`, label: 'of list' },
-            { val: clubRankLabel, label: 'in club' },
           ].map((s, i) => (
             <div key={i} style={{
               background: 'rgba(255,255,255,0.06)', borderRadius: 12,
