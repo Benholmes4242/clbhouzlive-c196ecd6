@@ -787,7 +787,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       </div>
 
       {/* ── BODY CONTENT (below hero) ── */}
-      <div className="flex flex-col px-4" style={{ gap: 20, paddingTop: 16, paddingBottom: 40 }}>
+      <div style={{ padding: 'clamp(12px,3vw,16px)', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* Season Status Panel */}
       {timeFilter === 'seasonal' && currentSeason && (
