@@ -7,14 +7,15 @@ interface TimeModeToggleProps {
 }
 
 /**
- * TimeModeToggle — Full-width segmented control for Season / All-Time.
+ * TimeModeToggle — Inline tab style that sits flush at the bottom of the green header.
+ * Rounded-t corners, active tab matches page bg, inactive is translucent white.
  */
 export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   value,
   onChange,
   seasonYear,
 }) => {
-  const yearLabel = String(seasonYear ?? new Date().getFullYear());
+  const yearLabel = `${seasonYear ?? new Date().getFullYear()} Season`;
 
   const options = [
     { id: 'seasonal' as const, label: yearLabel },
@@ -22,26 +23,28 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   ];
 
   return (
-    <div className="w-full">
-      <div className="flex gap-2 w-full">
-        {options.map((option) => {
-          const isActive = value === option.id;
-          return (
-            <button
-              key={option.id}
-              onClick={() => onChange(option.id)}
-              className={`flex-1 min-h-[36px] px-2 sm:px-4 text-xs sm:text-sm font-semibold transition-all active:scale-[0.97] ${
-                isActive
-                  ? 'text-white bg-foreground border-0'
-                  : 'text-muted-foreground bg-transparent border-[1.5px] border-border'
-              }`}
-              style={{ borderRadius: 8 }}
-            >
-              {option.label}
-            </button>
-          );
-        })}
-      </div>
+    <div className="flex" style={{ gap: 0 }}>
+      {options.map((t) => (
+        <button
+          key={t.id}
+          onClick={() => onChange(t.id)}
+          style={{
+            flex: 1,
+            padding: 'clamp(8px,2vw,10px) 0',
+            borderRadius: '10px 10px 0 0',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 'clamp(12px,3vw,13px)',
+            fontWeight: value === t.id ? 800 : 500,
+            fontFamily: 'DM Sans,system-ui,sans-serif',
+            background: value === t.id ? '#F0F2F5' : 'rgba(255,255,255,0.08)',
+            color: value === t.id ? '#0C0C0E' : 'rgba(255,255,255,0.65)',
+            transition: 'all 0.2s',
+          }}
+        >
+          {t.label}
+        </button>
+      ))}
     </div>
   );
 };

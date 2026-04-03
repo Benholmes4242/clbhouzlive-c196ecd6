@@ -12,6 +12,11 @@ interface SeasonSponsorCardProps {
   daysRemaining: number;
 }
 
+const GREEN = '#006747';
+const GREEN_DARK = '#004d36';
+const GREEN_MID = '#3EBD93';
+const GREEN_LIGHT = '#E8F5EF';
+
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
@@ -21,34 +26,33 @@ function ordinal(n: number): string {
 export const SeasonSponsorCard: React.FC<SeasonSponsorCardProps> = ({
   sponsorName,
   prizeDescription,
-  seasonColor,
   seasonLabel,
   leaderCourses,
   yourCourses,
   yourSeasonRank,
   totalSeasonPlayers,
-  daysRemaining,
 }) => {
   const gap = Math.max(0, leaderCourses - yourCourses);
   const progressPercent = leaderCourses > 0 ? Math.min(100, (yourCourses / leaderCourses) * 100) : 0;
+  const isLeading = yourCourses > 0 && yourCourses >= leaderCourses;
 
   return (
     <div
       className="relative overflow-hidden"
       style={{
-        borderRadius: 20,
-        border: `1.5px solid ${seasonColor}30`,
-        boxShadow: `0 0 24px ${seasonColor}08, 0 4px 16px rgba(0,0,0,0.05)`,
-        background: `linear-gradient(150deg, ${seasonColor}06, ${seasonColor}02)`,
+        borderRadius: 18,
+        border: `1.5px solid ${GREEN}20`,
+        boxShadow: `0 0 24px ${GREEN}08, 0 4px 16px rgba(0,0,0,0.05)`,
+        background: `linear-gradient(150deg, ${GREEN}08, ${GREEN}02)`,
       }}
     >
       {/* Shimmer overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `linear-gradient(105deg, transparent 35%, ${seasonColor}05 50%, transparent 65%)`,
+          background: `linear-gradient(105deg, transparent 35%, ${GREEN}06 50%, transparent 65%)`,
           backgroundSize: '200% 100%',
-          animation: 'shimmerSeason 4s linear infinite',
+          animation: 'shimS 4s linear infinite',
         }}
       />
 
@@ -56,7 +60,7 @@ export const SeasonSponsorCard: React.FC<SeasonSponsorCardProps> = ({
       <div
         style={{
           height: 3,
-          background: `linear-gradient(90deg, ${seasonColor}, ${seasonColor}20)`,
+          background: `linear-gradient(90deg, ${GREEN}, ${GREEN}30)`,
         }}
       />
 
@@ -65,20 +69,39 @@ export const SeasonSponsorCard: React.FC<SeasonSponsorCardProps> = ({
         <div className="flex items-start justify-between">
           <div>
             <p
-              className="text-[10px] font-medium uppercase tracking-wider"
-              style={{ color: 'hsl(var(--muted-foreground))' }}
+              style={{
+                fontSize: 10,
+                fontWeight: 500,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: '#6B7280',
+                fontFamily: 'DM Sans,system-ui,sans-serif',
+              }}
             >
-              Season sponsored by
+              Season Sponsored By
             </p>
-            <p className="text-[17px] font-black mt-0.5" style={{ color: 'hsl(var(--foreground))' }}>
+            <p
+              style={{
+                fontSize: 'clamp(16px,4vw,20px)',
+                fontWeight: 900,
+                color: '#0C0C0E',
+                fontFamily: 'DM Sans,system-ui,sans-serif',
+                marginTop: 2,
+              }}
+            >
               {sponsorName}
             </p>
           </div>
           <span
-            className="flex-shrink-0 px-3 py-1 text-[11px] font-bold rounded-full"
+            className="flex-shrink-0"
             style={{
-              backgroundColor: seasonColor,
+              padding: '4px 12px',
+              fontSize: 11,
+              fontWeight: 700,
+              borderRadius: 99,
+              backgroundColor: GREEN,
               color: 'white',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
             }}
           >
             🏆 Prize
@@ -87,42 +110,39 @@ export const SeasonSponsorCard: React.FC<SeasonSponsorCardProps> = ({
 
         {/* Prize box */}
         <div
-          className="px-3 py-2.5"
           style={{
+            padding: '10px 12px',
             borderRadius: 12,
-            backgroundColor: `${seasonColor}06`,
-            border: `1px solid ${seasonColor}12`,
+            backgroundColor: `${GREEN}08`,
+            border: `1px solid ${GREEN}15`,
           }}
         >
-          <p className="text-[13px] font-semibold" style={{ color: seasonColor }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: GREEN, fontFamily: 'DM Sans,system-ui,sans-serif' }}>
             🎁 {prizeDescription}
           </p>
-          <p
-            className="text-[11px] mt-1"
-            style={{ color: 'hsl(var(--muted-foreground))' }}
-          >
-            Most Top 100 courses played during {seasonLabel} wins
+          <p style={{ fontSize: 11, color: '#6B7280', marginTop: 4, fontFamily: 'DM Sans,system-ui,sans-serif' }}>
+            Most Top 100 courses played during {seasonLabel}
           </p>
         </div>
 
         {/* Race progress */}
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: '#0C0C0E', fontFamily: 'DM Sans,system-ui,sans-serif' }}>
               You — {yourCourses} this season
             </span>
-            <span className="text-[12px] font-semibold" style={{ color: seasonColor }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: GREEN, fontFamily: 'DM Sans,system-ui,sans-serif' }}>
               Leader — {leaderCourses}
             </span>
           </div>
 
           {/* Progress bar */}
           <div
-            className="w-full overflow-hidden"
             style={{
               height: 8,
               borderRadius: 4,
-              backgroundColor: 'hsl(var(--muted) / 0.4)',
+              backgroundColor: 'rgba(0,0,0,0.06)',
+              overflow: 'hidden',
             }}
           >
             <div
@@ -130,25 +150,25 @@ export const SeasonSponsorCard: React.FC<SeasonSponsorCardProps> = ({
                 width: `${progressPercent}%`,
                 height: '100%',
                 borderRadius: 4,
-                background: `linear-gradient(90deg, ${seasonColor}, ${seasonColor}99)`,
+                background: `linear-gradient(90deg, ${GREEN}, ${GREEN_MID})`,
                 transition: 'width 0.5s ease',
               }}
             />
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-[11px]" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              {gap > 0 ? `${gap} behind the lead` : gap === 0 && yourCourses > 0 ? "You're in the lead!" : 'Play a course to start'}
+            <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'DM Sans,system-ui,sans-serif' }}>
+              {yourCourses === 0 ? 'Play a course to start' : isLeading ? "You're in the lead! 🔥" : `${gap} courses behind the lead`}
             </span>
-            <span className="text-[11px] font-semibold" style={{ color: seasonColor }}>
-              {ordinal(yourSeasonRank)} of {totalSeasonPlayers}
+            <span style={{ fontSize: 11, fontWeight: 600, color: GREEN, fontFamily: 'DM Sans,system-ui,sans-serif' }}>
+              {yourSeasonRank === 0 ? '—' : ordinal(yourSeasonRank)} of {totalSeasonPlayers}
             </span>
           </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes shimmerSeason {
+        @keyframes shimS {
           0% { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
