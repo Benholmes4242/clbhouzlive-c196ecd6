@@ -28,7 +28,7 @@ export const useNavigationHandlers = () => {
     } else if (location.pathname === '/watch') {
       setActiveTab('watch');
     }
-  }, [location.pathname]);
+  }, [location.pathname, markCoursesAsSeen]);
 
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     // Track nav tab tap
