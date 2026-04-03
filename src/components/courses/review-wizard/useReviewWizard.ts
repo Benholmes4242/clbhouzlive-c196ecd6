@@ -409,13 +409,8 @@ export function useReviewWizard({
         });
       }
 
-      // For edit mode, go directly to success
-      // For new reviews, go to preview step first
-      if (isEditMode) {
-        onSuccess?.(ratingId);
-      } else {
-        onPreview?.(ratingId);
-      }
+      // Both edit and new reviews go to success
+      onSuccess?.(ratingId);
     },
     onError: (error) => {
       console.error('[useReviewWizard] Submit error:', error);
