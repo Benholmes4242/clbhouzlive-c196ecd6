@@ -506,8 +506,8 @@ export function useReviewWizard({
 
   const nextStep = useCallback(() => {
     setState(prev => {
-      // Only increment for numeric steps
-      if (typeof prev.step === 'number' && prev.step < 4) {
+      // Only increment for numeric steps, cap at 3
+      if (typeof prev.step === 'number' && prev.step < 3) {
         return { ...prev, step: (prev.step + 1) as WizardStepExtended };
       }
       return prev;
