@@ -147,7 +147,7 @@ export function PostStep({
 
       {/* Media block */}
       <div
-        className="rounded-[16px] p-3 mb-5 transition-all"
+        className="rounded-[16px] mb-5 transition-all"
         style={{
           border: media.length > 0
             ? '1.5px solid hsl(var(--border))'
@@ -155,6 +155,23 @@ export function PostStep({
           background: media.length > 0 ? 'transparent' : 'rgba(247,147,30,0.02)',
         }}
       >
+        {/* Header row with label + Add more link */}
+        <div className="flex items-center justify-between px-3 pt-3 pb-1">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.12em]">
+            Photos &amp; Videos · <span className="font-normal normal-case tracking-normal">optional</span>
+          </p>
+          {media.length > 0 && media.length < MAX_MEDIA_ITEMS && (
+            <button
+              type="button"
+              onClick={handlePickMedia}
+              className="text-[13px] font-bold bg-transparent border-none cursor-pointer active:scale-[0.95] transition-all"
+              style={{ color: '#F7931E' }}
+            >
+              + Add more
+            </button>
+          )}
+        </div>
+        <div className="px-3 pb-3">
         {permissionDenied && (
           <PermissionDeniedCard type={permissionDenied} onRetry={() => setPermissionDenied(null)} />
         )}
