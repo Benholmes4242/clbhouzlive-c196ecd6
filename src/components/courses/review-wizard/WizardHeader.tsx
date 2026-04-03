@@ -180,12 +180,12 @@ export function WizardHeader({
             className="text-[13px] font-semibold px-[14px] min-h-[36px] flex items-center rounded-full transition-all duration-200 active:scale-[0.96]"
             style={{
               background: isLastStep
-                ? (isNextEnabled ? '#f59e0b' : '#F5F5F7')
+                ? (isNextEnabled ? '#F7931E' : '#F5F5F7')
                 : (isNextEnabled ? '#1C1C1E' : '#F5F5F7'),
               color: isLastStep
                 ? (isNextEnabled ? '#FFFFFF' : '#AEAEB2')
                 : (isNextEnabled ? '#FFFFFF' : '#AEAEB2'),
-              boxShadow: isLastStep && isNextEnabled ? '0 2px 12px rgba(245,158,11,0.22)' : 'none',
+              boxShadow: isLastStep && isNextEnabled ? '0 2px 12px rgba(247,147,30,0.22)' : 'none',
               pointerEvents: isNextEnabled ? 'auto' : 'none',
             }}
           >

@@ -334,8 +334,8 @@ export function ReviewWizard({
                         isEditMode={isEditMode}
                         onViewReview={handleViewReview}
                         onDone={handleDone}
-                        onShareToClubhouse={handleShareFromPreview}
-                        isSharing={isSharing}
+                        onShareToClubhouse={!isEditMode ? handleShareFromPreview : undefined}
+                        isSharing={!isEditMode ? isSharing : false}
                       />
                     ) : wizard.state.step === 'share-success' ? (
                       <SuccessScreen

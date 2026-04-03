@@ -130,8 +130,8 @@ export function SuccessScreen({
           transition={{ delay: 0.6 }}
           className="mt-6 px-5 py-2.5 rounded-full"
           style={{
-            background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05))',
-            border: '1.5px solid rgba(245,158,11,0.2)',
+            background: 'linear-gradient(135deg, rgba(247,147,30,0.1), rgba(247,147,30,0.05))',
+            border: '1.5px solid rgba(247,147,30,0.2)',
           }}
         >
           <span className="text-xl font-bold" style={{ color: tierData.accent }}>

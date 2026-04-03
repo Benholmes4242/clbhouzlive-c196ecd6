@@ -113,7 +113,6 @@ export function useReviewWizard({
   isEditMode,
   existingRating,
   onSuccess,
-  onPreview,
   initialMediaFiles,
 }: UseReviewWizardOptions) {
   
