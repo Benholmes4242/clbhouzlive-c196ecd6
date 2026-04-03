@@ -199,43 +199,102 @@ function ProfileHubSheet({
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4">
 
-              {/* ── Profile header ── */}
-              <div className="flex items-center gap-3 py-3">
-                <SquircleAvatar
-                  size={52}
-                  src={activeProfile.avatarUrl}
-                  alt={activeProfile.name}
-                  fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
-                  hideRing
-                />
-                <div className="min-w-0">
-                  <div className="text-[16px] font-semibold text-foreground truncate">
-                    {activeProfile.name}
-                  </div>
-                  <p className="text-[12px] text-muted-foreground truncate">
-                    {activeProfile.type === 'business' ? 'Business account' : 'Personal account'}
-                  </p>
-                </div>
-              </div>
-
-              {/* ── Search bar ── */}
-              <button
-                type="button"
-                onClick={() => setSearchOpen(true)}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl active:scale-[0.98] transition-transform"
+              {/* ── Dark editorial header card ── */}
+              <div
+                className="relative rounded-[20px] overflow-hidden mb-4 mt-1"
                 style={{
-                  background: 'rgba(0,0,0,0.05)',
-                  border: '1px solid rgba(0,0,0,0.08)',
+                  background: 'linear-gradient(135deg, #1C1C1E, #2d2d30)',
+                  padding: '16px 18px 18px',
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.3-4.3" />
-                </svg>
-                <span className="text-[14px] text-muted-foreground">
-                  Search courses, players, businesses...
-                </span>
-              </button>
+                {/* Ambient amber glow */}
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    top: -20, right: -20,
+                    width: 120, height: 120,
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(247,147,30,0.25) 0%, transparent 70%)',
+                  }}
+                />
+
+                {/* Profile row */}
+                <div className="relative flex items-center gap-3 mb-4">
+                  <SquircleAvatar
+                    size={52}
+                    src={activeProfile.avatarUrl}
+                    alt={activeProfile.name}
+                    fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
+                    hideRing
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[17px] font-extrabold truncate" style={{ color: '#ffffff', letterSpacing: '-0.3px' }}>
+                      {activeProfile.name}
+                    </div>
+                    <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      {activeProfile.type === 'business' ? 'Business account' : 'Personal account'}
+                    </p>
+                  </div>
+                  {/* Search icon pill */}
+                  <button
+                    type="button"
+                    onClick={() => setSearchOpen(true)}
+                    className="flex items-center justify-center flex-shrink-0 active:scale-[0.94] transition-transform"
+                    style={{
+                      width: 36, height: 36, borderRadius: '50%',
+                      background: 'rgba(247,147,30,0.18)',
+                      border: '1px solid rgba(247,147,30,0.28)',
+                    }}
+                    aria-label="Search"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F7931E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"/>
+                      <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Echo AI Assistant feature card */}
+                <button
+                  type="button"
+                  onClick={() => handleNav('/echo')}
+                  className="relative w-full flex items-center gap-3 active:scale-[0.97] transition-all duration-150 overflow-hidden"
+                  style={{
+                    height: 62, borderRadius: 14, padding: '0 16px',
+                    background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
+                    border: 'none', cursor: 'pointer',
+                    boxShadow: '0 4px 20px rgba(247,147,30,0.35)',
+                  }}
+                >
+                  {/* Sheen overlay */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.12), transparent 60%)' }}
+                  />
+                  {/* Icon container */}
+                  <div
+                    className="flex items-center justify-center flex-shrink-0"
+                    style={{
+                      width: 38, height: 38, borderRadius: 10,
+                      background: 'rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    <AnimatedEchoWave size={22} color="#ffffff" active={true} />
+                  </div>
+                  {/* Text */}
+                  <div className="flex-1 text-left">
+                    <div className="text-[15px] font-extrabold" style={{ color: '#ffffff', letterSpacing: '-0.3px' }}>
+                      Echo AI Assistant
+                    </div>
+                    <div className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)', marginTop: 1 }}>
+                      Playing tips · course knowledge · advice
+                    </div>
+                  </div>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                  </svg>
+                </button>
+              </div>
 
               {/* ── Switch profile ── */}
               <div className="pb-3">
@@ -310,40 +369,9 @@ function ProfileHubSheet({
               {/* ── Divider ── */}
               <div className="h-px bg-border/50 -mx-4" />
 
-              {/* ── Quick actions — #3 vertical card layout ── */}
-              <div className="grid grid-cols-2 gap-2.5 py-4">
-                {quickActions.map(({ icon: Icon, label, route, badge, badgeColor, isEcho }) => (
-                  isEcho ? (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => handleNav(route)}
-                      className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl active:scale-[0.97] transition-all duration-150 overflow-hidden"
-                      style={{
-                        height: 80,
-                        background: 'linear-gradient(135deg, #F5A623 0%, #E8920A 100%)',
-                        border: 'none',
-                        boxShadow: '0 4px 16px rgba(245,166,35,0.40), 0 1px 4px rgba(0,0,0,0.08)',
-                      }}
-                    >
-                      {/* Sheen overlay */}
-                      <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%)',
-                        }}
-                      />
-
-                      <AnimatedEchoWave size={28} color="#ffffff" active={true} />
-
-                      <span
-                        className="text-[13px] font-extrabold leading-none w-full text-left"
-                        style={{ color: '#ffffff', letterSpacing: '-0.1px' }}
-                      >
-                        {label}
-                      </span>
-                    </button>
-                  ) : (
+              {/* ── Quick actions — 3 column grid ── */}
+              <div className="grid grid-cols-3 gap-2 py-4">
+                {quickActions.map(({ icon: Icon, label, route, badge, badgeColor }) => (
                     <button
                       key={label}
                       type="button"
