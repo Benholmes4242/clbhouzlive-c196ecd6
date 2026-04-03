@@ -735,9 +735,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           }}
         >
           <SquircleAvatar
-            src={activeProfile?.avatarUrl ?? null}
+            src={userPhotoUrl}
             size={38}
-            fallback={activeProfile?.name?.charAt(0) ?? '?'}
+            fallback={currentUserEntry?.display_name?.charAt(0) ?? user?.email?.charAt(0) ?? '?'}
             hideRing
           />
           <div style={{ flex: 1 }}>
