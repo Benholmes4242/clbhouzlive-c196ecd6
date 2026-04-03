@@ -84,33 +84,61 @@ const LeaderboardLoadingSkeleton = () => (
   </div>
 );
 
-/** Full-page skeleton for initial Championship tab load — green-tinted */
+/** Full-page skeleton for initial Championship tab load — matches Augusta layout */
 const ChampionshipPageSkeleton = () => (
   <div className="flex flex-col" style={{ background: '#F8FAFC', minHeight: '100%' }}>
-    {/* Green hero header skeleton */}
-    <div style={{ background: 'linear-gradient(160deg, #003D28, #006747)', padding: '18px 18px 0' }}>
-      <Skeleton className="h-3 w-40 rounded mb-4" style={{ background: 'rgba(255,255,255,0.15)' }} />
-      <Skeleton className="h-16 w-full rounded-[14px] mb-5" style={{ background: 'rgba(255,255,255,0.1)' }} />
-      <div className="flex gap-3">
-        <Skeleton className="h-10 flex-1 rounded-t-[10px]" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        <Skeleton className="h-10 flex-1 rounded-t-[10px]" style={{ background: 'rgba(255,255,255,0.06)' }} />
+    {/* Green hero header skeleton — full bleed, matches real header */}
+    <div style={{
+      background: 'linear-gradient(160deg, #003D28 0%, #006747 55%, #005238 100%)',
+      padding: '18px 18px 0',
+    }}>
+      {/* Active label */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
+        <Skeleton className="h-2.5 w-48 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
+      </div>
+      {/* Position band */}
+      <div style={{
+        background: 'rgba(255,255,255,0.1)',
+        borderRadius: 14,
+        padding: '12px 14px',
+        marginBottom: 20,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+      }}>
+        <Skeleton className="w-[38px] h-[38px] rounded-xl flex-shrink-0" style={{ background: 'rgba(255,255,255,0.18)' }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, gap: 6 }}>
+          <Skeleton className="h-2.5 w-24 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
+          <Skeleton className="h-5 w-36 rounded" style={{ background: 'rgba(255,255,255,0.2)' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 6, alignItems: 'flex-end' }}>
+          <Skeleton className="h-2.5 w-20 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
+          <Skeleton className="h-5 w-10 rounded" style={{ background: 'rgba(255,255,255,0.2)' }} />
+        </div>
+      </div>
+      {/* Time toggle tabs */}
+      <div style={{ display: 'flex', gap: 3 }}>
+        <div style={{ flex: 1, height: 40, borderRadius: '10px 10px 0 0', background: '#F8FAFC' }} />
+        <div style={{ flex: 1, height: 40, borderRadius: '10px 10px 0 0', background: 'rgba(255,255,255,0.08)' }} />
       </div>
     </div>
-    <div className="flex flex-col gap-3 p-4">
+    {/* Body skeleton */}
+    <div style={{ padding: '16px 16px 40px', display: 'flex', flexDirection: 'column' as const, gap: 12 }}>
       {/* Sponsor card skeleton */}
-      <Skeleton className="h-[180px] w-full rounded-[18px]" />
-      {/* Scope toggle skeleton */}
-      <Skeleton className="h-10 w-full rounded-[12px]" />
+      <Skeleton className="h-[190px] w-full rounded-[18px]" />
+      {/* Scope selector skeleton */}
+      <Skeleton className="h-10 w-full rounded-xl" />
       {/* Leaderboard rows */}
-      {[...Array(6)].map((_, i) => (
-        <div key={i} className="flex items-center gap-3 px-3 py-3">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3">
           <Skeleton className="w-7 h-5 rounded" />
-          <Skeleton className="w-11 h-11 rounded-lg" />
-          <div className="flex-1 space-y-1.5">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-24" />
+          <Skeleton className="w-11 h-11 rounded-xl" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 rounded" style={{ width: `${[55,70,60,75,50][i]}%` }} />
+            <Skeleton className="h-3 rounded" style={{ width: `${[40,55,45,60,35][i]}%` }} />
           </div>
-          <Skeleton className="w-10 h-8 rounded" />
+          <Skeleton className="w-10 h-7 rounded" />
         </div>
       ))}
     </div>
