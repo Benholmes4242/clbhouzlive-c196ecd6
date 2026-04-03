@@ -228,7 +228,7 @@ export function RateStep({
     country: course.country,
   }) : '';
 
-  const overallTier = overallTouched && rating !== null ? getScoreTier(rating) : null;
+  const overallTier = rating !== null ? getScoreTier(rating) : null;
 
   return (
     <motion.div
