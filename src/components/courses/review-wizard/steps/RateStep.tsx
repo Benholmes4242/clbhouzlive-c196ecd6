@@ -192,7 +192,6 @@ export function RateStep({
   onRatingChange, 
   onBreakdownChange 
 }: RateStepProps) {
-  const [overallTouched, setOverallTouched] = useState(() => rating !== null);
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     BREAKDOWN_FIELDS.forEach(({ key }) => {
