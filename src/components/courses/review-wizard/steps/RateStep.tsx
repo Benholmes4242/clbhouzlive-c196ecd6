@@ -213,12 +213,6 @@ export function RateStep({
     });
   }, [breakdowns]);
 
-  useEffect(() => {
-    if (rating !== null && !overallTouched) {
-      setOverallTouched(true);
-    }
-  }, [rating]);
-
   const handleOverallChange = useCallback((val: number) => {
     onRatingChange(val);
   }, [onRatingChange]);
