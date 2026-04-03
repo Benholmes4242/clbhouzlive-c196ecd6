@@ -115,6 +115,7 @@ export function CoursesLeaderboardView() {
     else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
     return getSeasonConfig(id).themeColor;
   }, [seasonCalendar]);
+
   // ─── Filter state with persistence ───────────────────────────────
   const [sort, setSort] = useState<CourseSortType>(() => {
     const saved = readSavedFilters();
@@ -183,7 +184,6 @@ export function CoursesLeaderboardView() {
     }
   }, [scope]);
 
-
   // Fetch course leaderboard data
   const { 
     data, 
@@ -216,6 +216,28 @@ export function CoursesLeaderboardView() {
   const allCourses = useMemo(() => {
     return data?.pages.flatMap(page => page.entries) ?? [];
   }, [data?.pages]);
+
+  // ─── Computed stats for header ────────────────────────────────────
+  const userPlayedCount = useMemo(() => {
+    return allCourses.filter(c => c.current_user_played).length;
+  }, [allCourses]);
+
+  const userPlayedPct = useMemo(() => {
+    if (allCourses.length === 0) return 0;
+    return Math.round((userPlayedCount / allCourses.length) * 100);
+  }, [userPlayedCount, allCourses.length]);
+
+  const clubRankLabel = '—';
+
+  const currentSeasonId = useMemo(() => {
+    const current = seasonCalendar?.find(s => s.is_current);
+    if (!current) return 'major' as SeasonId;
+    const lower = current.name.toLowerCase();
+    if (lower.includes('pre')) return 'preseason' as SeasonId;
+    if (lower.includes('summer')) return 'summer' as SeasonId;
+    if (lower.includes('off')) return 'offseason' as SeasonId;
+    return 'major' as SeasonId;
+  }, [seasonCalendar]);
 
   // ─── Infinite scroll via IntersectionObserver ─────────────────────
   const isFetchingRef = useRef(isFetchingNextPage);
@@ -405,301 +427,411 @@ export function CoursesLeaderboardView() {
   // Loading skeleton for initial load
   if (isLoading && allCourses.length === 0 && !isError) {
     return (
-      <div className="space-y-4 pb-8 animate-fade-in">
-        {/* Bucket list strip skeleton */}
-        <Skeleton className="h-[72px] w-full rounded-xl" />
-        {/* Season spotlight skeleton */}
-        <Skeleton className="h-[88px] w-full rounded-2xl" />
-        {/* Filter pills row */}
-        <div className="flex gap-2 px-4">
-          <Skeleton className="h-9 w-20 rounded-full" />
-          <Skeleton className="h-9 w-20 rounded-full" />
-          <Skeleton className="h-9 w-20 rounded-full" />
-          <Skeleton className="h-9 w-20 rounded-full" />
-        </div>
-        {/* Course rows */}
-        <div className="space-y-0">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border">
-              <Skeleton className="w-6 h-5 rounded" />
-              <Skeleton className="w-14 h-14 rounded-xl flex-shrink-0" />
-              <div className="flex-1 space-y-1.5">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
-                <Skeleton className="h-3 w-2/3" />
-              </div>
-              <Skeleton className="w-6 h-10 rounded" />
+      <div style={{ display: 'flex', flexDirection: 'column', background: '#F8FAFC', minHeight: '100%' }}>
+        {/* Dark header skeleton */}
+        <div style={{ background: 'linear-gradient(160deg, #1a1a2e, #2d1f3d, #1f1535)', padding: '16px 16px 0' }}>
+          <Skeleton className="h-3 w-52 rounded mb-4" style={{ background: 'rgba(255,255,255,0.12)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+            <div style={{ flex: 1 }}>
+              <Skeleton className="h-3 w-24 rounded mb-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              <Skeleton className="h-9 w-32 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
             </div>
-          ))}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Skeleton className="h-14 w-16 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              <Skeleton className="h-14 w-16 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 2 }}>
+            <Skeleton className="h-10 flex-1 rounded-t-[8px]" style={{ background: 'rgba(255,255,255,0.12)' }} />
+            <Skeleton className="h-10 flex-1 rounded-t-[8px]" style={{ background: 'rgba(255,255,255,0.07)' }} />
+            <Skeleton className="h-10 flex-1 rounded-t-[8px]" style={{ background: 'rgba(255,255,255,0.07)' }} />
+          </div>
+        </div>
+
+        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Region pills */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[60, 56, 52, 60, 80].map((w, i) => <Skeleton key={i} className="h-8 rounded-full" style={{ width: w }} />)}
+          </div>
+
+          {/* Circle rounds */}
+          <Skeleton className="h-4 w-48 rounded mb-1" />
+          <div style={{ display: 'flex', gap: 10 }}>
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-[70px] w-[180px] rounded-xl flex-shrink-0" />
+            ))}
+          </div>
+
+          {/* Season spotlight */}
+          <Skeleton className="h-[168px] w-full rounded-2xl" />
+
+          {/* Rankings header */}
+          <div>
+            <Skeleton className="h-6 w-48 rounded mb-2" />
+            <Skeleton className="h-4 w-64 rounded" />
+          </div>
+
+          {/* Podium */}
+          <Skeleton className="h-[200px] w-full rounded-2xl" />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Skeleton className="h-[148px] flex-1 rounded-2xl" />
+            <Skeleton className="h-[148px] flex-1 rounded-2xl" />
+          </div>
+
+          {/* Row list */}
+          <div style={{ background: '#FFFFFF', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.07)' }}>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px',
+                borderBottom: i < 4 ? '1px solid rgba(0,0,0,0.07)' : 'none',
+              }}>
+                <Skeleton className="w-6 h-5 rounded" />
+                <Skeleton className="w-[60px] h-[44px] rounded-[10px]" />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton className="h-4 rounded" style={{ width: `${[75, 60, 70, 55, 65][i]}%` }} />
+                  <Skeleton className="h-3 rounded" style={{ width: `${[55, 45, 50, 40, 55][i]}%` }} />
+                </div>
+                <Skeleton className="h-4 w-16 rounded" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col" style={{ gap: 20 }}>
-      {/* 1. Recently Played by Your Circle - TOP */}
-      {circleLoading ? (
-        <section className="space-y-3 -mx-5">
-          <div className="px-5">
-            <Skeleton className="h-5 w-48" />
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+
+      {/* ── DARK HERO HEADER ── */}
+      <div style={{
+        background: 'linear-gradient(160deg, #1a1a2e 0%, #2d1f3d 60%, #1f1535 100%)',
+        padding: 'clamp(14px,3vw,18px) clamp(14px,4vw,18px) 0',
+        position: 'relative', overflow: 'hidden', flexShrink: 0,
+      }}>
+        {/* Decorative ambient glows */}
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(247,147,30,0.06)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: 20, right: -10, width: 100, height: 100, borderRadius: '50%', background: 'rgba(247,147,30,0.04)', pointerEvents: 'none' }} />
+
+        {/* Season label */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 'clamp(8px,2vw,12px)' }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }} />
+          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(9px,2.5vw,11px)', fontWeight: 600, fontFamily: 'DM Sans, system-ui, sans-serif', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+            Course Rankings · {getSeasonConfig(currentSeasonId ?? 'major').title}
+          </span>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'clamp(14px,3.5vw,20px)' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(10px,2.8vw,12px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif', marginBottom: 2 }}>
+              You've played
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <span style={{ color: '#F7931E', fontSize: 'clamp(28px,7.5vw,36px)', fontWeight: 800, fontFamily: 'DM Sans, system-ui, sans-serif', lineHeight: 1 }}>
+                {userPlayedCount}
+              </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(12px,3.2vw,14px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif' }}>
+                courses
+              </span>
+            </div>
           </div>
-          <div className="flex gap-3 overflow-x-auto pl-4 pr-4 scrollbar-hide">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[170px]">
-                <Skeleton className="h-[128px] w-full rounded-2xl mb-2" />
-                <Skeleton className="h-4 w-32 mb-1" />
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-5 w-5 rounded-full" />
-                  <Skeleton className="h-3 w-20" />
-                </div>
+
+          {/* Stat pills */}
+          {[
+            { val: `${userPlayedPct}%`, label: 'of list' },
+            { val: clubRankLabel, label: 'in club' },
+          ].map((s, i) => (
+            <div key={i} style={{
+              background: 'rgba(255,255,255,0.06)', borderRadius: 12,
+              padding: 'clamp(8px,2vw,10px) clamp(10px,2.5vw,14px)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              minWidth: 56,
+            }}>
+              <span style={{ color: '#fff', fontSize: 'clamp(15px,4vw,19px)', fontWeight: 800, fontFamily: 'DM Sans, system-ui, sans-serif', lineHeight: 1 }}>
+                {s.val}
+              </span>
+              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 'clamp(9px,2.4vw,11px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif', marginTop: 2 }}>
+                {s.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Sort tabs — flush to bottom */}
+        <div style={{ display: 'flex', gap: 2 }}>
+          {[
+            { id: 'highest_rated', label: 'Highest Rated' },
+            { id: 'most_played', label: 'Most Played' },
+            { id: 'rising', label: 'Trending' },
+          ].map(t => (
+            <button
+              key={t.id}
+              onClick={() => handleSortChange(t.id as CourseSortType)}
+              style={{
+                flex: 1, padding: 'clamp(8px,2vw,10px) 0', borderRadius: '8px 8px 0 0',
+                border: 'none', cursor: 'pointer',
+                fontSize: 'clamp(10px,2.8vw,12px)',
+                fontWeight: sort === t.id ? 800 : 500,
+                fontFamily: 'DM Sans, system-ui, sans-serif',
+                background: sort === t.id ? '#F8FAFC' : 'rgba(255,255,255,0.07)',
+                color: sort === t.id ? '#0C0C0E' : 'rgba(255,255,255,0.55)',
+                transition: 'all 0.2s',
+              }}
+              className="active:scale-[0.97] transition-all"
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── LIGHT BODY ZONE ── */}
+      <div style={{ background: '#F8FAFC', flex: 1, padding: 'clamp(12px,3vw,16px) 0' }}>
+
+        {/* Region pills */}
+        <div style={{ padding: '0 clamp(12px,3vw,16px)', marginBottom: 14 }}>
+          <CourseRegionPills
+            value={quickRegion}
+            onChange={(r) => {
+              handleScopeChange(r === 'global' || r === 'row' ? 'global' : 'country');
+              setQuickRegion(r);
+              if (r !== 'global') {
+                setSelectedRegion(null);
+                setSelectedSubRegion(null);
+              }
+            }}
+          />
+        </div>
+
+        {/* Circle Rounds — compact pill format */}
+        <div style={{ padding: '0 clamp(12px,3vw,16px)', marginBottom: 14 }}>
+          {circleLoading ? (
+            <div>
+              <Skeleton className="h-4 w-48 rounded mb-3" />
+              <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
+                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[70px] rounded-xl flex-shrink-0" style={{ width: 180 }} />)}
               </div>
-            ))}
-          </div>
-        </section>
-      ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-        <section className="-mx-5">
-          <h3 className="text-xl font-bold text-foreground px-5 mb-3" style={{ letterSpacing: '-0.3px' }}>
-            Your Circle's Recent Rounds
-          </h3>
-          <div className="relative">
-            <div className="overflow-x-auto pb-2 px-5 scrollbar-hide">
-              <div className="flex gap-4">
+            </div>
+          ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
+            <div>
+              <h3 style={{ fontSize: 'clamp(14px,3.8vw,16px)', fontWeight: 800, color: '#0C0C0E', fontFamily: 'DM Sans, system-ui, sans-serif', marginBottom: 10, letterSpacing: '-0.3px' }}>
+                Your Circle's Recent Rounds
+              </h3>
+              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }} className="scrollbar-hide">
                 {circleRecentRounds.slice(0, 8).map((round: any) => (
                   <button
                     key={round.id}
                     onClick={() => handleCourseClick(round.course_id)}
-                    className="w-[190px] flex-shrink-0 text-left group active:scale-[0.97] transition-transform"
+                    style={{
+                      flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
+                      background: '#FFFFFF', borderRadius: 12,
+                      padding: '8px 10px',
+                      border: '1px solid rgba(0,0,0,0.07)',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                      cursor: 'pointer', textAlign: 'left',
+                      maxWidth: 220,
+                    }}
+                    className="active:scale-[0.97] transition-all"
                   >
-                    {/* Course Image */}
-                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-2">
-                      {round.golf_courses?.thumbnail_image ? (
-                        <img
-                          src={round.golf_courses.thumbnail_image}
-                          alt={round.golf_courses.name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <span className="text-muted-foreground text-xs">No image</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Course Name — single line truncated */}
-                    <h4 className="font-semibold text-foreground truncate leading-tight" style={{ fontSize: 15 }}>
-                      {round.golf_courses?.name}
-                    </h4>
-                    
-                    {/* Row 2: Avatar + Username */}
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <SquircleAvatar
-                        size={20}
-                        src={round.user_profiles?.profile_photo_url}
-                        alt={round.user_profiles?.display_name}
-                        fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
-                        hideRing
+                    {/* Course thumbnail */}
+                    {round.golf_courses?.thumbnail_image ? (
+                      <img
+                        src={round.golf_courses.thumbnail_image}
+                        alt={round.golf_courses?.name}
+                        style={{ width: 52, height: 52, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+                        loading="lazy"
                       />
-                      <span className="text-sm text-muted-foreground truncate">
-                        {round.user_profiles?.display_name}
-                      </span>
-                    </div>
+                    ) : (
+                      <div style={{ width: 52, height: 52, borderRadius: 10, background: '#e5e7eb', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: 9, color: '#9ca3af' }}>No img</span>
+                      </div>
+                    )}
 
-                    {/* Row 3: Time ago + Rating */}
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {formatDistanceToNow(new Date(round.created_at), { addSuffix: true })}
-                      </span>
-                      {round.rating && (
-                        <>
-                          <span className="text-xs text-muted-foreground/40">·</span>
-                          <div className="flex items-center">
-                            <span className="font-bold" style={{ color: 'hsl(var(--accent-amber))', fontSize: 14 }}>
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0C0C0E', fontFamily: 'DM Sans, system-ui, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {round.golf_courses?.name}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3 }}>
+                        <SquircleAvatar
+                          size={14}
+                          src={round.user_profiles?.profile_photo_url}
+                          alt={round.user_profiles?.display_name}
+                          fallback={(round.user_profiles?.display_name?.[0] ?? '?').toUpperCase()}
+                          hideRing
+                        />
+                        <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'DM Sans, system-ui, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {round.user_profiles?.display_name}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                        <span style={{ fontSize: 10, color: '#9CA3AF', fontFamily: 'DM Sans, system-ui, sans-serif' }}>
+                          {formatDistanceToNow(new Date(round.created_at), { addSuffix: true })}
+                        </span>
+                        {round.rating && (
+                          <>
+                            <span style={{ fontSize: 10, color: '#d1d5db' }}>·</span>
+                            <span style={{ fontSize: 12, fontWeight: 800, color: '#F7931E', fontFamily: 'DM Sans, system-ui, sans-serif' }}>
                               {round.rating.toFixed(1)}
                             </span>
-                          </div>
-                        </>
-                      )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </button>
                 ))}
               </div>
             </div>
-            {/* Right fade-out hint */}
-            <div className="absolute top-0 right-0 bottom-2 w-8 pointer-events-none" style={{ background: 'linear-gradient(to right, transparent, hsl(var(--background)))' }} />
-          </div>
-          
-          {/* Pill-style pagination dots */}
-          <div className="flex justify-center gap-2 mt-3">
-            {circleRecentRounds.slice(0, Math.min(4, circleRecentRounds.length)).map((_: any, index: number) => (
-              <div 
-                key={index}
-                className="rounded-full transition-colors"
-                style={index === 0 
-                   ? { width: 20, height: 6, background: 'hsl(var(--accent-amber))' }
-                  : { width: 6, height: 6, background: 'hsl(var(--border))' }
-                }
-              />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {/* 1b. Season Spotlight — NEW */}
-      <CourseSeasonSpotlight onCourseClick={handleCourseClick} />
-
-      {/* 1c. Bucket List Strip — NEW */}
-      <div className="-mx-3">
-        <BucketListStrip onCourseClick={handleCourseClick} />
-      </div>
-
-      {/* 2. Sort tabs — single row */}
-      <div className="mt-4">
-        <CourseFilters
-          sort={sort}
-          onSortChange={handleSortChange}
-        />
-      </div>
-
-      {/* 2b. Region pills — NEW */}
-      <CourseRegionPills
-        value={quickRegion}
-        onChange={(r) => {
-          handleScopeChange(r === 'global' || r === 'row' ? 'global' : 'country');
-          setQuickRegion(r);
-          if (r !== 'global') {
-            setSelectedRegion(null);
-            setSelectedSubRegion(null);
-          }
-        }}
-      />
-
-      {/* Course Rankings Section */}
-      <section className="-mx-3">
-        <div className="px-3 mb-5">
-          <h2 className="text-2xl font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
-          <p className="text-base text-muted-foreground mt-0.5">
-            {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-            {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-            {sort === 'rising' && `The world's greatest courses trending right now${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-          </p>
+          ) : null}
         </div>
 
-        {/* Initial error state */}
-        {isError && allCourses.length === 0 ? (
-          <InitialErrorState onRetry={() => refetch()} />
-        ) : (
-          <>
-            {/* Updating overlay */}
-            <div className={isFetching && !isFetchingNextPage ? 'opacity-60' : ''}>
-              {/* Podium (conditional) */}
-              {showPodium && (
-                <CoursePodium 
-                  courses={podiumCourses.map(c => ({
-                    course_id: c.course_id,
-                    course_name: c.course_name,
-                    country: c.country,
-                    sub_country: c.sub_country,
-                    thumbnail_url: c.thumbnail_url,
-                    avg_rating: c.avg_rating,
-                    times_played: c.times_played,
-                    rank_change: c.rank_change,
-                  }))}
-                  sort={sort === 'rising' ? 'rising' : sort === 'highest_rated' ? 'highest_rated' : 'most_played'}
-                  seasonColor={seasonThemeColor}
-                  onCourseClick={handleCourseClick}
-                />
+        {/* Season Spotlight */}
+        <div style={{ padding: '0 clamp(12px,3vw,16px)', marginBottom: 14 }}>
+          <CourseSeasonSpotlight onCourseClick={handleCourseClick} />
+        </div>
+
+        {/* Bucket List Strip */}
+        <div style={{ marginBottom: 14 }}>
+          <BucketListStrip onCourseClick={handleCourseClick} />
+        </div>
+
+        {/* Course Rankings Section */}
+        <div style={{ padding: '0 clamp(12px,3vw,16px)' }}>
+          {/* Rankings header */}
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ fontSize: 'clamp(20px,5.5vw,24px)', fontWeight: 800, color: '#0C0C0E', fontFamily: 'DM Sans, system-ui, sans-serif', letterSpacing: '-0.3px', margin: 0 }}>
+              Course Rankings
+            </h2>
+            <p style={{ fontSize: 'clamp(12px,3.2vw,14px)', color: '#6B7280', fontFamily: 'DM Sans, system-ui, sans-serif', marginTop: 4, margin: 0 }}>
+              {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+              {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+              {sort === 'rising' && `The world's greatest courses trending right now${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            </p>
+          </div>
+
+          {/* Initial error state */}
+          {isError && allCourses.length === 0 ? (
+            <InitialErrorState onRetry={() => refetch()} />
+          ) : (
+            <>
+              {/* Updating overlay */}
+              <div className={isFetching && !isFetchingNextPage ? 'opacity-60' : ''}>
+                {/* Podium (conditional) */}
+                {showPodium && (
+                  <CoursePodium 
+                    courses={podiumCourses.map(c => ({
+                      course_id: c.course_id,
+                      course_name: c.course_name,
+                      country: c.country,
+                      sub_country: c.sub_country,
+                      thumbnail_url: c.thumbnail_url,
+                      avg_rating: c.avg_rating,
+                      times_played: c.times_played,
+                      rank_change: c.rank_change,
+                    }))}
+                    sort={sort === 'rising' ? 'rising' : sort === 'highest_rated' ? 'highest_rated' : 'most_played'}
+                    seasonColor={seasonThemeColor}
+                    onCourseClick={handleCourseClick}
+                  />
+                )}
+
+                {/* Rankings List — white card container */}
+                <div
+                  ref={listContainerRef}
+                  style={{
+                    background: '#FFFFFF', borderRadius: 16, overflow: 'hidden',
+                    border: '1px solid rgba(0,0,0,0.07)',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                    marginTop: showPodium ? 16 : 0,
+                  }}
+                >
+                  {listCourses.length === 0 && allCourses.length === 0 && !isLoading ? (
+                    <div className="py-8">
+                      <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
+                    </div>
+                  ) : useVirtualization && virtualizedContent ? (
+                    // Virtualized list for large entry counts
+                    <div
+                      className="relative"
+                      style={{ height: virtualizedContent.totalHeight }}
+                    >
+                      <div
+                        className="absolute inset-x-0"
+                        style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
+                      >
+                        {virtualizedContent.visibleEntries.map((course, i) => (
+                          <CourseRankingRow
+                            key={course.course_id}
+                            course={{
+                              ...course,
+                              unique_players: course.unique_players || course.times_played,
+                              rank_change: course.rank_change || 0,
+                              is_trending: course.is_trending || false,
+                              is_hall_of_fame: course.is_hall_of_fame || false,
+                              prestige_tags: course.prestige_tags || [],
+                              current_user_played: course.current_user_played || false,
+                              current_user_play_count: course.current_user_play_count || 0,
+                            }}
+                            rank={(virtualizedContent.startIndex + i) + 1}
+                            sort={sort}
+                            seasonColor={seasonThemeColor}
+                            onClick={() => handleCourseClick(course.course_id)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    // Non-virtualized list
+                    listCourses.map((course, index) => (
+                      <CourseRankingRow
+                        key={course.course_id}
+                        course={{
+                          ...course,
+                          unique_players: course.unique_players || course.times_played,
+                          rank_change: course.rank_change || 0,
+                          is_trending: course.is_trending || false,
+                          is_hall_of_fame: course.is_hall_of_fame || false,
+                          prestige_tags: course.prestige_tags || [],
+                          current_user_played: course.current_user_played || false,
+                          current_user_play_count: course.current_user_play_count || 0,
+                        }}
+                        rank={index + 1}
+                        sort={sort}
+                        seasonColor={seasonThemeColor}
+                        onClick={() => handleCourseClick(course.course_id)}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Sentinel + loading skeleton for infinite scroll */}
+              {hasNextPage && !isError && (
+                <div ref={sentinelRef}>
+                  {isFetchingNextPage && <CourseLeaderboardSkeleton />}
+                </div>
               )}
 
-              {/* Rankings List */}
-              <div ref={listContainerRef} className="flex flex-col relative">
-                {listCourses.length === 0 && allCourses.length === 0 && !isLoading ? (
-                  <div className="py-8">
-                    <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
-                  </div>
-                ) : useVirtualization && virtualizedContent ? (
-                  // Virtualized list for large entry counts
-                  <div
-                    className="relative"
-                    style={{ height: virtualizedContent.totalHeight }}
-                  >
-                    <div
-                      className="absolute inset-x-0"
-                      style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
-                    >
-                      {virtualizedContent.visibleEntries.map((course, i) => (
-                        <CourseRankingRow
-                          key={course.course_id}
-                          course={{
-                            ...course,
-                            unique_players: course.unique_players || course.times_played,
-                            rank_change: course.rank_change || 0,
-                            is_trending: course.is_trending || false,
-                            is_hall_of_fame: course.is_hall_of_fame || false,
-                            prestige_tags: course.prestige_tags || [],
-                            current_user_played: course.current_user_played || false,
-                            current_user_play_count: course.current_user_play_count || 0,
-                          }}
-                          rank={(virtualizedContent.startIndex + i) + 1}
-                          sort={sort}
-                          seasonColor={seasonThemeColor}
-                          onClick={() => handleCourseClick(course.course_id)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  // Non-virtualized list
-                  listCourses.map((course, index) => (
-                    <CourseRankingRow
-                      key={course.course_id}
-                      course={{
-                        ...course,
-                        unique_players: course.unique_players || course.times_played,
-                        rank_change: course.rank_change || 0,
-                        is_trending: course.is_trending || false,
-                        is_hall_of_fame: course.is_hall_of_fame || false,
-                        prestige_tags: course.prestige_tags || [],
-                        current_user_played: course.current_user_played || false,
-                        current_user_play_count: course.current_user_play_count || 0,
-                      }}
-                      rank={index + 1}
-                      sort={sort}
-                      seasonColor={seasonThemeColor}
-                      onClick={() => handleCourseClick(course.course_id)}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
+              {/* Inline retry on pagination error */}
+              {isError && !isFetchingNextPage && allCourses.length > 0 && (
+                <InlineRetryCard onRetry={() => fetchNextPage()} />
+              )}
 
-            {/* Sentinel + loading skeleton for infinite scroll */}
-            {hasNextPage && !isError && (
-              <div ref={sentinelRef}>
-                {isFetchingNextPage && <CourseLeaderboardSkeleton />}
-              </div>
-            )}
-
-            {/* Inline retry on pagination error */}
-            {isError && !isFetchingNextPage && allCourses.length > 0 && (
-              <InlineRetryCard onRetry={() => fetchNextPage()} />
-            )}
-
-            {/* Loading indicator during retry */}
-            {isError && isFetchingNextPage && allCourses.length > 0 && (
-              <CourseLeaderboardSkeleton />
-            )}
-          </>
-        )}
-      </section>
+              {/* Loading indicator during retry */}
+              {isError && isFetchingNextPage && allCourses.length > 0 && (
+                <CourseLeaderboardSkeleton />
+              )}
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Create Game Sheet */}
       <CreateGameTripSheetV2
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
       />
-
     </div>
   );
 }

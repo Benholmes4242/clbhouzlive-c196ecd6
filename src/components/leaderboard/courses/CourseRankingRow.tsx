@@ -45,8 +45,8 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
   const rankColor = getRankColor();
 
   // Season-aware played treatment using CSS vars for proper alpha
-  const playedBg = course.current_user_played ? 'hsl(var(--accent-amber) / 0.05)' : undefined;
-  const playedBorder = course.current_user_played ? 'hsl(var(--accent-amber) / 0.3)' : undefined;
+  const playedBg = course.current_user_played ? 'rgba(247,147,30,0.06)' : undefined;
+  const playedBorder = course.current_user_played ? '#F7931E' : undefined;
 
   return (
     <button
@@ -73,7 +73,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
       {/* Course thumbnail — 72x54 */}
       <div
         className="flex-shrink-0 rounded-xl overflow-hidden bg-muted"
-        style={{ width: 72, height: 54 }}
+        style={{ width: 'clamp(54px,15vw,64px)', height: 'clamp(40px,11vw,48px)' }}
       >
         {course.thumbnail_url ? (
           <img
