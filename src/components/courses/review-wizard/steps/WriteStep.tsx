@@ -108,12 +108,15 @@ function VoiceMic({ onTranscript, onStateChange }: { onTranscript: (text: string
 
   if (!SpeechRecognitionClass) {
     return (
-      <div
-        className="w-11 h-11 rounded-full flex items-center justify-center opacity-30"
+      <button
+        type="button"
+        onClick={() => toast.info('Voice input isn\'t supported on this device. Type your review instead.', { duration: 3000 })}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full active:scale-[0.95] transition-all"
         style={{ background: 'hsl(var(--muted))' }}
       >
-        <Mic className="w-5 h-5 text-muted-foreground" />
-      </div>
+        <Mic className="w-4 h-4 text-muted-foreground" />
+        <span className="text-[12px] text-muted-foreground font-medium">Voice unavailable</span>
+      </button>
     );
   }
 

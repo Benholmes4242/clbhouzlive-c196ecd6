@@ -292,8 +292,8 @@ export function RateStep({
         <SegmentedSlider
           value={rating ?? 5}
           onChange={handleOverallChange}
-          touched={overallTouched}
-          onFirstTouch={() => setOverallTouched(true)}
+          touched={true}
+          onFirstTouch={() => {}}
           size="hero"
           ariaLabel="Overall rating"
         />
