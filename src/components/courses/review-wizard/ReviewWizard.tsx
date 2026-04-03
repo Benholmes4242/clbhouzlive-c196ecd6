@@ -425,15 +425,15 @@ export function ReviewWizard({
           <RemoveReviewActionSheet
             open={showDeleteConfirm}
             onCancel={() => setShowDeleteConfirm(false)}
-            onConfirm={confirmDeleteReview}
-            isDeleting={wizard.isDeleting}
+            onRemove={confirmDeleteReview}
+            isRemoving={wizard.isDeleting}
           />
 
           {/* Course Search Sheet */}
           <CourseSearchSheet
             isOpen={showCourseSearch}
             onClose={() => setShowCourseSearch(false)}
-            onCourseSelect={(selectedCourse) => {
+            onSelectCourse={(selectedCourse) => {
               setActiveCourse(selectedCourse);
               setShowCourseSearch(false);
             }}
