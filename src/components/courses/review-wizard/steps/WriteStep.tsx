@@ -8,6 +8,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mic, Square, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
 
