@@ -55,25 +55,17 @@ interface ProfileHubSheetProps {
 function ProfileHubSheetSkeleton() {
   return (
     <div className="px-4">
-      {/* ── Dark header card skeleton ── */}
-      <div
-        className="relative rounded-[20px] overflow-hidden mb-4 mt-1 p-4 sm:p-[18px]"
-        style={{ background: 'linear-gradient(135deg, #1C1C1E, #2d2d30)' }}
-      >
-        {/* Profile row */}
-        <div className="flex items-center gap-3 mb-4">
-          {/* Avatar */}
-          <Skeleton variant="dark" className="w-[52px] h-[52px] rounded-[34%]" />
-          <div className="flex-1 min-w-0 space-y-2">
-            <Skeleton variant="dark" className="h-4 w-28 rounded-lg" />
-            <Skeleton variant="dark" className="h-3 w-20 rounded-lg" />
-          </div>
-          {/* Search pill */}
-          <Skeleton variant="dark" className="w-9 h-9 rounded-full flex-shrink-0" />
+      {/* ── Profile row skeleton ── */}
+      <div className="flex items-center gap-3 pt-2 pb-3">
+        <Skeleton className="w-[52px] h-[52px] rounded-[34%]" />
+        <div className="flex-1 min-w-0 space-y-2">
+          <Skeleton className="h-4 w-28 rounded-lg" />
+          <Skeleton className="h-3 w-20 rounded-lg" />
         </div>
-        {/* Echo card */}
-        <Skeleton variant="dark" className="h-[62px] w-full rounded-[14px]" />
+        <Skeleton className="w-9 h-9 rounded-full flex-shrink-0" />
       </div>
+      {/* Echo card skeleton */}
+      <Skeleton className="h-[48px] w-full rounded-[12px] mb-3" />
 
       {/* ── Switch Profile skeleton ── */}
       <div className="pb-3">
