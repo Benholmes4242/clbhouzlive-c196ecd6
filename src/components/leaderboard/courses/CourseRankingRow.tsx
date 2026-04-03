@@ -73,7 +73,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
       {/* Course thumbnail — 72x54 */}
       <div
         className="flex-shrink-0 rounded-xl overflow-hidden bg-muted"
-        style={{ width: 72, height: 54 }}
+        style={{ width: 'clamp(54px,15vw,64px)', height: 'clamp(40px,11vw,48px)' }}
       >
         {course.thumbnail_url ? (
           <img
