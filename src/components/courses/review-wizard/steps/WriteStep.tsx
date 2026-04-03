@@ -168,6 +168,7 @@ export function WriteStep({
   const titleLength = countGraphemes(title);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
+  const [currentVoiceState, setCurrentVoiceState] = useState<VoiceState>('idle');
 
   // Mention state
   const [showMentions, setShowMentions] = useState(false);
