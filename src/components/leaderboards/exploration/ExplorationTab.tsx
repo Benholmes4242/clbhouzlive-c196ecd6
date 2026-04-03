@@ -623,12 +623,14 @@ export function ExplorationTab() {
 
         {/* Tier progress — compact ladder + milestone card */}
         {hasUserData && (
-          <ExplorerTierCard
-            tier={userTier}
-            nextTier={nextTier}
-            countriesCount={countriesPlayed}
-            continentsCount={continentsPlayed}
-          />
+          <div style={{ marginBottom: 14 }}>
+            <ExplorerTierCard
+              tier={userTier}
+              nextTier={nextTier}
+              countriesCount={countriesPlayed}
+              continentsCount={continentsPlayed}
+            />
+          </div>
         )}
 
         {/* Empty state */}
