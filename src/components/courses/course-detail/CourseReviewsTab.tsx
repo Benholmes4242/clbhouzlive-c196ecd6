@@ -435,24 +435,36 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (!hasRatings) {
     return (
       <div className="flex flex-col">
-        <section className="px-4 pt-4 pb-5">
-          <div className="px-4 py-6 text-center">
-            <p className="text-base font-semibold text-foreground">No reviews yet</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Be the first to share your experience at {courseName}.
-            </p>
+        <div className="px-4 pt-4 pb-2">
+          <div
+            className="flex items-center gap-3.5 p-4 rounded-2xl"
+            style={{
+              background: 'linear-gradient(135deg, rgba(247,147,30,0.06), rgba(247,147,30,0.02))',
+              border: '1.5px solid rgba(247,147,30,0.15)',
+            }}
+          >
+            <div
+              className="w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #F7931E, #FBBC2E)' }}
+            >
+              <span style={{ fontSize: 20 }}>⭐</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-bold text-foreground">No reviews yet</p>
+              <p className="text-[13px] text-muted-foreground mt-0.5">
+                Be the first to review {courseName}
+              </p>
+            </div>
             <button
               type="button"
-              className="mt-4 h-11 rounded-xl inline-flex items-center justify-center px-6 text-sm font-semibold bg-card text-foreground border border-border/60 transition active:scale-[0.97]"
               onClick={handleRateClick}
+              className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-bold text-white active:scale-[0.97] transition-all"
+              style={{ background: '#F7931E' }}
             >
-              Write the first review
+              Rate
             </button>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Reviews help other golfers discover great courses
-            </p>
           </div>
-        </section>
+        </div>
       </div>
     );
   }
