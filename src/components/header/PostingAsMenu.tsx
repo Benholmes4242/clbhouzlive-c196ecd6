@@ -217,6 +217,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           onSwitchProfile={handleSwitchProfile}
           onNavigate={handleAccountHubNavigate}
           isAdmin={hasAdminAccess || false}
+          isLoading={isProfileLoading}
         />
       </>
     );
