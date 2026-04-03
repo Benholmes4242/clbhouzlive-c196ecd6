@@ -514,7 +514,7 @@ function ProfileHubSheet({
                 <div className={sectionLabelClass}>
                   Account
                 </div>
-                {accountRows.map(({ icon: Icon, label, route }, index) => (
+                {accountRows.map(({ emoji, bg, label, route }, index) => (
                   <div key={label}>
                     {index > 0 && <div className="h-px bg-border/30 mx-1" />}
                     <button
@@ -524,13 +524,9 @@ function ProfileHubSheet({
                     >
                       <div
                         className="flex items-center justify-center rounded-[10px]"
-                        style={{
-                          width: 34,
-                          height: 34,
-                          background: 'rgba(0,0,0,0.05)',
-                        }}
+                        style={{ width: 34, height: 34, background: bg }}
                       >
-                        <Icon className="w-4 h-4 text-muted-foreground" />
+                        <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
                       </div>
                       <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
                       <ChevronRight className="w-[13px] h-[13px] text-muted-foreground/30" />
