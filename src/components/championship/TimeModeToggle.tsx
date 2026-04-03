@@ -37,7 +37,7 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
             fontSize: 'clamp(12px,3vw,13px)',
             fontWeight: value === t.id ? 800 : 500,
             fontFamily: 'DM Sans,system-ui,sans-serif',
-            background: value === t.id ? '#F0F2F5' : 'rgba(255,255,255,0.08)',
+            background: value === t.id ? '#F8FAFC' : 'rgba(255,255,255,0.08)',
             color: value === t.id ? '#0C0C0E' : 'rgba(255,255,255,0.65)',
             transition: 'all 0.2s',
           }}
