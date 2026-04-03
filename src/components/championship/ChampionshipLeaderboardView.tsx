@@ -86,7 +86,7 @@ const LeaderboardLoadingSkeleton = () => (
 
 /** Full-page skeleton for initial Championship tab load — green-tinted */
 const ChampionshipPageSkeleton = () => (
-  <div className="flex flex-col" style={{ background: '#F0F2F5', minHeight: '100%' }}>
+  <div className="flex flex-col" style={{ background: '#F8FAFC', minHeight: '100%' }}>
     {/* Green hero header skeleton */}
     <div style={{ background: 'linear-gradient(160deg, #003D28, #006747)', padding: '18px 18px 0' }}>
       <Skeleton className="h-3 w-40 rounded mb-4" style={{ background: 'rgba(255,255,255,0.15)' }} />
