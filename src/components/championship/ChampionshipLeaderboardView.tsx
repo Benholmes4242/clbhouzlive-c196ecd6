@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffe
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
 
 import {
