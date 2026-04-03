@@ -481,7 +481,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       const { data } = await supabase
         .from('user_profiles')
-        .select('id, display_name, avatar_url, golf_clubs!user_profiles_primary_club_id_fkey(name)')
+        .select('id, display_name, profile_photo_url, golf_clubs!user_profiles_primary_club_id_fkey(name)')
         .in('id', winnerIds);
 
       if (data) {
