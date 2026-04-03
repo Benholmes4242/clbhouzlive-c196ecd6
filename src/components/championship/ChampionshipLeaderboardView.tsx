@@ -153,7 +153,14 @@ interface ChampionshipLeaderboardViewProps {
 export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboardViewProps) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const userId = user?.id;
+
+  // Invalidate stale caches on mount so users see fresh data immediately
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['championship-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['season-calendar'] });
+  }, [queryClient]);
 
   // ─── Filter state with persistence ───────────────────────────────
   const [arenaMode, setArenaMode] = useState<ChampionshipArenaMode>(() => {
