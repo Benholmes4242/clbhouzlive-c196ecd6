@@ -265,6 +265,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       const profileCountry = (data as any)?.country ?? null;
       setUserCountry(clubCountry || profileCountry || null);
       setUserHandicap((data as any)?.eg_handicap_index ?? null);
+      setUserPhotoUrl((data as any)?.profile_photo_url ?? null);
     };
 
     fetchUserProfile();
