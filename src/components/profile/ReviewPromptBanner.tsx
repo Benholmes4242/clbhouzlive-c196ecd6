@@ -1,7 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Star, ChevronRight } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface ReviewPromptBannerProps {
   unratedCoursesCount: number;
@@ -12,41 +9,51 @@ interface ReviewPromptBannerProps {
 const ReviewPromptBanner: React.FC<ReviewPromptBannerProps> = ({
   unratedCoursesCount,
   onAddReviewClick,
-  isVisible
+  isVisible,
 }) => {
   if (!isVisible || unratedCoursesCount === 0) {
     return null;
   }
 
   return (
-    <Card className="mb-4 border-l-4 border-l-slate-500 bg-slate-50/50 dark:bg-slate-950/20">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="rounded-full bg-slate-100 dark:bg-slate-900/20 p-2">
-              <Star className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                {unratedCoursesCount} course{unratedCoursesCount > 1 ? 's' : ''} waiting for your review
-              </p>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                Share your experience to help other golfers
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onAddReviewClick}
-            className="border-slate-200 text-cta-text hover:bg-slate-100 dark:border-slate-800 dark:text-cta-text-dark dark:hover:bg-slate-900/20"
-          >
-            Add Reviews
-            <ChevronRight className="ml-1 h-3 w-3" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <div
+      className="flex items-center gap-3.5 p-4 rounded-2xl mb-4"
+      style={{
+        background: 'rgba(247,147,30,0.05)',
+        border: '1.5px solid rgba(247,147,30,0.12)',
+      }}
+    >
+      {/* Amber gradient icon square */}
+      <div
+        className="w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0"
+        style={{ background: 'linear-gradient(135deg, #F7931E, #FBBC2E)' }}
+      >
+        <span style={{ fontSize: 20 }}>⭐</span>
+      </div>
+
+      {/* Copy */}
+      <div className="flex-1 min-w-0">
+        <p className="text-[14px] font-bold text-foreground">
+          {unratedCoursesCount} course{unratedCoursesCount > 1 ? 's' : ''} to review
+        </p>
+        <p className="text-[13px] text-muted-foreground mt-0.5">
+          Add your verdict and help golfers worldwide
+        </p>
+      </div>
+
+      {/* Amber pill CTA */}
+      <button
+        type="button"
+        onClick={onAddReviewClick}
+        className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-bold text-white active:scale-[0.97] transition-all whitespace-nowrap"
+        style={{
+          background: '#F7931E',
+          boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
+        }}
+      >
+        Add Reviews
+      </button>
+    </div>
   );
 };
 
