@@ -20,6 +20,7 @@ import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // ── Types ──
 
@@ -47,6 +48,73 @@ interface ProfileHubSheetProps {
   onSwitchProfile: (profileId: string) => Promise<void> | void;
   onNavigate: (route: string) => void;
   isAdmin: boolean;
+  isLoading?: boolean;
+}
+
+// ── Skeleton ──
+
+function ProfileHubSheetSkeleton() {
+  return (
+    <div className="px-4">
+      {/* ── Dark header card skeleton ── */}
+      <div
+        className="relative rounded-[20px] overflow-hidden mb-4 mt-1 p-4 sm:p-[18px]"
+        style={{ background: 'linear-gradient(135deg, #1C1C1E, #2d2d30)' }}
+      >
+        {/* Profile row */}
+        <div className="flex items-center gap-3 mb-4">
+          {/* Avatar */}
+          <Skeleton variant="dark" className="w-[52px] h-[52px] rounded-[34%]" />
+          <div className="flex-1 min-w-0 space-y-2">
+            <Skeleton variant="dark" className="h-4 w-28 rounded-lg" />
+            <Skeleton variant="dark" className="h-3 w-20 rounded-lg" />
+          </div>
+          {/* Search pill */}
+          <Skeleton variant="dark" className="w-9 h-9 rounded-full flex-shrink-0" />
+        </div>
+        {/* Echo card */}
+        <Skeleton variant="dark" className="h-[62px] w-full rounded-[14px]" />
+      </div>
+
+      {/* ── Switch Profile skeleton ── */}
+      <div className="pb-3">
+        <Skeleton className="h-3 w-24 rounded-lg mb-2" />
+        <div className="flex gap-3 overflow-hidden">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="flex flex-col items-center gap-1.5 shrink-0 min-w-[72px]">
+              <Skeleton className="w-[48px] h-[48px] rounded-[34%]" />
+              <Skeleton className="h-3 w-14 rounded-lg" />
+              <Skeleton className="h-2.5 w-10 rounded-lg" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="h-px bg-border/50 -mx-4" />
+
+      {/* ── Quick action tiles skeleton — 3 columns ── */}
+      <div className="grid grid-cols-3 gap-2 py-4">
+        {[0, 1, 2].map(i => (
+          <Skeleton key={i} className="h-[80px] rounded-2xl" />
+        ))}
+      </div>
+
+      {/* Divider */}
+      <div className="h-px bg-border/50 -mx-4" />
+
+      {/* ── Account rows skeleton ── */}
+      <div className="py-3 space-y-1">
+        <Skeleton className="h-3 w-16 rounded-lg mb-2" />
+        {[0, 1, 2].map(i => (
+          <div key={i} className="flex items-center gap-3 min-h-[48px] px-2">
+            <Skeleton className="w-[34px] h-[34px] rounded-[10px]" />
+            <Skeleton className="h-4 w-32 rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 // ── Component ──
@@ -59,6 +127,7 @@ function ProfileHubSheet({
   onSwitchProfile,
   onNavigate,
   isAdmin,
+  isLoading,
 }: ProfileHubSheetProps) {
   const navigate = useNavigate();
   const { logout: handleLogout } = useLogout();
@@ -183,6 +252,7 @@ function ProfileHubSheet({
             style={{
               y: sheetY,
               maxHeight: '92dvh',
+              minHeight: 'min(72dvh, 520px)',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
             initial={{ y: '100%' }}
@@ -199,13 +269,14 @@ function ProfileHubSheet({
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4">
 
+              {isLoading ? (
+                <ProfileHubSheetSkeleton />
+              ) : (
+                <>
               {/* ── Dark editorial header card ── */}
               <div
-                className="relative rounded-[20px] overflow-hidden mb-4 mt-1"
-                style={{
-                  background: 'linear-gradient(135deg, #1C1C1E, #2d2d30)',
-                  padding: '16px 18px 18px',
-                }}
+                className="relative rounded-[20px] overflow-hidden mb-4 mt-1 p-4 sm:p-[18px]"
+                style={{ background: 'linear-gradient(135deg, #1C1C1E, #2d2d30)' }}
               >
                 {/* Ambient amber glow */}
                 <div
@@ -258,9 +329,9 @@ function ProfileHubSheet({
                 <button
                   type="button"
                   onClick={() => handleNav('/echo')}
-                  className="relative w-full flex items-center gap-3 active:scale-[0.97] transition-all duration-150 overflow-hidden"
+                  className="relative w-full flex items-center gap-3 active:scale-[0.97] transition-all duration-150 overflow-hidden min-h-[56px]"
                   style={{
-                    height: 62, borderRadius: 14, padding: '0 16px',
+                    minHeight: 62, borderRadius: 14, padding: '0 16px',
                     background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
                     border: 'none', cursor: 'pointer',
                     boxShadow: '0 4px 20px rgba(247,147,30,0.35)',
@@ -316,7 +387,7 @@ function ProfileHubSheet({
                         key={profile.id}
                         type="button"
                         onClick={() => handleSwitchProfile(profile.id)}
-                        className="flex flex-col items-center gap-1.5 shrink-0 min-w-[72px]"
+                        className="flex flex-col items-center gap-1.5 shrink-0 min-w-[64px] min-h-[44px] touch-manipulation"
                         style={{ scrollSnapAlign: 'start' }}
                       >
                         <div className="relative">
@@ -353,7 +424,7 @@ function ProfileHubSheet({
                   <button
                     type="button"
                     onClick={() => handleNav('/businesses/manage')}
-                    className="flex flex-col items-center gap-1.5 shrink-0 min-w-[72px]"
+                    className="flex flex-col items-center gap-1.5 shrink-0 min-w-[64px] min-h-[44px] touch-manipulation"
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <div className="w-[52px] h-[52px] rounded-[34%] border-2 border-dashed border-border flex items-center justify-center">
@@ -378,7 +449,7 @@ function ProfileHubSheet({
                       onClick={() => handleNav(route)}
                       className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
                       style={{
-                        height: 80,
+                        minHeight: 80,
                         background: '#ffffff',
                         border: '1px solid rgba(0,0,0,0.07)',
                         boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
@@ -507,7 +578,7 @@ function ProfileHubSheet({
               <div className="h-px bg-border/50 -mx-4" />
 
               {/* ── Logout — #6 pill buttons ── */}
-              <div className="py-3 pb-6">
+              <div className="py-3" style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom, 0px))' }}>
                 {!showLogoutConfirm ? (
                   <button
                     type="button"
@@ -536,6 +607,8 @@ function ProfileHubSheet({
                   </div>
                 )}
               </div>
+                </>
+              )}
 
             </div>
           </motion.div>
