@@ -370,9 +370,9 @@ export function WriteStep({
             className="flex items-center gap-3 px-4 py-2.5"
             style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
           >
-            <VoiceMic onTranscript={handleVoiceTranscript} />
+            <VoiceMic onTranscript={handleVoiceTranscript} onStateChange={setCurrentVoiceState} />
             <span className="text-[12px] text-muted-foreground flex-1">
-              Tap mic to speak
+              {currentVoiceState === 'listening' ? 'Listening… tap to stop' : 'Tap mic to speak'}
             </span>
             {reviewLength > 0 && (
               <span className={cn(
