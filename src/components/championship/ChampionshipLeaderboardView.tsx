@@ -1109,7 +1109,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           }}
         />
       )}
-
+      </div>{/* end body content */}
     </div>
   );
 }
