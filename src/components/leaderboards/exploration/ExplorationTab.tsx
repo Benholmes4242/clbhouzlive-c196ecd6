@@ -21,7 +21,7 @@ import { ContinentBreakdownGrid } from './ContinentBreakdownGrid';
 import { ExplorerTierCard } from './ExplorerTierCard';
 import { CountryLeaderboard } from './CountryLeaderboard';
 import CountryFlag from '@/components/ui/country-flag';
-import { getUserTier, getNextTier, EXPLORER_TIERS } from '@/config/explorerTiers';
+import { getUserTier, getNextTier } from '@/config/explorerTiers';
 import { useSeasonCalendar } from '@/hooks/championship';
 import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
