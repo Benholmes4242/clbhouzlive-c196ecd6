@@ -31,7 +31,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const navigate = useNavigate();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
-  const { data: userProfile } = useUserProfile(user?.id);
+  const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
   
   // Get unread messages from shared messaging context
@@ -217,6 +217,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           onSwitchProfile={handleSwitchProfile}
           onNavigate={handleAccountHubNavigate}
           isAdmin={hasAdminAccess || false}
+          isLoading={isProfileLoading}
         />
       </>
     );
