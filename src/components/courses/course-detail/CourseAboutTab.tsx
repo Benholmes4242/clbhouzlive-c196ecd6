@@ -280,9 +280,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <p className="text-base text-muted-foreground mb-3">
             Add your rating to see how it compares with the Clbhouz community.
           </p>
-          <Button onClick={handleRateClick} className="w-full h-11 rounded-xl bg-card text-foreground border border-border/60 font-semibold active:scale-[0.98] transition-colors" variant="outline">
+          <button
+            onClick={handleRateClick}
+            className="w-full h-11 rounded-full text-[14px] font-bold text-white active:scale-[0.97] transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
+              boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
+            }}
+          >
             Rate this course
-          </Button>
+          </button>
         </section>
       )}
 

@@ -50,20 +50,32 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   // Empty state
   if (totalRatings === 0) {
     return (
-      <div className="p-6 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-          <Star className="w-8 h-8 text-muted-foreground/40" />
-        </div>
-        <h3 className="text-lg font-semibold text-foreground mb-1">No ratings yet</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Be the first to share your experience{courseName ? ` at ${courseName}` : ''}.
-        </p>
-        <Button
-          onClick={onRateClick}
-          className="px-6 py-2.5 bg-card text-foreground border border-border/60 text-sm font-semibold rounded-full transition-colors shadow-sm active:scale-[0.97] min-h-[44px]"
+      <div
+        className="flex items-center gap-3.5 p-4 rounded-2xl"
+        style={{
+          background: 'linear-gradient(135deg, rgba(247,147,30,0.06), rgba(247,147,30,0.02))',
+          border: '1.5px solid rgba(247,147,30,0.15)',
+        }}
+      >
+        <div
+          className="w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0"
+          style={{ background: 'linear-gradient(135deg, #F7931E, #FBBC2E)' }}
         >
-          Rate this course
-        </Button>
+          <span style={{ fontSize: 20 }}>⭐</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[14px] font-bold text-foreground">No ratings yet</p>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
+            Be the first to rate{courseName ? ` ${courseName}` : ' this course'}
+          </p>
+        </div>
+        <button
+          onClick={onRateClick}
+          className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-bold text-white active:scale-[0.97] transition-all"
+          style={{ background: '#F7931E' }}
+        >
+          Rate
+        </button>
       </div>
     );
   }

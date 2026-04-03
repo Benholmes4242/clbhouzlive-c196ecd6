@@ -312,22 +312,24 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               style={{
                 width: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '11px 16px', marginTop: 12, marginBottom: 12,
-                background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
-                border: 'none', cursor: 'pointer', borderRadius: 12,
+                padding: '12px 16px', marginTop: 12, marginBottom: 12,
+                background: 'linear-gradient(135deg, rgba(247,147,30,0.06), rgba(247,147,30,0.02))',
+                border: '1.5px solid rgba(247,147,30,0.15)',
+                borderRadius: 16,
+                cursor: 'pointer',
               }}
-              className="active:opacity-90 transition-opacity"
+              className="active:scale-[0.97] transition-all"
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Star size={15} fill="white" color="white" />
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, #F7931E, #FBBC2E)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 20 }}>⭐</span>
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Rate a Course</p>
-                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', margin: 0 }}>Search any course you've played</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: 'hsl(var(--foreground))', margin: 0 }}>Rate a Course</p>
+                  <p style={{ fontSize: 13, color: 'hsl(var(--muted-foreground))', margin: 0 }}>Search any course you've played</p>
                 </div>
               </div>
-              <ChevronRight size={16} color="rgba(255,255,255,0.7)" />
+              <ChevronRight size={16} className="text-muted-foreground" />
             </button>
           )}
 
