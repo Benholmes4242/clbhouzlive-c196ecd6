@@ -1,9 +1,9 @@
 /**
  * Success Screen — Frosted glass + amber gradient checkmark
- * Matches PostSuccessScreen aesthetic
+ * With opt-in Clubhouse share prompt
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Eye, ExternalLink, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -20,6 +20,8 @@ interface SuccessScreenProps {
   onViewReview?: () => void;
   onViewPost?: () => void;
   onDone: () => void;
+  onShareToClubhouse?: () => void;
+  isSharing?: boolean;
 }
 
 export function SuccessScreen({
@@ -32,27 +34,37 @@ export function SuccessScreen({
   onViewReview,
   onViewPost,
   onDone,
+  onShareToClubhouse,
+  isSharing = false,
 }: SuccessScreenProps) {
   const isShared = variant === 'shared';
   const tierData = rating ? getScoreTier(rating) : null;
+  const [showShareBlock, setShowShareBlock] = useState(false);
 
+  // Confetti on all success variants
   useEffect(() => {
-    if (isShared) {
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#fbbf24', '#ffffff', '#d97706'],
-      });
-    }
+    confetti({
+      particleCount: 60,
+      spread: 60,
+      origin: { y: 0.6 },
+      colors: ['#f59e0b', '#fbbf24', '#ffffff', '#d97706'],
+    });
   }, []);
+
+  // Fade in share block after 700ms
+  useEffect(() => {
+    if (onShareToClubhouse && !isShared) {
+      const timer = setTimeout(() => setShowShareBlock(true), 700);
+      return () => clearTimeout(timer);
+    }
+  }, [onShareToClubhouse, isShared]);
   
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center px-6"
       style={{
         background: 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(40px) saturate(200%)',
@@ -130,12 +142,46 @@ export function SuccessScreen({
         </motion.div>
       )}
 
+      {/* Opt-in share block — fades in after 700ms */}
+      {onShareToClubhouse && !isShared && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: showShareBlock ? 1 : 0, y: showShareBlock ? 0 : 12 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-[340px] mt-7 rounded-2xl p-5"
+          style={{ background: 'hsl(var(--muted) / 0.6)' }}
+        >
+          <p className="text-[15px] font-bold text-foreground text-center">
+            Share to Clubhouse?
+          </p>
+          <p className="text-[13px] text-muted-foreground text-center mt-1">
+            Post your verdict so friends can see it in their feed
+          </p>
+          <button
+            type="button"
+            onClick={onShareToClubhouse}
+            disabled={isSharing}
+            className="w-full mt-4 rounded-full text-[14px] font-semibold text-white active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center disabled:opacity-60"
+            style={{ background: '#1C1C1E' }}
+          >
+            {isSharing ? 'Sharing…' : 'Share to Clubhouse'}
+          </button>
+          <button
+            type="button"
+            onClick={onDone}
+            className="w-full mt-2 rounded-full text-[13px] font-medium text-muted-foreground active:scale-[0.97] transition-all min-h-[36px] flex items-center justify-center"
+          >
+            Maybe later
+          </button>
+        </motion.div>
+      )}
+
       {/* Actions */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
-        className="flex gap-3 mt-8"
+        className="flex gap-3 mt-6"
       >
         {isShared ? (
           <button
