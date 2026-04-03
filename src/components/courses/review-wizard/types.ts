@@ -51,7 +51,7 @@ export interface ReviewMediaItem {
 /**
  * Extended wizard step type that includes post-submit states
  */
-export type WizardStepExtended = 1 | 2 | 3 | 4 | 'preview' | 'success' | 'share-success';
+export type WizardStepExtended = 1 | 2 | 3 | 'success' | 'share-success';
 
 /**
  * Success screen variant type
