@@ -753,38 +753,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 5. Division Progress Preview & Ladder (collapsible) - Only in seasonal mode */}
-      {timeFilter === 'seasonal' && divisionLadderData.length > 0 && userStatus && (
-        <>
-          <DivisionProgressPreview
-            currentDivision={divisionLadderData.find(d => d.status === 'current') || null}
-            nextDivision={divisionLadderData.find(d => d.status === 'next') || null}
-            coursesToNext={userStatus.courses_to_next_division || 0}
-            userCourses={userStatus.courses_this_season || 0}
-            isExpanded={showDivisionLadder}
-            onToggle={() => setShowDivisionLadder(!showDivisionLadder)}
-            totalDivisions={divisionLadderData.length}
-            completedCount={divisionLadderData.filter(d => d.status === 'completed').length}
-            seasonColor={seasonThemeColor}
-          />
-          
-          {/* Full Division Ladder (expandable with animation) */}
-          <div
-            className={cn(
-              'overflow-hidden transition-all duration-300 ease-in-out',
-              showDivisionLadder ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
-            )}
-          >
-            <DivisionLadderPanel
-              divisions={divisionLadderData}
-              userCourses={userStatus.courses_this_season}
-              coursesToNext={nextDivision.coursesToNext}
-              nextDivisionName={nextDivision.name}
-              seasonColor={seasonThemeColor}
-            />
-          </div>
-        </>
-      )}
 
       {/* 6. Motivational Carousel - Only show in Season mode */}
       {timeFilter === 'seasonal' && currentUserEntry && (
