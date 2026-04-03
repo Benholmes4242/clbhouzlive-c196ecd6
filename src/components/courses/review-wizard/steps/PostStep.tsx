@@ -156,7 +156,7 @@ export function PostStep({
         }}
       >
         {permissionDenied && (
-          <PermissionDeniedCard type={permissionDenied} onDismiss={() => setPermissionDenied(null)} />
+          <PermissionDeniedCard type={permissionDenied} onRetry={() => setPermissionDenied(null)} />
         )}
 
         {media.length === 0 ? (
