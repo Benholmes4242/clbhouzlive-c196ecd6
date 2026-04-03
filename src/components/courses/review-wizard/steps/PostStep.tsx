@@ -368,15 +368,14 @@ export function PostStep({
       {/* Fullscreen media preview */}
       {previewMediaIndex !== null && (
         <MediaPreviewViewer
-          media={composerMedia}
+          items={composerMedia}
           initialIndex={previewMediaIndex}
           onClose={() => setPreviewMediaIndex(null)}
-          onRemove={(id) => {
-            onRemoveMedia(id);
-            setPreviewMediaIndex(null);
+          onSetCover={(index) => {
+            const item = composerMedia[index];
+            if (item) onSetCover(item.id);
           }}
-          onSetCover={(id) => onSetCover(id)}
-          coverMediaId={coverMediaId}
+          coverIndex={composerMedia.findIndex(m => m.id === coverMediaId)}
         />
       )}
     </motion.div>
