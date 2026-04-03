@@ -489,22 +489,11 @@ function ProfileHubSheet({
                             ? badgeColor === 'emerald'
                               ? 'rgba(16,185,129,0.10)'
                               : 'rgba(247,147,30,0.10)'
-                            : 'rgba(0,0,0,0.05)',
+                            : (bg || 'rgba(0,0,0,0.05)'),
                           transition: 'background 0.2s ease',
                         }}
                       >
-                        <Icon
-                          className="w-[18px] h-[18px]"
-                          style={{
-                            color: badge > 0
-                              ? badgeColor === 'emerald'
-                                ? '#10b981'
-                                : '#F7931E'
-                              : '#475569',
-                            transition: 'color 0.2s ease',
-                          }}
-                          strokeWidth={2}
-                        />
+                        <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
                       </div>
 
                       <span
