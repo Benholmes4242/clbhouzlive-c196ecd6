@@ -555,13 +555,43 @@ const AppInner: React.FC = () => {
         os.login?.(userId);
         os.register?.();
 
-        await new Promise(r => setTimeout(r, 1000));
+        // Wait for registration to complete then get the subscription info
+        await new Promise(r => setTimeout(r, 3000));
 
+        // Try to get the actual device token via Median bridge
+        const deviceInfo = await new Promise<any>(resolve => {
+          const timeout = setTimeout(() => resolve(null), 5000);
+          
+          // Try multiple methods to get the subscription ID
+          if (os.info) {
+            os.info((result: any) => {
+              clearTimeout(timeout);
+              resolve(result);
+            });
+          } else if (os.onesignalInfo) {
+            os.onesignalInfo((result: any) => {
+              clearTimeout(timeout);
+              resolve(result);
+            });
+          } else {
+            clearTimeout(timeout);
+            resolve(null);
+          }
+        });
+
+        console.log('[Push] Device info from OneSignal:', JSON.stringify(deviceInfo));
+
+        // Register with backend including the OneSignal subscription ID if available
         const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
           ? 'ios' : 'android';
 
         const { error } = await supabase.functions.invoke('register-push-device', {
-          body: { provider_id: userId, platform, enabled: true },
+          body: { 
+            provider_id: userId, 
+            platform, 
+            enabled: true,
+            onesignal_id: deviceInfo?.oneSignalUserId || deviceInfo?.userId || null,
+          },
         });
 
         if (error) {
