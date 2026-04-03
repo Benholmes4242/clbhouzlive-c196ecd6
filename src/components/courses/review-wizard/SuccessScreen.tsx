@@ -47,7 +47,7 @@ export function SuccessScreen({
       particleCount: 60,
       spread: 60,
       origin: { y: 0.6 },
-      colors: ['#f59e0b', '#fbbf24', '#ffffff', '#d97706'],
+      colors: ['#F7931E', '#FBBC2E', '#ffffff', '#d97706'],
     });
   }, []);
 
