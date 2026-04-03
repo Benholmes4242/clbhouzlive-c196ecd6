@@ -704,7 +704,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             onUserClick={handleUserClick}
           />
         )}
-        {timeFilter === 'all_time' && completedSeasonsWithWinners.length > 0 && (
+        {completedSeasonsWithWinners.length > 0 && (
           <div className="space-y-4 mb-4">
             {completedSeasonsWithWinners.map(season => {
               const winnerId = season.season_winner_user_id!;
