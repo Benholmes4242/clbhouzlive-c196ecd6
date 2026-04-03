@@ -99,7 +99,7 @@ const INITIAL_BREAKDOWNS: ReviewBreakdowns = {
 
 const INITIAL_STATE: WizardState = {
   step: 1,
-  rating: null,
+  rating: 5,
   breakdowns: INITIAL_BREAKDOWNS,
   title: '',
   review: '',

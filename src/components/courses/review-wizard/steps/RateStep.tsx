@@ -192,7 +192,6 @@ export function RateStep({
   onRatingChange, 
   onBreakdownChange 
 }: RateStepProps) {
-  const [overallTouched, setOverallTouched] = useState(() => rating !== null);
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     BREAKDOWN_FIELDS.forEach(({ key }) => {
@@ -214,12 +213,6 @@ export function RateStep({
     });
   }, [breakdowns]);
 
-  useEffect(() => {
-    if (rating !== null && !overallTouched) {
-      setOverallTouched(true);
-    }
-  }, [rating]);
-
   const handleOverallChange = useCallback((val: number) => {
     onRatingChange(val);
   }, [onRatingChange]);
@@ -235,7 +228,7 @@ export function RateStep({
     country: course.country,
   }) : '';
 
-  const overallTier = overallTouched && rating !== null ? getScoreTier(rating) : null;
+  const overallTier = rating !== null ? getScoreTier(rating) : null;
 
   return (
     <motion.div
@@ -274,25 +267,19 @@ export function RateStep({
         
         {/* Animated value display */}
         <div className="flex justify-center py-4">
-          {overallTouched && rating !== null ? (
-            <motion.span
-              key={rating.toFixed(1)}
-              initial={{ opacity: 0, y: -8, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="text-5xl font-bold tabular-nums leading-none"
-              style={{ color: getScoreTier(rating).accent }}
-            >
-              {rating.toFixed(1)}
-            </motion.span>
-          ) : (
-            <span className="text-5xl font-bold text-muted-foreground/30 leading-none">
-              —
-            </span>
-          )}
+          <motion.span
+            key={(rating ?? 5).toFixed(1)}
+            initial={{ opacity: 0, y: -8, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="text-5xl font-bold tabular-nums leading-none"
+            style={{ color: getScoreTier(rating ?? 5).accent }}
+          >
+            {rating !== null ? rating.toFixed(1) : '5.0'}
+          </motion.span>
         </div>
 
         {/* Tier label */}
-        {overallTouched && overallTier && (
+        {overallTier && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -305,8 +292,8 @@ export function RateStep({
         <SegmentedSlider
           value={rating ?? 5}
           onChange={handleOverallChange}
-          touched={overallTouched}
-          onFirstTouch={() => setOverallTouched(true)}
+          touched={true}
+          onFirstTouch={() => {}}
           size="hero"
           ariaLabel="Overall rating"
         />
