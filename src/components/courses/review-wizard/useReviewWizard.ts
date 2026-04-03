@@ -409,13 +409,8 @@ export function useReviewWizard({
         });
       }
 
-      // For edit mode, go directly to success
-      // For new reviews, go to preview step first
-      if (isEditMode) {
-        onSuccess?.(ratingId);
-      } else {
-        onPreview?.(ratingId);
-      }
+      // Both edit and new reviews go to success
+      onSuccess?.(ratingId);
     },
     onError: (error) => {
       console.error('[useReviewWizard] Submit error:', error);
@@ -506,8 +501,8 @@ export function useReviewWizard({
 
   const nextStep = useCallback(() => {
     setState(prev => {
-      // Only increment for numeric steps
-      if (typeof prev.step === 'number' && prev.step < 4) {
+      // Only increment for numeric steps, cap at 3
+      if (typeof prev.step === 'number' && prev.step < 3) {
         return { ...prev, step: (prev.step + 1) as WizardStepExtended };
       }
       return prev;
@@ -847,12 +842,8 @@ export function useReviewWizard({
   }, [cleanupBlobUrls]);
 
   // Check if can proceed to next step
-  // Step 1: requires rating; Step 3: requires media (shows Skip when empty); others: always true
-  const canProceed = state.step === 1 
-    ? state.rating !== null 
-    : state.step === 3 
-      ? allMedia.length > 0 
-      : true;
+  // Step 1: requires rating; all other steps: always true
+  const canProceed = state.step === 1 ? state.rating !== null : true;
   
   // Check if any uploads are in progress (always false with upload-on-submit)
   const hasUploadsInProgress = isSubmitting;

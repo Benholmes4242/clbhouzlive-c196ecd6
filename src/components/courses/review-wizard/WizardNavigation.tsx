@@ -1,6 +1,6 @@
 /**
  * Wizard Navigation Buttons
- * Hidden on post-submit screens (preview, success, share-success)
+ * Hidden on post-submit screens (success, share-success)
  */
 
 import { ArrowLeft, ArrowRight, Loader2, Check, Trash2 } from 'lucide-react';
@@ -32,13 +32,13 @@ export function WizardNavigation({
   onRemoveReview,
 }: WizardNavigationProps) {
   // Hide navigation on post-submit screens
-  if (currentStep === 'preview' || currentStep === 'success' || currentStep === 'share-success') {
+  if (currentStep === 'success' || currentStep === 'share-success') {
     return null;
   }
 
   const isFirstStep = currentStep === 1;
-  const isLastStep = currentStep === 4;
-  const isOptionalStep = currentStep === 2 || currentStep === 3;
+  const isLastStep = currentStep === 3;
+  const isOptionalStep = currentStep === 2;
   const showRemoveButton = isEditMode && isFirstStep && onRemoveReview;
 
   return (
@@ -74,7 +74,7 @@ export function WizardNavigation({
         </Button>
       )}
 
-      {/* Next/Submit Button - brand primary */}
+      {/* Next/Submit Button */}
       {isLastStep ? (
         <Button
           size="lg"
@@ -85,12 +85,12 @@ export function WizardNavigation({
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              {isEditMode ? 'Updating...' : 'Submitting...'}
+              {isEditMode ? 'Updating...' : 'Posting...'}
             </>
           ) : (
             <>
               <Check className="h-4 w-4" />
-              {isEditMode ? 'Update Review' : 'Submit Review'}
+              {isEditMode ? 'Update Review' : 'Post Review'}
             </>
           )}
         </Button>
@@ -98,11 +98,10 @@ export function WizardNavigation({
         <Button
           size="lg"
           onClick={onNext}
-          disabled={(!canProceed && !isOptionalStep) || isDeleting}
+          disabled={!canProceed && !isOptionalStep || isDeleting}
           className="gap-2 min-w-[120px] bg-primary text-primary-foreground hover:bg-primary/90 rounded-full active:scale-[0.97] transition-all duration-200"
         >
-          {isOptionalStep && !canProceed ? 'Skip' : 'Next'}
-          <ArrowRight className="h-4 w-4" />
+          Next →
         </Button>
       )}
     </div>

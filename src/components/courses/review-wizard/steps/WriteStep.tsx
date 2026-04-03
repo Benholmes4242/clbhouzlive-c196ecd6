@@ -1,17 +1,15 @@
 /**
  * Step 2: Write Your Review (The Verdict)
- * Card-based inputs with amber focus glow, floating labels
+ * Voice input, tappable prompt chips, amber focus cards
  * @mention support, grapheme-aware counting
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Mic, Square, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CharacterRing } from '@/components/post-studio/components/CharacterRing';
 
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
-import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 interface WriteStepProps {
   title: string;
@@ -25,12 +23,13 @@ interface WriteStepProps {
 const MAX_REVIEW_LENGTH = 4000;
 const MAX_TITLE_LENGTH = 100;
 
-const PROMPT_CHIPS = [
-  'Course highlights',
-  'Conditions',
-  'Memorable holes',
-  'Value for money',
-  'Tips for visitors',
+const CHIPS = [
+  { label: 'Best holes', text: 'The standout holes were ' },
+  { label: 'Conditions', text: 'The course condition was ' },
+  { label: 'Value', text: 'In terms of value for money, ' },
+  { label: 'Tips', text: 'A tip for visitors: ' },
+  { label: 'The views', text: 'The views were ' },
+  { label: 'Pace', text: 'Pace of play was ' },
 ];
 
 function countGraphemes(str: string): number {
@@ -43,6 +42,119 @@ function countGraphemes(str: string): number {
   }
 }
 
+// Check if SpeechRecognition is available
+const getSpeechRecognition = (): any => {
+  if (typeof window === 'undefined') return null;
+  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null;
+};
+
+/* ── VoiceMic sub-component ── */
+type VoiceState = 'idle' | 'listening' | 'processing';
+
+function VoiceMic({ onTranscript }: { onTranscript: (text: string) => void }) {
+  const [voiceState, setVoiceState] = useState<VoiceState>('idle');
+  const recognitionRef = useRef<any>(null);
+  const SpeechRecognitionClass = getSpeechRecognition();
+
+  const startListening = useCallback(() => {
+    if (!SpeechRecognitionClass) return;
+    const recognition = new SpeechRecognitionClass();
+    recognition.lang = 'en-GB';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = Array.from(event.results)
+        .map(r => r[0].transcript)
+        .join('');
+      if (transcript.trim()) {
+        setVoiceState('processing');
+        onTranscript(transcript.trim());
+        setTimeout(() => setVoiceState('idle'), 400);
+      }
+    };
+
+    recognition.onerror = () => setVoiceState('idle');
+    recognition.onend = () => {
+      if (voiceState === 'listening') setVoiceState('idle');
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setVoiceState('listening');
+  }, [SpeechRecognitionClass, onTranscript, voiceState]);
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setVoiceState('idle');
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
+  const handleTap = () => {
+    if (voiceState === 'listening') {
+      stopListening();
+    } else if (voiceState === 'idle') {
+      startListening();
+    }
+  };
+
+  if (!SpeechRecognitionClass) {
+    return (
+      <div
+        className="w-11 h-11 rounded-full flex items-center justify-center opacity-30"
+        style={{ background: 'hsl(var(--muted))' }}
+      >
+        <Mic className="w-5 h-5 text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {/* Pulse rings when listening */}
+      {voiceState === 'listening' && (
+        <>
+          <span
+            className="absolute inset-0 rounded-full animate-ping"
+            style={{ background: 'rgba(239,68,68,0.15)', animationDuration: '1.5s' }}
+          />
+          <span
+            className="absolute inset-0 rounded-full animate-ping"
+            style={{ background: 'rgba(239,68,68,0.08)', animationDuration: '2s', animationDelay: '0.3s' }}
+          />
+        </>
+      )}
+      <button
+        type="button"
+        onClick={handleTap}
+        className="relative w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.95] transition-all z-10"
+        style={{
+          background: voiceState === 'listening'
+            ? 'rgba(239,68,68,0.12)'
+            : voiceState === 'processing'
+              ? 'rgba(247,147,30,0.10)'
+              : 'hsl(var(--muted))',
+        }}
+      >
+        {voiceState === 'listening' ? (
+          <Square className="w-4 h-4 text-red-500 fill-red-500" />
+        ) : voiceState === 'processing' ? (
+          <RotateCw className="w-5 h-5 text-amber-500 animate-spin" />
+        ) : (
+          <Mic className="w-5 h-5 text-muted-foreground" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+/* ── WriteStep ── */
 export function WriteStep({
   title,
   review,
@@ -53,10 +165,9 @@ export function WriteStep({
 }: WriteStepProps) {
   const reviewLength = countGraphemes(review);
   const titleLength = countGraphemes(title);
-  const keyboardHeight = useKeyboardHeight();
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
-  
+
   // Mention state
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
@@ -78,13 +189,13 @@ export function WriteStep({
   const handleReviewChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const cursor = e.target.selectionStart || 0;
-    
+
     onReviewChange(value.slice(0, MAX_REVIEW_LENGTH));
     setCursorPosition(cursor);
-    
+
     const textBeforeCursor = value.slice(0, cursor);
     const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
-    
+
     if (mentionMatch) {
       setMentionQuery(mentionMatch[1]);
       setShowMentions(true);
@@ -97,19 +208,19 @@ export function WriteStep({
   const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
     const textBeforeCursor = review.slice(0, cursorPosition);
     const textAfterCursor = review.slice(cursorPosition);
-    
+
     const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
     const displayName = mention.username || mention.name;
     const newReview = `${beforeMention}@${displayName} ${textAfterCursor}`;
-    
+
     onReviewChange(newReview);
     setShowMentions(false);
     setMentionQuery('');
-    
+
     if (!selectedTags.some(t => t.id === mention.id)) {
       onTagsChange([...selectedTags, mention]);
     }
-    
+
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.focus();
@@ -123,17 +234,35 @@ export function WriteStep({
     onTagsChange(selectedTags.filter(t => t.id !== tagId));
   }, [selectedTags, onTagsChange]);
 
-  const getTitleCounterColor = () => {
-    if (titleLength >= 95) return 'text-destructive font-medium';
-    if (titleLength >= 80) return 'text-amber-500';
-    return 'text-muted-foreground';
-  };
+  // Voice transcript handler
+  const handleVoiceTranscript = useCallback((transcript: string) => {
+    const current = review;
+    let newText: string;
+    if (!current) {
+      newText = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+    } else {
+      newText = current.endsWith(' ')
+        ? current + transcript
+        : current + ' ' + transcript;
+    }
+    onReviewChange(newText.slice(0, MAX_REVIEW_LENGTH));
+  }, [review, onReviewChange]);
 
-  const getReviewCounterColor = () => {
-    if (reviewLength >= MAX_REVIEW_LENGTH * 0.95) return 'text-destructive font-medium';
-    if (reviewLength >= MAX_REVIEW_LENGTH * 0.8) return 'text-amber-500';
-    return 'text-muted-foreground';
-  };
+  // Insert chip text
+  const insertChip = useCallback((chipText: string) => {
+    const current = review;
+    let newText: string;
+    if (!current) {
+      newText = chipText;
+    } else {
+      newText = current.endsWith(' ')
+        ? current + chipText
+        : current + ' ' + chipText;
+    }
+    onReviewChange(newText.slice(0, MAX_REVIEW_LENGTH));
+    // Focus textarea after chip insertion
+    setTimeout(() => textareaRef.current?.focus(), 50);
+  }, [review, onReviewChange]);
 
   return (
     <motion.div
@@ -146,22 +275,22 @@ export function WriteStep({
     >
       {/* Header */}
       <div className="text-center pb-4">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
+        <h2 className="text-[22px] text-foreground" style={{ fontWeight: 900 }}>
           The Verdict
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Optional – skip to let your ratings speak
+        <p className="text-[13px] text-muted-foreground mt-1">
+          Optional — your ratings already tell the story
         </p>
       </div>
 
       {/* Form Fields */}
       <div className="flex-1 flex flex-col min-h-0 space-y-4">
-        {/* Title input — card style */}
+        {/* Headline card */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="shrink-0 rounded-2xl p-4 transition-all duration-200"
+          className="shrink-0 rounded-[14px] p-4 transition-all duration-200"
           style={{
             background: (isTitleFocused || title.length > 0) ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
             border: (isTitleFocused || title.length > 0)
@@ -191,7 +320,11 @@ export function WriteStep({
                 exit={{ opacity: 0 }}
                 className="flex justify-end mt-1"
               >
-                <span className={cn("text-[11px] tabular-nums", getTitleCounterColor())}>
+                <span className={cn(
+                  "text-[11px] tabular-nums",
+                  titleLength >= 95 ? 'text-destructive font-medium' :
+                  titleLength >= 80 ? 'text-amber-500' : 'text-muted-foreground'
+                )}>
                   {titleLength}/{MAX_TITLE_LENGTH}
                 </span>
               </motion.div>
@@ -199,12 +332,12 @@ export function WriteStep({
           </AnimatePresence>
         </motion.div>
 
-        {/* Body textarea — card style */}
+        {/* Body card with textarea + voice toolbar */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex-1 flex flex-col min-h-0 rounded-2xl p-4 transition-all duration-200"
+          className="flex-1 flex flex-col min-h-0 rounded-[14px] transition-all duration-200"
           style={{
             background: (isReviewFocused || review.length > 0) ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
             border: (isReviewFocused || review.length > 0)
@@ -212,40 +345,62 @@ export function WriteStep({
               : '1.5px solid transparent',
           }}
         >
-          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">
-            Your review
-          </label>
-          <textarea
-            ref={textareaRef}
-            id="review-body"
-            value={review}
-            onChange={handleReviewChange}
-            onFocus={() => setIsReviewFocused(true)}
-            onBlur={() => setIsReviewFocused(false)}
-            placeholder="Share what other golfers should expect"
-            className="w-full bg-transparent text-foreground text-[15px] mt-1 outline-none resize-none placeholder:text-muted-foreground/40"
-            style={{ minHeight: '120px' }}
-            maxLength={MAX_REVIEW_LENGTH + 100}
-          />
-          <div className="flex justify-end mt-1">
-            <CharacterRing count={reviewLength} maxCount={MAX_REVIEW_LENGTH} />
+          <div className="p-4 pb-0 flex-1 flex flex-col min-h-0">
+            <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">
+              Your review
+            </label>
+            <textarea
+              ref={textareaRef}
+              id="review-body"
+              value={review}
+              onChange={handleReviewChange}
+              onFocus={() => setIsReviewFocused(true)}
+              onBlur={() => setIsReviewFocused(false)}
+              placeholder="Share what other golfers should expect"
+              className="w-full bg-transparent text-foreground text-[15px] mt-1 outline-none resize-none placeholder:text-muted-foreground/40"
+              style={{ minHeight: '120px' }}
+              maxLength={MAX_REVIEW_LENGTH + 100}
+            />
+          </div>
+
+          {/* Voice toolbar — separated by thin border */}
+          <div
+            className="flex items-center gap-3 px-4 py-2.5"
+            style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
+          >
+            <VoiceMic onTranscript={handleVoiceTranscript} />
+            <span className="text-[12px] text-muted-foreground flex-1">
+              Tap mic to speak
+            </span>
+            {reviewLength > 0 && (
+              <span className={cn(
+                "text-[11px] tabular-nums",
+                reviewLength >= MAX_REVIEW_LENGTH * 0.95 ? 'text-destructive font-medium' :
+                reviewLength >= MAX_REVIEW_LENGTH * 0.8 ? 'text-amber-500' : 'text-muted-foreground'
+              )}>
+                {reviewLength.toLocaleString()}/{MAX_REVIEW_LENGTH.toLocaleString()}
+              </span>
+            )}
           </div>
         </motion.div>
 
-        {/* Prompt chips — always visible when body is short */}
-        {reviewLength < 50 && (
-          <div className="flex flex-wrap gap-2 pt-1 justify-center">
-            {PROMPT_CHIPS.map(prompt => (
-              <span
-                key={prompt}
-                className="text-xs text-muted-foreground/60 bg-muted/30 px-2.5 py-1 rounded-full select-none"
+        {/* Tappable prompt chips */}
+        <div>
+          <p className="text-[11px] text-muted-foreground mb-2 ml-0.5">Write about…</p>
+          <div className="flex flex-wrap gap-2">
+            {CHIPS.map(chip => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => insertChip(chip.text)}
+                className="px-3.5 py-1.5 rounded-full border border-border bg-card text-[13px] font-medium shadow-sm active:scale-[0.95] active:bg-[rgba(247,147,30,0.1)] transition-all"
               >
-                {prompt}
-              </span>
+                {chip.label}
+              </button>
             ))}
           </div>
-        )}
-          
+        </div>
+
         {/* Tagged entities chips */}
         {selectedTags.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">

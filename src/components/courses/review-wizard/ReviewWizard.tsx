@@ -2,11 +2,7 @@
  * Review Wizard - Multi-step review flow (Full-Screen)
  * Immersive full-viewport experience with scroll-lock
  * 
- * New Flow (for new reviews):
- * Steps 1-4 → Submit → Preview Step → Success/Share-Success
- * 
- * Edit Mode Flow:
- * Steps 1-4 → Submit → Success (skips preview)
+ * Flow: Steps 1-3 → Submit → Success (with opt-in share)
  */
 
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react';
@@ -28,13 +24,12 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Loader2 } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
 
-
 import { WizardHeader } from './WizardHeader';
 import { WizardProgress } from './WizardProgress';
 import { DiscardActionSheet } from './DiscardActionSheet';
 import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
 import { ReviewPostingOptionsSheet, ReviewVisibility } from './ReviewPostingOptionsSheet';
-import { RateStep, WriteStep, MediaStep, ConfirmStep, PreviewStep } from './steps';
+import { RateStep, WriteStep, PostStep } from './steps';
 import { SuccessScreen } from './SuccessScreen';
 import { useReviewWizard } from './useReviewWizard';
 import type { ReviewWizardProps, ReviewWizardCourse, WizardStepExtended } from './types';
@@ -61,11 +56,11 @@ export function ReviewWizard({
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
   
-  // Studio edits state (retained for media display, Studio UI removed until backend supports persistence)
+  // Studio edits state (retained for media display)
   const [studioEditsByMediaId, setStudioEditsByMediaId] = useState<Record<string, StudioEdits>>({});
   const [reviewActiveMediaId, setReviewActiveMediaId] = useState<string | null>(null);
   
-  // Actor and visibility state (local to this wizard, not persisted globally)
+  // Actor and visibility state
   const [selectedActor, setSelectedActor] = useState(activeActor);
   const [visibility, setVisibility] = useState<ReviewVisibility>('anyone');
   
@@ -81,11 +76,11 @@ export function ReviewWizard({
     }
   }, [isOpen, activeActor, availableActors]);
   
-  // Overlay portal container for dropdowns/popovers to render within the modal
+  // Overlay portal container
   const overlayRootRef = useRef<HTMLDivElement>(null);
   const [overlayRoot, setOverlayRoot] = useState<HTMLElement | null>(null);
   
-  // Fetch current user profile for preview
+  // Fetch current user profile
   const { data: userProfile } = useQuery({
     queryKey: ['current-user-profile-wizard'],
     queryFn: async () => {
@@ -101,7 +96,6 @@ export function ReviewWizard({
     enabled: isOpen,
   });
   
-  // Set overlay root when modal opens
   useEffect(() => {
     if (isOpen && overlayRootRef.current) {
       setOverlayRoot(overlayRootRef.current);
@@ -146,12 +140,9 @@ export function ReviewWizard({
     onSuccess: () => {
       wizard.goToStep('success');
     },
-    onPreview: () => {
-      wizard.goToStep('preview');
-    },
   });
 
-  // All steps use light status bar (no more immersive hero)
+  // All steps use light status bar
   useMedianStatusBar("light", "transparent", isOpen, false);
 
   // Navigation guard
@@ -159,8 +150,7 @@ export function ReviewWizard({
     wizard.state.review.length > 0 || 
     wizard.allMedia.length > 0;
 
-  const isPostSubmit = wizard.state.step === 'preview' || 
-    wizard.state.step === 'success' || 
+  const isPostSubmit = wizard.state.step === 'success' || 
     wizard.state.step === 'share-success';
 
   useNavigationGuard({
@@ -244,11 +234,7 @@ export function ReviewWizard({
     }
   }, [wizard, activeCourse, shareReview]);
 
-  const handleSkipShare = useCallback(() => {
-    wizard.goToStep('success');
-  }, [wizard]);
-
-  const handleCloseFromPreview = useCallback(() => {
+  const handleDone = useCallback(() => {
     wizard.cleanup();
     onClose();
   }, [wizard, onClose]);
@@ -283,24 +269,7 @@ export function ReviewWizard({
     }
   }, [wizard, hasUnsavedChanges, handleClose]);
 
-  const activeMedia = useMemo(() => {
-    if (!reviewActiveMediaId) return null;
-    return wizard.allMedia.find(m => m.id === reviewActiveMediaId) || null;
-  }, [reviewActiveMediaId, wizard.allMedia]);
-
-  const handleDone = useCallback(() => {
-    wizard.cleanup();
-    onClose();
-  }, [wizard, onClose]);
-
   if (!isOpen) return null;
-
-  const creator = userProfile ? {
-    id: userProfile.id,
-    name: userProfile.display_name || userProfile.username || 'You',
-    username: userProfile.username || undefined,
-    avatar: userProfile.profile_photo_url || undefined,
-  } : { id: '', name: 'You' };
 
   const showStepUI = typeof wizard.state.step === 'number';
 
@@ -316,20 +285,19 @@ export function ReviewWizard({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               "light fixed inset-0 z-[9999]",
-              wizard.state.step === 'preview' ? "bg-black" : "",
               "flex flex-col",
               "overscroll-contain"
             )}
             style={{ 
               touchAction: 'pan-y',
-              backgroundColor: wizard.state.step === 'preview' ? undefined : 'var(--bg-page)',
+              backgroundColor: 'var(--bg-page)',
             }}
           >
-            {/* Header — consistent across all steps */}
+            {/* Header */}
             {showStepUI && (
               <WizardHeader
                 currentStep={wizard.state.step}
-                totalSteps={4}
+                totalSteps={3}
                 isEditMode={isEditMode}
                 canProceed={wizard.canProceed}
                 isSubmitting={wizard.isSubmitting}
@@ -345,9 +313,9 @@ export function ReviewWizard({
               />
             )}
 
-            {/* Progress bar — below header, above content */}
+            {/* Progress bar */}
             {showStepUI && (
-              <WizardProgress currentStep={wizard.state.step} totalSteps={4} />
+              <WizardProgress currentStep={wizard.state.step} totalSteps={3} />
             )}
 
             {/* Content Area */}
@@ -356,25 +324,7 @@ export function ReviewWizard({
                 <div ref={overlayRootRef} className="contents" />
                 <OverlayPortalProvider container={overlayRoot}>
                   <AnimatePresence mode="wait">
-                    {wizard.state.step === 'preview' ? (
-                      <PreviewStep
-                        key="preview"
-                        course={activeCourse}
-                        reviewId={wizard.submittedRatingId || ''}
-                        rating={wizard.state.rating}
-                        breakdowns={wizard.state.breakdowns}
-                        title={wizard.state.title}
-                        review={wizard.state.review}
-                        media={wizard.allMedia}
-                        coverMediaId={wizard.state.coverMediaId}
-                        creator={creator}
-                        visibility={visibility}
-                        onSkip={handleSkipShare}
-                        onShare={handleShareFromPreview}
-                        onClose={handleCloseFromPreview}
-                        isSharing={isSharing}
-                      />
-                    ) : wizard.state.step === 'success' ? (
+                    {wizard.state.step === 'success' ? (
                       <SuccessScreen
                         key="success"
                         variant="standard"
@@ -384,6 +334,8 @@ export function ReviewWizard({
                         isEditMode={isEditMode}
                         onViewReview={handleViewReview}
                         onDone={handleDone}
+                        onShareToClubhouse={handleShareFromPreview}
+                        isSharing={isSharing}
                       />
                     ) : wizard.state.step === 'share-success' ? (
                       <SuccessScreen
@@ -416,36 +368,29 @@ export function ReviewWizard({
                         onTagsChange={wizard.setTags}
                       />
                     ) : wizard.state.step === 3 ? (
-                      <MediaStep
-                        key="media"
-                        media={wizard.allMedia}
-                        coverMediaId={wizard.state.coverMediaId}
-                        course={activeCourse}
-                        onAddImages={wizard.addImages}
-                        onAddVideo={wizard.addVideo}
-                        onRemoveMedia={wizard.removeMedia}
-                        onSetCover={wizard.setCoverMedia}
-                        onRetryMedia={wizard.retryMedia}
-                        onReorderMedia={wizard.reorderMedia}
-                        studioEditsByMediaId={studioEditsByMediaId}
-                        activeMediaId={reviewActiveMediaId}
-                        onActiveMediaChange={setReviewActiveMediaId}
-                      />
-                    ) : (
-                      <ConfirmStep
-                        key="confirm"
+                      <PostStep
+                        key="post"
                         course={activeCourse}
                         rating={wizard.state.rating}
                         breakdowns={wizard.state.breakdowns}
                         title={wizard.state.title}
                         review={wizard.state.review}
                         media={wizard.allMedia}
+                        coverMediaId={wizard.state.coverMediaId}
                         selectedTags={wizard.state.selectedTags}
                         hasUploadsInProgress={wizard.hasUploadsInProgress}
                         isEditMode={isEditMode}
+                        isSubmitting={wizard.isSubmitting}
+                        onAddImages={wizard.addImages}
+                        onAddVideo={wizard.addVideo}
+                        onRemoveMedia={wizard.removeMedia}
+                        onSetCover={wizard.setCoverMedia}
+                        onRetryMedia={wizard.retryMedia}
+                        onReorderMedia={wizard.reorderMedia}
                         onGoToStep={(step) => wizard.goToStep(step)}
+                        onSubmit={() => wizard.submit()}
                       />
-                    )}
+                    ) : null}
                   </AnimatePresence>
                 </OverlayPortalProvider>
               </div>
@@ -471,24 +416,27 @@ export function ReviewWizard({
             onClose={() => setShowPostingOptions(false)}
             selectedActor={selectedActor}
             availableActors={availableActors}
-            onActorChange={setSelectedActor}
             visibility={visibility}
+            onActorChange={setSelectedActor}
             onVisibilityChange={setVisibility}
           />
 
-          {/* Delete review confirmation */}
+          {/* Remove Review Confirmation Action Sheet */}
           <RemoveReviewActionSheet
             open={showDeleteConfirm}
-            onRemove={confirmDeleteReview}
             onCancel={() => setShowDeleteConfirm(false)}
+            onRemove={confirmDeleteReview}
             isRemoving={wizard.isDeleting}
           />
 
-          {/* Course search */}
+          {/* Course Search Sheet */}
           <CourseSearchSheet
             isOpen={showCourseSearch}
             onClose={() => setShowCourseSearch(false)}
-            onSelectCourse={() => {}}
+            onSelectCourse={(selectedCourse) => {
+              setActiveCourse(selectedCourse);
+              setShowCourseSearch(false);
+            }}
           />
         </>
       )}
