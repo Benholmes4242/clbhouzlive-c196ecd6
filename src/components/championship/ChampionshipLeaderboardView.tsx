@@ -481,7 +481,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       const { data } = await supabase
         .from('user_profiles')
-        .select('id, display_name, avatar_url, golf_clubs!user_profiles_primary_club_id_fkey(name)')
+        .select('id, display_name, profile_photo_url, golf_clubs!user_profiles_primary_club_id_fkey(name)')
         .in('id', winnerIds);
 
       if (data) {
@@ -490,7 +490,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           const clubData = Array.isArray(p.golf_clubs) ? p.golf_clubs[0] : p.golf_clubs;
           profiles[p.id] = {
             display_name: p.display_name || 'Champion',
-            avatar_url: p.avatar_url,
+            avatar_url: p.profile_photo_url,
             club_name: clubData?.name || null,
           };
         });
