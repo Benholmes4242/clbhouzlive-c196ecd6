@@ -9,8 +9,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import {
-  User, MessageCircle, Bell, Pencil,
-  Building2, Settings, ChevronRight, LogOut,
+  ChevronRight, LogOut,
   Shield, Plus, Check, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -196,21 +195,22 @@ function ProfileHubSheet({
   // ── Quick actions config ──
   const quickActions = [
     {
-      icon: User,
+      emoji: '👤',
+      bg: 'rgba(99,102,241,0.10)',
       label: 'View Profile',
       route: `/profile/${localActiveId}`,
       badge: 0,
       badgeColor: '',
     },
     {
-      icon: MessageCircle,
+      emoji: '💬',
       label: 'Messages',
       route: '/messages',
       badge: unreadMessageCount,
       badgeColor: 'emerald',
     },
     {
-      icon: Bell,
+      emoji: '🔔',
       label: 'Notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
@@ -219,9 +219,9 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { icon: Pencil, label: 'Edit profile', route: '/edit-profile' },
-    { icon: Building2, label: 'Manage business profiles', route: '/businesses/manage' },
-    { icon: Settings, label: 'Settings', route: '/settings' },
+    { emoji: '✏️', bg: 'rgba(99,102,241,0.10)', label: 'Edit profile', route: '/edit-profile' },
+    { emoji: '🏢', bg: 'rgba(0,0,0,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
+    { emoji: '⚙️', bg: 'rgba(0,0,0,0.05)', label: 'Settings', route: '/settings' },
   ];
 
   // ── Section label class ──
@@ -442,7 +442,7 @@ function ProfileHubSheet({
 
               {/* ── Quick actions — 3 column grid ── */}
               <div className="grid grid-cols-3 gap-2 py-4">
-                {quickActions.map(({ icon: Icon, label, route, badge, badgeColor }) => (
+                {quickActions.map(({ emoji, bg, label, route, badge, badgeColor }) => (
                     <button
                       key={label}
                       type="button"
@@ -489,22 +489,11 @@ function ProfileHubSheet({
                             ? badgeColor === 'emerald'
                               ? 'rgba(16,185,129,0.10)'
                               : 'rgba(247,147,30,0.10)'
-                            : 'rgba(0,0,0,0.05)',
+                            : (bg || 'rgba(0,0,0,0.05)'),
                           transition: 'background 0.2s ease',
                         }}
                       >
-                        <Icon
-                          className="w-[18px] h-[18px]"
-                          style={{
-                            color: badge > 0
-                              ? badgeColor === 'emerald'
-                                ? '#10b981'
-                                : '#F7931E'
-                              : '#475569',
-                            transition: 'color 0.2s ease',
-                          }}
-                          strokeWidth={2}
-                        />
+                        <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
                       </div>
 
                       <span
@@ -525,7 +514,7 @@ function ProfileHubSheet({
                 <div className={sectionLabelClass}>
                   Account
                 </div>
-                {accountRows.map(({ icon: Icon, label, route }, index) => (
+                {accountRows.map(({ emoji, bg, label, route }, index) => (
                   <div key={label}>
                     {index > 0 && <div className="h-px bg-border/30 mx-1" />}
                     <button
@@ -535,13 +524,9 @@ function ProfileHubSheet({
                     >
                       <div
                         className="flex items-center justify-center rounded-[10px]"
-                        style={{
-                          width: 34,
-                          height: 34,
-                          background: 'rgba(0,0,0,0.05)',
-                        }}
+                        style={{ width: 34, height: 34, background: bg }}
                       >
-                        <Icon className="w-4 h-4 text-muted-foreground" />
+                        <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
                       </div>
                       <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
                       <ChevronRight className="w-[13px] h-[13px] text-muted-foreground/30" />
