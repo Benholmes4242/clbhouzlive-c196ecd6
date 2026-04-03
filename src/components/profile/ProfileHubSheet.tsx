@@ -443,7 +443,6 @@ function ProfileHubSheet({
                         {label}
                       </span>
                     </button>
-                  )
                 ))}
               </div>
 
