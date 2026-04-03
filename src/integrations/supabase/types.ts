@@ -15878,8 +15878,13 @@ export type Database = {
           icon: string
           is_current: boolean
           name: string
+          prize_claimed: boolean
+          prize_description: string
           season_id: string
           season_number: number
+          season_winner_courses: number
+          season_winner_user_id: string
+          sponsor_name: string
           start_date: string
           status: string
           tagline: string
