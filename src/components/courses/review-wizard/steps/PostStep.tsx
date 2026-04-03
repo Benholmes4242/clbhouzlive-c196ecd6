@@ -190,10 +190,6 @@ export function PostStep({
                     onRemove={() => onRemoveMedia(item.id)}
                     onSetCover={() => onSetCover(item.id)}
                   />
-                  {/* Redundant COVER badge removed — MediaThumbnail already shows cover */}
-                </div>
-                    </span>
-                  )}
                 </div>
               ))}
               {/* Add more button */}
