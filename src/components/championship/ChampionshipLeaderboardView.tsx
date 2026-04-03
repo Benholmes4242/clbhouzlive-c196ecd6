@@ -83,31 +83,36 @@ const LeaderboardLoadingSkeleton = () => (
   </div>
 );
 
-/** Full-page skeleton for initial Championship tab load */
+/** Full-page skeleton for initial Championship tab load — green-tinted */
 const ChampionshipPageSkeleton = () => (
-  <div className="flex flex-col px-3 py-4 space-y-5 animate-pulse">
-    {/* Season status panel */}
-    <Skeleton className="h-[88px] w-full rounded-2xl" />
-    {/* Time toggle */}
-    <Skeleton className="h-9 w-48 rounded-full mx-auto" />
-    {/* Podium */}
-    <div className="flex items-end justify-center gap-2">
-      <Skeleton className="h-[110px] w-[30%] rounded-xl" />
-      <Skeleton className="h-[130px] w-[38%] rounded-xl" />
-      <Skeleton className="h-[110px] w-[30%] rounded-xl" />
-    </div>
-    {/* Leaderboard rows */}
-    {[...Array(6)].map((_, i) => (
-      <div key={i} className="flex items-center gap-3 px-3 py-3">
-        <Skeleton className="w-7 h-5 rounded" />
-        <Skeleton className="w-11 h-11 rounded-lg" />
-        <div className="flex-1 space-y-1.5">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-24" />
-        </div>
-        <Skeleton className="w-10 h-8 rounded" />
+  <div className="flex flex-col" style={{ background: '#F0F2F5', minHeight: '100%' }}>
+    {/* Green hero header skeleton */}
+    <div style={{ background: 'linear-gradient(160deg, #003D28, #006747)', padding: '18px 18px 0' }}>
+      <Skeleton className="h-3 w-40 rounded mb-4" style={{ background: 'rgba(255,255,255,0.15)' }} />
+      <Skeleton className="h-16 w-full rounded-[14px] mb-5" style={{ background: 'rgba(255,255,255,0.1)' }} />
+      <div className="flex gap-3">
+        <Skeleton className="h-10 flex-1 rounded-t-[10px]" style={{ background: 'rgba(255,255,255,0.12)' }} />
+        <Skeleton className="h-10 flex-1 rounded-t-[10px]" style={{ background: 'rgba(255,255,255,0.06)' }} />
       </div>
-    ))}
+    </div>
+    <div className="flex flex-col gap-3 p-4">
+      {/* Sponsor card skeleton */}
+      <Skeleton className="h-[180px] w-full rounded-[18px]" />
+      {/* Scope toggle skeleton */}
+      <Skeleton className="h-10 w-full rounded-[12px]" />
+      {/* Leaderboard rows */}
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-3 py-3">
+          <Skeleton className="w-7 h-5 rounded" />
+          <Skeleton className="w-11 h-11 rounded-lg" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+          <Skeleton className="w-10 h-8 rounded" />
+        </div>
+      ))}
+    </div>
   </div>
 );
 
