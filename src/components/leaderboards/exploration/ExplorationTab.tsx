@@ -621,45 +621,14 @@ export function ExplorationTab() {
           </div>
         )}
 
-        {/* Tier progress ladder */}
+        {/* Tier progress — compact ladder + milestone card */}
         {hasUserData && (
-          <div style={{
-            background: '#FFFFFF', borderRadius: 14, padding: '12px 14px', marginBottom: 14,
-            border: '1px solid rgba(0,0,0,0.07)',
-          }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>
-              Tier progress ladder
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-              {EXPLORER_TIERS.map((t, i) => {
-                const current = t.name === userTier.name;
-                const unlocked = i <= EXPLORER_TIERS.findIndex(x => x.name === userTier.name);
-                return (
-                  <div key={t.name} style={{ display: 'flex', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                      <div style={{
-                        width: current ? 36 : 28, height: current ? 36 : 28,
-                        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: current ? 17 : 13,
-                        background: unlocked ? `${t.color}22` : 'rgba(0,0,0,0.05)',
-                        border: current ? `3px solid ${t.color}` : `1.5px solid ${unlocked ? t.color + '44' : 'rgba(0,0,0,0.08)'}`,
-                        boxShadow: current ? `0 3px 10px ${t.color}44` : 'none',
-                        transition: 'all 0.3s',
-                      }}>
-                        {unlocked && !current ? <span style={{ fontSize: 12, color: t.color }}>✓</span> : t.icon}
-                      </div>
-                      <div style={{ fontSize: 8, fontWeight: current ? 800 : 500, color: current ? t.color : '#94A3B8', textAlign: 'center', maxWidth: 48 }}>
-                        {t.name}
-                      </div>
-                    </div>
-                    {i < EXPLORER_TIERS.length - 1 && (
-                      <div style={{ flex: 1, height: 3, background: unlocked && i < EXPLORER_TIERS.findIndex(x => x.name === userTier.name) ? t.color : 'rgba(0,0,0,0.08)', minWidth: 12, margin: '0 2px', borderRadius: 2, marginBottom: 16 }} />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <ExplorerTierCard
+            tier={userTier}
+            nextTier={nextTier}
+            countriesCount={countriesPlayed}
+            continentsCount={continentsPlayed}
+          />
         )}
 
         {/* Empty state */}
