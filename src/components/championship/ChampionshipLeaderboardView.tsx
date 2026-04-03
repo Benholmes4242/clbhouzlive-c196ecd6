@@ -4,6 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import {
   useChampionshipLeaderboard,
