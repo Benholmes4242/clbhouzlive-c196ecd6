@@ -154,78 +154,66 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
         </div>
       </div>
 
-      {/* Season Selector — 2×2 grid of independent tiles */}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* Season strip — compact horizontal pills */}
+      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
         {SEASON_ORDER.map((id) => {
           const seasonConfig = getSeasonConfig(id);
           const SeasonIcon = seasonConfig.Icon;
           const state = getSeasonState(id);
           const isLocked = state === 'locked';
           const isActive = state === 'active';
+          const isCompleted = state === 'completed';
           const tabColor = getTabSeasonColor(id);
-          const daysUntil = seasonData[id]?.daysUntilAvailable;
 
           return (
             <button
               key={id}
               onClick={() => !isLocked && onSeasonSelect?.(id)}
               disabled={isLocked}
-              className={cn(
-                'relative flex flex-col items-start gap-2 p-3.5 rounded-2xl text-left',
-                'transition-all duration-200 active:scale-[0.97]',
-                isActive && 'bg-card shadow-sm',
-                !isActive && !isLocked && 'bg-muted/40',
-                isLocked && 'bg-muted/20 cursor-not-allowed',
-              )}
+              className="flex items-center gap-2 flex-shrink-0 active:scale-[0.97] transition-all duration-200"
               style={{
+                padding: '7px 14px',
+                borderRadius: 99,
                 border: isActive
-                  ? `1.5px solid ${tabColor}30`
-                  : '1.5px solid hsl(var(--border) / 0.3)',
+                  ? `1.5px solid ${tabColor}40`
+                  : '1.5px solid hsl(var(--border) / 0.4)',
+                background: isActive
+                  ? 'hsl(var(--card))'
+                  : isCompleted
+                  ? 'hsl(var(--muted) / 0.3)'
+                  : 'hsl(var(--muted) / 0.15)',
+                cursor: isLocked ? 'not-allowed' : 'pointer',
+                opacity: isLocked ? 0.45 : 1,
+                boxShadow: isActive ? '0 1px 6px rgba(0,0,0,0.08)' : 'none',
               }}
             >
-              {/* Icon row */}
-              <div className="flex items-center justify-between w-full">
-                <SeasonIcon
-                  className="w-5 h-5"
-                  style={{
-                    color: isActive ? tabColor : 'hsl(var(--muted-foreground))',
-                    opacity: isLocked ? 0.4 : 1,
-                  }}
+              <SeasonIcon
+                className="w-3.5 h-3.5 flex-shrink-0"
+                style={{ color: isActive ? tabColor : 'hsl(var(--muted-foreground))' }}
+              />
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: isActive ? 800 : 500,
+                  color: isActive ? tabColor : 'hsl(var(--muted-foreground))',
+                  fontFamily: 'DM Sans, system-ui, sans-serif',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {getShortName(id)}
+              </span>
+              {isActive && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: tabColor }}
                 />
-                {isActive && (
-                  <span
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: tabColor }}
-                  />
-                )}
-                {isLocked && (
-                  <Lock className="w-3.5 h-3.5 text-muted-foreground/40" />
-                )}
-              </div>
-
-              {/* Label */}
-              <div>
-                <p
-                  className={cn(
-                    'font-semibold leading-tight',
-                    isActive ? 'text-foreground' : 'text-muted-foreground',
-                    isLocked && 'opacity-40',
-                  )}
-                  style={{ fontSize: 13 }}
-                >
-                  {getShortName(id)}
-                </p>
-                {isLocked && daysUntil && daysUntil <= 60 && (
-                  <p className="text-[11px] text-muted-foreground/50 mt-0.5">
-                    In {daysUntil}d
-                  </p>
-                )}
-                {isActive && (
-                  <p className="text-[11px] mt-0.5" style={{ color: tabColor }}>
-                    Active
-                  </p>
-                )}
-              </div>
+              )}
+              {isCompleted && (
+                <span style={{ fontSize: 11 }}>✓</span>
+              )}
+              {isLocked && (
+                <Lock className="w-3 h-3 flex-shrink-0 opacity-40" />
+              )}
             </button>
           );
         })}

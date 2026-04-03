@@ -196,6 +196,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [previousRank, setPreviousRank] = useState<number | null>(null);
   const [userHandicap, setUserHandicap] = useState<number | null>(null);
   const [userCountry, setUserCountry] = useState<string | null>(null);
+  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
   // Club-related state (restored from persistence)
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
@@ -244,7 +245,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('primary_club_id, country, eg_handicap_index, golf_clubs!user_profiles_primary_club_id_fkey(id, name, country)')
+        .select('primary_club_id, country, eg_handicap_index, profile_photo_url, golf_clubs!user_profiles_primary_club_id_fkey(id, name, country)')
         .eq('id', userId)
         .single();
 
@@ -264,6 +265,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       const profileCountry = (data as any)?.country ?? null;
       setUserCountry(clubCountry || profileCountry || null);
       setUserHandicap((data as any)?.eg_handicap_index ?? null);
+      setUserPhotoUrl((data as any)?.profile_photo_url ?? null);
     };
 
     fetchUserProfile();
@@ -733,9 +735,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           }}
         >
           <SquircleAvatar
-            src={activeProfile?.avatarUrl ?? null}
+            src={userPhotoUrl}
             size={38}
-            fallback={activeProfile?.name?.charAt(0) ?? '?'}
+            fallback={currentUserEntry?.display_name?.charAt(0) ?? user?.email?.charAt(0) ?? '?'}
             hideRing
           />
           <div style={{ flex: 1 }}>
