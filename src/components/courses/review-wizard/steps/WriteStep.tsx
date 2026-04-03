@@ -53,6 +53,7 @@ type VoiceState = 'idle' | 'listening' | 'processing';
 
 function VoiceMic({ onTranscript, onStateChange }: { onTranscript: (text: string) => void; onStateChange?: (state: VoiceState) => void }) {
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
+  const updateVoiceState = useCallback((s: VoiceState) => { setVoiceState(s); onStateChange?.(s); }, [onStateChange]);
   const recognitionRef = useRef<any>(null);
   const SpeechRecognitionClass = getSpeechRecognition();
 
