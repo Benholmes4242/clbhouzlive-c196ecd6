@@ -96,6 +96,39 @@ Deno.serve(async (req) => {
 
     console.log("[register-push-device] Success:", data?.id);
 
+    // Register user in OneSignal via REST API
+    const oneSignalAppId = Deno.env.get("ONESIGNAL_APP_ID");
+    const oneSignalApiKey = Deno.env.get("ONESIGNAL_REST_API_KEY");
+
+    if (oneSignalAppId && oneSignalApiKey && enabled) {
+      try {
+        const osResponse = await fetch(
+          `https://api.onesignal.com/apps/${oneSignalAppId}/users`,
+          {
+            method: "POST",
+            headers: {
+              "Authorization": `Key ${oneSignalApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              identity: {
+                external_id: user.id,
+              },
+              subscriptions: [{
+                type: "iOSPush",
+                token: provider_id,
+                enabled: true,
+              }],
+            }),
+          }
+        );
+        const osData = await osResponse.json();
+        console.log("[register-push-device] OneSignal registration:", JSON.stringify(osData));
+      } catch (osErr) {
+        console.error("[register-push-device] OneSignal registration failed:", osErr);
+      }
+    }
+
     return new Response(
       JSON.stringify({ ok: true, device_id: data?.id }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
