@@ -143,6 +143,13 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
   </div>
 );
 
+// ─── Helpers ────────────────────────────────────────────────────────
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 // ─── Virtualization constants ───────────────────────────────────────
 const ROW_HEIGHT = 72; // 64px row (p-3 + h-10 avatar) + 8px gap (space-y-2)
 const VIRTUALIZATION_THRESHOLD = 50;
