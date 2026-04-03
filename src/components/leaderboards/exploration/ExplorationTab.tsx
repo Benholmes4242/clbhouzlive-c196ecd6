@@ -459,11 +459,11 @@ export function ExplorationTab() {
               <img
                 src={currentUserProfile.profile_photo_url}
                 alt=""
-                style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
+                style={{ width: 52, height: 52, borderRadius: '34%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
               />
             ) : (
               <div style={{
-                width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,0.12)',
+                width: 52, height: 52, borderRadius: '34%', background: 'rgba(255,255,255,0.12)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 700, flexShrink: 0,
               }}>
