@@ -666,11 +666,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return { totalHeight, visibleEntries, offsetY, startIndex };
   }, [useVirtualization, allEntries, scrollTop]);
 
-  // Full-page skeleton for initial load
-  if (leaderboardLoading && allEntries.length === 0) {
-    return <ChampionshipPageSkeleton />;
-  }
-
   // Get user's profile data for position band
   const activeProfile = useMemo(() => {
     if (!currentUserEntry) return null;
@@ -679,6 +674,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       name: currentUserEntry.display_name,
     };
   }, [currentUserEntry]);
+
+  // Full-page skeleton for initial load
+  if (leaderboardLoading && allEntries.length === 0) {
+    return <ChampionshipPageSkeleton />;
+  }
 
   return (
     <div className={cn('flex flex-col', className)} style={{ background: '#F0F2F5', minHeight: '100%' }}>
