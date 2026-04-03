@@ -69,27 +69,27 @@ function VoiceMic({ onTranscript, onStateChange }: { onTranscript: (text: string
         .map(r => r[0].transcript)
         .join('');
       if (transcript.trim()) {
-        setVoiceState('processing');
+        updateVoiceState('processing');
         onTranscript(transcript.trim());
-        setTimeout(() => setVoiceState('idle'), 400);
+        setTimeout(() => updateVoiceState('idle'), 400);
       }
     };
 
-    recognition.onerror = () => setVoiceState('idle');
+    recognition.onerror = () => updateVoiceState('idle');
     recognition.onend = () => {
-      if (voiceState === 'listening') setVoiceState('idle');
+      if (voiceState === 'listening') updateVoiceState('idle');
     };
 
     recognitionRef.current = recognition;
     recognition.start();
-    setVoiceState('listening');
-  }, [SpeechRecognitionClass, onTranscript, voiceState]);
+    updateVoiceState('listening');
+  }, [SpeechRecognitionClass, onTranscript, voiceState, updateVoiceState]);
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
     recognitionRef.current = null;
-    setVoiceState('idle');
-  }, []);
+    updateVoiceState('idle');
+  }, [updateVoiceState]);
 
   useEffect(() => {
     return () => {
