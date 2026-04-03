@@ -1,0 +1,1 @@
+UPDATE championship_seasons SET sponsor_name = 'Scottsdale Golf', prize_description = '£250 voucher' WHERE name ILIKE '%major%';
