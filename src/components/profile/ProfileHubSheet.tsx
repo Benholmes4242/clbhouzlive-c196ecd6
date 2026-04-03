@@ -9,8 +9,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import {
-  User, MessageCircle, Bell, Pencil,
-  Building2, Settings, ChevronRight, LogOut,
+  ChevronRight, LogOut,
   Shield, Plus, Check, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
