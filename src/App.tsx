@@ -545,7 +545,13 @@ const AppInner: React.FC = () => {
 
         const userId = session.user.id;
 
-        // Login with real user UUID — this fixes any previous bad login
+        // Grant user privacy consent first — required before login in SDK v5
+        os.userPrivacyConsent?.(true);
+
+        // Small delay to let consent register
+        await new Promise(r => setTimeout(r, 500));
+
+        // Login with real user UUID
         os.login?.(userId);
         os.register?.();
 
