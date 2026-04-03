@@ -55,25 +55,17 @@ interface ProfileHubSheetProps {
 function ProfileHubSheetSkeleton() {
   return (
     <div className="px-4">
-      {/* ── Dark header card skeleton ── */}
-      <div
-        className="relative rounded-[20px] overflow-hidden mb-4 mt-1 p-4 sm:p-[18px]"
-        style={{ background: 'linear-gradient(135deg, #1C1C1E, #2d2d30)' }}
-      >
-        {/* Profile row */}
-        <div className="flex items-center gap-3 mb-4">
-          {/* Avatar */}
-          <Skeleton variant="dark" className="w-[52px] h-[52px] rounded-[34%]" />
-          <div className="flex-1 min-w-0 space-y-2">
-            <Skeleton variant="dark" className="h-4 w-28 rounded-lg" />
-            <Skeleton variant="dark" className="h-3 w-20 rounded-lg" />
-          </div>
-          {/* Search pill */}
-          <Skeleton variant="dark" className="w-9 h-9 rounded-full flex-shrink-0" />
+      {/* ── Profile row skeleton ── */}
+      <div className="flex items-center gap-3 pt-2 pb-3">
+        <Skeleton className="w-[52px] h-[52px] rounded-[34%]" />
+        <div className="flex-1 min-w-0 space-y-2">
+          <Skeleton className="h-4 w-28 rounded-lg" />
+          <Skeleton className="h-3 w-20 rounded-lg" />
         </div>
-        {/* Echo card */}
-        <Skeleton variant="dark" className="h-[62px] w-full rounded-[14px]" />
+        <Skeleton className="w-9 h-9 rounded-full flex-shrink-0" />
       </div>
+      {/* Echo card skeleton */}
+      <Skeleton className="h-[48px] w-full rounded-[12px] mb-3" />
 
       {/* ── Switch Profile skeleton ── */}
       <div className="pb-3">
@@ -273,99 +265,73 @@ function ProfileHubSheet({
                 <ProfileHubSheetSkeleton />
               ) : (
                 <>
-              {/* ── Dark editorial header card ── */}
-              <div
-                className="relative rounded-[20px] overflow-hidden mb-4 mt-1 p-4 sm:p-[18px]"
-                style={{ background: 'linear-gradient(135deg, #1C1C1E, #2d2d30)' }}
-              >
-                {/* Ambient amber glow */}
-                <div
-                  className="absolute pointer-events-none"
-                  style={{
-                    top: -20, right: -20,
-                    width: 120, height: 120,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(247,147,30,0.25) 0%, transparent 70%)',
-                  }}
+              {/* ── Profile row — sits on sheet background ── */}
+              <div className="flex items-center gap-3 pt-2 pb-3">
+                <SquircleAvatar
+                  size={52}
+                  src={activeProfile.avatarUrl}
+                  alt={activeProfile.name}
+                  fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
+                  hideRing
                 />
-
-                {/* Profile row */}
-                <div className="relative flex items-center gap-3 mb-4">
-                  <SquircleAvatar
-                    size={52}
-                    src={activeProfile.avatarUrl}
-                    alt={activeProfile.name}
-                    fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
-                    hideRing
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[17px] font-extrabold truncate" style={{ color: '#ffffff', letterSpacing: '-0.3px' }}>
-                      {activeProfile.name}
-                    </div>
-                    <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      {activeProfile.type === 'business' ? 'Business account' : 'Personal account'}
-                    </p>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[17px] font-extrabold truncate text-foreground" style={{ letterSpacing: '-0.3px' }}>
+                    {activeProfile.name}
                   </div>
-                  {/* Search icon pill */}
-                  <button
-                    type="button"
-                    onClick={() => setSearchOpen(true)}
-                    className="flex items-center justify-center flex-shrink-0 active:scale-[0.94] transition-transform"
-                    style={{
-                      width: 36, height: 36, borderRadius: '50%',
-                      background: 'rgba(247,147,30,0.18)',
-                      border: '1px solid rgba(247,147,30,0.28)',
-                    }}
-                    aria-label="Search"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F7931E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="8"/>
-                      <path d="m21 21-4.3-4.3"/>
-                    </svg>
-                  </button>
+                  <p className="text-[12px] truncate text-muted-foreground">
+                    {activeProfile.type === 'business' ? 'Business account' : 'Personal account'}
+                  </p>
                 </div>
-
-                {/* Echo AI Assistant feature card */}
+                {/* Search icon pill */}
                 <button
                   type="button"
-                  onClick={() => handleNav('/echo')}
-                  className="relative w-full flex items-center gap-3 active:scale-[0.97] transition-all duration-150 overflow-hidden min-h-[56px]"
+                  onClick={() => setSearchOpen(true)}
+                  className="flex items-center justify-center flex-shrink-0 active:scale-[0.94] transition-transform"
                   style={{
-                    minHeight: 62, borderRadius: 14, padding: '0 16px',
-                    background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
-                    border: 'none', cursor: 'pointer',
-                    boxShadow: '0 4px 20px rgba(247,147,30,0.35)',
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'rgba(247,147,30,0.12)',
+                    border: '1px solid rgba(247,147,30,0.22)',
                   }}
+                  aria-label="Search"
                 >
-                  {/* Sheen overlay */}
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.12), transparent 60%)' }}
-                  />
-                  {/* Icon container */}
-                  <div
-                    className="flex items-center justify-center flex-shrink-0"
-                    style={{
-                      width: 38, height: 38, borderRadius: 10,
-                      background: 'rgba(255,255,255,0.2)',
-                    }}
-                  >
-                    <AnimatedEchoWave size={22} color="#ffffff" active={true} />
-                  </div>
-                  {/* Text */}
-                  <div className="flex-1 text-left">
-                    <div className="text-[15px] font-extrabold" style={{ color: '#ffffff', letterSpacing: '-0.3px' }}>
-                      Echo AI Assistant
-                    </div>
-                    <div className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)', marginTop: 1 }}>
-                      Playing tips · course knowledge · advice
-                    </div>
-                  </div>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m9 18 6-6-6-6"/>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F7931E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.3-4.3"/>
                   </svg>
                 </button>
               </div>
+
+              {/* ── Echo AI Assistant — Discover-style light card ── */}
+              <button
+                type="button"
+                onClick={() => handleNav('/echo')}
+                className="w-full flex items-center gap-3 active:scale-[0.98] transition-all duration-150 mb-3"
+                style={{
+                  padding: '11px 13px',
+                  borderRadius: 12,
+                  background: 'rgba(247,147,30,0.08)',
+                  border: '1px solid rgba(247,147,30,0.20)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                {/* Echo icon */}
+                <div style={{
+                  width: 32, height: 32, borderRadius: 9,
+                  background: 'linear-gradient(135deg, #F7931E, #E8920A)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <AnimatedEchoWave size={16} color="#ffffff" active={true} />
+                </div>
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-bold text-foreground truncate">Echo AI Assistant</div>
+                  <div className="text-[11px] text-muted-foreground truncate">Playing tips · course knowledge · advice</div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground flex-shrink-0">
+                  <path d="m9 18 6-6-6-6"/>
+                </svg>
+              </button>
 
               {/* ── Switch profile ── */}
               <div className="pb-3">
