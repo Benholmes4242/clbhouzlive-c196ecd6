@@ -195,21 +195,22 @@ function ProfileHubSheet({
   // ── Quick actions config ──
   const quickActions = [
     {
-      icon: User,
+      emoji: '👤',
+      bg: 'rgba(99,102,241,0.10)',
       label: 'View Profile',
       route: `/profile/${localActiveId}`,
       badge: 0,
       badgeColor: '',
     },
     {
-      icon: MessageCircle,
+      emoji: '💬',
       label: 'Messages',
       route: '/messages',
       badge: unreadMessageCount,
       badgeColor: 'emerald',
     },
     {
-      icon: Bell,
+      emoji: '🔔',
       label: 'Notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
@@ -218,9 +219,9 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { icon: Pencil, label: 'Edit profile', route: '/edit-profile' },
-    { icon: Building2, label: 'Manage business profiles', route: '/businesses/manage' },
-    { icon: Settings, label: 'Settings', route: '/settings' },
+    { emoji: '✏️', bg: 'rgba(99,102,241,0.10)', label: 'Edit profile', route: '/edit-profile' },
+    { emoji: '🏢', bg: 'rgba(0,0,0,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
+    { emoji: '⚙️', bg: 'rgba(0,0,0,0.05)', label: 'Settings', route: '/settings' },
   ];
 
   // ── Section label class ──
