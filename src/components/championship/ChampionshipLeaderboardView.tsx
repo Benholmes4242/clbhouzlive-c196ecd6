@@ -196,6 +196,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [previousRank, setPreviousRank] = useState<number | null>(null);
   const [userHandicap, setUserHandicap] = useState<number | null>(null);
   const [userCountry, setUserCountry] = useState<string | null>(null);
+  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
   // Club-related state (restored from persistence)
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
