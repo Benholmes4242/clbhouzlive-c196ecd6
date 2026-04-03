@@ -950,9 +950,52 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 9. Leaderboard List */}
-      <div ref={listContainerRef} className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
-        {/* Loading overlay - doesn't unmount the list */}
+      {/* Empty state — season just started */}
+      {timeFilter === 'seasonal' && !leaderboardLoading && allEntries.length === 0 && (
+        <div
+          className="flex flex-col items-center justify-center py-12 px-4 text-center"
+          style={{
+            background: '#FFFFFF',
+            borderRadius: 18,
+            border: '1px solid rgba(0,0,0,0.07)',
+          }}
+        >
+          <span style={{ fontSize: 36 }}>⛳</span>
+          <p style={{
+            fontSize: 16,
+            fontWeight: 700,
+            color: '#0C0C0E',
+            fontFamily: 'DM Sans,system-ui,sans-serif',
+            marginTop: 12,
+          }}>
+            {getSeasonConfig(currentSeasonId).title} has begun
+          </p>
+          <p style={{
+            fontSize: 13,
+            color: '#6B7280',
+            fontFamily: 'DM Sans,system-ui,sans-serif',
+            marginTop: 6,
+            maxWidth: 260,
+          }}>
+            Log your first Top 100 course to appear on the leaderboard. Everyone starts from zero.
+          </p>
+        </div>
+      )}
+
+      {/* 9. Leaderboard List — wrapped in card */}
+      {(allEntries.length > 0 || leaderboardLoading || isError) && (
+      <div
+        ref={listContainerRef}
+        className="min-h-[200px] relative"
+        style={{
+          background: '#FFFFFF',
+          borderRadius: 'clamp(14px,4vw,18px)',
+          border: '1px solid rgba(0,0,0,0.07)',
+          overflow: 'hidden',
+          overflowAnchor: 'auto',
+        }}
+      >
+        {/* Loading overlay */}
         {leaderboardLoading && allEntries.length > 0 && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-background/80 backdrop-blur-sm rounded-full shadow-sm border border-border/50">
@@ -966,8 +1009,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {isError && allEntries.length === 0 ? (
           <InitialErrorState onRetry={() => refetch()} />
         ) : leaderboardLoading && allEntries.length === 0 ? (
-          // Initial loading skeleton
-          <div className="space-y-2">
+          <div className="space-y-2 p-2">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="py-3 px-4 flex items-center gap-3">
                 <Skeleton className="w-8 h-8 rounded" />
@@ -981,7 +1023,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             ))}
           </div>
         ) : allEntries.length === 0 && !leaderboardLoading ? (
-          // Contextual empty states based on arena mode
           arenaMode === 'friends' ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <Users className="w-12 h-12 text-muted-foreground/40 mb-3" />
@@ -1004,13 +1045,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </div>
           )
         ) : useVirtualization && virtualizedContent ? (
-          // Virtualized list for large entry counts
           <div
             className={cn('relative transition-opacity duration-150', leaderboardLoading && 'opacity-60')}
             style={{ height: virtualizedContent.totalHeight }}
           >
             <div
-              className="absolute inset-x-0 space-y-2"
+              className="absolute inset-x-0"
               style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
             >
               {virtualizedContent.visibleEntries.map((entry) => (
@@ -1022,15 +1062,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   homeClubName={entry.home_club}
                   courses={entry.courses_this_season}
                   isCurrentUser={entry.is_current_user}
-                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))'}
+                  leaderCourses={allEntries[0]?.courses_this_season ?? 0}
                   onClick={() => handleEntryClick(entry.user_id)}
                 />
               ))}
             </div>
           </div>
         ) : (
-          // Non-virtualized list for smaller entry counts
-          <div className={cn('transition-opacity duration-150 space-y-2', leaderboardLoading && 'opacity-60')}>
+          <div className={cn('transition-opacity duration-150', leaderboardLoading && 'opacity-60')}>
             {allEntries.map((entry) => (
               <LeaderboardRowV3
                 key={entry.user_id}
@@ -1039,8 +1078,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 avatarUrl={entry.avatar_url}
                 homeClubName={entry.home_club}
                 courses={entry.courses_this_season}
-                  isCurrentUser={entry.is_current_user}
-                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))'}
+                isCurrentUser={entry.is_current_user}
+                leaderCourses={allEntries[0]?.courses_this_season ?? 0}
                 onClick={() => handleEntryClick(entry.user_id)}
               />
             ))}
@@ -1049,15 +1088,15 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         
         {/* Short list invite CTA */}
         {allEntries.length > 0 && allEntries.length < 10 && !hasNextPage && !leaderboardLoading && (
-          <div className="mt-6 mx-4 py-5 px-4 rounded-2xl flex flex-col items-center gap-2 text-center"
-            style={{ border: '1.5px dashed hsl(var(--border) / 0.3)' }}
+          <div className="mt-2 mx-4 mb-4 py-5 px-4 rounded-2xl flex flex-col items-center gap-2 text-center"
+            style={{ border: '1.5px dashed rgba(0,0,0,0.1)' }}
           >
-            <p className="text-[14px] text-muted-foreground">
+            <p style={{ fontSize: 14, color: '#6B7280', fontFamily: 'DM Sans,system-ui,sans-serif' }}>
               Invite friends to climb the leaderboard
             </p>
             <button
-              className="text-[14px] font-semibold transition-opacity active:scale-[0.97] active:opacity-70"
-              style={{ color: 'hsl(var(--accent-amber))' }}
+              className="transition-opacity active:scale-[0.97] active:opacity-70"
+              style={{ fontSize: 14, fontWeight: 600, color: '#006747', fontFamily: 'DM Sans,system-ui,sans-serif' }}
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({ title: 'Join me on Clbhouz', url: window.location.origin });
@@ -1086,6 +1125,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <LeaderboardLoadingSkeleton />
         )}
       </div>
+      )}
 
       {/* Rival Versus Panel (drawer) */}
       {userStatus && selectedRival && (
