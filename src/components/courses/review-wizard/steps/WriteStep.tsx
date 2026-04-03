@@ -395,7 +395,7 @@ export function WriteStep({
                 key={chip.label}
                 type="button"
                 onClick={() => insertChip(chip.text)}
-                className="px-3.5 py-1.5 rounded-full border border-border bg-card text-[13px] font-medium shadow-sm active:scale-[0.95] active:bg-[rgba(247,147,30,0.1)] transition-all"
+                className="px-3.5 py-1.5 rounded-full border border-border bg-card text-foreground text-[13px] font-medium shadow-sm active:scale-[0.95] active:bg-[rgba(247,147,30,0.1)] transition-all"
               >
                 {chip.label}
               </button>
