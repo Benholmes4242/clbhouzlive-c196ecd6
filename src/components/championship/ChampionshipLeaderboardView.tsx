@@ -683,7 +683,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }
 
   return (
-    <div className={cn('flex flex-col', className)} style={{ background: '#F0F2F5', minHeight: '100%' }}>
+    <div className={cn('flex flex-col', className)} style={{ background: '#F8FAFC', minHeight: '100%' }}>
       {/* ── GREEN HERO HEADER ── */}
       <div
         style={{
@@ -694,6 +694,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
+          marginLeft: '-16px',
+          marginRight: '-16px',
         }}
       >
         {/* Season info line */}
