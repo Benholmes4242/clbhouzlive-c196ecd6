@@ -91,7 +91,7 @@ export function SuccessScreen({
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
         style={{
           background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
-          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.3)',
+          boxShadow: '0 8px 32px rgba(247, 147, 30, 0.3)',
         }}
       >
         <Check className="w-10 h-10 text-white" strokeWidth={3} />
