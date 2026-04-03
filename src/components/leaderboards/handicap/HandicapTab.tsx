@@ -1,10 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
-import { LeaderboardScopeSelector } from '../shared';
-import { ClubSearchBar } from '../exploration/ClubSearchBar';
-import { CountrySelector } from '../shared/CountrySelector';
 import { LowestHandicapLeaderboard } from './LowestHandicapLeaderboard';
 import type { LeaderboardScope } from '@/types/leaderboards';
 
@@ -18,21 +14,9 @@ function loadSavedFilters() {
   return null;
 }
 
-// --- Scope pills per brief Section 4.2 ---
-const SCOPE_OPTIONS: { id: LeaderboardScope; label: string }[] = [
-  { id: 'global', label: '🌍 Global' },
-  { id: 'country', label: 'Country' },
-  { id: 'club', label: 'Club' },
-  { id: 'friends', label: '👥 Friends' },
-];
-
 export function HandicapTab() {
   const { user } = useSupabaseSession();
   const savedFilters = useRef(loadSavedFilters()).current;
-
-  // Mode toggle — "lowest" or "improved"
-  // TODO: add hcp_movement_30d to RPC to enable Most Improved mode
-  // const [mode, setMode] = useState<'lowest' | 'improved'>('lowest');
 
   const [scope, setScope] = useState<LeaderboardScope>(() => savedFilters?.scope ?? 'global');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => savedFilters?.selectedClubId ?? null);
@@ -66,7 +50,6 @@ export function HandicapTab() {
           setSelectedClubName((data.golf_clubs as any)?.name || null);
         }
       }
-      // Use club country or profile country
       const clubCountry = (data?.golf_clubs as any)?.country;
       setUserCountry(clubCountry || data?.country || null);
     }
@@ -103,109 +86,20 @@ export function HandicapTab() {
   const effectiveCountry = scope === 'country' ? (selectedCountry || userCountry) : null;
 
   return (
-    <div className="space-y-3 px-3 pt-3">
-      {/* Mode Toggle — Section 4.1 */}
-      {/* TODO: add hcp_movement_30d to RPC to enable Most Improved mode
-      <div
-        style={{
-          background: '#F1F5F9',
-          borderRadius: 12,
-          padding: 3,
-          display: 'flex',
-        }}
-      >
-        <button
-          onClick={() => setMode('lowest')}
-          style={{
-            flex: 1,
-            borderRadius: 10,
-            minHeight: 36,
-            fontSize: 12,
-            fontWeight: mode === 'lowest' ? 700 : 500,
-            color: mode === 'lowest' ? '#0F172A' : '#64748B',
-            background: mode === 'lowest' ? 'white' : 'transparent',
-            boxShadow: mode === 'lowest' ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          ⬇ Lowest
-        </button>
-        <button
-          onClick={() => setMode('improved')}
-          style={{
-            flex: 1,
-            borderRadius: 10,
-            minHeight: 36,
-            fontSize: 12,
-            fontWeight: mode === 'improved' ? 700 : 500,
-            color: mode === 'improved' ? '#0F172A' : '#64748B',
-            background: mode === 'improved' ? 'white' : 'transparent',
-            boxShadow: mode === 'improved' ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          📉 Most Improved
-        </button>
-      </div>
-      */}
-
-      {/* Leaderboard */}
+    <div>
       <LowestHandicapLeaderboard
         scope={scope}
+        onScopeChange={setScope}
         clubId={scope === 'club' ? selectedClubId : null}
         clubName={scope === 'club' ? selectedClubName : null}
         country={effectiveCountry}
-        scopeSelector={
-          <div className="space-y-3">
-            {/* Scope pills — Section 4.2 */}
-            <div
-              className="flex overflow-x-auto no-scrollbar"
-              style={{ gap: 8 }}
-            >
-              {SCOPE_OPTIONS.map(opt => {
-                const isActive = scope === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    onClick={() => setScope(opt.id)}
-                    className={cn(
-                      'flex-shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] shadow-none',
-                      isActive
-                        ? 'bg-foreground text-white border-0'
-                        : 'bg-transparent text-muted-foreground border-[1.5px] border-border'
-                    )}
-                    style={{ borderRadius: 8 }}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Club search — shown when club scope active */}
-            {scope === 'club' && (
-              <ClubSearchBar
-                selectedClubId={selectedClubId}
-                selectedClubName={selectedClubName}
-                userHomeClubId={userHomeClubId}
-                userHomeClubName={userHomeClubName}
-                onClubSelect={handleClubSelect}
-              />
-            )}
-
-            {/* Country selector — shown when country scope active */}
-            {scope === 'country' && (
-              <CountrySelector
-                selectedCountry={selectedCountry}
-                onCountrySelect={setSelectedCountry}
-              />
-            )}
-          </div>
-        }
+        selectedClubId={selectedClubId}
+        selectedClubName={selectedClubName}
+        onClubSelect={handleClubSelect}
+        selectedCountry={selectedCountry}
+        onCountrySelect={setSelectedCountry}
+        userHomeClubId={userHomeClubId}
+        userHomeClubName={userHomeClubName}
       />
     </div>
   );
