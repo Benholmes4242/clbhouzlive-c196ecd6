@@ -247,17 +247,6 @@ export function WriteStep({
     }
     onReviewChange(newText.slice(0, MAX_REVIEW_LENGTH));
   }, [review, onReviewChange]);
-    const current = review;
-    let newText: string;
-    if (!current) {
-      newText = transcript.charAt(0).toUpperCase() + transcript.slice(1);
-    } else {
-      newText = current.endsWith(' ')
-        ? current + transcript
-        : current + ' ' + transcript;
-    }
-    onReviewChange(newText.slice(0, MAX_REVIEW_LENGTH));
-  }, [review, onReviewChange]);
 
   // Insert chip text
   const insertChip = useCallback((chipText: string) => {
