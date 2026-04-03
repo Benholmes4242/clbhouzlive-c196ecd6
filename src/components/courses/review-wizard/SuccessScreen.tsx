@@ -90,7 +90,7 @@ export function SuccessScreen({
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
         style={{
-          background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+          background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
           boxShadow: '0 8px 32px rgba(245, 158, 11, 0.3)',
         }}
       >
