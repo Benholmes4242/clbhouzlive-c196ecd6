@@ -671,9 +671,123 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return <ChampionshipPageSkeleton />;
   }
 
+  // Get user's profile data for position band
+  const activeProfile = useMemo(() => {
+    if (!currentUserEntry) return null;
+    return {
+      avatarUrl: currentUserEntry.avatar_url,
+      name: currentUserEntry.display_name,
+    };
+  }, [currentUserEntry]);
+
   return (
-    <div className={cn('flex flex-col px-3 py-4', className)} style={{ gap: 20 }}>
-      {/* 1. Season Status Panel — floats on page background, no card wrapper */}
+    <div className={cn('flex flex-col', className)} style={{ background: '#F0F2F5', minHeight: '100%' }}>
+      {/* ── GREEN HERO HEADER ── */}
+      <div
+        style={{
+          background: 'linear-gradient(160deg, #003D28, #006747, #005238)',
+          padding: 'clamp(14px,4vw,20px)',
+          paddingTop: "max(env(safe-area-inset-top, 0px), 47px)",
+          paddingBottom: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}
+      >
+        {/* Season info line */}
+        {currentSeason && (
+          <div className="flex items-center gap-2">
+            <span
+              style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: '#4ade80',
+                boxShadow: '0 0 6px #4ade80',
+                animation: 'pulse 2s infinite',
+              }}
+            />
+            <span
+              style={{
+                fontSize: 'clamp(9px,2.5vw,11px)',
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.7)',
+                letterSpacing: '0.04em',
+                fontFamily: 'DM Sans,system-ui,sans-serif',
+              }}
+            >
+              {getSeasonConfig(currentSeasonId).title} · Active · {currentSeason.days_remaining ?? 0} days left
+            </span>
+          </div>
+        )}
+
+        {/* Position band — frosted glass */}
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.1)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: 14,
+            padding: 'clamp(10px,3vw,14px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <SquircleAvatar
+            src={activeProfile?.avatarUrl ?? null}
+            size={38}
+            fallback={activeProfile?.name?.charAt(0) ?? '?'}
+            hideRing
+          />
+          <div style={{ flex: 1 }}>
+            <p style={{
+              fontSize: 10,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.6)',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              Your position
+            </p>
+            <p style={{
+              fontSize: 'clamp(15px,4vw,18px)',
+              fontWeight: 800,
+              color: '#FFFFFF',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              {currentRank ? `${ordinal(currentRank)} of ${allEntries.length}` : 'Not yet ranked'}
+            </p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{
+              fontSize: 10,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.6)',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              Courses logged
+            </p>
+            <p style={{
+              fontSize: 'clamp(18px,5vw,22px)',
+              fontWeight: 800,
+              color: '#FFFFFF',
+              fontFamily: 'DM Sans,system-ui,sans-serif',
+            }}>
+              {currentUserEntry?.courses_this_season ?? 0}
+            </p>
+          </div>
+        </div>
+
+        {/* Inline Time Toggle — flush at bottom of green header */}
+        <TimeModeToggle
+          value={timeFilter}
+          onChange={setTimeFilter}
+          seasonYear={currentSeason ? new Date(currentSeason.start_date).getFullYear() : undefined}
+        />
+      </div>
+
+      {/* ── BODY CONTENT (below hero) ── */}
+      <div style={{ padding: 'clamp(12px,3vw,16px)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+      {/* Season Status Panel */}
       {timeFilter === 'seasonal' && currentSeason && (
         <SeasonStatusPanel
           currentSeasonId={currentSeasonId}
@@ -692,7 +806,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 1b. Season Race Card — live position in season race */}
+      {/* Season Race Card */}
       {timeFilter === 'seasonal' && currentSeason && (currentUserEntry?.courses_this_season ?? 0) > 0 && (
         <SeasonRaceCard
           seasonLabel={getSeasonConfig(currentSeasonId).title}
@@ -705,15 +819,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           majorsBonusActive={currentSeasonId === 'major'}
         />
       )}
-
-      {/* 2. Time Filter Toggle */}
-      <div>
-        <TimeModeToggle
-          value={timeFilter}
-          onChange={setTimeFilter}
-          seasonYear={currentSeason ? new Date(currentSeason.start_date).getFullYear() : undefined}
-        />
-      </div>
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
       <div className="overflow-visible">
