@@ -45,8 +45,8 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
   const rankColor = getRankColor();
 
   // Season-aware played treatment using CSS vars for proper alpha
-  const playedBg = course.current_user_played ? 'hsl(var(--accent-amber) / 0.05)' : undefined;
-  const playedBorder = course.current_user_played ? 'hsl(var(--accent-amber) / 0.3)' : undefined;
+  const playedBg = course.current_user_played ? 'rgba(247,147,30,0.06)' : undefined;
+  const playedBorder = course.current_user_played ? '#F7931E' : undefined;
 
   return (
     <button
