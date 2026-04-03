@@ -1,5 +1,4 @@
 import React from 'react';
-import { Star } from 'lucide-react';
 
 interface WriteReviewPromptProps {
   onRateClick: () => void;
@@ -13,25 +12,41 @@ export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
   onRateClick,
 }) => {
   return (
-    <div className="rounded-sq-md border border-border bg-card px-4 py-4 shadow-sm">
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50">
-          <Star className="h-5 w-5 text-amber-500" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-foreground">Played here?</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Rate this course to help the community.
-          </p>
-          <button
-            type="button"
-            onClick={onRateClick}
-            className="mt-3 h-9 inline-flex items-center px-4 rounded-lg text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all"
-          >
-            Rate this course
-          </button>
-        </div>
+    <div
+      className="flex items-center gap-3.5 p-4 rounded-2xl"
+      style={{
+        background: 'linear-gradient(135deg, rgba(247,147,30,0.06), rgba(247,147,30,0.02))',
+        border: '1.5px solid rgba(247,147,30,0.15)',
+      }}
+    >
+      {/* Amber gradient icon square */}
+      <div
+        className="w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0"
+        style={{ background: 'linear-gradient(135deg, #F7931E, #FBBC2E)' }}
+      >
+        <span style={{ fontSize: 20 }}>⭐</span>
       </div>
+
+      {/* Copy */}
+      <div className="flex-1 min-w-0">
+        <p className="text-[14px] font-bold text-foreground">Played here?</p>
+        <p className="text-[13px] text-muted-foreground mt-0.5">
+          Your rating helps golfers worldwide
+        </p>
+      </div>
+
+      {/* Amber pill CTA */}
+      <button
+        type="button"
+        onClick={onRateClick}
+        className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-bold text-white active:scale-[0.97] transition-all"
+        style={{
+          background: '#F7931E',
+          boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
+        }}
+      >
+        Rate
+      </button>
     </div>
   );
 };

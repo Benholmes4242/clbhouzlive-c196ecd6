@@ -267,9 +267,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           <button
             type="button"
             onClick={onRateCourse}
-            className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium text-slate-600 border border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.97] transition-all min-h-[40px]"
+            className="inline-flex items-center px-5 py-2 rounded-full text-[13px] font-bold text-white active:scale-[0.97] transition-all"
+            style={{
+              background: '#F7931E',
+              boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
+            }}
           >
-            <span>Rate this course</span>
+            Rate this course
           </button>
         </div>
       )}
