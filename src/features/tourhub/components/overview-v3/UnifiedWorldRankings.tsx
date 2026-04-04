@@ -564,7 +564,7 @@ export function UnifiedWorldRankings() {
 
       {/* ═══ 9. Pagination ═══ */}
       {totalPages > 1 && (
-        <div className="pt-3 pb-1">
+        <div className="pt-3">
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={goToPrevPage}
