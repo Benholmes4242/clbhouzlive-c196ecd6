@@ -8,7 +8,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import type { WizardStepExtended } from './types';
 
-const STEP_LABELS = ['RATE', 'WRITE', 'POST'] as const;
+const STEP_LABELS = ['RATE', 'WRITE', 'SHARE'] as const;
 
 interface WizardProgressProps {
   currentStep: WizardStepExtended;
