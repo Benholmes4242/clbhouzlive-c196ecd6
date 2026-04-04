@@ -28,18 +28,30 @@ const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
 interface FranchiseLeaderboardProps {
   limit?: number;
   className?: string;
+  /** When provided, parent controls the active metric — tabs are hidden */
+  activeMetric?: MetricTab;
+  onMetricChange?: (metric: MetricTab) => void;
+  /** When true, suppress the sticky tab header (parent renders it instead) */
+  hideHeader?: boolean;
 }
 
-export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderboardProps) {
+export function FranchiseLeaderboard({ limit = 25, className, activeMetric: externalMetric, onMetricChange, hideHeader = false }: FranchiseLeaderboardProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortParam = searchParams.get('sort') || 'earnings';
-  const activeMetric: MetricTab = VALID_METRICS.has(sortParam) ? (sortParam as MetricTab) : 'earnings';
+  const internalMetric: MetricTab = VALID_METRICS.has(sortParam) ? (sortParam as MetricTab) : 'earnings';
+
+  // Use external control if provided, otherwise internal URL state
+  const activeMetric = externalMetric ?? internalMetric;
 
   const setActiveMetric = (metric: MetricTab) => {
-    const params = new URLSearchParams(searchParams);
-    if (metric === 'earnings') params.delete('sort');
-    else params.set('sort', metric);
-    setSearchParams(params, { replace: true });
+    if (onMetricChange) {
+      onMetricChange(metric);
+    } else {
+      const params = new URLSearchParams(searchParams);
+      if (metric === 'earnings') params.delete('sort');
+      else params.set('sort', metric);
+      setSearchParams(params, { replace: true });
+    }
   };
 
   const { data: allStats, isLoading, error } = useCollegeSeasonStats();
@@ -73,55 +85,57 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
 
   return (
     <div className={cn('', className)}>
-      {/* Tabs — pill style, sticky */}
-      <div
-        className="sticky top-0 z-20 -mx-4 px-4"
-        style={{
-          background: 'hsl(var(--background) / 0.95)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          paddingBottom: 8,
-          marginBottom: 16,
-          borderBottom: '1px solid hsl(var(--border) / 0.15)',
-        }}
-      >
+      {/* Tabs — only rendered when parent hasn't taken over (hideHeader = false) */}
+      {!hideHeader && (
         <div
-          role="tablist"
-          aria-label="Franchise Leaderboard Sort"
-          className="flex rounded-xl"
+          className="sticky top-0 z-20 -mx-4 px-4"
           style={{
-            background: 'transparent',
-            padding: 4,
+            background: 'hsl(var(--background) / 0.95)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            paddingBottom: 8,
+            marginBottom: 16,
+            borderBottom: '1px solid hsl(var(--border) / 0.15)',
           }}
         >
-          {METRIC_TABS.map(({ value, label }) => {
-            const isSelected = activeMetric === value;
-            return (
-              <button
-                key={value}
-                role="tab"
-                aria-selected={isSelected}
-                onClick={() => setActiveMetric(value)}
-                className={cn(
-                  'relative flex-1 whitespace-nowrap rounded-lg active:scale-[0.98] transition-all duration-200',
-                  isSelected
-                    ? 'bg-foreground text-background'
-                    : 'text-muted-foreground hover:bg-muted/50'
-                )}
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  minHeight: 44,
-                  padding: '10px 4px',
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
+          <div
+            role="tablist"
+            aria-label="Franchise Leaderboard Sort"
+            className="flex rounded-xl"
+            style={{
+              background: 'transparent',
+              padding: 4,
+            }}
+          >
+            {METRIC_TABS.map(({ value, label }) => {
+              const isSelected = activeMetric === value;
+              return (
+                <button
+                  key={value}
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => setActiveMetric(value)}
+                  className={cn(
+                    'relative flex-1 whitespace-nowrap rounded-lg active:scale-[0.98] transition-all duration-200',
+                    isSelected
+                      ? 'bg-foreground text-background'
+                      : 'text-muted-foreground hover:bg-muted/50'
+                  )}
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    minHeight: 44,
+                    padding: '10px 4px',
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Content */}
       {activeMetric === 'movers' ? (
