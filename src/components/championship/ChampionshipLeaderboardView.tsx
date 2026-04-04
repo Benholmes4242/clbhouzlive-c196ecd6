@@ -719,7 +719,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* Merged season hero header */}
       {timeFilter === 'seasonal' && currentSeason && (
-        <div style={{ margin: '0 -12px' }}>
+        <div style={{ margin: '0 calc(-1 * clamp(12px,3vw,16px))' }}>
           <div style={{
             background: 'linear-gradient(160deg, #0a2a1a, #0f3d20, #0a2a1a)',
             padding: '14px 16px 0',
