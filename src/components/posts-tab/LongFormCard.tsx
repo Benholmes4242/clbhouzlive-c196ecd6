@@ -18,6 +18,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
   const [expanded, setExpanded] = useState(false);
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
+  const isVideo = firstMedia?.type === 'video';
   const duration = firstMedia?.duration;
   const hlsUrl = firstMedia?.hlsUrl;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
