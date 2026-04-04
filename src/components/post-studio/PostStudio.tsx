@@ -28,7 +28,7 @@ import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
 
 // ─── Screen order for directional transitions ───────────────────────────────
 const STEP_ORDER: StudioStep[] = [
-  'COMPOSE', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS',
+  'VIEWFINDER', 'COMPOSE', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS',
 ];
 
 function getDirection(from: StudioStep | null, to: StudioStep): 'forward' | 'backward' {
