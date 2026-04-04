@@ -9,8 +9,9 @@ import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ChevronLeft } from 'lucide-react';
+import { RefreshCw, ChevronLeft, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
@@ -58,6 +59,7 @@ export function LeadersTab() {
   // ─── Pull-to-refresh ───
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
+  const [categorySheetOpen, setCategorySheetOpen] = useState(false);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
 
@@ -221,42 +223,75 @@ export function LeadersTab() {
         />
       )}
 
-      {/* ← Tour Overview back link */}
-      <div className="px-4" style={{ marginTop: '20px' }}>
-        <Link
-          to="/tourhub?tab=overview"
-          replace
-          className="inline-flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
-        >
-          <ChevronLeft size={14} />
-          Tour Overview
-        </Link>
-      </div>
+      {/* ══════════════════════════════════════════════
+          STICKY HEADER — back link · category pill · stat context
+          ══════════════════════════════════════════════ */}
+      <div
+        className="-mx-4 sticky top-0 z-20"
+        style={{
+          background: 'hsl(var(--background) / 0.96)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid hsl(var(--border) / 0.10)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          marginTop: '12px',
+        }}
+      >
+        {/* Control row: ← Tour Overview | [spacer] | category pill */}
+        <div className="flex items-center gap-2 px-4 pt-2.5">
+          {/* Back link */}
+          <Link
+            to="/tourhub?tab=overview"
+            replace
+            className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+            style={{ color: 'hsl(var(--muted-foreground) / 0.70)' }}
+          >
+            <ChevronLeft size={13} strokeWidth={2.5} />
+            Tour Overview
+          </Link>
 
-      {/* Content area */}
-      <div className="px-4" style={{ paddingTop: 8, paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-        {/* Category selector — sticky */}
-        <div
-          className="sticky top-0 z-20 -mx-4 px-4 pb-2"
-          style={{
-            background: 'hsl(var(--background) / 0.95)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            borderBottom: '1px solid hsl(var(--border) / 0.15)',
-            marginTop: '12px',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          }}
-        >
-          <LeadersCategorySheet
-            categories={LEADER_CATEGORIES}
-            activeKey={category.key}
-            onCategoryChange={setCategory}
-            leaderValue={leaderValue}
-          />
+          <div className="flex-1" />
+
+          {/* Category selector pill — opens LeadersCategorySheet */}
+          <button
+            onClick={() => setCategorySheetOpen(true)}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] shrink-0',
+              'bg-card border border-border/50 shadow-sm',
+              'transition-all duration-150 active:scale-[0.97]'
+            )}
+          >
+            <category.icon
+              className="w-[13px] h-[13px] shrink-0"
+              style={{
+                color: category.key !== 'world_rank'
+                  ? (category as any).accentColor ?? 'hsl(var(--muted-foreground))'
+                  : 'hsl(var(--muted-foreground))',
+              }}
+            />
+            <span className="text-[12px] font-bold text-foreground">
+              {category.shortLabel}
+            </span>
+            <span
+              className="text-[10px] font-bold uppercase tracking-[0.06em]"
+              style={{ color: 'hsl(var(--muted-foreground))' }}
+            >
+              Leaderboard
+            </span>
+            {leaderValue && (
+              <span
+                className="text-[10px] font-bold"
+                style={{ color: 'hsl(var(--muted-foreground) / 0.40)' }}
+              >
+                · {leaderValue}
+              </span>
+            )}
+            <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
+          </button>
         </div>
 
-        {/* Stat context */}
-        <div style={{ marginTop: 12 }}>
+        {/* Stat context — tight 2-line block, always visible in header */}
+        <div className="px-4 pt-2 pb-3">
           <AnimatePresence mode="wait">
             <motion.div
               key={`ctx-${category.key}`}
@@ -272,7 +307,10 @@ export function LeadersTab() {
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
 
+      {/* Content area */}
+      <div className="px-4" style={{ paddingTop: 0, paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Rankings list (#4–50) */}
         <div style={{ marginTop: 16 }}>
           <AnimatePresence mode="wait">
@@ -331,6 +369,17 @@ export function LeadersTab() {
           </p>
         </div>
       </div>
+
+      {/* Category sheet — driven by categorySheetOpen state */}
+      <LeadersCategorySheet
+        categories={LEADER_CATEGORIES}
+        activeKey={category.key}
+        onCategoryChange={setCategory}
+        leaderValue={leaderValue}
+        externalOpen={categorySheetOpen}
+        onExternalClose={() => setCategorySheetOpen(false)}
+        hideTrigger
+      />
     </div>
   );
 }
