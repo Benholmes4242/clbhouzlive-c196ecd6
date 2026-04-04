@@ -75,6 +75,8 @@ export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [tourSheetOpen, setTourSheetOpen] = useState(false);
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
