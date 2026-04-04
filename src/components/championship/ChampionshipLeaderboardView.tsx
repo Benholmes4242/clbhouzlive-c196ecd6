@@ -713,14 +713,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   return (
     <div className={cn('flex flex-col', className)} style={{ background: '#F8FAFC', minHeight: '100%' }}>
-      {/* Time Toggle */}
-      <div style={{ padding: '0 16px' }}>
-        <TimeModeToggle
-          value={timeFilter}
-          onChange={setTimeFilter}
-          seasonYear={currentSeason ? new Date(currentSeason.start_date).getFullYear() : undefined}
-        />
-      </div>
 
       {/* ── BODY CONTENT (below hero) ── */}
       <div style={{ padding: 'clamp(12px,3vw,16px)', display: 'flex', flexDirection: 'column', gap: 16, marginLeft: '-16px', marginRight: '-16px' }}>
@@ -857,7 +849,33 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
       )}
 
-      {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
+      {/* Time Toggle — primary tab pills */}
+      <div style={{ display: 'flex', gap: 8, padding: '12px 4px 4px' }}>
+        {([
+          { id: 'seasonal' as const, label: `${currentSeason ? new Date(currentSeason.start_date).getFullYear() : new Date().getFullYear()} Season` },
+          { id: 'all_time' as const, label: 'All-Time' },
+        ] as const).map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTimeFilter(t.id)}
+            className="active:scale-[0.97] transition-all"
+            style={{
+              padding: '8px 20px',
+              borderRadius: 8,
+              border: timeFilter === t.id ? 'none' : '1.5px solid hsl(var(--border))',
+              background: timeFilter === t.id ? 'hsl(var(--foreground))' : 'transparent',
+              color: timeFilter === t.id ? '#fff' : 'hsl(var(--muted-foreground))',
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              minHeight: 36,
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
       <div className="overflow-visible">
         {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
           <TrophyPodium
