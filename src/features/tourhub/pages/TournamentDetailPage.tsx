@@ -25,8 +25,6 @@ import {
   FullLeaderboard,
   CourseInfoCard,
   TournamentInfoGrid,
-  TournamentDetailTabs,
-  StatusBar,
   TeeTimesTab,
   HoleStatsTab,
   SummaryTab,
