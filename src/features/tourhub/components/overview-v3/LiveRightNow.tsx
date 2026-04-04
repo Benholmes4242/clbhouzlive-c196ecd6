@@ -86,40 +86,41 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
           flexShrink: 0,
         }}
       />
-      {/* Live badge */}
+      {/* Live badge + tour label row */}
       <div
         style={{
-          padding: '4px 12px 0',
+          padding: '5px 10px 0',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          justifyContent: 'space-between',
         }}
       >
-        <div
-          className="animate-live-pulse"
-          style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }}
-        />
-        <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 800, letterSpacing: '0.1em' }}>
-          LIVE
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <div
+            className="animate-live-pulse"
+            style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }}
+          />
+          <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 800, letterSpacing: '0.1em' }}>
+            LIVE
+          </span>
+        </div>
         {tourLabel && (
-          <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.7)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <span style={{ color: 'hsl(var(--muted-foreground))', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em' }}>
             {tourLabel}
           </span>
         )}
       </div>
 
       {/* Card body */}
-      <div style={{ padding: '12px 12px 14px' }}>
+      <div style={{ padding: '6px 10px 10px' }}>
         {/* Tournament name */}
         <div
           style={{
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: 700,
             color: 'hsl(var(--foreground))',
             lineHeight: 1.3,
-            marginBottom: '12px',
-            minHeight: '36px',
+            marginBottom: '8px',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical' as const,
