@@ -12645,30 +12645,27 @@ export type Database = {
           created_at: string
           enabled: boolean
           id: string
-          last_seen_at: string | null
+          onesignal_external_id: string
           platform: string
-          provider: string
-          provider_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           enabled?: boolean
           id?: string
-          last_seen_at?: string | null
+          onesignal_external_id: string
           platform: string
-          provider?: string
-          provider_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           enabled?: boolean
           id?: string
-          last_seen_at?: string | null
+          onesignal_external_id?: string
           platform?: string
-          provider?: string
-          provider_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
