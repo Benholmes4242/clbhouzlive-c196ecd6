@@ -488,7 +488,7 @@ export function TourHubNavOverlay({
                       }}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => handleItemClick(item.value)}
-                      className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left relative overflow-hidden"
+                      className="w-full flex items-center gap-3.5 p-4 rounded-[18px] text-left relative overflow-hidden"
                       style={{
                         background: isActive ? '#ffffff' : 'rgba(255,255,255,0.60)',
                         border: isActive ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(0,0,0,0.05)',
@@ -499,9 +499,9 @@ export function TourHubNavOverlay({
                     >
                       {/* Icon in circle */}
                       <div 
-                        className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                        className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
                         style={{
-                          background: isActive ? 'rgba(245,166,35,0.10)' : 'rgba(0,0,0,0.04)',
+                          background: isActive ? 'rgba(245,166,35,0.14)' : 'rgba(0,0,0,0.04)',
                           color: isActive ? '#d97706' : '#64748b',
                         }}
                       >
@@ -545,7 +545,7 @@ export function TourHubNavOverlay({
                     }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => handleLinkClick(item.path)}
-                    className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left"
+                    className="w-full flex items-center gap-3.5 p-4 rounded-[18px] text-left"
                     style={{
                       background: 'rgba(255,255,255,0.60)',
                       border: '1px solid rgba(0,0,0,0.05)',
@@ -555,7 +555,7 @@ export function TourHubNavOverlay({
                   >
                     {/* Icon in circle */}
                     <div 
-                      className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                      className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
                       style={{ background: 'rgba(0,0,0,0.04)', color: '#64748b' }}
                     >
                       {item.icon}
