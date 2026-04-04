@@ -84,10 +84,10 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
             <button
               key={pill.id}
               onClick={() => !isUnavailable && onArenaChange(pill.id)}
-              className="flex-1 flex flex-col items-center transition-all active:scale-[0.96]"
+              className="flex-1 flex flex-col transition-all active:scale-[0.96]"
               style={{
                 borderRadius: 14,
-                padding: '10px 12px',
+                padding: '8px 10px',
                 backgroundColor: isActive ? `${pill.color}15` : '#FFFFFF',
                 border: isActive
                   ? `1.5px solid ${pill.color}88`
@@ -97,19 +97,21 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
                 cursor: isUnavailable ? 'default' : 'pointer',
               }}
             >
-              <span className="text-base mb-1">{pill.icon}</span>
-              <span
-                className="font-black leading-none"
-                style={{
-                  fontSize: isUnavailable ? 13 : 22,
-                  color: isUnavailable
-                    ? 'hsl(var(--muted-foreground))'
-                    : isActive ? pill.color : 'hsl(var(--foreground))',
-                }}
-              >
-                {isUnavailable ? 'N/A' : pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
-              </span>
-              <span className="text-[11px] font-semibold text-foreground mt-0.5 truncate w-full text-center">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span className="text-base">{pill.icon}</span>
+                <span
+                  className="font-black leading-none"
+                  style={{
+                    fontSize: isUnavailable ? 13 : 20,
+                    color: isUnavailable
+                      ? 'hsl(var(--muted-foreground))'
+                      : isActive ? pill.color : 'hsl(var(--foreground))',
+                  }}
+                >
+                  {isUnavailable ? 'N/A' : pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
+                </span>
+              </div>
+              <span className="text-[11px] font-semibold text-foreground mt-0.5 truncate w-full">
                 {pill.label}
               </span>
               <span className="text-[10px] text-muted-foreground">
