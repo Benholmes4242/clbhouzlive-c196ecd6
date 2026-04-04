@@ -180,7 +180,7 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
             </div>
 
             {/* Name + location */}
-            <div style={{ position: 'absolute', bottom: 10, left: 10, right: 10 }}>
+            <div style={{ position: 'absolute', bottom: 10, left: 10, right: 48 }}>
               <div style={{
                 color: '#fff', fontSize: 'clamp(12px,3.3vw,14px)', fontWeight: 700,
                 lineHeight: 1.2, fontFamily: 'DM Sans, system-ui, sans-serif',
