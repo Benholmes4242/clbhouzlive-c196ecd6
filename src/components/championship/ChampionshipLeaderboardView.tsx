@@ -1006,33 +1006,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
 
-      {/* 6. Motivational Carousel - Only show in Season mode */}
-      {timeFilter === 'seasonal' && currentUserEntry && (
-        <MotivationalCarousel
-          currentRank={currentRank}
-          totalPlayers={allEntries.length}
-          coursesThisSeason={currentUserEntry.courses_this_season}
-          friendAhead={friendAhead ? {
-            name: friendAhead.display_name?.split(' ')[0] || 'Friend',
-            rank: friendAhead.current_rank,
-            coursesAhead: friendAhead.courses_this_season - currentUserEntry.courses_this_season,
-          } : null}
-          friendBehind={friendBehind ? {
-            name: friendBehind.display_name?.split(' ')[0] || 'Friend',
-            rank: friendBehind.current_rank,
-            coursesBehind: currentUserEntry.courses_this_season - friendBehind.courses_this_season,
-          } : null}
-          rivalAhead={closestRivalAhead ? {
-            name: closestRivalAhead.display_name?.split(' ')[0] || 'Rival',
-            rank: closestRivalAhead.current_rank ?? 0,
-            coursesAhead: closestRivalAhead.gap ?? 0,
-          } : null}
-          coursesToNextRank={userStatus?.courses_to_next_division}
-          isInTop10={isInTop10}
-          isInTop3={isInTop3}
-          streak={undefined}
-        />
-      )}
 
       {/* 6b. Arenas Strip — rank pills */}
       {timeFilter === 'seasonal' && currentUserEntry && (
