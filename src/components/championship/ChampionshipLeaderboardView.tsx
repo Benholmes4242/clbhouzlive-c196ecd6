@@ -810,17 +810,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                       }} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 14px' }}>
-                      <div>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
-                        <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E' }}>
-                          +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} courses
-                        </div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Leader</div>
-                        <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
-                          {allEntries[0]?.courses_this_season ?? 0} courses
-                        </div>
+                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
+                      <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E' }}>
+                        +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} courses
                       </div>
                     </div>
                   </>
