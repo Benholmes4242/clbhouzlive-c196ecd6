@@ -349,52 +349,167 @@ export function TournamentDetailPage() {
           tournament={tournament} 
           imageUrl={heroImageUrl}
         />
-        
-        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-          {/* Canonical back link — always first below hero */}
-          <button
-            onClick={() => {
-              if (window.history.length > 1) {
-                navigate(-1);
-              } else {
-                navigate('/tourhub?tab=schedule');
-              }
-            }}
-            className="flex items-center gap-0.5 text-muted-foreground active:opacity-70 transition-opacity"
-            style={{ fontSize: 13, fontWeight: 500, padding: '12px 0 8px 0' }}
-          >
-            <ChevronLeft size={14} />
-            Back
-          </button>
 
-          {/* Status bar — below back CTA */}
-          <div>
+        {/* ══════════════════════════════════════════════
+            STICKY HEADER — ← Back | status pill | tabs
+            ══════════════════════════════════════════════ */}
+        <div
+          className="sticky top-0 z-20"
+          style={{
+            background: 'hsl(var(--background) / 0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderBottom: '1px solid hsl(var(--border) / 0.10)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          }}
+        >
+          {/* Row 1: ← Back | [spacer] | status pill */}
+          <div className="flex items-center gap-2 px-4 pt-2.5">
+            <button
+              onClick={() => {
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate('/tourhub?tab=schedule');
+                }
+              }}
+              className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+              style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+            >
+              <ChevronLeft size={13} strokeWidth={2.5} />
+              Back
+            </button>
+
+            <div className="flex-1" />
+
+            {/* Status pill — compact, right-aligned */}
             {isLive && (
-              <StatusBar
-                variant="live"
-                lastUpdatedText={isConnected ? 'Live' : 'Reconnecting…'}
-                isRefreshing={false}
-                leaderName={leader?.name}
-                leaderScore={leader?.score}
-                className="mb-4"
-              />
+              <div
+                className="flex items-center gap-1.5 shrink-0 max-w-[220px]"
+                style={{
+                  background: 'rgba(34,197,94,0.08)',
+                  border: '1px solid rgba(34,197,94,0.20)',
+                  borderRadius: 99,
+                  padding: '5px 10px',
+                }}
+              >
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: 'rgb(34,197,94)' }} />
+                  <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: 'rgb(34,197,94)' }} />
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'rgb(34,197,94)', flexShrink: 0 }}>
+                  Live
+                </span>
+                {leader && (
+                  <>
+                    <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.35)', flexShrink: 0 }}>·</span>
+                    <span className="text-[12px] font-medium text-foreground truncate">
+                      {leader.name}{leader.score ? ` at ${leader.score}` : ''}
+                    </span>
+                  </>
+                )}
+                {isConnected && (
+                  <span className="text-[11px] text-muted-foreground/50 shrink-0 ml-1">Live</span>
+                )}
+              </div>
             )}
-            {isCompleted && (
-              <StatusBar variant="final" className="mb-4" />
-            )}
+
             {isUpcoming && (
-              <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
+              <div
+                className="flex items-center gap-1.5 shrink-0"
+                style={{
+                  background: 'hsl(var(--accent-amber) / 0.08)',
+                  border: '1px solid hsl(var(--accent-amber) / 0.20)',
+                  borderRadius: 99,
+                  padding: '5px 10px',
+                }}
+              >
+                <Clock
+                  className="w-[13px] h-[13px] shrink-0"
+                  style={{ color: 'hsl(var(--accent-amber))' }}
+                  strokeWidth={2.5}
+                />
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'hsl(var(--accent-amber))', flexShrink: 0 }}>
+                  Upcoming
+                </span>
+                {countdownText && (
+                  <>
+                    <span style={{ fontSize: 11, color: 'hsl(var(--accent-amber) / 0.35)', flexShrink: 0 }}>·</span>
+                    <span style={{ fontSize: 12, color: 'hsl(var(--accent-amber) / 0.85)' }} className="truncate">
+                      {countdownText}
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+
+            {isCompleted && (
+              <div
+                className="flex items-center gap-1.5 shrink-0"
+                style={{
+                  background: 'hsl(var(--muted) / 0.5)',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 99,
+                  padding: '5px 10px',
+                }}
+              >
+                <Trophy
+                  className="w-[13px] h-[13px] shrink-0"
+                  style={{ color: 'hsl(var(--accent-amber) / 0.80)' }}
+                  strokeWidth={2.5}
+                />
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'hsl(var(--foreground))', flexShrink: 0 }}>
+                  Final
+                </span>
+                <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.35)', flexShrink: 0 }}>·</span>
+                <span className="text-[12px] text-muted-foreground">Official results</span>
+              </div>
             )}
           </div>
-          
-          {/* TD-05: Tabs with role="tablist" */}
-          <TournamentDetailTabs 
-            activeTab={activeTab} 
-            onTabChange={handleTabChange}
-            tournamentStatus={tournament.status}
-          />
-          
-          {/* Tab Content with role="tabpanel" */}
+
+          {/* Row 2: Tabs */}
+          <div
+            className="flex gap-1 overflow-x-auto scrollbar-hide px-4 pt-2 pb-2.5"
+            role="tablist"
+            aria-label="Tournament Sections"
+          >
+            {(isCompleted
+              ? [
+                  { value: 'summary' as TournamentTab, label: 'Summary' },
+                  { value: 'leaderboard' as TournamentTab, label: 'Leaderboard' },
+                  { value: 'tee-times' as TournamentTab, label: 'Tee Times' },
+                  { value: 'hole-stats' as TournamentTab, label: 'Holes' },
+                ]
+              : [
+                  { value: 'overview' as TournamentTab, label: 'Overview' },
+                  { value: 'leaderboard' as TournamentTab, label: 'Leaderboard' },
+                  { value: 'tee-times' as TournamentTab, label: 'Tee Times' },
+                  { value: 'hole-stats' as TournamentTab, label: 'Holes' },
+                ]
+            ).map((tab) => {
+              const isActive = activeTab === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => handleTabChange(tab.value)}
+                  className={cn(
+                    'flex-shrink-0 h-[34px] px-3 rounded-[10px] text-[12px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
+                    isActive
+                      ? 'bg-foreground text-background font-bold shadow-sm'
+                      : 'bg-transparent text-muted-foreground font-medium'
+                  )}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+          {/* Tab Content */}
           <AnimatePresence mode="wait">
             <div key={activeTab} className="pt-5" role="tabpanel" aria-label={`${activeTab} content`}>
               {renderTabContent()}
