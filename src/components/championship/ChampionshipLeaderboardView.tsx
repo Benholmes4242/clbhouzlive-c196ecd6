@@ -850,7 +850,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* Time Toggle — primary tab pills */}
-      <div style={{ display: 'flex', gap: 8, padding: '12px 4px 4px' }}>
+      <div style={{ display: 'flex', gap: 8, padding: '12px 4px 4px', justifyContent: 'center' }}>
         {([
           { id: 'seasonal' as const, label: `${currentSeason ? new Date(currentSeason.start_date).getFullYear() : new Date().getFullYear()} Season` },
           { id: 'all_time' as const, label: 'All-Time' },
