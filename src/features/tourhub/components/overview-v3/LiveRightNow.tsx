@@ -77,11 +77,19 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       }}
       aria-label={`${tournament.name} — live now`}
     >
-      {/* Live badge bar */}
+      {/* Live gradient line */}
       <div
         style={{
           background: 'linear-gradient(135deg, #22C55E 0%, #16a34a 60%, #15803d 100%)',
-          padding: '3px 12px',
+          height: '1.5px',
+          width: '100%',
+          flexShrink: 0,
+        }}
+      />
+      {/* Live badge */}
+      <div
+        style={{
+          padding: '4px 12px 0',
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
@@ -89,9 +97,9 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       >
         <div
           className="animate-live-pulse"
-          style={{ width: 7, height: 7, borderRadius: '50%', background: '#ffffff', boxShadow: '0 0 6px rgba(255,255,255,0.7)' }}
+          style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }}
         />
-        <span style={{ color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em' }}>
+        <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 800, letterSpacing: '0.1em' }}>
           LIVE
         </span>
         {tourLabel && (
