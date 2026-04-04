@@ -29,7 +29,6 @@ import {
   ScheduleTournamentCard,
   ScheduleMonthHeader,
   ScheduleEmptyMessage,
-  ScheduleTourFilter,
   type TourFilterCode,
 } from '../schedule';
 
