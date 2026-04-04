@@ -117,7 +117,7 @@ export function PublishScreen() {
       <StudioHeader
         title="Review Post"
         step="PUBLISH"
-        leftAction={{ label: 'Back', onClick: () => setStep('COMPOSE') }}
+        leftAction={{ label: '', onClick: () => setStep('COMPOSE'), icon: 'back' as const }}
       />
 
       <div className="flex-1 overflow-y-auto flex flex-col" style={{ scrollbarWidth: 'none' }}>
