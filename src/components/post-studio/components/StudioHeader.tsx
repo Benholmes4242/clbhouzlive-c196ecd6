@@ -179,7 +179,7 @@ export function StudioHeader({
               className="h-full rounded-full"
               style={{ background: 'linear-gradient(90deg, #F7931E, #FBBC2E)' }}
               initial={{ width: '0%' }}
-              animate={{ width: `${(currentStepNum / 3) * 100}%` }}
+              animate={{ width: `${(currentStepNum / TOTAL_STEPS) * 100}%` }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             />
           </div>
