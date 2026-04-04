@@ -25,7 +25,8 @@ interface StudioHeaderProps {
   darkMode?: boolean;
 }
 
-const STEP_LABELS = ['COMPOSE', 'REVIEW', 'POST'] as const;
+const STEP_LABELS = ['COMPOSE', 'REVIEW'] as const;
+const TOTAL_STEPS = 2;
 
 const STEP_PROGRESS: Partial<Record<StudioStep, number>> = {
   COMPOSE:  1,
@@ -178,7 +179,7 @@ export function StudioHeader({
               className="h-full rounded-full"
               style={{ background: 'linear-gradient(90deg, #F7931E, #FBBC2E)' }}
               initial={{ width: '0%' }}
-              animate={{ width: `${(currentStepNum / 3) * 100}%` }}
+              animate={{ width: `${(currentStepNum / TOTAL_STEPS) * 100}%` }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             />
           </div>
