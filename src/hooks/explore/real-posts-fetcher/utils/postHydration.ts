@@ -131,14 +131,14 @@ export async function buildHydrationContext(
     .filter(Boolean) as string[];
   
   // Parallel fetch all hydration data
-  const [userProfiles, businessAccounts, golfCourses, ratings] = await Promise.all([
+  const [userProfiles, businessAccounts, golfCourses, ratingsResult] = await Promise.all([
     batchFetchUserProfiles(userIds),
     batchFetchBusinessAccounts(businessIds),
     batchFetchGolfCourses(courseIds),
     batchFetchRatings(reviewIds),
   ]);
   
-  return { userProfiles, businessAccounts, golfCourses, ratings };
+  return { userProfiles, businessAccounts, golfCourses, ratings: ratingsResult.ratings, reviewTexts: ratingsResult.reviewTexts };
 }
 
 /**
