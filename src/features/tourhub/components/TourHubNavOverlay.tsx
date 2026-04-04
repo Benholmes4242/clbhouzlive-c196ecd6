@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronRight, 
-  Trophy, 
 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
@@ -362,7 +361,7 @@ export function TourHubNavOverlay({
                 {/* Section header */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4" style={{ color: TOUR_COLORS.intelligenceGoldLight }} />
+                    <span className="text-base">🏆</span>
                     <span className="text-[11px] font-bold uppercase" style={{ letterSpacing: "0.1em", color: "#94a3b8" }}>
                       World Rankings
                     </span>
