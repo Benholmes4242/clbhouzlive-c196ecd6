@@ -809,12 +809,17 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                         borderRadius: 99,
                       }} />
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 16 }}>🎯</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 14px' }}>
                       <div>
                         <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
-                        <div style={{ fontSize: 14, fontWeight: 900, color: '#F7931E' }}>
-                          +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)}
+                        <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E' }}>
+                          +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} courses
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Your rank</div>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
+                          {ordinal(currentUserEntry.current_rank)} of {allEntries.length}
                         </div>
                       </div>
                     </div>
