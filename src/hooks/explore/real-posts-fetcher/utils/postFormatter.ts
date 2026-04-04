@@ -229,6 +229,9 @@ export function formatPost(
   const reviewRating = post.source_review_id && context.ratings
     ? context.ratings.get(post.source_review_id) ?? null
     : null;
+  const reviewText = post.source_review_id && context.reviewTexts
+    ? context.reviewTexts.get(post.source_review_id) ?? null
+    : null;
   
   // Build media array
   const allMedia = (post.post_media || []);
