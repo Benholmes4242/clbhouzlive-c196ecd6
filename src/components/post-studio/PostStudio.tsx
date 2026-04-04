@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Trash2 } from 'lucide-react';
 import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
 import { ComposeScreen } from './screens/ComposeScreen';
+import { ViewfinderScreen } from './screens/ViewfinderScreen';
 import { TrimScreen } from './screens/TrimScreen';
 import { PosterScreen } from './screens/PosterScreen';
 import { PublishScreen } from './screens/PublishScreen';
