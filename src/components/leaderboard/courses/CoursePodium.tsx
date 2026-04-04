@@ -124,9 +124,6 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
           }}>
             {getMetric(first, sort)}
           </span>
-          {metricLabel === 'rating' && (
-            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 1 }}>/10</span>
-          )}
         </div>
       </button>
 
