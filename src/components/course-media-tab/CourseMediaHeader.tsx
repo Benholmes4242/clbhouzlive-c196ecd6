@@ -28,25 +28,27 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
 
   return (
     <div className="px-4 pt-3 pb-2 flex flex-col gap-3">
-      {/* Summary row */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Camera className="w-3.5 h-3.5" />
-          <span className="animate-in fade-in duration-300">
-            <span className="font-semibold text-foreground">{mediaCounts.photos}</span> photos
-            {' · '}
-            <span className="font-semibold text-foreground">{mediaCounts.videos}</span> videos
-          </span>
+      {/* Summary row - hidden when both counts are 0 */}
+      {(mediaCounts.photos > 0 || mediaCounts.videos > 0) && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Camera className="w-3.5 h-3.5" />
+            <span className="animate-in fade-in duration-300">
+              <span className="font-semibold text-foreground">{mediaCounts.photos}</span> photos
+              {' · '}
+              <span className="font-semibold text-foreground">{mediaCounts.videos}</span> videos
+            </span>
+          </div>
+          <button
+            onClick={() => navigate(`/courses/${courseId}/rate`)}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold active:scale-[0.97] transition-all min-h-[36px]"
+            style={{ borderRadius: 8, background: 'hsl(var(--muted))', color: 'hsl(var(--foreground))', border: 'none' }}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add media
+          </button>
         </div>
-        <button
-          onClick={() => navigate(`/courses/${courseId}/rate`)}
-          className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold active:scale-[0.97] transition-all min-h-[36px]"
-          style={{ borderRadius: 8, background: 'hsl(var(--muted))', color: 'hsl(var(--foreground))', border: 'none' }}
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add media
-        </button>
-      </div>
+      )}
 
       {/* Filter chips — pill style */}
       <div className="flex items-center justify-center gap-2">

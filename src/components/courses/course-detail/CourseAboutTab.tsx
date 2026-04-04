@@ -302,8 +302,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="px-4 pt-2 pb-4">
           <Button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-card text-foreground border border-border/60 active:scale-[0.98]"
-            variant="outline"
+            className="w-full flex items-center justify-center gap-2 h-9 font-semibold active:scale-[0.98] transition-all"
+            variant="ghost"
+            style={{ borderRadius: 10, background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))', border: 'none' }}
           >
             <ExternalLink className="h-4 w-4" />
             Official course website

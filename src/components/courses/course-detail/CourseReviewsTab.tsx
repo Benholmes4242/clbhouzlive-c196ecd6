@@ -434,35 +434,50 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Empty state - use aggregates as source of truth
   if (!hasRatings) {
     return (
-      <div className="flex flex-col">
-        <div className="px-4 pt-4 pb-2">
-          <div
-            className="flex items-center gap-3.5 p-4 rounded-2xl"
-            style={{
-              background: 'linear-gradient(135deg, rgba(247,147,30,0.06), rgba(247,147,30,0.02))',
-              border: '1.5px solid rgba(247,147,30,0.15)',
-            }}
+      <div className="flex flex-col px-4 pt-8 pb-8">
+        <div className="flex flex-col items-center text-center gap-4">
+          {/* Star icon */}
+          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/40">
+              <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>
+            </svg>
+          </div>
+          {/* Heading + subtext */}
+          <div>
+            <p className="text-lg font-bold text-foreground">No reviews yet</p>
+            <p className="mt-1.5 text-sm text-muted-foreground max-w-[260px] mx-auto leading-relaxed">
+              Be the first to share your experience at {courseName}.
+            </p>
+          </div>
+          {/* PRIMARY CTA - amber filled */}
+          <button
+            type="button"
+            onClick={handleRateClick}
+            className="w-full h-11 rounded-xl text-sm font-semibold text-white active:scale-[0.97] transition-all"
+            style={{ background: '#F7931E' }}
           >
-            <div
-              className="w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #F7931E, #FBBC2E)' }}
-            >
-              <span style={{ fontSize: 20 }}>⭐</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[14px] font-bold text-foreground">No reviews yet</p>
-              <p className="text-[13px] text-muted-foreground mt-0.5">
-                Be the first to review {courseName}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleRateClick}
-              className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-bold text-white active:scale-[0.97] transition-all"
-              style={{ background: '#F7931E' }}
-            >
-              Rate
-            </button>
+            Write the first review
+          </button>
+        </div>
+        {/* Supporting tips card */}
+        <div className="mt-8 rounded-2xl border border-border bg-card p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
+            Reviews help other golfers discover great courses
+          </p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
+            What to include
+          </p>
+          <div className="flex flex-col gap-4">
+            {[
+              { icon: '🏌️‍♂️', label: 'Course condition — greens, fairways, bunkers' },
+              { icon: '🏌️', label: 'Layout and design — challenge, variety, scenery' },
+              { icon: '🏠', label: 'Facilities — clubhouse, practice areas, service' },
+            ].map(({ icon, label }) => (
+              <div key={label} className="flex items-center gap-3">
+                <span className="text-base">{icon}</span>
+                <p className="text-sm text-muted-foreground">{label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
