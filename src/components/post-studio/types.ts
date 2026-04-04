@@ -9,6 +9,7 @@ import type { StudioEdits } from '@/types/studio';
 
 /** Wizard step identifiers */
 export type StudioStep =
+  | 'VIEWFINDER'
   | 'COMPOSE'
   | 'TRIM'
   | 'POSTER'
@@ -142,7 +143,7 @@ export interface PostStudioState {
 /** Initial state factory */
 export function createInitialState(overrides?: Partial<PostStudioState>): PostStudioState {
   return {
-    step: 'COMPOSE',
+    step: 'VIEWFINDER',
     previousStep: null,
     actorType: 'personal',
     actorId: null,

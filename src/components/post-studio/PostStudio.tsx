@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Trash2 } from 'lucide-react';
 import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
 import { ComposeScreen } from './screens/ComposeScreen';
+import { ViewfinderScreen } from './screens/ViewfinderScreen';
 import { TrimScreen } from './screens/TrimScreen';
 import { PosterScreen } from './screens/PosterScreen';
 import { PublishScreen } from './screens/PublishScreen';
@@ -27,7 +28,7 @@ import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
 
 // ─── Screen order for directional transitions ───────────────────────────────
 const STEP_ORDER: StudioStep[] = [
-  'COMPOSE', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS',
+  'VIEWFINDER', 'COMPOSE', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS',
 ];
 
 function getDirection(from: StudioStep | null, to: StudioStep): 'forward' | 'backward' {
@@ -63,6 +64,7 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
 
 function renderScreen(step: StudioStep, onSuccessDone: () => void, onClose: () => void) {
   switch (step) {
+    case 'VIEWFINDER': return <ViewfinderScreen onClose={onClose} />;
     case 'COMPOSE':  return <ComposeScreen onClose={onClose} />;
     case 'TRIM':     return <TrimScreen />;
     case 'POSTER':   return <PosterScreen />;
