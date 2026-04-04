@@ -1276,6 +1276,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 </motion.div>
               )}
 
+            </AnimatePresence>
+
             {/* Dots moved outside glass card */}
           </motion.div>
         )}
