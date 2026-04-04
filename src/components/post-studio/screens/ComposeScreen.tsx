@@ -1285,103 +1285,61 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
         }} />
 
-        <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
+        <div className="flex items-center justify-between px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)' }}>
+          {/* Camera */}
+          <motion.button whileTap={{ scale: 0.85 }}
+            onClick={() => setStep('VIEWFINDER')}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
+            <Camera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Camera</span>
+          </motion.button>
 
-          {/* Zone A — Capture */}
-          <div className="flex items-center" style={{ gap: 4 }}>
-            {/* Rear — solid dark, primary */}
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => rearCameraInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex flex-col items-center justify-center disabled:opacity-40"
-              style={{ width: 52, height: 54, gap: 3 }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(15,23,42,0.90)',
-                boxShadow: '0 2px 14px rgba(0,0,0,0.12)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Camera className="w-[18px] h-[18px]" style={{ color: '#FFFFFF' }} strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
-            </motion.button>
+          {/* Library */}
+          <motion.button whileTap={{ scale: 0.85 }}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isProcessing}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
+            <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
+          </motion.button>
 
-            {/* Front */}
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => frontCameraInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex flex-col items-center justify-center disabled:opacity-40"
-              style={{ width: 52, height: 54, gap: 3 }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
-            </motion.button>
+          {/* Mention */}
+          <motion.button whileTap={{ scale: 0.85 }}
+            onClick={() => {
+              const pos = textareaRef.current?.selectionStart ?? state.caption.length;
+              const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
+              setCaption(newCaption);
+              setMentionTriggerIndex(pos);
+              openPanel('mention');
+            }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
+            <AtSign className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Mention</span>
+          </motion.button>
 
-            {/* Library */}
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex flex-col items-center justify-center disabled:opacity-40"
-              style={{ width: 52, height: 54, gap: 3 }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
-            </motion.button>
-          </div>
+          {/* Audience */}
+          <motion.button whileTap={{ scale: 0.85 }}
+            onClick={() => openPanel('audience')}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
+            {state.visibility === 'anyone'
+              ? <Globe className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+              : state.visibility === 'followers'
+                ? <Users className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+                : <Lock className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+            }
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Audience</span>
+          </motion.button>
 
-          {/* Divider */}
-          <div style={{ width: 1, height: 28, background: RAIL_HAIRLINE, margin: '0 10px' }} />
+          {/* Drafts */}
+          <motion.button whileTap={{ scale: 0.85 }}
+            onClick={() => openPanel('drafts')}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
+            <BookOpen className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Drafts</span>
+          </motion.button>
 
-          {/* Zone B — Text tools */}
-          <div className="flex items-center" style={{ gap: 0 }}>
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => {
-                const pos = textareaRef.current?.selectionStart ?? state.caption.length;
-                const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
-                setCaption(newCaption);
-                setMentionTriggerIndex(pos);
-                openPanel('mention');
-              }}
-              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              <AtSign className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
-            </motion.button>
-
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => openPanel('drafts')}
-              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              <BookOpen className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
-            </motion.button>
-          </div>
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* Zone C — Character count */}
-          <div className="flex items-center justify-center" style={{ width: 36, height: 36 }}>
-            <CharacterRing count={charCount} />
-          </div>
+          {/* Character count */}
+          <CharacterRing count={charCount} />
         </div>
       </div>
 
