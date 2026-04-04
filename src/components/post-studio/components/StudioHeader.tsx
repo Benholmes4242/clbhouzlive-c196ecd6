@@ -25,7 +25,8 @@ interface StudioHeaderProps {
   darkMode?: boolean;
 }
 
-const STEP_LABELS = ['COMPOSE', 'REVIEW', 'POST'] as const;
+const STEP_LABELS = ['COMPOSE', 'REVIEW'] as const;
+const TOTAL_STEPS = 2;
 
 const STEP_PROGRESS: Partial<Record<StudioStep, number>> = {
   COMPOSE:  1,
