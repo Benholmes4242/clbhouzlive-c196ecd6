@@ -229,6 +229,9 @@ export function formatPost(
   const reviewRating = post.source_review_id && context.ratings
     ? context.ratings.get(post.source_review_id) ?? null
     : null;
+  const reviewText = post.source_review_id && context.reviewTexts
+    ? context.reviewTexts.get(post.source_review_id) ?? null
+    : null;
   
   // Build media array
   const allMedia = (post.post_media || []);
@@ -279,6 +282,7 @@ export function formatPost(
     isReview: isReviewPost,
     sourceReviewId: post.source_review_id || null,
     reviewRating,
+    reviewText,
     label: Math.random() > 0.6 ? RANDOM_LABELS[Math.floor(Math.random() * RANDOM_LABELS.length)] : undefined,
     isFollowing: options.isFollowing ?? options.isFriend ?? Math.random() > 0.5,
     media,

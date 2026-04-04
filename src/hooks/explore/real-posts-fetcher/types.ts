@@ -87,6 +87,7 @@ export interface HydrationContext {
   businessAccounts: Map<string, BusinessAccount>;
   golfCourses: Map<string, GolfCourseData>;
   ratings?: Map<string, number>;
+  reviewTexts?: Map<string, string>;
 }
 
 // Curation algorithm types
