@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
