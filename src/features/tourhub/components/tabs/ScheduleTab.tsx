@@ -12,7 +12,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
+import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
@@ -29,7 +29,6 @@ import {
   ScheduleTournamentCard,
   ScheduleMonthHeader,
   ScheduleEmptyMessage,
-  ScheduleTourFilter,
   type TourFilterCode,
 } from '../schedule';
 
@@ -76,6 +75,8 @@ export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [tourSheetOpen, setTourSheetOpen] = useState(false);
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
@@ -349,69 +350,138 @@ export function ScheduleTab() {
 
       {/* Content below hero */}
       <div
-        className="sticky top-0 z-30 -mx-4 px-4 bg-background/95 backdrop-blur-xl border-b border-border/10"
+        className="sticky top-0 z-30 -mx-4 bg-background/95 backdrop-blur-xl border-b border-border/10"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
-        {/* Search Bar */}
-        <div className="pb-3">
-          <div className="relative">
-            <Search 
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
+        {/* ── ROW 1: Filter pills + Search icon toggle ── */}
+        <div className="flex items-center gap-2 px-4 pt-2.5 pb-0">
+          <div className="flex items-center flex-1 gap-0">
+            {(['all', 'upcoming', 'live', 'completed'] as const).map((f) => {
+              const isActive = filter === f;
+              const isLive = f === 'live';
+              const label = f === 'all' ? 'All' : f === 'upcoming' ? 'Upcoming' : f === 'live' ? 'Live' : 'Completed';
+              const count = filterStats[f];
+              return (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    'relative flex-1 h-[38px] rounded-[10px] text-[13px] font-semibold transition-all duration-200',
+                    'flex items-center justify-center gap-1.5 active:scale-[0.97]',
+                    isActive
+                      ? isLive
+                        ? 'text-white'
+                        : 'bg-foreground text-background'
+                      : 'bg-transparent text-muted-foreground'
+                  )}
+                  style={isActive && isLive ? { background: '#22C55E' } : undefined}
+                >
+                  {isLive && count > 0 && (
+                    <span className="relative flex h-[6px] w-[6px] shrink-0">
+                      <span
+                        className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-75"
+                        style={{ background: isActive ? 'rgba(255,255,255,0.8)' : '#22C55E' }}
+                      />
+                      <span
+                        className="relative inline-flex h-[6px] w-[6px] rounded-full"
+                        style={{ background: isActive ? 'rgba(255,255,255,0.9)' : '#22C55E' }}
+                      />
+                    </span>
+                  )}
+                  {label}
+                  {isLive && count > 0 && !isActive && (
+                    <span
+                      className="absolute top-[5px] right-[5px] flex items-center justify-center rounded-full text-white font-bold"
+                      style={{ background: '#22C55E', fontSize: 9, width: 14, height: 14, lineHeight: 1 }}
+                    >
+                      {count}
+                    </span>
+                  )}
+                  {isLive && count > 0 && isActive && (
+                    <span
+                      className="flex items-center justify-center rounded-full font-bold text-white"
+                      style={{ background: 'rgba(255,255,255,0.25)', fontSize: 10, padding: '0 4px', height: 16, lineHeight: '16px' }}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            onClick={() => setSearchExpanded(v => !v)}
+            className={cn(
+              'w-[38px] h-[38px] rounded-[10px] flex items-center justify-center shrink-0 transition-colors duration-150',
+              searchExpanded ? 'bg-amber-50' : 'bg-transparent'
+            )}
+          >
+            <Search
+              className="w-[17px] h-[17px] transition-colors duration-150"
+              style={{ color: searchExpanded ? '#F59E0B' : undefined }}
               strokeWidth={2.5}
             />
+          </button>
+        </div>
+
+        {/* ── SEARCH BAR — collapsible ── */}
+        <div
+          className="overflow-hidden transition-all ease-in-out px-4"
+          style={{ maxHeight: searchExpanded ? 60 : 0, opacity: searchExpanded ? 1 : 0, transitionDuration: '250ms' }}
+        >
+          <div className="relative pt-2.5">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[17px] h-[17px] mt-[5px]" strokeWidth={2.5} />
             <input
               type="text"
               placeholder="Search tournaments, venues, tours..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className={cn(
-                "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
-                "bg-card border text-foreground placeholder:text-muted-foreground",
-                "focus:outline-none focus:ring-2 focus:bg-card",
-                "border-border/50 ring-transparent",
-                "focus:border-border focus:ring-border/50 focus:shadow-lg"
+                'w-full h-11 pl-10 pr-9 rounded-xl text-[13px] transition-all duration-200',
+                'bg-card border text-foreground placeholder:text-muted-foreground',
+                'focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60',
+                'border-border/50'
               )}
             />
             <AnimatePresence>
               {searchInput && (
                 <motion.button
                   onClick={() => setSearchInput('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors active:scale-90"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 mt-[5px] p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors active:scale-90"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                 >
-                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                  <X className="w-3 h-3 text-muted-foreground" />
                 </motion.button>
               )}
             </AnimatePresence>
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className="pb-1">
-          <ScheduleFilterPills
-            activeFilter={filter}
-            onFilterChange={setFilter}
-            counts={filterStats}
-          />
-        </div>
-        <div className="pb-2">
-          <ScheduleTourFilter
-            activeTour={activeTour}
-            onTourChange={setActiveTour}
-            tourCounts={tourCounts}
-          />
-        </div>
-        {/* ← Tour Overview back link */}
-        <div className="pt-2 pb-2">
+        {/* ── ROW 2: ← Tour Overview + Tour filter pill ── */}
+        <div className="flex items-center justify-between px-4 pt-2 pb-2.5">
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+            className="flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
           >
-            <ChevronLeft size={14} />
+            <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
+          </button>
+          <button
+            onClick={() => setTourSheetOpen(true)}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] transition-all duration-150 active:scale-[0.97]',
+              'bg-card border border-border/50 shadow-sm',
+              activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
+            )}
+          >
+            <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
+            <span className="text-[12px] font-semibold text-foreground">
+              {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
+            </span>
+            <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
           </button>
         </div>
       </div>
@@ -495,6 +565,75 @@ export function ScheduleTab() {
           </div>
         )}
       </div>
+
+      {/* Tour Filter Bottom Sheet */}
+      <AnimatePresence>
+        {tourSheetOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-40 bg-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setTourSheetOpen(false)}
+            />
+            <motion.div
+              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-card rounded-t-[20px] shadow-2xl"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
+            >
+              <div className="flex justify-center pt-2.5 pb-1">
+                <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
+              </div>
+              <div className="px-5 pt-3 pb-4 border-b border-border/10">
+                <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
+                  Filter
+                </p>
+                <p className="text-[18px] font-bold text-foreground tracking-tight">Select Tour</p>
+              </div>
+              {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
+                const labels: Record<string, string> = {
+                  all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
+                  LPGA: 'LPGA', CHAMP: 'Champions', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
+                };
+                const isSelected = activeTour === code;
+                const count = code === 'all'
+                  ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
+                  : tourCounts[code] ?? 0;
+                return (
+                  <button
+                    key={code}
+                    onClick={() => { setActiveTour(code as TourFilterCode); setTourSheetOpen(false); }}
+                    className={cn(
+                      'w-full flex items-center justify-between px-5 py-[14px]',
+                      'border-b border-border/[0.06] transition-colors duration-100',
+                      'active:bg-muted/50 text-left',
+                      isSelected ? 'text-foreground' : 'text-muted-foreground'
+                    )}
+                  >
+                    <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
+                      {labels[code]}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {count > 0 && (
+                        <span className="text-[12px] text-muted-foreground/60 font-medium">{count}</span>
+                      )}
+                      {isSelected && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 6 9 17l-5-5"/>
+                        </svg>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Bottom safe area */}
       <div style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }} />
