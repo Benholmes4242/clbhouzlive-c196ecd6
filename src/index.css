@@ -53,6 +53,7 @@ img[src*="Silhouette"] {
  */
 html {
   background-color: #0d0d0d;
+  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
