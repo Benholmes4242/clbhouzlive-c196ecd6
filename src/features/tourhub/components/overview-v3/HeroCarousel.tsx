@@ -1513,7 +1513,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             />
           ))}
         </div>
-      )}
+        );
+      })()}
 
     </div>
   );
