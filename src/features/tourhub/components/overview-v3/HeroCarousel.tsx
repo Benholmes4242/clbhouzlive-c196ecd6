@@ -1494,8 +1494,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       {/* Carousel Dots - Between glass card and bottom of hero */}
       {safeSlides.length > 1 && (
         <div
-          className="absolute bottom-0 left-0 right-0 flex items-center justify-center z-20"
-          style={{ gap: '5px', paddingBottom: '6px' }}
+          className="absolute bottom-0 flex items-center justify-center z-20"
+          style={{ gap: '5px', paddingBottom: '6px', left: '16px', width: 'min(350px, calc(100% - 32px))' }}
         >
           {Array.from({ length: safeSlides.length }).map((_, index) => (
             <button
