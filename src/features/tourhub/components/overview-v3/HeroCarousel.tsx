@@ -1491,11 +1491,16 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         ))}
       </AnimatePresence>
 
-      {/* Carousel Dots - Between glass card and bottom of hero */}
-      {safeSlides.length > 1 && (
+      {/* Carousel Dots - Centered with glass card above */}
+      {safeSlides.length > 1 && (() => {
+        const activeSlide = safeSlides[currentIndex];
+        const cardExpanded = activeSlide?.type === 'live' ? true : isExpanded;
+        const dotLeft = cardExpanded ? '12px' : '16px';
+        const dotWidth = cardExpanded ? 'calc(100% - 24px)' : 'min(350px, calc(100% - 32px))';
+        return (
         <div
           className="absolute bottom-0 flex items-center justify-center z-20"
-          style={{ gap: '5px', paddingBottom: '6px', left: '16px', width: 'min(350px, calc(100% - 32px))' }}
+          style={{ gap: '5px', paddingBottom: '6px', left: dotLeft, width: dotWidth }}
         >
           {Array.from({ length: safeSlides.length }).map((_, index) => (
             <button
