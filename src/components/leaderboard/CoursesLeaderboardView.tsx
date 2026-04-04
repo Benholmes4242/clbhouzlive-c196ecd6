@@ -218,14 +218,12 @@ export function CoursesLeaderboardView() {
   }, [data?.pages]);
 
   // ─── Computed stats for header ────────────────────────────────────
-  const userPlayedCount = useMemo(() => {
-    return allCourses.filter(c => c.current_user_played).length;
-  }, [allCourses]);
+  const userPlayedCount = userPlayedCountData ?? 0;
 
   const userPlayedPct = useMemo(() => {
-    if (allCourses.length === 0) return 0;
-    return Math.round((userPlayedCount / allCourses.length) * 100);
-  }, [userPlayedCount, allCourses.length]);
+    // Every Top 100 list has exactly 100 courses — use as fixed denominator
+    return Math.round((userPlayedCount / 100) * 100);
+  }, [userPlayedCount]);
 
   const clubRankLabel = '—';
 
