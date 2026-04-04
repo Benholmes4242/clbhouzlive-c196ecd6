@@ -151,7 +151,7 @@ export function CollegeGolfHubPage() {
           <CollegeHeroBanner
             stats={topCollege}
             college={topCollegeMedia}
-            activeMetric={activeMetric}
+            activeMetric={activeMetric === 'movers' ? 'earnings' : activeMetric}
           />
         ) : null}
 
