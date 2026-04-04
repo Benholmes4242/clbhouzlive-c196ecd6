@@ -273,25 +273,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </section>
 
-      {/* 9. CTA for users who haven't rated yet */}
-      {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-5 pb-5 md:pt-6" style={{ marginTop: 12 }}>
-          <h3 className="text-lg font-semibold text-foreground mb-1">How do you rate this course?</h3>
-          <p className="text-base text-muted-foreground mb-3">
-            Add your rating to see how it compares with the Clbhouz community.
-          </p>
-          <button
-            onClick={handleRateClick}
-            className="w-full h-11 rounded-full text-[14px] font-bold text-white active:scale-[0.97] transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
-              boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
-            }}
-          >
-            Rate this course
-          </button>
-        </section>
-      )}
 
       {/* Claim This Course CTA - only for unclaimed courses with a club_id */}
       {!courseClaim && course.club_id && (
@@ -321,8 +302,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="px-4 pt-2 pb-4">
           <Button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-card text-foreground border border-border/60 active:scale-[0.98]"
-            variant="outline"
+            className="w-full flex items-center justify-center gap-2 h-9 font-semibold active:scale-[0.98] transition-all"
+            variant="ghost"
+            style={{ borderRadius: 10, background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))', border: 'none' }}
           >
             <ExternalLink className="h-4 w-4" />
             Official course website

@@ -85,14 +85,36 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-2 px-8 text-center">
-        <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
-          <Camera className="w-7 h-7 text-muted-foreground/40" />
+      <div className="flex flex-col px-4 pt-8 pb-8">
+        <div className="flex flex-col items-center text-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+            <Camera className="w-8 h-8 text-muted-foreground/40" />
+          </div>
+          <div>
+            <p className="text-lg font-bold text-foreground">No photos or videos yet</p>
+            <p className="mt-1.5 text-sm text-muted-foreground max-w-[260px] mx-auto leading-relaxed">
+              Help other golfers discover {courseName || 'this course'} — be the first to share your experience.
+            </p>
+          </div>
         </div>
-        <p className="text-base font-semibold text-foreground">No media yet</p>
-        <p className="text-sm text-muted-foreground">
-          Be the first to share a photo or video from {courseName || 'this course'}.
-        </p>
+        {/* Supporting tips card */}
+        <div className="mt-8 rounded-2xl border border-border bg-card p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
+            What to share
+          </p>
+          <div className="flex flex-col gap-4">
+            {[
+              { icon: '📸', label: 'Course views and signature holes' },
+              { icon: '🎬', label: 'Short videos from your round' },
+              { icon: '🏠', label: 'Clubhouse, facilities and atmosphere' },
+            ].map(({ icon, label }) => (
+              <div key={label} className="flex items-center gap-3">
+                <span className="text-base">{icon}</span>
+                <p className="text-sm text-muted-foreground">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
