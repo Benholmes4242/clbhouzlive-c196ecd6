@@ -85,12 +85,10 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
             gap: 8,
             background: isPlayed
               ? 'linear-gradient(90deg, #F59E0B, #F7931E)'
-              : 'hsl(var(--foreground))',
+              : 'linear-gradient(90deg, #F59E0B, #F7931E)',
             color: '#fff',
             border: 'none',
-            boxShadow: isPlayed
-              ? '0 3px 12px rgba(247,147,30,0.28)'
-              : '0 2px 10px rgba(0,0,0,0.20)',
+            boxShadow: '0 3px 12px rgba(247,147,30,0.28)',
             transition: 'all 0.18s ease',
           }}
         >
