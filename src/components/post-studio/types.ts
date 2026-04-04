@@ -9,6 +9,7 @@ import type { StudioEdits } from '@/types/studio';
 
 /** Wizard step identifiers */
 export type StudioStep =
+  | 'VIEWFINDER'
   | 'COMPOSE'
   | 'TRIM'
   | 'POSTER'
