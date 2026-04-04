@@ -817,9 +817,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                         </div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Your rank</div>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Leader</div>
                         <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
-                          {ordinal(currentUserEntry.current_rank)} of {allEntries.length}
+                          {allEntries[0]?.courses_this_season ?? 0} courses
                         </div>
                       </div>
                     </div>
