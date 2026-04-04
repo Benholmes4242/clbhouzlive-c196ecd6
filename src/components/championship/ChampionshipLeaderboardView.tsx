@@ -788,7 +788,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 </div>
                 {currentSeason.prize_description && (
                   <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginBottom: currentUserEntry ? 10 : 0 }}>
-                    {currentSeason.prize_description}
+                    🎁 {currentSeason.prize_description}
                   </div>
                 )}
                 {currentUserEntry && allEntries.length > 0 && (
