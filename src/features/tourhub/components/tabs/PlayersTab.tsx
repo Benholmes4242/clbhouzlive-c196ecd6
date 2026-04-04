@@ -6,7 +6,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ChevronLeft, RefreshCw } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, SlidersHorizontal } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
@@ -15,11 +15,27 @@ import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
 import { PlayersHero } from '../players/PlayersHero';
 import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
-import { PlayerSortControl, type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
-import { PlayersTourFilterSheet } from '../players/PlayersTourFilterSheet';
+import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { PlayersWorldsBest } from '../players/PlayersWorldsBest';
+
+// Inline sort label resolver — mirrors PlayerSortControl's SORT_OPTIONS logic
+function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
+  const map: Record<string, string> = {
+    'world-rank-desc': 'World Ranking',
+    'world-rank-asc': 'World Ranking ↑',
+    'alpha-az': 'A–Z',
+    'alpha-za': 'Z–A',
+    'most-wins': 'Wins',
+    'highest-earnings': 'Earnings',
+    'race-to-dubai': 'Race to Dubai',
+    'race-to-cme': 'Race to CME Globe',
+    'points-list': 'Points List',
+    'liv-standings': 'Standings',
+  };
+  return map[sort] ?? 'Sort';
+}
 
 function useDebouncedValue(value: string, delay: number): string {
   const [debounced, setDebounced] = useState(value);
@@ -48,6 +64,9 @@ export function PlayersTab() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const initialTour = searchParams.get('tour') || 'all';
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [tourSheetOpen, setTourSheetOpen] = useState(false);
+  const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
   // Scroll position handled by centralized ScrollRestoration component
 
@@ -457,98 +476,300 @@ export function PlayersTab() {
         <PlayersHero players={heroPlayers} activeTour={activeTour} statsMap={statsMap} sort={sort} />
       )}
 
-      {/* ← Tour Overview back link */}
-      <div className="px-4 pt-3">
-        <button
-          type="button"
-          onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+      {/* ══════════════════════════════════════════════
+          STICKY HEADER — back link · sort · tour · search
+          ══════════════════════════════════════════════ */}
+      <div
+        className="-mx-4 sticky top-0 z-20"
+        style={{
+          background: 'hsl(var(--background) / 0.96)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid hsl(var(--border) / 0.10)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        }}
+      >
+        {/* Collapsible search bar */}
+        <div
+          className="overflow-hidden transition-all duration-250 ease-in-out px-4"
+          style={{
+            maxHeight: searchExpanded ? 60 : 0,
+            opacity: searchExpanded ? 1 : 0,
+          }}
         >
-          <ChevronLeft size={14} />
-          Tour Overview
-        </button>
+          <div className="relative pt-2.5">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[17px] h-[17px] mt-[5px]"
+              strokeWidth={2.5}
+            />
+            <input
+              type="text"
+              placeholder="Search players, countries..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={cn(
+                'w-full h-11 pl-10 pr-9 rounded-xl text-[13px] transition-all duration-200',
+                'bg-card border text-foreground placeholder:text-muted-foreground',
+                'focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60',
+                'border-border/50'
+              )}
+            />
+            <AnimatePresence>
+              {search && (
+                <motion.button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 mt-[5px] p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors active:scale-90"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                >
+                  <X className="w-3 h-3 text-muted-foreground" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Main control row */}
+        <div className="flex items-center gap-2 px-4 pt-2.5">
+          {/* ← Tour Overview */}
+          <button
+            type="button"
+            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+            className="flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity shrink-0"
+          >
+            <ChevronLeft size={13} strokeWidth={2.5} />
+            Tour Overview
+          </button>
+
+          <div className="flex-1" />
+
+          {/* Sort pill — only when a specific tour is selected */}
+          {activeTour !== 'all' && (
+            <button
+              onClick={() => setSortSheetOpen(true)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] shrink-0',
+                'bg-card border border-border/50 shadow-sm',
+                'transition-all duration-150 active:scale-[0.97]'
+              )}
+            >
+              <SlidersHorizontal
+                className="w-[12px] h-[12px] shrink-0"
+                style={{ color: '#F59E0B' }}
+                strokeWidth={2.5}
+              />
+              <span className="text-[12px] font-semibold text-foreground">
+                {getSortShortLabel(sort, activeTour)}
+              </span>
+              <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
+            </button>
+          )}
+
+          {/* Tour filter pill */}
+          <button
+            onClick={() => setTourSheetOpen(true)}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] shrink-0',
+              'bg-card border border-border/50 shadow-sm',
+              'transition-all duration-150 active:scale-[0.97]',
+              activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
+            )}
+          >
+            <Globe
+              className="w-[12px] h-[12px] shrink-0"
+              style={{ color: '#F59E0B' }}
+              strokeWidth={2.5}
+            />
+            <span className="text-[12px] font-semibold text-foreground">
+              {activeTour === 'all'
+                ? 'All Tours'
+                : activeTour === 'pga' ? 'PGA Tour'
+                : activeTour === 'EURO' ? 'DP World Tour'
+                : activeTour === 'LPGA' ? 'LPGA'
+                : activeTour === 'PGAD' ? 'Korn Ferry'
+                : activeTour === 'LIV' ? 'LIV Golf'
+                : 'All Tours'}
+            </span>
+            <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
+          </button>
+
+          {/* Search icon toggle */}
+          <button
+            onClick={() => setSearchExpanded(v => !v)}
+            className={cn(
+              'w-[38px] h-[38px] rounded-[10px] flex items-center justify-center shrink-0',
+              'transition-colors duration-150',
+              searchExpanded ? 'bg-amber-50' : 'bg-transparent'
+            )}
+          >
+            <Search
+              className="w-[16px] h-[16px] transition-colors duration-150"
+              style={{ color: searchExpanded ? '#F59E0B' : undefined }}
+              strokeWidth={2.5}
+            />
+          </button>
+        </div>
+
+        {/* Count / context label */}
+        <div className="flex justify-end px-4 pt-1.5 pb-2.5">
+          <span className="text-[11px] font-medium text-muted-foreground/50">
+            {activeTour === 'all'
+              ? `${totalCount.toLocaleString()} players · A–Z`
+              : `${(tourCounts[activeTour] ?? 0).toLocaleString()} players`}
+          </span>
+        </div>
       </div>
 
-      {/* World's Best showcase — All Tours only */}
+      {/* World's Best showcase — All Tours only, sits below sticky header */}
       {activeTour === 'all' && !debouncedSearch && elitePlayers && elitePlayers.length > 0 && (
-        <div className="px-4" style={{ marginTop: '20px' }}>
+        <div className="px-4 mt-5">
           <PlayersWorldsBest players={elitePlayers.slice(0, 5)} />
         </div>
       )}
 
-      {/* Search Bar — 24px gap from runner cards */}
-      <div className="px-4" style={{ marginTop: '16px' }}>
-        <div className="relative">
-          <Search 
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
-            strokeWidth={2.5}
-          />
-          <input
-            type="text"
-            placeholder="Search players, countries..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className={cn(
-              "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
-              "bg-card border text-foreground placeholder:text-muted-foreground",
-              "focus:outline-none focus:ring-2 focus:bg-card",
-              "border-border/50 ring-transparent",
-              "focus:border-border focus:ring-border/50 focus:shadow-lg"
-            )}
-          />
-          <AnimatePresence>
-            {search && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-muted hover:bg-muted/80 active:scale-[0.9] transition-transform"
-              >
-                <X className="w-3.5 h-3.5 text-muted-foreground" />
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
+      {/* Sort bottom sheet — driven directly from PlayersTab */}
+      <AnimatePresence>
+        {sortSheetOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-40 bg-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSortSheetOpen(false)}
+            />
+            <motion.div
+              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-card rounded-t-[20px] shadow-2xl"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
+            >
+              <div className="flex justify-center pt-2.5 pb-1">
+                <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
+              </div>
+              <div className="px-5 pt-3 pb-4 border-b border-border/10">
+                <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
+                  Sort
+                </p>
+                <p className="text-[18px] font-bold text-foreground tracking-tight">Sort Players</p>
+              </div>
+              {/* Render sort options using the same logic as PlayerSortControl */}
+              {(() => {
+                const isPGA = activeTour === 'pga';
+                const isEuro = activeTour === 'EURO';
+                const isLPGA = activeTour === 'LPGA';
+                const isPGAD = activeTour === 'PGAD';
+                const isLIV = activeTour === 'LIV';
+                const opts: { value: PlayerSortType; label: string }[] =
+                  isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+                  : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+                  : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+                  : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+                  : isPGA  ? [{ value: 'world-rank-desc', label: 'Highest World Ranking' }, { value: 'highest-earnings', label: 'Highest Earnings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+                  : [{ value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }];
+                return opts.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setSort(opt.value); setVisibleCount(PAGE_SIZE); setSortSheetOpen(false); }}
+                    className={cn(
+                      'w-full flex items-center justify-between px-5 py-[14px]',
+                      'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
+                      sort === opt.value ? 'text-foreground' : 'text-muted-foreground'
+                    )}
+                  >
+                    <span className={cn('text-[15px]', sort === opt.value ? 'font-bold' : 'font-medium')}>
+                      {opt.label}
+                    </span>
+                    {sort === opt.value && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6 9 17l-5-5"/>
+                      </svg>
+                    )}
+                  </button>
+                ));
+              })()}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
-      {/* Sticky Tour Filter Toolbar */}
-      <div
-        className="sticky top-0 z-20 -mx-4 px-4"
-        style={{
-          background: 'hsl(var(--background) / 0.95)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid hsl(var(--border) / 0.15)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          paddingBottom: '10px',
-          marginTop: '16px',
-        }}
-      >
-        <PlayersTourFilterSheet
-          activeTour={activeTour}
-          onTourChange={setActiveTour}
-          tourCounts={tourCounts}
-        />
-      </div>
+      {/* Tour filter bottom sheet */}
+      <AnimatePresence>
+        {tourSheetOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-40 bg-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setTourSheetOpen(false)}
+            />
+            <motion.div
+              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-card rounded-t-[20px] shadow-2xl"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
+            >
+              <div className="flex justify-center pt-2.5 pb-1">
+                <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
+              </div>
+              <div className="px-5 pt-3 pb-4 border-b border-border/10">
+                <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
+                  Filter
+                </p>
+                <p className="text-[18px] font-bold text-foreground tracking-tight">Select Tour</p>
+              </div>
+              {(['all', 'pga', 'EURO', 'LPGA', 'PGAD', 'LIV'] as const).map((code) => {
+                const labels: Record<string, string> = {
+                  all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
+                  LPGA: 'LPGA', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
+                };
+                const isSelected = activeTour === code;
+                const count = code === 'all'
+                  ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
+                  : (tourCounts[code] ?? 0);
+                if (code !== 'all' && count === 0) return null;
+                return (
+                  <button
+                    key={code}
+                    onClick={() => { setActiveTour(code as PlayerTourCode); setTourSheetOpen(false); }}
+                    className={cn(
+                      'w-full flex items-center justify-between px-5 py-[14px]',
+                      'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
+                      isSelected ? 'text-foreground' : 'text-muted-foreground'
+                    )}
+                  >
+                    <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
+                      {labels[code]}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {count > 0 && (
+                        <span className="text-[12px] text-muted-foreground/60 font-medium">
+                          {count.toLocaleString()}
+                        </span>
+                      )}
+                      {isSelected && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 6 9 17l-5-5"/>
+                        </svg>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Content */}
       <div className="px-4">
-        {/* Sort row — 24px from tour dropdown (hidden for All Tours) */}
-        {activeTour !== 'all' && (
-          <div className="flex items-center justify-end" style={{ marginTop: '24px' }}>
-            <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} activeTour={activeTour} />
-          </div>
-        )}
-
-        {/* All Tours sort label */}
-        {activeTour === 'all' && !debouncedSearch && (
-          <p className="text-right" style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground) / 0.5)', marginTop: '8px' }}>
-            {totalCount} players · A–Z
-          </p>
-        )}
-
-        {/* Player cards — 12px from sort */}
+        {/* Player cards */}
         <AnimatePresence mode="wait">
           <motion.div
             key={contentKey}
@@ -557,7 +778,7 @@ export function PlayersTab() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="flex flex-col gap-2"
-            style={{ marginTop: activeTour === 'all' ? '24px' : '16px' }}
+            style={{ marginTop: '16px' }}
           >
             {displayRows.length > 0 ? (
               <>
