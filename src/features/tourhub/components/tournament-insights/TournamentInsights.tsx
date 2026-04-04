@@ -599,7 +599,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           return null;
         }
         return (
-          <div className="pb-6">
+          <div>
             {insightsData.courseDNA.length > 0 && (
               <CourseDNACard
                 items={insightsData.courseDNA}

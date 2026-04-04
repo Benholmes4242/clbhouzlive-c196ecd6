@@ -239,7 +239,7 @@ export function LiveRightNow() {
           gap: '10px',
           overflowX: 'auto',
           paddingRight: '16px',
-          paddingBottom: '4px',
+          paddingBottom: '0px',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
