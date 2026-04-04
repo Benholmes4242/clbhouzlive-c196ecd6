@@ -582,6 +582,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       'portugal': '🇵🇹', 'italy': '🇮🇹', 'japan': '🇯🇵', 'south korea': '🇰🇷',
       'sweden': '🇸🇪', 'norway': '🇳🇴', 'denmark': '🇩🇰', 'netherlands': '🇳🇱',
       'south africa': '🇿🇦', 'new zealand': '🇳🇿', 'united kingdom': '🇬🇧',
+      'britain & ireland': '🇬🇧', 'great britain': '🇬🇧', 'northern ireland': '🏴󠁧󠁢󠁮󠁩󠁲󠁿',
     };
     return flags[country.toLowerCase()] || '🏳️';
   };
