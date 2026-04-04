@@ -190,8 +190,9 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
                 {course.course_name.split('(')[0].trim()}
               </div>
               <div style={{
-                color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(10px,2.6vw,11px)',
+                color: 'rgba(255,255,255,0.55)', fontSize: 'clamp(10px,2.6vw,11px)',
                 marginTop: 1, fontFamily: 'DM Sans, system-ui, sans-serif',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}>
                 {location(course)}
               </div>
