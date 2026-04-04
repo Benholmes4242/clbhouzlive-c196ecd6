@@ -604,6 +604,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state, setStep, onSuccess, isPublishing]);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
   const frontCameraInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
