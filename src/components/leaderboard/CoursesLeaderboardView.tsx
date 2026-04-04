@@ -217,15 +217,54 @@ export function CoursesLeaderboardView() {
     return data?.pages.flatMap(page => page.entries) ?? [];
   }, [data?.pages]);
 
+  // Fetch user's played count for the active list — independent of pagination
+  const { data: userPlayedCountData } = useQuery({
+    queryKey: ['user-played-count-for-list', quickRegion],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return 0;
+
+      const listSlug =
+        quickRegion === 'gb-i'    ? 'gb-i' :
+        quickRegion === 'usa'     ? 'usa' :
+        quickRegion === 'europe'  ? 'europe' :
+        'global';
+
+      const { data: listRow } = await supabase
+        .from('top100_lists')
+        .select('id')
+        .eq('slug', listSlug)
+        .single();
+
+      if (!listRow) return 0;
+
+      const { data: membershipRows } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id')
+        .eq('list_id', listRow.id);
+
+      const listCourseIds = (membershipRows ?? []).map(r => r.course_id);
+      if (listCourseIds.length === 0) return 0;
+
+      const { data: ratingRows } = await supabase
+        .from('course_ratings')
+        .select('course_id')
+        .eq('user_id', authUser.id)
+        .in('course_id', listCourseIds);
+
+      const unique = new Set((ratingRows ?? []).map(r => r.course_id));
+      return unique.size;
+    },
+  });
+
   // ─── Computed stats for header ────────────────────────────────────
-  const userPlayedCount = useMemo(() => {
-    return allCourses.filter(c => c.current_user_played).length;
-  }, [allCourses]);
+  const userPlayedCount = userPlayedCountData ?? 0;
 
   const userPlayedPct = useMemo(() => {
-    if (allCourses.length === 0) return 0;
-    return Math.round((userPlayedCount / allCourses.length) * 100);
-  }, [userPlayedCount, allCourses.length]);
+    // Every Top 100 list has exactly 100 courses — use as fixed denominator
+    return Math.round((userPlayedCount / 100) * 100);
+  }, [userPlayedCount]);
 
   const clubRankLabel = '—';
 
@@ -348,6 +387,7 @@ export function CoursesLeaderboardView() {
     },
     staleTime: 60_000,
   });
+
 
   // Only show podium for Most Played and Highest Rated (not Trending)
   const showPodium = useMemo(() => {
