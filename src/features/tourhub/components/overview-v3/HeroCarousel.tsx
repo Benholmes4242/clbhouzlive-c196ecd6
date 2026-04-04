@@ -1501,7 +1501,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         return (
         <div
           className="absolute bottom-0 flex items-center justify-center z-20"
-          style={{ gap: '5px', paddingBottom: '6px', left: dotLeft, width: dotWidth }}
+          style={{ gap: '5px', paddingBottom: '6px', left: dotLeft, right: dotRight, maxWidth: dotMaxWidth }}
         >
           {Array.from({ length: safeSlides.length }).map((_, index) => (
             <button
