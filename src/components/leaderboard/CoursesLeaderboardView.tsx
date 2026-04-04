@@ -268,6 +268,22 @@ export function CoursesLeaderboardView() {
     },
   });
 
+  // Fetch current user profile for header avatar
+  const { data: currentUserProfile } = useQuery({
+    queryKey: ['courses-tab-user-profile'],
+    staleTime: 120_000,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('display_name, profile_photo_url')
+        .eq('id', user.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   // ─── Computed stats for header ────────────────────────────────────
   const userPlayedPct = useMemo(() => {
     const total = allCourses.length > 0 ? allCourses.length : 100;
