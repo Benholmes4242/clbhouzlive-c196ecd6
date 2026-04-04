@@ -710,18 +710,64 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
-      <StudioHeader
-        centerContent={<ActorSelector compact header />}
-        step="COMPOSE"
-        leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
-        rightAction={
-          isValid
-            ? { label: 'Next', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
-            : state.isDirty
-              ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
-              : undefined
-        }
-      />
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: 'max(env(safe-area-inset-top, 0px), 47px) 16px 10px',
+        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        background: BG_BASE,
+      }}>
+        {/* Left: close */}
+        <motion.button whileTap={{ scale: 0.9 }}
+          onClick={onClose ?? (() => setStep('VIEWFINDER'))}
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.06)', border: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+          }}>
+          <X className="w-[14px] h-[14px]" style={{ color: 'rgba(15,23,42,0.55)' }} strokeWidth={2.5} />
+        </motion.button>
+
+        {/* Center: actor + audience pill */}
+        <motion.button whileTap={{ scale: 0.97 }} onClick={() => openPanel('audience')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '7px 14px 7px 10px', borderRadius: 24,
+            background: 'rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.08)',
+            cursor: 'pointer',
+          }}>
+          <ActorSelector compact header />
+          <div style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.08)' }} />
+          {state.visibility === 'anyone'
+            ? <Globe className="w-3.5 h-3.5" style={{ color: ICON_DIM }} strokeWidth={2} />
+            : state.visibility === 'followers'
+              ? <Users className="w-3.5 h-3.5" style={{ color: ICON_DIM }} strokeWidth={2} />
+              : <Lock className="w-3.5 h-3.5" style={{ color: ICON_DIM }} strokeWidth={2} />
+          }
+        </motion.button>
+
+        {/* Right: Post / Save CTA */}
+        <motion.button whileTap={{ scale: 0.93 }}
+          onClick={isValid ? handlePublish : (state.isDirty ? handleSaveDraft : undefined)}
+          disabled={(!isValid && !state.isDirty) || isPublishing || isSavingDraft}
+          style={{
+            padding: '9px 20px', borderRadius: 22, border: 'none',
+            background: isValid ? '#F7931E' : 'rgba(0,0,0,0.08)',
+            color: isValid ? '#fff' : 'rgba(15,23,42,0.25)',
+            fontWeight: 800, fontSize: 14,
+            cursor: isValid || state.isDirty ? 'pointer' : 'default',
+            boxShadow: isValid ? '0 4px 16px rgba(247,147,30,0.28)' : 'none',
+            display: 'flex', alignItems: 'center', gap: 6,
+            transition: 'all 0.18s',
+          }}>
+          {isPublishing ? (
+            <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'transparent', animation: 'spin 0.6s linear infinite' }} />
+          ) : isValid ? (
+            <Zap className="w-4 h-4" fill="currentColor" strokeWidth={0} />
+          ) : null}
+          {isPublishing ? 'Posting…' : isValid ? 'Post' : state.isDirty ? 'Save' : 'Post'}
+        </motion.button>
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
