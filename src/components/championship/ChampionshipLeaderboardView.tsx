@@ -743,12 +743,21 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             {currentUserEntry && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
                 <div style={{ position: 'relative' }}>
-                  <SquircleAvatar
-                    src={userPhotoUrl}
-                    size={52}
-                    fallback={currentUserEntry?.display_name?.charAt(0) ?? '?'}
-                    hideRing
-                  />
+                  {userPhotoUrl ? (
+                    <img
+                      src={userPhotoUrl}
+                      alt=""
+                      style={{ width: 52, height: 52, borderRadius: '34%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: 52, height: 52, borderRadius: '34%', background: 'rgba(255,255,255,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 700, flexShrink: 0,
+                    }}>
+                      {(currentUserEntry?.display_name || '?').charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div style={{ position: 'absolute', bottom: -4, right: -4, background: '#F7931E', borderRadius: 99, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0a2a1a', fontSize: 10, fontWeight: 900, color: '#fff' }}>
                     {currentUserEntry.current_rank}
                   </div>

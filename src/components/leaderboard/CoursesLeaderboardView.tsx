@@ -569,7 +569,25 @@ export function CoursesLeaderboardView() {
           </span>
         </div>
 
-        {/* Stats row */}
+        {/* Stats row with avatar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'clamp(14px,3.5vw,20px)' }}>
+          {/* Squircle avatar */}
+          {currentUserProfile?.profile_photo_url ? (
+            <img
+              src={currentUserProfile.profile_photo_url}
+              alt=""
+              style={{ width: 52, height: 52, borderRadius: '34%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
+            />
+          ) : currentUserProfile ? (
+            <div style={{
+              width: 52, height: 52, borderRadius: '34%', background: 'rgba(255,255,255,0.12)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 700, flexShrink: 0,
+            }}>
+              {(currentUserProfile.display_name || '?').charAt(0).toUpperCase()}
+            </div>
+          ) : null}
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'clamp(14px,3.5vw,20px)' }}>
           <div style={{ flex: 1 }}>
             <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(10px,2.8vw,12px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif', marginBottom: 2 }}>
