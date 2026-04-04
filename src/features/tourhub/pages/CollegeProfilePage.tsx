@@ -365,7 +365,9 @@ export function CollegeProfilePage() {
         </div>
       </div>
 
-        {/* Story Strip — 16px from compare button */}
+      {/* Content sections */}
+      <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+        {/* Story Strip — 20px from sticky header */}
         {stats && (
           <motion.div
             variants={sectionVariants}
@@ -373,7 +375,7 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4 }}
-            style={{ marginTop: '16px' }}
+            style={{ marginTop: '20px' }}
           >
             <FranchiseStoryStrip normalizedName={collegeSlug || ''} />
           </motion.div>
