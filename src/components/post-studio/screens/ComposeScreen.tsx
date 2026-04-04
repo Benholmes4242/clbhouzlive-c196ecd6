@@ -6,10 +6,10 @@ import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom';
 import {
   Camera, SwitchCamera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
-  Zap, Globe, Users, Lock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { StudioHeader } from '../components/StudioHeader';
 import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
@@ -18,10 +18,6 @@ import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPE
 import { BG_BASE, ICON_BG, ICON_COLOR, ICON_DIM, RAIL_BG, RAIL_HAIRLINE, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
-import { enqueuePostUpload } from '@/uploads/uploadPipeline';
-import { supabase } from '@/integrations/supabase/client';
-import type { UploadJobInput } from '@/uploads/types';
-import { analyticsEvents } from '@/utils/analyticsEvents';
 import StudioShelf from '@/components/studio/StudioShelf';
 
 // ─── Golf-native rotating placeholders ────────────────────────────────────────
@@ -525,7 +521,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, updateMediaEdits,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset,
-    onSuccess,
   } = usePostStudioContext();
 
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
@@ -534,75 +529,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const ok = await saveDraft();
     if (ok && onClose) { reset(); onClose(); }
   }, [saveDraft, reset, onClose]);
-
-  const [isPublishing, setIsPublishing] = useState(false);
-
-  const handlePublish = useCallback(async () => {
-    if (isPublishing) return;
-    setIsPublishing(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error('You need to be logged in');
-        setIsPublishing(false);
-        return;
-      }
-
-      const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
-      const selectedTags = state.mentions.map((m) => ({
-        id: m.entityId,
-        entity_id: m.profileId,
-        entity_type: m.entityType,
-        name: m.displayName,
-        username: m.username ?? null,
-        start_index: m.start,
-        end_index: m.end,
-      }));
-
-      const input: UploadJobInput = {
-        actorType: state.actorType,
-        actorId: state.actorId ?? user.id,
-        userId: user.id,
-        caption: state.caption,
-        files,
-        mediaItems: state.mediaItems.map((item) => ({
-          id: item.id, file: item.file, type: item.mediaType,
-          width: item.width ?? undefined, height: item.height ?? undefined,
-          duration: item.duration ?? undefined,
-          trimStart: item.trimStart || null, trimEnd: item.trimEnd || null,
-          posterTimestamp: item.posterTimestamp || null,
-        })),
-        studioEditsByMediaId: Object.fromEntries(
-          state.mediaItems
-            .filter((item) => item.edits && Object.keys(item.edits).length > 0)
-            .map((item) => [item.id, item.edits!])
-        ),
-        courseIds: state.taggedCourses.map((c) => c.courseId),
-        courseInfo: state.taggedCourses[0]
-          ? { id: state.taggedCourses[0].courseId, name: state.taggedCourses[0].courseName, country: state.taggedCourses[0].country ?? '' }
-          : null,
-        selectedTags,
-        visibility: state.visibility,
-        scheduledAt: state.scheduledAt,
-      };
-
-      enqueuePostUpload(input);
-      analyticsEvents.track('post_published', {
-        media_count: state.mediaItems.length,
-        media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
-        has_caption: state.caption.trim().length > 0,
-        has_tagged_course: state.taggedCourses.length > 0,
-        visibility: state.visibility,
-        is_scheduled: !!state.scheduledAt,
-      });
-      onSuccess?.('');
-      setStep('SUCCESS');
-    } catch (err) {
-      console.error('[ComposeScreen] Failed to enqueue:', err);
-      toast.error('Failed to start upload. Please try again.');
-      setIsPublishing(false);
-    }
-  }, [state, setStep, onSuccess, isPublishing]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
@@ -779,64 +705,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: 'max(env(safe-area-inset-top, 0px), 47px) 16px 10px',
-        borderBottom: '1px solid rgba(0,0,0,0.07)',
-        background: BG_BASE,
-      }}>
-        {/* Left: close */}
-        <motion.button whileTap={{ scale: 0.9 }}
-          onClick={onClose ?? (() => setStep('VIEWFINDER'))}
-          style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: 'rgba(0,0,0,0.06)', border: 'none',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-          }}>
-          <X className="w-[14px] h-[14px]" style={{ color: 'rgba(15,23,42,0.55)' }} strokeWidth={2.5} />
-        </motion.button>
-
-        {/* Center: actor + audience pill */}
-        <motion.button whileTap={{ scale: 0.97 }} onClick={() => openPanel('audience')}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '7px 14px 7px 10px', borderRadius: 24,
-            background: 'rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.08)',
-            cursor: 'pointer',
-          }}>
-          <ActorSelector compact header />
-          <div style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.08)' }} />
-          {state.visibility === 'anyone'
-            ? <Globe className="w-3.5 h-3.5" style={{ color: ICON_DIM }} strokeWidth={2} />
-            : state.visibility === 'followers'
-              ? <Users className="w-3.5 h-3.5" style={{ color: ICON_DIM }} strokeWidth={2} />
-              : <Lock className="w-3.5 h-3.5" style={{ color: ICON_DIM }} strokeWidth={2} />
-          }
-        </motion.button>
-
-        {/* Right: Post / Save CTA */}
-        <motion.button whileTap={{ scale: 0.93 }}
-          onClick={isValid ? handlePublish : (state.isDirty ? handleSaveDraft : undefined)}
-          disabled={(!isValid && !state.isDirty) || isPublishing || isSavingDraft}
-          style={{
-            padding: '9px 20px', borderRadius: 22, border: 'none',
-            background: isValid ? '#F7931E' : 'rgba(0,0,0,0.08)',
-            color: isValid ? '#fff' : 'rgba(15,23,42,0.25)',
-            fontWeight: 800, fontSize: 14,
-            cursor: isValid || state.isDirty ? 'pointer' : 'default',
-            boxShadow: isValid ? '0 4px 16px rgba(247,147,30,0.28)' : 'none',
-            display: 'flex', alignItems: 'center', gap: 6,
-            transition: 'all 0.18s',
-          }}>
-          {isPublishing ? (
-            <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'transparent', animation: 'spin 0.6s linear infinite' }} />
-          ) : isValid ? (
-            <Zap className="w-4 h-4" fill="currentColor" strokeWidth={0} />
-          ) : null}
-          {isPublishing ? 'Posting…' : isValid ? 'Post' : state.isDirty ? 'Save' : 'Post'}
-        </motion.button>
-      </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <StudioHeader
+        centerContent={<ActorSelector compact header />}
+        step="COMPOSE"
+        leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
+        rightAction={
+          isValid
+            ? { label: 'Next', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
+            : state.isDirty
+              ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
+              : undefined
+        }
+      />
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
@@ -1285,64 +1165,103 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
         }} />
 
-        <div className="flex items-center justify-between px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)' }}>
-          {/* Camera */}
-          <motion.button whileTap={{ scale: 0.85 }}
-            onClick={() => setStep('VIEWFINDER')}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
-            <Camera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Camera</span>
-          </motion.button>
+        <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
 
-          {/* Library */}
-          <motion.button whileTap={{ scale: 0.85 }}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isProcessing}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
-            <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
-          </motion.button>
+          {/* Zone A — Capture */}
+          <div className="flex items-center" style={{ gap: 4 }}>
+            {/* Rear — solid dark, primary */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => rearCameraInputRef.current?.click()}
+              disabled={isProcessing}
+              className="flex flex-col items-center justify-center disabled:opacity-40"
+              style={{ width: 52, height: 54, gap: 3 }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 13,
+                background: 'rgba(15,23,42,0.90)',
+                boxShadow: '0 2px 14px rgba(0,0,0,0.12)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Camera className="w-[18px] h-[18px]" style={{ color: '#FFFFFF' }} strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
+            </motion.button>
+
+            {/* Front */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => frontCameraInputRef.current?.click()}
+              disabled={isProcessing}
+              className="flex flex-col items-center justify-center disabled:opacity-40"
+              style={{ width: 52, height: 54, gap: 3 }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 13,
+                background: ICON_BG,
+                border: '1px solid rgba(0,0,0,0.06)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
+            </motion.button>
+
+            {/* Library */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isProcessing}
+              className="flex flex-col items-center justify-center disabled:opacity-40"
+              style={{ width: 52, height: 54, gap: 3 }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 13,
+                background: ICON_BG,
+                border: '1px solid rgba(0,0,0,0.06)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
+            </motion.button>
+          </div>
 
           {/* Divider */}
-          <div style={{ width: 1, height: 24, background: RAIL_HAIRLINE, margin: '0 6px' }} />
+          <div style={{ width: 1, height: 28, background: RAIL_HAIRLINE, margin: '0 10px' }} />
 
-          {/* Mention */}
-          <motion.button whileTap={{ scale: 0.85 }}
-            onClick={() => {
-              const pos = textareaRef.current?.selectionStart ?? state.caption.length;
-              const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
-              setCaption(newCaption);
-              setMentionTriggerIndex(pos);
-              openPanel('mention');
-            }}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
-            <AtSign className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Mention</span>
-          </motion.button>
+          {/* Zone B — Text tools */}
+          <div className="flex items-center" style={{ gap: 0 }}>
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => {
+                const pos = textareaRef.current?.selectionStart ?? state.caption.length;
+                const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
+                setCaption(newCaption);
+                setMentionTriggerIndex(pos);
+                openPanel('mention');
+              }}
+              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <AtSign className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+            </motion.button>
 
-          {/* Audience */}
-          <motion.button whileTap={{ scale: 0.85 }}
-            onClick={() => openPanel('audience')}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
-            {state.visibility === 'anyone'
-              ? <Globe className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-              : state.visibility === 'followers'
-                ? <Users className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-                : <Lock className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-            }
-            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Audience</span>
-          </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => openPanel('drafts')}
+              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <BookOpen className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+            </motion.button>
+          </div>
 
-          {/* Drafts */}
-          <motion.button whileTap={{ scale: 0.85 }}
-            onClick={() => openPanel('drafts')}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, width: 50, height: 50, background: 'none', border: 'none', cursor: 'pointer' }}>
-            <BookOpen className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Drafts</span>
-          </motion.button>
+          {/* Spacer */}
+          <div className="flex-1" />
 
-          {/* Character count */}
-          <CharacterRing count={charCount} />
+          {/* Zone C — Character count */}
+          <div className="flex items-center justify-center" style={{ width: 36, height: 36 }}>
+            <CharacterRing count={charCount} />
+          </div>
         </div>
       </div>
 
