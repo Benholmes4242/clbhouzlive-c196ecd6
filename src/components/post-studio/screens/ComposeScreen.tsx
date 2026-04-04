@@ -1303,6 +1303,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
           </motion.button>
 
+          {/* Divider */}
+          <div style={{ width: 1, height: 24, background: RAIL_HAIRLINE, margin: '0 6px' }} />
+
           {/* Mention */}
           <motion.button whileTap={{ scale: 0.85 }}
             onClick={() => {
