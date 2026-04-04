@@ -67,65 +67,111 @@ export function CollegeComparePage() {
 
           {/* Hero content — VS logos centered */}
           <div
-            className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8"
-            style={{ paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)' }}
+            className="relative z-10 flex items-center justify-center h-full px-5"
+            style={{
+              paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)',
+              paddingBottom: 28,
+            }}
           >
             {!hasValidParams ? (
               <p className="text-white/70" style={{ fontSize: 15, fontWeight: 500 }}>
                 Select two colleges to compare
               </p>
             ) : isLoading ? (
-              /* Skeleton VS header inside hero */
               <div className="flex items-center w-full max-w-xs">
-                <div className="flex-1 flex flex-col items-center gap-2">
-                  <Skeleton className="w-20 h-20 rounded-xl bg-white/10" />
-                  <Skeleton className="h-4 w-24 bg-white/10" />
+                <div className="flex-1 flex flex-col items-center gap-3">
+                  <Skeleton className="w-[130px] h-[130px] rounded-[24px] bg-white/10" />
+                  <Skeleton className="h-5 w-28 bg-white/10" />
                 </div>
-                <div className="w-16 flex justify-center">
-                  <span className="text-white/30" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
+                <div className="w-12 flex justify-center mb-10">
+                  <span className="text-white/25" style={{ fontSize: 14, fontWeight: 900 }}>VS</span>
                 </div>
-                <div className="flex-1 flex flex-col items-center gap-2">
-                  <Skeleton className="w-20 h-20 rounded-xl bg-white/10" />
-                  <Skeleton className="h-4 w-24 bg-white/10" />
+                <div className="flex-1 flex flex-col items-center gap-3">
+                  <Skeleton className="w-[130px] h-[130px] rounded-[24px] bg-white/10" />
+                  <Skeleton className="h-5 w-28 bg-white/10" />
                 </div>
               </div>
             ) : data ? (
-              /* VS logos in hero */
-              <div className="flex items-center w-full max-w-xs">
-                <div className="flex-1 flex flex-col items-center min-w-0">
-                  <div className="w-20 h-20 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center overflow-hidden mb-2">
+              <div className="flex items-center w-full">
+                {/* College 1 */}
+                <div className="flex-1 flex flex-col items-center gap-3.5 min-w-0">
+                  <div
+                    className="flex items-center justify-center overflow-hidden"
+                    style={{
+                      width: 130, height: 130,
+                      borderRadius: 24,
+                      background: 'rgba(255,255,255,0.14)',
+                      border: '1.5px solid rgba(255,255,255,0.20)',
+                      backdropFilter: 'blur(6px)',
+                      WebkitBackdropFilter: 'blur(6px)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+                    }}
+                  >
                     {(() => {
                       const logo = getCollegeLogoUrl(data.college1.media?.college_name || '');
                       return logo ? (
-                        <img src={logo} alt="" className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                        <img
+                          src={logo}
+                          alt=""
+                          className="object-contain"
+                          style={{ width: 100, height: 100 }}
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
                       ) : (
-                        <span className="text-xl font-bold text-white/60">
+                        <span className="font-bold text-white/60" style={{ fontSize: 40 }}>
                           {(data.college1.media?.short_name || 'C1').charAt(0)}
                         </span>
                       );
                     })()}
                   </div>
-                  <span className="text-white text-center truncate max-w-full" style={{ fontSize: 14, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+                  <span
+                    className="text-white text-center"
+                    style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', textShadow: '0 1px 6px rgba(0,0,0,0.45)' }}
+                  >
                     {data.college1.media?.short_name || data.college1.media?.college_name || 'College 1'}
                   </span>
                 </div>
-                <div className="shrink-0 w-16 flex items-center justify-center" style={{ height: 80 }}>
-                  <span className="text-white/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
+
+                {/* VS */}
+                <div className="shrink-0 w-12 flex items-center justify-center" style={{ marginBottom: 42 }}>
+                  <span className="text-white/28" style={{ fontSize: 14, fontWeight: 900, letterSpacing: '0.05em' }}>VS</span>
                 </div>
-                <div className="flex-1 flex flex-col items-center min-w-0">
-                  <div className="w-20 h-20 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center overflow-hidden mb-2">
+
+                {/* College 2 */}
+                <div className="flex-1 flex flex-col items-center gap-3.5 min-w-0">
+                  <div
+                    className="flex items-center justify-center overflow-hidden"
+                    style={{
+                      width: 130, height: 130,
+                      borderRadius: 24,
+                      background: 'rgba(255,255,255,0.14)',
+                      border: '1.5px solid rgba(255,255,255,0.20)',
+                      backdropFilter: 'blur(6px)',
+                      WebkitBackdropFilter: 'blur(6px)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+                    }}
+                  >
                     {(() => {
                       const logo = getCollegeLogoUrl(data.college2.media?.college_name || '');
                       return logo ? (
-                        <img src={logo} alt="" className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                        <img
+                          src={logo}
+                          alt=""
+                          className="object-contain"
+                          style={{ width: 100, height: 100 }}
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
                       ) : (
-                        <span className="text-xl font-bold text-white/60">
+                        <span className="font-bold text-white/60" style={{ fontSize: 40 }}>
                           {(data.college2.media?.short_name || 'C2').charAt(0)}
                         </span>
                       );
                     })()}
                   </div>
-                  <span className="text-white text-center truncate max-w-full" style={{ fontSize: 14, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+                  <span
+                    className="text-white text-center"
+                    style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', textShadow: '0 1px 6px rgba(0,0,0,0.45)' }}
+                  >
                     {data.college2.media?.short_name || data.college2.media?.college_name || 'College 2'}
                   </span>
                 </div>
@@ -134,26 +180,36 @@ export function CollegeComparePage() {
           </div>
         </div>
 
-        {/* Content below hero */}
+        {/* ══════════════════════════════════════════════
+            STICKY HEADER — ← College Golf
+            ══════════════════════════════════════════════ */}
         <div
-          className="relative px-4"
+          className="-mx-0 sticky top-0 z-20"
           style={{
-            marginTop: -24,
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+            background: 'hsl(var(--background) / 0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderBottom: '1px solid hsl(var(--border) / 0.10)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           }}
         >
-          {/* Back CTA */}
-          <div style={{ marginTop: 28 }}>
+          <div className="flex items-center px-4 pt-2.5 pb-3">
             <button
               onClick={() => navigate('/tourhub/college-golf')}
-              className="inline-flex items-center gap-0.5 text-muted-foreground active:opacity-70 transition-opacity"
-              style={{ fontSize: 13, fontWeight: 500 }}
+              className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity"
+              style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={13} strokeWidth={2.5} />
               College Golf
             </button>
           </div>
+        </div>
 
+        {/* Content */}
+        <div
+          className="relative px-4"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
+        >
           {!hasValidParams ? (
             <div className="text-center py-16">
               <button
@@ -165,9 +221,7 @@ export function CollegeComparePage() {
             </div>
           ) : isLoading ? (
             <div style={{ paddingTop: 16 }}>
-              {/* Summary card skeleton */}
               <Skeleton className="h-24 rounded-2xl mb-4" />
-              {/* Stats skeleton */}
               <Skeleton className="h-48 rounded-2xl" />
             </div>
           ) : error ? (
@@ -177,8 +231,8 @@ export function CollegeComparePage() {
               </p>
             </div>
           ) : data ? (
-            <div style={{ paddingTop: 8 }}>
-              <CollegeCompareHero data={data} onBack={() => navigate(-1)} />
+            <div style={{ paddingTop: 16 }}>
+              <CollegeCompareHero data={data} />
             </div>
           ) : null}
         </div>
