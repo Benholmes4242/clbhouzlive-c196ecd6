@@ -18,6 +18,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
   const [expanded, setExpanded] = useState(false);
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
+  const isVideo = firstMedia?.type === 'video';
   const duration = firstMedia?.duration;
   const hlsUrl = firstMedia?.hlsUrl;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
@@ -60,17 +61,27 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           />
         )}
 
-        {/* Play icon center */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{
-              background: 'rgba(0,0,0,0.45)',
-            }}
-          >
-            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+        {/* Play icon — only for videos */}
+        {isVideo && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{ background: 'rgba(0,0,0,0.45)' }}
+            >
+              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Carousel indicator — for multi-media posts */}
+        {!isVideo && post.mediaItems.length > 1 && (
+          <div
+            className="absolute top-2 right-2 px-2 py-1 rounded-full text-[11px] font-semibold text-white"
+            style={{ background: 'rgba(0,0,0,0.4)' }}
+          >
+            1/{post.mediaItems.length}
+          </div>
+        )}
 
         {/* Duration badge */}
         {duration != null && duration > 0 && (
