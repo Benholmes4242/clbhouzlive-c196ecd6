@@ -525,6 +525,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, updateMediaEdits,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset,
+    onSuccess,
   } = usePostStudioContext();
 
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
