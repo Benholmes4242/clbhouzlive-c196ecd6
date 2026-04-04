@@ -820,37 +820,138 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       {/* ── BODY CONTENT (below hero) ── */}
       <div style={{ padding: 'clamp(12px,3vw,16px)', display: 'flex', flexDirection: 'column', gap: 16, marginLeft: '-16px', marginRight: '-16px' }}>
 
-      {/* Season Status Panel */}
+      {/* Merged season hero header */}
       {timeFilter === 'seasonal' && currentSeason && (
-        <SeasonStatusPanel
-          currentSeasonId={currentSeasonId}
-          daysRemaining={currentSeason.days_remaining ?? 0}
-          progressPercent={progressPercent}
-          seasonData={seasonData}
-          isLoading={!seasonCalendar}
-          onSeasonClick={(id) => console.log('Season chip clicked:', id)}
-          seasonColor={seasonThemeColor}
-          sponsorName={currentSeason.sponsor_name ?? null}
-          prizeDescription={currentSeason.prize_description ?? null}
-          leaderCourses={allEntries[0]?.courses_this_season ?? 0}
-          yourCourses={currentUserEntry?.courses_this_season ?? 0}
-          yourSeasonRank={currentUserEntry?.current_rank ?? 0}
-          totalSeasonPlayers={allEntries.length}
-        />
-      )}
+        <div style={{ margin: '0 -12px' }}>
+          <div style={{
+            background: 'linear-gradient(160deg, #0a2a1a, #0f3d20, #0a2a1a)',
+            padding: '14px 16px 0',
+          }}>
+            {/* Top row — season name + days left */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+                  {getSeasonConfig(currentSeasonId).title}
+                </span>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 99, padding: '3px 10px' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
+                  {currentSeason.days_remaining ?? 0} days left
+                </span>
+              </div>
+            </div>
 
-      {/* Season Race Card */}
-      {timeFilter === 'seasonal' && currentSeason && (currentUserEntry?.courses_this_season ?? 0) > 0 && (
-        <SeasonRaceCard
-          seasonLabel={getSeasonConfig(currentSeasonId).title}
-          seasonColor={seasonThemeColor}
-          yourCourses={currentUserEntry?.courses_this_season ?? 0}
-          leaderCourses={allEntries[0]?.courses_this_season ?? 0}
-          yourRank={currentUserEntry?.current_rank ?? 0}
-          totalPlayers={allEntries.length}
-          daysRemaining={currentSeason.days_remaining ?? 0}
-          majorsBonusActive={currentSeasonId === 'major'}
-        />
+            {/* Your rank + courses */}
+            {currentUserEntry && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{ position: 'relative' }}>
+                  <SquircleAvatar
+                    src={userPhotoUrl}
+                    size={52}
+                    fallback={currentUserEntry?.display_name?.charAt(0) ?? '?'}
+                    hideRing
+                  />
+                  <div style={{ position: 'absolute', bottom: -4, right: -4, background: '#F7931E', borderRadius: 99, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0a2a1a', fontSize: 10, fontWeight: 900, color: '#fff' }}>
+                    {currentUserEntry.current_rank}
+                  </div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Your position</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+                    {ordinal(currentUserEntry.current_rank)} of {allEntries.length}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Courses</div>
+                  <div style={{ fontSize: 36, fontWeight: 900, color: '#fff', letterSpacing: '-1px', lineHeight: 1 }}>
+                    {currentUserEntry.courses_this_season}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sponsor + prize + progress */}
+            {currentSeason.sponsor_name && (
+              <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px 12px 0 0', padding: '12px 14px', marginBottom: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div>
+                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>
+                      Sponsored by
+                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 900, color: '#fff' }}>
+                      {currentSeason.sponsor_name}
+                    </div>
+                  </div>
+                  {currentSeason.prize_description && (
+                    <div style={{ background: '#F7931E', borderRadius: 99, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: '#fff' }}>
+                      🏆 Prize
+                    </div>
+                  )}
+                </div>
+                {currentSeason.prize_description && (
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginBottom: currentUserEntry ? 10 : 0 }}>
+                    {currentSeason.prize_description}
+                  </div>
+                )}
+                {currentUserEntry && allEntries.length > 0 && (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+                        You — <strong style={{ color: '#fff' }}>{currentUserEntry.courses_this_season}</strong>
+                      </span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#4ade80' }}>
+                        Leader — {allEntries[0]?.courses_this_season ?? 0}
+                      </span>
+                    </div>
+                    <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${Math.min((currentUserEntry.courses_this_season / Math.max(allEntries[0]?.courses_this_season ?? 1, 1)) * 100, 100)}%`,
+                        background: '#4ade80',
+                        borderRadius: 99,
+                      }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>
+                          To reach {ordinal(Math.max(1, currentUserEntry.current_rank - 1))}
+                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 900, color: '#F7931E' }}>
+                          +{Math.max(0, (allEntries[currentUserEntry.current_rank - 2]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season + 1)} courses
+                        </div>
+                      </div>
+                      {currentSeasonId === 'major' && (
+                        <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Majors bonus</div>
+                          <div style={{ fontSize: 15, fontWeight: 900, color: '#F7931E' }}>×2 pts</div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Season cycle pills */}
+            <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              {(['pre-season', 'major', 'summer'] as const).map((s, i) => {
+                const label = s === 'pre-season' ? 'Pre-Season' : s === 'major' ? 'Major' : 'Summer';
+                const isActive = currentSeasonId === s;
+                return (
+                  <div key={s} style={{
+                    flex: 1, textAlign: 'center', padding: '9px 4px',
+                    borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                    background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  }}>
+                    <div style={{ fontSize: 11, fontWeight: isActive ? 800 : 400, color: isActive ? '#fff' : 'rgba(255,255,255,0.35)' }}>{label}</div>
+                    {isActive && <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#F7931E', margin: '3px auto 0' }} />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
@@ -905,33 +1006,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
 
-      {/* 6. Motivational Carousel - Only show in Season mode */}
-      {timeFilter === 'seasonal' && currentUserEntry && (
-        <MotivationalCarousel
-          currentRank={currentRank}
-          totalPlayers={allEntries.length}
-          coursesThisSeason={currentUserEntry.courses_this_season}
-          friendAhead={friendAhead ? {
-            name: friendAhead.display_name?.split(' ')[0] || 'Friend',
-            rank: friendAhead.current_rank,
-            coursesAhead: friendAhead.courses_this_season - currentUserEntry.courses_this_season,
-          } : null}
-          friendBehind={friendBehind ? {
-            name: friendBehind.display_name?.split(' ')[0] || 'Friend',
-            rank: friendBehind.current_rank,
-            coursesBehind: currentUserEntry.courses_this_season - friendBehind.courses_this_season,
-          } : null}
-          rivalAhead={closestRivalAhead ? {
-            name: closestRivalAhead.display_name?.split(' ')[0] || 'Rival',
-            rank: closestRivalAhead.current_rank ?? 0,
-            coursesAhead: closestRivalAhead.gap ?? 0,
-          } : null}
-          coursesToNextRank={userStatus?.courses_to_next_division}
-          isInTop10={isInTop10}
-          isInTop3={isInTop3}
-          streak={undefined}
-        />
-      )}
 
       {/* 6b. Arenas Strip — rank pills */}
       {timeFilter === 'seasonal' && currentUserEntry && (
