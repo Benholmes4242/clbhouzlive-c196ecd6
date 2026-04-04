@@ -64,6 +64,7 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
 
 function renderScreen(step: StudioStep, onSuccessDone: () => void, onClose: () => void) {
   switch (step) {
+    case 'VIEWFINDER': return <ViewfinderScreen onClose={onClose} />;
     case 'COMPOSE':  return <ComposeScreen onClose={onClose} />;
     case 'TRIM':     return <TrimScreen />;
     case 'POSTER':   return <PosterScreen />;
