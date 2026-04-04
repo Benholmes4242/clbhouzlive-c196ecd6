@@ -61,17 +61,6 @@ export const SeasonWinnerCard: React.FC<SeasonWinnerCardProps> = ({
         />
 
         <div className="relative px-5 pt-4 pb-5" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Crown */}
-          <div
-            className="text-center"
-            style={{
-              fontSize: 'clamp(22px,6vw,30px)',
-              animation: 'crownIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both',
-            }}
-          >
-            👑
-          </div>
-
           {/* Stamp badge */}
           <div
             className="flex justify-center"
