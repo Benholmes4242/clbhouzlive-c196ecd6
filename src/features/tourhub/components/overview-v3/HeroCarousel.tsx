@@ -1276,8 +1276,29 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 </motion.div>
               )}
 
-            </AnimatePresence>
+      </AnimatePresence>
 
+      {/* Carousel Dots - Between glass card and bottom of hero */}
+      {safeSlides.length > 1 && (
+        <div
+          className="absolute bottom-0 left-0 right-0 flex items-center justify-center z-20"
+          style={{
+            gap: '5px',
+            paddingBottom: '6px',
+          }}
+        >
+          {Array.from({ length: safeSlides.length }).map((_, index) => (
+            <button
+              key={index}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentIndex(index);
+              }}
+              className={index === currentIndex ? "hero-dot-active hero-dot-sm" : "hero-dot-inactive hero-dot-sm"}
+            />
+          ))}
+        </div>
+      )}
 
             {/* Dots moved outside glass card */}
           </motion.div>
