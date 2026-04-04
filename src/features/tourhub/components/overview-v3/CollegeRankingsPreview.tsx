@@ -782,7 +782,7 @@ export function CollegeRankingsPreview() {
       <FranchiseLeadersCarousel leaders={franchiseLeaders} />
 
       {/* 6. PICK YOUR FRANCHISE CTA */}
-      <div className="px-4 mb-6">
+      <div className="px-4">
         <PickFranchiseCTA onOpen={() => setSheetOpen(true)} />
       </div>
 
