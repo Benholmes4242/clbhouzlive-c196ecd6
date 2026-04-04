@@ -452,23 +452,6 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
           </>
         )}
 
-        {/* Pagination dots — inside glass card */}
-        {totalSlides > 1 && (
-          <div className="flex items-center justify-center gap-1.5 pt-2 pb-1">
-            {Array.from({ length: totalSlides }).map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDotClick?.(i); }}
-                className={`rounded-full transition-all duration-300 ${
-                  i === currentIndex
-                    ? 'w-[18px] h-[6px] bg-white/90'
-                    : 'w-[6px] h-[6px] bg-white/40'
-                }`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
       </motion.div>
     </div>
   );
