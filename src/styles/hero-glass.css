@@ -446,14 +446,14 @@
 
 .hero-dot-sm.hero-dot-inactive {
   width: 5px;
-  height: 5px;
-  border-radius: 2.5px;
+  height: 4px;
+  border-radius: 2px;
 }
 
 .hero-dot-sm.hero-dot-active {
   width: 16px;
-  height: 5px;
-  border-radius: 2.5px;
+  height: 4px;
+  border-radius: 2px;
 }
 
 
