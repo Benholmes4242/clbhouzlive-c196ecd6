@@ -9,11 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronRight, 
-  LayoutGrid, 
-  Calendar, 
-  Users, 
   Trophy, 
-  GraduationCap 
 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
@@ -47,10 +43,10 @@ interface LinkItem {
 const CLBHOUZ_ORANGE = '#F59E0B';
 
 const NAV_ITEMS: NavItem[] = [
-  { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <LayoutGrid className="w-5 h-5" /> },
-  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening - past, present, and upcoming.', icon: <Calendar className="w-5 h-5" /> },
-  { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <Users className="w-5 h-5" /> },
-  { value: 'leaderboards', label: 'Performance Rankings', subtitle: 'Statistical leaders across every category.', icon: <Trophy className="w-5 h-5" /> },
+  { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <span className="text-xl">🌍</span> },
+  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening - past, present, and upcoming.', icon: <span className="text-xl">📅</span> },
+  { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <span className="text-xl">🏌️</span> },
+  { value: 'leaderboards', label: 'Performance Rankings', subtitle: 'Statistical leaders across every category.', icon: <span className="text-xl">🏆</span> },
 ];
 
 const LINK_ITEMS: LinkItem[] = [
@@ -59,7 +55,7 @@ const LINK_ITEMS: LinkItem[] = [
     label: 'College Franchise Rankings', 
     subtitle: 'From campus standout to Tour contender.',
     path: '/tourhub/college-golf',
-    icon: <GraduationCap className="w-5 h-5" />,
+    icon: <span className="text-xl">🎓</span>,
   },
 ];
 
@@ -490,9 +486,9 @@ export function TourHubNavOverlay({
                       onClick={() => handleItemClick(item.value)}
                       className="w-full flex items-center gap-3.5 p-4 rounded-[18px] text-left relative overflow-hidden"
                       style={{
-                        background: isActive ? '#ffffff' : 'rgba(255,255,255,0.60)',
-                        border: isActive ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(0,0,0,0.05)',
-                        boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.07)' : '0 1px 2px rgba(0,0,0,0.03)',
+                        background: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)',
+                        border: isActive ? '1.5px solid rgba(245,166,35,0.22)' : '1px solid rgba(0,0,0,0.06)',
+                        boxShadow: isActive ? '0 2px 12px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.04)',
                       }}
                       aria-current={isActive ? 'page' : undefined}
                       aria-label={getAriaLabel(item)}
