@@ -23,7 +23,7 @@ import { TrophyPodium } from './podium/TrophyPodium';
 import { HallOfFamePodium } from './podium/HallOfFamePodium';
 import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
-import { SeasonStatusPanel } from './season-status';
+
 import { TimeModeToggle } from './TimeModeToggle';
 import { DivisionLadderPanel } from './DivisionLadderPanel';
 import { DivisionProgressPreview } from './DivisionProgressPreview';
