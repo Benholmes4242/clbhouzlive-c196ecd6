@@ -39,12 +39,12 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
           <SelectValue placeholder="Select a country..." />
         </div>
       </SelectTrigger>
-      <SelectContent className="bg-card z-50 max-h-[300px]">
+      <SelectContent className="bg-card text-foreground z-50 max-h-[300px]">
         {countries?.map((country) => (
           <SelectItem 
             key={country.country_code} 
             value={country.country_code}
-            className="cursor-pointer"
+            className="cursor-pointer text-foreground"
           >
             {country.country_name}
           </SelectItem>
