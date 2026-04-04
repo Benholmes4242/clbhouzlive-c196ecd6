@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
@@ -319,40 +320,54 @@ export function CollegeProfilePage() {
         </div>
       )}
 
-      {/* Back link */}
-      <div className="px-4" style={{ marginTop: 20 }}>
-        <button
-          onClick={() => navigate('/tourhub/college-golf')}
-          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
-        >
-          <ChevronLeft size={14} />
-          College Golf
-        </button>
+      {/* ══════════════════════════════════════════════
+          STICKY HEADER — ← College Golf | Compare
+          ══════════════════════════════════════════════ */}
+      <div
+        className="-mx-4 sticky top-0 z-20"
+        style={{
+          background: 'hsl(var(--background) / 0.96)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid hsl(var(--border) / 0.10)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          marginTop: 14,
+        }}
+      >
+        <div className="flex items-center gap-2 px-4 pt-2.5 pb-2.5">
+          {/* ← College Golf */}
+          <button
+            type="button"
+            onClick={() => navigate('/tourhub/college-golf')}
+            className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+            style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+          >
+            <ChevronLeft size={13} strokeWidth={2.5} />
+            College Golf
+          </button>
+
+          <div className="flex-1" />
+
+          {/* Compare pill — only shown when rivalSlugs exist */}
+          {stats && rivalSlugs.length > 0 && (
+            <button
+              onClick={handleCompareClick}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] shrink-0',
+                'bg-card border border-border/50 shadow-sm',
+                'transition-all duration-150 active:scale-[0.97]'
+              )}
+            >
+              <GitCompare className="w-[13px] h-[13px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
+              <span className="text-[12px] font-semibold text-foreground">Compare</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Content sections */}
       <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-        {/* Compare Button — 16px from stats bar */}
-        {stats && rivalSlugs.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="flex items-center justify-center"
-            style={{ marginTop: '16px' }}
-          >
-            <button 
-              onClick={handleCompareClick}
-              className="flex items-center rounded-xl border border-border/50 bg-card active:scale-95 transition-all"
-              style={{ padding: '10px 20px', gap: '6px' }}
-            >
-              <GitCompare className="w-4 h-4 text-muted-foreground" />
-              <span style={{ fontSize: '14px', fontWeight: 600 }} className="text-foreground">Compare</span>
-            </button>
-          </motion.div>
-        )}
-
-        {/* Story Strip — 16px from compare button */}
+        {/* Story Strip — 20px from sticky header */}
         {stats && (
           <motion.div
             variants={sectionVariants}
@@ -360,7 +375,7 @@ export function CollegeProfilePage() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4 }}
-            style={{ marginTop: '16px' }}
+            style={{ marginTop: '20px' }}
           >
             <FranchiseStoryStrip normalizedName={collegeSlug || ''} />
           </motion.div>
