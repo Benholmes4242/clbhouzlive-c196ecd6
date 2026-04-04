@@ -11,7 +11,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { CharacterRing } from '../components/CharacterRing';
-import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { useSaveDraft } from '../hooks/useSaveDraft';
@@ -19,6 +18,10 @@ import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPE
 import { BG_BASE, ICON_BG, ICON_COLOR, ICON_DIM, RAIL_BG, RAIL_HAIRLINE, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
+import { enqueuePostUpload } from '@/uploads/uploadPipeline';
+import { supabase } from '@/integrations/supabase/client';
+import type { UploadJobInput } from '@/uploads/types';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import StudioShelf from '@/components/studio/StudioShelf';
 
 // ─── Golf-native rotating placeholders ────────────────────────────────────────
