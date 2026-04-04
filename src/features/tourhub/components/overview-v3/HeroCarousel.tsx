@@ -1496,11 +1496,12 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         const activeSlide = safeSlides[currentIndex];
         const cardExpanded = activeSlide?.type === 'live' ? true : isExpanded;
         const dotLeft = cardExpanded ? '12px' : '16px';
-        const dotWidth = cardExpanded ? 'calc(100% - 24px)' : 'min(350px, calc(100% - 32px))';
+        const dotRight = cardExpanded ? '12px' : 'auto';
+        const dotMaxWidth = cardExpanded ? undefined : 'min(350px, calc(100% - 32px))';
         return (
         <div
           className="absolute bottom-0 flex items-center justify-center z-20"
-          style={{ gap: '5px', paddingBottom: '6px', left: dotLeft, width: dotWidth }}
+          style={{ gap: '5px', paddingBottom: '6px', left: dotLeft, right: dotRight, maxWidth: dotMaxWidth }}
         >
           {Array.from({ length: safeSlides.length }).map((_, index) => (
             <button
