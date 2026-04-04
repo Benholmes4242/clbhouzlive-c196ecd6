@@ -877,7 +877,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   winnerName={profile?.display_name || 'Champion'}
                   winnerAvatarUrl={profile?.avatar_url}
                   winnerClubName={profile?.club_name}
-                  winnerCourses={season.season_winner_courses ?? 0}
+                  winnerCourses={season.name?.toLowerCase().includes('pre-season') ? 24 : (season.season_winner_courses ?? 0)}
                   sponsorName={season.sponsor_name}
                   prizeDescription={season.prize_description}
                   prizeClaimed={season.prize_claimed}
