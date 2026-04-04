@@ -526,6 +526,48 @@ const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
 
+  // Push notification registration — runs on every cold launch
+  useEffect(() => {
+    const register = async () => {
+      try {
+        // Only in Median native app
+        const os = (window as any).median?.onesignal;
+        if (!os) return;
+
+        // Wait for auth — retry every second for up to 10 seconds
+        let session = null;
+        for (let i = 0; i < 10; i++) {
+          const { data } = await supabase.auth.getSession();
+          if (data.session?.user) { session = data.session; break; }
+          await new Promise(r => setTimeout(r, 1000));
+        }
+        if (!session?.user) return;
+
+        const userId = session.user.id;
+        os.userPrivacyConsent?.(true);
+        os.login?.(userId);
+        os.register?.();
+
+        const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
+          ? 'ios' : 'android';
+
+        const { error } = await supabase.functions.invoke('register-push-device', {
+          body: { platform, enabled: true },
+        });
+
+        if (error) {
+          console.error('[Push] Registration failed:', error);
+        } else {
+          console.log('[Push] Registered:', userId);
+        }
+      } catch (e) {
+        console.error('[Push] Error:', e);
+      }
+    };
+
+    const timer = setTimeout(register, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ── Analytics: session start + page tracking ──
   useEffect(() => {
