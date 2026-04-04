@@ -106,7 +106,7 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingTop: 24, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
+          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 36, paddingTop: 36, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
             <LiveRightNow />
             <WhatsComing />
             <LazySection minHeight={250}>
