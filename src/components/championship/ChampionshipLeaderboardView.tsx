@@ -30,7 +30,7 @@ import { DivisionProgressPreview } from './DivisionProgressPreview';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
-import { SeasonRaceCard } from './SeasonRaceCard';
+
 import { ArenasStrip } from './ArenasStrip';
 import { SeasonWinnerCard } from './SeasonWinnerCard';
 // HallOfFameHeader is now integrated into HallOfFamePodium
