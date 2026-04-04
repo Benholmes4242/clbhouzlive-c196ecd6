@@ -284,11 +284,46 @@ export function CoursesLeaderboardView() {
     },
   });
 
+  // Fetch total courses in region for accurate percentage
+  const { data: totalCoursesInRegion = 0 } = useQuery({
+    queryKey: ['courses-tab-total-count', quickRegion],
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const countryFilter: Record<string, string | null> = {
+        'global': null,
+        'gb-i':   'Britain & Ireland',
+        'usa':    'USA',
+        'europe': 'Continental Europe',
+        'row':    null,
+      };
+      const country = countryFilter[quickRegion] ?? null;
+
+      let query = supabase
+        .from('course_ratings')
+        .select('course_id, golf_courses!inner(country)', { count: 'exact', head: false })
+        .eq('is_mock', false);
+
+      if (country) {
+        query = query.eq('golf_courses.country', country);
+      } else if (quickRegion === 'row') {
+        query = query
+          .neq('golf_courses.country', 'Britain & Ireland')
+          .neq('golf_courses.country', 'USA')
+          .neq('golf_courses.country', 'Continental Europe');
+      }
+
+      const { data, error } = await query;
+      if (error) return 0;
+      const unique = new Set((data ?? []).map((r: any) => r.course_id));
+      return unique.size;
+    },
+  });
+
   // ─── Computed stats for header ────────────────────────────────────
   const userPlayedPct = useMemo(() => {
-    const total = allCourses.length > 0 ? allCourses.length : 100;
-    return Math.min(99, Math.round((userPlayedCount / total) * 100));
-  }, [userPlayedCount, allCourses.length]);
+    if (totalCoursesInRegion === 0) return 0;
+    return Math.min(99, Math.round((userPlayedCount / totalCoursesInRegion) * 100));
+  }, [userPlayedCount, totalCoursesInRegion]);
 
   const clubRankLabel = '—';
 
