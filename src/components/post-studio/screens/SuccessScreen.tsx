@@ -86,10 +86,10 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         onClick={onDone}
         className="w-full max-w-sm flex items-center justify-center gap-2 rounded-[18px] font-bold text-[15px] min-h-[58px] relative z-10"
         style={{
-          background: 'rgba(15,23,42,0.90)',
+          background: '#F7931E',
           color: '#FFFFFF',
           letterSpacing: '-0.015em',
-          boxShadow: '0 6px 28px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+          boxShadow: '0 6px 28px rgba(247,147,30,0.22), 0 2px 8px rgba(247,147,30,0.12)',
         }}
       >
         Back to clbhouz

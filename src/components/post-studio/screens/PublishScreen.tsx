@@ -117,7 +117,7 @@ export function PublishScreen() {
       <StudioHeader
         title="Review Post"
         step="PUBLISH"
-        leftAction={{ label: 'Back', onClick: () => setStep('COMPOSE') }}
+        leftAction={{ label: '', onClick: () => setStep('COMPOSE'), icon: 'back' as const }}
       />
 
       <div className="flex-1 overflow-y-auto flex flex-col" style={{ scrollbarWidth: 'none' }}>
@@ -315,11 +315,11 @@ export function PublishScreen() {
             fontWeight: 700,
             letterSpacing: '-0.015em',
             borderRadius: 18,
-            background: isPublishing ? 'rgba(15,23,42,0.25)' : 'rgba(15,23,42,0.90)',
+          background: isPublishing ? 'rgba(247,147,30,0.4)' : '#F7931E',
             color: '#FFFFFF',
             boxShadow: isPublishing
               ? 'none'
-              : '0 6px 28px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+              : '0 6px 28px rgba(247,147,30,0.22), 0 2px 8px rgba(247,147,30,0.12)',
           }}
         >
           {isPublishing ? (
