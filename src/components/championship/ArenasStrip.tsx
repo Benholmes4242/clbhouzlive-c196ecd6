@@ -84,7 +84,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
             <button
               key={pill.id}
               onClick={() => !isUnavailable && onArenaChange(pill.id)}
-              className="flex-1 flex flex-col transition-all active:scale-[0.96]"
+              className="flex-1 flex flex-col items-center transition-all active:scale-[0.96]"
               style={{
                 borderRadius: 14,
                 padding: '8px 10px',
