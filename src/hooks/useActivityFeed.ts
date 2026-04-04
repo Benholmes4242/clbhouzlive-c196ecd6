@@ -253,12 +253,10 @@ function getContextUrl(notification: any): string {
     if (businessSlug) return `/business/${businessSlug}`;
   }
   
-  // Tag and mention notifications — post_id lives in the data JSONB
-  if (
-    (type === 'tag' || type === 'mention' || type === 'mention_post' || type === 'comment_mention') &&
-    data?.post_id
-  ) {
-    return `/post/${data.post_id}`;
+  // Tag and mention notifications — post_id lives in the data JSONB, fallback to entity_id
+  if (type === 'tag' || type === 'mention' || type === 'mention_post' || type === 'comment_mention') {
+    const pid = data?.post_id || (entity_type === 'post' ? entity_id : null);
+    if (pid) return `/post/${pid}`;
   }
 
   return '/';

@@ -96,12 +96,18 @@ const PostDeepLinkPage: React.FC = () => {
     loadPost();
   }, [postId]);
 
-  // Logged-in users go straight to Clubhouse
+  // Logged-in users: go to Clubhouse and open the post's comments sheet
   useEffect(() => {
-    if (!authLoading && user && !isLoading) {
-      navigate('/clubhouse', { replace: true });
+    if (!authLoading && user && !isLoading && postId) {
+      navigate('/', {
+        replace: true,
+        state: {
+          deepLinkPostId: postId,
+          openComments: true,
+        },
+      });
     }
-  }, [authLoading, user, isLoading, navigate]);
+  }, [authLoading, user, isLoading, navigate, postId]);
 
   // --- Loading ---
   if (isLoading || authLoading) {
