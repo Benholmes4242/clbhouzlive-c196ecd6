@@ -914,11 +914,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>
-                          To reach {ordinal(Math.max(1, currentUserEntry.current_rank - 1))}
-                        </div>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
                         <div style={{ fontSize: 15, fontWeight: 900, color: '#F7931E' }}>
-                          +{Math.max(0, (allEntries[currentUserEntry.current_rank - 2]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season + 1)} courses
+                          +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} courses
                         </div>
                       </div>
                       {currentSeasonId === 'major' && (
