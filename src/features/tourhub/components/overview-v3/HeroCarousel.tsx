@@ -1279,29 +1279,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             </AnimatePresence>
 
 
-            {/* Carousel Dots - Inside card, below CTA — fade out when expanded */}
-            {totalSlides > 1 && (
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  gap: '6px',
-                  marginTop: '8px',
-                  paddingBottom: '4px',
-                  flexShrink: 0,
-                }}
-              >
-                {Array.from({ length: totalSlides }).map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDotClick(index);
-                    }}
-                    className={index === currentIndex ? "hero-dot-active" : "hero-dot-inactive"}
-                  />
-                ))}
-              </div>
-            )}
+            {/* Dots moved outside glass card */}
           </motion.div>
         )}
       </AnimatePresence>
