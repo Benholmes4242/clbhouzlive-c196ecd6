@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -12,7 +11,6 @@ import type { CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 interface CollegeCompareHeroProps {
   data: CollegeCompareData;
   className?: string;
-  onBack?: () => void;
 }
 
 /* ── Section header matching design system ── */
@@ -201,7 +199,7 @@ function formatSg(v: number): string {
 }
 
 /* ── Main component ── */
-export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHeroProps) {
+export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps) {
   const { college1, college2 } = data;
   const { data: season } = useTourSeason();
   const seasonYear = season?.year || new Date().getFullYear();
@@ -324,17 +322,6 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
         </div>
       </motion.div>
 
-      {/* Back button — below VS header */}
-      {onBack && (
-        <button
-          onClick={onBack}
-          className="flex items-center gap-0.5 text-muted-foreground active:opacity-70 transition-opacity mb-4"
-          style={{ fontSize: 13, fontWeight: 500 }}
-        >
-          <ChevronLeft size={14} />
-          Back
-        </button>
-      )}
 
       {/* Summary Verdict Card */}
       <motion.div className="bg-card rounded-2xl border border-border/50 p-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
