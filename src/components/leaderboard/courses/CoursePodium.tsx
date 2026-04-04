@@ -93,7 +93,7 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
         </div>
 
         {/* Course name + location bottom-left */}
-        <div style={{ position: 'absolute', bottom: 12, left: 14, right: 80 }}>
+        <div style={{ position: 'absolute', bottom: 12, left: 14, right: 96 }}>
           <div style={{
             color: '#fff', fontSize: 'clamp(16px,4.5vw,20px)', fontWeight: 800,
             lineHeight: 1.2, fontFamily: 'DM Sans, system-ui, sans-serif',
@@ -102,11 +102,13 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
           }}>
             {first.course_name}
           </div>
-          <div style={{
-            color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px,3vw,13px)',
-            marginTop: 2, fontFamily: 'DM Sans, system-ui, sans-serif',
-          }}>
-            {location(first)} · Played by {first.times_played}
+          <div style={{ marginTop: 2, fontFamily: 'DM Sans, system-ui, sans-serif' }}>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px,3vw,13px)' }}>
+              {location(first)}
+            </div>
+            <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 'clamp(10px,2.6vw,12px)', marginTop: 1 }}>
+              Played by {first.times_played}
+            </div>
           </div>
         </div>
 
@@ -178,7 +180,7 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
             </div>
 
             {/* Name + location */}
-            <div style={{ position: 'absolute', bottom: 10, left: 10, right: 10 }}>
+            <div style={{ position: 'absolute', bottom: 10, left: 10, right: 48 }}>
               <div style={{
                 color: '#fff', fontSize: 'clamp(12px,3.3vw,14px)', fontWeight: 700,
                 lineHeight: 1.2, fontFamily: 'DM Sans, system-ui, sans-serif',
@@ -188,8 +190,9 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
                 {course.course_name.split('(')[0].trim()}
               </div>
               <div style={{
-                color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(10px,2.6vw,11px)',
+                color: 'rgba(255,255,255,0.55)', fontSize: 'clamp(10px,2.6vw,11px)',
                 marginTop: 1, fontFamily: 'DM Sans, system-ui, sans-serif',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}>
                 {location(course)}
               </div>
