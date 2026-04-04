@@ -6,10 +6,11 @@ import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom';
 import {
   Camera, SwitchCamera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
+  Zap, Globe, Users, Lock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { StudioHeader } from '../components/StudioHeader';
+import { CharacterRing } from '../components/CharacterRing';
 import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
