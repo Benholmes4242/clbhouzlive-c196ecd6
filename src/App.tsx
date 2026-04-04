@@ -720,7 +720,7 @@ const App: React.FC = () => {
     <>
       <AppShell>
         <ReviewIslandLoader />
-        <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
+        <ThemeProvider defaultTheme="dark" storageKey="clbhouz-ui-theme">
           <Top100DebugProvider>
             <QueryClientProvider client={queryClient}>
               <Suspense fallback={null}>

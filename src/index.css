@@ -53,6 +53,7 @@ img[src*="Silhouette"] {
  */
 html {
   background-color: #0d0d0d;
+  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -63,6 +64,7 @@ html {
 body {
   @apply font-sans;
   background-color: #0d0d0d;
+  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -704,12 +706,28 @@ html.lightbox-open {
   padding-right: var(--sar);
   
   /* Ensure background extends behind safe areas */
-  background-color: var(--bg-page);
+  background-color: #0d0d0d;
 
   /* Desktop centering — constrains to mobile width on large screens */
   max-width: 480px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* ── BOOT FLASH PREVENTION ─────────────────────────────────────────────────
+   The app shell defaults to --bg-page (#F8FAFC) which causes a white flash
+   between the splash screen and Clubhouse skeleton. Force the shell to black
+   on first render; individual light pages apply their own background via
+   body class or component-level styles once they mount.
+   ──────────────────────────────────────────────────────────────────────── */
+body.route-clubhouse .app-shell,
+body.route-auth .app-shell {
+  background-color: #0d0d0d !important;
+}
+
+/* Light routes restore the page background after mount */
+body.route-light .app-shell {
+  background-color: var(--bg-page);
 }
 
 /* ============================================================
