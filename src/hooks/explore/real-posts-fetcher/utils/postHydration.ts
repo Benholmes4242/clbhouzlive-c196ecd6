@@ -83,15 +83,15 @@ export async function batchFetchGolfCourses(
 }
 
 /**
- * Batch fetch ratings for review posts
+ * Batch fetch ratings and review text for review posts
  */
 export async function batchFetchRatings(
   reviewIds: string[]
-): Promise<Map<string, number>> {
-  if (reviewIds.length === 0) return new Map();
+): Promise<{ ratings: Map<string, number>; reviewTexts: Map<string, string> }> {
+  if (reviewIds.length === 0) return { ratings: new Map(), reviewTexts: new Map() };
   
   const uniqueIds = [...new Set(reviewIds.filter(Boolean))];
-  if (uniqueIds.length === 0) return new Map();
+  if (uniqueIds.length === 0) return { ratings: new Map(), reviewTexts: new Map() };
   
   const { data, error } = await supabase
     .from('course_ratings')
@@ -100,10 +100,15 @@ export async function batchFetchRatings(
   
   if (error) {
     console.error('[postHydration] Error fetching ratings:', error);
-    return new Map();
+    return { ratings: new Map(), reviewTexts: new Map() };
   }
   
-  return new Map((data || []).map(r => [r.id, r.rating]));
+  const ratings = new Map((data || []).map(r => [r.id, r.rating]));
+  const reviewTexts = new Map(
+    (data || []).filter(r => r.review).map(r => [r.id, r.review as string])
+  );
+  return { ratings, reviewTexts };
+}
 }
 
 /**
