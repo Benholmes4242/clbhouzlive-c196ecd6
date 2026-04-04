@@ -109,7 +109,6 @@ export async function batchFetchRatings(
   );
   return { ratings, reviewTexts };
 }
-}
 
 /**
  * Build complete hydration context for a batch of posts
