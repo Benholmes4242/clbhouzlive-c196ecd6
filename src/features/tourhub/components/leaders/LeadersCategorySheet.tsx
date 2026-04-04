@@ -1,9 +1,10 @@
 /**
  * LeadersCategorySheet — Full-width selector button + BottomSheet
  * for choosing leaderboard categories, organized in grouped grid.
+ * Supports external open control via optional externalOpen/onExternalClose props.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -25,6 +26,11 @@ interface LeadersCategorySheetProps {
   activeKey: string;
   onCategoryChange: (key: string) => void;
   leaderValue?: string;
+  /** When provided, external code controls open state */
+  externalOpen?: boolean;
+  onExternalClose?: () => void;
+  /** Hide the built-in trigger button when using external trigger */
+  hideTrigger?: boolean;
 }
 
 export function LeadersCategorySheet({
@@ -32,8 +38,24 @@ export function LeadersCategorySheet({
   activeKey,
   onCategoryChange,
   leaderValue,
+  externalOpen,
+  onExternalClose,
+  hideTrigger = false,
 }: LeadersCategorySheetProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  // Sync external open state
+  useEffect(() => {
+    if (externalOpen !== undefined) {
+      setInternalOpen(externalOpen);
+    }
+  }, [externalOpen]);
+
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const closeSheet = useCallback(() => {
+    setInternalOpen(false);
+    onExternalClose?.();
+  }, [onExternalClose]);
 
   const activeCategory = categories.find((c) => c.key === activeKey) || categories[0];
   const ActiveIcon = activeCategory.icon;
@@ -48,48 +70,51 @@ export function LeadersCategorySheet({
   const handleSelect = useCallback(
     (key: string) => {
       onCategoryChange(key);
-      setOpen(false);
+      setInternalOpen(false);
+      onExternalClose?.();
     },
-    [onCategoryChange]
+    [onCategoryChange, onExternalClose]
   );
 
   return (
     <>
-      {/* Selector Button */}
-      <button
-        onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-between active:scale-[0.99] transition-all duration-200"
-        style={{
-          background: 'hsl(var(--card))',
-          border: '1px solid hsl(var(--border) / 0.5)',
-          borderRadius: 16,
-          padding: '12px 16px',
-        }}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-      >
-        <div className="flex items-center gap-2.5">
-          <ActiveIcon
-            className="w-5 h-5 shrink-0"
-            style={{ color: activeKey !== 'world_rank' ? (activeCategory as any).accentColor ?? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))' }}
-          />
-          <span style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground">{activeCategory.shortLabel}</span>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' as const }} className="text-muted-foreground">
-            Leaderboard
-          </span>
-          {leaderValue && (
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--muted-foreground) / 0.5)' }}>
-              · {leaderValue}
+      {/* Selector Button — hidden when external trigger is used */}
+      {!hideTrigger && (
+        <button
+          onClick={() => setInternalOpen(true)}
+          className="w-full flex items-center justify-between active:scale-[0.99] transition-all duration-200"
+          style={{
+            background: 'hsl(var(--card))',
+            border: '1px solid hsl(var(--border) / 0.5)',
+            borderRadius: 16,
+            padding: '12px 16px',
+          }}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+        >
+          <div className="flex items-center gap-2.5">
+            <ActiveIcon
+              className="w-5 h-5 shrink-0"
+              style={{ color: activeKey !== 'world_rank' ? (activeCategory as any).accentColor ?? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))' }}
+            />
+            <span style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground">{activeCategory.shortLabel}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' as const }} className="text-muted-foreground">
+              Leaderboard
             </span>
-          )}
-        </div>
-        <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
-      </button>
+            {leaderValue && (
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--muted-foreground) / 0.5)' }}>
+                · {leaderValue}
+              </span>
+            )}
+          </div>
+          <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
+        </button>
+      )}
 
       {/* Bottom Sheet */}
       <BottomSheet
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={closeSheet}
         ariaLabelledBy="leaders-category-sheet-title"
       >
         <div
