@@ -141,7 +141,7 @@ export const SeasonWinnerCard: React.FC<SeasonWinnerCardProps> = ({
             </div>
 
             {/* Courses with crown */}
-            <div className="flex-shrink-0 text-right">
+            <div className="flex-shrink-0" style={{ textAlign: 'center' }}>
               <div
                 style={{
                   fontSize: 'clamp(16px,4vw,20px)',
