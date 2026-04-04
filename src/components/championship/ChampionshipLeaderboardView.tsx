@@ -809,25 +809,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                         borderRadius: 99,
                       }} />
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 16 }}>🎯</span>
-                        <div>
-                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
-                          <div style={{ fontSize: 14, fontWeight: 900, color: '#F7931E' }}>
-                            +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)}
-                          </div>
+                    <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>🎯</span>
+                      <div>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
+                        <div style={{ fontSize: 14, fontWeight: 900, color: '#F7931E' }}>
+                          +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)}
                         </div>
                       </div>
-                      {currentSeasonId === 'major' && (
-                        <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 16 }}>⭐</span>
-                          <div>
-                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Majors bonus</div>
-                            <div style={{ fontSize: 14, fontWeight: 900, color: '#F7931E' }}>×2 pts</div>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </>
                 )}
@@ -836,13 +825,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
             {/* Season cycle pills */}
             <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              {(['pre-season', 'major', 'summer'] as const).map((s, i) => {
-                const label = s === 'pre-season' ? 'Pre-Season' : s === 'major' ? 'Major' : 'Summer';
+              {(['pre-season', 'major', 'summer', 'off-season'] as const).map((s, i) => {
+                const label = s === 'pre-season' ? 'Pre-Season' : s === 'major' ? 'Major' : s === 'summer' ? 'Summer' : 'Off-Season';
                 const isActive = currentSeasonId === s;
                 return (
                   <div key={s} style={{
                     flex: 1, textAlign: 'center', padding: '9px 4px',
-                    borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                    borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none',
                     background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
                   }}>
                     <div style={{ fontSize: 11, fontWeight: isActive ? 800 : 400, color: isActive ? '#fff' : 'rgba(255,255,255,0.35)' }}>{label}</div>
