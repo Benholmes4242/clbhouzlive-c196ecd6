@@ -95,7 +95,7 @@ export async function batchFetchRatings(
   
   const { data, error } = await supabase
     .from('course_ratings')
-    .select('id, rating')
+    .select('id, rating, review')
     .in('id', uniqueIds);
   
   if (error) {

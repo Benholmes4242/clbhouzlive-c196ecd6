@@ -96,6 +96,7 @@ export interface ExploreContentItem {
   isReview?: boolean; // True if this is a shared review post
   sourceReviewId?: string | null; // ID of the source course_rating
   reviewRating?: number | null; // Rating from the review (1-10)
+  reviewText?: string | null; // Written review caption from course_ratings
 }
 
 export interface CTAContentItem {

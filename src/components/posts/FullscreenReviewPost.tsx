@@ -351,7 +351,7 @@ export function FullscreenReviewPost({
           }}
           onReviewTap={() => handleOpenReviewSheet({} as React.MouseEvent)}
           isVisible={true}
-          caption=""
+          caption={reviewText ?? ''}
           golfCourse={null}
           isFollowing={false}
           isOwnPost={true}
