@@ -825,13 +825,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
             {/* Season cycle pills */}
             <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              {(['pre-season', 'major', 'summer'] as const).map((s, i) => {
-                const label = s === 'pre-season' ? 'Pre-Season' : s === 'major' ? 'Major' : 'Summer';
+              {(['pre-season', 'major', 'summer', 'off-season'] as const).map((s, i) => {
+                const label = s === 'pre-season' ? 'Pre-Season' : s === 'major' ? 'Major' : s === 'summer' ? 'Summer' : 'Off-Season';
                 const isActive = currentSeasonId === s;
                 return (
                   <div key={s} style={{
                     flex: 1, textAlign: 'center', padding: '9px 4px',
-                    borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                    borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none',
                     background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
                   }}>
                     <div style={{ fontSize: 11, fontWeight: isActive ? 800 : 400, color: isActive ? '#fff' : 'rgba(255,255,255,0.35)' }}>{label}</div>
