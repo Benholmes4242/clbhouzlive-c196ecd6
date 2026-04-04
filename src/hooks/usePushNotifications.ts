@@ -24,16 +24,20 @@ export function usePushNotifications(): UsePushNotificationsResult {
     const os = getOS();
     if (!os) { setState('unavailable'); setIsLoading(false); return; }
 
-    supabase
-      .from('user_push_devices')
-      .select('enabled')
-      .eq('user_id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('user_push_devices')
+          .select('enabled')
+          .eq('user_id', user.id)
+          .maybeSingle();
         setState(data ? (data.enabled ? 'enabled' : 'disabled') : 'enabled');
+      } catch {
+        setState('unknown');
+      } finally {
         setIsLoading(false);
-      })
-      .catch(() => { setState('unknown'); setIsLoading(false); });
+      }
+    })();
   }, [user]);
 
   const enable = useCallback(async (): Promise<boolean> => {
