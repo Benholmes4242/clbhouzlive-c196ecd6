@@ -84,7 +84,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     <div className="flex flex-col min-h-0">
       {/* Filter dropdown — right-aligned, matching courses tab sort dropdown */}
       {posts.length > 0 && (
-        <div className="flex justify-end px-4 pt-3 pb-1">
+        <div className="flex justify-end px-4 pt-3 pb-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground min-h-[36px] whitespace-nowrap shrink-0">
