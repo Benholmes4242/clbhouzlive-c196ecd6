@@ -603,8 +603,6 @@ export function CoursesLeaderboardView() {
               {(currentUserProfile.display_name || '?').charAt(0).toUpperCase()}
             </div>
           ) : null}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'clamp(14px,3.5vw,20px)' }}>
           <div style={{ flex: 1 }}>
             <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(10px,2.8vw,12px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif', marginBottom: 2 }}>
               You've played
