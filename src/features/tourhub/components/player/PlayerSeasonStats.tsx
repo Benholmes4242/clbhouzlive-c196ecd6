@@ -154,6 +154,22 @@ interface PlayerSeasonStatsProps {
 export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: PlayerSeasonStatsProps) {
   const [internalTab, setInternalTab] = useState('Player Overview');
   const activeTab = externalTab ?? internalTab;
+
+  const top10Ratio = (playerStats.top_10s && playerStats.events_played && playerStats.events_played > 0)
+    ? (playerStats.top_10s / playerStats.events_played) * 100 : undefined;
+  const top25Ratio = (playerStats.top_25s && playerStats.events_played && playerStats.events_played > 0)
+    ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
+
+  return (
+    <div className="px-4 py-6 border-b border-border/30">
+      {/* Section header */}
+      <div style={{ marginBottom: '12px' }}>
+        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
+          Season Performance
+        </h2>
+      </div>
+
+      {/* Tab content — 16px gap from tabs */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
