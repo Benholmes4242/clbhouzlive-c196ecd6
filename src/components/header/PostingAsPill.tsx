@@ -112,7 +112,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
-                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black",
+                "",
                 notificationCount > 9
                   ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
                   : notificationCount > 0
