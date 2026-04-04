@@ -486,9 +486,9 @@ export function TourHubNavOverlay({
                       onClick={() => handleItemClick(item.value)}
                       className="w-full flex items-center gap-3.5 p-4 rounded-[18px] text-left relative overflow-hidden"
                       style={{
-                        background: isActive ? '#ffffff' : 'rgba(255,255,255,0.60)',
-                        border: isActive ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(0,0,0,0.05)',
-                        boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.07)' : '0 1px 2px rgba(0,0,0,0.03)',
+                        background: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)',
+                        border: isActive ? '1.5px solid rgba(245,166,35,0.22)' : '1px solid rgba(0,0,0,0.06)',
+                        boxShadow: isActive ? '0 2px 12px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.04)',
                       }}
                       aria-current={isActive ? 'page' : undefined}
                       aria-label={getAriaLabel(item)}
