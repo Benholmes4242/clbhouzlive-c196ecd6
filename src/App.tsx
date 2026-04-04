@@ -526,54 +526,6 @@ const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
 
-  // One-time push registration on app launch (Median/native only)
-  useEffect(() => {
-    const registerPushOnLaunch = async () => {
-      try {
-        // Retry up to 5 times waiting for Median bridge
-        let os = (window as any).median?.onesignal;
-        let attempts = 0;
-        while (!os && attempts < 5) {
-          await new Promise(r => setTimeout(r, 1000));
-          os = (window as any).median?.onesignal;
-          attempts++;
-        }
-        if (!os) return;
-
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) return;
-
-        const userId = session.user.id;
-
-        // SDK v5: grant consent, login with external ID, register
-        os.userPrivacyConsent?.(true);
-        os.login?.(userId);
-        os.register?.();
-
-        // Short wait for registration to initialise
-        await new Promise(r => setTimeout(r, 1000));
-
-        // Register in our DB — edge function also registers in OneSignal via REST API
-        const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
-          ? 'ios' : 'android';
-
-        const { error } = await supabase.functions.invoke('register-push-device', {
-          body: { provider_id: userId, platform, enabled: true },
-        });
-
-        if (error) {
-          console.error('[Push] Registration failed:', error);
-        } else {
-          console.log('[Push] Device registered successfully');
-        }
-      } catch (e) {
-        console.error('[Push] Registration error:', e);
-      }
-    };
-
-    const timer = setTimeout(registerPushOnLaunch, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // ── Analytics: session start + page tracking ──
   useEffect(() => {
