@@ -852,7 +852,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                     fallback={currentUserEntry?.display_name?.charAt(0) ?? '?'}
                     hideRing
                   />
-                  <div style={{ position: 'absolute', bottom: -4, right: -4, background: '#F7931E', borderRadius: 99, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#fff' }}>
+                  <div style={{ position: 'absolute', bottom: -4, right: -4, background: '#F7931E', borderRadius: 99, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0a2a1a', fontSize: 10, fontWeight: 900, color: '#fff' }}>
                     {currentUserEntry.current_rank}
                   </div>
                 </div>
