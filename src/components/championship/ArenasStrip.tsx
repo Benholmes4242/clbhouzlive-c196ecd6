@@ -109,7 +109,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
               >
                 {isUnavailable ? 'N/A' : pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
               </span>
-              <span className="text-[11px] font-semibold text-foreground mt-0.5 truncate max-w-[72px]">
+              <span className="text-[11px] font-semibold text-foreground mt-0.5 truncate w-full text-center">
                 {pill.label}
               </span>
               <span className="text-[10px] text-muted-foreground">
