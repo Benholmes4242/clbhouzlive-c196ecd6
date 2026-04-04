@@ -810,16 +810,22 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                       }} />
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: '#F7931E' }}>
-                          +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} courses
+                      <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 16 }}>🎯</span>
+                        <div>
+                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Gap to leader</div>
+                          <div style={{ fontSize: 14, fontWeight: 900, color: '#F7931E' }}>
+                            +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)}
+                          </div>
                         </div>
                       </div>
                       {currentSeasonId === 'major' && (
-                        <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
-                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Majors bonus</div>
-                          <div style={{ fontSize: 15, fontWeight: 900, color: '#F7931E' }}>×2 pts</div>
+                        <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: 16 }}>⭐</span>
+                          <div>
+                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>Majors bonus</div>
+                            <div style={{ fontSize: 14, fontWeight: 900, color: '#F7931E' }}>×2 pts</div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -850,7 +856,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* Time Toggle — primary tab pills */}
-      <div style={{ display: 'flex', gap: 8, padding: '12px 4px 4px' }}>
+      <div style={{ display: 'flex', gap: 8, padding: '12px 4px 4px', justifyContent: 'center' }}>
         {([
           { id: 'seasonal' as const, label: `${currentSeason ? new Date(currentSeason.start_date).getFullYear() : new Date().getFullYear()} Season` },
           { id: 'all_time' as const, label: 'All-Time' },

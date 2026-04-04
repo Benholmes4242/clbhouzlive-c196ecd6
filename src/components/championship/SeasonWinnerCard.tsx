@@ -61,17 +61,6 @@ export const SeasonWinnerCard: React.FC<SeasonWinnerCardProps> = ({
         />
 
         <div className="relative px-5 pt-4 pb-5" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Crown */}
-          <div
-            className="text-center"
-            style={{
-              fontSize: 'clamp(22px,6vw,30px)',
-              animation: 'crownIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both',
-            }}
-          >
-            👑
-          </div>
-
           {/* Stamp badge */}
           <div
             className="flex justify-center"
@@ -151,8 +140,17 @@ export const SeasonWinnerCard: React.FC<SeasonWinnerCardProps> = ({
               </p>
             </div>
 
-            {/* Courses */}
+            {/* Courses with crown */}
             <div className="flex-shrink-0 text-right">
+              <div
+                style={{
+                  fontSize: 'clamp(16px,4vw,20px)',
+                  animation: 'crownIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both',
+                  lineHeight: 1,
+                }}
+              >
+                👑
+              </div>
               <p
                 style={{
                   fontSize: 'clamp(28px,7vw,36px)',
