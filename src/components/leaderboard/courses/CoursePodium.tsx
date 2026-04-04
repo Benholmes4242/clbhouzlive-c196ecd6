@@ -102,11 +102,13 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, seasonColor, onCo
           }}>
             {first.course_name}
           </div>
-          <div style={{
-            color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px,3vw,13px)',
-            marginTop: 2, fontFamily: 'DM Sans, system-ui, sans-serif',
-          }}>
-            {location(first)} · Played by {first.times_played}
+          <div style={{ marginTop: 2, fontFamily: 'DM Sans, system-ui, sans-serif' }}>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px,3vw,13px)' }}>
+              {location(first)}
+            </div>
+            <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 'clamp(10px,2.6vw,12px)', marginTop: 1 }}>
+              Played by {first.times_played}
+            </div>
           </div>
         </div>
 
