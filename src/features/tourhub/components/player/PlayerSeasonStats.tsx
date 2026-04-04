@@ -145,65 +145,15 @@ function SGBar({ label, value }: SGBarProps) {
   );
 }
 
-const TABS = ['Player Overview', 'Ball Striking', 'Short Game', 'Shots Gained'];
-
 interface PlayerSeasonStatsProps {
   playerStats: TourPlayerStatistics;
+  /** Tab controlled externally by PlayerProfilePage sticky header */
+  activeTab?: string;
 }
 
-export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
-  const [activeTab, setActiveTab] = useState('Player Overview');
-
-  const top10Ratio = (playerStats.top_10s && playerStats.events_played && playerStats.events_played > 0)
-    ? (playerStats.top_10s / playerStats.events_played) * 100 : undefined;
-  const top25Ratio = (playerStats.top_25s && playerStats.events_played && playerStats.events_played > 0)
-    ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
-
-  return (
-    <div className="px-4 py-6 border-b border-border/30">
-      {/* Section header — 22px / 700 / tracking -0.3px */}
-      <div style={{ marginBottom: '12px' }}>
-        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Season Performance
-        </h2>
-      </div>
-
-      {/* Tab bar — secondary pill style */}
-      <div
-        className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3"
-        style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
-      >
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Season Performance Stats">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab;
-            return (
-              <button
-                key={tab}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  "px-3 py-1.5 transition-all text-center shrink-0",
-                  isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                )}
-                style={{
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  borderRadius: 20,
-                  backgroundColor: isActive ? '#475569' : 'transparent',
-                  color: isActive ? '#fff' : undefined,
-                }}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Tab content — 16px gap from tabs */}
+export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: PlayerSeasonStatsProps) {
+  const [internalTab, setInternalTab] = useState('Player Overview');
+  const activeTab = externalTab ?? internalTab;
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}

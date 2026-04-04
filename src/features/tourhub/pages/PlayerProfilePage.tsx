@@ -9,6 +9,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -34,6 +35,9 @@ const sectionVariants = {
 
 const PULL_THRESHOLD = 50;
 
+const STAT_TABS = ['Player Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
+type StatTab = (typeof STAT_TABS)[number];
+
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
@@ -46,8 +50,8 @@ export function PlayerProfilePage() {
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
-  // TEMPORARILY HIDDEN — Clbhouz Rating
-  // const { data: playerRating } = usePlayerRating(playerId);
+
+  const [activeStatTab, setActiveStatTab] = useState<StatTab>('Player Overview');
 
   // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -195,15 +199,51 @@ export function PlayerProfilePage() {
         {/* Stats Strip — flush below hero */}
         <StatRibbon playerStats={playerStats ?? null} />
 
-        {/* ← Back text link */}
-        <div style={{ padding: '12px 16px 8px 16px' }}>
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
-          >
-            <ChevronLeft size={14} />
-            Back
-          </button>
+        {/* ══════════════════════════════════════════════
+            STICKY HEADER — ← Back | stat tabs
+            ══════════════════════════════════════════════ */}
+        <div
+          className="-mx-0 sticky top-0 z-20"
+          style={{
+            background: 'hsl(var(--background) / 0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderBottom: '1px solid hsl(var(--border) / 0.10)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          }}
+        >
+          {/* Row 1: ← Back */}
+          <div className="flex items-center px-4 pt-2.5">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity"
+              style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+            >
+              <ChevronLeft size={13} strokeWidth={2.5} />
+              Back
+            </button>
+          </div>
+
+          {/* Row 2: Stat tabs — horizontal scroll, no track */}
+          <div className="flex gap-0.5 overflow-x-auto scrollbar-hide px-4 pt-2 pb-2.5">
+            {STAT_TABS.map((tab) => {
+              const isActive = activeStatTab === tab;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveStatTab(tab)}
+                  className={cn(
+                    'flex-shrink-0 h-[34px] px-3 rounded-[10px] text-[12px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
+                    isActive
+                      ? 'bg-foreground text-background font-bold shadow-sm'
+                      : 'bg-transparent text-muted-foreground font-medium'
+                  )}
+                >
+                  {tab}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Momentum Strip — flush, 0 gap from stats */}
@@ -242,7 +282,7 @@ export function PlayerProfilePage() {
             transition={{ duration: 0.4 }}
           >
             {playerStats ? (
-              <PlayerSeasonStats playerStats={playerStats} />
+              <PlayerSeasonStats playerStats={playerStats} activeTab={activeStatTab} />
             ) : (
               <div className="py-16 text-center">
                 <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
