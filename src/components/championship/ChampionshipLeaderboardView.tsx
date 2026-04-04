@@ -713,14 +713,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   return (
     <div className={cn('flex flex-col', className)} style={{ background: '#F8FAFC', minHeight: '100%' }}>
-      {/* Time Toggle */}
-      <div style={{ padding: '0 16px' }}>
-        <TimeModeToggle
-          value={timeFilter}
-          onChange={setTimeFilter}
-          seasonYear={currentSeason ? new Date(currentSeason.start_date).getFullYear() : undefined}
-        />
-      </div>
 
       {/* ── BODY CONTENT (below hero) ── */}
       <div style={{ padding: 'clamp(12px,3vw,16px)', display: 'flex', flexDirection: 'column', gap: 16, marginLeft: '-16px', marginRight: '-16px' }}>
