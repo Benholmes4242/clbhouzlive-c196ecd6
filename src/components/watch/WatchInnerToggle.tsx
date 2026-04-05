@@ -1,22 +1,9 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useWatchCategoryChips } from './hooks/useWatchCategoryChips';
 
 export type WatchInnerMode = 'clips' | 'longform';
-
-const GOLF_TAGS: { id: string; label: string; icon?: React.ReactNode }[] = [
-  { id: 'all',           label: 'All' },
-  { id: 'near',          label: 'Near Me', icon: <MapPin className="w-3 h-3" /> },
-  { id: 'practice',      label: 'Practice' },
-  { id: 'review',        label: 'Reviews' },
-  { id: 'funny',         label: 'Funny 😂' },
-  { id: 'my-round',      label: 'Rounds' },
-  { id: 'tips-coaching',  label: 'Tips' },
-  { id: 'course-vlog',   label: 'Course Vlogs' },
-  { id: 'hole-out',      label: 'Hole Outs' },
-  { id: 'hole-in-one',   label: 'Hole in Ones' },
-  { id: 'travel',        label: 'Golf Trips' },
-  { id: 'swing',         label: 'Swings' },
-];
 
 interface WatchInnerToggleProps {
   mode: WatchInnerMode;
@@ -25,7 +12,34 @@ interface WatchInnerToggleProps {
   onTagChange: (tag: string) => void;
 }
 
+interface ChipButtonProps {
+  label: string;
+  icon?: React.ReactNode;
+  isActive: boolean;
+  onTap: () => void;
+}
+
+function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
+  return (
+    <button
+      onClick={onTap}
+      className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
+      style={{
+        borderRadius: 20,
+        background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+        color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+      }}
+    >
+      {icon && <span className="flex items-center">{icon}</span>}
+      {label}
+    </button>
+  );
+}
+
 export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onModeChange, activeTag, onTagChange }) => {
+  const { data: categoryChips = [], isLoading: chipsLoading } = useWatchCategoryChips();
+
   return (
     <div
       className="sticky z-[29] bg-background"
@@ -54,31 +68,42 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
         ))}
       </div>
 
-      {/* Row 2 — Golf category tag chips (Clips mode only) */}
+      {/* Row 2 — Dynamic category chips (Clips mode only) */}
       {mode === 'clips' && (
         <div
           className="flex items-center gap-2 overflow-x-auto"
           style={{ scrollbarWidth: 'none', padding: '2px 16px 10px' }}
         >
-          {GOLF_TAGS.map((tag) => {
-            const isActive = activeTag === tag.id;
-            return (
-              <button
-                key={tag.id}
-                onClick={() => onTagChange(tag.id)}
-                className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
-                style={{
-                  borderRadius: 20,
-                  background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-                  border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-                  color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
-                }}
-              >
-                {tag.icon && <span className="flex items-center">{tag.icon}</span>}
-                {tag.label}
-              </button>
-            );
-          })}
+          {/* Always-present: All */}
+          <ChipButton
+            label="All"
+            isActive={activeTag === 'all'}
+            onTap={() => onTagChange('all')}
+          />
+
+          {/* Always-present: Near Me */}
+          <ChipButton
+            label="Near Me"
+            icon={<MapPin className="w-3 h-3" />}
+            isActive={activeTag === 'near'}
+            onTap={() => onTagChange('near')}
+          />
+
+          {/* Dynamic category chips */}
+          {chipsLoading ? (
+            [0, 1, 2, 3].map(i => (
+              <Skeleton key={i} className="shrink-0 h-[28px] w-[72px] rounded-full" />
+            ))
+          ) : (
+            categoryChips.map(chip => (
+              <ChipButton
+                key={chip.id}
+                label={chip.label}
+                isActive={activeTag === chip.id}
+                onTap={() => onTagChange(chip.id)}
+              />
+            ))
+          )}
         </div>
       )}
     </div>
