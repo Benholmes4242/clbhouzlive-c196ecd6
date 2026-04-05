@@ -128,7 +128,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationPills course={course} />
 
       {/* 2. Community Rating Section */}
-      <section className="px-4 pt-5 pb-5 md:px-6 md:pt-6 space-y-5">
+      <section className="px-4 pt-8 pb-5 md:px-6 md:pt-10 space-y-5">
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
