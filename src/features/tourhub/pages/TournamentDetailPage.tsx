@@ -167,7 +167,7 @@ export function TournamentDetailPage() {
         <Skeleton
           className="w-full"
           style={{
-            minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))',
+            minHeight: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))',
           }}
         />
         <div className="space-y-4 mt-6 px-4">
@@ -354,17 +354,18 @@ export function TournamentDetailPage() {
             STICKY HEADER — ← Back | status pill | tabs
             ══════════════════════════════════════════════ */}
         <div
-          className="sticky top-0 z-20"
+          className="-mx-5 sticky top-0 z-20"
           style={{
             background: 'hsl(var(--background) / 0.96)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '1px solid hsl(var(--border) / 0.10)',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            paddingTop: 10,
+            marginTop: 8,
           }}
         >
           {/* Row 1: ← Back | [spacer] | status pill */}
-          <div className="flex items-center gap-2 px-4 pt-2.5">
+          <div className="flex items-center gap-2 px-5 pt-2">
             <button
               onClick={() => {
                 if (window.history.length > 1) {
@@ -373,7 +374,7 @@ export function TournamentDetailPage() {
                   navigate('/tourhub?tab=schedule');
                 }
               }}
-              className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+              className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
               style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
@@ -469,7 +470,7 @@ export function TournamentDetailPage() {
 
           {/* Row 2: Tabs */}
           <div
-            className="flex gap-1 overflow-x-auto scrollbar-hide px-4 pt-2 pb-2.5"
+            className="flex gap-1 overflow-x-auto scrollbar-hide px-5 pt-2 pb-2.5"
             role="tablist"
             aria-label="Tournament Sections"
           >
@@ -494,12 +495,21 @@ export function TournamentDetailPage() {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => handleTabChange(tab.value)}
-                  className={cn(
-                    'flex-shrink-0 h-[34px] px-3 rounded-[10px] text-[12px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
-                    isActive
-                      ? 'bg-foreground text-background font-bold shadow-sm'
-                      : 'bg-transparent text-muted-foreground font-medium'
-                  )}
+                  className="flex-shrink-0 transition-all duration-200 active:scale-[0.97]"
+                  style={{
+                    height: 34,
+                    padding: '0 12px',
+                    borderRadius: 8,
+                    fontSize: 12,
+                    fontWeight: isActive ? 600 : 500,
+                    whiteSpace: 'nowrap',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                    color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                    border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                  }}
                 >
                   {tab.label}
                 </button>
@@ -508,7 +518,7 @@ export function TournamentDetailPage() {
           </div>
         </div>
 
-        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+        <div className="px-5" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           {/* Tab Content */}
           <AnimatePresence mode="wait">
             <div key={activeTab} className="pt-5" role="tabpanel" aria-label={`${activeTab} content`}>
