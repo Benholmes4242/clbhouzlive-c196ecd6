@@ -80,7 +80,6 @@ export const LoopCard = React.memo(function LoopCard({
     return () => observer.disconnect();
   }, [hlsUrl]);
 
-  const [expanded, setExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [showComments, setShowComments] = useState(false);
@@ -140,81 +139,13 @@ export const LoopCard = React.memo(function LoopCard({
   return (
     <>
       <article ref={tileRef} className="bg-card overflow-hidden border-b border-border/50">
-        {/* Creator header */}
-        <div className="flex items-center gap-3 px-3 pt-3 pb-2">
-          <button
-            onClick={() => navigate(`/profile/${post.userId}`)}
-            className="flex items-center gap-3 min-w-0 flex-1"
-          >
-            <SquircleAvatar src={post.avatarUrl || '/placeholder.svg'} size="sm" hideRing />
-            <div className="flex-1 min-w-0 text-left">
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold text-foreground truncate">
-                  {post.displayName}
-                </span>
-                {post.isVerified && (
-                  <svg
-                    className="h-3.5 w-3.5 text-primary shrink-0"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                )}
-              </div>
-              <span className="text-xs text-muted-foreground">{timeAgo}</span>
-              {/* Addition 1: "at Course Name" attribution */}
-              {courseName && (
-                <div
-                  className="flex items-center gap-1 mt-0.5"
-                  style={{ fontSize: 12, color: '#F7931E', fontWeight: 500 }}
-                >
-                  <MapPin className="w-3 h-3" style={{ color: '#F7931E' }} />
-                  <span className="truncate">at {courseName}</span>
-                </div>
-              )}
-            </div>
-          </button>
-          <FriendsCardMenu postId={post.id} userId={userId} onShare={handleShare} />
-        </div>
 
-        {/* Caption */}
-        {cleanCaption && (
-          <div className="px-3 pb-2">
-            <PostContentWithTags
-              content={cleanCaption}
-              tags={post.tags || []}
-              className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}
-            />
-            {!expanded && cleanCaption.length > 100 && (
-              <button
-                onClick={() => setExpanded(true)}
-                className="text-xs font-semibold text-muted-foreground mt-0.5"
-              >
-                See more
-              </button>
-            )}
-            {expanded && cleanCaption.length > 100 && (
-              <button
-                onClick={() => setExpanded(false)}
-                className="text-xs font-semibold text-muted-foreground mt-0.5"
-              >
-                less
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Media area — dynamic aspect ratio */}
+        {/* 1. MEDIA — leads the card, full width, variable aspect ratio */}
         <button
           type="button"
           data-media-wrapper
-          aria-label={`Play post by ${post.displayName}`}
-          className={`relative w-full ${aspectClass} bg-muted`}
+          aria-label={`Open post by ${post.displayName}`}
+          className={`relative w-full ${aspectClass} bg-muted block`}
           onClick={() => {
             if (allPosts && cardIndex != null) {
               useFullscreenFeedStore.getState().open(allPosts, cardIndex);
@@ -229,75 +160,177 @@ export const LoopCard = React.memo(function LoopCard({
               loading="lazy"
             />
           )}
+
+          {/* Duration badge — bottom right, videos only */}
           {isVideo && duration > 0 && (
-            <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium rounded bg-black/60 text-white backdrop-blur-sm z-10">
+            <span
+              className="absolute bottom-2 right-2 z-10 text-[12px] font-semibold text-white"
+              style={{
+                background: 'rgba(0,0,0,0.72)',
+                borderRadius: 5,
+                padding: '3px 7px',
+              }}
+            >
               {formatVideoDuration(duration)}
             </span>
           )}
+
+          {/* Review rating badge — top right */}
           {post.isReview && post.review?.rating && (
-            <div className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm z-10">
+            <div
+              className="absolute top-2 right-2 z-10 flex items-center gap-0.5"
+              style={{
+                background: 'rgba(0,0,0,0.55)',
+                backdropFilter: 'blur(8px)',
+                borderRadius: 6,
+                padding: '3px 7px',
+                border: '0.5px solid rgba(255,255,255,0.15)',
+              }}
+            >
               <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-              <span className="text-xs font-medium text-white">
+              <span className="text-[12px] font-semibold text-white">
                 {post.review.rating.toFixed(1)}
               </span>
             </div>
           )}
         </button>
 
-        {/* Engagement row */}
-        <div className="flex items-center" style={{ gap: 14, padding: '8px 14px 12px' }}>
+        {/* 2. CREATOR ROW — compact, sits directly below media */}
+        <div className="flex items-center gap-2.5 px-3 pt-2.5 pb-0">
+          <button
+            onClick={() => navigate(`/profile/${post.userId}`)}
+            className="shrink-0"
+            aria-label={`View ${post.displayName}'s profile`}
+          >
+            <SquircleAvatar
+              src={post.avatarUrl || '/placeholder.svg'}
+              size={32}
+              hideRing
+            />
+          </button>
+          <button
+            onClick={() => navigate(`/profile/${post.userId}`)}
+            className="flex-1 min-w-0 text-left"
+          >
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="text-[13px] font-semibold text-foreground truncate">
+                {post.displayName}
+              </span>
+              {post.isVerified && (
+                <svg className="h-3.5 w-3.5 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                </svg>
+              )}
+              <span className="text-[12px] text-muted-foreground shrink-0">· {timeAgo}</span>
+            </div>
+            {/* Amber course attribution — inline below name row */}
+            {courseName && (
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (courseId) {
+                    navigate(`/courses/${courseId}`);
+                  } else if (courseName) {
+                    try {
+                      const { data } = await supabase
+                        .from('golf_courses')
+                        .select('id')
+                        .ilike('name', courseName.trim())
+                        .limit(1)
+                        .single();
+                      if (data?.id) {
+                        navigate(`/courses/${data.id}`);
+                      } else {
+                        navigate(`/courses?search=${encodeURIComponent(courseName)}`);
+                      }
+                    } catch {
+                      navigate(`/courses?search=${encodeURIComponent(courseName)}`);
+                    }
+                  }
+                }}
+                className="flex items-center gap-0.5 mt-0.5"
+              >
+                <MapPin className="h-3 w-3 shrink-0" style={{ color: '#F7931E' }} />
+                <span
+                  className="text-[11px] font-medium truncate"
+                  style={{ color: '#F7931E' }}
+                >
+                  at {courseName}
+                </span>
+              </button>
+            )}
+          </button>
+          {/* 3-dot menu */}
+          <FriendsCardMenu
+            postId={post.id}
+            userId={userId}
+            onShare={handleShare}
+          />
+        </div>
+
+        {/* 3. CAPTION — two lines max, truncated */}
+        {cleanCaption && (
+          <div className="px-3 pt-1.5 pb-0">
+            <PostContentWithTags
+              content={cleanCaption}
+              tags={post.tags || []}
+              className="text-[13px] text-foreground line-clamp-2"
+            />
+          </div>
+        )}
+
+        {/* 4. ENGAGEMENT ROW */}
+        <div className="flex items-center gap-5 px-3 pt-2 pb-2.5">
           <button
             onClick={toggleLike}
             aria-label={`${isLiked ? 'Unlike' : 'Like'} post`}
-            className="flex items-center gap-1 text-xs min-h-[44px]"
+            className="flex items-center gap-1.5 min-h-[40px]"
           >
             <Heart
-              className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
+              className={`h-[17px] w-[17px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
             />
-            <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
+            <span className={`text-[13px] ${isLiked ? 'text-like' : 'text-muted-foreground'}`}>
               {formatCompact(likeCount)}
             </span>
           </button>
           <button
             onClick={() => setShowComments(true)}
             aria-label="Open comments"
-            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+            className="flex items-center gap-1.5 text-muted-foreground min-h-[40px]"
           >
-            <MessageCircle className="h-[18px] w-[18px]" />
-            {formatCompact(post.commentCount)}
+            <MessageCircle className="h-[17px] w-[17px]" />
+            <span className="text-[13px]">{formatCompact(post.commentCount)}</span>
           </button>
           <button
             onClick={handleShare}
             aria-label="Share post"
-            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+            className="flex items-center gap-1.5 text-muted-foreground min-h-[40px]"
           >
-            <Share2 className="h-[18px] w-[18px]" />
-            {formatCompact(post.shareCount)}
+            <Share2 className="h-[17px] w-[17px]" />
+            <span className="text-[13px]">{formatCompact(post.shareCount)}</span>
           </button>
 
-          {/* Addition 2: "I've played there" button */}
+          {/* "I've played there" button — pushed right, shows when course is known */}
           {courseName && courseId && (
             <button
               onClick={() => navigate(`/courses/${courseId}`)}
               className="ml-auto flex items-center gap-1 active:scale-[0.97] transition-transform"
               style={{
-                fontSize: 12,
-                color: '#006747',
+                fontSize: 11,
                 fontWeight: 500,
+                color: '#006747',
                 background: 'rgba(0,103,71,0.08)',
                 border: '0.5px solid rgba(0,103,71,0.3)',
                 borderRadius: 20,
                 padding: '4px 10px',
               }}
-              aria-label={`I've played ${courseName}`}
             >
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="#006747">
-                <path d="M5.5 1a2.5 2.5 0 100 5 2.5 2.5 0 000-5zm0 6.5C3.2 7.5 1 8.5 1 9.5h9c0-1-2.2-2-4.5-2z" />
-              </svg>
+              <span>⛳</span>
               I've played there
             </button>
           )}
         </div>
+
       </article>
 
       {/* Comments bottom sheet */}
