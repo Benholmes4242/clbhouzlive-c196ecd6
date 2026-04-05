@@ -16344,6 +16344,13 @@ export type Database = {
           username: string
         }[]
       }
+      get_watch_category_counts: {
+        Args: never
+        Returns: {
+          category: string
+          post_count: number
+        }[]
+      }
       get_watch_shorts:
         | {
             Args: {
