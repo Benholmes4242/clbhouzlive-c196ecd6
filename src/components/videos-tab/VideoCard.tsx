@@ -62,12 +62,10 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   const duration = firstVideo?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
-  const [expanded, setExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [showComments, setShowComments] = useState(false);
 
-  // Clean caption: strip "📍 Played at..." text and extract course if not already tagged
   const cleanedCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
   const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
   const courseNameToShow = post.review?.courseName || post.courseName || extractedCourse?.name || null;
@@ -124,29 +122,55 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   return (
     <>
       <article ref={tileRef} className="bg-card overflow-hidden border-b border-border/50">
-        {/* Creator header */}
-        <div className="flex items-center gap-3 px-3 pt-3 pb-2">
+        {/* 1. Thumbnail — full width, leads the card */}
+        <button
+          data-media-wrapper
+          className="relative w-full aspect-video bg-muted cursor-pointer"
+          onClick={handleTap}
+          aria-label={`Play video by ${post.displayName}`}
+        >
+          {thumbnailUrl && (
+            <img
+              src={thumbnailUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+            />
+          )}
+          {duration > 0 && (
+            <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-[11px] font-medium rounded bg-black/70 text-white backdrop-blur-sm z-10">
+              {formatVideoDuration(duration)}
+            </span>
+          )}
+        </button>
+
+        {/* 2. Creator row — compact, beneath thumbnail */}
+        <div className="flex items-center gap-2.5 px-3 pt-2.5 pb-1.5">
           <button
             onClick={() => navigate(`/profile/${post.userId}`)}
-            className="flex items-center gap-3 min-w-0 flex-1"
+            className="shrink-0"
+            aria-label={`View ${post.displayName}'s profile`}
           >
-          <SquircleAvatar
-            src={post.avatarUrl || '/placeholder.svg'}
-            size="sm"
-            hideRing
-          />
-            <div className="flex-1 min-w-0 text-left">
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold text-foreground truncate">
-                  {post.displayName}
-                </span>
-                {post.isVerified && (
-                  <svg className="h-3.5 w-3.5 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </div>
-              <span className="text-xs text-muted-foreground">{timeAgo}</span>
+            <SquircleAvatar
+              src={post.avatarUrl || '/placeholder.svg'}
+              size="sm"
+              hideRing
+            />
+          </button>
+          <button
+            onClick={() => navigate(`/profile/${post.userId}`)}
+            className="flex-1 min-w-0 text-left"
+          >
+            <div className="flex items-center gap-1">
+              <span className="text-[13px] font-semibold text-foreground truncate">
+                {post.displayName}
+              </span>
+              {post.isVerified && (
+                <svg className="h-3.5 w-3.5 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                </svg>
+              )}
+              <span className="text-xs text-muted-foreground">· {timeAgo}</span>
             </div>
           </button>
           <VideoCardMenu
@@ -156,36 +180,20 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           />
         </div>
 
-        {/* Caption */}
+        {/* 3. Caption — single line, truncated */}
         {cleanedCaption && (
-          <div className="px-3 pb-2">
+          <div className="px-3 pb-1.5">
             <PostContentWithTags
               content={cleanedCaption}
               tags={post.tags || []}
-              className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}
+              className="text-[13px] text-foreground line-clamp-1"
             />
-            {!expanded && cleanedCaption.length > 100 && (
-              <button
-                onClick={() => setExpanded(true)}
-                className="text-xs font-semibold text-muted-foreground mt-0.5"
-              >
-                See more
-              </button>
-            )}
-            {expanded && cleanedCaption.length > 100 && (
-              <button
-                onClick={() => setExpanded(false)}
-                className="text-xs font-semibold text-muted-foreground mt-0.5"
-              >
-                less
-              </button>
-            )}
           </div>
         )}
 
-        {/* Course tag */}
+        {/* 4. Course tag */}
         {courseNameToShow && (
-          <div className="px-3 pb-2">
+          <div className="px-3 pb-1.5">
             <button
               onClick={async (e) => {
                 e.stopPropagation();
@@ -211,53 +219,30 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
               }}
               className="flex items-center gap-1 hover:underline"
             >
-              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+              <MapPin className="h-3 w-3 text-muted-foreground" />
               <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
             </button>
           </div>
         )}
 
-        {/* Video area */}
-        <button
-          data-media-wrapper
-          className="relative w-full aspect-[16/9.5] bg-muted cursor-pointer"
-          onClick={handleTap}
-          
-          aria-label={`Play video by ${post.displayName}`}
-        >
-          {thumbnailUrl && (
-            <img
-              src={thumbnailUrl}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
+        {/* 5. Engagement row */}
+        <div className="flex items-center gap-6 px-3 py-2">
+          <button
+            onClick={toggleLike}
+            aria-label={`${isLiked ? 'Unlike' : 'Like'} video`}
+            className="flex items-center gap-1.5 text-xs min-h-[40px]"
+          >
+            <Heart
+              className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
             />
-          )}
-          {duration > 0 && (
-            <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium rounded bg-black/60 text-white backdrop-blur-sm z-10">
-              {formatVideoDuration(duration)}
+            <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
+              {formatCompact(likeCount)}
             </span>
-          )}
-        </button>
-
-        {/* Engagement row */}
-        <div className="flex items-center gap-6 px-3 py-3">
-        <button
-          onClick={toggleLike}
-          aria-label={`${isLiked ? 'Unlike' : 'Like'} video`}
-          className="flex items-center gap-1 text-xs min-h-[44px]"
-        >
-          <Heart
-            className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
-          />
-          <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
-            {formatCompact(likeCount)}
-          </span>
-        </button>
+          </button>
           <button
             onClick={() => setShowComments(true)}
             aria-label="Open comments"
-            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground min-h-[40px]"
           >
             <MessageCircle className="h-[18px] w-[18px]" />
             {formatCompact(post.commentCount)}
@@ -265,7 +250,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           <button
             onClick={handleShare}
             aria-label="Share video"
-            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground min-h-[40px]"
           >
             <Share2 className="h-[18px] w-[18px]" />
             {formatCompact(post.shareCount)}
