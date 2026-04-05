@@ -24,6 +24,7 @@ export interface LiveTournamentWithLeader {
   venueCity: string | null;
   /** True if tournament is in date range but has no leaderboard data with strokes yet */
   isStartingSoon?: boolean;
+  currentRound: number;
   leader: {
     id: string;
     name: string;
@@ -148,6 +149,11 @@ export function useLiveRightNow() {
           position,
           score,
           player_id,
+          thru,
+          round_1,
+          round_2,
+          round_3,
+          round_4,
           player:sr_players!inner(id, first_name, last_name)
         `)
         .in('tournament_id', tournamentIds)
@@ -166,8 +172,21 @@ export function useLiveRightNow() {
       }
 
       return cache.live.map((t): LiveTournamentWithLeader => {
-        const leader = leaderMap[t.id] || null;
-        const isStartingSoon = t.status !== 'inprogress' || !leader;
+        const leaderEntry = leaderMap[t.id] || null;
+        const isStartingSoon = t.status !== 'inprogress' || !leaderEntry;
+
+        // Compute current round from leader's round scores + thru
+        const r1 = leaderEntry?.round_1;
+        const r2 = leaderEntry?.round_2;
+        const r3 = leaderEntry?.round_3;
+        const r4 = leaderEntry?.round_4;
+        const thru = leaderEntry?.thru;
+        const midRound = thru != null && thru > 0 && thru < 18;
+        let currentRound = 1;
+        if (r4 != null) currentRound = 4;
+        else if (r3 != null) currentRound = midRound ? 4 : 3;
+        else if (r2 != null) currentRound = midRound ? 3 : 2;
+        else if (r1 != null) currentRound = midRound ? 2 : 1;
 
         return {
           id: t.id,
@@ -180,19 +199,20 @@ export function useLiveRightNow() {
           venueName: t.venue_name,
           venueCity: t.venue_city,
           isStartingSoon,
-          leader: leader
+          currentRound,
+          leader: leaderEntry
             ? leaderCountMap[t.id] > 1
               ? {
-                  id: (leader.player as any).id,
+                  id: (leaderEntry.player as any).id,
                   name: `${leaderCountMap[t.id]} tied`,
-                  score: leader.score,
-                  scoreDisplay: formatScore(leader.score),
+                  score: leaderEntry.score,
+                  scoreDisplay: formatScore(leaderEntry.score),
                 }
               : {
-                  id: (leader.player as any).id,
-                  name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
-                  score: leader.score,
-                  scoreDisplay: formatScore(leader.score),
+                  id: (leaderEntry.player as any).id,
+                  name: `${(leaderEntry.player as any).first_name} ${(leaderEntry.player as any).last_name}`,
+                  score: leaderEntry.score,
+                  scoreDisplay: formatScore(leaderEntry.score),
                 }
             : null,
         };
