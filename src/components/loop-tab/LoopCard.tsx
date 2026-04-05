@@ -251,7 +251,7 @@ export const LoopCard = React.memo(function LoopCard({
               >
                 <MapPin className="h-3 w-3 shrink-0" style={{ color: '#F7931E' }} />
                 <span
-                  className="text-[11px] font-medium truncate"
+                  className="text-[12px] font-medium truncate"
                   style={{ color: '#F7931E' }}
                 >
                   at {courseName}

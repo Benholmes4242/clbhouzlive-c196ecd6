@@ -25,7 +25,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
         >
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
-              <div className="w-[68px] h-[68px] bg-muted animate-pulse" style={{ borderRadius: '34%' }} />
+              <div className="w-[70px] h-[70px] bg-muted animate-pulse" style={{ borderRadius: '34%' }} />
               <div className="h-2.5 w-10 bg-muted animate-pulse rounded" />
             </div>
           ))}
@@ -78,7 +78,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
         className="flex items-start overflow-x-auto"
         style={{
           padding: '4px 16px 14px',
-          gap: 10,
+          gap: 14,
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
