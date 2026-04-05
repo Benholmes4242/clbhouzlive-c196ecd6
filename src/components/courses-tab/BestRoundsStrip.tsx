@@ -36,9 +36,17 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
   const navigate = useNavigate();
 
   const { data: reviews, isLoading } = useQuery({
-    queryKey: ['best-rounds-this-week', activeRegion],
+    queryKey: ['best-rounds-this-month', activeRegion],
     queryFn: async (): Promise<ReviewItem[]> => {
-      const params: Record<string, any> = { days_back: 30, result_limit: 10 };
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const daysIntoMonth = Math.max(Math.ceil((now.getTime() - startOfMonth.getTime()) / 86400000), 7);
+
+      const params: Record<string, any> = {
+        days_back: daysIntoMonth,
+        result_limit: 10,
+        p_sort_by: 'rating',
+      };
       if (activeRegion) params.p_region_slug = activeRegion;
       const { data, error } = await supabase.rpc('get_top_video_reviews', params);
       if (error) return [];
