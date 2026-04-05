@@ -165,11 +165,11 @@ export function LeadersCategorySheet({
                           padding: '12px 14px',
                           minWidth: 0,
                           border: isActive
-                            ? '1px solid hsl(var(--foreground))'
+                            ? '1.5px solid hsl(var(--accent-amber) / 0.40)'
                             : '1px solid hsl(var(--border) / 0.5)',
-                          background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
-                          color: isActive ? 'white' : 'hsl(var(--foreground))',
-                          fontWeight: isActive ? 600 : 500,
+                          background: isActive ? 'hsl(var(--accent-amber) / 0.10)' : 'hsl(var(--card))',
+                          color: 'hsl(var(--foreground))',
+                          fontWeight: isActive ? 700 : 500,
                         }}
                       >
                         <div className="flex items-center gap-2.5 w-full min-w-0">
@@ -186,7 +186,7 @@ export function LeadersCategorySheet({
                           <span
                             style={{
                               fontSize: 11,
-                              color: isActive ? 'rgba(255,255,255,0.6)' : 'hsl(var(--muted-foreground) / 0.5)',
+                              color: 'hsl(var(--muted-foreground) / 0.5)',
                               display: 'block',
                               marginTop: 2,
                               lineHeight: 1.3,
