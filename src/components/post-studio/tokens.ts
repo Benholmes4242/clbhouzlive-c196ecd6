@@ -34,3 +34,17 @@ export const ICON_COLOR = 'rgba(15,23,42,0.65)';
 export const ICON_DIM   = 'rgba(15,23,42,0.38)';
 export const RAIL_BG    = 'rgba(248,250,252,0.98)';
 export const RAIL_HAIRLINE = 'rgba(0,0,0,0.08)';
+
+// Dark immersive compose surface tokens
+export const DARK_BG           = '#0a0a0a';
+export const DARK_SURFACE      = 'rgba(16,16,16,0.97)';
+export const DARK_BORDER       = 'rgba(255,255,255,0.12)';
+export const DARK_TEXT         = 'rgba(255,255,255,0.92)';
+export const DARK_TEXT_DIM     = 'rgba(255,255,255,0.55)';
+export const DARK_TEXT_GHOST   = 'rgba(255,255,255,0.28)';
+export const DARK_ICON         = 'rgba(255,255,255,0.70)';
+export const DARK_SCRIM        = 'rgba(0,0,0,0.45)';
+export const AMBER_BRAND       = '#F7931E';
+export const GREEN_COURSE      = 'rgba(34,197,94,0.88)';
+export const GREEN_COURSE_BG   = 'rgba(34,197,94,0.14)';
+export const GREEN_COURSE_BDR  = 'rgba(34,197,94,0.30)';
