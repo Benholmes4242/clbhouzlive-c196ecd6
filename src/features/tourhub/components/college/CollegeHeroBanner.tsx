@@ -60,11 +60,10 @@ export function CollegeHeroBanner({ stats, college, activeMetric, className }: C
           }}
         />
 
-        {/* Bottom fade for text legibility */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 65%, transparent 85%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.05) 65%, transparent 85%)',
           }}
         />
 
