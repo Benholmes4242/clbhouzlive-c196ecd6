@@ -58,17 +58,27 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         }}
       />
 
-      {/* Burger menu — standard Tour Hub position */}
+      {/* Burger menu — glass pill */}
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
-        className="fixed z-30 flex items-center justify-center"
-        style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: 16 }}
+        className="fixed z-30 flex items-center justify-center active:scale-[0.97] transition-transform"
+        style={{
+          width: 36,
+          height: 36,
+          top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+          left: 16,
+          borderRadius: 10,
+          background: 'rgba(0,0,0,0.28)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+        }}
       >
         <Menu
-          className="w-[24px] h-[24px]"
-          strokeWidth={1.5}
-          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
+          className="w-[18px] h-[18px]"
+          strokeWidth={2}
+          style={{ color: '#FFFFFF' }}
         />
       </button>
 
