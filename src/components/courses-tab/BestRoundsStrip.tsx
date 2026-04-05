@@ -86,7 +86,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
           </span>
         </div>
         <button
-          onClick={() => navigate('/discover?tab=explore')}
+          onClick={() => onClick={() => navigate('/discover?main=courses')}}
           className="active:scale-[0.97] transition-transform"
           style={{ fontSize: 13, fontWeight: 500, color: '#F7931E' }}
         >
