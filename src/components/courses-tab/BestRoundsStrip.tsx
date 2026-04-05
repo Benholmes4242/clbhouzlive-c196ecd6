@@ -57,7 +57,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+      <div style={{ padding: '12px 0 16px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
         <div
           className="flex items-center gap-1.5"
           style={{ padding: '0 16px 10px' }}
