@@ -150,8 +150,10 @@ export function StudioHeader({
                 disabled={rightAction.disabled}
                 className="text-[13px] font-semibold px-[14px] min-h-[36px] flex items-center rounded-full transition-all duration-200 active:scale-[0.96]"
                 style={{
-                  background: rightAction.disabled ? '#F5F5F7' : '#1C1C1E',
-                  color: rightAction.disabled ? '#AEAEB2' : '#FFFFFF',
+                  background: darkMode
+                    ? (rightAction.disabled ? 'rgba(255,255,255,0.12)' : '#F7931E')
+                    : (rightAction.disabled ? '#F5F5F7' : '#1C1C1E'),
+                  color: '#FFFFFF',
                   pointerEvents: rightAction.disabled ? 'none' : 'auto',
                 }}
               >
