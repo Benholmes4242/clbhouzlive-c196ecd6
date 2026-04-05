@@ -12,12 +12,14 @@ import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 interface WatchPageContentProps {
   embedded?: boolean;
   showShotOfWeek?: boolean;
+  showSortFilter?: boolean;
+  activeTag?: string;
 }
 
-const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, showShotOfWeek = true }) => {
+const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, showShotOfWeek = true, showSortFilter = true, activeTag }) => {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const [activeFilter, setActiveFilter] = useState<WatchFilter>('trending');
+  const activeFilter: WatchFilter = activeTag === 'near' ? 'near' : 'trending';
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -50,19 +52,16 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
     resetSeen,
   } = useWatchFeed({ userId, filter: activeFilter, userLat, userLng });
 
-  const handleFilterChange = (f: WatchFilter) => {
-    setActiveFilter(f);
-    resetSeen();
-  };
-
   return (
     <div className="bg-background min-h-screen">
-      <WatchHeader
-        activeFilter={activeFilter}
-        onFilterChange={handleFilterChange}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        embedded={embedded}
-      />
+      {showSortFilter && (
+        <WatchHeader
+          activeFilter={activeFilter}
+          onFilterChange={() => {}}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          embedded={embedded}
+        />
+      )}
 
       {showShotOfWeek && <ShotOfTheWeek userId={userId} />}
 
