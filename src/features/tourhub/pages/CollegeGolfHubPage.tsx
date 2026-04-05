@@ -143,9 +143,16 @@ export function CollegeGolfHubPage() {
         {/* Immersive Hero */}
         {statsLoading ? (
           <div
-            className="animate-pulse"
+            className="animate-pulse relative overflow-hidden"
             style={{ height: '35dvh', background: 'hsl(var(--muted) / 0.3)' }}
-          />
+          >
+            {/* Logo + text skeleton centered */}
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-8 gap-3">
+              <div className="w-[130px] h-[130px] rounded-[24px] bg-muted/30 animate-pulse" />
+              <div className="h-6 w-40 rounded bg-muted/30 animate-pulse" />
+              <div className="h-4 w-28 rounded bg-muted/30 animate-pulse" />
+            </div>
+          </div>
         ) : topCollege ? (
           <CollegeHeroBanner
             stats={topCollege}
