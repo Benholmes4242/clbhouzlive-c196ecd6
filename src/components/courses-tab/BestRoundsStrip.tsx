@@ -62,7 +62,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
           className="flex items-center gap-1.5"
           style={{ padding: '4px 16px 8px' }}
         >
-          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+          <Star className="w-3.5 h-3.5" style={{ color: '#F7931E', fill: '#F7931E' }} />
           <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
             Highest rated this month
           </span>
