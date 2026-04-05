@@ -95,7 +95,7 @@ function LeaderboardSkeleton() {
 // Use shared getCurrentRoundLabel, adapting LeaderEntry[] to the expected interface
 function getCurrentRoundLabel(leaders: LeaderEntry[], startDate: string): string {
   if (leaders.length > 0) {
-    return getCurrentRoundLabelShared(leaders[0], startDate);
+    return getCurrentRoundLabelShared(leaders[0], startDate, leaders[0].thru);
   }
   return getCurrentRoundLabelShared(null, startDate);
 }
