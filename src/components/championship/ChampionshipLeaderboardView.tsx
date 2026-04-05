@@ -86,11 +86,11 @@ const LeaderboardLoadingSkeleton = () => (
 
 /** Full-page skeleton for initial Championship tab load — matches Augusta layout */
 const ChampionshipPageSkeleton = () => (
-  <div className="flex flex-col" style={{ background: '#F8FAFC', minHeight: '100%' }}>
+  <div className="flex flex-col" style={{ background: '#F8FAFC', minHeight: '100%', marginLeft: '-16px', marginRight: '-16px' }}>
     {/* Green hero header skeleton — full bleed, matches real header */}
     <div style={{
       background: 'linear-gradient(160deg, #003D28 0%, #006747 55%, #005238 100%)',
-      padding: '18px 18px 0',
+      padding: '18px 16px 0',
     }}>
       {/* Active label */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
