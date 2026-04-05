@@ -502,7 +502,7 @@ export function PlayersTab() {
             opacity: searchExpanded ? 1 : 0,
           }}
         >
-          <div className="relative pt-2.5">
+          <div className="-mx-1 relative pt-2.5">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[17px] h-[17px] mt-[5px]"
               strokeWidth={2.5}
@@ -541,7 +541,7 @@ export function PlayersTab() {
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity shrink-0"
+            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity shrink-0"
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
