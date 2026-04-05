@@ -1,176 +1,107 @@
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useCourseOfTheWeek } from './hooks/useCourseOfTheWeek';
 
 interface FeaturedCoursesCarouselProps {
   onRegionSelect: (slug: string) => void;
 }
 
-interface CarouselSlide {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle: string | null;
-  hero_image_url: string | null;
-  courseCount: number;
-}
-
 export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarouselProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
-  const { data: slides, isLoading } = useQuery({
-    queryKey: ['courses-tab-featured-carousel'],
-    queryFn: async (): Promise<CarouselSlide[]> => {
-      const { data, error } = await supabase
-        .from('explore_regions')
-        .select('id, slug, title, subtitle, hero_image_url')
-        .order('sort_order')
-        .limit(10);
-
-      if (error || !data) return [];
-
-      const regionIds = data.map(r => r.id);
-      const { data: allMembers } = await supabase
-        .from('explore_region_members')
-        .select('region_id, country')
-        .in('region_id', regionIds);
-
-      const countriesByRegion = new Map<string, string[]>();
-      for (const m of (allMembers ?? [])) {
-        const list = countriesByRegion.get(m.region_id) ?? [];
-        list.push(m.country);
-        countriesByRegion.set(m.region_id, list);
-      }
-
-      const allCountries = [...new Set((allMembers ?? []).map(m => m.country))];
-      let countsByCountry = new Map<string, number>();
-
-      if (allCountries.length > 0) {
-        const { data: countRows } = await supabase
-          .from('golf_courses')
-          .select('country')
-          .in('country', allCountries);
-
-        if (countRows) {
-          for (const row of countRows) {
-            countsByCountry.set(row.country, (countsByCountry.get(row.country) ?? 0) + 1);
-          }
-        }
-      }
-
-      return data.map(r => {
-        const countries = countriesByRegion.get(r.id) ?? [];
-        const courseCount = countries.reduce((sum, c) => sum + (countsByCountry.get(c) ?? 0), 0);
-        return { ...r, courseCount };
-      });
-    },
-    staleTime: 30 * 60 * 1000,
-  });
-
-  useEffect(() => {
-    if (!slides || slides.length <= 1 || isPaused) return;
-    const timer = setInterval(() => {
-      setCurrentSlide((s) => (s + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [slides?.length, isPaused]);
+  const navigate = useNavigate();
+  const { data: course, isLoading } = useCourseOfTheWeek();
 
   if (isLoading) {
     return <div className="w-full h-[280px] sm:h-[310px] bg-muted animate-pulse" />;
   }
 
-  if (!slides || slides.length === 0) return null;
+  if (!course) return null;
 
-  const slide = slides[currentSlide];
+  const location = [course.sub_country, course.country].filter(Boolean).join(', ');
 
   return (
     <div
       className="relative w-full h-[280px] sm:h-[310px] overflow-hidden"
       style={{ background: '#1a1a1a' }}
-      onPointerDown={() => setIsPaused(true)}
-      onPointerUp={() => setIsPaused(false)}
-      onPointerLeave={() => setIsPaused(false)}
     >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={currentSlide}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
-          style={{ position: 'absolute', inset: 0 }}
+      {/* Hero image */}
+      <img
+        src={course.thumbnail_image}
+        alt={course.course_name}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+      {/* Course of the Week eyebrow */}
+      <div className="absolute top-0 left-0 right-0 p-4">
+        <div
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)' }}
         >
-          {slide.hero_image_url ? (
-            <img
-              src={slide.hero_image_url}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0d2a1a] to-[#051408]" />
+          <span style={{ fontSize: 10 }}>⛳</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'white', letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
+            Course of the Week
+          </span>
+        </div>
+      </div>
+
+      {/* Content — bottom overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-1.5">
+        {/* Global rank if present */}
+        {course.global_rank && (
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.02em' }}>
+            #{course.global_rank} in the world
+          </p>
+        )}
+
+        {/* Course name */}
+        <h2 style={{ fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1.2, letterSpacing: '-0.03em' }}>
+          {course.course_name}
+        </h2>
+
+        {/* Location */}
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 400 }}>
+          {location}
+        </p>
+
+        {/* Bottom row — rating + explore button */}
+        <div className="flex items-center justify-between" style={{ marginTop: 6 }}>
+          {/* Avg rating badge */}
+          {course.avg_rating && (
+            <div className="flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#F7931E" stroke="none">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>
+                {Number(course.avg_rating).toFixed(1)}
+              </span>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+                ({course.review_count} {course.review_count === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
           )}
 
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-          {/* Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
-            <h2 style={{ fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1.2, letterSpacing: '-0.03em' }}>
-              {slide.title}
-            </h2>
-            {slide.courseCount > 0 && (
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', fontWeight: 400 }}>
-                {slide.courseCount.toLocaleString()} courses
-              </p>
-            )}
-            <button
-              onClick={() => onRegionSelect(slide.slug)}
-              className="self-start active:scale-[0.97] transition-transform liquid-glass"
-              style={{
-                marginTop: 4,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                padding: '8px 16px',
-                fontSize: 13,
-                fontWeight: 700,
-                color: 'white',
-                borderRadius: 10,
-              }}
-            >
-              Explore →
-            </button>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Dot indicators */}
-      {slides.length > 1 && (
-        <div
-          className="absolute flex items-center"
-          style={{ bottom: 20, right: 20, gap: 5, paddingBottom: 8 }}
-        >
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              style={{
-                width: currentSlide === i ? 20 : 7,
-                height: 7,
-                borderRadius: currentSlide === i ? 4 : '50%',
-                background: currentSlide === i ? 'white' : 'rgba(255,255,255,0.4)',
-                transition: 'all 0.3s ease',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-              }}
-            />
-          ))}
+          {/* Explore button */}
+          <button
+            onClick={() => navigate(`/courses/${course.course_id}`)}
+            className="active:scale-[0.97] transition-transform liquid-glass"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '8px 18px',
+              fontSize: 13,
+              fontWeight: 700,
+              color: 'white',
+              borderRadius: 10,
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            View course →
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }

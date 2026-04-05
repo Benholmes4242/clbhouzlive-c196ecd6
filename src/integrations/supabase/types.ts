@@ -15449,6 +15449,21 @@ export type Database = {
           width: number
         }[]
       }
+      get_course_of_the_week: {
+        Args: never
+        Returns: {
+          avg_rating: number
+          country: string
+          course_id: string
+          course_name: string
+          description: string
+          global_rank: number
+          review_count: number
+          sub_country: string
+          thumbnail_image: string
+          week_label: string
+        }[]
+      }
       get_course_regions: {
         Args: never
         Returns: {
