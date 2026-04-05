@@ -189,9 +189,17 @@ export function CollegeCompareSheet({
 
   return (
     <BottomSheet open={isOpen} onClose={onClose} ariaLabelledBy="compare-sheet-title">
-      {/* Title — 18px, weight 700 */}
-      <div className="flex items-center justify-between" style={{ padding: '20px 20px 16px' }}>
-        <h3 id="compare-sheet-title" className="text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>Head to Head</h3>
+      {/* Header */}
+      <div style={{ padding: '8px 20px 16px' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--accent-amber))', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: 4 }}>
+          College Golf
+        </div>
+        <h3
+          id="compare-sheet-title"
+          style={{ fontSize: 20, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: '-0.02em', margin: 0 }}
+        >
+          Head to Head
+        </h3>
       </div>
       
       {hasError && (
