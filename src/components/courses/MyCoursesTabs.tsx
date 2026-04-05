@@ -39,22 +39,22 @@ const MyCoursesTabs = ({
   const { user: currentUser } = useSupabaseSession();
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="flex items-center gap-4 w-full bg-transparent border-b border-border p-0 h-auto justify-center rounded-none">
+      <TabsList className="flex items-center w-full bg-transparent border-b border-border p-0 h-auto justify-center rounded-none" style={{ display: 'inline-flex', gap: 34 }}>
         <TabsTrigger 
           value="all"
-          className="min-h-[36px] px-1 text-sm font-semibold transition-all border-0 shadow-none rounded-none"
+          className="min-h-[44px] px-1 text-[19px] font-semibold transition-all border-0 shadow-none rounded-none"
         >
           All Courses
         </TabsTrigger>
         <TabsTrigger 
           value="top100"
-          className="min-h-[36px] px-1 text-sm font-semibold transition-all border-0 shadow-none rounded-none"
+          className="min-h-[44px] px-1 text-[19px] font-semibold transition-all border-0 shadow-none rounded-none"
         >
           Top 100
         </TabsTrigger>
         <TabsTrigger 
           value="recent"
-          className="min-h-[36px] px-1 text-sm font-semibold transition-all border-0 shadow-none rounded-none"
+          className="min-h-[44px] px-1 text-[19px] font-semibold transition-all border-0 shadow-none rounded-none"
         >
           Recent
         </TabsTrigger>

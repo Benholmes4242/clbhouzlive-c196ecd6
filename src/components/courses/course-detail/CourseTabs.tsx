@@ -28,7 +28,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
 
   return (
     <section className="px-4 pt-1 pb-0 flex justify-center">
-      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'inline-flex', gap: 20, justifyContent: 'center' }}>
+      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'inline-flex', gap: 34, justifyContent: 'center' }}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -39,8 +39,8 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '11px 2px 9px',
-                fontSize: 16,
+                padding: '14px 7px 12px',
+                fontSize: 19,
                 fontWeight: isActive ? 700 : 500,
                 color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
                 letterSpacing: isActive ? '-0.025em' : '0',
@@ -58,7 +58,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 2.5,
+                  height: 3,
                   borderRadius: 2,
                   background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
                 }} />
