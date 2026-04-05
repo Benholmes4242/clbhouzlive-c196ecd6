@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useNetworkActivity, type NetworkCourseHighlight } from '@/hooks/useNetworkActivity';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface NetworkReviewShelfProps {
   userId: string | undefined;
@@ -126,7 +127,7 @@ function HighlightCard({
       {/* Body */}
       <div style={{ padding: '6px 8px 0' }}>
         <p
-          className="line-clamp-2"
+          className="truncate"
           style={{
             fontSize: 11,
             fontWeight: 600,
@@ -148,8 +149,9 @@ function HighlightCard({
           </p>
         )}
         {highlight.avg_network_rating != null && highlight.avg_network_rating > 0 && (
-          <p style={{ fontSize: 10, color: '#F7931E', fontWeight: 600 }}>
-            ⭐ {highlight.avg_network_rating.toFixed(1)}
+          <p className="flex items-center gap-1" style={{ fontSize: 10, color: '#F7931E', fontWeight: 600 }}>
+            <ClubhouseLogo size="xs" />
+            {highlight.avg_network_rating.toFixed(1)}
           </p>
         )}
       </div>
