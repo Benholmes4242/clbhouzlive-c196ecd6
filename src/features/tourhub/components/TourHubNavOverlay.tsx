@@ -402,72 +402,88 @@ export function TourHubNavOverlay({
                       WebkitOverflowScrolling: 'touch',
                     }}
                   >
-                    {displayPlayers.map((player, index) => {
-                      const isFirst = index === 0;
-                      const lastName = player.playerName.split(' ').slice(-1)[0];
-                      const country = toTitleCase(player.country);
-                      
-                      return (
-                        <motion.button
-                          key={player.playerId}
-                          initial={false}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => handlePlayerClick(player.playerId)}
-                          className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl transition-all"
+                    {rankingsLoading ? (
+                      Array.from({ length: 5 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl animate-pulse"
                           style={{
-                            scrollSnapAlign: 'start',
-                            background: isFirst 
-                              ? 'rgba(245,166,35,0.09)'
-                              : 'rgba(255,255,255,0.80)',
-                            border: isFirst 
-                              ? '1.5px solid rgba(245,166,35,0.22)'
-                              : '1px solid rgba(0,0,0,0.07)',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                             minWidth: '155px',
+                            background: 'rgba(255,255,255,0.80)',
+                            border: '1px solid rgba(0,0,0,0.07)',
                           }}
                         >
-                          {/* Rank number — plain typographic, amber for #1 */}
-                          <span
-                            className="flex-shrink-0 text-center"
+                          <div className="w-5 h-3 rounded-full bg-slate-200 flex-shrink-0" />
+                          <div className="w-9 h-9 rounded-[11px] bg-slate-200 flex-shrink-0" />
+                          <div className="flex flex-col gap-1.5 flex-1">
+                            <div className="h-3 w-16 rounded bg-slate-200" />
+                            <div className="h-2.5 w-12 rounded bg-slate-200" />
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      displayPlayers.map((player, index) => {
+                        const isFirst = index === 0;
+                        const lastName = player.playerName.split(' ').slice(-1)[0];
+                        const country = toTitleCase(player.country);
+                        
+                        return (
+                          <motion.button
+                            key={player.playerId}
+                            initial={false}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => handlePlayerClick(player.playerId)}
+                            className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl transition-all"
                             style={{
-                              width: '20px',
-                              fontSize: '13px',
-                              fontWeight: 700,
-                              fontVariantNumeric: 'tabular-nums',
-                              color: index === 0
-                                ? 'hsl(var(--accent-amber))'
-                                : 'hsl(var(--muted-foreground))',
+                              scrollSnapAlign: 'start',
+                              background: isFirst 
+                                ? 'rgba(245,166,35,0.09)'
+                                : 'rgba(255,255,255,0.80)',
+                              border: isFirst 
+                                ? '1.5px solid rgba(245,166,35,0.22)'
+                                : '1px solid rgba(0,0,0,0.07)',
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                              minWidth: '155px',
                             }}
                           >
-                            {player.worldRank}
-                          </span>
-                          
-                          {/* TM-11: Avatar with initials fallback */}
-                          {(() => {
-                            const headshot = getPlayerHeadshotUrl(player.playerName, (player as any).tourCode ?? 'pga');
-                            const initials = getInitials(player.playerName);
-                            return (
-                              <AvatarWithInitials
-                                src={headshot}
-                                alt={player.playerName}
-                                initials={initials}
-                                size={36}
-                              />
-                            );
-                          })()}
-                          
-                          {/* Name & Country */}
-                          <div className="flex-1 min-w-0 text-left">
-                            <p className="text-sm font-semibold text-foreground truncate">
-                              {lastName}
-                            </p>
-                            <p className="text-[11px] text-muted-foreground truncate">
-                              {country || 'Unknown'}
-                            </p>
-                          </div>
-                        </motion.button>
-                      );
-                    })}
+                            <span
+                              className="flex-shrink-0 text-center"
+                              style={{
+                                width: '20px',
+                                fontSize: '13px',
+                                fontWeight: 700,
+                                fontVariantNumeric: 'tabular-nums',
+                                color: index === 0
+                                  ? 'hsl(var(--accent-amber))'
+                                  : 'hsl(var(--muted-foreground))',
+                              }}
+                            >
+                              {player.worldRank}
+                            </span>
+                            {(() => {
+                              const headshot = getPlayerHeadshotUrl(player.playerName, (player as any).tourCode ?? 'pga');
+                              const initials = getInitials(player.playerName);
+                              return (
+                                <AvatarWithInitials
+                                  src={headshot}
+                                  alt={player.playerName}
+                                  initials={initials}
+                                  size={36}
+                                />
+                              );
+                            })()}
+                            <div className="flex-1 min-w-0 text-left">
+                              <p className="text-sm font-semibold text-foreground truncate">
+                                {lastName}
+                              </p>
+                              <p className="text-[11px] text-muted-foreground truncate">
+                                {country || 'Unknown'}
+                              </p>
+                            </div>
+                          </motion.button>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -590,8 +606,15 @@ export function TourHubNavOverlay({
                         {item.subtitle}
                       </div>
                       {/* TM-06: College #1 teaser — school name tappable */}
+                      {item.id === 'college-golf' && !topCollege && (
+                        <div className="flex items-center gap-2 mt-1 animate-pulse">
+                          <div className="w-5 h-5 rounded-sm bg-slate-100 flex-shrink-0" />
+                          <div className="h-3 w-24 rounded bg-slate-100" />
+                          <div className="h-3 w-16 rounded bg-slate-100" />
+                        </div>
+                      )}
                       {item.id === 'college-golf' && topCollege && (
-                        <p className="text-[13px] mt-1 text-muted-foreground flex items-center gap-1.5">
+                        <p className="text-[13px] mt-1 text-muted-foreground flex items-center gap-1.5 flex-wrap">
                           <button
                             type="button"
                             className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 focus:outline-none"
@@ -612,7 +635,7 @@ export function TourHubNavOverlay({
                             )}
                             <span className="font-medium">{topCollege.name}</span>
                           </button>
-                          <span>
+                          <span className="truncate">
                             {' leads • '}
                             {formatCurrency(topCollege.earnings)} earned
                           </span>
