@@ -201,13 +201,13 @@ export function LeadersTab() {
       <div className="space-y-4 py-4">
         <Skeleton className="rounded-2xl w-full" style={{ height: '35dvh' }} />
         {/* Runner card skeletons */}
-        <div className="flex gap-2 px-4" style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
+        <div className="flex gap-2 px-5" style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
           <Skeleton className="flex-1 h-[60px] rounded-2xl" />
           <Skeleton className="flex-1 h-[60px] rounded-2xl" />
         </div>
-        <Skeleton className="mx-4 mt-3 h-[48px] rounded-2xl" />
-        <Skeleton className="mx-4 mt-3 h-[72px] rounded-xl" />
-        <div className="rounded-2xl border border-border/30 overflow-hidden mx-4">
+        <Skeleton className="mx-5 mt-3 h-[48px] rounded-2xl" />
+        <Skeleton className="mx-5 mt-3 h-[72px] rounded-xl" />
+        <div className="rounded-2xl border border-border/30 overflow-hidden mx-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-[60px] rounded-none border-b border-border/20" />
           ))}
@@ -280,7 +280,7 @@ export function LeadersTab() {
         }}
       >
         {/* Control row: ← Tour Overview | [spacer] | category pill */}
-        <div className="flex items-center gap-2 px-4 pt-2.5">
+        <div className="flex items-center gap-2 px-5 pt-2.5">
           {/* Back link */}
           <Link
             to="/tourhub?tab=overview"
@@ -326,7 +326,7 @@ export function LeadersTab() {
         </div>
 
         {/* Stat context — tight 2-line block, always visible in header */}
-        <div className="px-4 pt-2 pb-3">
+        <div className="px-5 pt-2 pb-3">
           <AnimatePresence mode="wait">
             <motion.div
               key={`ctx-${category.key}`}
@@ -345,7 +345,7 @@ export function LeadersTab() {
       </div>
 
       {/* Content area */}
-      <div className="px-4" style={{ paddingTop: 0, paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+      <div className="px-5" style={{ paddingTop: 0, paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Rankings list (#4–50) */}
         <div style={{ marginTop: 16 }}>
           <AnimatePresence mode="wait">

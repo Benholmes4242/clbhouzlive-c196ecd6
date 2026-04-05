@@ -170,7 +170,7 @@ export function TournamentDetailPage() {
             minHeight: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))',
           }}
         />
-        <div className="space-y-4 mt-6 px-4">
+        <div className="space-y-4 mt-6 px-5">
           <Skeleton className="h-12 rounded-xl" />
           <Skeleton className="h-48 rounded-2xl" />
           <Skeleton className="h-32 rounded-2xl" />
@@ -183,7 +183,7 @@ export function TournamentDetailPage() {
   if (!tournament) {
     return (
       <TourHubShell immersive>
-        <div className="pt-6 px-4">
+        <div className="pt-6 px-5">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
               <AlertCircle className="w-10 h-10 mx-auto text-muted-foreground" />

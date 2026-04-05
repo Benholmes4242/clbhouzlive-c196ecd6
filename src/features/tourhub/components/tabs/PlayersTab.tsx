@@ -434,8 +434,8 @@ export function PlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 py-6">
-        <Skeleton className="w-full" style={{ height: '45dvh' }} />
-        <div className="px-4 space-y-3">
+        <Skeleton className="w-full" style={{ height: '35dvh' }} />
+        <div className="px-5 space-y-3">
           <Skeleton className="h-12 rounded-2xl" />
           <Skeleton className="h-11 rounded-2xl" />
           {Array.from({ length: 4 }).map((_, i) => (
@@ -496,7 +496,7 @@ export function PlayersTab() {
       >
         {/* Collapsible search bar */}
         <div
-          className="overflow-hidden transition-all duration-250 ease-in-out px-4"
+          className="overflow-hidden transition-all duration-250 ease-in-out px-5"
           style={{
             maxHeight: searchExpanded ? 60 : 0,
             opacity: searchExpanded ? 1 : 0,
@@ -536,7 +536,7 @@ export function PlayersTab() {
         </div>
 
         {/* Main control row */}
-        <div className="flex items-center gap-2 px-4 pt-2.5">
+        <div className="flex items-center gap-2 px-5 pt-2.5">
           {/* ← Tour Overview */}
           <button
             type="button"
@@ -617,7 +617,7 @@ export function PlayersTab() {
         </div>
 
         {/* Count / context label */}
-        <div className="flex px-4 pt-1.5 pb-2.5">
+        <div className="flex px-5 pt-1.5 pb-2.5">
           <span className="text-[11px] font-medium text-muted-foreground/50">
             {activeTour === 'all'
               ? `${totalCount.toLocaleString()} players · A–Z`

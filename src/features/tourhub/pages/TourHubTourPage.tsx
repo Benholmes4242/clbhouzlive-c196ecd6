@@ -109,7 +109,7 @@ export function TourHubTourPage() {
 
       {/* Sticky search + filter header */}
       <div
-        className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50 -mx-4 px-4"
+        className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50 -mx-5 px-5"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         <div className="pb-2">
@@ -127,7 +127,7 @@ export function TourHubTourPage() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
+              className="shrink-0 min-h-[36px] px-5 rounded-full text-sm font-semibold transition-colors"
               style={{
                 backgroundColor: statusFilter === status
                   ? 'hsl(var(--tab-sub-active))'
@@ -187,7 +187,7 @@ export function TourHubTourPage() {
         onRemoveRecent={removeSearch}
         trendingItems={TRENDING}
       >
-        <div className="px-4 py-2">
+        <div className="px-5 py-2">
           {filteredEvents.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <span className="text-3xl">🔍</span>
