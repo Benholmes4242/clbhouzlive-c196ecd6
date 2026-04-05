@@ -147,7 +147,7 @@ export function PlayerProfilePage() {
             <p className="text-sm text-muted-foreground">Tap to try again</p>
             <button
               onClick={() => refetch()}
-              className="mt-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium active:opacity-70 transition-opacity"
+              className="mt-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium active:opacity-70 transition-opacity"
             >
               Retry
             </button>
