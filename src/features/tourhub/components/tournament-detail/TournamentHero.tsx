@@ -98,7 +98,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
     <div className="relative overflow-hidden">
       <motion.div 
         className="relative overflow-hidden"
-        style={{ minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
+        style={{ minHeight: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -130,25 +130,30 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           )}
         </motion.div>
 
-        {/* Canonical gradient scrim */}
+        {/* Canonical gradient scrim — lighter */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
           }}
         />
 
-        {/* Burger menu — standard Tour Hub position */}
+        {/* Burger menu — dark glass pill */}
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
-          className="absolute z-30 flex items-center justify-center"
-          style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: 16 }}
+          className="absolute z-30 flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{
+            width: 36, height: 36,
+            top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+            left: 16,
+            borderRadius: 10,
+            background: 'rgba(0,0,0,0.28)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
         >
-          <Menu
-            className="w-[24px] h-[24px] text-white"
-            style={{ strokeWidth: 1.5, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
-          />
+          <Menu className="w-[18px] h-[18px] text-white" strokeWidth={2} />
         </button>
 
         {/* Content overlay - bottom aligned */}
