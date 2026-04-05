@@ -121,11 +121,11 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
         style={{
           width: 58,
           height: 58,
-          borderRadius: '28%',
+          borderRadius: '34%',
           border: `2.5px solid ${isActive ? '#F7931E' : 'hsl(var(--border))'}`,
         }}
       >
-        <div className="w-full h-full overflow-hidden" style={{ borderRadius: '26%' }}>
+        <div className="w-full h-full overflow-hidden" style={{ borderRadius: '32%' }}>
           {friend.profile_photo_url ? (
             <img
               src={friend.profile_photo_url}
