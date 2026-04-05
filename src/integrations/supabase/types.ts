@@ -7273,6 +7273,7 @@ export type Database = {
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
+          post_categories: string[] | null
           post_type: string | null
           scheduled_at: string | null
           source_review_id: string | null
@@ -7301,6 +7302,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          post_categories?: string[] | null
           post_type?: string | null
           scheduled_at?: string | null
           source_review_id?: string | null
@@ -7329,6 +7331,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          post_categories?: string[] | null
           post_type?: string | null
           scheduled_at?: string | null
           source_review_id?: string | null
@@ -16341,57 +16344,110 @@ export type Database = {
           username: string
         }[]
       }
-      get_watch_shorts: {
-        Args: {
-          p_cursor?: string
-          p_mode?: string
-          p_page_size?: number
-          p_search_query?: string
-          p_seen_ids?: string[]
-          p_user_id: string
-          p_user_lat?: number
-          p_user_lng?: number
-        }
-        Returns: {
-          business_is_verified: boolean
-          business_logo_url: string
-          business_name: string
-          comment_count: number
-          course_country: string
-          course_region: string
-          creator_avatar_url: string
-          creator_display_name: string
-          creator_is_verified: boolean
-          creator_relation: string
-          creator_username: string
-          display_order: number
-          duration_seconds: number
-          engagement_score: number
-          height: number
-          is_followed_by_me: boolean
-          is_liked_by_me: boolean
-          like_count: number
-          media_id: string
-          media_type: string
-          media_url: string
-          post_actor_id: string
-          post_actor_type: string
-          post_content: string
-          post_created_at: string
-          post_id: string
-          post_status: string
-          post_user_id: string
-          poster_url: string
-          review_course_id: string
-          review_course_image: string
-          review_course_name: string
-          review_rating: number
-          share_count: number
-          source_review_id: string
-          stream_id: string
-          width: number
-        }[]
-      }
+      get_watch_shorts:
+        | {
+            Args: {
+              p_cursor?: string
+              p_mode?: string
+              p_page_size?: number
+              p_search_query?: string
+              p_seen_ids?: string[]
+              p_user_id: string
+              p_user_lat?: number
+              p_user_lng?: number
+            }
+            Returns: {
+              business_is_verified: boolean
+              business_logo_url: string
+              business_name: string
+              comment_count: number
+              course_country: string
+              course_region: string
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_relation: string
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              engagement_score: number
+              height: number
+              is_followed_by_me: boolean
+              is_liked_by_me: boolean
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_actor_id: string
+              post_actor_type: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_status: string
+              post_user_id: string
+              poster_url: string
+              review_course_id: string
+              review_course_image: string
+              review_course_name: string
+              review_rating: number
+              share_count: number
+              source_review_id: string
+              stream_id: string
+              width: number
+            }[]
+          }
+        | {
+            Args: {
+              p_category?: string
+              p_cursor?: string
+              p_mode?: string
+              p_page_size?: number
+              p_search_query?: string
+              p_seen_ids?: string[]
+              p_user_id: string
+              p_user_lat?: number
+              p_user_lng?: number
+            }
+            Returns: {
+              business_is_verified: boolean
+              business_logo_url: string
+              business_name: string
+              comment_count: number
+              course_country: string
+              course_region: string
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_relation: string
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              engagement_score: number
+              height: number
+              is_followed_by_me: boolean
+              is_liked_by_me: boolean
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_actor_id: string
+              post_actor_type: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_status: string
+              post_user_id: string
+              poster_url: string
+              review_course_id: string
+              review_course_image: string
+              review_course_name: string
+              review_rating: number
+              share_count: number
+              source_review_id: string
+              stream_id: string
+              width: number
+            }[]
+          }
       gettransactionid: { Args: never; Returns: unknown }
       has_role: {
         Args: {
