@@ -20,6 +20,7 @@ import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { PlayersWorldsBest } from '../players/PlayersWorldsBest';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 
 // Inline sort label resolver — mirrors PlayerSortControl's SORT_OPTIONS logic
 function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
@@ -709,9 +710,22 @@ export function PlayersTab() {
                 isSelected ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
-              <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
-                {labels[code]}
-              </span>
+              <div className="flex items-center gap-2.5">
+                {code === 'all' ? (
+                  <Globe className="w-5 h-5 flex-shrink-0 text-muted-foreground" />
+                ) : hasTourLogo(code.toLowerCase()) ? (
+                  <img
+                    src={getTourLogo(code.toLowerCase())}
+                    alt=""
+                    aria-hidden="true"
+                    className="object-contain flex-shrink-0"
+                    style={{ width: 32, height: 22 }}
+                  />
+                ) : null}
+                <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
+                  {labels[code]}
+                </span>
+              </div>
               <div className="flex items-center gap-2">
                 {count > 0 && (
                   <span className="text-[12px] text-muted-foreground/60 font-medium">
