@@ -447,7 +447,8 @@ async function syncTournament(
         body: JSON.stringify({
           action: 'scorecards',
           tournamentId: tournament.sr_id,
-          round: activeRound,
+          tourId: tour,
+          roundNumber: activeRound,
           year: year,
         }),
       });
