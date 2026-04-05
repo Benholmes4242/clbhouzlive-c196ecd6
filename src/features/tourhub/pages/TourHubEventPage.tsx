@@ -74,7 +74,7 @@ export function TourHubEventPage() {
       </div>
       {/* Combined Sticky Header + Tabs */}
       <div
-        className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 -mx-4 px-4"
+        className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 -mx-5 px-5"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         <div className="pt-2 pb-1">

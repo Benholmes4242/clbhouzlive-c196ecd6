@@ -114,7 +114,7 @@ export function PlayerProfilePage() {
       <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar>
         <Skeleton className="w-full" style={{ height: '35dvh' }} />
         <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-          <div className="flex justify-between px-4">
+          <div className="flex justify-between px-5">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="text-center space-y-1">
                 <Skeleton className="h-3 w-10 mx-auto" />
@@ -123,7 +123,7 @@ export function PlayerProfilePage() {
             ))}
           </div>
         </div>
-        <div className="px-4 mt-6 space-y-6">
+        <div className="px-5 mt-6 space-y-6">
           <Skeleton className="h-48 rounded-lg" />
           <Skeleton className="h-64 rounded-lg" />
         </div>
@@ -134,7 +134,7 @@ export function PlayerProfilePage() {
   if (!player) {
     return (
       <PageRoot className="min-h-screen w-full bg-background">
-        <div className="pt-20 px-4">
+        <div className="pt-20 px-5">
           <button
             onClick={handleBack}
             className="text-primary hover:underline flex items-center gap-1 mb-6 text-sm active:opacity-70 transition-opacity"

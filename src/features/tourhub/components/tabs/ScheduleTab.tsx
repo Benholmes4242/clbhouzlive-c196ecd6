@@ -281,9 +281,9 @@ export function ScheduleTab() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-6 -mx-4">
-        <Skeleton className="w-full" style={{ height: '45dvh' }} />
-        <div className="px-4 space-y-3">
+      <div className="space-y-6 -mx-5">
+        <Skeleton className="w-full" style={{ height: '35dvh' }} />
+        <div className="px-5 space-y-3">
           <Skeleton className="h-12 rounded-xl w-full" />
           <Skeleton className="h-11 rounded-xl" />
           {Array.from({ length: 4 }).map((_, i) => (
@@ -319,7 +319,7 @@ export function ScheduleTab() {
   
   return (
     <div
-      className="min-h-screen -mx-4"
+      className="min-h-screen -mx-5"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -352,7 +352,7 @@ export function ScheduleTab() {
 
       {/* Content below hero */}
       <div
-        className="sticky top-0 z-30 -mx-4 bg-background/95 backdrop-blur-xl border-b border-border/10"
+        className="sticky top-0 z-30 -mx-5 bg-background/95 backdrop-blur-xl border-b border-border/10"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         {/* ── ROW 1: Filter pills + Search icon toggle ── */}
@@ -466,7 +466,7 @@ export function ScheduleTab() {
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
+            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
@@ -530,7 +530,7 @@ export function ScheduleTab() {
                   )}
 
                   {/* Tournament list — 12px gap from header, 12px between cards */}
-                  <div className="flex flex-col gap-3 px-4 mt-3">
+                  <div className="flex flex-col gap-3 px-5 mt-3">
                     {group.tournaments.map((tournament) => (
                       <InViewCard key={tournament.id}>
                         <ScheduleTournamentCard 
