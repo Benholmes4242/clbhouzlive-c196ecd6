@@ -210,9 +210,11 @@ const GolfersToFollowPage = () => {
             activeTab={activeTab}
             onTabChange={(id) => setActiveTab(id as TabKey)}
           />
+          {/* Divider matching Watch tab */}
+          <div style={{ height: 0.5, background: 'hsl(var(--border) / 0.5)' }} />
           
           {/* Search bar */}
-          <div className="px-4 pb-3">
+          <div className="px-4 pt-3 pb-3">
             {activeTab === 'home_club' && hasNoHomeClub ? (
               <div className="h-11 px-4 flex items-center rounded-xl border border-border/40 bg-white/50">
                 <Search className="h-4 w-4 text-muted-foreground/50 mr-2" />
