@@ -56,7 +56,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
       {mode === 'clips' && (
         <div
           className="flex items-center gap-2 pb-2.5 overflow-x-auto"
-          style={{ scrollbarWidth: 'none' }}
+          style={{ scrollbarWidth: 'none', padding: '2px 16px 10px' }}
         >
           {GOLF_TAGS.map((tag) => {
             const isActive = activeTag === tag.id;
@@ -64,7 +64,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
               <button
                 key={tag.id}
                 onClick={() => setActiveTag(tag.id)}
-                className="shrink-0 whitespace-nowrap min-h-[30px] px-3 text-xs font-semibold transition-colors active:scale-[0.97]"
+                className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97]"
                 style={{
                   borderRadius: 20,
                   background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
