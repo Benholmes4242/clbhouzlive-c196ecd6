@@ -356,7 +356,7 @@ export function ScheduleTab() {
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         {/* ── ROW 1: Filter pills + Search icon toggle ── */}
-        <div className="flex items-center gap-2 px-4 pt-2.5 pb-0">
+        <div className="flex items-center gap-2 px-5 pt-2.5 pb-0">
           <div className="flex items-center flex-1 gap-0">
             {(['all', 'upcoming', 'live', 'completed'] as const).map((f) => {
               const isActive = filter === f;
@@ -428,7 +428,7 @@ export function ScheduleTab() {
 
         {/* ── SEARCH BAR — collapsible ── */}
         <div
-          className="overflow-hidden transition-all ease-in-out px-4"
+          className="overflow-hidden transition-all ease-in-out px-5"
           style={{ maxHeight: searchExpanded ? 60 : 0, opacity: searchExpanded ? 1 : 0, transitionDuration: '250ms' }}
         >
           <div className="relative pt-2.5">
@@ -462,7 +462,7 @@ export function ScheduleTab() {
         </div>
 
         {/* ── ROW 2: ← Tour Overview + Tour filter pill ── */}
-        <div className="flex items-center justify-between px-4 pt-2 pb-2.5">
+        <div className="flex items-center justify-between px-5 pt-2 pb-2.5">
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
