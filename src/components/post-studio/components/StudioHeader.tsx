@@ -25,7 +25,7 @@ interface StudioHeaderProps {
   darkMode?: boolean;
 }
 
-const STEP_LABELS = ['COMPOSE', 'POST'] as const;
+const STEP_LABELS = ['COMPOSE', 'REVIEW'] as const;
 const TOTAL_STEPS = 2;
 
 const STEP_PROGRESS: Partial<Record<StudioStep, number>> = {
@@ -64,20 +64,20 @@ export function StudioHeader({
                 whileTap={{ scale: 0.97 }}
                 onClick={leftAction.onClick}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100"
-                style={{ background: darkMode ? 'rgba(0,0,0,0.40)' : '#F5F5F7' }}
+                style={{ background: '#F5F5F7' }}
                 aria-label="Close"
               >
-                <X className="h-[18px] w-[18px]" style={{ color: darkMode ? 'rgba(255,255,255,0.70)' : '#8E8E93' }} />
+                <X className="h-[18px] w-[18px]" style={{ color: '#8E8E93' }} />
               </motion.button>
             ) : (
               <button
                 onClick={leftAction.onClick}
                 disabled={leftAction.disabled}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                style={{ background: darkMode ? 'rgba(255,255,255,0.10)' : '#F5F5F7' }}
+                style={{ background: '#F5F5F7' }}
                 aria-label="Back"
               >
-                <ChevronLeft className="h-5 w-5" style={{ color: darkMode ? 'rgba(255,255,255,0.80)' : undefined }} />
+                <ChevronLeft className="h-5 w-5 text-foreground" />
               </button>
             )
           ) : <div />}
@@ -150,10 +150,8 @@ export function StudioHeader({
                 disabled={rightAction.disabled}
                 className="text-[13px] font-semibold px-[14px] min-h-[36px] flex items-center rounded-full transition-all duration-200 active:scale-[0.96]"
                 style={{
-                  background: darkMode
-                    ? (rightAction.disabled ? 'rgba(255,255,255,0.12)' : '#F7931E')
-                    : (rightAction.disabled ? '#F5F5F7' : '#1C1C1E'),
-                  color: '#FFFFFF',
+                  background: rightAction.disabled ? '#F5F5F7' : '#1C1C1E',
+                  color: rightAction.disabled ? '#AEAEB2' : '#FFFFFF',
                   pointerEvents: rightAction.disabled ? 'none' : 'auto',
                 }}
               >
@@ -176,7 +174,7 @@ export function StudioHeader({
       {/* Amber progress bar — matching Wizard */}
       {showProgress && (
         <div className="px-4 pt-1 pb-2">
-          <div className="h-[3px] rounded-full overflow-hidden" style={{ background: darkMode ? 'rgba(255,255,255,0.12)' : undefined }}>
+          <div className="h-[3px] rounded-full overflow-hidden bg-muted">
             <motion.div
               className="h-full rounded-full"
               style={{ background: 'linear-gradient(90deg, #F7931E, #FBBC2E)' }}
