@@ -145,7 +145,7 @@ export function CollegeGolfHubPage() {
         {statsLoading ? (
           <div
             className="animate-pulse"
-            style={{ height: '45dvh', background: 'hsl(var(--muted) / 0.3)' }}
+            style={{ height: '35dvh', background: 'hsl(var(--muted) / 0.3)' }}
           />
         ) : topCollege ? (
           <CollegeHeroBanner
@@ -155,18 +155,23 @@ export function CollegeGolfHubPage() {
           />
         ) : null}
 
-        {/* Burger menu — AFTER hero in DOM so it paints on top of hero's stacking context */}
+        {/* Burger menu — frosted glass pill */}
         <button
-          className="fixed z-20 flex items-center justify-center"
-          style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: '16px', width: '44px', height: '44px' }}
+          className="fixed z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{
+            top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+            left: '16px',
+            width: 36,
+            height: 36,
+            borderRadius: 12,
+            background: 'rgba(0,0,0,0.28)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
         >
-          <Menu
-            className="w-6 h-6"
-            strokeWidth={1.5}
-            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
-          />
+          <Menu className="w-[18px] h-[18px] text-white" strokeWidth={2} />
         </button>
 
         {/* Alumni Face Strip — overlaps hero */}
@@ -183,19 +188,19 @@ export function CollegeGolfHubPage() {
             STICKY HEADER — back · tabs · search
             ══════════════════════════════════════════════ */}
         <div
-          className="-mx-4 sticky top-0 z-20"
+          className="-mx-5 sticky top-0 z-20"
           style={{
             background: 'hsl(var(--background) / 0.96)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '1px solid hsl(var(--border) / 0.10)',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-            marginTop: 14,
+            paddingTop: 10,
+            marginTop: 8,
           }}
         >
           {/* Collapsible search bar */}
           <div
-            className="overflow-hidden transition-all duration-250 ease-in-out px-4"
+            className="overflow-hidden transition-all duration-250 ease-in-out px-5"
             style={{
               maxHeight: searchExpanded ? 60 : 0,
               opacity: searchExpanded ? 1 : 0,
@@ -230,12 +235,12 @@ export function CollegeGolfHubPage() {
           </div>
 
           {/* Control row: ← Tour Overview | tabs | search icon */}
-          <div className="flex items-center gap-1.5 px-4 pt-2.5 pb-2.5">
+          <div className="flex items-center gap-1.5 px-5 pt-2 pb-2.5">
             {/* Back link */}
             <Link
               to="/tourhub?tab=overview"
               replace
-              className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+              className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
               style={{ color: 'hsl(var(--muted-foreground) / 0.70)' }}
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
@@ -284,7 +289,7 @@ export function CollegeGolfHubPage() {
 
         {/* Search results — only shown when searchExpanded and query >= 2 chars */}
         {showSearchResults && (
-          <div className="px-4 mt-3 space-y-2">
+          <div className="px-5 mt-3 space-y-2">
             {searchLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="h-[110px] rounded-xl bg-muted/40 animate-pulse" />
@@ -313,7 +318,7 @@ export function CollegeGolfHubPage() {
 
         {/* Content */}
         <div
-          className="px-4"
+          className="px-5"
           style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
         >
           <section style={{ marginTop: 16 }}>

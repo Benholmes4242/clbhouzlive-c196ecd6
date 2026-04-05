@@ -41,7 +41,7 @@ export function CollegeHeroBanner({ stats, college, activeMetric, className }: C
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
         className={cn('relative overflow-hidden', className)}
-        style={{ height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
+        style={{ height: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
       >
         {/* Background gradient with Ken Burns */}
         <motion.div
@@ -72,7 +72,7 @@ export function CollegeHeroBanner({ stats, college, activeMetric, className }: C
         <Link
           to={`/tourhub/college-golf/${stats.normalized_name}`}
           className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20"
-          style={{ minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
+          style={{ minHeight: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
         >
           {/* Logo — 140×140 centered */}
           <motion.div
