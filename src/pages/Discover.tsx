@@ -54,7 +54,7 @@ const Discover = () => {
                 tabs={[
                   { id: 'watch', label: 'Watch' },
                   { id: 'loop', label: 'The Loop' },
-                  { id: 'courses', label: 'Courses' },
+                  { id: 'courses', label: 'Explore' },
                 ]}
                 activeTab={main}
                 onTabChange={(id) => setMain(id as MainKey)}
