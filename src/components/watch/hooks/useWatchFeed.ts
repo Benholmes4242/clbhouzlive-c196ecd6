@@ -10,17 +10,18 @@ const PAGE_SIZE = 30;
 interface UseWatchFeedParams {
   userId: string | undefined;
   filter: WatchFilter;
+  category?: string;
   searchQuery?: string;
   userLat?: number | null;
   userLng?: number | null;
   enabled?: boolean;
 }
 
-export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng, enabled = true }: UseWatchFeedParams) {
+export function useWatchFeed({ userId, filter, category, searchQuery, userLat, userLng, enabled = true }: UseWatchFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['watch-feed', filter, searchQuery, userId],
+    queryKey: ['watch-feed', filter, category ?? null, searchQuery, userId],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -42,6 +43,7 @@ export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng, en
         params.p_user_lat = userLat;
         params.p_user_lng = userLng;
       }
+      if (category) params.p_category = category;
 
       const { data, error } = await supabase.rpc('get_watch_shorts', params as any);
 

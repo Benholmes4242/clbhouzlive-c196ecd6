@@ -109,6 +109,16 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
     courseCount: input.courseIds?.length || (input.courseId ? 1 : 0),
   });
   
+  // Auto-detect categories from caption if none explicitly provided
+  const autoCategories = input.content
+    ? detectPostCategories(input.content)
+    : [];
+
+  // Merge explicit categories (if any) with auto-detected ones, deduplicated
+  const finalCategories = Array.from(
+    new Set([...(input.categories ?? []), ...autoCategories])
+  );
+
   const { data, error } = await supabase
     .from('posts')
     .insert({
@@ -118,7 +128,8 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
       actor_type: input.actorType,
       actor_id: input.actorId,
       course_id: primaryCourseId, // Backwards compatibility
-      categories: input.categories ?? [],
+      categories: finalCategories,
+      post_categories: finalCategories,
       badges: input.badges ?? [],
       visibility: input.visibility ?? 'anyone',
       status: isScheduled ? 'scheduled' : 'published',
