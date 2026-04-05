@@ -326,12 +326,17 @@ export function UnifiedWorldRankings() {
         ariaLabelledBy="rankings-tour-sheet-title"
       >
         <div className="px-5 pb-6 pt-2">
-          <h3
-            id="rankings-tour-sheet-title"
-            className="text-[1.125rem] font-bold text-foreground mb-4"
-          >
-            Rankings by tour
-          </h3>
+          <div style={{ paddingBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--accent-amber))', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: 4 }}>
+              Filter
+            </div>
+            <h3
+              id="rankings-tour-sheet-title"
+              style={{ fontSize: 20, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: '-0.02em', margin: 0 }}
+            >
+              Rankings by tour
+            </h3>
+          </div>
           <div className="flex flex-col gap-2">
             {RANKING_TOUR_OPTIONS.map(tour => {
               const isActive = activeTour === tour.code;
@@ -345,10 +350,10 @@ export function UnifiedWorldRankings() {
                     borderRadius: 12,
                     padding: '14px 16px',
                     border: isActive
-                      ? '1px solid hsl(var(--foreground))'
+                      ? '1.5px solid hsl(var(--accent-amber) / 0.40)'
                       : '1px solid hsl(var(--border) / 0.5)',
                     background: isActive
-                      ? 'hsl(var(--foreground))'
+                      ? 'hsl(var(--accent-amber) / 0.10)'
                       : 'hsl(var(--card))',
                   }}
                 >
@@ -360,20 +365,20 @@ export function UnifiedWorldRankings() {
                   <div className="flex-1 min-w-0">
                     <div
                       className="text-[0.875rem] font-semibold"
-                      style={{ color: isActive ? 'hsl(var(--background))' : 'hsl(var(--foreground))' }}
+                      style={{ color: 'hsl(var(--foreground))' }}
                     >
                       {tour.label}
                     </div>
                     <div
                       className="text-[0.75rem]"
-                      style={{ color: isActive ? 'hsl(var(--background) / 0.7)' : 'hsl(var(--muted-foreground))' }}
+                      style={{ color: 'hsl(var(--muted-foreground))' }}
                     >
                       {tour.description}
                     </div>
                   </div>
                   {isActive && (
                     <div className="flex-shrink-0">
-                      <Check className="w-4 h-4" style={{ color: 'hsl(var(--background))' }} />
+                      <Check className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
                     </div>
                   )}
                 </button>
