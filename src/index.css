@@ -2461,18 +2461,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     display: none;
   }
 
-  /* Liquid Glass Effect for Suggested Users */
-  .liquid-glass {
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    background: var(--glass-bg);
-    border: 1px solid var(--border-hairline);
-  }
-
-  .dark .liquid-glass {
-    background: var(--glass-bg);
-    border: 1px solid var(--border-hairline);
-  }
+  /* Liquid Glass — canonical spec lives in liquid-glass.css */
 
   .liquid-glass-button {
     backdrop-filter: blur(var(--glass-blur));
@@ -3947,18 +3936,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   font-size: 12px;
 }
 
-/* Liquid Glass Effect for Suggested Users */
-.liquid-glass {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dark .liquid-glass {
-  background: rgba(0, 0, 0, 0.24);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
+/* Liquid Glass — canonical spec lives in liquid-glass.css, do not duplicate here */
 
 .liquid-glass-button {
   backdrop-filter: blur(8px);
