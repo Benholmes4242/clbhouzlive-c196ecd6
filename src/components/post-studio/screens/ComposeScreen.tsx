@@ -809,7 +809,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            minHeight: '100%',
+            minHeight: hasMedia ? 'auto' : '100%',
             justifyContent: hasMedia || state.caption.length > 0 ? 'flex-start' : 'center',
             paddingBottom: 'clamp(12px, 3vh, 24px)',
           }}
