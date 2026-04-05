@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, ChevronLeft, Check, UserPlus, Info, Users, Building2, BadgeCheck, AlertCircle, LucideIcon } from 'lucide-react';
+import { Search, Check, UserPlus, Info, Users, Building2, BadgeCheck, AlertCircle, LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useGolfersDiscovery, TabKey } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
@@ -193,21 +193,9 @@ const GolfersToFollowPage = () => {
     <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <div className="w-full">
         {/* Scrollable header - scrolls away */}
-        <div className="bg-[#F8FAFC] px-4 pt-6 pb-4">
-          {/* Back button */}
-          <button
-            type="button"
-            onClick={handleBack}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </button>
-          
-          {/* Title block */}
+        <div className="bg-[#F8FAFC] px-4 pt-3 pb-4">
           <div className="text-center">
             <h1 className="text-xl font-bold text-foreground mb-1">Golfers to follow</h1>
-            <p className="text-sm text-muted-foreground">Discover new golfers and build your community.</p>
           </div>
         </div>
         
@@ -313,16 +301,16 @@ const GolfersToFollowPage = () => {
           {loading && !error ? (
             <div className="divide-y divide-border/30">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center gap-3 px-6 py-4">
-                  <Skeleton className="w-14 h-14 rounded-2xl flex-shrink-0" />
+                <div key={i} className="flex items-center gap-3 px-4 py-3">
+                  <Skeleton className="w-12 h-12 rounded-xl flex-shrink-0" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-3 w-24" />
                     <Skeleton className="h-3 w-28" />
                   </div>
                   <div className="flex gap-2">
-                    <Skeleton className="h-8 w-20 rounded-full" />
-                    <Skeleton className="h-8 w-24 rounded-full" />
+                    <Skeleton className="h-7 w-20 rounded-full" />
+                    <Skeleton className="h-7 w-24 rounded-full" />
                   </div>
                 </div>
               ))}
@@ -376,24 +364,25 @@ const GolfersToFollowPage = () => {
               {golfers.map((golfer) => {
                 const isFollowing = followingIds.has(golfer.id);
                 const isActioning = actioningUserId === golfer.id;
-                const clubLine = golfer.homeClub || 'Home club not set';
+                const clubLine = golfer.homeClub || null;
                 const friendStatus = getEffectiveFriendStatus(golfer);
 
                 return (
                   <button
                     key={golfer.id}
                     onClick={() => navigate(getProfilePathById(golfer.id, golfer.creatorOnly, golfer.username))}
-                    className="w-full text-left px-6 py-4 hover:bg-slate-100 transition-colors"
+                    className="w-full text-left px-4 py-3 hover:bg-slate-100 transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                      {/* Avatar - no overlay */}
+                      {/* Avatar */}
                       <div className="shrink-0">
                         <SquircleAvatar
                           src={golfer.profileImage}
                           alt={golfer.displayName}
-                          size={56}
-                          fallback={golfer.displayName?.charAt(0) || '?'}
-                          ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
+                          size={48}
+                          fallback={golfer.displayName?.charAt(0)?.toUpperCase() || '?'}
+                          ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0) || 'hsl(var(--border))'}
+                          hideRing={!golfer.totalTop100Played}
                         />
                       </div>
 
@@ -414,14 +403,16 @@ const GolfersToFollowPage = () => {
                           @{golfer.username}
                         </p>
 
-                        {/* Row 3: Home club */}
-                        <p className="text-xs text-muted-foreground truncate">
-                          {clubLine}
-                        </p>
+                        {/* Row 3: Home club (hidden when empty) */}
+                        {clubLine && (
+                          <p className="text-xs text-muted-foreground truncate">
+                            {clubLine}
+                          </p>
+                        )}
 
-                        {/* Row 3: Buttons grid */}
+                        {/* Row 4: Buttons grid */}
                         <div 
-                          className="grid grid-cols-2 gap-2 pt-2" 
+                          className="grid grid-cols-2 gap-1.5 pt-2" 
                           onClick={(e) => e.stopPropagation()}
                         >
                           {/* Follow/Following button - PRIMARY */}
@@ -433,7 +424,7 @@ const GolfersToFollowPage = () => {
                               }}
                               disabled={isActioning}
                               aria-label={`Unfollow ${golfer.displayName}`}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted text-muted-foreground hover:bg-muted/80 gap-1.5"
+                              className="h-7 px-3 text-[11px] font-medium rounded-full border transition-colors transition-transform flex items-center justify-center whitespace-nowrap border-border bg-muted text-muted-foreground hover:bg-muted/80 active:scale-[0.97] gap-1.5"
                             >
                               <Check className="h-3.5 w-3.5" />
                               Following
@@ -446,7 +437,7 @@ const GolfersToFollowPage = () => {
                               }}
                               disabled={isActioning}
                               aria-label={`Follow ${golfer.displayName}`}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20"
+                              className="h-7 px-3 text-[11px] font-medium rounded-full border transition-colors transition-transform flex items-center justify-center whitespace-nowrap border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20 active:scale-[0.97]"
                             >
                               Follow
                             </button>
@@ -456,7 +447,7 @@ const GolfersToFollowPage = () => {
                           {friendStatus === 'friends' ? (
                             <span
                               aria-label={`Already friends with ${golfer.displayName}`}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-500/10 text-emerald-600 gap-1.5 cursor-default"
+                              className="h-7 px-3 text-[11px] font-medium rounded-full border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-500/10 text-emerald-600 gap-1.5 cursor-default"
                             >
                               <Check className="h-3.5 w-3.5" />
                               Friends
@@ -464,7 +455,7 @@ const GolfersToFollowPage = () => {
                           ) : friendStatus === 'pending' ? (
                             <span
                               aria-label={`Friend request pending for ${golfer.displayName}`}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted/50 text-muted-foreground cursor-default"
+                              className="h-7 px-3 text-[11px] font-medium rounded-full border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted/50 text-muted-foreground cursor-default"
                             >
                               Request sent
                             </span>
@@ -476,7 +467,7 @@ const GolfersToFollowPage = () => {
                               }}
                               disabled={isActioning}
                               aria-label={`Send friend request to ${golfer.displayName}`}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                              className="h-7 px-3 text-[11px] font-medium rounded-full border transition-colors transition-transform flex items-center justify-center whitespace-nowrap border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 active:scale-[0.97]"
                             >
                               Add friend
                             </button>
