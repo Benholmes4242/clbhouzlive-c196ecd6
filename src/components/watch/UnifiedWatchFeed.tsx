@@ -23,10 +23,16 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
   return (
     <button
       onClick={onTap}
-      className="shrink-0 flex items-center gap-1.5 px-3.5 py-[7px] rounded-full text-[13px] font-semibold active:scale-[0.97] transition-transform"
+      className="shrink-0 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
       style={{
-        background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted))',
-        color: isActive ? 'hsl(var(--background))' : 'hsl(var(--foreground))',
+        minHeight: 34,
+        padding: '0 14px',
+        fontSize: 13,
+        fontWeight: 600,
+        borderRadius: 20,
+        background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+        color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
       }}
     >
       {icon}
