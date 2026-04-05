@@ -14,6 +14,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import SegmentedControl from '@/components/discover/SegmentedControl';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -203,29 +204,12 @@ const GolfersToFollowPage = () => {
         </div>
         
         {/* Sticky section - tabs + search */}
-        <div className="sticky top-0 z-40 bg-[#F8FAFC]">
-          {/* Tabs - Segmented control (matches ProfilePageV2) */}
-          <section className="px-4 py-2">
-            <div className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
-              {TABS.map((tab) => {
-                const isActive = activeTab === tab.key;
-                return (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={cn(
-                      "flex-1 py-2.5 text-[13px] font-semibold rounded-lg transition-all duration-150 whitespace-nowrap min-h-[44px]",
-                      isActive
-                        ? "m-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]"
-                        : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
-                    )}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+        <div className="sticky z-40 bg-[#F8FAFC]" style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+          <SegmentedControl
+            tabs={TABS.map(t => ({ id: t.key, label: t.label }))}
+            activeTab={activeTab}
+            onTabChange={(id) => setActiveTab(id as TabKey)}
+          />
           
           {/* Search bar */}
           <div className="px-4 pb-3">
