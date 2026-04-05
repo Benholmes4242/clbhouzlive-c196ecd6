@@ -84,7 +84,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         }}
       >
         {highlights.map((h) => (
-          <HighlightCard key={h.course_id} highlight={h} onTap={() => navigate(`/course/${h.course_id}`)} />
+          <HighlightCard key={h.course_id} highlight={h} onTap={() => <HighlightCard key={h.course_id} highlight={h} onTap={() => navigate(`/courses/${h.course_id}`)} />} />
         ))}
       </div>
     </div>
