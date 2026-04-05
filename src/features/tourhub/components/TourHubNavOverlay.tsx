@@ -81,7 +81,7 @@ export function TourHubNavOverlay({
   const swipeStartYRef = useRef<number | null>(null);
 
   // Only fetch data when overlay is open (lazy-mount)
-  const { data: topPlayers } = useTopWorldRanked(5);
+  const { data: topPlayers, isLoading: rankingsLoading } = useTopWorldRanked(5);
   const { data: liveCount } = useLiveTournamentCount();
   const { data: leaderTeaser } = useLiveLeaderTeaser();
   const { data: topCollege } = useTopCollegeTeaser();
@@ -192,6 +192,15 @@ export function TourHubNavOverlay({
 
   // Helper: render card teaser text — TM-04: player + tournament names tappable
   const renderTeaser = (item: NavItem) => {
+    // Show skeleton while leader data is loading
+    if (item.value === 'overview' && hasLive && !leaderTeaser) {
+      return (
+        <div className="mt-1 flex flex-col gap-1.5 animate-pulse">
+          <div className="h-3 w-3/4 rounded bg-slate-100" />
+          <div className="h-3 w-1/2 rounded bg-slate-100" />
+        </div>
+      );
+    }
     if (item.value === 'overview' && leaderTeaser && hasLive) {
       const scoreStr = leaderTeaser.score !== null
         ? (leaderTeaser.score < 0 ? `${leaderTeaser.score}` : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
@@ -310,6 +319,8 @@ export function TourHubNavOverlay({
             }}
             style={{
               width: '100vw',
+              maxWidth: '480px',
+              marginLeft: 'auto',
               background: '#F8FAFC',
             }}
             role="dialog"
@@ -334,6 +345,7 @@ export function TourHubNavOverlay({
                 transition={{ duration: 0.4, delay: 0.1 }}
                 src="/assets/logomark-orange.png"
                 alt=""
+                loading="lazy"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -351,7 +363,7 @@ export function TourHubNavOverlay({
             >
             
             {/* World Rankings Strip */}
-            {displayPlayers.length > 0 && (
+            {(rankingsLoading || displayPlayers.length > 0) && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
