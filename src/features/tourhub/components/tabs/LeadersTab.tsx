@@ -303,14 +303,7 @@ export function LeadersTab() {
               'transition-all duration-150 active:scale-[0.97]'
             )}
           >
-            <category.icon
-              className="w-[13px] h-[13px] shrink-0"
-              style={{
-                color: category.key !== 'world_rank'
-                  ? (category as any).accentColor ?? 'hsl(var(--muted-foreground))'
-                  : 'hsl(var(--muted-foreground))',
-              }}
-            />
+            <span className="text-[13px] leading-none shrink-0">{category.emoji}</span>
             <span className="text-[12px] font-bold text-foreground">
               {category.shortLabel}
             </span>
