@@ -1491,6 +1491,55 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         ))}
       </AnimatePresence>
 
+      {/* ── Slide position dots — only shown when 2+ slides and not expanded ── */}
+      {safeSlides.length > 1 && !isExpanded && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 28,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            zIndex: 30,
+            pointerEvents: 'none',
+          }}
+        >
+          {safeSlides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentIndex(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              style={{
+                pointerEvents: 'auto',
+                padding: 4,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <div
+                style={{
+                  height: 6,
+                  width: i === currentIndex ? 18 : 6,
+                  borderRadius: 99,
+                  background: i === currentIndex
+                    ? 'rgba(255,255,255,0.90)'
+                    : 'rgba(255,255,255,0.35)',
+                  transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: i === currentIndex
+                    ? '0 1px 4px rgba(0,0,0,0.30)'
+                    : 'none',
+                }}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
 
     </div>
   );
