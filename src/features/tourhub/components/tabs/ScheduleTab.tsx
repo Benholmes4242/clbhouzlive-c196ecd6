@@ -10,6 +10,7 @@
  */
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe } from 'lucide-react';
@@ -566,74 +567,77 @@ export function ScheduleTab() {
         )}
       </div>
 
-      {/* Tour Filter Bottom Sheet */}
-      <AnimatePresence>
-        {tourSheetOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-40 bg-black/40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setTourSheetOpen(false)}
-            />
-            <motion.div
-              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-card rounded-t-[20px] shadow-2xl"
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
-            >
-              <div className="flex justify-center pt-2.5 pb-1">
-                <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
-              </div>
-              <div className="px-5 pt-3 pb-4 border-b border-border/10">
-                <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
-                  Filter
-                </p>
-                <p className="text-[18px] font-bold text-foreground tracking-tight">Select Tour</p>
-              </div>
-              {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
-                const labels: Record<string, string> = {
-                  all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
-                  LPGA: 'LPGA', CHAMP: 'Champions', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
-                };
-                const isSelected = activeTour === code;
-                const count = code === 'all'
-                  ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
-                  : tourCounts[code] ?? 0;
-                return (
-                  <button
-                    key={code}
-                    onClick={() => { setActiveTour(code as TourFilterCode); setTourSheetOpen(false); }}
-                    className={cn(
-                      'w-full flex items-center justify-between px-5 py-[14px]',
-                      'border-b border-border/[0.06] transition-colors duration-100',
-                      'active:bg-muted/50 text-left',
-                      isSelected ? 'text-foreground' : 'text-muted-foreground'
-                    )}
-                  >
-                    <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
-                      {labels[code]}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {count > 0 && (
-                        <span className="text-[12px] text-muted-foreground/60 font-medium">{count}</span>
+      {/* Tour Filter Bottom Sheet — portaled to escape backdrop-blur stacking context */}
+      {createPortal(
+        <AnimatePresence>
+          {tourSheetOpen && (
+            <>
+              <motion.div
+                className="fixed inset-0 z-40 bg-black/40"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setTourSheetOpen(false)}
+              />
+              <motion.div
+                className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-card rounded-t-[20px] shadow-2xl"
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
+              >
+                <div className="flex justify-center pt-2.5 pb-1">
+                  <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
+                </div>
+                <div className="px-5 pt-3 pb-4 border-b border-border/10">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
+                    Filter
+                  </p>
+                  <p className="text-[18px] font-bold text-foreground tracking-tight">Select Tour</p>
+                </div>
+                {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
+                  const labels: Record<string, string> = {
+                    all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
+                    LPGA: 'LPGA', CHAMP: 'Champions', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
+                  };
+                  const isSelected = activeTour === code;
+                  const count = code === 'all'
+                    ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
+                    : tourCounts[code] ?? 0;
+                  return (
+                    <button
+                      key={code}
+                      onClick={() => { setActiveTour(code as TourFilterCode); setTourSheetOpen(false); }}
+                      className={cn(
+                        'w-full flex items-center justify-between px-5 py-[14px]',
+                        'border-b border-border/[0.06] transition-colors duration-100',
+                        'active:bg-muted/50 text-left',
+                        isSelected ? 'text-foreground' : 'text-muted-foreground'
                       )}
-                      {isSelected && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20 6 9 17l-5-5"/>
-                        </svg>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+                    >
+                      <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
+                        {labels[code]}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {count > 0 && (
+                          <span className="text-[12px] text-muted-foreground/60 font-medium">{count}</span>
+                        )}
+                        {isSelected && (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 6 9 17l-5-5"/>
+                          </svg>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Bottom safe area */}
       <div style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }} />
