@@ -37,7 +37,7 @@ export function BucketListStrip() {
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 145, height: 95, borderRadius: 12 }}
+              style={{ width: 167, height: 109, borderRadius: 12 }}
             />
           ))}
         </div>

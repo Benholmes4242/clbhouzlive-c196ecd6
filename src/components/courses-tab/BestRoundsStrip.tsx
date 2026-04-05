@@ -86,7 +86,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
   if (!reviews || reviews.length === 0) return null;
 
   return (
-    <div style={{ padding: '12px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+    <div style={{ padding: '12px 0 16px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
       {/* Section header */}
       <div
         className="flex items-center justify-between"
@@ -116,7 +116,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             onClick={() => navigate(`/courses/${review.course_id}`)}
             className="shrink-0 text-left active:scale-[0.97] transition-transform"
             style={{
-              width: 160,
+              width: 184,
               borderRadius: 12,
               overflow: 'hidden',
               border: '0.5px solid hsl(var(--border) / 0.15)',
