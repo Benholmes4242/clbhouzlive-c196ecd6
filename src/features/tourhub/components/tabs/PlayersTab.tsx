@@ -482,7 +482,7 @@ export function PlayersTab() {
           STICKY HEADER — back link · sort · tour · search
           ══════════════════════════════════════════════ */}
       <div
-        className="-mx-4 sticky top-0 z-20"
+        className="-mx-5 sticky top-0 z-20"
         style={{
           background: 'hsl(var(--background) / 0.96)',
           backdropFilter: 'blur(20px)',
@@ -493,7 +493,7 @@ export function PlayersTab() {
       >
         {/* Collapsible search bar */}
         <div
-          className="overflow-hidden transition-all duration-250 ease-in-out px-4"
+          className="overflow-hidden transition-all duration-250 ease-in-out px-5"
           style={{
             maxHeight: searchExpanded ? 60 : 0,
             opacity: searchExpanded ? 1 : 0,
@@ -533,7 +533,7 @@ export function PlayersTab() {
         </div>
 
         {/* Main control row */}
-        <div className="flex items-center gap-2 px-4 pt-2.5">
+        <div className="flex items-center gap-2 px-5 pt-2.5">
           {/* ← Tour Overview */}
           <button
             type="button"
@@ -614,7 +614,7 @@ export function PlayersTab() {
         </div>
 
         {/* Count / context label */}
-        <div className="flex justify-end px-4 pt-1.5 pb-2.5">
+        <div className="flex justify-end px-5 pt-1.5 pb-2.5">
           <span className="text-[11px] font-medium text-muted-foreground/50">
             {activeTour === 'all'
               ? `${totalCount.toLocaleString()} players · A–Z`
@@ -625,7 +625,7 @@ export function PlayersTab() {
 
       {/* World's Best showcase — All Tours only, sits below sticky header */}
       {activeTour === 'all' && !debouncedSearch && elitePlayers && elitePlayers.length > 0 && (
-        <div className="px-4 mt-5">
+        <div className="px-5 mt-5">
           <PlayersWorldsBest players={elitePlayers.slice(0, 5)} />
         </div>
       )}
@@ -744,7 +744,7 @@ export function PlayersTab() {
       </BottomSheet>
 
       {/* Content */}
-      <div className="px-4">
+      <div className="px-5">
         {/* Player cards */}
         <AnimatePresence mode="wait">
           <motion.div
