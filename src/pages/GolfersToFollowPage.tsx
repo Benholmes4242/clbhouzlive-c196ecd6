@@ -15,7 +15,7 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { Button } from '@/components/ui/button';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
+
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
@@ -81,7 +81,6 @@ const GolfersToFollowPage = () => {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadMoreLockRef = useRef(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  useHideHeader();
 
   // Apply debounced search query
   useEffect(() => {
