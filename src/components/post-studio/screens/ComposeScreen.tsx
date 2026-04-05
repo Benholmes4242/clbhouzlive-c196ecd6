@@ -1023,21 +1023,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           )}
         </AnimatePresence>
 
-        {/* ── Media grid — visible when media added ── */}
-        {state.mediaItems.length > 0 && (
-          <MediaGrid
-            items={state.mediaItems}
-            activeIndex={state.activeMediaIndex}
-            coverIndex={coverIndex}
-            onSelect={setActiveMedia}
-            onRemove={removeMedia}
-            onEdit={handleEdit}
-            onSetCover={handleSetCover}
-            onOverflow={handleOverflow}
-            onAddMore={handleAddMore}
-          />
-        )}
-
         {/* Add more — below grid when < 10 items */}
         {state.mediaItems.length > 0 && state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
           <div className="px-4 mb-2">
@@ -1048,19 +1033,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               style={{
                 padding: '6px 12px 6px 8px',
                 borderRadius: 10,
-                border: '1.5px dashed rgba(0,0,0,0.10)',
-                background: 'rgba(0,0,0,0.015)',
+                border: hasMedia ? `1.5px dashed ${DARK_BORDER}` : '1.5px dashed rgba(0,0,0,0.10)',
+                background: hasMedia ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.015)',
               }}
             >
               <div style={{
                 width: 22, height: 22, borderRadius: 6,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
+                background: hasMedia ? 'rgba(255,255,255,0.10)' : ICON_BG,
+                border: hasMedia ? `1px solid ${DARK_BORDER}` : '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Plus className="w-3 h-3" style={{ color: ICON_DIM }} strokeWidth={2} />
+                <Plus className="w-3 h-3" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
               </div>
-              <span className="text-[12px]" style={{ color: TEXT_TERTIARY }}>Add more</span>
+              <span className="text-[12px]" style={{ color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY }}>Add more</span>
             </motion.button>
           </div>
         )}
@@ -1072,6 +1057,27 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <div className="px-4 mb-3">
           <AnimatePresence mode="wait">
             {state.taggedCourses.length === 0 ? (
+              hasMedia ? (
+                <motion.button
+                  key="prompt-dark"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => openPanel('course')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    background: GREEN_COURSE_BG,
+                    border: `1px solid ${GREEN_COURSE_BDR}`,
+                    borderRadius: 20, padding: '6px 14px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span className="text-base">⛳</span>
+                  <span className="text-[13px] font-medium" style={{ color: 'rgba(34,197,94,0.88)' }}>Tag a course</span>
+                </motion.button>
+              ) : (
               <motion.button
                 key="prompt"
                 initial={{ opacity: 0, y: 4 }}
@@ -1099,6 +1105,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </motion.button>
+              )
             ) : (
               <motion.div
                 key="tagged"
@@ -1118,8 +1125,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => openPanel('course')}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: 'rgba(34,197,94,0.07)',
-                      border: '1px solid rgba(34,197,94,0.16)',
+                      background: hasMedia ? GREEN_COURSE_BG : 'rgba(34,197,94,0.07)',
+                      border: `1px solid ${hasMedia ? GREEN_COURSE_BDR : 'rgba(34,197,94,0.16)'}`,
                     }}
                   >
                     <div style={{
