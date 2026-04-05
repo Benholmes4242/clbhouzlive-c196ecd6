@@ -299,7 +299,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             tabs={[
               { id: 'explore', label: 'Explore' },
               { id: 'top100', label: 'Top 100', icon: <Trophy className="h-4 w-4" /> },
-              { id: 'leaderboards', label: 'Standings' },
+              { id: 'leaderboards', label: 'Rankings' },
             ]}
             activeTab={activeTab}
             onTabChange={handleTabChange}
