@@ -122,7 +122,7 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
           width: 70,
           height: 70,
           borderRadius: '34%',
-          border: `0.5px solid ${isActive ? '#F7931E' : 'hsl(var(--border))'}`,
+          border: `1px solid ${isActive ? '#F7931E' : 'hsl(var(--border))'}`,
         }}
       >
         <div className="w-full h-full overflow-hidden" style={{ borderRadius: '32%' }}>
