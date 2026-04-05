@@ -901,6 +901,30 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               {highlightedCaption}
             </div>
           )}
+          {/* Caption tap affordance — visible only when media present and no caption typed */}
+          {hasMedia && state.caption.length === 0 && (
+            <div
+              onClick={() => textareaRef.current?.focus()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '10px 14px',
+                marginBottom: 6,
+                borderRadius: 14,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                cursor: 'text',
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
+                Write a caption…
+              </span>
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             value={state.caption}
@@ -1068,14 +1092,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   onClick={() => openPanel('course')}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 8,
-                    background: GREEN_COURSE_BG,
-                    border: `1px solid ${GREEN_COURSE_BDR}`,
+                    background: 'rgba(0,0,0,0.45)',
+                    border: '1px solid rgba(255,255,255,0.16)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
                     borderRadius: 20, padding: '6px 14px',
                     cursor: 'pointer',
                   }}
                 >
                   <span className="text-base">⛳</span>
-                  <span className="text-[13px] font-medium" style={{ color: 'rgba(34,197,94,0.88)' }}>Tag a course</span>
+                  <span className="text-[13px] font-medium" style={{ color: DARK_TEXT }}>Tag a course</span>
                 </motion.button>
               ) : (
               <motion.button
@@ -1125,23 +1151,29 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => openPanel('course')}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: hasMedia ? GREEN_COURSE_BG : 'rgba(34,197,94,0.07)',
-                      border: `1px solid ${hasMedia ? GREEN_COURSE_BDR : 'rgba(34,197,94,0.16)'}`,
+                      background: hasMedia
+                        ? 'rgba(0,0,0,0.55)'
+                        : 'rgba(34,197,94,0.07)',
+                      border: `1px solid ${hasMedia
+                        ? 'rgba(255,255,255,0.18)'
+                        : 'rgba(34,197,94,0.16)'}`,
+                      backdropFilter: hasMedia ? 'blur(12px)' : 'none',
+                      WebkitBackdropFilter: hasMedia ? 'blur(12px)' : 'none',
                     }}
                   >
                     <div style={{
                       width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                      background: 'rgba(34,197,94,0.12)',
-                      border: '1px solid rgba(34,197,94,0.20)',
+                      background: hasMedia ? 'rgba(255,255,255,0.12)' : 'rgba(34,197,94,0.12)',
+                      border: hasMedia ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(34,197,94,0.20)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 14,
                     }}>⛳</div>
                     <div className="text-left">
-                      <p className="text-[13px] font-semibold leading-none" style={{ color: TEXT_PRIMARY }}>
+                      <p className="text-[13px] font-semibold leading-none" style={{ color: hasMedia ? DARK_TEXT : TEXT_PRIMARY }}>
                         {course.courseName}
                       </p>
                       {course.country && (
-                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: TEXT_TERTIARY }}>
+                      <p className="text-[10px] mt-0.5 leading-none" style={{ color: hasMedia ? DARK_TEXT_DIM : TEXT_TERTIARY }}>
                           {course.region ? `${course.region}, ${course.country}` : course.country}
                         </p>
                       )}
@@ -1155,9 +1187,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       }}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
                       className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ background: 'rgba(0,0,0,0.08)' }}
+                      style={{ background: hasMedia ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)' }}
                     >
-                      <X className="w-2.5 h-2.5" style={{ color: ICON_DIM }} strokeWidth={2.5} />
+                      <X className="w-2.5 h-2.5" style={{ color: hasMedia ? 'rgba(255,255,255,0.70)' : ICON_DIM }} strokeWidth={2.5} />
                     </div>
                   </motion.button>
                 ))}
