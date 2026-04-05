@@ -123,14 +123,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 key={player.playerId}
                 src={photoUrl}
                 alt={player.playerName}
-                className="absolute w-full object-cover"
-                style={{
-                  top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 48px)',
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  objectPosition: 'center top',
-                }}
+                className="absolute inset-0 w-full h-full object-cover object-[center_15%]"
                 loading="eager"
                 initial={{ opacity: 0, scale: 1.04 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -425,14 +418,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
-                  className="absolute w-full object-cover"
-                  style={{
-                    top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 48px)',
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    objectPosition: `center top`,
-                  }}
+                  className="absolute inset-0 w-full h-full object-cover object-[center_15%]"
                   loading="eager"
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
