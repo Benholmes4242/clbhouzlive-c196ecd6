@@ -12,9 +12,10 @@ interface WatchPageContentProps {
   embedded?: boolean;
   showSortFilter?: boolean;
   activeTag?: string;
+  activeCategory?: string | null;
 }
 
-const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, showSortFilter = true, activeTag }) => {
+const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, showSortFilter = true, activeTag, activeCategory }) => {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const activeFilter: WatchFilter = activeTag === 'near' ? 'near' : 'trending';
@@ -48,7 +49,13 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
     fetchNextPage,
     refetch,
     resetSeen,
-  } = useWatchFeed({ userId, filter: activeFilter, userLat, userLng });
+  } = useWatchFeed({
+    userId,
+    filter: activeFilter,
+    category: activeCategory ?? undefined,
+    userLat,
+    userLng,
+  });
 
   return (
     <div className="bg-background min-h-screen">
@@ -61,7 +68,7 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
         />
       )}
 
-      <TrendingThisWeek enabled={!!userId} />
+      <TrendingThisWeek enabled={!!userId && activeTag === 'all'} />
 
       <WatchGrid
         posts={posts}
