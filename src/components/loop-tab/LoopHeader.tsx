@@ -41,12 +41,17 @@ export function LoopHeader({ activeMode, onModeChange, onOpenSearch }: LoopHeade
               role="tab"
               aria-selected={isActive}
               onClick={() => onModeChange(id)}
-              className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors active:scale-[0.97]"
+              className="shrink-0 transition-colors active:scale-[0.97]"
               style={{
-                borderRadius: 8,
-                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                borderRadius: 20,
+                background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+                border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                fontSize: 13,
+                fontWeight: isActive ? 500 : 400,
+                padding: '4px 18px',
+                minHeight: 28,
+                whiteSpace: 'nowrap',
               }}
             >
               {label}
