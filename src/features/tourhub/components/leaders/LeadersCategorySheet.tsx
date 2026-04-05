@@ -58,7 +58,7 @@ export function LeadersCategorySheet({
   }, [onExternalClose]);
 
   const activeCategory = categories.find((c) => c.key === activeKey) || categories[0];
-  const ActiveIcon = activeCategory.icon;
+  const activeEmoji = (activeCategory as any).emoji;
 
   const groups: CategoryGroup[] = CATEGORY_GROUPS.map((g) => ({
     label: g.label,
@@ -93,10 +93,9 @@ export function LeadersCategorySheet({
           aria-expanded={open}
         >
           <div className="flex items-center gap-2.5">
-            <ActiveIcon
-              className="w-5 h-5 shrink-0"
-              style={{ color: activeKey !== 'world_rank' ? (activeCategory as any).accentColor ?? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))' }}
-            />
+            <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
+              {activeEmoji}
+            </span>
             <span style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground">{activeCategory.shortLabel}</span>
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' as const }} className="text-muted-foreground">
               Leaderboard
@@ -122,13 +121,13 @@ export function LeadersCategorySheet({
           style={{ maxHeight: 'calc(70vh - 60px)' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2
-              id="leaders-category-sheet-title"
-              className="text-lg font-bold text-foreground"
-            >
+          <div style={{ paddingBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
+              Category
+            </div>
+            <div id="leaders-category-sheet-title" style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em' }} className="text-foreground">
               Performance Category
-            </h2>
+            </div>
           </div>
 
           {/* Grouped grid */}
@@ -152,7 +151,7 @@ export function LeadersCategorySheet({
                 <div className="grid grid-cols-2" style={{ gap: 8 }} role="group" aria-label={group.label}>
                   {group.categories.map((cat) => {
                     const isActive = activeKey === cat.key;
-                    const Icon = cat.icon;
+                    const emoji = (cat as any).emoji;
                     return (
                       <button
                         key={cat.key}
@@ -174,12 +173,9 @@ export function LeadersCategorySheet({
                         }}
                       >
                         <div className="flex items-center gap-2.5 w-full min-w-0">
-                          <Icon
-                            className="w-5 h-5 shrink-0"
-                            style={{
-                              color: isActive ? 'white' : (activeKey === cat.key ? ((cat as any).accentColor ?? 'hsl(var(--muted-foreground) / 0.5)') : 'hsl(var(--muted-foreground) / 0.5)'),
-                            }}
-                          />
+                          <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>
+                            {emoji}
+                          </span>
                           <span style={{ fontSize: 14 }} className="flex-1 truncate">
                             {cat.shortLabel}
                           </span>
