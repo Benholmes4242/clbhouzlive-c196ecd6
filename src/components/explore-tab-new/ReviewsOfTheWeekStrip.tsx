@@ -69,7 +69,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
   return (
     <div className="py-4">
       <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground px-4 pb-3">
-        <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
+        <Heart className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E' }} />
         Most loved this month
       </h3>
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
