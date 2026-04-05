@@ -1491,18 +1491,18 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         ))}
       </AnimatePresence>
 
-      {/* ── Slide position dots — only shown when 2+ slides and not expanded ── */}
+      {/* ── Slide position dots — top of hero, below safe area ── */}
       {safeSlides.length > 1 && !isExpanded && (
         <div
           style={{
             position: 'absolute',
-            bottom: 28,
+            top: 'calc(max(env(safe-area-inset-top, 47px), 47px) + 12px)',
             left: '50%',
             transform: 'translateX(-50%)',
             display: 'flex',
             alignItems: 'center',
             gap: 5,
-            zIndex: 30,
+            zIndex: 35,
             pointerEvents: 'none',
           }}
         >
