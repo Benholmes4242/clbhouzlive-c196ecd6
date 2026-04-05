@@ -52,19 +52,16 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
     resetSeen,
   } = useWatchFeed({ userId, filter: activeFilter, userLat, userLng });
 
-  const handleFilterChange = (f: WatchFilter) => {
-    setActiveFilter(f);
-    resetSeen();
-  };
-
   return (
     <div className="bg-background min-h-screen">
-      <WatchHeader
-        activeFilter={activeFilter}
-        onFilterChange={handleFilterChange}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        embedded={embedded}
-      />
+      {showSortFilter && (
+        <WatchHeader
+          activeFilter={activeFilter}
+          onFilterChange={() => {}}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          embedded={embedded}
+        />
+      )}
 
       {showShotOfWeek && <ShotOfTheWeek userId={userId} />}
 
