@@ -155,6 +155,28 @@ export function LeadersTab() {
     ? (worldFormatOverride ?? category.format)(rankedPlayers[0].value)
     : undefined;
 
+  // Leader value for each category — shown in the sheet grid tiles
+  const categoryLeaderValues = useMemo(() => {
+    if (!playerStats) return {} as Record<string, string>;
+    const map: Record<string, string> = {};
+    for (const cat of LEADER_CATEGORIES) {
+      if (cat.key === 'world_rank') continue;
+      const values = playerStats
+        .map((s: any) => ({ value: cat.accessor(s.statistics ?? s) }))
+        .filter((x: any) => x.value !== null && x.value !== undefined)
+        .sort((a: any, b: any) =>
+          cat.sortDirection === 'asc' ? a.value - b.value : b.value - a.value
+        );
+      if (values.length > 0) {
+        map[cat.key] = cat.format(values[0].value);
+      }
+    }
+    if (worldRankings?.length) {
+      map['world_rank'] = '#1';
+    }
+    return map;
+  }, [playerStats, worldRankings]);
+
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
@@ -376,6 +398,7 @@ export function LeadersTab() {
         activeKey={category.key}
         onCategoryChange={setCategory}
         leaderValue={leaderValue}
+        categoryLeaderValues={categoryLeaderValues}
         externalOpen={categorySheetOpen}
         onExternalClose={() => setCategorySheetOpen(false)}
         hideTrigger
