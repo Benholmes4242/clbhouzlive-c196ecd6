@@ -4,7 +4,6 @@
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, SlidersHorizontal } from 'lucide-react';
@@ -20,6 +19,7 @@ import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSor
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { PlayersWorldsBest } from '../players/PlayersWorldsBest';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 // Inline sort label resolver — mirrors PlayerSortControl's SORT_OPTIONS logic
 function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
@@ -630,148 +630,104 @@ export function PlayersTab() {
       )}
 
       {/* Sort bottom sheet — portaled to escape backdrop-blur stacking context */}
-      {createPortal(
-        <AnimatePresence>
-          {sortSheetOpen && (
-            <>
-              <motion.div
-                className="fixed inset-0 z-40 bg-black/40"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSortSheetOpen(false)}
-              />
-              <motion.div
-                className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-card rounded-t-[20px] shadow-2xl"
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
-              >
-                <div className="flex justify-center pt-2.5 pb-1">
-                  <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
-                </div>
-                <div className="px-5 pt-3 pb-4 border-b border-border/10">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
-                    Sort
-                  </p>
-                  <p className="text-[18px] font-bold text-foreground tracking-tight">Sort Players</p>
-                </div>
-                {(() => {
-                  const isPGA = activeTour === 'pga';
-                  const isEuro = activeTour === 'EURO';
-                  const isLPGA = activeTour === 'LPGA';
-                  const isPGAD = activeTour === 'PGAD';
-                  const isLIV = activeTour === 'LIV';
-                  const opts: { value: PlayerSortType; label: string }[] =
-                    isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-                    : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-                    : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-                    : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-                    : isPGA  ? [{ value: 'world-rank-desc', label: 'Highest World Ranking' }, { value: 'highest-earnings', label: 'Highest Earnings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-                    : [{ value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }];
-                  return opts.map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => { setSort(opt.value); setVisibleCount(PAGE_SIZE); setSortSheetOpen(false); }}
-                      className={cn(
-                        'w-full flex items-center justify-between px-5 py-[14px]',
-                        'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
-                        sort === opt.value ? 'text-foreground' : 'text-muted-foreground'
-                      )}
-                    >
-                      <span className={cn('text-[15px]', sort === opt.value ? 'font-bold' : 'font-medium')}>
-                        {opt.label}
-                      </span>
-                      {sort === opt.value && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20 6 9 17l-5-5"/>
-                        </svg>
-                      )}
-                    </button>
-                  ));
-                })()}
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      <BottomSheet
+        open={sortSheetOpen}
+        onClose={() => setSortSheetOpen(false)}
+        ariaLabelledBy="players-sort-sheet-title"
+      >
+        <div className="px-5 pt-3 pb-4 border-b border-border/10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
+            Sort
+          </p>
+          <p id="players-sort-sheet-title" className="text-[18px] font-bold text-foreground tracking-tight">Sort Players</p>
+        </div>
+        {(() => {
+          const isPGA = activeTour === 'pga';
+          const isEuro = activeTour === 'EURO';
+          const isLPGA = activeTour === 'LPGA';
+          const isPGAD = activeTour === 'PGAD';
+          const isLIV = activeTour === 'LIV';
+          const opts: { value: PlayerSortType; label: string }[] =
+            isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            : isPGA  ? [{ value: 'world-rank-desc', label: 'Highest World Ranking' }, { value: 'highest-earnings', label: 'Highest Earnings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            : [{ value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }];
+          return opts.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => { setSort(opt.value); setVisibleCount(PAGE_SIZE); setSortSheetOpen(false); }}
+              className={cn(
+                'w-full flex items-center justify-between px-5 py-[14px]',
+                'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
+                sort === opt.value ? 'text-foreground' : 'text-muted-foreground'
+              )}
+            >
+              <span className={cn('text-[15px]', sort === opt.value ? 'font-bold' : 'font-medium')}>
+                {opt.label}
+              </span>
+              {sort === opt.value && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              )}
+            </button>
+          ));
+        })()}
+      </BottomSheet>
 
-      {/* Tour filter bottom sheet — portaled to escape backdrop-blur stacking context */}
-      {createPortal(
-        <AnimatePresence>
-          {tourSheetOpen && (
-            <>
-              <motion.div
-                className="fixed inset-0 z-40 bg-black/40"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setTourSheetOpen(false)}
-              />
-              <motion.div
-                className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 bg-card rounded-t-[20px] shadow-2xl"
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
-              >
-                <div className="flex justify-center pt-2.5 pb-1">
-                  <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
-                </div>
-                <div className="px-5 pt-3 pb-4 border-b border-border/10">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
-                    Filter
-                  </p>
-                  <p className="text-[18px] font-bold text-foreground tracking-tight">Select Tour</p>
-                </div>
-                {(['all', 'pga', 'EURO', 'LPGA', 'PGAD', 'LIV'] as const).map((code) => {
-                  const labels: Record<string, string> = {
-                    all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
-                    LPGA: 'LPGA', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
-                  };
-                  const isSelected = activeTour === code;
-                  const count = code === 'all'
-                    ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
-                    : (tourCounts[code] ?? 0);
-                  if (code !== 'all' && count === 0) return null;
-                  return (
-                    <button
-                      key={code}
-                      onClick={() => { setActiveTour(code as PlayerTourCode); setTourSheetOpen(false); }}
-                      className={cn(
-                        'w-full flex items-center justify-between px-5 py-[14px]',
-                        'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
-                        isSelected ? 'text-foreground' : 'text-muted-foreground'
-                      )}
-                    >
-                      <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
-                        {labels[code]}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {count > 0 && (
-                          <span className="text-[12px] text-muted-foreground/60 font-medium">
-                            {count.toLocaleString()}
-                          </span>
-                        )}
-                        {isSelected && (
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20 6 9 17l-5-5"/>
-                          </svg>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      {/* Tour filter bottom sheet */}
+      <BottomSheet
+        open={tourSheetOpen}
+        onClose={() => setTourSheetOpen(false)}
+        ariaLabelledBy="players-tour-sheet-title"
+      >
+        <div className="px-5 pt-3 pb-4 border-b border-border/10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
+            Filter
+          </p>
+          <p id="players-tour-sheet-title" className="text-[18px] font-bold text-foreground tracking-tight">Select Tour</p>
+        </div>
+        {(['all', 'pga', 'EURO', 'LPGA', 'PGAD', 'LIV'] as const).map((code) => {
+          const labels: Record<string, string> = {
+            all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
+            LPGA: 'LPGA', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
+          };
+          const isSelected = activeTour === code;
+          const count = code === 'all'
+            ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
+            : (tourCounts[code] ?? 0);
+          if (code !== 'all' && count === 0) return null;
+          return (
+            <button
+              key={code}
+              onClick={() => { setActiveTour(code as PlayerTourCode); setTourSheetOpen(false); }}
+              className={cn(
+                'w-full flex items-center justify-between px-5 py-[14px]',
+                'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
+                isSelected ? 'text-foreground' : 'text-muted-foreground'
+              )}
+            >
+              <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
+                {labels[code]}
+              </span>
+              <div className="flex items-center gap-2">
+                {count > 0 && (
+                  <span className="text-[12px] text-muted-foreground/60 font-medium">
+                    {count.toLocaleString()}
+                  </span>
+                )}
+                {isSelected && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5"/>
+                  </svg>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </BottomSheet>
 
       {/* Content */}
       <div className="px-4">
