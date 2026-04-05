@@ -125,10 +125,8 @@ const ClubhouseContent = () => {
   useHeaderVariant('glass-dark');
   useMedianStatusBar("dark", "transparent", true, false, true, pathname);
   
-  useLayoutEffect(() => {
-    document.body.classList.add('route-clubhouse');
-    return () => { document.body.classList.remove('route-clubhouse'); };
-  }, []);
+  // route-clubhouse class is now applied by ClubhouseWrapped (eagerly loaded)
+  // to prevent white flash during lazy chunk loading
   
   const navigate = useNavigate();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
