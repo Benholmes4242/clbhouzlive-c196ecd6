@@ -144,8 +144,8 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
           <div
             style={{
               position: 'absolute',
-              bottom: -3,
-              right: -3,
+              bottom: -2,
+              right: -2,
               width: 10,
               height: 10,
               borderRadius: '50%',
