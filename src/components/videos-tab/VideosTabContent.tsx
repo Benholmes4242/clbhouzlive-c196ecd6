@@ -44,11 +44,11 @@ export default function VideosTabContent({ embedded = false, hideStickyHeader = 
         />
       )}
       <VideosFeed
-        posts={posts}
+        posts={limitCards ? posts.slice(0, limitCards) : posts}
         isLoading={isLoading}
         isError={isError}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
+        hasNextPage={limitCards ? false : hasNextPage}
+        isFetchingNextPage={limitCards ? false : isFetchingNextPage}
         fetchNextPage={fetchNextPage}
         refetch={refetch}
         userId={user?.id}
