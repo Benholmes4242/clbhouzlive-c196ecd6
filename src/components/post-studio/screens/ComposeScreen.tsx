@@ -704,10 +704,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
+    <div className="flex-1 flex flex-col" style={{ background: hasMedia ? DARK_BG : BG_BASE, position: 'relative' }}>
       <StudioHeader
         centerContent={<ActorSelector compact header />}
         step="COMPOSE"
+        darkMode={hasMedia}
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
           isValid
@@ -722,10 +723,45 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
       <input ref={frontCameraInputRef} type="file" accept="image/*,video/*" capture="user" onChange={handleFileSelect} className="hidden" />
 
+      {/* ── Full-bleed media background — only when media is present ── */}
+      {hasMedia && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          {(() => {
+            const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+            if (!item) return null;
+            return item.mediaType === 'video' ? (
+              <video
+                src={item.previewUrl}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                className="w-full h-full object-cover"
+                style={{ pointerEvents: 'none' }}
+              />
+            ) : (
+              <img
+                src={item.previewUrl}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            );
+          })()}
+          {/* Bottom scrim for text legibility */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.80) 100%)',
+            pointerEvents: 'none',
+          }} />
+        </div>
+      )}
+
       {/* ── Scrollable compose area ── */}
       <div
         className="flex-1 overflow-y-auto relative"
-        style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
+        style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain', zIndex: 1 }}
       >
         {/* ── Ambient empty state — visible only when canvas is blank ── */}
         {!hasMedia && state.caption.length === 0 && (
@@ -817,8 +853,29 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </div>
         )}
 
+        {/* ── Media thumbnail rail — when media present, above caption ── */}
+        {hasMedia && (
+          <div className="px-4 pt-2 pb-1">
+            <MediaGrid
+              items={state.mediaItems}
+              activeIndex={state.activeMediaIndex}
+              coverIndex={coverIndex}
+              onSelect={(index) => { setActiveMedia(index); setCoverIndex(index); }}
+              onRemove={removeMedia}
+              onEdit={handleEdit}
+              onSetCover={handleSetCover}
+              onOverflow={handleOverflow}
+              onAddMore={handleAddMore}
+            />
+          </div>
+        )}
+
         {/* ── Text input — fixed height, scrolls internally ── */}
-        <div className="px-4 pt-3 pb-2 relative">
+        <div className="px-4 pt-3 pb-2 relative" style={{
+          borderBottom: hasMedia
+            ? `1px solid ${DARK_BORDER}`
+            : '1px solid rgba(0,0,0,0.06)',
+        }}>
           {/* Flashing cursor — shows when canvas is blank, replaces placeholder */}
           {state.caption.length === 0 && !hasMedia && (
             <div style={{
@@ -854,8 +911,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               background: 'transparent',
               fontSize: 17,
               fontWeight: 400,
-              color: state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY,
-              caretColor: 'rgba(15,23,42,0.70)',
+              color: hasMedia
+                ? (state.mentions.length > 0 ? 'transparent' : DARK_TEXT)
+                : (state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY),
+              caretColor: hasMedia ? 'rgba(255,255,255,0.70)' : 'rgba(15,23,42,0.70)',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
               height: hasMedia ? 'clamp(60px, 10vh, 80px)' : 'clamp(80px, 15vh, 120px)',
               overflowY: 'auto',
