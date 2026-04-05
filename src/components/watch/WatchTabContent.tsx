@@ -13,10 +13,16 @@ interface WatchTabContentProps {
 
 export default function WatchTabContent({ embedded = false }: WatchTabContentProps) {
   const [mode, setMode] = useState<WatchInnerMode>('clips');
+  const [activeTag, setActiveTag] = useState<string>('all');
 
   return (
     <div className="bg-background min-h-screen">
-      <WatchInnerToggle mode={mode} onModeChange={setMode} />
+      <WatchInnerToggle
+        mode={mode}
+        onModeChange={setMode}
+        activeTag={activeTag}
+        onTagChange={setActiveTag}
+      />
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={mode}
@@ -27,7 +33,7 @@ export default function WatchTabContent({ embedded = false }: WatchTabContentPro
         >
           {mode === 'clips' ? (
             <Suspense fallback={<WatchGridSkeleton />}>
-              <WatchPageContent embedded={embedded} showShotOfWeek />
+              <WatchPageContent embedded={embedded} showShotOfWeek showSortFilter={false} activeTag={activeTag} />
             </Suspense>
           ) : (
             <Suspense fallback={<VideosFeedSkeleton />}>

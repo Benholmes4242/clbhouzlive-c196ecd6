@@ -12,12 +12,14 @@ import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 interface WatchPageContentProps {
   embedded?: boolean;
   showShotOfWeek?: boolean;
+  showSortFilter?: boolean;
+  activeTag?: string;
 }
 
-const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, showShotOfWeek = true }) => {
+const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, showShotOfWeek = true, showSortFilter = true, activeTag }) => {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const [activeFilter, setActiveFilter] = useState<WatchFilter>('trending');
+  const activeFilter: WatchFilter = activeTag === 'near' ? 'near' : 'trending';
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 

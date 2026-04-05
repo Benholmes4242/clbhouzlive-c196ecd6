@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { MapPin } from 'lucide-react';
 
 export type WatchInnerMode = 'clips' | 'longform';
 
-const GOLF_TAGS = [
+const GOLF_TAGS: { id: string; label: string; icon?: React.ReactNode }[] = [
   { id: 'all', label: 'All' },
+  { id: 'near', label: 'Near Me', icon: <MapPin className="w-3 h-3" /> },
   { id: 'course-vlog', label: 'Course Vlogs' },
   { id: 'hole-out', label: 'Hole Outs' },
   { id: 'swing', label: 'Swing' },
@@ -19,11 +21,11 @@ const GOLF_TAGS = [
 interface WatchInnerToggleProps {
   mode: WatchInnerMode;
   onModeChange: (m: WatchInnerMode) => void;
+  activeTag: string;
+  onTagChange: (tag: string) => void;
 }
 
-export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onModeChange }) => {
-  const [activeTag, setActiveTag] = useState('all');
-
+export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onModeChange, activeTag, onTagChange }) => {
   return (
     <div
       className="sticky z-[29] bg-background"
@@ -55,7 +57,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
       {/* Row 2 — Golf category tag chips (Clips mode only) */}
       {mode === 'clips' && (
         <div
-          className="flex items-center gap-2 pb-2.5 overflow-x-auto"
+          className="flex items-center gap-2 overflow-x-auto"
           style={{ scrollbarWidth: 'none', padding: '2px 16px 10px' }}
         >
           {GOLF_TAGS.map((tag) => {
@@ -63,8 +65,8 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
             return (
               <button
                 key={tag.id}
-                onClick={() => setActiveTag(tag.id)}
-                className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97]"
+                onClick={() => onTagChange(tag.id)}
+                className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
                 style={{
                   borderRadius: 20,
                   background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
@@ -72,6 +74,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
                   color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 }}
               >
+                {tag.icon && <span className="flex items-center">{tag.icon}</span>}
                 {tag.label}
               </button>
             );
