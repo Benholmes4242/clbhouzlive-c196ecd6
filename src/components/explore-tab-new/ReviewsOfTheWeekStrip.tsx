@@ -34,7 +34,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
   const { data: reviews } = useQuery({
     queryKey: ['explore-reviews-of-week', activeRegion],
     queryFn: async (): Promise<ReviewItem[]> => {
-      const params: Record<string, any> = { days_back: 30, result_limit: 10 };
+      const params: Record<string, any> = { days_back: 30, result_limit: 10, p_sort_by: 'engagement' };
       if (activeRegion) params.p_region_slug = activeRegion;
 
       const { data, error } = await supabase.rpc('get_top_video_reviews', params);
