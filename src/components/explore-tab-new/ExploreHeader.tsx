@@ -27,19 +27,19 @@ function ExploreHeaderInner({
       className="sticky z-30 bg-background pb-0 pt-0 px-0"
       style={{ top: '0px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
-      <div className="px-4 pt-3 pb-2">
+      <div className="px-4 pt-3.5 pb-2.5">
         <button
           type="button"
           onClick={onOpenSearch}
           aria-label="Search courses and videos"
-          className="w-full flex items-center gap-2 h-10 px-3 rounded-xl bg-muted text-muted-foreground text-sm"
+          className="w-full flex items-center gap-2 h-11 px-4 rounded-2xl bg-muted text-muted-foreground text-[15px]"
         >
           <Search className="h-4 w-4 shrink-0" />
           <span>Search courses & videos...</span>
         </button>
       </div>
 
-      <div role="tablist" aria-label="Filter by region" className="flex justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Filter by region" className="flex justify-center gap-2 px-4 pb-3.5 overflow-x-auto scrollbar-hide">
         {regions.map((region) => {
           const isActive = activeRegion === region.slug;
           return (
@@ -49,9 +49,9 @@ function ExploreHeaderInner({
               role="tab"
               aria-selected={isActive}
               onClick={() => onRegionChange(region.slug)}
-              className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors"
+              className="shrink-0 min-h-[40px] px-5 text-[15px] font-semibold transition-colors"
               style={{
-                borderRadius: 8,
+                borderRadius: 10,
                 background: isActive ? 'hsl(var(--foreground))' : 'transparent',
                 color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
                 border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
@@ -67,7 +67,7 @@ function ExploreHeaderInner({
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="shrink-0 min-h-[36px] w-20 rounded-[8px] bg-muted animate-pulse"
+                className="shrink-0 min-h-[40px] w-24 rounded-[10px] bg-muted animate-pulse"
               />
             ))}
           </>
