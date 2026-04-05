@@ -30,7 +30,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
+      style={{ height: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
     >
       {/* Hero Image or Fallback Gradient */}
       {heroPhotoUrl ? (
@@ -54,7 +54,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.03) 60%, transparent 80%)',
         }}
       />
 
@@ -62,7 +62,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
-        className="fixed z-30 flex items-center justify-center active:scale-[0.97] transition-transform"
+        className="absolute z-30 flex items-center justify-center active:scale-[0.97] transition-transform"
         style={{
           width: 36,
           height: 36,
