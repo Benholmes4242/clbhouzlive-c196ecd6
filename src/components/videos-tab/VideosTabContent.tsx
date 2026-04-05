@@ -7,9 +7,11 @@ import { VideosSearchOverlay } from './VideosSearchOverlay';
 
 interface VideosTabContentProps {
   embedded?: boolean;
+  hideStickyHeader?: boolean;
+  limitCards?: number;
 }
 
-export default function VideosTabContent({ embedded = false }: VideosTabContentProps) {
+export default function VideosTabContent({ embedded = false, hideStickyHeader = false, limitCards }: VideosTabContentProps) {
   const { user } = useSupabaseSession();
   const [activeFilter, setActiveFilter] = useState<VideosFilter>('latest');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -33,12 +35,14 @@ export default function VideosTabContent({ embedded = false }: VideosTabContentP
 
   return (
     <div className="bg-background min-h-screen">
-      <VideosHeader
-        activeFilter={activeFilter}
-        onFilterChange={handleFilterChange}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        embedded={embedded}
-      />
+      {!hideStickyHeader && (
+        <VideosHeader
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          embedded={embedded}
+        />
+      )}
       <VideosFeed
         posts={posts}
         isLoading={isLoading}
