@@ -204,7 +204,7 @@ export const LoopCard = React.memo(function LoopCard({
           >
             <SquircleAvatar
               src={post.avatarUrl || '/placeholder.svg'}
-              size={32}
+              size="sm"
               hideRing
             />
           </button>

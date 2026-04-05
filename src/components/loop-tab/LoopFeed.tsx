@@ -93,7 +93,7 @@ export function LoopFeed({
   }
 
   return (
-    <div ref={feedContainerRef} className="flex flex-col pb-4 pt-2">
+    <div ref={feedContainerRef} className="flex flex-col gap-3 pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => (
         <React.Fragment key={post.id}>
