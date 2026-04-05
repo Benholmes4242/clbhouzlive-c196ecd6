@@ -150,6 +150,7 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
               height: 8,
               borderRadius: '50%',
               background: '#22c55e',
+              border: '1.5px solid white',
               zIndex: 10,
             }}
           >
