@@ -44,15 +44,8 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
 
   return (
     <div className="py-4" style={{ gridColumn: '1 / -1' }}>
-      <div className="flex items-center justify-between px-4 pb-3">
+      <div className="flex items-center px-4 pb-3">
         <h3 className="text-sm font-semibold text-foreground">Trending Courses</h3>
-        <button
-          type="button"
-          onClick={() => navigate('/courses')}
-          className="text-xs text-muted-foreground min-h-[44px] px-2 flex items-center"
-        >
-          See all →
-        </button>
       </div>
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {courses.map((course) => (
@@ -60,7 +53,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
             key={course.course_id}
             type="button"
             onClick={() => navigate(`/courses/${course.course_id}`)}
-            className="shrink-0 w-[140px] flex flex-col rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
+            className="shrink-0 w-[154px] flex flex-col rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
           >
             {course.thumbnail_image ? (
               <img

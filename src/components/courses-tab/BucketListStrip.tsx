@@ -86,8 +86,8 @@ export function BucketListStrip() {
           <div
             className="shrink-0 flex flex-col items-center justify-center"
             style={{
-              width: 145,
-              height: 95,
+              width: 167,
+              height: 109,
               borderRadius: 12,
               border: '1.5px dashed hsl(var(--border))',
               gap: 4,
@@ -119,12 +119,12 @@ export function BucketListStrip() {
                   key={row.course_id}
                   onClick={() => navigate(`/courses/${row.course_id}`)}
                   className="shrink-0 text-left active:scale-[0.97] transition-transform"
-                  style={{ width: 145 }}
-                >
-                  {/* Image */}
-                  <div
-                    className="overflow-hidden"
-                    style={{ width: 145, height: 95, borderRadius: 12 }}
+                   style={{ width: 167 }}
+                 >
+                   {/* Image */}
+                   <div
+                     className="overflow-hidden"
+                     style={{ width: 167, height: 109, borderRadius: 12 }}
                   >
                     {img ? (
                       <img

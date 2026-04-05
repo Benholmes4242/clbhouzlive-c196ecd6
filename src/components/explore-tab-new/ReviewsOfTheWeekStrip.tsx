@@ -78,7 +78,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
             key={review.review_id}
             type="button"
             onClick={() => handleReviewTap(review)}
-            className="shrink-0 w-[165px] aspect-[3/4] rounded-2xl overflow-hidden relative bg-muted focus:outline-none"
+            className="shrink-0 w-[182px] aspect-[3/4] rounded-2xl overflow-hidden relative bg-muted focus:outline-none"
           >
             {review.thumbnail_url ? (
               <img

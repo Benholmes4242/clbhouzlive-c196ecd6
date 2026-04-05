@@ -75,7 +75,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 160, height: 150, borderRadius: 12 }}
+              style={{ width: 184, height: 173, borderRadius: 12 }}
             />
           ))}
         </div>
@@ -124,7 +124,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             }}
           >
             {/* Image area */}
-            <div className="relative" style={{ width: 160, height: 120 }}>
+            <div className="relative" style={{ width: 184, height: 138 }}>
               {review.thumbnail_url ? (
                 <img
                   src={review.thumbnail_url}
