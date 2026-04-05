@@ -26,10 +26,9 @@ interface LeadersCategorySheetProps {
   activeKey: string;
   onCategoryChange: (key: string) => void;
   leaderValue?: string;
-  /** When provided, external code controls open state */
+  categoryLeaderValues?: Record<string, string>;
   externalOpen?: boolean;
   onExternalClose?: () => void;
-  /** Hide the built-in trigger button when using external trigger */
   hideTrigger?: boolean;
 }
 
@@ -38,6 +37,7 @@ export function LeadersCategorySheet({
   activeKey,
   onCategoryChange,
   leaderValue,
+  categoryLeaderValues = {},
   externalOpen,
   onExternalClose,
   hideTrigger = false,
@@ -182,7 +182,7 @@ export function LeadersCategorySheet({
 
 
                         </div>
-                        {(cat as any).tourAverage && (
+                        {(categoryLeaderValues[cat.key] || (cat as any).tourAverage) && (
                           <span
                             style={{
                               fontSize: 11,
@@ -193,7 +193,9 @@ export function LeadersCategorySheet({
                             }}
                             className="truncate"
                           >
-                            Tour avg: {(cat as any).tourAverage}
+                            {categoryLeaderValues[cat.key]
+                              ? `Leader: ${categoryLeaderValues[cat.key]}`
+                              : `Tour avg: ${(cat as any).tourAverage}`}
                           </span>
                         )}
                       </button>
