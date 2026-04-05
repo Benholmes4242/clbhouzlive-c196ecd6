@@ -51,6 +51,7 @@ export function BucketListStrip() {
   return (
     <div
       style={{
+        background: 'white',
         borderTop: '0.5px solid hsl(var(--border) / 0.15)',
         borderBottom: '0.5px solid hsl(var(--border) / 0.15)',
         padding: '10px 0',
