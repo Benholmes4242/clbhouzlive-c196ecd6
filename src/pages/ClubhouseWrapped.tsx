@@ -1,4 +1,4 @@
-import React, { useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, useLayoutEffect, lazy, Suspense } from 'react';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useSearchParams } from 'react-router-dom';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
@@ -10,6 +10,13 @@ const ClubhouseWrapped = () => {
   const { setVariant } = useHeader();
   const [searchParams] = useSearchParams();
   const showGlass = searchParams.get('glass') === 'true';
+
+  // Apply dark shell immediately — before the lazy Clubhouse chunk loads
+  // This prevents the white flash between splash screen and clubhouse
+  useLayoutEffect(() => {
+    document.body.classList.add('route-clubhouse');
+    return () => { document.body.classList.remove('route-clubhouse'); };
+  }, []);
 
   useEffect(() => {
     setVariant('glass-dark');
