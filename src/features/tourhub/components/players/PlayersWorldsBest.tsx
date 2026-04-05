@@ -182,8 +182,8 @@ export function PlayersWorldsBest({ players }: PlayersWorldsBestProps) {
             ref={scrollRef}
             className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-2"
           >
-            {runners.map((player) => (
-              <RunnerCard key={player.playerId} player={player} />
+            {runners.map((player, index) => (
+              <RunnerCard key={player.playerId} player={player} displayRank={index + 2} />
             ))}
           </div>
         </div>

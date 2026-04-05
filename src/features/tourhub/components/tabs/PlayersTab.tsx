@@ -482,13 +482,16 @@ export function PlayersTab() {
           STICKY HEADER — back link · sort · tour · search
           ══════════════════════════════════════════════ */}
       <div
-        className="-mx-5 sticky top-0 z-20"
+        className="-mx-5 sticky z-20 px-5"
         style={{
+          top: 'max(env(safe-area-inset-top, 0px), 0px)',
           background: 'hsl(var(--background) / 0.96)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid hsl(var(--border) / 0.10)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingTop: 10,
+          paddingBottom: 10,
+          marginTop: 8,
         }}
       >
         {/* Collapsible search bar */}
@@ -614,7 +617,7 @@ export function PlayersTab() {
         </div>
 
         {/* Count / context label */}
-        <div className="flex justify-end px-5 pt-1.5 pb-2.5">
+        <div className="flex px-5 pt-1.5 pb-2.5">
           <span className="text-[11px] font-medium text-muted-foreground/50">
             {activeTour === 'all'
               ? `${totalCount.toLocaleString()} players · A–Z`
