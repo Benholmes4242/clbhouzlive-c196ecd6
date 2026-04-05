@@ -200,7 +200,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     shortLabel: 'Putting',
     section: 'stats',
     icon: Flag,
-    emoji: '🏌️',
+    emoji: '🕳️',
     sortDirection: 'asc',
     unit: 'avg',
     description: 'Average number of putts per green hit in regulation. Lower is better.',
