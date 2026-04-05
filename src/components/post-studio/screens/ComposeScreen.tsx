@@ -15,7 +15,7 @@ import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { useSaveDraft } from '../hooks/useSaveDraft';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
-import { BG_BASE, ICON_BG, ICON_COLOR, ICON_DIM, RAIL_BG, RAIL_HAIRLINE, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
+import { BG_BASE, ICON_BG, ICON_COLOR, ICON_DIM, RAIL_BG, RAIL_HAIRLINE, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, DARK_BG, DARK_SURFACE, DARK_BORDER, DARK_TEXT, DARK_TEXT_DIM, DARK_TEXT_GHOST, DARK_ICON, DARK_SCRIM, GREEN_COURSE_BG, GREEN_COURSE_BDR } from '../tokens';
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
@@ -704,10 +704,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
+    <div className="flex-1 flex flex-col" style={{ background: hasMedia ? DARK_BG : BG_BASE, position: 'relative' }}>
       <StudioHeader
         centerContent={<ActorSelector compact header />}
         step="COMPOSE"
+        darkMode={hasMedia}
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
           isValid
@@ -722,10 +723,45 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
       <input ref={frontCameraInputRef} type="file" accept="image/*,video/*" capture="user" onChange={handleFileSelect} className="hidden" />
 
+      {/* ── Full-bleed media background — only when media is present ── */}
+      {hasMedia && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          {(() => {
+            const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+            if (!item) return null;
+            return item.mediaType === 'video' ? (
+              <video
+                src={item.previewUrl}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                className="w-full h-full object-cover"
+                style={{ pointerEvents: 'none' }}
+              />
+            ) : (
+              <img
+                src={item.previewUrl}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            );
+          })()}
+          {/* Bottom scrim for text legibility */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.80) 100%)',
+            pointerEvents: 'none',
+          }} />
+        </div>
+      )}
+
       {/* ── Scrollable compose area ── */}
       <div
         className="flex-1 overflow-y-auto relative"
-        style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
+        style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain', zIndex: 1 }}
       >
         {/* ── Ambient empty state — visible only when canvas is blank ── */}
         {!hasMedia && state.caption.length === 0 && (
@@ -817,8 +853,29 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </div>
         )}
 
+        {/* ── Media thumbnail rail — when media present, above caption ── */}
+        {hasMedia && (
+          <div className="px-4 pt-2 pb-1">
+            <MediaGrid
+              items={state.mediaItems}
+              activeIndex={state.activeMediaIndex}
+              coverIndex={coverIndex}
+              onSelect={(index) => { setActiveMedia(index); setCoverIndex(index); }}
+              onRemove={removeMedia}
+              onEdit={handleEdit}
+              onSetCover={handleSetCover}
+              onOverflow={handleOverflow}
+              onAddMore={handleAddMore}
+            />
+          </div>
+        )}
+
         {/* ── Text input — fixed height, scrolls internally ── */}
-        <div className="px-4 pt-3 pb-2 relative">
+        <div className="px-4 pt-3 pb-2 relative" style={{
+          borderBottom: hasMedia
+            ? `1px solid ${DARK_BORDER}`
+            : '1px solid rgba(0,0,0,0.06)',
+        }}>
           {/* Flashing cursor — shows when canvas is blank, replaces placeholder */}
           {state.caption.length === 0 && !hasMedia && (
             <div style={{
@@ -854,8 +911,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               background: 'transparent',
               fontSize: 17,
               fontWeight: 400,
-              color: state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY,
-              caretColor: 'rgba(15,23,42,0.70)',
+              color: hasMedia
+                ? (state.mentions.length > 0 ? 'transparent' : DARK_TEXT)
+                : (state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY),
+              caretColor: hasMedia ? 'rgba(255,255,255,0.70)' : 'rgba(15,23,42,0.70)',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
               height: hasMedia ? 'clamp(60px, 10vh, 80px)' : 'clamp(80px, 15vh, 120px)',
               overflowY: 'auto',
@@ -964,21 +1023,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           )}
         </AnimatePresence>
 
-        {/* ── Media grid — visible when media added ── */}
-        {state.mediaItems.length > 0 && (
-          <MediaGrid
-            items={state.mediaItems}
-            activeIndex={state.activeMediaIndex}
-            coverIndex={coverIndex}
-            onSelect={setActiveMedia}
-            onRemove={removeMedia}
-            onEdit={handleEdit}
-            onSetCover={handleSetCover}
-            onOverflow={handleOverflow}
-            onAddMore={handleAddMore}
-          />
-        )}
-
         {/* Add more — below grid when < 10 items */}
         {state.mediaItems.length > 0 && state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
           <div className="px-4 mb-2">
@@ -989,19 +1033,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               style={{
                 padding: '6px 12px 6px 8px',
                 borderRadius: 10,
-                border: '1.5px dashed rgba(0,0,0,0.10)',
-                background: 'rgba(0,0,0,0.015)',
+                border: hasMedia ? `1.5px dashed ${DARK_BORDER}` : '1.5px dashed rgba(0,0,0,0.10)',
+                background: hasMedia ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.015)',
               }}
             >
               <div style={{
                 width: 22, height: 22, borderRadius: 6,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
+                background: hasMedia ? 'rgba(255,255,255,0.10)' : ICON_BG,
+                border: hasMedia ? `1px solid ${DARK_BORDER}` : '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Plus className="w-3 h-3" style={{ color: ICON_DIM }} strokeWidth={2} />
+                <Plus className="w-3 h-3" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
               </div>
-              <span className="text-[12px]" style={{ color: TEXT_TERTIARY }}>Add more</span>
+              <span className="text-[12px]" style={{ color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY }}>Add more</span>
             </motion.button>
           </div>
         )}
@@ -1013,6 +1057,27 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <div className="px-4 mb-3">
           <AnimatePresence mode="wait">
             {state.taggedCourses.length === 0 ? (
+              hasMedia ? (
+                <motion.button
+                  key="prompt-dark"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => openPanel('course')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    background: GREEN_COURSE_BG,
+                    border: `1px solid ${GREEN_COURSE_BDR}`,
+                    borderRadius: 20, padding: '6px 14px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span className="text-base">⛳</span>
+                  <span className="text-[13px] font-medium" style={{ color: 'rgba(34,197,94,0.88)' }}>Tag a course</span>
+                </motion.button>
+              ) : (
               <motion.button
                 key="prompt"
                 initial={{ opacity: 0, y: 4 }}
@@ -1040,6 +1105,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </motion.button>
+              )
             ) : (
               <motion.div
                 key="tagged"
@@ -1059,8 +1125,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => openPanel('course')}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: 'rgba(34,197,94,0.07)',
-                      border: '1px solid rgba(34,197,94,0.16)',
+                      background: hasMedia ? GREEN_COURSE_BG : 'rgba(34,197,94,0.07)',
+                      border: `1px solid ${hasMedia ? GREEN_COURSE_BDR : 'rgba(34,197,94,0.16)'}`,
                     }}
                   >
                     <div style={{
@@ -1153,16 +1219,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <div
         className="shrink-0"
         style={{
-          background: RAIL_BG,
+          background: hasMedia ? DARK_SURFACE : RAIL_BG,
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          position: 'relative',
+          zIndex: 2,
         }}
       >
         {/* Hairline at top */}
         <div style={{
           height: 1,
-          background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
+          background: hasMedia
+            ? `linear-gradient(90deg, transparent 0%, ${DARK_BORDER} 20%, rgba(255,255,255,0.18) 50%, ${DARK_BORDER} 80%, transparent 100%)`
+            : `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
         }} />
 
         <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
@@ -1179,13 +1249,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(15,23,42,0.90)',
-                boxShadow: '0 2px 14px rgba(0,0,0,0.12)',
+                background: hasMedia ? 'rgba(255,255,255,0.15)' : 'rgba(15,23,42,0.90)',
+                boxShadow: hasMedia ? 'none' : '0 2px 14px rgba(0,0,0,0.12)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <Camera className="w-[18px] h-[18px]" style={{ color: '#FFFFFF' }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
             </motion.button>
 
             {/* Front */}
@@ -1198,13 +1268,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
+                background: hasMedia ? 'rgba(255,255,255,0.10)' : ICON_BG,
+                border: hasMedia ? `1px solid rgba(255,255,255,0.14)` : '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
             </motion.button>
 
             {/* Library */}
@@ -1217,18 +1287,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
+                background: hasMedia ? 'rgba(255,255,255,0.10)' : ICON_BG,
+                border: hasMedia ? `1px solid rgba(255,255,255,0.14)` : '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+                <Layers className="w-[18px] h-[18px]" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
           </div>
 
           {/* Divider */}
-          <div style={{ width: 1, height: 28, background: RAIL_HAIRLINE, margin: '0 10px' }} />
+          <div style={{ width: 1, height: 28, background: hasMedia ? DARK_BORDER : RAIL_HAIRLINE, margin: '0 10px' }} />
 
           {/* Zone B — Text tools */}
           <div className="flex items-center" style={{ gap: 0 }}>
@@ -1243,7 +1313,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               }}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <AtSign className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+              <AtSign className="w-5 h-5" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
             </motion.button>
 
             <motion.button
@@ -1251,7 +1321,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               onClick={() => openPanel('drafts')}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <BookOpen className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+              <BookOpen className="w-5 h-5" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
             </motion.button>
           </div>
 

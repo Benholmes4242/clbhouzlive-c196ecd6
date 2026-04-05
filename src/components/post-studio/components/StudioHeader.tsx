@@ -64,20 +64,20 @@ export function StudioHeader({
                 whileTap={{ scale: 0.97 }}
                 onClick={leftAction.onClick}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100"
-                style={{ background: '#F5F5F7' }}
+                style={{ background: darkMode ? 'rgba(0,0,0,0.40)' : '#F5F5F7' }}
                 aria-label="Close"
               >
-                <X className="h-[18px] w-[18px]" style={{ color: '#8E8E93' }} />
+                <X className="h-[18px] w-[18px]" style={{ color: darkMode ? 'rgba(255,255,255,0.70)' : '#8E8E93' }} />
               </motion.button>
             ) : (
               <button
                 onClick={leftAction.onClick}
                 disabled={leftAction.disabled}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                style={{ background: '#F5F5F7' }}
+                style={{ background: darkMode ? 'rgba(255,255,255,0.10)' : '#F5F5F7' }}
                 aria-label="Back"
               >
-                <ChevronLeft className="h-5 w-5 text-foreground" />
+                <ChevronLeft className="h-5 w-5" style={{ color: darkMode ? 'rgba(255,255,255,0.80)' : undefined }} />
               </button>
             )
           ) : <div />}
@@ -174,7 +174,7 @@ export function StudioHeader({
       {/* Amber progress bar — matching Wizard */}
       {showProgress && (
         <div className="px-4 pt-1 pb-2">
-          <div className="h-[3px] rounded-full overflow-hidden bg-muted">
+          <div className="h-[3px] rounded-full overflow-hidden" style={{ background: darkMode ? 'rgba(255,255,255,0.12)' : undefined }}>
             <motion.div
               className="h-full rounded-full"
               style={{ background: 'linear-gradient(90deg, #F7931E, #FBBC2E)' }}
