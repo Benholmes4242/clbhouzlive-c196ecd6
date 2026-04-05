@@ -82,7 +82,7 @@ function ChampionCard({ player }: { player: ElitePlayer }) {
 }
 
 /** #2-5 Runner cards in horizontal scroll */
-function RunnerCard({ player }: { player: ElitePlayer }) {
+function RunnerCard({ player, displayRank }: { player: ElitePlayer; displayRank: number }) {
   const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const country = titleCaseCountry(player.country);
@@ -101,12 +101,12 @@ function RunnerCard({ player }: { player: ElitePlayer }) {
             fontSize: 11,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
-            color: player.worldRank === 1
+            color: displayRank === 1
               ? 'hsl(var(--accent-amber))'
               : 'hsl(var(--muted-foreground))',
           }}
         >
-          {player.worldRank}
+          {displayRank}
         </span>
 
         {/* Avatar centered */}
