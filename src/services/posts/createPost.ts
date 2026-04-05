@@ -3,6 +3,7 @@
 // Now supports multi-course tagging via post_courses junction table
 
 import { supabase } from '@/integrations/supabase/client';
+import { detectPostCategories } from '@/utils/detectPostCategories';
 import { postEventBus } from '@/events/postEventBus';
 import type { ActorType, PostCreatedEvent } from '@/events/postEvents';
 

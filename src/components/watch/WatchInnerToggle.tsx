@@ -4,18 +4,18 @@ import { MapPin } from 'lucide-react';
 export type WatchInnerMode = 'clips' | 'longform';
 
 const GOLF_TAGS: { id: string; label: string; icon?: React.ReactNode }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'near', label: 'Near Me', icon: <MapPin className="w-3 h-3" /> },
-  { id: 'course-vlog', label: 'Course Vlogs' },
-  { id: 'hole-out', label: 'Hole Outs' },
-  { id: 'swing', label: 'Swing' },
-  { id: 'tips-coaching', label: 'Tips & Coaching' },
-  { id: 'my-round', label: 'My Round' },
-  { id: 'funny', label: 'Funny' },
-  { id: 'gear', label: 'Gear' },
-  { id: 'tournament', label: 'Tournament' },
-  { id: 'travel', label: 'Golf Trip' },
-  { id: 'challenge', label: 'Challenge' },
+  { id: 'all',           label: 'All' },
+  { id: 'near',          label: 'Near Me', icon: <MapPin className="w-3 h-3" /> },
+  { id: 'practice',      label: 'Practice' },
+  { id: 'review',        label: 'Reviews' },
+  { id: 'funny',         label: 'Funny 😂' },
+  { id: 'my-round',      label: 'Rounds' },
+  { id: 'tips-coaching',  label: 'Tips' },
+  { id: 'course-vlog',   label: 'Course Vlogs' },
+  { id: 'hole-out',      label: 'Hole Outs' },
+  { id: 'hole-in-one',   label: 'Hole in Ones' },
+  { id: 'travel',        label: 'Golf Trips' },
+  { id: 'swing',         label: 'Swings' },
 ];
 
 interface WatchInnerToggleProps {

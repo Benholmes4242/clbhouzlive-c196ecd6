@@ -1,1 +1,1 @@
-export type WatchFilter = 'trending' | 'latest' | 'top' | 'near';
+export type WatchFilter = 'trending' | 'latest' | 'top' | 'near' | 'category';
