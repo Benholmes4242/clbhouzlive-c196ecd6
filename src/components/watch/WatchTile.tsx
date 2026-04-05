@@ -62,18 +62,17 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
       {post.courseName && (
         <div
           style={{
-            position: 'absolute', top: 5, left: 5,
+            position: 'absolute', top: 5, left: '50%', transform: 'translateX(-50%)',
             display: 'flex', alignItems: 'center', gap: 3,
-            background: 'rgba(247,147,30,0.9)',
-            borderRadius: 5, padding: '2px 5px',
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: 5, padding: '2px 6px',
             fontSize: 9, fontWeight: 600, color: 'white',
-            maxWidth: '80%', overflow: 'hidden',
+            maxWidth: '90%', overflow: 'hidden',
             zIndex: 10,
           }}
         >
-          <svg width="6" height="6" viewBox="0 0 6 6" fill="white">
-            <circle cx="3" cy="3" r="3" />
-          </svg>
+          <span style={{ fontSize: 8, lineHeight: 1 }}>📍</span>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {post.courseName}
           </span>
