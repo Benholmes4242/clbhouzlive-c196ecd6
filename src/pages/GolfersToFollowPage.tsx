@@ -81,6 +81,7 @@ const GolfersToFollowPage = () => {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadMoreLockRef = useRef(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  useHideHeader();
 
   // Apply debounced search query
   useEffect(() => {
