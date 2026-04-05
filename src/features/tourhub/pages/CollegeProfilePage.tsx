@@ -150,7 +150,7 @@ export function CollegeProfilePage() {
       {/* Immersive Brand Color Hero */}
       <div
         className="relative overflow-hidden"
-        style={{ height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
+        style={{ height: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
       >
         {/* Brand gradient background with Ken Burns */}
         <motion.div
@@ -169,22 +169,31 @@ export function CollegeProfilePage() {
           }}
         />
 
-        {/* Bottom fade — strong gradient for text legibility */}
+        {/* Bottom fade — lighter gradient */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 65%, transparent 85%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.05) 65%, transparent 85%)',
           }}
         />
 
-        {/* Burger menu — matches Players/Leaders pages */}
+        {/* Burger menu — dark glass pill */}
         <button
-          className="fixed z-20 flex items-center justify-center"
-          style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: '16px', width: '44px', height: '44px' }}
+          className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{
+            top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+            left: 16,
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: 'rgba(0,0,0,0.28)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
         >
-          <Menu className="w-6 h-6" strokeWidth={1.5} style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+          <Menu className="w-[18px] h-[18px] text-white" strokeWidth={2} />
         </button>
 
         {/* Content — centered */}
@@ -301,7 +310,7 @@ export function CollegeProfilePage() {
 
       {/* Stats Bar — 3-column glass overlay on hero */}
       {stats && (
-        <div className="relative z-10 mx-4" style={{ marginTop: '-24px' }}>
+        <div className="relative z-10 mx-5" style={{ marginTop: '-24px' }}>
           <motion.div
             className="flex items-stretch rounded-2xl border border-border/50 bg-card"
             style={{
@@ -324,22 +333,22 @@ export function CollegeProfilePage() {
           STICKY HEADER — ← College Golf | Compare
           ══════════════════════════════════════════════ */}
       <div
-        className="-mx-4 sticky top-0 z-20"
+        className="-mx-5 sticky top-0 z-20"
         style={{
           background: 'hsl(var(--background) / 0.96)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid hsl(var(--border) / 0.10)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          marginTop: 14,
+          paddingTop: 10,
+          marginTop: 8,
         }}
       >
-        <div className="flex items-center gap-2 px-4 pt-2.5 pb-2.5">
+        <div className="flex items-center gap-2 px-5 pt-2 pb-2.5">
           {/* ← College Golf */}
           <button
             type="button"
             onClick={() => navigate('/tourhub/college-golf')}
-            className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
             style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
@@ -366,7 +375,7 @@ export function CollegeProfilePage() {
       </div>
 
       {/* Content sections */}
-      <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+      <div className="w-full max-w-5xl mx-auto px-5" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Story Strip — 20px from sticky header */}
         {stats && (
           <motion.div
