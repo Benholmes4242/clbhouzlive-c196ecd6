@@ -14,6 +14,7 @@ interface WatchTabContentProps {
 export default function WatchTabContent({ embedded = false }: WatchTabContentProps) {
   const [mode, setMode] = useState<WatchInnerMode>('clips');
   const [activeTag, setActiveTag] = useState<string>('all');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   return (
     <div className="bg-background min-h-screen">
@@ -21,7 +22,14 @@ export default function WatchTabContent({ embedded = false }: WatchTabContentPro
         mode={mode}
         onModeChange={setMode}
         activeTag={activeTag}
-        onTagChange={setActiveTag}
+        onTagChange={(tag) => {
+          setActiveTag(tag);
+          if (tag === 'all' || tag === 'near') {
+            setActiveCategory(null);
+          } else {
+            setActiveCategory(tag);
+          }
+        }}
       />
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
@@ -33,7 +41,12 @@ export default function WatchTabContent({ embedded = false }: WatchTabContentPro
         >
           {mode === 'clips' ? (
             <Suspense fallback={<WatchGridSkeleton />}>
-              <WatchPageContent embedded={embedded} showSortFilter={false} activeTag={activeTag} />
+              <WatchPageContent
+                embedded={embedded}
+                showSortFilter={false}
+                activeTag={activeTag}
+                activeCategory={activeCategory}
+              />
             </Suspense>
           ) : (
             <Suspense fallback={<VideosFeedSkeleton />}>
