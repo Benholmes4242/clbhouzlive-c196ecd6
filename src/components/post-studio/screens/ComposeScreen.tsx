@@ -1068,14 +1068,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   onClick={() => openPanel('course')}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 8,
-                    background: GREEN_COURSE_BG,
-                    border: `1px solid ${GREEN_COURSE_BDR}`,
+                    background: 'rgba(0,0,0,0.45)',
+                    border: '1px solid rgba(255,255,255,0.16)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
                     borderRadius: 20, padding: '6px 14px',
                     cursor: 'pointer',
                   }}
                 >
                   <span className="text-base">⛳</span>
-                  <span className="text-[13px] font-medium" style={{ color: 'rgba(34,197,94,0.88)' }}>Tag a course</span>
+                  <span className="text-[13px] font-medium" style={{ color: DARK_TEXT }}>Tag a course</span>
                 </motion.button>
               ) : (
               <motion.button
