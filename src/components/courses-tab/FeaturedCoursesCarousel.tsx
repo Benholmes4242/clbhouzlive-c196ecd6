@@ -131,14 +131,13 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
             )}
             <button
               onClick={() => onRegionSelect(slide.slug)}
-              className="self-start active:scale-[0.97] transition-transform liquid-glass"
+              className="self-start active:scale-[0.97] transition-transform liquid-glass rounded-lg"
               style={{
                 marginTop: 4,
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 5,
-                borderRadius: 8,
-                padding: '5px 12px',
+                padding: '6px 12px',
                 fontSize: 12,
                 fontWeight: 600,
                 color: 'white',
