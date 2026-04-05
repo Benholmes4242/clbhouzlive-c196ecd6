@@ -5,7 +5,8 @@
 
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy } from 'lucide-react';
+import { Trophy, Menu } from 'lucide-react';
+import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -43,6 +44,25 @@ export function CollegeHeroBanner({ stats, college, activeMetric, className }: C
         className={cn('relative overflow-hidden', className)}
         style={{ height: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
       >
+        {/* Burger menu — dark glass pill */}
+        <button
+          className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{
+            top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+            left: 16,
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: 'rgba(0,0,0,0.28)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+          aria-label="Open tour menu"
+        >
+          <Menu className="w-[18px] h-[18px] text-white" strokeWidth={2} />
+        </button>
+
         {/* Background gradient with Ken Burns */}
         <motion.div
           className="absolute inset-0"
