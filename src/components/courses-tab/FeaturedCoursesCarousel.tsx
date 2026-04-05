@@ -78,7 +78,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
   }, [slides?.length, isPaused]);
 
   if (isLoading) {
-    return <div className="w-full h-[260px] sm:h-[290px] bg-muted animate-pulse" />;
+    return <div className="w-full h-[280px] sm:h-[310px] bg-muted animate-pulse" />;
   }
 
   if (!slides || slides.length === 0) return null;
@@ -87,7 +87,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
 
   return (
     <div
-      className="relative w-full h-[260px] sm:h-[290px] overflow-hidden"
+      className="relative w-full h-[280px] sm:h-[310px] overflow-hidden"
       style={{ background: '#1a1a1a' }}
       onPointerDown={() => setIsPaused(true)}
       onPointerUp={() => setIsPaused(false)}
@@ -116,27 +116,28 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
           {/* Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-1.5">
-            <h2 style={{ fontSize: 26, fontWeight: 700, color: 'white', lineHeight: 1.2 }}>
+          <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
+            <h2 style={{ fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1.2, letterSpacing: '-0.03em' }}>
               {slide.title}
             </h2>
             {slide.courseCount > 0 && (
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: 400 }}>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', fontWeight: 400 }}>
                 {slide.courseCount.toLocaleString()} courses
               </p>
             )}
             <button
               onClick={() => onRegionSelect(slide.slug)}
-              className="self-start active:scale-[0.97] transition-transform liquid-glass rounded-lg"
+              className="self-start active:scale-[0.97] transition-transform liquid-glass"
               style={{
                 marginTop: 4,
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 5,
-                padding: '7px 14px',
+                padding: '8px 16px',
                 fontSize: 13,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: 'white',
+                borderRadius: 10,
               }}
             >
               Explore →
@@ -149,7 +150,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
       {slides.length > 1 && (
         <div
           className="absolute flex items-center"
-          style={{ bottom: 16, right: 16, gap: 5, paddingBottom: 8 }}
+          style={{ bottom: 20, right: 20, gap: 5, paddingBottom: 8 }}
         >
           {slides.map((_, i) => (
             <button
@@ -159,7 +160,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
               style={{
                 width: currentSlide === i ? 20 : 7,
                 height: 7,
-                borderRadius: currentSlide === i ? 3.5 : '50%',
+                borderRadius: currentSlide === i ? 4 : '50%',
                 background: currentSlide === i ? 'white' : 'rgba(255,255,255,0.4)',
                 transition: 'all 0.3s ease',
                 border: 'none',

@@ -13,13 +13,13 @@ export function BucketListStrip() {
         style={{
           borderTop: '1px solid hsl(var(--border) / 0.08)',
           borderBottom: '0.5px solid hsl(var(--border) / 0.15)',
-          padding: '14px 0 6px',
+          padding: '12px 0 14px',
           marginBottom: 4,
         }}
       >
         <div
           style={{
-            padding: '2px 16px 10px',
+            padding: '0 16px 10px',
             fontSize: 12,
             fontWeight: 700,
             textTransform: 'uppercase',
@@ -37,7 +37,7 @@ export function BucketListStrip() {
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 140, height: 95, borderRadius: 12 }}
+              style={{ width: 145, height: 95, borderRadius: 12 }}
             />
           ))}
         </div>
@@ -54,14 +54,14 @@ export function BucketListStrip() {
         background: 'white',
         borderTop: '1px solid hsl(var(--border) / 0.08)',
         borderBottom: '0.5px solid hsl(var(--border) / 0.15)',
-        padding: '14px 0 6px',
+        padding: '12px 0 14px',
         marginBottom: 4,
       }}
     >
       {/* Section label */}
       <div
         style={{
-          padding: '2px 16px 10px',
+          padding: '0 16px 10px',
           fontSize: 12,
           fontWeight: 700,
           textTransform: 'uppercase',
@@ -86,7 +86,7 @@ export function BucketListStrip() {
           <div
             className="shrink-0 flex flex-col items-center justify-center"
             style={{
-              width: 140,
+              width: 145,
               height: 95,
               borderRadius: 12,
               border: '1.5px dashed hsl(var(--border))',
@@ -119,12 +119,12 @@ export function BucketListStrip() {
                   key={row.course_id}
                   onClick={() => navigate(`/courses/${row.course_id}`)}
                   className="shrink-0 text-left active:scale-[0.97] transition-transform"
-                  style={{ width: 140 }}
+                  style={{ width: 145 }}
                 >
                   {/* Image */}
                   <div
                     className="overflow-hidden"
-                    style={{ width: 140, height: 95, borderRadius: 12 }}
+                    style={{ width: 145, height: 95, borderRadius: 12 }}
                   >
                     {img ? (
                       <img
@@ -146,7 +146,7 @@ export function BucketListStrip() {
                       fontWeight: 600,
                       color: 'hsl(var(--foreground))',
                       lineHeight: 1.3,
-                      marginTop: 5,
+                      marginTop: 6,
                     }}
                   >
                     {name}
@@ -171,9 +171,9 @@ export function BucketListStrip() {
               onClick={() => navigate('/courses')}
               className="shrink-0 self-center active:scale-[0.97] transition-transform"
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: '#F7931E',
-                fontWeight: 500,
+                fontWeight: 600,
                 whiteSpace: 'nowrap',
               }}
             >

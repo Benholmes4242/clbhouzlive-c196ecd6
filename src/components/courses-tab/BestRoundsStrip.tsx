@@ -57,25 +57,25 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '14px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+      <div style={{ padding: '12px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
         <div
           className="flex items-center gap-1.5"
-          style={{ padding: '8px 16px 10px' }}
+          style={{ padding: '0 16px 10px' }}
         >
           <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E' }} />
-          <span style={{ fontSize: 16, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: 'hsl(var(--foreground))' }}>
             Highest rated this month
           </span>
         </div>
         <div
           className="flex overflow-x-auto"
-          style={{ padding: '0 12px', gap: 8, scrollbarWidth: 'none' }}
+          style={{ padding: '0 14px', gap: 10, scrollbarWidth: 'none' }}
         >
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 150, height: 150, borderRadius: 12 }}
+              style={{ width: 160, height: 150, borderRadius: 12 }}
             />
           ))}
         </div>
@@ -86,15 +86,15 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
   if (!reviews || reviews.length === 0) return null;
 
   return (
-    <div style={{ padding: '14px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+    <div style={{ padding: '12px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
       {/* Section header */}
       <div
         className="flex items-center justify-between"
-        style={{ padding: '8px 16px 10px' }}
+        style={{ padding: '0 16px 10px' }}
       >
         <div className="flex items-center gap-1.5">
           <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E' }} />
-          <span style={{ fontSize: 16, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: 'hsl(var(--foreground))' }}>
             Highest rated this month
           </span>
         </div>
@@ -104,8 +104,8 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
       <div
         className="flex overflow-x-auto"
         style={{
-          padding: '0 12px',
-          gap: 8,
+          padding: '0 14px',
+          gap: 10,
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
@@ -116,7 +116,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             onClick={() => navigate(`/courses/${review.course_id}`)}
             className="shrink-0 text-left active:scale-[0.97] transition-transform"
             style={{
-              width: 150,
+              width: 160,
               borderRadius: 12,
               overflow: 'hidden',
               border: '0.5px solid hsl(var(--border) / 0.15)',
@@ -124,7 +124,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             }}
           >
             {/* Image area */}
-            <div className="relative" style={{ width: 150, height: 120 }}>
+            <div className="relative" style={{ width: 160, height: 120 }}>
               {review.thumbnail_url ? (
                 <img
                   src={review.thumbnail_url}
@@ -170,12 +170,12 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             </div>
 
             {/* Body */}
-            <div style={{ padding: '7px 8px' }}>
+            <div style={{ padding: '8px 10px' }}>
               <p
                 className="line-clamp-2"
                 style={{
                   fontSize: 12,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   color: 'hsl(var(--foreground))',
                   lineHeight: 1.3,
                 }}
