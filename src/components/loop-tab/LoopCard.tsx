@@ -278,7 +278,7 @@ export const LoopCard = React.memo(function LoopCard({
           {/* Addition 2: "I've played there" button */}
           {courseName && courseId && (
             <button
-              onClick={() => navigate(`/course/${courseId}`)}
+              onClick={() => onClick={() => navigate(`/courses/${courseId}`)}}
               className="ml-auto flex items-center gap-1 active:scale-[0.97] transition-transform"
               style={{
                 fontSize: 12,
