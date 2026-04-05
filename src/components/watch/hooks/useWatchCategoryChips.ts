@@ -17,7 +17,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   'gear':          'Gear',
 };
 
-const MIN_POSTS = 5;
+const MIN_POSTS = 1;
 const MAX_CHIPS = 8;
 
 export interface CategoryChip {
