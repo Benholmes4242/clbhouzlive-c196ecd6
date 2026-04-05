@@ -36,7 +36,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
       }}
     >
       {/* Row 1 — Mode toggle pills */}
-      <div className="flex items-center gap-2 pb-2">
+      <div className="flex items-center justify-center gap-2 pb-2">
         {(['clips', 'longform'] as WatchInnerMode[]).map((m) => (
           <button
             key={m}
@@ -49,7 +49,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
               border: mode === m ? 'none' : '1.5px solid hsl(var(--border))',
             }}
           >
-            {m === 'clips' ? 'Clips' : 'Long Form'}
+            {m === 'clips' ? 'Clips' : 'Videos'}
           </button>
         ))}
       </div>
