@@ -901,6 +901,30 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               {highlightedCaption}
             </div>
           )}
+          {/* Caption tap affordance — visible only when media present and no caption typed */}
+          {hasMedia && state.caption.length === 0 && (
+            <div
+              onClick={() => textareaRef.current?.focus()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '10px 14px',
+                marginBottom: 6,
+                borderRadius: 14,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                cursor: 'text',
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
+                Write a caption…
+              </span>
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             value={state.caption}
