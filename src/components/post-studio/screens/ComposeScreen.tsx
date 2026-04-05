@@ -1219,16 +1219,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <div
         className="shrink-0"
         style={{
-          background: RAIL_BG,
+          background: hasMedia ? DARK_SURFACE : RAIL_BG,
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          position: 'relative',
+          zIndex: 2,
         }}
       >
         {/* Hairline at top */}
         <div style={{
           height: 1,
-          background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
+          background: hasMedia
+            ? `linear-gradient(90deg, transparent 0%, ${DARK_BORDER} 20%, rgba(255,255,255,0.18) 50%, ${DARK_BORDER} 80%, transparent 100%)`
+            : `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
         }} />
 
         <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
@@ -1245,13 +1249,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(15,23,42,0.90)',
-                boxShadow: '0 2px 14px rgba(0,0,0,0.12)',
+                background: hasMedia ? 'rgba(255,255,255,0.15)' : 'rgba(15,23,42,0.90)',
+                boxShadow: hasMedia ? 'none' : '0 2px 14px rgba(0,0,0,0.12)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <Camera className="w-[18px] h-[18px]" style={{ color: '#FFFFFF' }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
             </motion.button>
 
             {/* Front */}
@@ -1264,13 +1268,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
+                background: hasMedia ? 'rgba(255,255,255,0.10)' : ICON_BG,
+                border: hasMedia ? `1px solid rgba(255,255,255,0.14)` : '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
             </motion.button>
 
             {/* Library */}
@@ -1283,18 +1287,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
+                background: hasMedia ? 'rgba(255,255,255,0.10)' : ICON_BG,
+                border: hasMedia ? `1px solid rgba(255,255,255,0.14)` : '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+                <Layers className="w-[18px] h-[18px]" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: hasMedia ? DARK_TEXT_GHOST : TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
           </div>
 
           {/* Divider */}
-          <div style={{ width: 1, height: 28, background: RAIL_HAIRLINE, margin: '0 10px' }} />
+          <div style={{ width: 1, height: 28, background: hasMedia ? DARK_BORDER : RAIL_HAIRLINE, margin: '0 10px' }} />
 
           {/* Zone B — Text tools */}
           <div className="flex items-center" style={{ gap: 0 }}>
@@ -1309,7 +1313,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               }}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <AtSign className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+              <AtSign className="w-5 h-5" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
             </motion.button>
 
             <motion.button
@@ -1317,7 +1321,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               onClick={() => openPanel('drafts')}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <BookOpen className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+              <BookOpen className="w-5 h-5" style={{ color: hasMedia ? DARK_ICON : ICON_DIM }} strokeWidth={2} />
             </motion.button>
           </div>
 
