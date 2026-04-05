@@ -141,14 +141,11 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
               {/* Rating chip */}
               {review.rating > 0 && (
                 <div
-                  className="absolute flex items-center"
+                  className="absolute flex items-center liquid-glass rounded-lg"
                   style={{
                     top: 6,
                     right: 6,
                     gap: 3,
-                    background: 'rgba(255,255,255,0.2)',
-                    border: '0.5px solid rgba(255,255,255,0.3)',
-                    borderRadius: 6,
                     padding: '2px 6px',
                     fontSize: 11,
                     fontWeight: 700,
