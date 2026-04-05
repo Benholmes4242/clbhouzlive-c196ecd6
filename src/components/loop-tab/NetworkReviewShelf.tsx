@@ -25,7 +25,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         <div
           style={{
             padding: '0 16px 8px',
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: 0.5,
@@ -36,13 +36,13 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         </div>
         <div
           className="flex overflow-x-auto"
-          style={{ padding: '0 16px', gap: 10, scrollbarWidth: 'none' }}
+          style={{ padding: '0 16px', gap: 12, scrollbarWidth: 'none' }}
         >
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 130, height: 105, borderRadius: 10 }}
+              style={{ width: 150, height: 120, borderRadius: 12 }}
             />
           ))}
         </div>
@@ -66,7 +66,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
       <div
         style={{
           padding: '0 16px 8px',
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: 0.5,
@@ -79,13 +79,13 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         className="flex overflow-x-auto"
         style={{
           padding: '0 16px',
-          gap: 10,
+          gap: 12,
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
       >
         {highlights.map((h) => (
-          <HighlightCard key={h.course_id} highlight={h} onTap={() => <HighlightCard key={h.course_id} highlight={h} onTap={() => navigate(`/courses/${h.course_id}`)} />} />
+          <HighlightCard key={h.course_id} highlight={h} onTap={() => navigate(`/courses/${h.course_id}`)} />
         ))}
       </div>
     </div>
@@ -105,12 +105,12 @@ function HighlightCard({
     <button
       onClick={onTap}
       className="shrink-0 text-left active:scale-[0.97] transition-transform"
-      style={{ width: 130 }}
+      style={{ width: 150 }}
     >
       {/* Image */}
       <div
         className="overflow-hidden"
-        style={{ width: 130, height: 75, borderRadius: 10 }}
+        style={{ width: 150, height: 95, borderRadius: 12 }}
       >
         {highlight.image_url ? (
           <img
@@ -129,7 +129,7 @@ function HighlightCard({
         <p
           className="truncate"
           style={{
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
             color: 'hsl(var(--foreground))',
             lineHeight: 1.3,

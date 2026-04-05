@@ -57,13 +57,13 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '8px 0 4px' }}>
+      <div style={{ padding: '14px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
         <div
           className="flex items-center gap-1.5"
-          style={{ padding: '4px 16px 8px' }}
+          style={{ padding: '8px 16px 10px' }}
         >
-          <Star className="w-3.5 h-3.5" style={{ color: '#F7931E', fill: '#F7931E' }} />
-          <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
+          <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E' }} />
+          <span style={{ fontSize: 16, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
             Highest rated this month
           </span>
         </div>
@@ -75,7 +75,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 150, height: 130, borderRadius: 12 }}
+              style={{ width: 150, height: 150, borderRadius: 12 }}
             />
           ))}
         </div>
@@ -86,15 +86,15 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
   if (!reviews || reviews.length === 0) return null;
 
   return (
-    <div style={{ padding: '8px 0 4px' }}>
+    <div style={{ padding: '14px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
       {/* Section header */}
       <div
         className="flex items-center justify-between"
-        style={{ padding: '4px 16px 8px' }}
+        style={{ padding: '8px 16px 10px' }}
       >
         <div className="flex items-center gap-1.5">
           <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E' }} />
-          <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
+          <span style={{ fontSize: 16, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
             Highest rated this month
           </span>
         </div>
@@ -124,7 +124,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             }}
           >
             {/* Image area */}
-            <div className="relative" style={{ width: 150, height: 100 }}>
+            <div className="relative" style={{ width: 150, height: 120 }}>
               {review.thumbnail_url ? (
                 <img
                   src={review.thumbnail_url}
@@ -146,13 +146,13 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
                     top: 6,
                     right: 6,
                     gap: 3,
-                    padding: '2px 6px',
-                    fontSize: 11,
+                    padding: '3px 8px',
+                    fontSize: 12,
                     fontWeight: 700,
                     color: 'white',
                   }}
                 >
-                  <Star className="w-[9px] h-[9px]" style={{ color: '#F7931E', fill: '#F7931E' }} />
+                  <Star className="w-[11px] h-[11px]" style={{ color: '#F7931E', fill: '#F7931E' }} />
                   {review.rating.toFixed(1)}
                 </div>
               )}
@@ -174,7 +174,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
               <p
                 className="line-clamp-2"
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 600,
                   color: 'hsl(var(--foreground))',
                   lineHeight: 1.3,
@@ -185,7 +185,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
               {formatCourseLocation(review.course_location) && (
                 <p
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     color: 'hsl(var(--muted-foreground))',
                     marginTop: 2,
                   }}

@@ -23,7 +23,7 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
   return (
     <button
       onClick={onTap}
-      className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
+      className="shrink-0 whitespace-nowrap min-h-[32px] px-3.5 text-[13px] font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
       style={{
         borderRadius: 20,
         background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
@@ -46,7 +46,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
       style={{
         top: '0px',
         borderBottom: '1px solid hsl(var(--border) / 0.12)',
-        padding: '10px 16px 0',
+        padding: '12px 16px 0',
       }}
     >
       {/* Row 1 — Mode toggle pills */}
@@ -55,7 +55,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
           <button
             key={m}
             onClick={() => onModeChange(m)}
-            className="shrink-0 min-h-[34px] px-4 text-sm font-semibold transition-colors active:scale-[0.97]"
+            className="shrink-0 min-h-[38px] px-6 text-[15px] font-semibold transition-colors active:scale-[0.97]"
             style={{
               borderRadius: 8,
               background: mode === m ? 'hsl(var(--foreground))' : 'transparent',
@@ -72,7 +72,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
       {mode === 'clips' && (
         <div
           className="flex items-center gap-2 overflow-x-auto"
-          style={{ scrollbarWidth: 'none', padding: '2px 16px 10px' }}
+          style={{ scrollbarWidth: 'none', padding: '4px 16px 12px' }}
         >
           {/* Always-present: All */}
           <ChipButton
@@ -92,7 +92,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
           {/* Dynamic category chips */}
           {chipsLoading ? (
             [0, 1, 2, 3].map(i => (
-              <Skeleton key={i} className="shrink-0 h-[28px] w-[72px] rounded-full" />
+              <Skeleton key={i} className="shrink-0 h-[32px] w-[72px] rounded-full" />
             ))
           ) : (
             categoryChips.map(chip => (

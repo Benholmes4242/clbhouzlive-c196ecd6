@@ -21,15 +21,15 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 0 8px' }}>
+      <div style={{ padding: '12px 0 10px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
         <div className="px-4 pb-2">
-          <span className="text-[13px] font-semibold text-foreground">
+          <span className="text-[15px] font-semibold text-foreground">
             Trending this week
           </span>
         </div>
-        <div className="flex gap-2 overflow-x-auto px-4" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex overflow-x-auto px-4" style={{ gap: 10, scrollbarWidth: 'none' }}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="shrink-0 w-[120px] aspect-[4/5] rounded-[4px]" />
+            <Skeleton key={i} className="shrink-0 w-[130px] aspect-[4/5] rounded-[4px]" />
           ))}
         </div>
       </div>
@@ -39,10 +39,10 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div style={{ padding: '12px 0 8px' }}>
+    <div style={{ padding: '14px 0 10px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
       {/* Section header */}
       <div className="flex items-center justify-between px-4 pb-2">
-        <span className="text-[13px] font-semibold text-foreground">
+        <span className="text-[15px] font-semibold text-foreground">
           Trending this week
         </span>
         <span className="text-[11px] text-muted-foreground">
@@ -52,11 +52,11 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
       {/* Horizontal scroll strip of portrait tiles */}
       <div
-        className="flex gap-2 overflow-x-auto px-4"
-        style={{ scrollbarWidth: 'none' }}
+        className="flex overflow-x-auto px-4 pb-2"
+        style={{ gap: 10, scrollbarWidth: 'none' }}
       >
         {topPosts.map((post, i) => (
-          <div key={post.id} className="shrink-0 w-[120px]">
+          <div key={post.id} className="shrink-0 w-[130px]">
             <WatchTile post={post} index={i} allPosts={topPosts} />
           </div>
         ))}
