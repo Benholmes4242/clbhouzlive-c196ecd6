@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useNetworkActivity, type NetworkFriend } from '@/hooks/useNetworkActivity';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface OnCourseNowStripProps {
   userId: string | undefined;
@@ -108,6 +107,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
 function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void }) {
   const isActive = friend.is_active_recently;
   const displayName = friend.display_name || friend.username || '?';
+  const initial = displayName.trim().charAt(0).toUpperCase() || '?';
 
   return (
     <button
@@ -123,15 +123,21 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
           height: 58,
           borderRadius: '28%',
           border: `2.5px solid ${isActive ? '#F7931E' : 'hsl(var(--border))'}`,
-          padding: 2,
         }}
       >
         <div className="w-full h-full overflow-hidden" style={{ borderRadius: '26%' }}>
-          <SquircleAvatar
-            src={friend.profile_photo_url || '/placeholder.svg'}
-            size="sm"
-            hideRing
-          />
+          {friend.profile_photo_url ? (
+            <img
+              src={friend.profile_photo_url}
+              alt={displayName}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-sm font-semibold">
+              {initial}
+            </div>
+          )}
         </div>
         {/* Green pulse dot */}
         {isActive && (
