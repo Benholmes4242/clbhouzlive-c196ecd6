@@ -28,7 +28,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
     <div
       className="sticky z-[29] bg-background"
       style={{
-        top: 'max(env(safe-area-inset-top, 0px), 47px)',
+        top: '0px',
         borderBottom: '1px solid hsl(var(--border) / 0.12)',
         padding: '10px 16px 0',
       }}

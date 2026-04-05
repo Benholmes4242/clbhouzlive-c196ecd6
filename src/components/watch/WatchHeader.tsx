@@ -20,7 +20,7 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange 
   return (
     <div
       className="sticky z-[28] bg-background pb-0 pt-0 px-0"
-      style={{ top: 'max(env(safe-area-inset-top, 0px), 105px)', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      style={{ top: '58px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div
         role="tablist"
