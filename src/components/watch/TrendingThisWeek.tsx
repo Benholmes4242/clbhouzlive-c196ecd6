@@ -35,7 +35,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         </div>
         <div className="flex gap-3 overflow-x-auto px-4" style={{ scrollbarWidth: 'none' }}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="shrink-0 w-[150px] aspect-[4/5] rounded-[8px]" />
+            <Skeleton key={i} className="shrink-0 w-[173px] aspect-[4/5] rounded-[8px]" />
           ))}
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         style={{ scrollbarWidth: 'none' }}
       >
         {topPosts.map((post, i) => (
-          <div key={post.id} className="shrink-0 w-[150px] rounded-[8px] overflow-hidden">
+          <div key={post.id} className="shrink-0 w-[173px] rounded-[8px] overflow-hidden">
             <WatchTile post={post} index={i} allPosts={topPosts} />
           </div>
         ))}
