@@ -482,7 +482,7 @@ export function PlayersTab() {
           STICKY HEADER — back link · sort · tour · search
           ══════════════════════════════════════════════ */}
       <div
-        className="-mx-5 sticky z-20 px-5"
+        className="-mx-5 sticky z-20"
         style={{
           top: 'max(env(safe-area-inset-top, 0px), 0px)',
           background: 'hsl(var(--background) / 0.96)',
