@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Check, UserPlus, Info, Users, Building2, BadgeCheck, AlertCircle, LucideIcon } from 'lucide-react';
+import { Search, Check, UserPlus, Info, Users, Building2, BadgeCheck, AlertCircle, LucideIcon, ChevronLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useGolfersDiscovery, TabKey } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
@@ -192,11 +192,14 @@ const GolfersToFollowPage = () => {
   return (
     <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <div className="w-full">
-        {/* Scrollable header - scrolls away */}
-        <div className="bg-[#F8FAFC] px-4 pt-3 pb-4">
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-foreground mb-1">Golfers to follow</h1>
-          </div>
+        {/* Compact sticky nav header */}
+        <div className="sticky top-0 z-50 bg-[#F8FAFC] flex items-center px-4 pb-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+          <button onClick={handleBack} className="p-2 -ml-2">
+            <ChevronLeft className="w-5 h-5 text-foreground" />
+          </button>
+          <h1 className="flex-1 text-center text-[17px] font-semibold text-foreground pr-7">
+            Golfers to follow
+          </h1>
         </div>
         
         {/* Sticky section - tabs + search */}
