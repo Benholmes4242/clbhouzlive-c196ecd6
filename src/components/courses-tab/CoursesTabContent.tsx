@@ -36,7 +36,7 @@ export default function CoursesTabContent({ embedded = false }: CoursesTabConten
   return (
     <div className="bg-background min-h-screen">
       {/* A: Featured hero carousel — only when no region filter active */}
-      {activeRegion === null && <FeaturedCoursesCarousel onRegionSelect={handleRegionChange} />}
+      {activeRegion === null && <div className="pt-3"><FeaturedCoursesCarousel onRegionSelect={handleRegionChange} /></div>}
 
       {/* B: Region filter chips + search (existing ExploreHeader) */}
       <ExploreHeader
