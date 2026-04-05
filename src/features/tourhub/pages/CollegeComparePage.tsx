@@ -31,7 +31,7 @@ export function CollegeComparePage() {
         {/* Immersive Hero — matches CollegeProfilePage pattern */}
         <div
           className="relative overflow-hidden"
-          style={{ height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
+          style={{ height: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
         >
           {/* Gradient background */}
           <div
@@ -47,22 +47,30 @@ export function CollegeComparePage() {
             }}
           />
 
-          {/* Bottom fade */}
+          {/* Bottom fade — lighter */}
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 65%, transparent 85%)',
+              background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.05) 65%, transparent 85%)',
             }}
           />
 
-          {/* Burger menu — absolute inside hero, white with drop shadow */}
+          {/* Burger menu — dark glass pill */}
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
             aria-label="Open tour menu"
-            className="absolute z-30 flex items-center justify-center"
-            style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: 16 }}
+            className="absolute z-30 flex items-center justify-center active:scale-[0.97] transition-transform"
+            style={{
+              width: 36, height: 36,
+              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+              left: 16,
+              borderRadius: 10,
+              background: 'rgba(0,0,0,0.28)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+            }}
           >
-            <Menu className="w-[24px] h-[24px]" strokeWidth={1.5} style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+            <Menu className="w-[18px] h-[18px] text-white" strokeWidth={2} />
           </button>
 
           {/* Hero content — VS logos centered */}
@@ -184,19 +192,20 @@ export function CollegeComparePage() {
             STICKY HEADER — ← College Golf
             ══════════════════════════════════════════════ */}
         <div
-          className="-mx-0 sticky top-0 z-20"
+          className="-mx-5 sticky top-0 z-20"
           style={{
             background: 'hsl(var(--background) / 0.96)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '1px solid hsl(var(--border) / 0.10)',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            paddingTop: 10,
+            marginTop: 8,
           }}
         >
-          <div className="flex items-center px-4 pt-2.5 pb-3">
+          <div className="flex items-center px-5 pt-2 pb-2.5">
             <button
               onClick={() => navigate('/tourhub/college-golf')}
-              className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity"
+              className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity"
               style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
@@ -207,7 +216,7 @@ export function CollegeComparePage() {
 
         {/* Content */}
         <div
-          className="relative px-4"
+          className="relative px-5"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
         >
           {!hasValidParams ? (
