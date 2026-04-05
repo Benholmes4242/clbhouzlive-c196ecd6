@@ -412,13 +412,27 @@ async function syncTournament(
         .limit(5);
 
       if (roundCheck?.length) {
+        // First check completed rounds (non-null round score)
+        let completedRound = 0;
         for (let r = 4; r >= 1; r--) {
           const key = `round_${r}`;
           if (roundCheck.some((entry: any) => entry[key] !== null && entry[key] !== undefined)) {
-            activeRound = r;
+            completedRound = r;
             break;
           }
         }
+        // Also check thru values — if any player has thru 1-17, a round is in progress
+        const { data: thruCheck } = await supabase
+          .from('sr_leaderboards')
+          .select('thru')
+          .eq('tournament_id', tournament.id)
+          .not('thru', 'is', null)
+          .gt('thru', 0)
+          .lt('thru', 18)
+          .limit(1);
+        const midRound = (thruCheck?.length ?? 0) > 0;
+        // If players are mid-round, the active round is one ahead of the last completed
+        activeRound = midRound ? Math.min(completedRound + 1, 4) : Math.max(completedRound, 1);
       }
 
       console.log(`[LiveSync] Triggering scorecards sync for ${tournament.name}, round ${activeRound}`);
@@ -433,7 +447,8 @@ async function syncTournament(
         body: JSON.stringify({
           action: 'scorecards',
           tournamentId: tournament.sr_id,
-          round: activeRound,
+          tourId: tour,
+          roundNumber: activeRound,
           year: year,
         }),
       });
