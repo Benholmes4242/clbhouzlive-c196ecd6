@@ -42,7 +42,7 @@ function ExploreRegionsStripInner({ onRegionSelect, activeRegion }: ExploreRegio
               key={region.id}
               type="button"
               onClick={() => onRegionSelect(region.slug)}
-              className="shrink-0 w-[200px] rounded-xl overflow-hidden relative focus:outline-none"
+              className="shrink-0 w-[220px] rounded-xl overflow-hidden relative focus:outline-none"
             >
               {imageUrl ? (
                 <img

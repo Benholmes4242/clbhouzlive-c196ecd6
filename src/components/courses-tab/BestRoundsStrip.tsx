@@ -57,7 +57,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+      <div style={{ padding: '12px 0 16px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
         <div
           className="flex items-center gap-1.5"
           style={{ padding: '0 16px 10px' }}
@@ -75,7 +75,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 160, height: 150, borderRadius: 12 }}
+              style={{ width: 184, height: 173, borderRadius: 12 }}
             />
           ))}
         </div>
@@ -86,7 +86,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
   if (!reviews || reviews.length === 0) return null;
 
   return (
-    <div style={{ padding: '12px 0 6px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+    <div style={{ padding: '12px 0 16px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
       {/* Section header */}
       <div
         className="flex items-center justify-between"
@@ -116,7 +116,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             onClick={() => navigate(`/courses/${review.course_id}`)}
             className="shrink-0 text-left active:scale-[0.97] transition-transform"
             style={{
-              width: 160,
+              width: 184,
               borderRadius: 12,
               overflow: 'hidden',
               border: '0.5px solid hsl(var(--border) / 0.15)',
@@ -124,7 +124,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
             }}
           >
             {/* Image area */}
-            <div className="relative" style={{ width: 160, height: 120 }}>
+            <div className="relative" style={{ width: 184, height: 138 }}>
               {review.thumbnail_url ? (
                 <img
                   src={review.thumbnail_url}
