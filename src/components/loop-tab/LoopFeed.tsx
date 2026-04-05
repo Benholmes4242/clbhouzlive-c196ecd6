@@ -96,7 +96,7 @@ export function LoopFeed({
     <div ref={feedContainerRef} className="flex flex-col gap-3 pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => (
-        <React.Fragment key={post.id}>
+        <div key={post.id}>
           <div data-card-index={i}>
             <LoopCard
               post={post}
@@ -109,7 +109,7 @@ export function LoopFeed({
             />
           </div>
           {(i + 1) % SHELF_INTERVAL === 0 && <NetworkReviewShelf userId={userId} />}
-        </React.Fragment>
+        </div>
       ))}
       <div ref={sentinelRef} className="h-1" />
       {isFetchingNextPage && (
