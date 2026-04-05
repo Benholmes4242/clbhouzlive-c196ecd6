@@ -53,7 +53,7 @@ const Discover = () => {
               <SegmentedControl
                 tabs={[
                   { id: 'watch', label: 'Watch' },
-                  { id: 'loop', label: 'Clbhouz' },
+                  { id: 'loop', label: 'clbhouz' },
                   { id: 'courses', label: 'Explore' },
                 ]}
                 activeTab={main}
