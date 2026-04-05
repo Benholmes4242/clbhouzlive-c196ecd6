@@ -93,18 +93,11 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
         style={{ padding: '4px 16px 8px' }}
       >
         <div className="flex items-center gap-1.5">
-          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+          <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E' }} />
           <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
             Highest rated this month
           </span>
         </div>
-        <button
-          onClick={() => navigate('/courses')}
-          className="active:scale-[0.97] transition-transform"
-          style={{ fontSize: 13, fontWeight: 500, color: '#F7931E' }}
-        >
-          See all →
-        </button>
       </div>
 
       {/* Horizontal scroll */}
