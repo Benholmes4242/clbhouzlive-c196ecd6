@@ -1125,23 +1125,29 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => openPanel('course')}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: hasMedia ? GREEN_COURSE_BG : 'rgba(34,197,94,0.07)',
-                      border: `1px solid ${hasMedia ? GREEN_COURSE_BDR : 'rgba(34,197,94,0.16)'}`,
+                      background: hasMedia
+                        ? 'rgba(0,0,0,0.55)'
+                        : 'rgba(34,197,94,0.07)',
+                      border: `1px solid ${hasMedia
+                        ? 'rgba(255,255,255,0.18)'
+                        : 'rgba(34,197,94,0.16)'}`,
+                      backdropFilter: hasMedia ? 'blur(12px)' : 'none',
+                      WebkitBackdropFilter: hasMedia ? 'blur(12px)' : 'none',
                     }}
                   >
                     <div style={{
                       width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                      background: 'rgba(34,197,94,0.12)',
-                      border: '1px solid rgba(34,197,94,0.20)',
+                      background: hasMedia ? 'rgba(255,255,255,0.12)' : 'rgba(34,197,94,0.12)',
+                      border: hasMedia ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(34,197,94,0.20)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 14,
                     }}>⛳</div>
                     <div className="text-left">
-                      <p className="text-[13px] font-semibold leading-none" style={{ color: TEXT_PRIMARY }}>
+                      <p className="text-[13px] font-semibold leading-none" style={{ color: hasMedia ? DARK_TEXT : TEXT_PRIMARY }}>
                         {course.courseName}
                       </p>
                       {course.country && (
-                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: TEXT_TERTIARY }}>
+                      <p className="text-[10px] mt-0.5 leading-none" style={{ color: hasMedia ? DARK_TEXT_DIM : TEXT_TERTIARY }}>
                           {course.region ? `${course.region}, ${course.country}` : course.country}
                         </p>
                       )}
@@ -1155,9 +1161,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       }}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
                       className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ background: 'rgba(0,0,0,0.08)' }}
+                      style={{ background: hasMedia ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)' }}
                     >
-                      <X className="w-2.5 h-2.5" style={{ color: ICON_DIM }} strokeWidth={2.5} />
+                      <X className="w-2.5 h-2.5" style={{ color: hasMedia ? 'rgba(255,255,255,0.70)' : ICON_DIM }} strokeWidth={2.5} />
                     </div>
                   </motion.button>
                 ))}
