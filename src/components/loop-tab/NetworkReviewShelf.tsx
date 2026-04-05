@@ -18,7 +18,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
           background: 'rgba(247,147,30,0.05)',
           borderTop: '0.5px solid rgba(247,147,30,0.15)',
           borderBottom: '0.5px solid rgba(247,147,30,0.15)',
-          padding: '14px 0',
+          padding: '14px 0 6px',
           margin: '4px 0',
         }}
       >
@@ -59,7 +59,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         background: 'rgba(247,147,30,0.05)',
         borderTop: '0.5px solid rgba(247,147,30,0.15)',
         borderBottom: '0.5px solid rgba(247,147,30,0.15)',
-        padding: '14px 0',
+        padding: '14px 0 6px',
         margin: '4px 0',
       }}
     >
