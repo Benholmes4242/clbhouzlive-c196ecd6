@@ -11,12 +11,11 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useNavigate } from 'react-router-dom';
 
 // Lazy load heavy/inactive components for better initial bundle size
-const NewFriendsTab = lazy(() => import('@/components/discover/NewFriendsTab'));
-const NewVideosTab = lazy(() => import('@/components/discover/NewVideosTab'));
-const NewExploreTab = lazy(() => import('@/components/discover/NewExploreTab'));
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
+const NewLoopTab = lazy(() => import('@/components/discover/NewLoopTab'));
+const NewCoursesTab = lazy(() => import('@/components/discover/NewCoursesTab'));
 
-type MainKey = 'watch' | 'videos' | 'explore' | 'following';
+type MainKey = 'watch' | 'loop' | 'courses';
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -54,9 +53,8 @@ const Discover = () => {
               <SegmentedControl
                 tabs={[
                   { id: 'watch', label: 'Watch' },
-                  { id: 'videos', label: 'Videos' },
-                  { id: 'explore', label: 'Explore' },
-                  { id: 'following', label: 'Friends' },
+                  { id: 'loop', label: 'The Loop' },
+                  { id: 'courses', label: 'Courses' },
                 ]}
                 activeTab={main}
                 onTabChange={(id) => setMain(id as MainKey)}
@@ -66,7 +64,7 @@ const Discover = () => {
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
               activeKey={main as MainKey}
-              order={['watch', 'videos', 'explore', 'following'] as const}
+              order={['watch', 'loop', 'courses'] as const}
             >
               {(key: MainKey) => {
                 if (key === 'watch') {
@@ -76,24 +74,17 @@ const Discover = () => {
                     </Suspense>
                   );
                 }
-                if (key === 'explore') {
+                if (key === 'loop') {
                   return (
                     <Suspense fallback={null}>
-                      <NewExploreTab />
+                      <NewLoopTab />
                     </Suspense>
                   );
                 }
-                if (key === 'following') {
-                  return (
-                    <Suspense fallback={null}>
-                      <NewFriendsTab />
-                    </Suspense>
-                  );
-                }
-                // 'videos'
+                // 'courses'
                 return (
                   <Suspense fallback={null}>
-                    <NewVideosTab />
+                    <NewCoursesTab />
                   </Suspense>
                 );
               }}

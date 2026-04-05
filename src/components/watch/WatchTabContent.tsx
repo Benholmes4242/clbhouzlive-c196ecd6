@@ -27,7 +27,7 @@ export default function WatchTabContent({ embedded = false }: WatchTabContentPro
         >
           {mode === 'clips' ? (
             <Suspense fallback={<WatchGridSkeleton />}>
-              <WatchPageContent embedded={embedded} hideHeader={false} showShotOfWeek />
+              <WatchPageContent embedded={embedded} showShotOfWeek />
             </Suspense>
           ) : (
             <Suspense fallback={<VideosFeedSkeleton />}>
