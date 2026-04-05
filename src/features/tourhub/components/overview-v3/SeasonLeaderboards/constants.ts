@@ -29,14 +29,14 @@ export const CATEGORY_ACCENT_COLORS: Record<CategoryId, typeof AMBER_ACCENT> = {
 
 /** Pill order: power → money → efficiency → short game */
 export const CATEGORY_CONFIG: { id: CategoryId; name: string }[] = [
-  { id: 'distance',    name: '💥 Big Hitter'      },
+  { id: 'distance',    name: '💪 Big Hitter'      },
   { id: 'earnings',    name: '💰 Bag Man'          },
   { id: 'sg_total',    name: '⚡ Strokes Gained'   },
-  { id: 'scoring_avg', name: '🎯 Scoring Avg'      },
-  { id: 'gir_pct',     name: '🟢 Green Machine'    },
+  { id: 'scoring_avg', name: '📊 Scoring Avg'      },
+  { id: 'gir_pct',     name: '⛳ Green Machine'    },
   { id: 'putting',     name: '🕳️ Silky Stroke'     },
   { id: 'accuracy',    name: '🎯 Sniper'            },
-  { id: 'scrambling',  name: '🔥 Escape Artist'    },
+  { id: 'scrambling',  name: '🔀 Escape Artist'    },
   { id: 'sand_saves',  name: '🏖️ Sand Wizard'      },
 ];
 
