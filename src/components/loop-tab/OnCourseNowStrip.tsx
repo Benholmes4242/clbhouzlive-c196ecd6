@@ -62,11 +62,11 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
             }}
           />
           <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-            On the course now
+            Recently active
           </span>
         </div>
         <button
-          onClick={() => navigate('/golfers')}
+          onClick={() => navigate('/golferstofollow')}
           className="active:scale-[0.97] transition-transform"
           style={{ fontSize: 13, fontWeight: 500, color: '#F7931E' }}
         >
