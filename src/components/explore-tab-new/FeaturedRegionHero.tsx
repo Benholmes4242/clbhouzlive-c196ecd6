@@ -100,8 +100,8 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
              </span>
            </div>
           <span
-            className="inline-block mt-2.5 text-xs font-semibold text-white rounded-full"
-            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', padding: '6px 12px' }}
+            className="inline-block mt-2.5 text-xs font-semibold text-white rounded-lg liquid-glass"
+            style={{ padding: '6px 12px' }}
           >
             Explore →
           </span>
