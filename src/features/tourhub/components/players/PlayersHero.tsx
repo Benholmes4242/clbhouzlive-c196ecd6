@@ -138,7 +138,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
 
             {/* Gradient */}
             <div className="absolute inset-0" style={{
-              background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
+              background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.03) 55%, transparent 75%)',
             }} />
 
             {/* Bottom content */}
@@ -175,21 +175,38 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Carousel dots — left-aligned, no frosted pill */}
+              {/* Carousel dots — matching HeroCarousel style */}
               {count > 1 && (
-                <div className="flex items-center gap-1.5 pt-1">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, paddingTop: 4 }}>
                   {players.map((_, i) => (
                     <button
                       key={i}
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
-                      className="rounded-full transition-all duration-300"
                       style={{
-                        width: i === currentIndex ? '18px' : '6px',
-                        height: '6px',
-                        background: i === currentIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)',
+                        padding: 4,
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
                       }}
                       aria-label={`Player ${i + 1}`}
-                    />
+                    >
+                      <div
+                        style={{
+                          height: 5,
+                          width: i === currentIndex ? 14 : 5,
+                          borderRadius: 99,
+                          background: i === currentIndex
+                            ? 'rgba(255,255,255,0.90)'
+                            : 'rgba(255,255,255,0.35)',
+                          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                          boxShadow: i === currentIndex
+                            ? '0 1px 4px rgba(0,0,0,0.30)'
+                            : 'none',
+                        }}
+                      />
+                    </button>
                   ))}
                 </div>
               )}
