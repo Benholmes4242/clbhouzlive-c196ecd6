@@ -3,7 +3,6 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
-import SuggestedCreatorsStrip from './SuggestedCreatorsStrip';
 
 interface WatchGridProps {
   posts: FeedPost[];
@@ -93,10 +92,9 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
   return (
     <>
-      <SuggestedCreatorsStrip userId={userId} />
       <div
         ref={gridRef}
-        className="grid grid-cols-3 gap-[2px] px-[2px]"
+        className="grid grid-cols-3 gap-[2px] px-[2px] pt-1"
       >
         {posts.map((post, i) => (
           <div key={post.id}>

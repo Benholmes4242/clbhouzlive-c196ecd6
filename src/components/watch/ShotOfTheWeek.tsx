@@ -40,7 +40,7 @@ const ShotOfTheWeek: React.FC<ShotOfTheWeekProps> = ({ userId }) => {
     <div
       className="relative overflow-hidden cursor-pointer active:scale-[0.97] h-[155px] sm:h-[175px] md:h-[195px]"
       style={{
-        margin: '0 12px 10px',
+        margin: '8px 12px 14px',
         borderRadius: 14,
         transition: 'transform 100ms ease',
       }}
@@ -63,7 +63,7 @@ const ShotOfTheWeek: React.FC<ShotOfTheWeekProps> = ({ userId }) => {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)',
         }}
       />
 
@@ -71,8 +71,8 @@ const ShotOfTheWeek: React.FC<ShotOfTheWeekProps> = ({ userId }) => {
       <span
         style={{
           position: 'absolute',
-          top: 12,
-          left: 12,
+          top: 10,
+          left: 10,
           background: '#F7931E',
           color: 'white',
           fontSize: 10,
