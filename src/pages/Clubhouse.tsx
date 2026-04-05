@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
@@ -125,10 +125,8 @@ const ClubhouseContent = () => {
   useHeaderVariant('glass-dark');
   useMedianStatusBar("dark", "transparent", true, false, true, pathname);
   
-  useLayoutEffect(() => {
-    document.body.classList.add('route-clubhouse');
-    return () => { document.body.classList.remove('route-clubhouse'); };
-  }, []);
+  // route-clubhouse class is now applied by ClubhouseWrapped (eagerly loaded)
+  // to prevent white flash during lazy chunk loading
   
   const navigate = useNavigate();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
