@@ -657,15 +657,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const parts: React.ReactNode[] = [];
     let last = 0;
     let partIndex = 0;
+    const textColor = hasMedia ? DARK_TEXT : TEXT_PRIMARY;
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
-      if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: TEXT_PRIMARY }}>{state.caption.slice(last, m.start)}</span>);
-      parts.push(<span key={`m-${partIndex++}`} style={{ color: TEXT_PRIMARY, fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
+      if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: textColor }}>{state.caption.slice(last, m.start)}</span>);
+      parts.push(<span key={`m-${partIndex++}`} style={{ color: textColor, fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
       last = m.end;
     }
-    if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: TEXT_PRIMARY }}>{state.caption.slice(last)}</span>);
+    if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: textColor }}>{state.caption.slice(last)}</span>);
     return parts;
-  }, [state.caption, state.mentions]);
+  }, [state.caption, state.mentions, hasMedia]);
 
   const handleUpdateEdits = useCallback((patch: Partial<StudioEdits>) => {
     if (!activeItem) return;
@@ -704,14 +705,14 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: hasMedia ? DARK_BG : BG_BASE, position: 'relative' }}>
+    <div className="flex-1 flex flex-col" style={{ background: hasMedia ? DARK_BG : BG_BASE, position: 'relative', minHeight: '100%' }}>
       <StudioHeader
         centerContent={<ActorSelector compact header />}
         step="COMPOSE"
         darkMode={hasMedia}
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
-          isValid
+          hasMedia || isValid
             ? { label: 'Next', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
             : state.isDirty
               ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
@@ -1049,7 +1050,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
         {/* Add more — below grid when < 10 items */}
         {state.mediaItems.length > 0 && state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-          <div className="px-4 mb-2">
+          <div className="px-4 mb-2" style={{ paddingTop: 10 }}>
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={() => fileInputRef.current?.click()}
@@ -1254,7 +1255,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: hasMedia ? DARK_SURFACE : RAIL_BG,
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
           position: 'relative',
           zIndex: 2,
         }}
