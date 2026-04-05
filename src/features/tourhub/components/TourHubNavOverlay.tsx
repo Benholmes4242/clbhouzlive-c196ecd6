@@ -77,8 +77,6 @@ export function TourHubNavOverlay({
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const swipeStartXRef = useRef<number | null>(null);
-  const swipeStartYRef = useRef<number | null>(null);
 
   // Only fetch data when overlay is open (lazy-mount)
   const { data: topPlayers, isLoading: rankingsLoading } = useTopWorldRanked(5);
@@ -302,21 +300,6 @@ export function TourHubNavOverlay({
               stiffness: 300,
             }}
             className="fixed inset-y-0 right-0 z-[10000] flex flex-col overflow-hidden"
-            onTouchStart={(e) => {
-              swipeStartXRef.current = e.touches[0].clientX;
-              swipeStartYRef.current = e.touches[0].clientY;
-            }}
-            onTouchEnd={(e) => {
-              if (swipeStartXRef.current === null || swipeStartYRef.current === null) return;
-              const deltaX = e.changedTouches[0].clientX - swipeStartXRef.current;
-              const deltaY = Math.abs(e.changedTouches[0].clientY - swipeStartYRef.current);
-              swipeStartXRef.current = null;
-              swipeStartYRef.current = null;
-              if (deltaX > 80 && deltaX > deltaY * 1.5) {
-                haptic('light');
-                onClose();
-              }
-            }}
             style={{
               width: '100vw',
               maxWidth: '480px',
