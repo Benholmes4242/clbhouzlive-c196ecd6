@@ -429,9 +429,9 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-muted/80 to-muted" />
               )}
 
-              {/* Strong bottom gradient for text legibility */}
+              {/* Bottom gradient for text legibility */}
               <div className="absolute inset-0" style={{
-                background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.03) 55%, transparent 75%)',
               }} />
 
               <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 space-y-1.5">
