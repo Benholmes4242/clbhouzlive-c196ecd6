@@ -248,27 +248,28 @@ export function CollegeCompareSheet({
       {/* Metric chips — 3 tabs: Earnings, Wins, Top 10s */}
       {!hasError && !hasNoRivals && (
         <div className="flex" style={{ padding: '0 20px 16px', gap: '8px' }}>
-          {METRICS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setActiveMetric(key)}
-              className={cn(
-                "flex-1 flex items-center justify-center rounded-xl",
-                "transition-all min-h-[40px]",
-                "active:scale-95",
-                activeMetric === key
-                  ? "bg-foreground text-background border border-foreground"
-                  : "bg-transparent text-muted-foreground border border-transparent"
-              )}
-              style={{
-                fontSize: '13px',
-                fontWeight: activeMetric === key ? 600 : 500,
-                padding: '10px 18px',
-              }}
-            >
-              {label}
-            </button>
-          ))}
+          {METRICS.map(({ key, label }) => {
+            const isActive = activeMetric === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setActiveMetric(key)}
+                className="flex-1 flex items-center justify-center transition-all active:scale-[0.97]"
+                style={{
+                  minHeight: 36,
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: isActive ? 600 : 500,
+                  padding: '8px 16px',
+                  background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                  color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                  border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       )}
       
