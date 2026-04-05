@@ -19,7 +19,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
           borderTop: '0.5px solid rgba(247,147,30,0.15)',
           borderBottom: '0.5px solid rgba(247,147,30,0.15)',
           padding: '14px 0 6px',
-          margin: '12px 0 4px',
+          margin: '14px 0 4px',
         }}
       >
         <div
@@ -60,7 +60,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         borderTop: '0.5px solid rgba(247,147,30,0.15)',
         borderBottom: '0.5px solid rgba(247,147,30,0.15)',
         padding: '14px 0 6px',
-        margin: '12px 0 4px',
+        margin: '14px 0 4px',
       }}
     >
       <div
