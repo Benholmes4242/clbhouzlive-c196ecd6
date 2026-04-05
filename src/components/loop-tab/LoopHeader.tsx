@@ -26,10 +26,10 @@ export function LoopHeader({ activeMode, onModeChange, onOpenSearch }: LoopHeade
         <button
           onClick={onOpenSearch}
           className="flex items-center gap-2 w-full h-11 px-3 rounded-2xl bg-muted text-muted-foreground text-[15px]"
-          aria-label="Search My Clb"
+          aria-label="Search Clbhouz"
         >
           <Search className="h-4 w-4 shrink-0" />
-          <span>Search My Clb…</span>
+          <span>Search Clbhouz…</span>
         </button>
       </div>
       <div role="tablist" className="flex justify-center gap-2 px-4 pb-3.5 overflow-x-auto scrollbar-hide">
