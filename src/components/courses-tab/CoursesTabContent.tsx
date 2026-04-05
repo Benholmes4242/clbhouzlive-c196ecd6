@@ -49,7 +49,7 @@ export default function CoursesTabContent({ embedded = false }: CoursesTabConten
       />
 
       {/* C: Echo CTA */}
-      <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+      <div style={{ padding: '8px 12px 14px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
         <EchoContextualButton
           prompt="Help me find my next golf course to play. Ask me a few questions about my preferences — type of course, location, handicap, budget — and suggest some great options."
           label="Ask Echo to find you a course"
