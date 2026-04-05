@@ -112,31 +112,32 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
       onClick={onClick}
       className={cn(
         "shrink-0 flex items-center rounded-xl",
-        "border transition-all duration-200",
+        "transition-all duration-200",
         "active:scale-95 min-h-[44px]",
-        isSelected 
-          ? "bg-foreground text-white border-foreground" 
-          : "bg-card border-border/50"
       )}
-      style={{ padding: '10px 16px', gap: '8px' }}
+      style={{
+        padding: '10px 16px',
+        gap: '8px',
+        background: isSelected ? 'hsl(var(--accent-amber) / 0.10)' : 'hsl(var(--card))',
+        border: isSelected
+          ? '1.5px solid hsl(var(--accent-amber) / 0.40)'
+          : '1px solid hsl(var(--border) / 0.5)',
+      }}
     >
       {/* College logo — 24×24px */}
       <div className="flex items-center justify-center overflow-hidden" style={{ width: '24px', height: '24px' }}>
         {logoUrl ? (
           <img src={logoUrl} alt={displayName} className="w-6 h-6 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
         ) : (
-          <span className={cn("text-xs font-bold", isSelected ? "text-white" : "text-muted-foreground")}>{displayName.charAt(0)}</span>
+          <span className="text-xs font-bold text-muted-foreground">{displayName.charAt(0)}</span>
         )}
       </div>
       
-      <span className={cn(
-        "whitespace-nowrap",
-        isSelected ? "text-white" : "text-muted-foreground"
-      )} style={{ fontSize: '13px', fontWeight: 500 }}>
+      <span className="whitespace-nowrap text-foreground" style={{ fontSize: '13px', fontWeight: isSelected ? 700 : 500 }}>
         {displayName}
       </span>
       
-      {isSelected && <Check className="w-4 h-4 text-white" />}
+      {isSelected && <Check className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />}
     </button>
   );
 }
