@@ -1501,7 +1501,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             transform: 'translateX(-50%)',
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 4,
             zIndex: 35,
             pointerEvents: 'none',
           }}
@@ -1523,8 +1523,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             >
               <div
                 style={{
-                  height: 6,
-                  width: i === currentIndex ? 18 : 6,
+                  height: 5,
+                  width: i === currentIndex ? 14 : 5,
                   borderRadius: 99,
                   background: i === currentIndex
                     ? 'rgba(255,255,255,0.90)'

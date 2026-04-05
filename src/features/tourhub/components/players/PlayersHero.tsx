@@ -88,17 +88,27 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
 
   return (
     <div className="relative">
-      {/* Burger menu */}
+      {/* Burger menu — glass pill (light) */}
       <button
-        className="absolute z-20 flex items-center justify-center"
-        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: '16px', width: '44px', height: '44px' }}
+        className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+        style={{
+          top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+          left: '16px',
+          width: 36,
+          height: 36,
+          borderRadius: 10,
+          background: 'rgba(255,255,255,0.70)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(0,0,0,0.08)',
+        }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
-        <Menu 
-          className="w-6 h-6" 
-          strokeWidth={1.5}
-          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
+        <Menu
+          className="w-[18px] h-[18px]"
+          strokeWidth={2}
+          style={{ color: 'hsl(var(--foreground))' }}
         />
       </button>
 
@@ -351,22 +361,27 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
 
   return (
     <div className="relative">
-      {/* Burger menu */}
-      <button 
-        className="absolute z-20 flex items-center justify-center"
+      {/* Burger menu — glass pill (light) */}
+      <button
+        className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
         style={{
           top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
           left: '16px',
-          width: '44px',
-          height: '44px',
+          width: 36,
+          height: 36,
+          borderRadius: 10,
+          background: 'rgba(255,255,255,0.70)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(0,0,0,0.08)',
         }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
-        <Menu 
-          className="w-6 h-6" 
-          strokeWidth={1.5}
-          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
+        <Menu
+          className="w-[18px] h-[18px]"
+          strokeWidth={2}
+          style={{ color: 'hsl(var(--foreground))' }}
         />
       </button>
       <AnimatePresence mode="wait">
