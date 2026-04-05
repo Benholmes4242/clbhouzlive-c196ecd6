@@ -533,30 +533,45 @@ async function syncTournament(
       // ── Final all-rounds scorecard sync on tournament close ──────
       if (tourSlug) {
         console.log(`[LiveSync] Running final all-rounds scorecard sync for ${tournament.name}`);
+        const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
+
         for (const round of [1, 2, 3, 4]) {
-          try {
-            console.log(`[LiveSync] Syncing scorecard round ${round} for ${tournament.name}`);
-            const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
-            await fetch(syncUrl, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                action: 'scorecards',
-                tournamentId: tournament.sr_id,
-                tourId: tourSlug,
-                year: year,
-                roundNumber: round,
-              }),
-            });
-            console.log(`[LiveSync] Scorecard round ${round} completed for ${tournament.name}`);
-          } catch (e) {
-            console.warn(`[LiveSync] Scorecard round ${round} failed for ${tournament.name}: ${e.message}`);
+          let attempts = 0;
+          let success = false;
+
+          while (attempts < 3 && !success) {
+            try {
+              console.log(`[LiveSync] Syncing scorecard round ${round} for ${tournament.name} (attempt ${attempts + 1}/3)`);
+              const res = await fetch(syncUrl, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  action: 'scorecards',
+                  tournamentId: tournament.sr_id,
+                  tourId: tourSlug,
+                  year: year,
+                  roundNumber: round,
+                }),
+              });
+              if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+              console.log(`[LiveSync] ✓ Scorecard round ${round} completed for ${tournament.name}`);
+              success = true;
+            } catch (e) {
+              attempts++;
+              console.warn(`[LiveSync] Scorecard round ${round} attempt ${attempts}/3 failed for ${tournament.name}: ${e.message}`);
+              if (attempts < 3) await new Promise(r => setTimeout(r, 2000 * attempts)); // 2s then 4s backoff
+            }
           }
-          // Small delay between rounds to avoid Sportradar rate limiting
-          if (round < 4) await new Promise(r => setTimeout(r, 500));
+
+          if (!success) {
+            console.error(`[LiveSync] ❌ SCORECARD SYNC PERMANENTLY FAILED — tournament: ${tournament.name} (${tournament.id}), round: ${round}. Manual backfill required.`);
+          }
+
+          // Delay between rounds to avoid Sportradar rate limiting
+          await new Promise(r => setTimeout(r, 800));
         }
         console.log(`[LiveSync] Final all-rounds scorecard sync finished for ${tournament.name}`);
       }
