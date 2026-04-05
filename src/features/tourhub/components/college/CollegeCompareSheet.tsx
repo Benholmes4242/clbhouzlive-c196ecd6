@@ -245,7 +245,7 @@ export function CollegeCompareSheet({
         </div>
       )}
       
-      {/* Metric chips — 3 tabs: Earnings, Wins, Top 10s */}
+      {/* Metric chips — card-style tiles matching Leaders category sheet */}
       {!hasError && !hasNoRivals && (
         <div className="flex" style={{ padding: '0 20px 16px', gap: '8px' }}>
           {METRICS.map(({ key, label }) => {
@@ -254,16 +254,18 @@ export function CollegeCompareSheet({
               <button
                 key={key}
                 onClick={() => setActiveMetric(key)}
-                className="flex-1 flex items-center justify-center transition-all active:scale-[0.97]"
+                className="flex-1 flex items-center justify-center transition-all duration-150 active:scale-[0.97]"
                 style={{
-                  minHeight: 36,
-                  borderRadius: 8,
+                  minHeight: 40,
+                  borderRadius: 12,
                   fontSize: 13,
-                  fontWeight: isActive ? 600 : 500,
-                  padding: '8px 16px',
-                  background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                  color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-                  border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                  fontWeight: isActive ? 700 : 500,
+                  padding: '10px 16px',
+                  background: isActive ? 'hsl(var(--accent-amber) / 0.10)' : 'hsl(var(--card))',
+                  color: 'hsl(var(--foreground))',
+                  border: isActive
+                    ? '1.5px solid hsl(var(--accent-amber) / 0.40)'
+                    : '1px solid hsl(var(--border) / 0.5)',
                 }}
               >
                 {label}
