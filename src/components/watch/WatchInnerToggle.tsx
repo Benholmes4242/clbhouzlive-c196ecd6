@@ -104,7 +104,7 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
           />
           {chipsLoading ? (
             [0, 1, 2, 3].map(i => (
-              <Skeleton key={i} className="shrink-0 h-[34px] w-[80px] rounded-full" />
+              <Skeleton key={i} className="shrink-0 h-[36px] w-[85px] rounded-full" />
             ))
           ) : (
             categoryChips.map(chip => (
