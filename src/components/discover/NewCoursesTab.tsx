@@ -1,11 +1,12 @@
-import React from 'react';
+import { lazy, Suspense } from 'react';
+import ExploreGridSkeleton from '@/components/explore-tab-new/ExploreGridSkeleton';
+
+const CoursesTabContent = lazy(() => import('@/components/courses-tab/CoursesTabContent'));
 
 export default function NewCoursesTab() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-      <div className="text-5xl mb-4">⛳</div>
-      <h3 className="text-lg font-semibold mb-1">Courses</h3>
-      <p className="text-sm text-muted-foreground">Coming soon — Phase 3</p>
-    </div>
+    <Suspense fallback={<ExploreGridSkeleton />}>
+      <CoursesTabContent embedded />
+    </Suspense>
   );
 }
