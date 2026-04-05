@@ -164,10 +164,9 @@ export const LoopCard = React.memo(function LoopCard({
           {/* Duration badge — bottom right, videos only */}
           {isVideo && duration > 0 && (
             <span
-              className="absolute bottom-2 right-2 z-10 text-[12px] font-semibold text-white"
+              className="absolute bottom-2 right-2 z-10 text-[12px] font-semibold text-white liquid-glass"
               style={{
-                background: 'rgba(0,0,0,0.72)',
-                borderRadius: 5,
+                borderRadius: 6,
                 padding: '3px 7px',
               }}
             >
