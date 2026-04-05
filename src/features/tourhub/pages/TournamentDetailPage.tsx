@@ -470,7 +470,7 @@ export function TournamentDetailPage() {
 
           {/* Row 2: Tabs */}
           <div
-            className="flex gap-1 overflow-x-auto scrollbar-hide px-5 pt-2 pb-2.5"
+            className="flex gap-1 overflow-x-auto scrollbar-hide px-5 pt-2 pb-2.5 justify-center"
             role="tablist"
             aria-label="Tournament Sections"
           >
