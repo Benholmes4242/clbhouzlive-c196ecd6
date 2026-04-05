@@ -4,7 +4,7 @@ export const DiscoverSkeleton = () => {
   return (
     <div className="min-h-screen page-with-header pb-20 bg-background">
       {/* Top tabs — 3 underline-style tabs matching SegmentedControl */}
-      <div className="flex justify-center" style={{ gap: 28, padding: '12px 6px 10px', borderBottom: '1px solid hsl(var(--border))' }}>
+      <div className="flex justify-center" style={{ gap: 34, padding: '14px 7px 12px', borderBottom: '1px solid hsl(var(--border))' }}>
         <Skeleton className="h-5 w-14 rounded" />
         <Skeleton className="h-5 w-16 rounded" />
         <Skeleton className="h-5 w-14 rounded" />
