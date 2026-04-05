@@ -18,13 +18,13 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
           background: 'rgba(247,147,30,0.05)',
           borderTop: '0.5px solid rgba(247,147,30,0.15)',
           borderBottom: '0.5px solid rgba(247,147,30,0.15)',
-          padding: '10px 0',
+          padding: '12px 0 14px',
           margin: '4px 0 2px',
         }}
       >
         <div
           style={{
-            padding: '0 16px 8px',
+            padding: '0 16px 10px',
             fontSize: 12,
             fontWeight: 700,
             textTransform: 'uppercase',
@@ -42,7 +42,7 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
             <div
               key={i}
               className="bg-muted animate-pulse shrink-0"
-              style={{ width: 150, height: 120, borderRadius: 12 }}
+              style={{ width: 155, height: 120, borderRadius: 12 }}
             />
           ))}
         </div>
@@ -59,13 +59,13 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         background: 'rgba(247,147,30,0.05)',
         borderTop: '0.5px solid rgba(247,147,30,0.15)',
         borderBottom: '0.5px solid rgba(247,147,30,0.15)',
-        padding: '10px 0',
+        padding: '12px 0 14px',
         margin: '4px 0 2px',
       }}
     >
       <div
         style={{
-          padding: '0 16px 8px',
+          padding: '0 16px 10px',
           fontSize: 12,
           fontWeight: 700,
           textTransform: 'uppercase',
@@ -105,12 +105,12 @@ function HighlightCard({
     <button
       onClick={onTap}
       className="shrink-0 text-left active:scale-[0.97] transition-transform"
-      style={{ width: 150 }}
+      style={{ width: 155 }}
     >
       {/* Image */}
       <div
-        className="overflow-hidden"
-        style={{ width: 150, height: 95, borderRadius: 12 }}
+        className="overflow-hidden relative"
+        style={{ width: 155, height: 95, borderRadius: 12 }}
       >
         {highlight.image_url ? (
           <img
@@ -122,10 +122,22 @@ function HighlightCard({
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#1a2a0d] to-[#0d1508]" />
         )}
+        {/* Rating badge on image */}
+        {highlight.avg_network_rating != null && highlight.avg_network_rating > 0 && (
+          <div
+            className="absolute flex items-center gap-1 liquid-glass"
+            style={{ top: 7, right: 7, borderRadius: 20, padding: '3px 8px' }}
+          >
+            <ClubhouseLogo size="xs" />
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>
+              {highlight.avg_network_rating.toFixed(1)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Body */}
-      <div style={{ padding: '6px 8px 0' }}>
+      <div style={{ padding: '7px 6px 0' }}>
         <p
           className="truncate"
           style={{
@@ -140,18 +152,12 @@ function HighlightCard({
         {location && (
           <p
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: 'hsl(var(--muted-foreground))',
               marginTop: 2,
             }}
           >
             {location}
-          </p>
-        )}
-        {highlight.avg_network_rating != null && highlight.avg_network_rating > 0 && (
-          <p className="flex items-center gap-1" style={{ fontSize: 10, color: '#F7931E', fontWeight: 600 }}>
-            <ClubhouseLogo size="xs" />
-            {highlight.avg_network_rating.toFixed(1)}
           </p>
         )}
       </div>

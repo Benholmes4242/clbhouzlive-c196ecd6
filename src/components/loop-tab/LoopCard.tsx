@@ -195,7 +195,7 @@ export const LoopCard = React.memo(function LoopCard({
         </button>
 
         {/* 2. CREATOR ROW — compact, sits directly below media */}
-        <div className="flex items-center gap-2.5 px-3 pt-2.5 pb-0">
+        <div className="flex items-center gap-2.5 px-4 pt-3 pb-0">
           <button
             onClick={() => navigate(`/profile/${post.userId}`)}
             className="shrink-0"
@@ -212,7 +212,7 @@ export const LoopCard = React.memo(function LoopCard({
             className="flex-1 min-w-0 text-left"
           >
             <div className="flex items-center gap-1 min-w-0">
-              <span className="text-[13px] font-semibold text-foreground truncate">
+              <span className="text-[14px] font-semibold text-foreground truncate">
                 {post.displayName}
               </span>
               {post.isVerified && (
@@ -220,7 +220,7 @@ export const LoopCard = React.memo(function LoopCard({
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
                 </svg>
               )}
-              <span className="text-[12px] text-muted-foreground shrink-0">· {timeAgo}</span>
+              <span className="text-[13px] text-muted-foreground shrink-0">· {timeAgo}</span>
             </div>
             {/* Amber course attribution — inline below name row */}
             {courseName && (
@@ -269,17 +269,17 @@ export const LoopCard = React.memo(function LoopCard({
 
         {/* 3. CAPTION — two lines max, truncated */}
         {cleanCaption && (
-          <div className="px-3 pt-1.5 pb-0">
+          <div className="px-4 pt-2 pb-0">
             <PostContentWithTags
               content={cleanCaption}
               tags={post.tags || []}
-              className="text-[13px] text-foreground line-clamp-2"
+              className="text-[14px] text-foreground line-clamp-2"
             />
           </div>
         )}
 
         {/* 4. ENGAGEMENT ROW */}
-        <div className="flex items-center gap-5 px-3 pt-2 pb-2.5">
+        <div className="flex items-center gap-5 px-4 pt-2.5 pb-3">
           <button
             onClick={toggleLike}
             aria-label={`${isLiked ? 'Unlike' : 'Like'} post`}
@@ -288,7 +288,7 @@ export const LoopCard = React.memo(function LoopCard({
             <Heart
               className={`h-[17px] w-[17px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
             />
-            <span className={`text-[13px] ${isLiked ? 'text-like' : 'text-muted-foreground'}`}>
+            <span className={`text-[14px] ${isLiked ? 'text-like' : 'text-muted-foreground'}`}>
               {formatCompact(likeCount)}
             </span>
           </button>
@@ -298,7 +298,7 @@ export const LoopCard = React.memo(function LoopCard({
             className="flex items-center gap-1.5 text-muted-foreground min-h-[40px]"
           >
             <MessageCircle className="h-[17px] w-[17px]" />
-            <span className="text-[13px]">{formatCompact(post.commentCount)}</span>
+            <span className="text-[14px]">{formatCompact(post.commentCount)}</span>
           </button>
           <button
             onClick={handleShare}
@@ -306,7 +306,7 @@ export const LoopCard = React.memo(function LoopCard({
             className="flex items-center gap-1.5 text-muted-foreground min-h-[40px]"
           >
             <Share2 className="h-[17px] w-[17px]" />
-            <span className="text-[13px]">{formatCompact(post.shareCount)}</span>
+            <span className="text-[14px]">{formatCompact(post.shareCount)}</span>
           </button>
 
           {/* "I've played here" button — pushed right, shows when course is known */}
@@ -315,13 +315,13 @@ export const LoopCard = React.memo(function LoopCard({
               onClick={() => navigate(`/courses/${courseId}`)}
               className="ml-auto flex items-center gap-1.5 active:scale-[0.97] transition-transform"
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 color: '#006747',
                 background: 'rgba(0,103,71,0.09)',
                 border: '1px solid rgba(0,103,71,0.25)',
                 borderRadius: 20,
-                padding: '5px 12px',
+                padding: '6px 14px',
                 letterSpacing: '0.01em',
               }}
             >
