@@ -285,7 +285,7 @@ export function LeadersTab() {
           <Link
             to="/tourhub?tab=overview"
             replace
-            className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
             style={{ color: 'hsl(var(--muted-foreground) / 0.70)' }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
