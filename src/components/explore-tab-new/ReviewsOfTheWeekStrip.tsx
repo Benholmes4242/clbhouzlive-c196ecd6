@@ -67,8 +67,8 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
   };
 
   return (
-    <div className="py-4">
-      <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground px-4 pb-3">
+    <div className="pt-5 pb-4" style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+      <h3 className="flex items-center gap-1.5 text-[15px] font-semibold text-foreground px-4 pb-4">
         <Heart className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E' }} />
         Most loved this month
       </h3>
@@ -78,7 +78,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
             key={review.review_id}
             type="button"
             onClick={() => handleReviewTap(review)}
-            className="shrink-0 w-[140px] aspect-[3/4] rounded-xl overflow-hidden relative bg-muted focus:outline-none"
+            className="shrink-0 w-[160px] aspect-[3/4] rounded-xl overflow-hidden relative bg-muted focus:outline-none"
           >
             {review.thumbnail_url ? (
               <img
@@ -100,20 +100,20 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
 
             {/* Rating badge */}
             <span
-              className="absolute top-2 right-2 rounded-lg flex items-center gap-[3px] text-[11px] font-semibold text-white leading-none liquid-glass"
-              style={{ padding: '3px 7px' }}
+              className="absolute top-2 right-2 rounded-lg flex items-center gap-[3px] text-[12px] font-semibold text-white leading-none liquid-glass"
+              style={{ padding: '4px 8px' }}
             >
-              <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[10px] h-[10px]" />
+              <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[12px] h-[12px]" />
               {review.rating.toFixed(1)}
             </span>
 
             {/* Course name + location */}
             <div className="absolute bottom-2 left-2 right-2">
-              <span className="text-[11px] font-semibold text-white line-clamp-1 block truncate">
+              <span className="text-[12px] font-semibold text-white line-clamp-1 block truncate">
                 {review.course_name}
               </span>
               {formatCourseLocation(review.course_location) && (
-                <span className="text-[9px] text-white/60 line-clamp-1 block truncate">
+                <span className="text-[11px] text-white/60 line-clamp-1 block truncate">
                   {formatCourseLocation(review.course_location)}
                 </span>
               )}

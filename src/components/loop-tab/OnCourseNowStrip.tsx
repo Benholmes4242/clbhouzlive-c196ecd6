@@ -12,8 +12,8 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div>
-        <div className="flex items-center justify-between px-4 pt-3 pb-1.5">
+      <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+        <div className="flex items-center justify-between px-4 pt-3.5 pb-1.5">
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-muted animate-pulse" />
             <div className="h-4 w-32 bg-muted animate-pulse rounded" />
@@ -25,7 +25,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
         >
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
-              <div className="w-[58px] h-[58px] rounded-full bg-muted animate-pulse" />
+              <div className="w-[68px] h-[68px] bg-muted animate-pulse" style={{ borderRadius: '34%' }} />
               <div className="h-2.5 w-10 bg-muted animate-pulse rounded" />
             </div>
           ))}
@@ -48,9 +48,9 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
   const hasActiveFriends = visibleFriends.some((f) => f.is_active_recently);
 
   return (
-    <div>
+    <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
       {/* Section header */}
-      <div className="flex items-center justify-between" style={{ padding: '12px 16px 6px' }}>
+      <div className="flex items-center justify-between" style={{ padding: '14px 16px 6px' }}>
         <div className="flex items-center gap-1.5">
           <div
             style={{
@@ -77,7 +77,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
       <div
         className="flex items-start overflow-x-auto"
         style={{
-          padding: '4px 16px 12px',
+          padding: '4px 16px 14px',
           gap: 10,
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
@@ -119,8 +119,8 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
       <div
         className="relative"
         style={{
-          width: 58,
-          height: 58,
+          width: 68,
+          height: 68,
           borderRadius: '34%',
           border: `2.5px solid ${isActive ? '#F7931E' : 'hsl(var(--border))'}`,
         }}
@@ -146,8 +146,8 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
               position: 'absolute',
               bottom: 1,
               right: 1,
-              width: 11,
-              height: 11,
+              width: 13,
+              height: 13,
               borderRadius: '50%',
               background: '#22c55e',
               border: '2px solid #F8FAFC',
@@ -170,10 +170,10 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
       <span
         className="truncate text-center"
         style={{
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 500,
           color: 'hsl(var(--muted-foreground))',
-          maxWidth: 54,
+          maxWidth: 62,
         }}
       >
         {displayName}

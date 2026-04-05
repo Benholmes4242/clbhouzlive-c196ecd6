@@ -47,10 +47,10 @@ export function LoopHeader({ activeMode, onModeChange, onOpenSearch }: LoopHeade
                 background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
                 border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
                 color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: isActive ? 500 : 400,
-                padding: '4px 18px',
-                minHeight: 28,
+                padding: '6px 18px',
+                minHeight: 34,
                 whiteSpace: 'nowrap',
               }}
             >

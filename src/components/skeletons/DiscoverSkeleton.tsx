@@ -4,16 +4,22 @@ export const DiscoverSkeleton = () => {
   return (
     <div className="min-h-screen page-with-header pb-20 bg-background">
       {/* Top tabs — 3 underline-style tabs matching SegmentedControl */}
-      <div className="flex justify-center gap-5 py-3 px-4" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+      <div className="flex justify-center" style={{ gap: 28, padding: '12px 6px 10px', borderBottom: '1px solid hsl(var(--border))' }}>
         <Skeleton className="h-5 w-14 rounded" />
         <Skeleton className="h-5 w-16 rounded" />
         <Skeleton className="h-5 w-14 rounded" />
       </div>
 
-      {/* Sub-tabs — Clips/Videos or filter chips */}
-      <div className="flex gap-2 px-4 py-3 overflow-hidden">
+      {/* Sub-tabs — Clips/Videos pills */}
+      <div className="flex justify-center gap-2 py-2.5 px-4">
+        <Skeleton className="h-[38px] w-[80px] rounded-lg" />
+        <Skeleton className="h-[38px] w-[80px] rounded-lg" />
+      </div>
+
+      {/* Category chips */}
+      <div className="flex gap-2 px-4 py-2 overflow-hidden">
         {[48, 64, 72, 56].map((w, i) => (
-          <Skeleton key={i} className="h-[30px] shrink-0 rounded-full" style={{ width: w }} />
+          <Skeleton key={i} className="h-[32px] shrink-0 rounded-full" style={{ width: w }} />
         ))}
       </div>
 

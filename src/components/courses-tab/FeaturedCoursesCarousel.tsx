@@ -31,14 +31,12 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
 
       if (error || !data) return [];
 
-      // Fetch all region members in one query
       const regionIds = data.map(r => r.id);
       const { data: allMembers } = await supabase
         .from('explore_region_members')
         .select('region_id, country')
         .in('region_id', regionIds);
 
-      // Group countries by region
       const countriesByRegion = new Map<string, string[]>();
       for (const m of (allMembers ?? [])) {
         const list = countriesByRegion.get(m.region_id) ?? [];
@@ -46,12 +44,10 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
         countriesByRegion.set(m.region_id, list);
       }
 
-      // Collect all unique countries for a single count query
       const allCountries = [...new Set((allMembers ?? []).map(m => m.country))];
       let countsByCountry = new Map<string, number>();
 
       if (allCountries.length > 0) {
-        // Get total per-country counts
         const { data: countRows } = await supabase
           .from('golf_courses')
           .select('country')
@@ -82,7 +78,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
   }, [slides?.length, isPaused]);
 
   if (isLoading) {
-    return <div className="w-full h-[200px] sm:h-[230px] bg-muted animate-pulse" />;
+    return <div className="w-full h-[260px] sm:h-[290px] bg-muted animate-pulse" />;
   }
 
   if (!slides || slides.length === 0) return null;
@@ -91,7 +87,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
 
   return (
     <div
-      className="relative w-full h-[200px] sm:h-[230px] overflow-hidden"
+      className="relative w-full h-[260px] sm:h-[290px] overflow-hidden"
       style={{ background: '#1a1a1a' }}
       onPointerDown={() => setIsPaused(true)}
       onPointerUp={() => setIsPaused(false)}
@@ -120,12 +116,12 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
           {/* Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-1.5">
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', lineHeight: 1.2 }}>
+          <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-1.5">
+            <h2 style={{ fontSize: 26, fontWeight: 700, color: 'white', lineHeight: 1.2 }}>
               {slide.title}
             </h2>
             {slide.courseCount > 0 && (
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', fontWeight: 400 }}>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: 400 }}>
                 {slide.courseCount.toLocaleString()} courses
               </p>
             )}
@@ -137,8 +133,8 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 5,
-                padding: '6px 12px',
-                fontSize: 12,
+                padding: '7px 14px',
+                fontSize: 13,
                 fontWeight: 600,
                 color: 'white',
               }}
@@ -153,7 +149,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
       {slides.length > 1 && (
         <div
           className="absolute flex items-center"
-          style={{ bottom: 16, right: 16, gap: 5 }}
+          style={{ bottom: 16, right: 16, gap: 5, paddingBottom: 8 }}
         >
           {slides.map((_, i) => (
             <button
@@ -161,9 +157,9 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
               onClick={() => setCurrentSlide(i)}
               aria-label={`Go to slide ${i + 1}`}
               style={{
-                width: currentSlide === i ? 16 : 6,
-                height: 6,
-                borderRadius: currentSlide === i ? 3 : '50%',
+                width: currentSlide === i ? 20 : 7,
+                height: 7,
+                borderRadius: currentSlide === i ? 3.5 : '50%',
                 background: currentSlide === i ? 'white' : 'rgba(255,255,255,0.4)',
                 transition: 'all 0.3s ease',
                 border: 'none',
