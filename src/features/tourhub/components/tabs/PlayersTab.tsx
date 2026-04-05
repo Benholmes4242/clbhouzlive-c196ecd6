@@ -433,13 +433,24 @@ export function PlayersTab() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="space-y-4 py-6">
+      <div className="space-y-4 -mx-5">
         <Skeleton className="w-full" style={{ height: '35dvh' }} />
         <div className="px-5 space-y-3">
-          <Skeleton className="h-12 rounded-2xl" />
-          <Skeleton className="h-11 rounded-2xl" />
+          {/* Worlds Best skeleton */}
+          <div className="flex gap-2 overflow-hidden">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="flex-shrink-0 rounded-2xl" style={{ width: 140, height: 180 }} />
+            ))}
+          </div>
+          {/* Sticky header skeleton: filter pills + tour/sort pills */}
+          <Skeleton className="h-[38px] rounded-[10px] w-full" />
+          <div className="flex gap-2">
+            <Skeleton className="h-[34px] rounded-[10px] flex-1" />
+            <Skeleton className="h-[34px] rounded-[10px] flex-1" />
+          </div>
+          {/* Player card skeletons */}
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[100px] rounded-2xl" />
+            <Skeleton key={i} className="h-[72px] rounded-2xl" />
           ))}
         </div>
       </div>

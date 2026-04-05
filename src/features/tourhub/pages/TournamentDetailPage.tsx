@@ -170,8 +170,18 @@ export function TournamentDetailPage() {
             minHeight: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))',
           }}
         />
-        <div className="space-y-4 mt-6 px-5">
-          <Skeleton className="h-12 rounded-xl" />
+        {/* Sticky header skeleton: back + tabs */}
+        <div className="px-5 pt-3 pb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="flex justify-center gap-4">
+            {['Overview', 'Leaderboard', 'Tee Times', 'Holes'].map((tab) => (
+              <Skeleton key={tab} className="h-4 rounded" style={{ width: tab.length * 8 }} />
+            ))}
+          </div>
+        </div>
+        <div className="space-y-4 mt-4 px-5">
           <Skeleton className="h-48 rounded-2xl" />
           <Skeleton className="h-32 rounded-2xl" />
         </div>
