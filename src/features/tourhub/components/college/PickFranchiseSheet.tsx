@@ -100,17 +100,18 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
         style={{ maxHeight: 'calc(85dvh - 60px)' }}
       >
         {/* Header */}
-        <div className="text-center mb-4">
+        <div style={{ paddingBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--accent-amber))', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: 4 }}>
+            College Golf
+          </div>
           <h2
             id="pick-franchise-title"
-            style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px' }}
-            className="text-foreground"
+            style={{ fontSize: 20, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: '-0.02em', margin: 0 }}
           >
             Pick Your Franchise
           </h2>
           <p
-            className="m-0"
-            style={{ fontSize: '13px', color: 'hsl(var(--muted-foreground) / 0.6)', marginTop: '2px' }}
+            style={{ fontSize: 13, color: 'hsl(var(--muted-foreground) / 0.6)', marginTop: 4, marginBottom: 0 }}
           >
             Follow a college and join the rivalry
           </p>
