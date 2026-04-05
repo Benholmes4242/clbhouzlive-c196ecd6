@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import type { WatchFilter } from './types';
 
 const FILTERS: { key: WatchFilter; label: string; icon?: React.ReactNode }[] = [
@@ -16,26 +16,16 @@ interface WatchHeaderProps {
   embedded?: boolean;
 }
 
-const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch }) => {
+const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange }) => {
   return (
     <div
-      className="sticky z-30 bg-background pb-0 pt-0 px-0"
-      style={{ top: '0px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      className="sticky z-[28] bg-background pb-0 pt-0 px-0"
+      style={{ top: 'max(env(safe-area-inset-top, 0px), 105px)', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
-      <div className="px-4 pt-3 pb-2">
-        <button
-          onClick={onOpenSearch}
-          className="w-full flex items-center gap-2 h-10 px-3 rounded-xl bg-muted text-muted-foreground text-sm"
-        >
-          <Search className="w-4 h-4 shrink-0" />
-          <span>Search shorts...</span>
-        </button>
-      </div>
-
       <div
         role="tablist"
         aria-label="Watch filters"
-        className="flex justify-center gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide"
+        className="flex justify-center gap-2 overflow-x-auto px-4 py-3 scrollbar-hide"
       >
         {FILTERS.map(({ key, label, icon }) => {
           const isActive = activeFilter === key;

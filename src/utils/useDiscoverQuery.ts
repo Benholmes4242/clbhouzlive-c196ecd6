@@ -9,11 +9,11 @@ export function useDiscoverQuery() {
 
   const rawMain = params.get("main") || "watch";
   
-  // Map legacy routes: 'friends' -> 'following', 'photos' -> 'videos', 'channels' -> 'explore'
+  // Map legacy routes to new tab keys
   let mappedMain = rawMain;
-  if (rawMain === "friends") mappedMain = "following";
-  if (rawMain === "photos") mappedMain = "videos";
-  if (rawMain === "channels") mappedMain = "explore";
+  if (rawMain === "friends" || rawMain === "following") mappedMain = "loop";
+  if (rawMain === "photos" || rawMain === "videos") mappedMain = "watch";
+  if (rawMain === "channels" || rawMain === "explore") mappedMain = "courses";
   
   const main = mappedMain as MainPill;
   const sub = params.get("sub") || "";

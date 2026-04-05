@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WatchHeader from '@/components/watch/WatchHeader';
 import WatchGrid from '@/components/watch/WatchGrid';
+import ShotOfTheWeek from '@/components/watch/ShotOfTheWeek';
 
 import WatchSearchOverlay from '@/components/watch/WatchSearchOverlay';
 import { useWatchFeed } from '@/components/watch/hooks/useWatchFeed';
@@ -10,9 +11,10 @@ import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 interface WatchPageContentProps {
   embedded?: boolean;
+  showShotOfWeek?: boolean;
 }
 
-const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false }) => {
+const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, showShotOfWeek = true }) => {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const [activeFilter, setActiveFilter] = useState<WatchFilter>('trending');
@@ -61,6 +63,9 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false })
         onOpenSearch={() => setIsSearchOpen(true)}
         embedded={embedded}
       />
+
+      {showShotOfWeek && <ShotOfTheWeek userId={userId} />}
+
       {/* Echo — watch discovery */}
       <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <EchoContextualButton

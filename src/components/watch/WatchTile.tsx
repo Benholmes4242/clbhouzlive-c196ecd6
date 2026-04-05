@@ -58,6 +58,28 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
       
       onClick={() => open(allPosts ?? [post], index)}
     >
+      {/* Course name badge */}
+      {post.courseName && (
+        <div
+          style={{
+            position: 'absolute', top: 5, left: 5,
+            display: 'flex', alignItems: 'center', gap: 3,
+            background: 'rgba(247,147,30,0.9)',
+            borderRadius: 5, padding: '2px 5px',
+            fontSize: 9, fontWeight: 600, color: 'white',
+            maxWidth: '80%', overflow: 'hidden',
+            zIndex: 10,
+          }}
+        >
+          <svg width="6" height="6" viewBox="0 0 6 6" fill="white">
+            <circle cx="3" cy="3" r="3" />
+          </svg>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {post.courseName}
+          </span>
+        </div>
+      )}
+
       {/* Poster or placeholder */}
       {thumbnailUrl ? (
         <img
