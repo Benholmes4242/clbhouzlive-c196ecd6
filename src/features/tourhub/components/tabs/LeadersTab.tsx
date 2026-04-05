@@ -198,15 +198,22 @@ export function LeadersTab() {
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
-      <div className="space-y-4 py-4">
-        <Skeleton className="rounded-2xl w-full" style={{ height: '35dvh' }} />
-        {/* Runner card skeletons */}
+      <div className="space-y-4 -mx-5">
+        <Skeleton className="w-full" style={{ height: '35dvh' }} />
+        {/* Runner card skeletons — overlapping hero */}
         <div className="flex gap-2 px-5" style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
           <Skeleton className="flex-1 h-[60px] rounded-2xl" />
           <Skeleton className="flex-1 h-[60px] rounded-2xl" />
         </div>
-        <Skeleton className="mx-5 mt-3 h-[48px] rounded-2xl" />
-        <Skeleton className="mx-5 mt-3 h-[72px] rounded-xl" />
+        {/* Sticky header skeleton: back link + category pill */}
+        <div className="flex items-center gap-2 px-5 pt-2">
+          <Skeleton className="h-4 w-24" />
+          <div className="flex-1" />
+          <Skeleton className="h-[34px] w-40 rounded-[10px]" />
+        </div>
+        {/* Stat context skeleton */}
+        <Skeleton className="mx-5 h-[48px] rounded-xl" />
+        {/* Leader rows */}
         <div className="rounded-2xl border border-border/30 overflow-hidden mx-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-[60px] rounded-none border-b border-border/20" />

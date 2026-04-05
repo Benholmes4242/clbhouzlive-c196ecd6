@@ -281,11 +281,21 @@ export function ScheduleTab() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-6 -mx-5">
+      <div className="space-y-4 -mx-5">
         <Skeleton className="w-full" style={{ height: '35dvh' }} />
         <div className="px-5 space-y-3">
-          <Skeleton className="h-12 rounded-xl w-full" />
-          <Skeleton className="h-11 rounded-xl" />
+          {/* Sticky header skeleton: filter pills */}
+          <div className="flex gap-1">
+            {['All', 'Upcoming', 'Live', 'Completed'].map((label) => (
+              <Skeleton key={label} className="flex-1 h-[38px] rounded-[10px]" />
+            ))}
+            <Skeleton className="w-[38px] h-[38px] rounded-[10px] shrink-0" />
+          </div>
+          {/* Tour filter + month header */}
+          <div className="flex gap-2">
+            <Skeleton className="h-[34px] rounded-[10px] flex-1" />
+          </div>
+          {/* Tournament card skeletons */}
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-20 rounded-2xl" />
           ))}
