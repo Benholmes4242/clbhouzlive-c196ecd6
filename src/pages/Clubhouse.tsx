@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
