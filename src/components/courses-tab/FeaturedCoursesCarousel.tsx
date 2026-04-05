@@ -88,21 +88,26 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
               padding: 16,
             }}
           >
-            {/* Featured badge */}
+            {/* Featured badge — clbhouz called it style, angled */}
             <span
               className="self-start"
               style={{
-                background: '#F7931E',
-                color: 'white',
-                fontSize: 9,
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: 6,
-                letterSpacing: '0.5px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                background: '#F59E0B',
+                color: '#451A03',
+                fontSize: 11,
+                fontWeight: 800,
+                padding: '5px 10px',
+                borderRadius: 8,
+                letterSpacing: '0.02em',
                 textTransform: 'uppercase',
                 marginBottom: 8,
+                transform: 'rotate(-2deg)',
               }}
             >
+              <span style={{ fontSize: 12 }}>⭐</span>
               Featured this week
             </span>
 
