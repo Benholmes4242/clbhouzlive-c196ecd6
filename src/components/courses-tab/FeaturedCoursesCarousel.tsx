@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useCourseOfTheWeek } from './hooks/useCourseOfTheWeek';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
 interface FeaturedCoursesCarouselProps {
   onRegionSelect: (slug: string) => void;
@@ -29,14 +30,14 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      {/* Gradient overlay — lighter */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
 
-      {/* Course of the Week eyebrow */}
+      {/* Course of the Week eyebrow — canonical liquid-glass */}
       <div className="absolute top-0 left-0 right-0 p-4">
         <div
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-          style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)' }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full liquid-glass"
+          style={{ border: '1px solid rgba(255,255,255,0.12)' }}
         >
           <span style={{ fontSize: 10 }}>⛳</span>
           <span style={{ fontSize: 11, fontWeight: 700, color: 'white', letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
@@ -66,12 +67,10 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
 
         {/* Bottom row — rating + explore button */}
         <div className="flex items-center justify-between" style={{ marginTop: 6 }}>
-          {/* Avg rating badge */}
+          {/* Avg rating badge with clbhouz logo */}
           {course.avg_rating && (
             <div className="flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#F7931E" stroke="none">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
+              <img src={clbhouzLogo} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />
               <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>
                 {Number(course.avg_rating).toFixed(1)}
               </span>
@@ -94,7 +93,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
               fontWeight: 700,
               color: 'white',
               borderRadius: 10,
-              border: 'none',
+              border: '1px solid rgba(255,255,255,0.12)',
               cursor: 'pointer',
             }}
           >
