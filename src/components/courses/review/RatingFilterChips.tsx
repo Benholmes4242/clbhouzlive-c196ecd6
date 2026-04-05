@@ -35,19 +35,12 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
             key={option.key}
             type="button"
             onClick={() => onChange(isActive ? null : option.key)}
+            className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
             style={{
-              borderRadius: 8,
-              height: 32,
-              paddingLeft: 12,
-              paddingRight: 12,
-              fontSize: 12,
-              fontWeight: isActive ? 700 : 500,
-              cursor: 'pointer',
-              background: isActive ? 'linear-gradient(90deg, #F59E0B, #F7931E)' : 'transparent',
-              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
-              boxShadow: isActive ? '0 2px 8px rgba(247,147,30,0.20)' : 'none',
-              transition: 'all 0.18s ease',
+              borderRadius: 20,
+              background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+              border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+              color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
             }}
           >
             {option.label}
