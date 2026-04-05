@@ -199,7 +199,7 @@ export function LeadersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 py-4">
-        <Skeleton className="rounded-2xl w-full" style={{ height: '45dvh' }} />
+        <Skeleton className="rounded-2xl w-full" style={{ height: '35dvh' }} />
         {/* Runner card skeletons */}
         <div className="flex gap-2 px-4" style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
           <Skeleton className="flex-1 h-[60px] rounded-2xl" />
@@ -219,7 +219,7 @@ export function LeadersTab() {
   // ─── Hero leader (#1) ───
   const leader = rankedPlayers[0] ?? null;
   const runners = rankedPlayers.slice(1, 3);
-  const listPlayers = rankedPlayers.slice(3);
+  const listPlayers = rankedPlayers;
 
   return (
     <div
@@ -267,14 +267,16 @@ export function LeadersTab() {
           STICKY HEADER — back link · category pill · stat context
           ══════════════════════════════════════════════ */}
       <div
-        className="-mx-4 sticky top-0 z-20"
+        className="sticky z-20"
         style={{
+          top: 'max(env(safe-area-inset-top, 0px), 0px)',
           background: 'hsl(var(--background) / 0.96)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid hsl(var(--border) / 0.10)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          marginTop: '12px',
+          paddingTop: 10,
+          paddingBottom: 0,
+          marginTop: 8,
         }}
       >
         {/* Control row: ← Tour Overview | [spacer] | category pill */}
@@ -283,7 +285,7 @@ export function LeadersTab() {
           <Link
             to="/tourhub?tab=overview"
             replace
-            className="flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
+            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
             style={{ color: 'hsl(var(--muted-foreground) / 0.70)' }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />

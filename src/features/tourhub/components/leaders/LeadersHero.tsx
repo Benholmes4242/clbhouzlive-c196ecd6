@@ -49,7 +49,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Burger menu — glass pill */}
+      {/* Burger menu — glass pill (dark) */}
       <button
         className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
         style={{
@@ -77,13 +77,13 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
         to={`/tourhub/player/${player.id}`}
         className="block active:scale-[0.995] transition-transform"
       >
-        {/* Hero — 50dvh */}
-        <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
+        {/* Hero — 35dvh matching Players */}
+        <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
           {photoUrl ? (
             <motion.img
               src={photoUrl}
               alt={player.full_name}
-              className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
+              className="absolute inset-0 w-full h-full object-cover object-[center_0%]"
               loading="eager"
               initial={{ scale: 1.06 }}
               animate={{ scale: 1 }}
@@ -98,13 +98,13 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
             </div>
           )}
 
-          {/* Gradient — stronger for text legibility */}
+          {/* Gradient — lighter, matching Players */}
           <div className="absolute inset-0" style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.03) 55%, transparent 75%)',
           }} />
 
           <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 space-y-1.5">
-            {/* Category label — 11px, 700, amber, uppercase, wide tracking */}
+            {/* Category label */}
             <motion.p
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -145,7 +145,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               </div>
             </motion.div>
 
-            {/* Stats pill — amber bg, white text, 13px/600 */}
+            {/* Stats pill */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
