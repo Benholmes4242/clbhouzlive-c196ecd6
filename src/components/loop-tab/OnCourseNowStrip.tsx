@@ -52,14 +52,27 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
       {/* Section header */}
       <div className="flex items-center justify-between" style={{ padding: '10px 16px 8px' }}>
         <div className="flex items-center gap-1.5">
-          <div
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: hasActiveFriends ? '#22c55e' : 'hsl(var(--muted-foreground))',
-            }}
-          />
+          <div className="relative" style={{ width: 8, height: 8 }}>
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: hasActiveFriends ? '#22c55e' : 'hsl(var(--muted-foreground))',
+              }}
+            />
+            {hasActiveFriends && (
+              <div
+                className="animate-ping"
+                style={{
+                  position: 'absolute',
+                  inset: -2,
+                  borderRadius: '50%',
+                  background: 'rgba(34, 197, 94, 0.4)',
+                }}
+              />
+            )}
+          </div>
           <span style={{ fontSize: 16, fontWeight: 700, color: 'hsl(var(--foreground))' }}>
             Recently active
           </span>
