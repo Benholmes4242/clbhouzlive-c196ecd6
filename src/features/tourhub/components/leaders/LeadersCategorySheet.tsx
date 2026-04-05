@@ -26,7 +26,7 @@ interface LeadersCategorySheetProps {
   activeKey: string;
   onCategoryChange: (key: string) => void;
   leaderValue?: string;
-  categoryLeaderValues?: Record<string, string>;
+  categoryLeaderValues?: Record<string, { name: string; value: string }>;
   externalOpen?: boolean;
   onExternalClose?: () => void;
   hideTrigger?: boolean;
@@ -182,22 +182,43 @@ export function LeadersCategorySheet({
 
 
                         </div>
-                        {(categoryLeaderValues[cat.key] || (cat as any).tourAverage) && (
-                          <span
-                            style={{
-                              fontSize: 11,
-                              color: 'hsl(var(--muted-foreground) / 0.5)',
-                              display: 'block',
-                              marginTop: 2,
-                              lineHeight: 1.3,
-                            }}
-                            className="truncate"
-                          >
-                            {categoryLeaderValues[cat.key]
-                              ? `Leader: ${categoryLeaderValues[cat.key]}`
-                              : `Tour avg: ${(cat as any).tourAverage}`}
-                          </span>
-                        )}
+                        {(() => {
+                          const leader = categoryLeaderValues?.[cat.key];
+                          const avg = (cat as any).tourAverage;
+                          if (leader) {
+                            return (
+                              <span
+                                style={{
+                                  fontSize: 11,
+                                  color: 'hsl(var(--muted-foreground) / 0.5)',
+                                  display: 'block',
+                                  marginTop: 2,
+                                  lineHeight: 1.3,
+                                }}
+                                className="truncate"
+                              >
+                                {leader.name} · {leader.value}
+                              </span>
+                            );
+                          }
+                          if (avg) {
+                            return (
+                              <span
+                                style={{
+                                  fontSize: 11,
+                                  color: 'hsl(var(--muted-foreground) / 0.5)',
+                                  display: 'block',
+                                  marginTop: 2,
+                                  lineHeight: 1.3,
+                                }}
+                                className="truncate"
+                              >
+                                Tour avg: {avg}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
                       </button>
                     );
                   })}

@@ -155,25 +155,43 @@ export function LeadersTab() {
     ? (worldFormatOverride ?? category.format)(rankedPlayers[0].value)
     : undefined;
 
-  // Leader value for each category — shown in the sheet grid tiles
+  // Leader name+value for each category — shown in the sheet grid tiles
   const categoryLeaderValues = useMemo(() => {
-    if (!playerStats) return {} as Record<string, string>;
-    const map: Record<string, string> = {};
-    for (const cat of LEADER_CATEGORIES) {
-      if (cat.key === 'world_rank') continue;
-      const values = playerStats
-        .map((s: any) => ({ value: cat.accessor(s.statistics ?? s) }))
-        .filter((x: any) => x.value !== null && x.value !== undefined)
-        .sort((a: any, b: any) =>
-          cat.sortDirection === 'asc' ? a.value - b.value : b.value - a.value
-        );
-      if (values.length > 0) {
-        map[cat.key] = cat.format(values[0].value);
+    const map: Record<string, { name: string; value: string }> = {};
+
+    const abbrevName = (fullName: string) => {
+      const parts = fullName.trim().split(' ');
+      if (parts.length < 2) return fullName;
+      return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
+    };
+
+    if (playerStats?.length) {
+      for (const cat of LEADER_CATEGORIES) {
+        if (cat.key === 'world_rank') continue;
+        const sorted = playerStats
+          .map((s: any) => ({ player: s.player, value: cat.accessor(s.statistics ?? s) }))
+          .filter((x: any) => x.value !== null && x.value !== undefined && x.player)
+          .sort((a: any, b: any) =>
+            cat.sortDirection === 'asc' ? a.value - b.value : b.value - a.value
+          );
+        if (sorted.length > 0) {
+          const top = sorted[0];
+          map[cat.key] = {
+            name: abbrevName(top.player.full_name),
+            value: cat.format(top.value),
+          };
+        }
       }
     }
+
     if (worldRankings?.length) {
-      map['world_rank'] = '#1';
+      const top = worldRankings[0];
+      map['world_rank'] = {
+        name: abbrevName((top as any).player?.full_name ?? (top as any).playerName ?? ''),
+        value: '#1',
+      };
     }
+
     return map;
   }, [playerStats, worldRankings]);
 
