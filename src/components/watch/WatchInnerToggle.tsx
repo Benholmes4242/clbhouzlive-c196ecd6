@@ -25,6 +25,7 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
       onClick={onTap}
       className="shrink-0 whitespace-nowrap min-h-[36px] text-[14px] font-semibold transition-colors active:scale-[0.97] flex items-center gap-1"
       style={{
+        padding: '6px 24px',
         borderRadius: 20,
         background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
         border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
