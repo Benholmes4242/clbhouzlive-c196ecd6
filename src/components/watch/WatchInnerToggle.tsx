@@ -23,7 +23,7 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
   return (
     <button
       onClick={onTap}
-      className="shrink-0 whitespace-nowrap min-h-[32px] px-3.5 text-[13px] font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
+      className="shrink-0 whitespace-nowrap min-h-[34px] px-3.5 text-[13px] font-semibold transition-colors active:scale-[0.97] flex items-center gap-1"
       style={{
         borderRadius: 20,
         background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
@@ -46,21 +46,37 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
       style={{
         top: '0px',
         borderBottom: '1px solid hsl(var(--border) / 0.12)',
-        padding: '12px 16px 0',
+        padding: '8px 16px 0',
       }}
     >
-      {/* Row 1 — Mode toggle pills */}
-      <div className="flex items-center justify-center gap-2 pb-2">
+      {/* Row 1 — Mode toggle: lighter segmented style */}
+      <div
+        className="flex items-center gap-1 pb-2 mx-auto"
+        style={{
+          maxWidth: 260,
+          background: 'hsl(var(--muted))',
+          borderRadius: 10,
+          padding: 3,
+        }}
+      >
         {(['clips', 'longform'] as WatchInnerMode[]).map((m) => (
           <button
             key={m}
             onClick={() => onModeChange(m)}
-            className="shrink-0 min-h-[38px] px-6 text-[15px] font-semibold transition-colors active:scale-[0.97]"
+            className="active:scale-[0.97] transition-colors"
             style={{
+              flex: 1,
+              minHeight: 32,
+              paddingLeft: 20,
+              paddingRight: 20,
               borderRadius: 8,
-              background: mode === m ? 'hsl(var(--foreground))' : 'transparent',
-              color: mode === m ? '#fff' : 'hsl(var(--muted-foreground))',
-              border: mode === m ? 'none' : '1.5px solid hsl(var(--border))',
+              fontSize: 14,
+              fontWeight: 600,
+              background: mode === m ? 'white' : 'transparent',
+              color: mode === m ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+              border: 'none',
+              boxShadow: mode === m ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+              transition: 'all 0.15s',
             }}
           >
             {m === 'clips' ? 'Clips' : 'Videos'}
@@ -72,27 +88,22 @@ export const WatchInnerToggle: React.FC<WatchInnerToggleProps> = ({ mode, onMode
       {mode === 'clips' && (
         <div
           className="flex items-center gap-2 overflow-x-auto"
-          style={{ scrollbarWidth: 'none', padding: '4px 16px 12px' }}
+          style={{ scrollbarWidth: 'none', padding: '6px 16px 12px' }}
         >
-          {/* Always-present: All */}
           <ChipButton
             label="All"
             isActive={activeTag === 'all'}
             onTap={() => onTagChange('all')}
           />
-
-          {/* Always-present: Near Me */}
           <ChipButton
             label="Near Me"
             icon={<MapPin className="w-3 h-3" />}
             isActive={activeTag === 'near'}
             onTap={() => onTagChange('near')}
           />
-
-          {/* Dynamic category chips */}
           {chipsLoading ? (
             [0, 1, 2, 3].map(i => (
-              <Skeleton key={i} className="shrink-0 h-[32px] w-[72px] rounded-full" />
+              <Skeleton key={i} className="shrink-0 h-[34px] w-[80px] rounded-full" />
             ))
           ) : (
             categoryChips.map(chip => (

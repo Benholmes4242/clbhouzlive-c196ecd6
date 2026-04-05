@@ -4,6 +4,7 @@ import WatchHeader from '@/components/watch/WatchHeader';
 import WatchGrid from '@/components/watch/WatchGrid';
 import TrendingThisWeek from '@/components/watch/TrendingThisWeek';
 
+import WatchAutoplay from '@/components/watch/WatchAutoplay';
 import WatchSearchOverlay from '@/components/watch/WatchSearchOverlay';
 import { useWatchFeed } from '@/components/watch/hooks/useWatchFeed';
 import type { WatchFilter } from '@/components/watch/types';
@@ -69,6 +70,8 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
       )}
 
       <TrendingThisWeek enabled={!!userId && activeTag === 'all'} />
+
+      <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
 
       <WatchGrid
         posts={posts}

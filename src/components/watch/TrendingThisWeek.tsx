@@ -1,6 +1,8 @@
+import { useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchTile from './WatchTile';
+import WatchAutoplay from './WatchAutoplay';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TrendingThisWeekProps {
@@ -10,6 +12,7 @@ interface TrendingThisWeekProps {
 export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekProps) {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
+  const stripRef = useRef<HTMLDivElement>(null);
 
   const { posts, isLoading } = useWatchFeed({
     userId,
@@ -21,15 +24,15 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 0 10px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+      <div style={{ padding: '14px 0 10px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
         <div className="px-4 pb-2">
           <span className="text-[15px] font-semibold text-foreground">
             Trending this week
           </span>
         </div>
-        <div className="flex overflow-x-auto px-4" style={{ gap: 10, scrollbarWidth: 'none' }}>
+        <div className="flex gap-3 overflow-x-auto px-4" style={{ scrollbarWidth: 'none' }}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="shrink-0 w-[130px] aspect-[4/5] rounded-[4px]" />
+            <Skeleton key={i} className="shrink-0 w-[150px] aspect-[4/5] rounded-[8px]" />
           ))}
         </div>
       </div>
@@ -50,13 +53,16 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         </span>
       </div>
 
+      <WatchAutoplay posts={topPosts} gridRef={stripRef as React.RefObject<HTMLDivElement>} />
+
       {/* Horizontal scroll strip of portrait tiles */}
       <div
-        className="flex overflow-x-auto px-4 pb-2"
-        style={{ gap: 10, scrollbarWidth: 'none' }}
+        ref={stripRef}
+        className="flex gap-3 overflow-x-auto px-4 pb-2"
+        style={{ scrollbarWidth: 'none' }}
       >
         {topPosts.map((post, i) => (
-          <div key={post.id} className="shrink-0 w-[130px]">
+          <div key={post.id} className="shrink-0 w-[150px] rounded-[8px] overflow-hidden">
             <WatchTile post={post} index={i} allPosts={topPosts} />
           </div>
         ))}
