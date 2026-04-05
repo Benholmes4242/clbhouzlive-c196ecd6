@@ -121,12 +121,12 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
         style={{
           width: 58,
           height: 58,
-          borderRadius: '50%',
+          borderRadius: '28%',
           border: `2.5px solid ${isActive ? '#F7931E' : 'hsl(var(--border))'}`,
           padding: 2,
         }}
       >
-        <div className="w-full h-full rounded-full overflow-hidden">
+        <div className="w-full h-full overflow-hidden" style={{ borderRadius: '26%' }}>
           <SquircleAvatar
             src={friend.profile_photo_url || '/placeholder.svg'}
             size="sm"
@@ -140,13 +140,24 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
               position: 'absolute',
               bottom: 1,
               right: 1,
-              width: 10,
-              height: 10,
+              width: 11,
+              height: 11,
+              borderRadius: '50%',
               background: '#22c55e',
               border: '2px solid #F8FAFC',
-              borderRadius: '50%',
+              zIndex: 10,
             }}
-          />
+          >
+            <div
+              className="animate-ping"
+              style={{
+                position: 'absolute',
+                inset: -2,
+                borderRadius: '50%',
+                background: 'rgba(34, 197, 94, 0.4)',
+              }}
+            />
+          </div>
         )}
       </div>
       {/* Name */}
