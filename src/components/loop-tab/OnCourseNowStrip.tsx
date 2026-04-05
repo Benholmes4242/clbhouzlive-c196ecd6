@@ -25,7 +25,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
         >
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
-              <div className="w-[68px] h-[68px] bg-muted animate-pulse" style={{ borderRadius: '34%' }} />
+              <div className="w-[70px] h-[70px] bg-muted animate-pulse" style={{ borderRadius: '34%' }} />
               <div className="h-2.5 w-10 bg-muted animate-pulse rounded" />
             </div>
           ))}
@@ -50,7 +50,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
   return (
     <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
       {/* Section header */}
-      <div className="flex items-center justify-between" style={{ padding: '14px 16px 6px' }}>
+      <div className="flex items-center justify-between" style={{ padding: '10px 16px 8px' }}>
         <div className="flex items-center gap-1.5">
           <div
             style={{
@@ -60,7 +60,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
               background: hasActiveFriends ? '#22c55e' : 'hsl(var(--muted-foreground))',
             }}
           />
-          <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: 'hsl(var(--foreground))' }}>
             Recently active
           </span>
         </div>
@@ -78,7 +78,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
         className="flex items-start overflow-x-auto"
         style={{
           padding: '4px 16px 14px',
-          gap: 10,
+          gap: 14,
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
@@ -119,8 +119,8 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
       <div
         className="relative"
         style={{
-          width: 68,
-          height: 68,
+          width: 70,
+          height: 70,
           borderRadius: '34%',
           border: `2.5px solid ${isActive ? '#F7931E' : 'hsl(var(--border))'}`,
         }}
@@ -146,11 +146,11 @@ function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void
               position: 'absolute',
               bottom: 1,
               right: 1,
-              width: 13,
-              height: 13,
+              width: 14,
+              height: 14,
               borderRadius: '50%',
               background: '#22c55e',
-              border: '2px solid #F8FAFC',
+              border: '2.5px solid #F8FAFC',
               zIndex: 10,
             }}
           >

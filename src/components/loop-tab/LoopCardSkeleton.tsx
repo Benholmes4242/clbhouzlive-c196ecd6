@@ -8,7 +8,7 @@ export function LoopCardSkeleton({ variant = 'landscape' }: LoopCardSkeletonProp
   return (
     <div className="bg-card overflow-hidden rounded-xl border border-border/30">
       {/* Creator header — squircle avatar */}
-      <div className="flex items-center gap-2.5 px-3 pt-3 pb-2">
+      <div className="flex items-center gap-2.5 px-4 pt-3 pb-2">
         <Skeleton className="h-9 w-9 shrink-0" style={{ borderRadius: '28%' }} />
         <div className="flex-1 space-y-1.5">
           <Skeleton className="h-3.5 w-28 rounded" />
