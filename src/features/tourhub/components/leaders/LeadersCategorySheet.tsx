@@ -118,7 +118,7 @@ export function LeadersCategorySheet({
       >
         <div
           className="overflow-y-auto overscroll-contain px-4 pb-2"
-          style={{ maxHeight: 'calc(70vh - 60px)' }}
+          style={{ maxHeight: 'calc(70vh - 60px)', paddingTop: 8 }}
         >
           {/* Header */}
           <div style={{ paddingBottom: 14 }}>
