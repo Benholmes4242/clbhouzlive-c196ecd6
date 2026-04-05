@@ -21,6 +21,11 @@ interface BestRoundsStripProps {
   activeRegion: string | null;
 }
 
+function formatCourseLocation(location: string | null): string | null {
+  if (!location) return null;
+  return location.split(',')[0].trim();
+}
+
 const GRADIENT_FALLBACKS = [
   'from-[#1a2a0d] to-[#0d1508]',
   'from-[#0d1a2a] to-[#050d14]',
@@ -49,9 +54,9 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
           className="flex items-center gap-1.5"
           style={{ padding: '4px 16px 8px' }}
         >
-          <Star className="w-3.5 h-3.5" style={{ color: '#F7931E' }} />
+          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
           <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-            Best rounds this week
+            Highest rated this month
           </span>
         </div>
         <div
@@ -80,13 +85,13 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
         style={{ padding: '4px 16px 8px' }}
       >
         <div className="flex items-center gap-1.5">
-          <Star className="w-3.5 h-3.5" style={{ color: '#F7931E' }} />
+          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
           <span style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-            Best rounds this week
+            Highest rated this month
           </span>
         </div>
         <button
-          onClick={() => navigate('/discover?main=courses')}
+          onClick={() => navigate('/courses')}
           className="active:scale-[0.97] transition-transform"
           style={{ fontSize: 13, fontWeight: 500, color: '#F7931E' }}
         >
@@ -179,7 +184,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
               >
                 {review.course_name}
               </p>
-              {review.course_location && (
+              {formatCourseLocation(review.course_location) && (
                 <p
                   style={{
                     fontSize: 10,
@@ -187,7 +192,7 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
                     marginTop: 2,
                   }}
                 >
-                  {review.course_location}
+                  {formatCourseLocation(review.course_location)}
                 </p>
               )}
             </div>
