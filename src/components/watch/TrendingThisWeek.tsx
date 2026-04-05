@@ -1,15 +1,18 @@
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchTile from './WatchTile';
 import WatchAutoplay from './WatchAutoplay';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ChevronRight } from 'lucide-react';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
 }
 
 export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekProps) {
+  const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const stripRef = useRef<HTMLDivElement>(null);
@@ -24,10 +27,10 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   if (isLoading) {
     return (
-      <div style={{ padding: '14px 0 10px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+      <div style={{ padding: '14px 0 10px' }}>
         <div className="px-4 pb-2">
           <span className="text-[15px] font-semibold text-foreground">
-            Trending this week
+            Trending clips
           </span>
         </div>
         <div className="flex gap-3 overflow-x-auto px-4" style={{ scrollbarWidth: 'none' }}>
@@ -42,15 +45,20 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div style={{ padding: '14px 0 10px', borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
+    <div style={{ padding: '14px 0 10px' }}>
       {/* Section header */}
       <div className="flex items-center justify-between px-4 pb-2">
         <span className="text-[15px] font-semibold text-foreground">
-          Trending this week
+          Trending clips
         </span>
-        <span className="text-[11px] text-muted-foreground">
-          {topPosts.length} clips
-        </span>
+        <button
+          onClick={() => navigate('/watch/clips')}
+          className="flex items-center gap-1 active:scale-[0.97] transition-transform"
+          style={{ fontSize: 13, fontWeight: 600, color: '#F7931E' }}
+        >
+          See all
+          <ChevronRight size={14} strokeWidth={2.5} />
+        </button>
       </div>
 
       <WatchAutoplay posts={topPosts} gridRef={stripRef as React.RefObject<HTMLDivElement>} />

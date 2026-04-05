@@ -103,6 +103,8 @@ const Signup = lazy(() => import("./pages/Signup"));
 const CheckEmailPage = lazy(() => import("./pages/auth/CheckEmailPage"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
+const ClipsSubpageWrapped = lazy(() => import("./components/watch/ClipsSubpage"));
+const VideosSubpageWrapped = lazy(() => import("./components/watch/VideosSubpage"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 
 
@@ -319,6 +321,8 @@ function AppRoutes() {
         <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/videos" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
+        <Route path="/watch/clips" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsSubpageWrapped /></Suspense>} />
+        <Route path="/watch/videos" element={<Suspense fallback={<GenericPageSkeleton />}><VideosSubpageWrapped /></Suspense>} />
         <Route path="/explore" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
