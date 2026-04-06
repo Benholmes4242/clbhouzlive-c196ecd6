@@ -34,7 +34,7 @@ export default function VideosTabContent({ embedded = false, hideStickyHeader = 
   };
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className={limitCards ? "bg-background" : "bg-background min-h-screen"}>
       {!hideStickyHeader && (
         <VideosHeader
           activeFilter={activeFilter}
