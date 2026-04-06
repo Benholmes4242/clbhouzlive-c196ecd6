@@ -8,6 +8,12 @@ const VideosTabContent = lazy(() => import('@/components/videos-tab/VideosTabCon
 export default function VideosSubpage() {
   const navigate = useNavigate();
 
+  // Force-remove dark body classes that may linger from KeepAlive clubhouse
+  useLayoutEffect(() => {
+    document.body.classList.remove('route-clubhouse');
+    document.body.classList.remove('route-hub');
+  }, []);
+
   return (
     <div className="bg-background min-h-screen light">
       {/* Back header */}
