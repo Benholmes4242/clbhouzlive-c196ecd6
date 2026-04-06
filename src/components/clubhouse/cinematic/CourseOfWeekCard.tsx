@@ -386,11 +386,11 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
               backdropFilter: 'blur(20px)',
             }}
           >
-            <Heart
-              size={17}
-              fill={localLiked ? '#F7931E' : 'none'}
-              style={{ color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}
-            />
+            {localLiked ? (
+              <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+            ) : (
+              <Heart size={17} fill="none" style={{ color: 'rgba(255,255,255,0.5)' }} />
+            )}
             {displayCount > 0 && (
               <span style={{ fontSize: 13, fontWeight: 700, color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}>
                 {displayCount}

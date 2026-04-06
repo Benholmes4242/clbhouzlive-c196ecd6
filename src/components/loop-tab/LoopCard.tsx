@@ -285,9 +285,11 @@ export const LoopCard = React.memo(function LoopCard({
             aria-label={`${isLiked ? 'Unlike' : 'Like'} post`}
             className="flex items-center gap-1.5 min-h-[40px]"
           >
-            <Heart
-              className={`h-[17px] w-[17px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
-            />
+            {isLiked ? (
+              <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+            ) : (
+              <Heart className="h-[17px] w-[17px] text-muted-foreground" />
+            )}
             <span className={`text-[14px] ${isLiked ? 'text-like' : 'text-muted-foreground'}`}>
               {formatCompact(likeCount)}
             </span>

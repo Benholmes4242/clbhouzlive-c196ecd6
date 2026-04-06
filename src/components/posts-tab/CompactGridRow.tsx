@@ -165,7 +165,7 @@ const CompactTile: React.FC<{
             padding: '2px 5px',
           }}
         >
-          <Heart className="w-[10px] h-[10px]" style={{ color: 'rgba(245, 158, 11, 0.9)', fill: 'rgba(245, 158, 11, 0.9)' }} />
+          <span style={{ fontSize: 10, lineHeight: 1 }}>🧡</span>
           <span className="text-[11px] font-medium text-white">
             {formatCompact(post.likeCount)}
           </span>
