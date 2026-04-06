@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { useNetworkActivity, type NetworkFriend } from '@/hooks/useNetworkActivity';
 
 interface OnCourseNowStripProps {
@@ -10,25 +10,20 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useNetworkActivity(userId);
 
-  // Loading skeleton
+  // ── Loading skeleton ──
   if (isLoading) {
     return (
-      <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
-        <div className="flex items-center justify-between px-4 pt-3.5 pb-1.5">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-muted animate-pulse" />
-            <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-          </div>
+      <div style={{ padding: '12px 16px' }}>
+        <div className="flex items-center gap-2" style={{ marginBottom: 10 }}>
+          <div className="h-4 w-28 bg-muted animate-pulse rounded" />
+          <div className="h-5 w-16 bg-muted animate-pulse rounded-full" />
         </div>
         <div
-          className="flex items-center gap-4 px-4 pb-3 overflow-x-auto"
+          className="flex gap-2 overflow-hidden"
           style={{ scrollbarWidth: 'none' }}
         >
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
-              <div className="w-[72px] h-[72px] bg-muted animate-pulse" style={{ borderRadius: '34%' }} />
-              <div className="h-2.5 w-10 bg-muted animate-pulse rounded" />
-            </div>
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} className="h-14 bg-muted animate-pulse rounded-2xl" style={{ minWidth: 160 }} />
           ))}
         </div>
       </div>
@@ -36,191 +31,158 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
   }
 
   const friends = data?.friends ?? [];
-  if (friends.length === 0) return null;
 
-  // Sort: active first, then others
-  const sortedFriends = [...friends].sort((a, b) => {
-    if (a.is_active_recently && !b.is_active_recently) return -1;
-    if (!a.is_active_recently && b.is_active_recently) return 1;
-    return 0;
-  });
-  const visibleFriends = sortedFriends.slice(0, 8);
+  // Filter to only those active in last 30 days (have last_activity set)
+  const activeFriends = friends.filter(f => f.last_activity !== null);
+  if (activeFriends.length === 0) return null;
 
-  const hasActiveFriends = visibleFriends.some((f) => f.is_active_recently);
+  const visibleFriends = activeFriends.slice(0, 10);
+  const onlineCount = visibleFriends.filter(f => f.is_active_recently).length;
 
   return (
     <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
-      {/* Section header */}
-      <div className="flex items-center justify-between" style={{ padding: '10px 16px 8px' }}>
+      {/* Header */}
+      <div
+        className="flex items-center justify-between"
+        style={{ padding: '10px 16px 8px' }}
+      >
         <div className="flex items-center gap-2">
-          <div className="relative" style={{ width: 9, height: 9 }}>
-            <div
-              style={{
-                width: 9,
-                height: 9,
-                borderRadius: '50%',
-                background: hasActiveFriends ? '#22c55e' : 'hsl(var(--muted-foreground))',
-                boxShadow: hasActiveFriends ? '0 0 0 3px rgba(34,197,94,0.15)' : 'none',
-              }}
-            />
-            {hasActiveFriends && (
-              <div
-                className="animate-ping"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: 9,
-                  height: 9,
-                  borderRadius: '50%',
-                  background: 'rgba(34, 197, 94, 0.4)',
-                }}
-              />
-            )}
-          </div>
           <span style={{ fontSize: 16, fontWeight: 700, color: 'hsl(var(--foreground))', letterSpacing: '-0.02em' }}>
             Recently active
           </span>
+          {onlineCount > 0 && (
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: '#16a34a',
+                background: 'rgba(22,163,74,0.08)',
+                borderRadius: 10,
+                padding: '2px 8px',
+              }}
+            >
+              {onlineCount} this week
+            </span>
+          )}
         </div>
         <button
           onClick={() => navigate('/golferstofollow')}
-          className="flex items-center gap-1 active:scale-[0.97] transition-transform"
-          style={{ fontSize: 13, fontWeight: 600, color: '#F7931E' }}
+          style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
         >
-          See all
-          <ChevronRight size={14} strokeWidth={2.5} />
+          See all →
         </button>
       </div>
 
-      {/* Stories strip */}
+      {/* Pill cards — horizontal scroll */}
       <div
-        className="flex items-start overflow-x-auto"
+        className="flex gap-2 overflow-x-auto"
         style={{
           padding: '4px 16px 14px',
-          gap: 16,
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {visibleFriends.map((friend) => (
-          <StoryItem
+        {visibleFriends.map(friend => (
+          <FriendPill
             key={friend.id}
             friend={friend}
             onTap={() => navigate(`/profile/${friend.id}`)}
           />
         ))}
       </div>
-
-      {/* Bottom divider */}
-      <div
-        style={{
-          height: 0.5,
-          background: 'hsl(var(--border) / 0.15)',
-          margin: '0 16px',
-        }}
-      />
     </div>
   );
 }
 
-function StoryItem({ friend, onTap }: { friend: NetworkFriend; onTap: () => void }) {
+function FriendPill({ friend, onTap }: { friend: NetworkFriend; onTap: () => void }) {
   const isActive = friend.is_active_recently;
   const displayName = friend.display_name || friend.username || '?';
-  const initial = displayName.trim().charAt(0).toUpperCase() || '?';
+  const initial = displayName.trim().charAt(0).toUpperCase();
+
+  const timeAgo = friend.last_activity
+    ? formatDistanceToNow(new Date(friend.last_activity), { addSuffix: false })
+        .replace('about ', '')
+        .replace(' hours', 'h')
+        .replace(' hour', 'h')
+        .replace(' minutes', 'm')
+        .replace(' minute', 'm')
+        .replace(' days', 'd')
+        .replace(' day', 'd')
+        .replace(' weeks', 'w')
+        .replace(' week', 'w')
+        .replace(' months', 'mo')
+        .replace(' month', 'mo')
+    : null;
 
   return (
     <button
       onClick={onTap}
-      className="flex flex-col items-center shrink-0 active:scale-[0.97] transition-transform"
-      style={{ gap: 5 }}
+      className="flex items-center shrink-0 active:scale-[0.97] transition-transform"
+      style={{
+        gap: 10,
+        padding: '8px 14px 8px 8px',
+        borderRadius: 20,
+        border: isActive ? '1.5px solid rgba(34,197,94,0.25)' : '1px solid hsl(var(--border))',
+        background: isActive ? 'rgba(34,197,94,0.04)' : 'transparent',
+        cursor: 'pointer',
+      }}
     >
-      {/* Outer ring — amber gradient for active, subtle border for inactive */}
-      <div
-        className="relative flex items-center justify-center"
-        style={{
-          width: 72,
-          height: 72,
-          borderRadius: '34%',
-          background: isActive
-            ? 'linear-gradient(135deg, #F59E0B, #F7931E)'
-            : 'hsl(var(--border))',
-          padding: isActive ? 2.5 : 1.5,
-        }}
-      >
-        {/* Inner white gap ring */}
-        <div
-          className="flex items-center justify-center"
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '32%',
-            background: 'white',
-            padding: isActive ? 2 : 1.5,
-          }}
-        >
-          {/* Avatar */}
+      {/* Avatar with green dot */}
+      <div className="relative" style={{ width: 36, height: 36, flexShrink: 0 }}>
+        {friend.profile_photo_url ? (
+          <img
+            src={friend.profile_photo_url}
+            alt={displayName}
+            style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
+            loading="lazy"
+          />
+        ) : (
           <div
-            className="w-full h-full overflow-hidden"
-            style={{ borderRadius: '30%' }}
+            className="flex items-center justify-center bg-muted text-muted-foreground"
+            style={{ width: 36, height: 36, borderRadius: '50%', fontSize: 14, fontWeight: 600 }}
           >
-            {friend.profile_photo_url ? (
-              <img
-                src={friend.profile_photo_url}
-                alt={displayName}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-sm font-semibold">
-                {initial}
-              </div>
-            )}
+            {initial}
           </div>
-        </div>
-
-        {/* Green presence dot */}
+        )}
         {isActive && (
           <div
             style={{
               position: 'absolute',
-              bottom: 0,
-              right: 0,
-              width: 16,
-              height: 16,
+              bottom: -1,
+              right: -1,
+              width: 12,
+              height: 12,
               borderRadius: '50%',
               background: '#22c55e',
-              border: '2.5px solid white',
-              zIndex: 10,
+              border: '2px solid hsl(var(--background))',
             }}
-          >
-            <div
-              className="animate-ping"
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: 16,
-                height: 16,
-                borderRadius: '50%',
-                background: 'rgba(34, 197, 94, 0.4)',
-              }}
-            />
-          </div>
+          />
         )}
       </div>
 
-      {/* Name */}
-      <span
-        className="truncate text-center"
-        style={{
-          fontSize: 11,
-          fontWeight: isActive ? 600 : 500,
-          color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-          maxWidth: 68,
-        }}
-      >
-        {displayName}
-      </span>
+      {/* Name + status */}
+      <div className="flex flex-col items-start" style={{ gap: 1, minWidth: 0 }}>
+        <span
+          className="truncate"
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'hsl(var(--foreground))',
+            maxWidth: 100,
+          }}
+        >
+          {displayName}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 500,
+            color: isActive ? '#16a34a' : 'hsl(var(--muted-foreground))',
+          }}
+        >
+          {isActive ? `● Active` : timeAgo ? `${timeAgo} ago` : 'Recently'}
+        </span>
+      </div>
     </button>
   );
 }

@@ -169,6 +169,22 @@ export function useNetworkActivity(userId: string | undefined) {
         }
       }
 
+      // Also fetch recent posts by friends (last 30 days)
+      const { data: recentPosts } = await supabase
+        .from('posts')
+        .select('user_id, created_at')
+        .in('user_id', friendIds)
+        .gte('created_at', thirtyDaysAgoISO)
+        .order('created_at', { ascending: false });
+
+      // Merge posts into activity map — keeps whichever is more recent
+      for (const post of recentPosts || []) {
+        const existing = friendActivityMap.get(post.user_id);
+        if (!existing || new Date(post.created_at) > new Date(existing)) {
+          friendActivityMap.set(post.user_id, post.created_at);
+        }
+      }
+
       // Build NetworkFriend list with activity status
       const friends: NetworkFriend[] = (profiles || [])
         .map((p) => {
@@ -179,7 +195,7 @@ export function useNetworkActivity(userId: string | undefined) {
             display_name: p.display_name,
             profile_photo_url: p.profile_photo_url,
             last_activity: lastActivity,
-            is_active_recently: lastActivity ? new Date(lastActivity) >= new Date(sevenDaysAgoISO) : false,
+            is_active_recently: lastActivity ? new Date(lastActivity) >= new Date(thirtyDaysAgoISO) : false,
           };
         })
         .sort((a, b) => {
