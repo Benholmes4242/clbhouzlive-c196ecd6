@@ -138,7 +138,7 @@ export const LoopCard = React.memo(function LoopCard({
 
   return (
     <>
-      <article ref={tileRef} className="bg-card overflow-hidden border-b border-border/50">
+      <article ref={tileRef} className="bg-card border-b border-border/50">
 
         {/* 1. MEDIA — leads the card, full width, variable aspect ratio */}
         <button
@@ -278,60 +278,88 @@ export const LoopCard = React.memo(function LoopCard({
           </div>
         )}
 
-        {/* 4. ENGAGEMENT ROW */}
-        <div className="flex items-center gap-5 px-4 pt-2.5 pb-3">
+        {/* 4. ENGAGEMENT ROW — pill buttons */}
+        <div
+          className="flex items-center gap-2 px-4 py-2.5"
+          style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}
+        >
+          {/* Like */}
           <button
             onClick={toggleLike}
-            aria-label={`${isLiked ? 'Unlike' : 'Like'} post`}
-            className="flex items-center gap-1.5 min-h-[40px]"
+            aria-label={isLiked ? 'Unlike' : 'Like'}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
           >
-            {isLiked ? (
-              <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
-            ) : (
-              <Heart className="h-[17px] w-[17px] text-muted-foreground" />
-            )}
-            <span className={`text-[14px] ${isLiked ? 'text-like' : 'text-muted-foreground'}`}>
+            <Heart
+              className="h-[19px] w-[19px] transition-colors"
+              style={{
+                fill: isLiked ? '#F7931E' : 'transparent',
+                color: isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))',
+              }}
+            />
+            <span style={{
+              fontSize: 13, fontWeight: 700,
+              color: isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))',
+            }}>
               {formatCompact(likeCount)}
             </span>
           </button>
+
+          {/* Divider */}
+          <div style={{ width: 1, height: 18, background: 'hsl(var(--border))', margin: '0 8px' }} />
+
+          {/* Comment */}
           <button
             onClick={() => setShowComments(true)}
-            aria-label="Open comments"
-            className="flex items-center gap-1.5 text-muted-foreground min-h-[40px]"
+            aria-label="Comments"
+            style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer' }}
           >
-            <MessageCircle className="h-[17px] w-[17px]" />
-            <span className="text-[14px]">{formatCompact(post.commentCount)}</span>
-          </button>
-          <button
-            onClick={handleShare}
-            aria-label="Share post"
-            className="flex items-center gap-1.5 text-muted-foreground min-h-[40px]"
-          >
-            <Share2 className="h-[17px] w-[17px]" />
-            <span className="text-[14px]">{formatCompact(post.shareCount)}</span>
+            <MessageCircle className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+              {formatCompact(post.commentCount)}
+            </span>
           </button>
 
-          {/* "I've played here" button — pushed right, shows when course is known */}
+          <div style={{ flex: 1 }} />
+
+          {/* "I've played here" — kept when course is known, pushed right */}
           {courseName && courseId && (
             <button
               onClick={() => navigate(`/courses/${courseId}`)}
-              className="ml-auto flex items-center gap-1.5 active:scale-[0.97] transition-transform"
+              className="active:scale-[0.97] transition-transform"
               style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#006747',
+                fontSize: 12, fontWeight: 600, color: '#006747',
                 background: 'rgba(0,103,71,0.09)',
                 border: '1px solid rgba(0,103,71,0.25)',
-                borderRadius: 20,
-                padding: '6px 14px',
+                borderRadius: 20, padding: '5px 12px',
+                display: 'flex', alignItems: 'center', gap: 5,
                 letterSpacing: '0.01em',
               }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
               I've played here
+            </button>
+          )}
+
+          {/* Share — pill, rightmost when no course button */}
+          {!(courseName && courseId) && (
+            <button
+              onClick={handleShare}
+              aria-label="Share"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                minHeight: 34, padding: '0 14px', borderRadius: 20,
+                fontSize: 13, fontWeight: 600,
+                background: 'transparent',
+                border: '1.5px solid hsl(var(--border))',
+                color: 'hsl(var(--muted-foreground))',
+                cursor: 'pointer',
+              }}
+            >
+              <Share2 className="h-[14px] w-[14px]" />
+              Share
             </button>
           )}
         </div>
