@@ -53,7 +53,7 @@ export default function ClipsSubpage() {
   } = useWatchFeed({ userId, filter: activeFilter, category: activeCategory });
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen light">
       {/* Header */}
       <div className="flex items-center gap-3 px-4" style={{ position: 'sticky', top: 0, zIndex: 29, paddingTop: 12, paddingBottom: 8, background: 'hsl(var(--background))', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}>
         <button

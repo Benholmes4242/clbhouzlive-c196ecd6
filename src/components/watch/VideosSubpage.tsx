@@ -9,7 +9,7 @@ export default function VideosSubpage() {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen light">
       {/* Back header */}
       <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
         <button
