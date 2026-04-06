@@ -1,6 +1,5 @@
 import React, { useEffect, useLayoutEffect, lazy, Suspense } from 'react';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
-import { useKeepAlive } from '@/components/keep-alive/KeepAliveOutlet';
 import { useSearchParams } from 'react-router-dom';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 
@@ -9,26 +8,19 @@ const Clubhouse = lazy(() => import('./Clubhouse'));
 
 const ClubhouseWrapped = () => {
   const { setVariant } = useHeader();
-  const { isActive } = useKeepAlive();
   const [searchParams] = useSearchParams();
   const showGlass = searchParams.get('glass') === 'true';
 
-  // KeepAlive preserves this route off-screen, so the dark route class must
-  // only exist while Clubhouse is the active route.
+  // Apply dark shell immediately — before the lazy Clubhouse chunk loads
+  // This prevents the white flash between splash screen and clubhouse
   useLayoutEffect(() => {
-    if (!isActive) {
-      document.body.classList.remove('route-clubhouse');
-      return;
-    }
-
     document.body.classList.add('route-clubhouse');
     return () => { document.body.classList.remove('route-clubhouse'); };
-  }, [isActive]);
+  }, []);
 
   useEffect(() => {
-    if (!isActive) return;
     setVariant('glass-dark');
-  }, [isActive, setVariant]);
+  }, [setVariant]);
 
   return (
     <>
