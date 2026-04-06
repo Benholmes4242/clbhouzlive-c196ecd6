@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useLayoutEffect } from 'react';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 
 const VideosTabContent = lazy(() => import('@/components/videos-tab/VideosTabContent'));
@@ -14,6 +14,10 @@ if (typeof document !== 'undefined') {
 
 export default function VideosSubpage() {
   const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    document.body.classList.remove('route-clubhouse', 'route-hub');
+  }, []);
 
   return (
     <div
