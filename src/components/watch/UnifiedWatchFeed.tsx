@@ -53,7 +53,7 @@ function SectionHeader({
   return (
     <div style={{
       display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-      padding: '18px 16px 10px',
+      padding: '12px 16px 10px',
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span style={{
