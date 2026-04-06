@@ -33,6 +33,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/tour', // Tour Hub alias
   '/discover/explore/region/', // Individual region pages - immersive hero
   '/achievements/', // Other user's quest page - has own back nav
+  '/watch/', // Watch subpages (clips, videos) - have own back headers
 ] as const;
 
 /**
