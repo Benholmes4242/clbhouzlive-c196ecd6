@@ -66,17 +66,32 @@ export function SnapFeed({
   useEffect(() => { onNearEndRef.current = onNearEnd; }, [onNearEnd]);
   useEffect(() => { onActiveIndexChangeRef.current = onActiveIndexChange; }, [onActiveIndexChange]);
 
-  // Scroll to startIndex on first mount only
+  // Scroll to startIndex on first mount only — retry until container has layout
   useEffect(() => {
     if (hasScrolledToStart.current) return;
     if (!startIndex || startIndex === 0) return;
     const container = containerRef.current;
     if (!container) return;
-    requestAnimationFrame(() => {
+
+    let attempts = 0;
+    const MAX_ATTEMPTS = 10;
+
+    const tryScroll = () => {
       const slideHeight = container.clientHeight;
-      container.scrollTo({ top: slideHeight * startIndex, behavior: 'instant' as ScrollBehavior });
+      if (slideHeight === 0 && attempts < MAX_ATTEMPTS) {
+        attempts++;
+        requestAnimationFrame(tryScroll);
+        return;
+      }
+      const resolvedHeight = slideHeight > 0 ? slideHeight : window.innerHeight;
+      container.scrollTo({
+        top: resolvedHeight * startIndex,
+        behavior: 'instant' as ScrollBehavior,
+      });
       hasScrolledToStart.current = true;
-    });
+    };
+
+    requestAnimationFrame(tryScroll);
   }, [startIndex]);
 
   const activeIndex = useClubhouseStore(s => s.activeIndex);
