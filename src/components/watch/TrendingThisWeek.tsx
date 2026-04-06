@@ -41,13 +41,13 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   // ── Dark skeleton loading state ──
   if (isLoading) {
     const shimmerBase = {
-      background: 'rgba(255,255,255,0.07)',
-      backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.13) 50%, transparent 100%)',
+      background: 'rgba(0,0,0,0.06)',
+      backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
       backgroundSize: '200% 100%',
     } as React.CSSProperties;
 
     return (
-      <div style={{ background: '#0a0a0a' }}>
+      <div style={{ background: '#F8FAFC' }}>
         {/* Label row skeleton */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 16px 10px' }}>
           <div style={{ ...shimmerBase, width: 140, height: 12, borderRadius: 6, animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
