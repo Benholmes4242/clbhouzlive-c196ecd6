@@ -103,36 +103,8 @@ function VideoCardSkeleton() {
   );
 }
 
-// ─── Mobile debug overlay ─────────────────────────────────────────────────────
 
-function ArticleChildrenDebug() {
-  const [children, setChildren] = useState<string[]>([]);
 
-  useEffect(() => {
-    const articleEl = document.querySelector('article[data-card-index="0"]');
-    if (!articleEl) { setChildren(['❌ article not found']); return; }
-    const kids = Array.from(articleEl.children).map((el, i) => {
-      const htmlEl = el as HTMLElement;
-      const rect = htmlEl.getBoundingClientRect();
-      const cs = getComputedStyle(htmlEl);
-      return `[${i}] ${el.tagName} h=${Math.round(rect.height)}px w=${Math.round(rect.width)}px display=${cs.display} visibility=${cs.visibility} opacity=${cs.opacity}`;
-    });
-    setChildren(kids);
-  }, []);
-
-  return (
-    <div>
-      <div style={{ color: '#ffd93d', fontFamily: 'monospace', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
-        📦 Article children ({children.length}):
-      </div>
-      {children.map((c, i) => (
-        <div key={i} style={{ color: '#ccc', fontFamily: 'monospace', fontSize: 11, marginBottom: 4, wordBreak: 'break-all' }}>
-          {c}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function MobileDebugOverlay({ post, thumbnailUrl, cleanedCaption }: {
   post: FeedPost;
