@@ -1,12 +1,12 @@
-// ActorSelector — Compact toolbar avatar + profile switcher, light mode
+// ActorSelector — Dark identity pill + dark bottom sheet with account + visibility sections
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronUp, ChevronDown, Check } from 'lucide-react';
+import { ChevronUp, ChevronDown, Check, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostStudioContext } from '../usePostStudio';
-import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG } from '../tokens';
+import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG, DARK_TEXT, DARK_TEXT2, DARK_TEXT3 } from '../tokens';
 
 interface BusinessAccount {
   id: string;
@@ -17,10 +17,13 @@ interface BusinessAccount {
 interface ActorSelectorProps {
   compact?: boolean;
   header?: boolean;
+  visibilityIcon?: string;
+  visibilityLabel?: string;
+  onOpenVisibility?: () => void;
 }
 
-export function ActorSelector({ compact = false, header = false }: ActorSelectorProps) {
-  const { state, setActor } = usePostStudioContext();
+export function ActorSelector({ compact = false, header = false, visibilityIcon, visibilityLabel, onOpenVisibility }: ActorSelectorProps) {
+  const { state, setActor, setVisibility } = usePostStudioContext();
   const [businesses, setBusinesses] = useState<BusinessAccount[]>([]);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('You');
@@ -69,44 +72,60 @@ export function ActorSelector({ compact = false, header = false }: ActorSelector
     : businesses.find(b => b.id === state.actorId)?.name ?? 'Business';
   const hasMultiple = businesses.length > 0;
 
+  // ── Compact header mode: dark identity pill ──
   if (compact) {
     return (
       <>
         <button
           onClick={() => setSheetOpen(true)}
-          className="relative flex items-center justify-center"
-          style={{ width: 40, height: 40 }}
+          className="relative flex items-center"
+          style={{
+            gap: 8,
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            borderRadius: 24,
+            padding: '6px 11px 6px 6px',
+            cursor: 'pointer',
+            flex: 1,
+            maxWidth: 210,
+          }}
         >
           <div
             className="overflow-hidden shrink-0"
             style={{
-              width: header ? 34 : 32,
-              height: header ? 34 : 32,
-              background: ICON_BG,
-              border: '1.5px solid rgba(0,0,0,0.10)',
-              borderRadius: '34%',
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.10)',
+              border: '1px solid rgba(255,255,255,0.12)',
             }}
           >
             {activeAvatar ? (
               <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[11px] font-bold" style={{ color: TEXT_SECONDARY }}>
+              <div className="w-full h-full flex items-center justify-center text-[11px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>
                 {activeName.charAt(0).toUpperCase()}
               </div>
             )}
           </div>
 
-          {(hasMultiple || header) && (
-            <div
-              className={`absolute w-4 h-4 rounded-full flex items-center justify-center ${header ? '-bottom-0.5 -right-0.5' : '-top-0.5 -right-0.5'}`}
-              style={{ background: 'rgba(15,23,42,0.90)', boxShadow: '0 1px 4px rgba(0,0,0,0.20)' }}
-            >
-              {header
-                ? <ChevronDown className="w-2.5 h-2.5" style={{ color: '#FFFFFF' }} strokeWidth={3} />
-                : <ChevronUp className="w-2.5 h-2.5" style={{ color: '#FFFFFF' }} strokeWidth={3} />
-              }
-            </div>
-          )}
+          <div className="flex flex-col items-start min-w-0">
+            <span className="text-[13px] font-semibold truncate" style={{ color: DARK_TEXT, maxWidth: 120 }}>
+              {activeName}
+            </span>
+            {visibilityLabel && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onOpenVisibility?.(); }}
+                className="flex items-center gap-1"
+                style={{ marginTop: 1 }}
+              >
+                {visibilityIcon && <span style={{ fontSize: 10 }}>{visibilityIcon}</span>}
+                <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>{visibilityLabel}</span>
+              </button>
+            )}
+          </div>
+
+          <ChevronDown className="w-[10px] h-[10px] shrink-0 ml-auto" style={{ color: 'rgba(255,255,255,0.35)' }} />
         </button>
 
         {createPortal(
@@ -118,7 +137,7 @@ export function ActorSelector({ compact = false, header = false }: ActorSelector
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="fixed inset-0 z-[10000]"
-                  style={{ background: 'rgba(0,0,0,0.25)' }}
+                  style={{ background: 'rgba(0,0,0,0.55)' }}
                   onClick={() => setSheetOpen(false)}
                 />
 
@@ -129,45 +148,54 @@ export function ActorSelector({ compact = false, header = false }: ActorSelector
                   transition={{ type: 'spring', damping: 32, stiffness: 380 }}
                   className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px] flex flex-col"
                   style={{
-                    background: 'rgba(255,255,255,0.98)',
-                    backdropFilter: 'blur(24px)',
-                    WebkitBackdropFilter: 'blur(24px)',
-                    borderTop: '1px solid rgba(0,0,0,0.06)',
-                    paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-                    boxShadow: '0 -8px 40px rgba(0,0,0,0.08)',
+                    background: 'rgba(16,16,16,0.99)',
+                    backdropFilter: 'blur(40px)',
+                    WebkitBackdropFilter: 'blur(40px)',
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)',
+                    boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
                   }}
                 >
-                  <div className="flex justify-center pt-2.5 pb-1">
-                    <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(0,0,0,0.12)' }} />
+                  {/* Handle + title */}
+                  <div className="flex items-center justify-between px-5 pt-4 pb-3">
+                    <span className="text-[15px] font-bold" style={{ color: DARK_TEXT }}>Post settings</span>
+                    <button
+                      onClick={() => setSheetOpen(false)}
+                      className="w-7 h-7 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(255,255,255,0.08)', border: 'none' }}
+                    >
+                      <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2.5} />
+                    </button>
                   </div>
 
-                  <div className="px-5 pb-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: TEXT_TERTIARY }}>
+                  {/* Posting as section */}
+                  <div className="px-5 pb-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: DARK_TEXT3 }}>
                       Posting as
                     </p>
                   </div>
 
-                  <div className="px-5 pb-5 flex flex-col gap-2">
+                  <div className="px-5 pb-4 flex flex-col gap-2">
                     <button
                       onClick={() => { setActor('personal', null); setSheetOpen(false); }}
                       className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
                       style={{
-                        background: state.actorType === 'personal' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)',
-                        border: state.actorType === 'personal' ? '1px solid rgba(0,0,0,0.12)' : '1px solid rgba(0,0,0,0.05)',
+                        background: state.actorType === 'personal' ? 'rgba(247,147,30,0.08)' : 'rgba(255,255,255,0.04)',
+                        border: state.actorType === 'personal' ? '1px solid rgba(247,147,30,0.25)' : '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
-                      <div className="w-10 h-10 overflow-hidden shrink-0" style={{ background: ICON_BG, borderRadius: '34%' }}>
+                      <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.08)' }}>
                         {userAvatar
                           ? <img src={userAvatar} alt="" className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: TEXT_SECONDARY }}>{userName}</div>
+                          : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: DARK_TEXT2 }}>{userName.charAt(0)}</div>
                         }
                       </div>
                       <div className="flex-1 text-left">
-                        <p className="text-sm font-semibold" style={{ color: TEXT_PRIMARY }}>{userName}</p>
-                        <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>Personal profile</p>
+                        <p className="text-sm font-semibold" style={{ color: DARK_TEXT }}>{userName}</p>
+                        <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>Personal profile</p>
                       </div>
                       {state.actorType === 'personal' && (
-                        <Check className="w-5 h-5 shrink-0" style={{ color: TEXT_PRIMARY }} strokeWidth={2.5} />
+                        <Check className="w-5 h-5 shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
                       )}
                     </button>
 
@@ -179,22 +207,61 @@ export function ActorSelector({ compact = false, header = false }: ActorSelector
                           onClick={() => { setActor('business', biz.id); setSheetOpen(false); }}
                           className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
                           style={{
-                            background: isActive ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)',
-                            border: isActive ? '1px solid rgba(0,0,0,0.12)' : '1px solid rgba(0,0,0,0.05)',
+                            background: isActive ? 'rgba(247,147,30,0.08)' : 'rgba(255,255,255,0.04)',
+                            border: isActive ? '1px solid rgba(247,147,30,0.25)' : '1px solid rgba(255,255,255,0.08)',
                           }}
                         >
-                          <div className="w-10 h-10 overflow-hidden shrink-0" style={{ background: ICON_BG, borderRadius: '34%' }}>
+                          <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.08)' }}>
                             {biz.logo_url
                               ? <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
-                              : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: TEXT_SECONDARY }}>{biz.name}</div>
+                              : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: DARK_TEXT2 }}>{biz.name.charAt(0)}</div>
                             }
                           </div>
                           <div className="flex-1 text-left">
-                            <p className="text-sm font-semibold" style={{ color: TEXT_PRIMARY }}>{biz.name}</p>
-                            <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>Business profile</p>
+                            <p className="text-sm font-semibold" style={{ color: DARK_TEXT }}>{biz.name}</p>
+                            <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>Business profile</p>
                           </div>
                           {isActive && (
-                            <Check className="w-5 h-5 shrink-0" style={{ color: TEXT_PRIMARY }} strokeWidth={2.5} />
+                            <Check className="w-5 h-5 shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Who can see this section */}
+                  <div className="px-5 pb-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: DARK_TEXT3 }}>
+                      Who can see this
+                    </p>
+                  </div>
+
+                  <div className="px-5 pb-4 flex flex-col gap-2">
+                    {([
+                      { value: 'anyone' as const, label: 'Everyone', desc: 'Visible to all Clbhouz users', icon: '🌍' },
+                      { value: 'followers' as const, label: 'Friends', desc: 'Only people who follow you', icon: '👥' },
+                      { value: 'private' as const, label: 'Only me', desc: 'Private — only you can see this', icon: '🔒' },
+                    ]).map((opt) => {
+                      const isActive = state.visibility === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => { setVisibility(opt.value); }}
+                          className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
+                          style={{
+                            background: isActive ? 'rgba(0,103,71,0.12)' : 'rgba(255,255,255,0.04)',
+                            border: isActive ? '1px solid rgba(0,103,71,0.30)' : '1px solid rgba(255,255,255,0.08)',
+                          }}
+                        >
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)', fontSize: 16 }}>
+                            {opt.icon}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <p className="text-sm font-semibold" style={{ color: DARK_TEXT }}>{opt.label}</p>
+                            <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>{opt.desc}</p>
+                          </div>
+                          {isActive && (
+                            <Check className="w-5 h-5 shrink-0" style={{ color: '#22c55e' }} strokeWidth={2.5} />
                           )}
                         </button>
                       );
