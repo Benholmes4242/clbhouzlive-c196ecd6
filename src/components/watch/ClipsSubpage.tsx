@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MapPin, ChevronLeft } from 'lucide-react';
@@ -43,6 +43,12 @@ export default function ClipsSubpage() {
   const userId = session?.user?.id;
   const [activeTag, setActiveTag] = useState<string>('all');
   const gridRef = useRef<HTMLDivElement>(null);
+
+  // Force-remove dark body classes that may linger from KeepAlive clubhouse
+  useLayoutEffect(() => {
+    document.body.classList.remove('route-clubhouse');
+    document.body.classList.remove('route-hub');
+  }, []);
 
   const { data: categoryChips = [], isLoading: chipsLoading } = useWatchCategoryChips();
   const activeCategory = (activeTag === 'all' || activeTag === 'near') ? undefined : activeTag;
