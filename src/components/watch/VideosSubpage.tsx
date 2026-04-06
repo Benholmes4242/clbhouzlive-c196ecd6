@@ -26,6 +26,11 @@ import {
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import type { FeedPost } from '@/components/media-system/types/media';
 
+// Strip body classes synchronously at import time — before first paint
+if (typeof document !== 'undefined') {
+  document.body.classList.remove('route-clubhouse', 'route-hub');
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatCompact(n: number): string {
@@ -447,7 +452,7 @@ function VideoFeedList({
   }
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 pb-24">
       {posts.map((post, i) => (
         <VideoCard key={post.id} post={post} userId={userId} cardIndex={i} allPosts={posts} />
       ))}
@@ -484,7 +489,7 @@ export default function VideosSubpage() {
   }, [resetSeen]);
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen light" data-page-scope="videos">
       {/* Sticky header — safe area baked into paddingTop, top:0, no gap on load */}
       <div
         style={{
