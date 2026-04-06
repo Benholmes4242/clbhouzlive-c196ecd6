@@ -118,7 +118,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   });
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
       {/* ── Chip filter row (dark bg) ── */}
       <div style={{ padding: '12px 0 0', background: '#0a0a0a' }}>
         <div

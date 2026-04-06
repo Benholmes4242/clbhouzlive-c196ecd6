@@ -22,8 +22,21 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   });
 
   const topPosts = posts.slice(0, 5);
-  const heroPost = topPosts[0];
-  const stripPosts = topPosts.slice(1, 4);
+
+  // Find the first landscape video (width > height) for the hero slot
+  const landscapeIndex = topPosts.findIndex(post => {
+    const media = post.mediaItems[0];
+    return media && media.width > 0 && media.height > 0 && media.width > media.height;
+  });
+
+  // If a landscape video exists, use it as hero; otherwise fall back to index 0
+  const heroIndex = landscapeIndex !== -1 ? landscapeIndex : 0;
+  const heroPost = topPosts[heroIndex];
+
+  // Strip: all topPosts except the hero, capped at 3
+  const stripPosts = topPosts
+    .filter((_, i) => i !== heroIndex)
+    .slice(0, 3);
 
   // ── Dark skeleton loading state ──
   if (isLoading) {
@@ -100,11 +113,11 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         <div style={{
           position: 'absolute', bottom: 10, left: 12, zIndex: 4,
           background: '#F7931E', color: '#fff',
-          fontSize: 10, fontWeight: 800, letterSpacing: '0.05em',
+          fontSize: 10, fontWeight: 800,
           padding: '3px 8px', borderRadius: 4,
           pointerEvents: 'none',
         }}>
-          #1
+          🔥
         </div>
         {/* Bottom gradient */}
         <div style={{
