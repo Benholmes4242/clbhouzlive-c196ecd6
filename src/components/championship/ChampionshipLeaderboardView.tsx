@@ -739,96 +739,146 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               </div>
             </div>
 
-            {/* Your rank + courses */}
-            {currentUserEntry && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                <div style={{ position: 'relative' }}>
-                  {userPhotoUrl ? (
-                    <img
-                      src={userPhotoUrl}
-                      alt=""
-                      style={{ width: 52, height: 52, borderRadius: '34%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
-                    />
-                  ) : (
-                    <div style={{
-                      width: 52, height: 52, borderRadius: '34%', background: 'rgba(255,255,255,0.12)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 700, flexShrink: 0,
-                    }}>
-                      {(currentUserEntry?.display_name || '?').charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div style={{ position: 'absolute', bottom: -4, right: -4, background: '#F7931E', borderRadius: 99, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0a2a1a', fontSize: 10, fontWeight: 900, color: '#fff' }}>
-                    {currentUserEntry.current_rank}
-                  </div>
+            {/* ── PRIZE HERO ── */}
+            {currentSeason.prize_description && (
+              <div style={{
+                margin: '12px 16px',
+                background: 'linear-gradient(135deg, rgba(247,147,30,0.22), rgba(247,147,30,0.08))',
+                border: '1.5px solid rgba(247,147,30,0.45)',
+                borderRadius: 14, padding: '14px 16px',
+              }}>
+                {/* Win label */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
+                  <span style={{ fontSize: 18 }}>🏆</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+                    1st Place Prize
+                  </span>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Your position</div>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
-                    {ordinal(currentUserEntry.current_rank)} of {allEntries.length}
-                  </div>
+                {/* Prize value */}
+                <div style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 4 }}>
+                  {currentSeason.prize_description}
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Courses</div>
-                  <div style={{ fontSize: 36, fontWeight: 900, color: '#fff', letterSpacing: '-1px', lineHeight: 1 }}>
-                    {currentUserEntry.courses_this_season}
+                {/* Sponsor */}
+                {currentSeason.sponsor_name && (
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+                    Sponsored by <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{currentSeason.sponsor_name}</span>
                   </div>
+                )}
+                {/* CTA */}
+                <div style={{
+                  background: '#F7931E', borderRadius: 10, padding: '10px 14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>
+                    Rate courses to climb the rankings
+                  </span>
+                  <span style={{ fontSize: 16 }}>⛳</span>
                 </div>
               </div>
             )}
 
-            {/* Sponsor + prize + progress */}
-            {currentSeason.sponsor_name && (
-              <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px 12px 0 0', padding: '12px 14px', marginBottom: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <div>
-                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>
-                      Sponsored by
-                    </div>
-                    <div style={{ fontSize: 15, fontWeight: 900, color: '#fff' }}>
-                      {currentSeason.sponsor_name}
-                    </div>
-                  </div>
-                  {currentSeason.prize_description && (
-                    <div style={{ background: '#F7931E', borderRadius: 99, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: '#fff' }}>
-                      🏆 Prize
-                    </div>
-                  )}
+            {/* ── LIVE RACE ── */}
+            {currentUserEntry && allEntries.length > 0 && (
+              <div style={{ padding: '0 16px 14px' }}>
+                {/* Live race label */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }} />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+                    Live Race
+                  </span>
                 </div>
-                {currentSeason.prize_description && (
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginBottom: currentUserEntry ? 10 : 0 }}>
-                    <span style={{ filter: 'brightness(1.8)' }}>🎁</span> {currentSeason.prize_description}
-                  </div>
-                )}
-                {currentUserEntry && allEntries.length > 0 && (
-                  <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
-                        You — <strong style={{ color: '#fff' }}>{currentUserEntry.courses_this_season}</strong>
-                      </span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: '#4ade80' }}>
-                        Leader — {allEntries[0]?.courses_this_season ?? 0}
+
+                {/* Leader bar */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: '34%', flexShrink: 0,
+                    background: 'rgba(255,255,255,0.12)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12, color: '#fff', fontWeight: 700,
+                  }}>1</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Leader</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80' }}>
+                        {allEntries[0]?.courses_this_season ?? 0} courses 🏆
                       </span>
                     </div>
-                    <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
+                    <div style={{ height: 8, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: '100%', background: 'linear-gradient(90deg, #4ade80, #22c55e)', borderRadius: 99 }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Your bar */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                  <div style={{ position: 'relative', width: 32, height: 32, flexShrink: 0 }}>
+                    {userPhotoUrl ? (
+                      <img
+                        src={userPhotoUrl}
+                        alt=""
+                        style={{ width: 32, height: 32, borderRadius: '34%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 32, height: 32, borderRadius: '34%',
+                        background: 'rgba(255,255,255,0.15)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 12, color: '#fff', fontWeight: 700,
+                      }}>
+                        {(currentUserEntry.display_name || '?').charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div style={{
+                      position: 'absolute', bottom: -3, right: -3,
+                      background: '#F7931E', borderRadius: 99, width: 14, height: 14,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 7, fontWeight: 900, color: '#fff', border: '1.5px solid #0a2a1a',
+                    }}>
+                      {currentUserEntry.current_rank}
+                    </div>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+                        You — <strong style={{ color: '#fff' }}>{ordinal(currentUserEntry.current_rank)} of {allEntries.length}</strong>
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>
+                        {currentUserEntry.courses_this_season} courses
+                      </span>
+                    </div>
+                    <div style={{ height: 8, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
                       <div style={{
                         height: '100%',
                         width: `${Math.min((currentUserEntry.courses_this_season / Math.max(allEntries[0]?.courses_this_season ?? 1, 1)) * 100, 100)}%`,
-                        background: '#4ade80',
+                        background: 'linear-gradient(90deg, #F7931E, #f59e0b)',
                         borderRadius: 99,
                       }} />
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 14px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span>🎯</span><span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>Gap to leader</span></div>
-                      <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E' }}>
-                        +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} courses
-                      </div>
+                  </div>
+                </div>
+
+                {/* Gap CTA */}
+                <div style={{
+                  background: 'rgba(255,255,255,0.07)', borderRadius: 10,
+                  padding: '10px 14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+                      Rate <strong style={{ color: '#fff' }}>
+                        {Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} more courses
+                      </strong> to lead
                     </div>
-                  </>
-                )}
+                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>
+                      Every review moves you up the rankings ⛳
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.5px' }}>
+                    +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)}
+                  </div>
+                </div>
               </div>
             )}
-
             {/* Season cycle pills */}
             <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               {(['pre-season', 'major', 'summer', 'off-season'] as const).map((s, i) => {
