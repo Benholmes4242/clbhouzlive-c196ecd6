@@ -36,14 +36,10 @@ export function BestRoundsStrip({ activeRegion }: BestRoundsStripProps) {
   const navigate = useNavigate();
 
   const { data: reviews, isLoading } = useQuery({
-    queryKey: ['best-rounds-this-month', activeRegion],
+    queryKey: ['best-rounds-last-30-days', activeRegion],
     queryFn: async (): Promise<ReviewItem[]> => {
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const daysIntoMonth = Math.max(Math.ceil((now.getTime() - startOfMonth.getTime()) / 86400000), 7);
-
       const params: Record<string, any> = {
-        days_back: daysIntoMonth,
+        days_back: 30,
         result_limit: 10,
         p_sort_by: 'rating',
       };
