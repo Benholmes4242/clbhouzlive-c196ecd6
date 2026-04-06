@@ -1,11 +1,11 @@
-// ComposeScreen — The single creative step
-// Keyboard up on open. Text first. Media additive. Everything in one place.
-// Light. Minimal. Golf-native.
+// ComposeScreen — Single dark cinematic creation surface
+// No step progress dots. No review step for standard posts.
+// Dark. Cinematic. Golf-native.
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Camera, SwitchCamera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
+  Camera, SwitchCamera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -15,31 +15,13 @@ import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { useSaveDraft } from '../hooks/useSaveDraft';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
-import { BG_BASE, ICON_BG, ICON_COLOR, ICON_DIM, RAIL_BG, RAIL_HAIRLINE, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
+import {
+  COMPOSE_BG, DARK_TEXT, DARK_TEXT2, DARK_TEXT3, DARK_ICON, DARK_BG, DARK_CARD, DARK_BORDER,
+  ICON_COLOR, TEXT_PRIMARY, TEXT_TERTIARY,
+} from '../tokens';
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
-
-// ─── Golf-native rotating placeholders ────────────────────────────────────────
-
-const GOLF_PLACEHOLDERS = [
-  "Which hole broke you today?",
-  "The fairway never lies.",
-  "Name the course. Tell the story.",
-  "Best shot of the round?",
-  "What did the back nine teach you?",
-  "Pin high. Did it count?",
-  "The 19th hole starts here.",
-  "Which course deserves more credit?",
-  "Birdied it. Bogied it. Either way, share it.",
-  "Golf is 90% mental. Vent here.",
-  "Which green was the fastest you've ever played?",
-  "Links, parkland, heathland — where were you?",
-];
-
-function getRandomPlaceholder(): string {
-  return GOLF_PLACEHOLDERS[Math.floor(Math.random() * GOLF_PLACEHOLDERS.length)];
-}
 
 // ─── Media processing helpers ─────────────────────────────────────────────────
 
@@ -163,7 +145,7 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[10000]"
-        style={{ background: 'rgba(0,0,0,0.35)' }}
+        style={{ background: 'rgba(0,0,0,0.55)' }}
         onClick={onClose}
       />
       <motion.div
@@ -174,15 +156,15 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
         className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
         style={{
-          background: 'rgba(255,255,255,0.98)',
-          backdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(0,0,0,0.06)',
+          background: 'rgba(16,16,16,0.99)',
+          backdropFilter: 'blur(40px)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.10)',
+          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
         }}
       >
         <div className="flex justify-center pt-3 pb-4">
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(0,0,0,0.12)' }} />
+          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
         </div>
 
         <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: item.height && item.width && item.height > item.width ? '4/5' : '16/9' }}>
@@ -203,33 +185,33 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
             whileTap={{ scale: 0.95 }}
             onClick={onEdit}
             className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}
+            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
           >
-            <Pencil className="w-5 h-5" style={{ color: ICON_COLOR }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Edit</span>
-            <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>Music, filters, text</span>
+            <Pencil className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Edit</span>
+            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Music, filters, text</span>
           </motion.button>
 
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onTrim}
             className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}
+            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
           >
-            <Scissors className="w-5 h-5" style={{ color: ICON_COLOR }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Trim</span>
-            <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>Cut start & end</span>
+            <Scissors className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Trim</span>
+            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Cut start & end</span>
           </motion.button>
 
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onCover}
             className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}
+            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
           >
-            <ImageIcon className="w-5 h-5" style={{ color: ICON_COLOR }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Cover</span>
-            <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>Choose thumbnail</span>
+            <ImageIcon className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Cover</span>
+            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Choose thumbnail</span>
           </motion.button>
         </div>
       </motion.div>
@@ -255,7 +237,7 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[10000]"
-        style={{ background: 'rgba(0,0,0,0.35)' }}
+        style={{ background: 'rgba(0,0,0,0.55)' }}
         onClick={onClose}
       />
       <motion.div
@@ -266,19 +248,19 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
         className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
         style={{
-          background: 'rgba(255,255,255,0.98)',
-          backdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(0,0,0,0.06)',
+          background: 'rgba(16,16,16,0.99)',
+          backdropFilter: 'blur(40px)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.10)',
+          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
         }}
       >
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(0,0,0,0.12)' }} />
+          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
         </div>
 
         <div className="px-5 pb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: TEXT_TERTIARY }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: DARK_TEXT3 }}>
             More media
           </p>
         </div>
@@ -534,7 +516,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
   const frontCameraInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const placeholderRef = useRef(getRandomPlaceholder());
+  // static placeholder — no rotating prompts
   const [isProcessing, setIsProcessing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
@@ -659,11 +641,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     let partIndex = 0;
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
-      if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: TEXT_PRIMARY }}>{state.caption.slice(last, m.start)}</span>);
-      parts.push(<span key={`m-${partIndex++}`} style={{ color: TEXT_PRIMARY, fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
+      if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last, m.start)}</span>);
+      parts.push(<span key={`m-${partIndex++}`} style={{ color: '#F7931E', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
       last = m.end;
     }
-    if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: TEXT_PRIMARY }}>{state.caption.slice(last)}</span>);
+    if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last)}</span>);
     return parts;
   }, [state.caption, state.mentions]);
 
@@ -704,14 +686,30 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
+    <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG }}>
       <StudioHeader
-        centerContent={<ActorSelector compact header />}
+        centerContent={
+          <ActorSelector
+            compact
+            header
+            visibilityIcon={
+              state.visibility === 'anyone' ? '🌍'
+              : state.visibility === 'followers' ? '👥'
+              : '🔒'
+            }
+            visibilityLabel={
+              state.visibility === 'anyone' ? 'Everyone'
+              : state.visibility === 'followers' ? 'Friends'
+              : 'Only me'
+            }
+          />
+        }
         step="COMPOSE"
+        darkMode={true}
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
           isValid
-            ? { label: 'Next', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
+            ? { label: 'Post', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
             : state.isDirty
               ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
               : undefined
@@ -727,46 +725,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         className="flex-1 overflow-y-auto relative"
         style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
       >
-        {/* ── Ambient empty state — visible only when canvas is blank ── */}
-        {!hasMedia && state.caption.length === 0 && (
-          <div
-            className="absolute inset-0 pointer-events-none overflow-hidden"
-            style={{ zIndex: 0 }}
-          >
-            <div style={{
-              position: 'absolute',
-              top: '22%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 320,
-              height: 320,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 50%, transparent 75%)',
-              animation: 'studio-orb-breathe 5s ease-in-out infinite',
-            }} />
-            <div style={{
-              position: 'absolute',
-              top: '28%',
-              left: '62%',
-              width: 140,
-              height: 140,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(232,152,10,0.04) 0%, transparent 70%)',
-              animation: 'studio-orb-breathe 6s ease-in-out infinite reverse',
-            }} />
-            <div style={{
-              position: 'absolute',
-              top: '35%',
-              left: '60%',
-              width: 180,
-              height: 180,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(0,0,0,0.015) 0%, transparent 70%)',
-              animation: 'studio-orb-breathe 7s ease-in-out infinite reverse',
-            }} />
-          </div>
-        )}
-
         {/* ── Centering wrapper — centres content when empty, anchors top when active ── */}
         <div
           style={{
@@ -778,56 +736,165 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           }}
         >
 
-        {/* ── Today's Prompt — visible when canvas is blank ── */}
-        {state.caption.length === 0 && !hasMedia && (
-           <div
-            onClick={() => textareaRef.current?.focus()}
+        {/* ── 4:5 Media Hero ── */}
+        <div className="px-4 pt-2 pb-2">
+          <div
             style={{
-            padding: '28px 24px 16px',
-            textAlign: 'center' as const,
-            position: 'relative',
-            zIndex: 1,
-            cursor: 'text',
-          }}>
-            <p style={{
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: 2.5,
-              textTransform: 'uppercase' as const,
-              color: TEXT_TERTIARY,
-              marginBottom: 12,
-            }}>
-              What's on your mind?
-            </p>
-            <p style={{
-              fontSize: 22,
-              fontWeight: 600,
-              color: TEXT_SECONDARY,
-              lineHeight: 1.4,
-              letterSpacing: '-0.025em',
-            }}>
-              {placeholderRef.current}
-            </p>
-            <div style={{
-              width: 28,
-              height: 1,
-              background: 'rgba(0,0,0,0.08)',
-              margin: '18px auto 0',
-            }} />
-          </div>
-        )}
+              aspectRatio: '4/5',
+              borderRadius: 18,
+              overflow: 'hidden',
+              background: 'rgba(255,255,255,0.04)',
+              border: `1px solid ${DARK_BORDER}`,
+              position: 'relative',
+            }}
+          >
+            {hasMedia ? (
+              <>
+                {/* Blurred background for letterboxing */}
+                {(() => {
+                  const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+                  if (!item) return null;
+                  const isLandscape = item.width && item.height && item.width > item.height;
+                  if (!isLandscape) return null;
+                  return (
+                    <div className="absolute inset-0" style={{ filter: 'blur(40px) brightness(0.4)', transform: 'scale(1.3)' }}>
+                      {item.mediaType === 'video' ? (
+                        <video src={item.previewUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
+                      ) : (
+                        <img src={item.previewUrl} alt="" className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                  );
+                })()}
 
-        {/* ── Text input — fixed height, scrolls internally ── */}
+                {/* Main media — object-contain */}
+                {(() => {
+                  const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+                  if (!item) return null;
+                  return item.mediaType === 'video' ? (
+                    <video
+                      src={item.previewUrl}
+                      autoPlay muted loop playsInline
+                      className="absolute inset-0 w-full h-full object-contain"
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  ) : (
+                    <img
+                      src={item.previewUrl}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-contain"
+                    />
+                  );
+                })()}
+
+                {/* Cover badge + Edit button */}
+                <div className="absolute top-3 left-3 z-10">
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.92)', color: '#0D0D0D' }}>
+                    Cover
+                  </span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleEdit(state.activeMediaIndex)}
+                  className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full"
+                  style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
+                >
+                  <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+                  <span className="text-[11px] font-semibold text-white">Edit</span>
+                </motion.button>
+
+                {/* Thumbnail strip */}
+                {state.mediaItems.length > 1 && (
+                  <div
+                    className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto z-10"
+                    style={{ scrollbarWidth: 'none' }}
+                  >
+                    {state.mediaItems.slice(0, 4).map((item, i) => (
+                      <motion.button
+                        key={item.id}
+                        whileTap={{ scale: 0.92 }}
+                        onClick={() => { setCoverIndex(i); setActiveMedia(i); }}
+                        className="shrink-0 overflow-hidden"
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 10,
+                          border: i === coverIndex ? '2px solid #F7931E' : '1.5px solid rgba(255,255,255,0.25)',
+                        }}
+                      >
+                        {item.mediaType === 'video' ? (
+                          <video src={item.previewUrl} muted playsInline preload="metadata" className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
+                        ) : (
+                          <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+                        )}
+                      </motion.button>
+                    ))}
+
+                    {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
+                      <motion.button
+                        whileTap={{ scale: 0.88 }}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="shrink-0 flex items-center justify-center"
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 10,
+                          background: 'rgba(255,255,255,0.08)',
+                          border: '1.5px dashed rgba(255,255,255,0.20)',
+                        }}
+                      >
+                        <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+                      </motion.button>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Empty state */
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+                style={{ cursor: 'pointer' }}
+              >
+                <ImageIcon className="w-7 h-7" style={{ color: 'rgba(247,147,30,0.80)' }} strokeWidth={1.5} />
+                <div className="text-center">
+                  <p className="text-[14px] font-semibold" style={{ color: DARK_TEXT }}>Add photo or video</p>
+                  <p className="text-[12px] mt-1" style={{ color: DARK_TEXT3 }}>Share your round with the world</p>
+                </div>
+                <div className="flex gap-3 mt-2">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    className="px-4 py-2 rounded-xl text-[13px] font-semibold"
+                    style={{ background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.25)', color: '#F7931E' }}
+                  >
+                    Library
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => { e.stopPropagation(); rearCameraInputRef.current?.click(); }}
+                    className="px-4 py-2 rounded-xl text-[13px] font-semibold"
+                    style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}`, color: DARK_TEXT2 }}
+                  >
+                    Camera
+                  </motion.button>
+                </div>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Text input — dark text, static placeholder ── */}
         <div className="px-4 pt-3 pb-2 relative">
-          {/* Flashing cursor — shows when canvas is blank, replaces placeholder */}
-          {state.caption.length === 0 && !hasMedia && (
+          {/* Flashing cursor — shows when canvas is blank */}
+          {state.caption.length === 0 && (
             <div style={{
               position: 'absolute',
               top: 12,
               left: 16,
               width: 2,
               height: 22,
-              background: 'rgba(15,23,42,0.60)',
+              background: '#F7931E',
               borderRadius: 1,
               animation: 'studio-cursor-blink 1s step-end infinite',
               zIndex: 2,
@@ -839,7 +906,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <div
               aria-hidden="true"
               className="absolute inset-x-4 top-3 text-[17px] leading-relaxed pointer-events-none whitespace-pre-wrap break-words"
-              style={{ wordBreak: 'break-word', height: hasMedia ? 'clamp(60px, 10vh, 80px)' : 'clamp(80px, 15vh, 120px)', overflowY: 'auto' }}
+              style={{ wordBreak: 'break-word', height: 'clamp(72px, 12vh, 100px)', overflowY: 'auto' }}
             >
               {highlightedCaption}
             </div>
@@ -848,16 +915,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             ref={textareaRef}
             value={state.caption}
             onChange={handleCaptionChange}
-            placeholder=""
+            placeholder="What's on your mind?"
             className="w-full resize-none outline-none leading-relaxed"
             style={{
               background: 'transparent',
               fontSize: 17,
               fontWeight: 400,
-              color: state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY,
-              caretColor: 'rgba(15,23,42,0.70)',
+              color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
+              caretColor: '#F7931E',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-              height: hasMedia ? 'clamp(60px, 10vh, 80px)' : 'clamp(80px, 15vh, 120px)',
+              height: 'clamp(72px, 12vh, 100px)',
               overflowY: 'auto',
               resize: 'none',
               WebkitOverflowScrolling: 'touch',
@@ -865,149 +932,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
           />
         </div>
-
-        {/* ── Inline media zone — visible only when no media added ── */}
-        <AnimatePresence>
-          {state.mediaItems.length === 0 && (
-            <motion.div
-              key="media-zone"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="px-4 mb-0"
-            >
-              <div
-                style={{
-                  borderRadius: 18,
-                  border: '1.5px dashed rgba(0,0,0,0.10)',
-                  background: 'rgba(0,0,0,0.015)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div style={{ display: 'flex' }}>
-                  {/* Library — primary, left */}
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isProcessing}
-                    style={{
-                      flex: 1.2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      padding: '20px 12px',
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                      borderRight: '1px solid rgba(0,0,0,0.05)',
-                    }}
-                  >
-                    <div style={{
-                      width: 52, height: 52, borderRadius: 16,
-                      background: ICON_BG,
-                      border: '1px solid rgba(0,0,0,0.08)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <ImageIcon className="w-[22px] h-[22px]" style={{ color: ICON_COLOR }} strokeWidth={1.75} />
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: TEXT_PRIMARY, marginBottom: 2 }}>
-                        Add from Library
-                      </div>
-                      <div style={{ fontSize: 11, color: TEXT_TERTIARY }}>
-                        Photos & videos
-                      </div>
-                    </div>
-                  </motion.button>
-
-                  {/* Camera — secondary, right */}
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => rearCameraInputRef.current?.click()}
-                    disabled={isProcessing}
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      padding: '20px 12px',
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 14,
-                      background: ICON_BG,
-                      border: '1px solid rgba(0,0,0,0.06)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <Camera className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={1.75} />
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: TEXT_SECONDARY, marginBottom: 2 }}>
-                        Take a Photo
-                      </div>
-                      <div style={{ fontSize: 11, color: TEXT_TERTIARY }}>
-                        Camera
-                      </div>
-                    </div>
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Media grid — visible when media added ── */}
-        {state.mediaItems.length > 0 && (
-          <MediaGrid
-            items={state.mediaItems}
-            activeIndex={state.activeMediaIndex}
-            coverIndex={coverIndex}
-            onSelect={setActiveMedia}
-            onRemove={removeMedia}
-            onEdit={handleEdit}
-            onSetCover={handleSetCover}
-            onOverflow={handleOverflow}
-            onAddMore={handleAddMore}
-          />
-        )}
-
-        {/* Add more — below grid when < 10 items */}
-        {state.mediaItems.length > 0 && state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-          <div className="px-4 mb-2">
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5"
-              style={{
-                padding: '6px 12px 6px 8px',
-                borderRadius: 10,
-                border: '1.5px dashed rgba(0,0,0,0.10)',
-                background: 'rgba(0,0,0,0.015)',
-              }}
-            >
-              <div style={{
-                width: 22, height: 22, borderRadius: 6,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Plus className="w-3 h-3" style={{ color: ICON_DIM }} strokeWidth={2} />
-              </div>
-              <span className="text-[12px]" style={{ color: TEXT_TERTIARY }}>Add more</span>
-            </motion.button>
-          </div>
-        )}
-
-        {/* 12px spacer between media zone / grid and course tag */}
-        <div className="h-3" />
 
         {/* ── Course tag ── */}
         <div className="px-4 mb-3">
@@ -1023,17 +947,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => openPanel('course')}
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
                 style={{
-                  background: 'rgba(34,197,94,0.06)',
-                  border: '1px solid rgba(34,197,94,0.14)',
+                  background: 'rgba(34,197,94,0.08)',
+                  border: '1px solid rgba(34,197,94,0.18)',
                 }}
               >
                 <div
                   className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.18)' }}
+                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.22)' }}
                 >
                   <span className="text-base">⛳</span>
                 </div>
-                <span className="flex-1 text-left text-[14px]" style={{ color: TEXT_TERTIARY }}>
+                <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
                   Where did you play?
                 </span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
@@ -1059,8 +983,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => openPanel('course')}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: 'rgba(34,197,94,0.07)',
-                      border: '1px solid rgba(34,197,94,0.16)',
+                      background: 'rgba(34,197,94,0.08)',
+                      border: '1px solid rgba(34,197,94,0.18)',
                     }}
                   >
                     <div style={{
@@ -1071,11 +995,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       fontSize: 14,
                     }}>⛳</div>
                     <div className="text-left">
-                      <p className="text-[13px] font-semibold leading-none" style={{ color: TEXT_PRIMARY }}>
+                      <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
                         {course.courseName}
                       </p>
                       {course.country && (
-                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: TEXT_TERTIARY }}>
+                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: DARK_TEXT3 }}>
                           {course.region ? `${course.region}, ${course.country}` : course.country}
                         </p>
                       )}
@@ -1089,9 +1013,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       }}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
                       className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ background: 'rgba(0,0,0,0.08)' }}
+                      style={{ background: 'rgba(255,255,255,0.08)' }}
                     >
-                      <X className="w-2.5 h-2.5" style={{ color: ICON_DIM }} strokeWidth={2.5} />
+                      <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
                     </div>
                   </motion.button>
                 ))}
@@ -1138,9 +1062,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex items-center gap-2 px-4 py-2 text-sm"
-              style={{ color: TEXT_TERTIARY }}
+              style={{ color: DARK_TEXT3 }}
             >
-              <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.12)', borderTopColor: 'transparent' }} />
+              <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.12)', borderTopColor: 'transparent' }} />
               Processing…
             </motion.div>
           )}
@@ -1149,11 +1073,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <div className="h-2" />
       </div>
 
-      {/* ── Bottom action rail ── */}
+      {/* ── Bottom action rail — always dark ── */}
       <div
         className="shrink-0"
         style={{
-          background: RAIL_BG,
+          background: 'rgba(13,13,13,0.98)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
@@ -1162,14 +1086,33 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         {/* Hairline at top */}
         <div style={{
           height: 1,
-          background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
+          background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 80%, transparent 100%)`,
         }} />
 
         <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
 
-          {/* Zone A — Capture */}
+          {/* Zone A — Library first (amber primary), then Camera */}
           <div className="flex items-center" style={{ gap: 4 }}>
-            {/* Rear — solid dark, primary */}
+            {/* Library — amber tinted, primary action */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isProcessing}
+              className="flex flex-col items-center justify-center disabled:opacity-40"
+              style={{ width: 52, height: 54, gap: 3 }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 13,
+                background: 'rgba(247,147,30,0.12)',
+                border: '1px solid rgba(247,147,30,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Layers className="w-[18px] h-[18px]" style={{ color: '#F7931E' }} strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Library</span>
+            </motion.button>
+
+            {/* Rear camera */}
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={() => rearCameraInputRef.current?.click()}
@@ -1179,13 +1122,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(15,23,42,0.90)',
-                boxShadow: '0 2px 14px rgba(0,0,0,0.12)',
+                background: DARK_CARD,
+                border: `1px solid ${DARK_BORDER}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Camera className="w-[18px] h-[18px]" style={{ color: '#FFFFFF' }} strokeWidth={2} />
+                <Camera className="w-[18px] h-[18px]" style={{ color: DARK_ICON }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Rear</span>
             </motion.button>
 
             {/* Front */}
@@ -1198,39 +1141,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
+                background: DARK_CARD,
+                border: `1px solid ${DARK_BORDER}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
+                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: DARK_ICON }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
-            </motion.button>
-
-            {/* Library */}
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex flex-col items-center justify-center disabled:opacity-40"
-              style={{ width: 52, height: 54, gap: 3 }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 13,
-                background: ICON_BG,
-                border: '1px solid rgba(0,0,0,0.06)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Selfie</span>
             </motion.button>
           </div>
 
           {/* Divider */}
-          <div style={{ width: 1, height: 28, background: RAIL_HAIRLINE, margin: '0 10px' }} />
+          <div style={{ width: 1, height: 28, background: DARK_BORDER, margin: '0 10px' }} />
 
-          {/* Zone B — Text tools */}
+          {/* Zone B — @ and Schedule */}
           <div className="flex items-center" style={{ gap: 0 }}>
             <motion.button
               whileTap={{ scale: 0.88 }}
@@ -1243,15 +1167,15 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               }}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <AtSign className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+              <AtSign className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
             </motion.button>
 
             <motion.button
               whileTap={{ scale: 0.88 }}
-              onClick={() => openPanel('drafts')}
+              onClick={() => openPanel('schedule')}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <BookOpen className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
+              <Clock className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
             </motion.button>
           </div>
 
