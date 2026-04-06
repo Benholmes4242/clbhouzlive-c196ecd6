@@ -9,6 +9,7 @@ import WatchGrid from './WatchGrid';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import { Skeleton } from '@/components/ui/skeleton';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const VideosTabContent = lazy(() => import('@/components/videos-tab/VideosTabContent'));
 
