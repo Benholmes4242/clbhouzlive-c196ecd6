@@ -183,3 +183,6 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           Share
         </button>
       </div>
+    </div>
+  );
+};
