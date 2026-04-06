@@ -310,7 +310,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         className="fixed inset-0 z-[9999] flex flex-col overflow-hidden"
         style={{
           top: 0,
-          background: BG_BASE,
+          background: '#0D0D0D',
         }}
       >
 
