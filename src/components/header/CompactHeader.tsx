@@ -152,11 +152,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          top: 'var(--sat, 0px)',
+          top: 0,
           background: 'hsl(var(--background))',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          height: `${contentHeight}px`,
+          height: `calc(${contentHeight}px + var(--sat, 0px))`,
+          paddingTop: 'var(--sat, 0px)',
           borderBottom: `0.5px solid hsl(var(--border) / 0.5)`,
           boxShadow: 'none',
         }}

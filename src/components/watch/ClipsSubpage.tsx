@@ -1,4 +1,4 @@
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MapPin, ChevronLeft } from 'lucide-react';
@@ -44,12 +44,6 @@ export default function ClipsSubpage() {
   const [activeTag, setActiveTag] = useState<string>('all');
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Force-remove dark body classes that may linger from KeepAlive clubhouse
-  useLayoutEffect(() => {
-    document.body.classList.remove('route-clubhouse');
-    document.body.classList.remove('route-hub');
-  }, []);
-
   const { data: categoryChips = [], isLoading: chipsLoading } = useWatchCategoryChips();
   const activeCategory = (activeTag === 'all' || activeTag === 'near') ? undefined : activeTag;
   const activeFilter = activeTag === 'near' ? 'near' as const : 'trending' as const;
@@ -59,9 +53,9 @@ export default function ClipsSubpage() {
   } = useWatchFeed({ userId, filter: activeFilter, category: activeCategory });
 
   return (
-    <div className="bg-background min-h-screen light">
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4" style={{ position: 'sticky', top: 0, zIndex: 29, paddingTop: 12, paddingBottom: 8, background: 'hsl(var(--background))', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}>
+      <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
         <button
           onClick={() => navigate(-1)}
           className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"

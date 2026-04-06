@@ -2404,9 +2404,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   /* Light theme reset - forces light mode for components that need it regardless of page theme */
   /* Used by Post Wizard, Review Wizard, and other modals that should always be light */
   .light,
-  .light *,
-  body.route-clubhouse .light *,
-  body.route-hub .light * {
+  .light * {
     --background: 210 40% 98%;
     --foreground: 210 13% 18%;
     --card: 0 0% 100%;
@@ -2426,19 +2424,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 210 13% 18%;
-  }
-
-  /* Videos page: exempt from route-clubhouse cascade override.
-     The .light[data-page-scope='videos'] container pins its own
-     CSS variables and must not inherit clubhouse theme values. */
-  body.route-clubhouse .light[data-page-scope='videos'],
-  body.route-clubhouse .light[data-page-scope='videos'] *,
-  body.route-hub .light[data-page-scope='videos'],
-  body.route-hub .light[data-page-scope='videos'] * {
-    --background: 210 40% 98%;
-    --foreground: 210 13% 18%;
-    --card: 0 0% 100%;
-    --muted-foreground: 215.4 16.3% 46.9%;
   }
 
   body.route-hub,
