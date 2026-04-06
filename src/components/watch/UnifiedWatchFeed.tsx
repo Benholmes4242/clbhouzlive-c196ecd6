@@ -1,7 +1,7 @@
 import { useState, useRef, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useWatchCategoryChips } from './hooks/useWatchCategoryChips';
 import TrendingThisWeek from './TrendingThisWeek';
 import WatchAutoplay from './WatchAutoplay';
@@ -30,9 +30,9 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
         fontSize: 13,
         fontWeight: 600,
         borderRadius: 20,
-        background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-        color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+        background: isActive ? '#F7931E' : 'rgba(255,255,255,0.08)',
+        border: isActive ? 'none' : '1px solid rgba(255,255,255,0.15)',
+        color: isActive ? '#fff' : 'rgba(255,255,255,0.65)',
       }}
     >
       {icon}
@@ -42,25 +42,45 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
 }
 
 function SectionHeader({
+  eyebrow,
   title,
   onSeeAll,
 }: {
+  eyebrow: string;
   title: string;
   onSeeAll?: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between px-4 pb-2" style={{ paddingTop: 18 }}>
-      <span className="text-[15px] font-semibold text-foreground">
-        {title}
-      </span>
+    <div style={{
+      display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+      padding: '18px 16px 10px',
+    }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+          color: '#F7931E',
+        }}>
+          {eyebrow}
+        </span>
+        <span style={{
+          fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em',
+          color: 'hsl(var(--foreground))',
+        }}>
+          {title}
+        </span>
+      </div>
       {onSeeAll && (
         <button
           onClick={onSeeAll}
-          className="flex items-center gap-1 active:scale-[0.97] transition-transform"
-          style={{ fontSize: 13, fontWeight: 600, color: '#F7931E' }}
+          className="active:scale-[0.97] transition-transform"
+          style={{
+            fontSize: 12, fontWeight: 600, color: '#F7931E',
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 2,
+            padding: 0,
+          }}
         >
-          See all
-          <ChevronRight size={14} strokeWidth={2.5} />
+          See all →
         </button>
       )}
     </div>
@@ -99,11 +119,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
   return (
     <div className="bg-background min-h-screen">
-      {/* ── Chip filter row ── */}
-      <div style={{ padding: '12px 0 4px' }}>
+      {/* ── Chip filter row (dark bg) ── */}
+      <div style={{ padding: '12px 0 0', background: '#0a0a0a' }}>
         <div
           className="flex gap-2 overflow-x-auto px-4"
-          style={{ scrollbarWidth: 'none' }}
+          style={{ scrollbarWidth: 'none', paddingBottom: 10 }}
         >
           <ChipButton
             label="For you"
@@ -130,14 +150,14 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         </div>
       </div>
 
-      {/* ── Section 1: Trending clips strip ── */}
+      {/* ── Section 1: Trending clips (dark hero block) ── */}
       <div>
         <TrendingThisWeek />
       </div>
 
-      {/* ── Section 2: Latest videos (first 3 cards) ── */}
+      {/* ── Section 2: Latest videos ── */}
       <div>
-        <SectionHeader title="Latest videos" onSeeAll={() => navigate('/watch/videos')} />
+        <SectionHeader eyebrow="Long-form" title="Latest videos" onSeeAll={() => navigate('/watch/videos')} />
         <Suspense fallback={<VideosFeedSkeleton />}>
           <VideosTabContent embedded={embedded} hideStickyHeader limitCards={3} />
         </Suspense>
@@ -145,7 +165,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
       {/* ── Section 3: More clips — 2-col grid ── */}
       <div>
-        <SectionHeader title="More clips" onSeeAll={() => navigate('/watch/clips')} />
+        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} />
         <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchGrid
           posts={posts}
