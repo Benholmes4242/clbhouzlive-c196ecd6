@@ -98,7 +98,11 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
 
       {/* Media thumbnail — full bleed 4:3 landscape */}
       {thumbnailUrl && (
-        <div className="relative aspect-[4/3] bg-muted mt-1 overflow-hidden">
+        <div
+          className="relative aspect-[4/3] bg-muted mt-1 overflow-hidden"
+          data-posts-tile-index={postIndex ?? -1}
+          data-hls-url={userMedia?.hlsUrl || ''}
+        >
           <img
             src={thumbnailUrl}
             alt=""
