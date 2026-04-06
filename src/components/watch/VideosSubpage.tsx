@@ -11,7 +11,7 @@ export default function VideosSubpage() {
   return (
     <div className="bg-background min-h-screen">
       {/* Back header */}
-      <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
+      <div className="flex items-center gap-3 px-4" style={{ position: 'sticky', top: 0, zIndex: 29, paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', paddingBottom: 10, background: 'hsl(var(--background))', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}>
         <button
           onClick={() => navigate(-1)}
           className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
