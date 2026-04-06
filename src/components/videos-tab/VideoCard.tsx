@@ -226,74 +226,34 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         )}
 
         {/* 5. Engagement row */}
-        <div
-          className="flex items-center gap-2 px-3 py-2.5"
-          style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}
-        >
-          {/* Like pill */}
+        <div className="flex items-center gap-6 px-3 py-2">
           <button
             onClick={toggleLike}
             aria-label={`${isLiked ? 'Unlike' : 'Like'} video`}
-            className="flex items-center gap-1.5 active:scale-[0.95] transition-transform"
-            style={{
-              minHeight: 34,
-              padding: '0 12px',
-              borderRadius: 20,
-              fontSize: 12,
-              fontWeight: 600,
-              background: isLiked ? 'rgba(247,147,30,0.10)' : 'hsl(var(--muted) / 0.6)',
-              border: isLiked ? '1px solid rgba(247,147,30,0.3)' : '1px solid hsl(var(--border) / 0.5)',
-              color: isLiked ? '#c97a10' : 'hsl(var(--muted-foreground))',
-            }}
+            className="flex items-center gap-1.5 text-xs min-h-[40px]"
           >
             <Heart
-              className="h-[14px] w-[14px] transition-colors"
-              style={{
-                fill: isLiked ? '#F7931E' : 'transparent',
-                color: isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))',
-              }}
+              className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
             />
-            <span>{formatCompact(likeCount)}</span>
+            <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
+              {formatCompact(likeCount)}
+            </span>
           </button>
-          {/* Comment pill */}
           <button
             onClick={() => setShowComments(true)}
             aria-label="Open comments"
-            className="flex items-center gap-1.5 active:scale-[0.95] transition-transform"
-            style={{
-              minHeight: 34,
-              padding: '0 12px',
-              borderRadius: 20,
-              fontSize: 12,
-              fontWeight: 600,
-              background: 'hsl(var(--muted) / 0.6)',
-              border: '1px solid hsl(var(--border) / 0.5)',
-              color: 'hsl(var(--muted-foreground))',
-            }}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground min-h-[40px]"
           >
-            <MessageCircle className="h-[14px] w-[14px]" />
-            <span>{formatCompact(post.commentCount)}</span>
+            <MessageCircle className="h-[18px] w-[18px]" />
+            {formatCompact(post.commentCount)}
           </button>
-          {/* Spacer pushes share right */}
-          <div className="flex-1" />
-          {/* Share pill */}
           <button
             onClick={handleShare}
             aria-label="Share video"
-            className="flex items-center gap-1.5 active:scale-[0.95] transition-transform"
-            style={{
-              minHeight: 34,
-              padding: '0 12px',
-              borderRadius: 20,
-              fontSize: 12,
-              fontWeight: 600,
-              background: 'hsl(var(--muted) / 0.6)',
-              border: '1px solid hsl(var(--border) / 0.5)',
-              color: 'hsl(var(--muted-foreground))',
-            }}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground min-h-[40px]"
           >
-            <Share2 className="h-[14px] w-[14px]" />
-            <span>Share</span>
+            <Share2 className="h-[18px] w-[18px]" />
+            {formatCompact(post.shareCount)}
           </button>
         </div>
       </article>
