@@ -144,119 +144,124 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           )}
         </button>
 
-        {/* 2. Creator row — compact, beneath thumbnail */}
-        <div className="flex items-center gap-2.5 px-3 pt-2.5 pb-1.5">
-          <button
-            onClick={() => navigate(`/profile/${post.userId}`)}
-            className="shrink-0"
-            aria-label={`View ${post.displayName}'s profile`}
-          >
-            <SquircleAvatar
-              src={post.avatarUrl || '/placeholder.svg'}
-              size="sm"
-              hideRing
-            />
-          </button>
-          <button
-            onClick={() => navigate(`/profile/${post.userId}`)}
-            className="flex-1 min-w-0 text-left"
-          >
-            <div className="flex items-center gap-1">
-              <span className="text-[13px] font-semibold text-foreground truncate">
+        {/* ── Meta: Option B — The Caddie Bag ── */}
+        <div style={{ padding: '11px 14px 0' }}>
+          {cleanedCaption && (
+            <p style={{
+              fontSize: 15, fontWeight: 700, color: 'hsl(var(--foreground))',
+              lineHeight: 1.35, margin: '0 0 8px',
+              letterSpacing: '-0.01em',
+            }}>
+              <PostContentWithTags
+                content={cleanedCaption}
+                tags={post.tags || []}
+                className="text-[15px] font-bold leading-[1.35] tracking-[-0.01em]"
+              />
+            </p>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+            <button onClick={() => navigate(`/profile/${post.userId}`)} className="shrink-0">
+              <SquircleAvatar src={post.avatarUrl || '/placeholder.svg'} size="sm" hideRing />
+            </button>
+            <button onClick={() => navigate(`/profile/${post.userId}`)} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
                 {post.displayName}
               </span>
               {post.isVerified && (
-                <svg className="h-3.5 w-3.5 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-3 w-3 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
                 </svg>
               )}
-              <span className="text-xs text-muted-foreground">· {timeAgo}</span>
-            </div>
-          </button>
-          <VideoCardMenu
-            postId={post.id}
-            userId={userId}
-            onShare={handleShare}
-          />
-        </div>
+            </button>
+            <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>·</span>
+            <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>{timeAgo}</span>
 
-        {/* 3. Caption — single line, truncated */}
-        {cleanedCaption && (
-          <div className="px-3 pb-1.5">
-            <PostContentWithTags
-              content={cleanedCaption}
-              tags={post.tags || []}
-              className="text-[13px] text-foreground line-clamp-1"
-            />
-          </div>
-        )}
-
-        {/* 4. Course tag */}
-        {courseNameToShow && (
-          <div className="px-3 pb-1.5">
-            <button
-              onClick={async (e) => {
-                e.stopPropagation();
-                if (courseIdToShow) {
-                  navigate(`/courses/${courseIdToShow}`);
-                } else if (courseNameToShow) {
-                  try {
-                    const { data } = await supabase
-                      .from('golf_courses')
-                      .select('id')
-                      .ilike('name', courseNameToShow.trim())
-                      .limit(1)
-                      .single();
-                    if (data?.id) {
-                      navigate(`/courses/${data.id}`);
+            {courseNameToShow && (
+              <>
+                <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>·</span>
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    if (courseIdToShow) {
+                      navigate(`/courses/${courseIdToShow}`);
                     } else {
-                      navigate(`/courses?search=${encodeURIComponent(courseNameToShow)}`);
+                      try {
+                        const { data } = await supabase
+                          .from('golf_courses')
+                          .select('id')
+                          .ilike('name', courseNameToShow.trim())
+                          .limit(1)
+                          .single();
+                        if (data?.id) navigate(`/courses/${data.id}`);
+                        else navigate(`/courses?search=${encodeURIComponent(courseNameToShow)}`);
+                      } catch {
+                        navigate(`/courses?search=${encodeURIComponent(courseNameToShow)}`);
+                      }
                     }
-                  } catch {
-                    navigate(`/courses?search=${encodeURIComponent(courseNameToShow)}`);
-                  }
-                }
-              }}
-              className="flex items-center gap-1 hover:underline"
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 3, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                >
+                  <span style={{ fontSize: 11 }}>🏌️</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#006747' }}>{courseNameToShow}</span>
+                </button>
+              </>
+            )}
+
+            <div style={{ flex: 1 }} />
+            <VideoCardMenu postId={post.id} userId={userId} onShare={handleShare} />
+          </div>
+
+          <div style={{ height: 1, background: 'hsl(var(--border) / 0.5)', margin: '0 -14px' }} />
+
+          <div style={{ display: 'flex', alignItems: 'center', padding: '9px 0 11px', gap: 4 }}>
+            <button
+              onClick={toggleLike}
+              aria-label={isLiked ? 'Unlike' : 'Like'}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
             >
-              <MapPin className="h-3 w-3 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
+              {isLiked ? (
+                <span style={{ fontSize: 19, lineHeight: 1 }}>🧡</span>
+              ) : (
+                <Heart className="h-[19px] w-[19px] text-muted-foreground" />
+              )}
+              <span style={{ fontSize: 13, fontWeight: 700, color: isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))' }}>
+                {formatCompact(likeCount)}
+              </span>
+            </button>
+
+            <div style={{ width: 1, height: 18, background: 'hsl(var(--border))', margin: '0 10px' }} />
+
+            <button
+              onClick={() => setShowComments(true)}
+              aria-label="Comments"
+              style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              <MessageCircle className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+                {formatCompact(post.commentCount)}
+              </span>
+            </button>
+
+            <div style={{ flex: 1 }} />
+
+            <button
+              onClick={handleShare}
+              aria-label="Share"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                minHeight: 34, padding: '0 14px', borderRadius: 20,
+                fontSize: 13, fontWeight: 600,
+                background: 'transparent',
+                border: '1.5px solid hsl(var(--border))',
+                color: 'hsl(var(--muted-foreground))',
+                cursor: 'pointer',
+              }}
+            >
+              <Share2 className="h-[14px] w-[14px]" />
+              Share
             </button>
           </div>
-        )}
-
-        {/* 5. Engagement row */}
-        <div className="flex items-center gap-6 px-3 py-2">
-          <button
-            onClick={toggleLike}
-            aria-label={`${isLiked ? 'Unlike' : 'Like'} video`}
-            className="flex items-center gap-1.5 text-xs min-h-[40px]"
-          >
-            {isLiked ? (
-              <span style={{ fontSize: 18, lineHeight: 1 }}>🧡</span>
-            ) : (
-              <Heart className="h-[18px] w-[18px] text-muted-foreground" />
-            )}
-            <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
-              {formatCompact(likeCount)}
-            </span>
-          </button>
-          <button
-            onClick={() => setShowComments(true)}
-            aria-label="Open comments"
-            className="flex items-center gap-1.5 text-xs text-muted-foreground min-h-[40px]"
-          >
-            <MessageCircle className="h-[18px] w-[18px]" />
-            {formatCompact(post.commentCount)}
-          </button>
-          <button
-            onClick={handleShare}
-            aria-label="Share video"
-            className="flex items-center gap-1.5 text-xs text-muted-foreground min-h-[40px]"
-          >
-            <Share2 className="h-[18px] w-[18px]" />
-            {formatCompact(post.shareCount)}
-          </button>
         </div>
       </article>
 
