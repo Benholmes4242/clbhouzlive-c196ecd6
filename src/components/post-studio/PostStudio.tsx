@@ -264,17 +264,17 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
   useEffect(() => {
     const prevShieldColor = currentShieldColor;
 
-    // Apply light status bar for the light studio surface
-    applyShieldColor('#F8FAFC');
-    document.documentElement.style.backgroundColor = '#F8FAFC';
-    document.body.style.backgroundColor = '#F8FAFC';
+    // Apply dark status bar for the dark studio surface
+    applyShieldColor('#0D0D0D');
+    document.documentElement.style.backgroundColor = '#0D0D0D';
+    document.body.style.backgroundColor = '#0D0D0D';
 
-    // Also update Median native status bar if available
+    // Dark studio — white status bar icons
     try {
       if (typeof window !== 'undefined' && window.median?.statusbar?.set) {
         window.median.statusbar.set({
-          style: 'light',
-          color: 'F8FAFC',
+          style: 'dark',
+          color: '0D0D0D',
           overlay: true,
           blur: false,
         });

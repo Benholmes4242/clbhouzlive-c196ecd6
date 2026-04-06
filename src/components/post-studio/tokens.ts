@@ -34,3 +34,13 @@ export const ICON_COLOR = 'rgba(15,23,42,0.65)';
 export const ICON_DIM   = 'rgba(15,23,42,0.38)';
 export const RAIL_BG    = 'rgba(248,250,252,0.98)';
 export const RAIL_HAIRLINE = 'rgba(0,0,0,0.08)';
+
+// Dark compose surface
+export const COMPOSE_BG = '#0D0D0D';
+export const DARK_TEXT  = 'rgba(255,255,255,0.92)';
+export const DARK_TEXT2 = 'rgba(255,255,255,0.50)';
+export const DARK_TEXT3 = 'rgba(255,255,255,0.30)';
+export const DARK_ICON  = 'rgba(255,255,255,0.55)';
+export const DARK_BG    = '#0D0D0D';
+export const DARK_CARD  = 'rgba(255,255,255,0.06)';
+export const DARK_BORDER = 'rgba(255,255,255,0.08)';

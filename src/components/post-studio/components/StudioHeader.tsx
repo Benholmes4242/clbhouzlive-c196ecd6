@@ -1,5 +1,6 @@
 // StudioHeader — Unified with Review Wizard design language
 // Amber progress bar, rounded pill buttons, transparent header
+// Dark mode support for ComposeScreen
 
 import React from 'react';
 import { ChevronLeft, X } from 'lucide-react';
@@ -45,7 +46,7 @@ export function StudioHeader({
   darkMode = false,
 }: StudioHeaderProps) {
   const currentStepNum = step ? STEP_PROGRESS[step] ?? 0 : 0;
-  const showProgress = step && currentStepNum > 0 && step !== 'SUCCESS';
+  const showProgress = step && currentStepNum > 0 && step !== 'SUCCESS' && step !== 'COMPOSE';
 
   return (
     <header
@@ -56,7 +57,7 @@ export function StudioHeader({
       }}
     >
       <div className="flex items-center justify-between px-3" style={{ minHeight: '48px' }}>
-        {/* Left action — round pill like Wizard */}
+        {/* Left action — round pill */}
         <div className="flex items-center gap-1 min-w-[72px]">
           {leftAction ? (
             leftAction.icon === 'close' ? (
@@ -64,26 +65,29 @@ export function StudioHeader({
                 whileTap={{ scale: 0.97 }}
                 onClick={leftAction.onClick}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100"
-                style={{ background: '#F5F5F7' }}
+                style={{
+                  background: darkMode ? 'rgba(255,255,255,0.08)' : '#F5F5F7',
+                  border: darkMode ? '1px solid rgba(255,255,255,0.09)' : 'none',
+                }}
                 aria-label="Close"
               >
-                <X className="h-[18px] w-[18px]" style={{ color: '#8E8E93' }} />
+                <X className="h-[18px] w-[18px]" style={{ color: darkMode ? 'rgba(255,255,255,0.65)' : '#8E8E93' }} />
               </motion.button>
             ) : (
               <button
                 onClick={leftAction.onClick}
                 disabled={leftAction.disabled}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                style={{ background: '#F5F5F7' }}
+                style={{ background: darkMode ? 'rgba(255,255,255,0.08)' : '#F5F5F7' }}
                 aria-label="Back"
               >
-                <ChevronLeft className="h-5 w-5 text-foreground" />
+                <ChevronLeft className="h-5 w-5" style={{ color: darkMode ? 'rgba(255,255,255,0.65)' : 'hsl(var(--foreground))' }} />
               </button>
             )
           ) : <div />}
         </div>
 
-        {/* Centre — labelled progress dots (matching Wizard) */}
+        {/* Centre */}
         <div className="flex-1 flex items-center justify-center">
           {showProgress ? (
             <div className="flex items-center gap-4">
@@ -131,7 +135,7 @@ export function StudioHeader({
               style={{
                 fontSize: 17,
                 fontWeight: 700,
-                color: TEXT_PRIMARY,
+                color: darkMode ? 'rgba(255,255,255,0.92)' : TEXT_PRIMARY,
                 letterSpacing: '-0.03em',
               }}
             >
@@ -140,7 +144,7 @@ export function StudioHeader({
           ) : null}
         </div>
 
-        {/* Right action — amber for primary, matching Wizard */}
+        {/* Right action — amber Post CTA in dark mode */}
         <div className="flex items-center min-w-[72px] justify-end">
           {rightAction && (
             rightAction.variant === 'primary' ? (
@@ -148,11 +152,15 @@ export function StudioHeader({
                 whileTap={{ scale: 0.96 }}
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
-                className="text-[13px] font-semibold px-[14px] min-h-[36px] flex items-center rounded-full transition-all duration-200 active:scale-[0.96]"
+                className="text-[14px] font-bold px-5 min-h-[38px] flex items-center rounded-full transition-all duration-200 active:scale-[0.96]"
                 style={{
-                  background: rightAction.disabled ? '#F5F5F7' : '#1C1C1E',
-                  color: rightAction.disabled ? '#AEAEB2' : '#FFFFFF',
+                  background: darkMode
+                    ? (rightAction.disabled ? 'rgba(255,255,255,0.07)' : 'linear-gradient(135deg, #F7931E, #E8980A)')
+                    : (rightAction.disabled ? '#F5F5F7' : '#1C1C1E'),
+                  color: rightAction.disabled ? 'rgba(255,255,255,0.22)' : '#FFFFFF',
                   pointerEvents: rightAction.disabled ? 'none' : 'auto',
+                  boxShadow: darkMode && !rightAction.disabled ? '0 4px 20px rgba(247,147,30,0.35)' : 'none',
+                  letterSpacing: '-0.1px',
                 }}
               >
                 {rightAction.label}
@@ -162,7 +170,7 @@ export function StudioHeader({
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
                 className="text-[15px] font-semibold disabled:opacity-30"
-                style={{ minHeight: MIN_TAP_TARGET, color: 'rgba(15,23,42,0.55)' }}
+                style={{ minHeight: MIN_TAP_TARGET, color: darkMode ? 'rgba(255,255,255,0.55)' : 'rgba(15,23,42,0.55)' }}
               >
                 {rightAction.label}
               </button>
