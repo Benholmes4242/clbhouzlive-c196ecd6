@@ -26,8 +26,8 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
       onClick={onTap}
       className="shrink-0 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
       style={{
-        minHeight: 34,
-        padding: '0 14px',
+        minHeight: 36,
+        padding: '0 16px',
         fontSize: 13,
         fontWeight: 600,
         borderRadius: 20,
