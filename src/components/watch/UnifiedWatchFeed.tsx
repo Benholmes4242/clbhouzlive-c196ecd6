@@ -30,9 +30,9 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
         fontSize: 13,
         fontWeight: 600,
         borderRadius: 20,
-        background: isActive ? '#F7931E' : 'rgba(255,255,255,0.08)',
-        border: isActive ? 'none' : '1px solid rgba(255,255,255,0.15)',
-        color: isActive ? '#fff' : 'rgba(255,255,255,0.65)',
+        background: isActive ? '#F7931E' : 'rgba(0,0,0,0.05)',
+        border: isActive ? 'none' : '1px solid rgba(0,0,0,0.12)',
+        color: isActive ? '#fff' : 'rgba(0,0,0,0.55)',
       }}
     >
       {icon}
@@ -120,7 +120,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   return (
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
       {/* ── Chip filter row (dark bg) ── */}
-      <div style={{ padding: '12px 0 0', background: '#0a0a0a' }}>
+      <div style={{ padding: '12px 0 0', background: '#F8FAFC' }}>
         <div
           className="flex gap-2 overflow-x-auto px-4"
           style={{ scrollbarWidth: 'none', paddingBottom: 10 }}
