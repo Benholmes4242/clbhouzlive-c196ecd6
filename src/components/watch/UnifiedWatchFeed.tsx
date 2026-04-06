@@ -165,9 +165,9 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         </Suspense>
       </div>
 
-      {/* ── Section 3: More clips — 2-col grid ── */}
-      <div>
-        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} />
+      <div style={{ marginTop: 1 }}>
+        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} paddingTop={0} />
+        <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchGrid
           posts={posts}
