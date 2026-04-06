@@ -7,6 +7,7 @@ import ExploreGrid from '@/components/explore-tab-new/ExploreGrid';
 import ExploreAutoplay from '@/components/explore-tab-new/ExploreAutoplay';
 import { ExploreSearchOverlay } from '@/components/explore-tab-new/ExploreSearchOverlay';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { FeaturedCoursesCarousel } from './FeaturedCoursesCarousel';
 import { BucketListStrip } from './BucketListStrip';
 import { BestRoundsStrip } from './BestRoundsStrip';
@@ -88,6 +89,7 @@ export default function CoursesTabContent({ embedded = false }: CoursesTabConten
         onClose={() => setIsSearchOpen(false)}
         userId={userId}
       />
+      <ScrollToTopGlass />
     </div>
   );
 }

@@ -25,7 +25,7 @@ function ExploreHeaderInner({
   return (
     <div
       className="sticky z-30 bg-background pb-0 pt-0 px-0"
-      style={{ top: '0px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      style={{ top: '100px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div className="px-4 pt-3.5 pb-2.5">
         <button
@@ -49,12 +49,16 @@ function ExploreHeaderInner({
               role="tab"
               aria-selected={isActive}
               onClick={() => onRegionChange(region.slug)}
-              className="shrink-0 min-h-[40px] px-5 text-[15px] font-semibold transition-colors"
+              className="shrink-0 transition-colors active:scale-[0.97]"
               style={{
-                borderRadius: 10,
-                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                minHeight: 36,
+                padding: '0 16px',
+                fontSize: 13,
+                fontWeight: 600,
+                borderRadius: 20,
+                background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+                border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
               }}
             >
               {region.title}
@@ -67,7 +71,8 @@ function ExploreHeaderInner({
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="shrink-0 min-h-[40px] w-24 rounded-[10px] bg-muted animate-pulse"
+                className="shrink-0 w-20 bg-muted animate-pulse"
+                style={{ minHeight: 36, borderRadius: 20 }}
               />
             ))}
           </>
