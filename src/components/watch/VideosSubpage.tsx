@@ -27,7 +27,7 @@ export default function VideosSubpage() {
 
       {/* Full videos experience — reuses everything */}
       <Suspense fallback={<VideosFeedSkeleton />}>
-        <VideosTabContent embedded />
+        <VideosTabContent embedded hideStickyHeader />
       </Suspense>
     </div>
   );
