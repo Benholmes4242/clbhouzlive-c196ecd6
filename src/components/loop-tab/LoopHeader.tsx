@@ -48,11 +48,10 @@ export function LoopHeader({ activeMode, onModeChange, onOpenSearch }: LoopHeade
                 background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
                 border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
                 color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
-                fontSize: 14,
-                fontWeight: isActive ? 600 : 400,
-                padding: '6px 24px',
+                fontSize: 13,
+                fontWeight: 600,
+                padding: '0 16px',
                 minHeight: 36,
-                whiteSpace: 'nowrap',
               }}
             >
               {label}
