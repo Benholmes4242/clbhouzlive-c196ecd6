@@ -70,8 +70,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
         {refetch && (
           <button
             onClick={() => refetch()}
-            className="mt-4 px-6 py-2 rounded-full text-sm font-semibold bg-foreground text-background active:scale-[0.96]"
-            style={{ transition: 'transform 100ms ease' }}
+            className="mt-4 px-6 py-2 rounded-full text-sm font-semibold bg-foreground text-background"
           >
             Try Again
           </button>
