@@ -2404,7 +2404,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
   /* Light theme reset - forces light mode for components that need it regardless of page theme */
   /* Used by Post Wizard, Review Wizard, and other modals that should always be light */
   .light,
-  .light * {
+  .light *,
+  body.route-clubhouse .light *,
+  body.route-hub .light * {
     --background: 210 40% 98%;
     --foreground: 210 13% 18%;
     --card: 0 0% 100%;
