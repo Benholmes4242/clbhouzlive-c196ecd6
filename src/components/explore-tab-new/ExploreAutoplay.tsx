@@ -4,8 +4,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
 
 const POOL_SIZE = 2;
-const ATTACH_THRESHOLD = 0.6;
-const DETACH_THRESHOLD = 0.2;
+const ATTACH_THRESHOLD = 0.5;
+const DETACH_THRESHOLD = 0.25;
 
 function isSlowNetwork(): boolean {
   const conn = (navigator as any).connection;
@@ -121,13 +121,14 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
     if (isSlowNetwork()) return;
 
     const grid = gridRef.current;
-    if (!grid || posts.length === 0) return;
+    if (!grid || posts.length === 0 || poolRef.current.length === 0) return;
 
     observerRef.current?.disconnect();
 
     const visibilityMap = new Map<number, number>();
 
     const observer = new IntersectionObserver((entries) => {
+      // Update visibility ratios
       for (const entry of entries) {
         const el = entry.target as HTMLElement;
         const idx = parseInt(el.dataset.exploreIndex ?? '', 10);
@@ -135,55 +136,45 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
         visibilityMap.set(idx, entry.intersectionRatio);
       }
 
-      // Find most visible video tile
-      let bestIdx = -1;
-      let bestRatio = 0;
-      for (const [idx, ratio] of visibilityMap) {
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          bestIdx = idx;
-        }
-      }
+      // Rank all visible video tiles by intersection ratio, descending
+      const ranked = [...visibilityMap.entries()]
+        .filter(([, ratio]) => ratio >= ATTACH_THRESHOLD)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, POOL_SIZE)
+        .map(([idx]) => idx);
 
-      // Detach slots whose tile has dropped below threshold
+      // Detach slots whose tile is no longer in top-2 or below threshold
       for (const [slot, tileIdx] of activeMapRef.current) {
         const ratio = visibilityMap.get(tileIdx) ?? 0;
-        if (ratio < DETACH_THRESHOLD) {
+        if (ratio < DETACH_THRESHOLD || !ranked.includes(tileIdx)) {
           activeMapRef.current.delete(slot);
           detachSlot(slot);
         }
       }
 
-      // Attach best visible tile to a free slot
-      if (bestIdx >= 0 && bestRatio >= ATTACH_THRESHOLD) {
-        const alreadyActive = [...activeMapRef.current.values()].includes(bestIdx);
-        if (!alreadyActive) {
-          // Find a free slot
-          let freeSlot = -1;
-          for (let s = 0; s < POOL_SIZE; s++) {
-            if (!activeMapRef.current.has(s)) { freeSlot = s; break; }
-          }
-          // If no free slot, evict slot 0
-          if (freeSlot === -1) {
-            const evictSlot = 0;
-            const evictTile = activeMapRef.current.get(evictSlot)!;
-            activeMapRef.current.delete(evictSlot);
-            detachSlot(evictSlot);
-            freeSlot = evictSlot;
-          }
+      // Attach top-2 visible tiles to available slots
+      for (const tileIdx of ranked) {
+        const alreadyActive = [...activeMapRef.current.values()].includes(tileIdx);
+        if (alreadyActive) continue;
 
-          const tile = grid.querySelector(`[data-explore-index="${bestIdx}"]`) as HTMLElement | null;
-          const post = posts[bestIdx];
-          const media = post?.mediaItems?.[0];
-          if (tile && post && media && (media.hlsUrl || media.mp4Url)) {
-            activeMapRef.current.set(freeSlot, bestIdx);
-            attachToTile(freeSlot, bestIdx, post, tile);
+        // Find a free slot
+        let freeSlot = -1;
+        for (let s = 0; s < POOL_SIZE; s++) {
+          if (!activeMapRef.current.has(s)) { freeSlot = s; break; }
+        }
+        if (freeSlot === -1) continue;
 
-            // Prefetch next tile
-            const nextPost = posts[bestIdx + 1];
-            const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
-            if (nextHlsUrl) prefetchTile(nextHlsUrl);
-          }
+        const tile = grid.querySelector(`[data-explore-index="${tileIdx}"]`) as HTMLElement | null;
+        const post = posts[tileIdx];
+        const media = post?.mediaItems?.[0];
+        if (tile && post && media && (media.hlsUrl || media.mp4Url)) {
+          activeMapRef.current.set(freeSlot, tileIdx);
+          attachToTile(freeSlot, tileIdx, post, tile);
+
+          // Prefetch the next video tile
+          const nextPost = posts[tileIdx + 1];
+          const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+          if (nextHlsUrl) prefetchTile(nextHlsUrl);
         }
       }
     }, { threshold: [0, DETACH_THRESHOLD, ATTACH_THRESHOLD, 1.0] });
