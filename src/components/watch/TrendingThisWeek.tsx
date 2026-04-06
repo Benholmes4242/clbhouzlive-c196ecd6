@@ -140,7 +140,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
 
       {/* ── Strip — 3 tiles, full-bleed, 4px gap ── */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+      <div style={{ display: 'flex', gap: 4 }}>
         {stripPosts.map((post, i) => (
           <div
             key={post.id}
