@@ -52,8 +52,8 @@ export function VideosHeader({
                 color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 fontSize: 13,
                 fontWeight: 600,
-                padding: '0 14px',
-                minHeight: 34,
+                padding: '0 16px',
+                minHeight: 36,
               }}
             >
               {label}
