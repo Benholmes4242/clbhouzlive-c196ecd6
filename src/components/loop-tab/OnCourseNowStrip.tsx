@@ -133,13 +133,13 @@ function FriendPill({ friend, onTap }: { friend: NetworkFriend; onTap: () => voi
           <img
             src={friend.profile_photo_url}
             alt={displayName}
-            style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
+            style={{ width: 36, height: 36, borderRadius: '34%', objectFit: 'cover' }}
             loading="lazy"
           />
         ) : (
           <div
             className="flex items-center justify-center bg-muted text-muted-foreground"
-            style={{ width: 36, height: 36, borderRadius: '50%', fontSize: 14, fontWeight: 600 }}
+            style={{ width: 36, height: 36, borderRadius: '34%', fontSize: 14, fontWeight: 600 }}
           >
             {initial}
           </div>
