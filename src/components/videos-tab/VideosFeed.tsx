@@ -18,6 +18,7 @@ interface VideosFeedProps {
   refetch: () => void;
   userId?: string;
   activeFilter?: VideosFilter;
+  compact?: boolean;
 }
 
 export function VideosFeed({
@@ -30,6 +31,7 @@ export function VideosFeed({
   refetch,
   userId,
   activeFilter,
+  compact = false,
 }: VideosFeedProps) {
   const fetchGuard = useRef(false);
   const feedRef = useRef<HTMLDivElement>(null);
@@ -96,7 +98,7 @@ export function VideosFeed({
   }
 
   return (
-    <div ref={feedRef} className="flex flex-col gap-3 pb-4 pt-2">
+    <div ref={feedRef} className={compact ? "flex flex-col gap-3" : "flex flex-col gap-3 pb-4 pt-2"}>
       <VideosAutoplay posts={posts} feedRef={feedRef} />
       {posts.map((post, i) => (
         <div key={post.id} data-card-index={i}>
