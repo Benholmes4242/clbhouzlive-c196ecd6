@@ -106,7 +106,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         ref={stripRef}
         style={{
           position: 'relative', width: '100%', aspectRatio: '16/9',
-          overflow: 'hidden', cursor: 'pointer', marginBottom: 10,
+          overflow: 'hidden', cursor: 'pointer', marginBottom: 4,
         }}
         data-watch-index={0}
       >
@@ -116,27 +116,11 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
           position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.05) 45%, transparent 70%)',
         }} />
-        {/* Autoplay indicator */}
-        <div style={{
-          position: 'absolute', top: 10, right: 10, pointerEvents: 'none',
-          background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.18)',
-          borderRadius: 20, padding: '3px 9px',
-          display: 'flex', alignItems: 'center', gap: 4,
-          fontSize: 9, fontWeight: 700, color: '#fff', letterSpacing: '0.06em',
-        }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#F7931E', display: 'inline-block' }} />
-          PLAYING
-        </div>
         {/* Bottom row: fire badge + likes + duration */}
         <div style={{
           position: 'absolute', bottom: 12, left: 14, right: 14,
           display: 'flex', alignItems: 'center', pointerEvents: 'none',
         }}>
-          <span style={{
-            background: '#F7931E', borderRadius: 6, padding: '3px 8px',
-            fontSize: 14, lineHeight: 1, marginRight: 8,
-          }}>🔥</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
             🧡 {heroPost.likeCount}
           </span>
@@ -154,8 +138,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         </div>
       </div>
 
-      {/* Amber divider */}
-      <div style={{ height: 3, background: 'linear-gradient(to right, #F7931E, rgba(247,147,30,0.15))', marginBottom: 4 }} />
 
       {/* ── Strip — 3 tiles, full-bleed, 4px gap ── */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
@@ -168,31 +150,18 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
             data-watch-index={i + 1}
           >
             <WatchTile post={post} index={i + 1} allPosts={topPosts} />
-            {/* Middle tile: amber top bar + play indicator */}
-            {i === 1 && (
-              <>
-                <div style={{
-                  position: 'absolute', top: 0, left: 0, right: 0,
-                  height: 3, background: '#F7931E', pointerEvents: 'none',
-                }} />
-                <div style={{
-                  position: 'absolute', top: 8, right: 7, pointerEvents: 'none',
-                  background: 'rgba(247,147,30,0.9)', borderRadius: 20,
-                  padding: '2px 6px', fontSize: 8, fontWeight: 800,
-                  color: '#fff', letterSpacing: '0.05em',
-                }}>▶</div>
-              </>
+            {/* Rank badge — skip for first strip tile (i===0) */}
+            {i > 0 && (
+              <div style={{
+                position: 'absolute', top: 7, left: 7, pointerEvents: 'none',
+                width: 20, height: 20, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.55)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 9, fontWeight: 800, color: '#fff',
+              }}>
+                {i + 2}
+              </div>
             )}
-            {/* Rank badge */}
-            <div style={{
-              position: 'absolute', top: 7, left: 7, pointerEvents: 'none',
-              width: 20, height: 20, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.55)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 9, fontWeight: 800, color: '#fff',
-            }}>
-              {i + 2}
-            </div>
           </div>
         ))}
       </div>
