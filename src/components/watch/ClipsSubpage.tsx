@@ -8,6 +8,7 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
 import { Skeleton } from '@/components/ui/skeleton';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 interface ChipButtonProps {
   label: string;
@@ -54,33 +55,36 @@ export default function ClipsSubpage() {
   } = useWatchFeed({ userId, filter: activeFilter, category: activeCategory });
 
   return (
-    <PageRoot className="bg-background min-h-screen" hasBottomNav={false}>
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
-        <button
-          onClick={() => navigate(-1)}
-          className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-          style={{ background: 'rgba(0,0,0,0.06)' }}
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <span className="text-[18px] font-bold text-foreground">
-          Clips
-        </span>
-        <div className="flex-1" />
-      </div>
+    <PageRoot className="bg-background min-h-screen" hasBottomNav={true}>
+      {/* Sticky header + chips block */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'hsl(var(--background))' }}>
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
+          <button
+            onClick={() => navigate(-1)}
+            className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+            style={{ background: 'rgba(0,0,0,0.06)' }}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span className="text-[18px] font-bold text-foreground">
+            Clips
+          </span>
+          <div className="flex-1" />
+        </div>
 
-      {/* Filter chips */}
-      <div style={{ padding: '4px 0 8px' }}>
-        <div className="flex gap-2 overflow-x-auto px-4" style={{ scrollbarWidth: 'none' }}>
-          <ChipButton label="For you" isActive={activeTag === 'all'} onTap={() => setActiveTag('all')} />
-          <ChipButton label="Nearby" icon={<MapPin size={13} />} isActive={activeTag === 'near'} onTap={() => setActiveTag('near')} />
-          {chipsLoading
-            ? [0, 1, 2].map(i => <Skeleton key={i} className="shrink-0 w-[72px] h-[34px] rounded-full" />)
-            : categoryChips.map(chip => (
-                <ChipButton key={chip.id} label={chip.label} isActive={activeTag === chip.id} onTap={() => setActiveTag(chip.id)} />
-              ))
-          }
+        {/* Filter chips */}
+        <div style={{ padding: '4px 0 8px' }}>
+          <div className="flex gap-2 overflow-x-auto px-4" style={{ scrollbarWidth: 'none' }}>
+            <ChipButton label="For you" isActive={activeTag === 'all'} onTap={() => setActiveTag('all')} />
+            <ChipButton label="Nearby" icon={<MapPin size={13} />} isActive={activeTag === 'near'} onTap={() => setActiveTag('near')} />
+            {chipsLoading
+              ? [0, 1, 2].map(i => <Skeleton key={i} className="shrink-0 w-[72px] h-[34px] rounded-full" />)
+              : categoryChips.map(chip => (
+                  <ChipButton key={chip.id} label={chip.label} isActive={activeTag === chip.id} onTap={() => setActiveTag(chip.id)} />
+                ))
+            }
+          </div>
         </div>
       </div>
 
@@ -97,6 +101,7 @@ export default function ClipsSubpage() {
         gridRef={gridRef as React.RefObject<HTMLDivElement>}
         userId={userId}
       />
+      <ScrollToTopGlass />
     </PageRoot>
   );
 }

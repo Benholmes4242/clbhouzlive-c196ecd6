@@ -9,6 +9,7 @@ import WatchGrid from './WatchGrid';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import { Skeleton } from '@/components/ui/skeleton';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const VideosTabContent = lazy(() => import('@/components/videos-tab/VideosTabContent'));
 
@@ -122,7 +123,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   return (
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
       {/* ── Chip filter row (dark bg) ── */}
-      <div style={{ padding: '12px 0 0', background: '#F8FAFC' }}>
+      <div style={{ padding: '12px 0 0', background: '#F8FAFC', position: 'sticky', top: 0, zIndex: 20 }}>
         <div
           className="flex gap-2 overflow-x-auto px-4"
           style={{ scrollbarWidth: 'none', paddingBottom: 10 }}
@@ -181,6 +182,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           userId={userId}
         />
       </div>
+      <ScrollToTopGlass />
     </div>
   );
 }
