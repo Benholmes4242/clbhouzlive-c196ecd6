@@ -103,6 +103,128 @@ function VideoCardSkeleton() {
   );
 }
 
+// ─── Mobile debug overlay ─────────────────────────────────────────────────────
+
+function ArticleChildrenDebug() {
+  const [children, setChildren] = useState<string[]>([]);
+
+  useEffect(() => {
+    const articleEl = document.querySelector('article[data-card-index="0"]');
+    if (!articleEl) { setChildren(['❌ article not found']); return; }
+    const kids = Array.from(articleEl.children).map((el, i) => {
+      const htmlEl = el as HTMLElement;
+      const rect = htmlEl.getBoundingClientRect();
+      const cs = getComputedStyle(htmlEl);
+      return `[${i}] ${el.tagName} h=${Math.round(rect.height)}px w=${Math.round(rect.width)}px display=${cs.display} visibility=${cs.visibility} opacity=${cs.opacity}`;
+    });
+    setChildren(kids);
+  }, []);
+
+  return (
+    <div>
+      <div style={{ color: '#ffd93d', fontFamily: 'monospace', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
+        📦 Article children ({children.length}):
+      </div>
+      {children.map((c, i) => (
+        <div key={i} style={{ color: '#ccc', fontFamily: 'monospace', fontSize: 11, marginBottom: 4, wordBreak: 'break-all' }}>
+          {c}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MobileDebugOverlay({ post, thumbnailUrl, cleanedCaption }: {
+  post: FeedPost;
+  thumbnailUrl: string;
+  cleanedCaption: string | null;
+}) {
+  const [info, setInfo] = useState<Record<string, string>>({});
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+    const cs = getComputedStyle(root);
+
+    const articleEl = body.querySelector('article[data-card-index="0"]');
+    const articleHeight = articleEl ? `${articleEl.getBoundingClientRect().height}px` : 'not found';
+    const articleOverflow = articleEl ? getComputedStyle(articleEl).overflow : '?';
+
+    setInfo({
+      '👤 displayName': post.displayName || '❌ empty',
+      '💬 caption': post.caption?.slice(0, 30) || '❌ empty',
+      '🖼 thumbnail': thumbnailUrl ? '✅' : '❌ null',
+      '❤️ likeCount': String(post.likeCount),
+      '💬 commentCount': String(post.commentCount),
+      '📐 articleHeight': articleHeight,
+      '🔒 articleOverflow': articleOverflow,
+      '🎨 --foreground': cs.getPropertyValue('--foreground').trim() || '❌',
+      '🎨 --card': cs.getPropertyValue('--card').trim() || '❌',
+      '🎨 --background': cs.getPropertyValue('--background').trim() || '❌',
+      '📱 viewport W': `${window.innerWidth}px`,
+      '📱 viewport H': `${window.innerHeight}px`,
+      '📱 devicePixelRatio': String(window.devicePixelRatio),
+      '📱 safeAreaTop': getComputedStyle(body).getPropertyValue('--sat') ||
+        `env=${CSS.supports('padding-top', 'env(safe-area-inset-top)') ? '✅' : '❌'}`,
+      '🏷 body classes': document.body.className || '— none',
+      '🌐 userAgent': navigator.userAgent.slice(0, 60),
+    });
+  }, [post, thumbnailUrl, cleanedCaption]);
+
+  if (!visible) return (
+    <button
+      onClick={() => setVisible(true)}
+      style={{
+        position: 'fixed', bottom: 100, right: 12, zIndex: 9999,
+        background: '#ff0055', color: '#fff', borderRadius: 20,
+        padding: '6px 12px', fontSize: 12, fontWeight: 700,
+        border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+      }}
+    >
+      🔍 Debug
+    </button>
+  );
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      zIndex: 9999, background: 'rgba(0,0,0,0.92)',
+      overflowY: 'auto', padding: '16px',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <span style={{ color: '#00ff88', fontFamily: 'monospace', fontSize: 14, fontWeight: 700 }}>
+          🔍 Mobile Debug — Card 0
+        </span>
+        <button
+          onClick={() => setVisible(false)}
+          style={{
+            background: '#ff0055', color: '#fff', border: 'none',
+            borderRadius: 16, padding: '6px 14px', fontSize: 13, fontWeight: 700,
+          }}
+        >
+          Close ✕
+        </button>
+      </div>
+
+      {Object.entries(info).map(([key, val]) => (
+        <div key={key} style={{
+          borderBottom: '1px solid #333', paddingBottom: 8, marginBottom: 8,
+        }}>
+          <div style={{ color: '#888', fontFamily: 'monospace', fontSize: 11 }}>{key}</div>
+          <div style={{
+            color: val.includes('❌') ? '#ff6b6b' : '#ffffff',
+            fontFamily: 'monospace', fontSize: 13, fontWeight: 600,
+            wordBreak: 'break-all',
+          }}>{val}</div>
+        </div>
+      ))}
+
+      <ArticleChildrenDebug />
+    </div>
+  );
+}
+
 // ─── Single video card ────────────────────────────────────────────────────────
 
 function VideoCard({
@@ -197,39 +319,11 @@ function VideoCard({
   return (
     <>
       <article className="bg-card overflow-hidden border-b border-border/50">
-        {/* ── TEMP DEBUG PANEL — remove after diagnosis ── */}
-        <div style={{
-          background: '#1a1a2e',
-          color: '#00ff88',
-          fontFamily: 'monospace',
-          fontSize: 10,
-          padding: '6px 8px',
-          lineHeight: 1.5,
-        }}>
-          <div style={{ color: '#ff6b6b', fontWeight: 'bold', marginBottom: 2 }}>🔍 DEBUG CARD {cardIndex}</div>
-          <div>displayName: <span style={{ color: '#fff' }}>{post.displayName || '❌ EMPTY'}</span></div>
-          <div>caption: <span style={{ color: '#fff' }}>{post.caption?.slice(0, 40) || '❌ EMPTY'}</span></div>
-          <div>likeCount: <span style={{ color: '#fff' }}>{post.likeCount}</span></div>
-          <div>commentCount: <span style={{ color: '#fff' }}>{post.commentCount}</span></div>
-          <div>avatarUrl: <span style={{ color: '#fff' }}>{post.avatarUrl ? '✅' : '❌ NULL'}</span></div>
-          <div>thumbnailUrl: <span style={{ color: '#fff' }}>{thumbnailUrl ? '✅' : '❌ NULL'}</span></div>
-          <div>duration: <span style={{ color: '#fff' }}>{duration}s</span></div>
-          <div>cleanedCaption: <span style={{ color: '#fff' }}>{cleanedCaption?.slice(0, 30) || '❌ EMPTY'}</span></div>
-          <div>courseNameToShow: <span style={{ color: '#fff' }}>{courseNameToShow || '— none'}</span></div>
-          <div style={{ marginTop: 4, color: '#ffd93d' }}>
-            --foreground CSS: <span style={{ color: '#fff' }}>
-              {typeof window !== 'undefined'
-                ? getComputedStyle(document.documentElement).getPropertyValue('--foreground').trim() || '❌ not set'
-                : 'SSR'}
-            </span>
-          </div>
-          <div style={{ color: '#ffd93d' }}>
-            body classes: <span style={{ color: '#fff' }}>
-              {typeof window !== 'undefined' ? document.body.className || '— none' : 'SSR'}
-            </span>
-          </div>
-        </div>
-        {/* ── END DEBUG PANEL ── */}
+        {/* ── TEMP MOBILE DEBUG ── */}
+        {cardIndex === 0 && (
+          <MobileDebugOverlay post={post} thumbnailUrl={thumbnailUrl} cleanedCaption={cleanedCaption} />
+        )}
+        {/* ── END TEMP MOBILE DEBUG ── */}
         {/* Thumbnail */}
         <button
           data-media-wrapper
