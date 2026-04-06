@@ -1,9 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchTile from './WatchTile';
-import WatchAutoplay from './WatchAutoplay';
+import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
@@ -13,7 +13,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const stripRef = useRef<HTMLDivElement>(null);
 
   const { posts, isLoading } = useWatchFeed({
     userId,
@@ -28,17 +27,101 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
     const media = post.mediaItems[0];
     return media && media.width > 0 && media.height > 0 && media.width > media.height;
   });
-
-  // If a landscape video exists, use it as hero; otherwise fall back to index 0
   const heroIndex = landscapeIndex !== -1 ? landscapeIndex : 0;
   const heroPost = topPosts[heroIndex];
+  const stripPosts = topPosts.filter((_, i) => i !== heroIndex).slice(0, 3);
 
-  // Strip: all topPosts except the hero, capped at 3
-  const stripPosts = topPosts
-    .filter((_, i) => i !== heroIndex)
-    .slice(0, 3);
+  // ── Dedicated trending autoplay ──
+  const heroRef = useRef<HTMLDivElement>(null);
+  const middleRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<HTMLVideoElement[]>([]);
+  const hlsRefs = useRef<(any | null)[]>([null, null]);
 
-  // ── Dark skeleton loading state ──
+  useEffect(() => {
+    const conn = (navigator as any).connection;
+    const ect = conn?.effectiveType ?? '4g';
+    if (ect === '2g' || ect === 'slow-2g') return;
+    if (topPosts.length === 0) return;
+
+    const videos: HTMLVideoElement[] = [0, 1].map(() => {
+      const v = document.createElement('video');
+      v.muted = true;
+      v.playsInline = true;
+      v.loop = true;
+      v.setAttribute('playsinline', '');
+      v.setAttribute('webkit-playsinline', '');
+      v.style.cssText = [
+        'position:absolute', 'inset:0', 'width:100%', 'height:100%',
+        'object-fit:cover', 'pointer-events:none', 'z-index:1',
+        'opacity:0', 'transition:opacity 250ms ease',
+      ].join(';');
+      return v;
+    });
+    videoRefs.current = videos;
+
+    const attach = async (
+      slot: number,
+      containerEl: HTMLDivElement | null,
+      post: (typeof topPosts)[0] | undefined,
+    ) => {
+      if (!containerEl || !post) return;
+      const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
+      if (!hlsUrl) return;
+
+      const video = videos[slot];
+      containerEl.appendChild(video);
+
+      const onCanPlay = () => { video.style.opacity = '1'; };
+      video.addEventListener('canplay', onCanPlay, { once: true });
+
+      try {
+        const hls = await attachHlsToTile({ hlsUrl, video });
+        hlsRefs.current[slot] = hls;
+      } catch { /* silent */ }
+    };
+
+    const heroPostTarget = topPosts[heroIndex];
+    const middleStripPost = stripPosts[1];
+
+    // Observe hero
+    const heroObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio >= 0.5) {
+          heroObserver.disconnect();
+          attach(0, heroRef.current, heroPostTarget);
+        }
+      },
+      { threshold: 0.5 },
+    );
+    if (heroRef.current) heroObserver.observe(heroRef.current);
+
+    // Observe middle strip tile
+    const middleObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio >= 0.5) {
+          middleObserver.disconnect();
+          attach(1, middleRef.current, middleStripPost);
+        }
+      },
+      { threshold: 0.5 },
+    );
+    if (middleRef.current) middleObserver.observe(middleRef.current);
+
+    return () => {
+      heroObserver.disconnect();
+      middleObserver.disconnect();
+      videos.forEach((v, slot) => {
+        v.pause();
+        if (v.parentElement) v.parentElement.removeChild(v);
+        hlsRefs.current[slot]?.destroy();
+        hlsRefs.current[slot] = null;
+      });
+      videoRefs.current = [];
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topPosts.length]);
+
+  // ── Loading skeleton ──
   if (isLoading) {
     const shimmerBase = {
       background: 'rgba(0,0,0,0.06)',
@@ -48,25 +131,14 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
     return (
       <div style={{ background: '#F8FAFC' }}>
-        {/* Label row skeleton */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 16px 10px' }}>
           <div style={{ ...shimmerBase, width: 140, height: 12, borderRadius: 6, animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
           <div style={{ ...shimmerBase, width: 52, height: 12, borderRadius: 6, animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
         </div>
-        {/* Hero skeleton */}
         <div style={{ ...shimmerBase, width: '100%', aspectRatio: '16/9', animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
-        {/* Strip skeleton */}
         <div style={{ display: 'flex', gap: 2 }}>
           {[0, 1, 2].map(i => (
-            <div
-              key={i}
-              style={{
-                ...shimmerBase,
-                flex: 1,
-                aspectRatio: '4/5',
-                animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite`,
-              }}
-            />
+            <div key={i} style={{ ...shimmerBase, flex: 1, aspectRatio: '4/5', animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite` }} />
           ))}
         </div>
       </div>
@@ -99,11 +171,9 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         </button>
       </div>
 
-      <WatchAutoplay posts={topPosts} gridRef={stripRef as React.RefObject<HTMLDivElement>} />
-
       {/* ── Hero — full-bleed 16:9 ── */}
       <div
-        ref={stripRef}
+        ref={heroRef}
         style={{
           position: 'relative', width: '100%', aspectRatio: '16/9',
           overflow: 'hidden', cursor: 'pointer', marginBottom: 4,
@@ -116,7 +186,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
           position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.05) 45%, transparent 70%)',
         }} />
-        {/* Bottom row: fire badge + likes + duration */}
+        {/* Bottom row: likes + duration */}
         <div style={{
           position: 'absolute', bottom: 12, left: 14, right: 14,
           display: 'flex', alignItems: 'center', pointerEvents: 'none',
@@ -138,12 +208,12 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         </div>
       </div>
 
-
       {/* ── Strip — 3 tiles, full-bleed, 4px gap ── */}
       <div style={{ display: 'flex', gap: 4 }}>
         {stripPosts.map((post, i) => (
           <div
             key={post.id}
+            ref={i === 1 ? middleRef : undefined}
             style={{
               flex: 1, aspectRatio: '4/5', overflow: 'hidden', position: 'relative', cursor: 'pointer',
             }}
