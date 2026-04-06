@@ -180,7 +180,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         }}
         data-watch-index={0}
       >
-        <WatchTile post={heroPost} index={0} allPosts={topPosts} />
+        <WatchTile post={heroPost} index={heroIndex} allPosts={topPosts} />
         {/* Gradient */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -219,7 +219,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
             }}
             data-watch-index={i + 1}
           >
-            <WatchTile post={post} index={i + 1} allPosts={topPosts} />
+            <WatchTile post={post} index={topPosts.indexOf(post)} allPosts={topPosts} />
             {/* Rank badge — skip for first strip tile (i===0) */}
             {i > 0 && (
               <div style={{
