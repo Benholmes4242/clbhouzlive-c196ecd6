@@ -94,7 +94,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
     <>
       <div
         ref={gridRef}
-        className="grid grid-cols-2 gap-[3px] px-[10px] pt-1"
+        className="grid grid-cols-2 gap-[3px] pt-1"
       >
         {posts.map((post, i) => (
           <div key={post.id}>
@@ -114,7 +114,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
       <div ref={sentinelRef} className="h-1" />
 
       {isFetchingNextPage && (
-        <div className="grid grid-cols-2 gap-[3px] px-[10px] mt-[3px]">
+        <div className="grid grid-cols-2 gap-[3px] mt-[3px]">
           {[0, 1].map((i) => (
             <div
               key={i}
