@@ -51,7 +51,11 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
       }}
     >
       {/* Media area — 16:9 */}
-      <div className="relative aspect-video bg-muted">
+      <div
+        className="relative aspect-video bg-muted"
+        data-posts-tile-index={postIndex ?? -1}
+        data-hls-url={hlsUrl || ''}
+      >
         {thumbnailUrl && (
           <img
             src={thumbnailUrl}
