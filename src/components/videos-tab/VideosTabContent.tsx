@@ -53,6 +53,7 @@ export default function VideosTabContent({ embedded = false, hideStickyHeader = 
         refetch={refetch}
         userId={user?.id}
         activeFilter={activeFilter}
+        compact={!!limitCards}
       />
       <VideosSearchOverlay
         isOpen={isSearchOpen}
