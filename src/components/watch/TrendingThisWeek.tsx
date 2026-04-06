@@ -76,25 +76,23 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
-      {/* ── Section label ── */}
+    <div>
+      {/* ── Label row ── */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '4px 16px 10px',
+        padding: '12px 16px 8px',
       }}>
-        <span style={{
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-          color: '#F7931E',
+        <div style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
+          color: '#F7931E', textTransform: 'uppercase',
         }}>
           ⛳ Trending this week
-        </span>
+        </div>
         <button
           onClick={() => navigate('/watch/clips')}
           style={{
             fontSize: 12, fontWeight: 600, color: '#F7931E',
-            background: 'none', border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 2,
-            padding: 0,
+            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
           }}
         >
           See all →
@@ -103,52 +101,98 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
       <WatchAutoplay posts={topPosts} gridRef={stripRef as React.RefObject<HTMLDivElement>} />
 
-      {/* ── Hero — full width 16:9 ── */}
+      {/* ── Hero — full-bleed 16:9 ── */}
       <div
         ref={stripRef}
-        style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden' }}
+        style={{
+          position: 'relative', width: '100%', aspectRatio: '16/9',
+          overflow: 'hidden', cursor: 'pointer', marginBottom: 10,
+        }}
+        data-watch-index={0}
       >
         <WatchTile post={heroPost} index={0} allPosts={topPosts} />
-        {/* #1 badge */}
+        {/* Gradient */}
         <div style={{
-          position: 'absolute', bottom: 10, left: 12, zIndex: 4,
-          fontSize: 18, lineHeight: 1,
-          pointerEvents: 'none',
-        }}>
-          🔥
-        </div>
-        {/* Bottom gradient */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, transparent 50%)',
-          pointerEvents: 'none',
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.05) 45%, transparent 70%)',
         }} />
+        {/* Autoplay indicator */}
+        <div style={{
+          position: 'absolute', top: 10, right: 10, pointerEvents: 'none',
+          background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          borderRadius: 20, padding: '3px 9px',
+          display: 'flex', alignItems: 'center', gap: 4,
+          fontSize: 9, fontWeight: 700, color: '#fff', letterSpacing: '0.06em',
+        }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#F7931E', display: 'inline-block' }} />
+          PLAYING
+        </div>
+        {/* Bottom row: fire badge + likes + duration */}
+        <div style={{
+          position: 'absolute', bottom: 12, left: 14, right: 14,
+          display: 'flex', alignItems: 'center', pointerEvents: 'none',
+        }}>
+          <span style={{
+            background: '#F7931E', borderRadius: 6, padding: '3px 8px',
+            fontSize: 14, lineHeight: 1, marginRight: 8,
+          }}>🔥</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
+            🧡 {heroPost.likeCount}
+          </span>
+          <div style={{ flex: 1 }} />
+          <span style={{
+            background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: 5, padding: '2px 7px',
+            fontSize: 11, fontWeight: 600, color: '#fff',
+          }}>
+            {heroPost.mediaItems[0]?.duration
+              ? `${Math.floor(heroPost.mediaItems[0].duration / 60)}:${String(Math.floor(heroPost.mediaItems[0].duration % 60)).padStart(2, '0')}`
+              : ''}
+          </span>
+        </div>
       </div>
 
-      {/* ── 3-up strip ── */}
-      <div style={{ display: 'flex', gap: 2 }}>
+      {/* Amber divider */}
+      <div style={{ height: 3, background: 'linear-gradient(to right, #F7931E, rgba(247,147,30,0.15))', marginBottom: 4 }} />
+
+      {/* ── Strip — 3 tiles, full-bleed, 4px gap ── */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
         {stripPosts.map((post, i) => (
           <div
             key={post.id}
-            style={{ flex: 1, position: 'relative', aspectRatio: '4/5', overflow: 'hidden' }}
+            style={{
+              flex: 1, aspectRatio: '4/5', overflow: 'hidden', position: 'relative', cursor: 'pointer',
+            }}
+            data-watch-index={i + 1}
           >
             <WatchTile post={post} index={i + 1} allPosts={topPosts} />
+            {/* Middle tile: amber top bar + play indicator */}
+            {i === 1 && (
+              <>
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0,
+                  height: 3, background: '#F7931E', pointerEvents: 'none',
+                }} />
+                <div style={{
+                  position: 'absolute', top: 8, right: 7, pointerEvents: 'none',
+                  background: 'rgba(247,147,30,0.9)', borderRadius: 20,
+                  padding: '2px 6px', fontSize: 8, fontWeight: 800,
+                  color: '#fff', letterSpacing: '0.05em',
+                }}>▶</div>
+              </>
+            )}
             {/* Rank badge */}
             <div style={{
-              position: 'absolute', top: 6, left: 6, zIndex: 4,
-              background: 'rgba(0,0,0,0.55)', color: '#fff',
-              fontSize: 9, fontWeight: 800,
-              padding: '2px 6px', borderRadius: 3,
-              pointerEvents: 'none',
+              position: 'absolute', top: 7, left: 7, pointerEvents: 'none',
+              width: 20, height: 20, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.55)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 9, fontWeight: 800, color: '#fff',
             }}>
-              #{i + 2}
+              {i + 2}
             </div>
-            {/* Bottom gradient */}
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
-              background: 'linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 55%)',
-              pointerEvents: 'none',
-            }} />
           </div>
         ))}
       </div>

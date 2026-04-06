@@ -30,9 +30,9 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
         fontSize: 13,
         fontWeight: 600,
         borderRadius: 20,
-        background: isActive ? '#F7931E' : 'rgba(0,0,0,0.05)',
-        border: isActive ? 'none' : '1px solid rgba(0,0,0,0.12)',
-        color: isActive ? '#fff' : 'rgba(0,0,0,0.55)',
+        background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+        color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
       }}
     >
       {icon}

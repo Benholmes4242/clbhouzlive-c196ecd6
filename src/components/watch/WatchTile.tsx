@@ -53,8 +53,8 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
     <div
       ref={tileRef}
       data-watch-index={index}
-      className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
-      style={{ transition: 'transform 100ms ease' }}
+      className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer"
+      style={{}}
       
       onClick={() => open(allPosts ?? [post], index)}
     >
