@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useLayoutEffect } from 'react';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 
 const VideosTabContent = lazy(() => import('@/components/videos-tab/VideosTabContent'));
