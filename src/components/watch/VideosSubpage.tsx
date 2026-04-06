@@ -318,7 +318,7 @@ function VideoCard({
 
   return (
     <>
-      <article className="bg-card overflow-hidden border-b border-border/50">
+      <article data-card-index={cardIndex} className="bg-card border-b border-border/50">
         {/* ── TEMP MOBILE DEBUG ── */}
         {cardIndex === 0 && (
           <MobileDebugOverlay post={post} thumbnailUrl={thumbnailUrl} cleanedCaption={cleanedCaption} />
