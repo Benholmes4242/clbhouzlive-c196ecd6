@@ -5,6 +5,7 @@ import { LoopHeader } from './LoopHeader';
 import { OnCourseNowStrip } from './OnCourseNowStrip';
 import { LoopFeed } from './LoopFeed';
 import { FriendsSearchOverlay } from '@/components/friends-tab/FriendsSearchOverlay';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 interface LoopTabContentProps {
   embedded?: boolean;
@@ -56,6 +57,7 @@ export default function LoopTabContent({ embedded = false }: LoopTabContentProps
         onClose={() => setIsSearchOpen(false)}
         userId={user?.id}
       />
+      <ScrollToTopGlass />
     </div>
   );
 }
