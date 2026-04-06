@@ -194,6 +194,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
           >
             <MoreHorizontal className="w-4 h-4" />
           </button>
+        )}
       </div>
     </div>
   );
