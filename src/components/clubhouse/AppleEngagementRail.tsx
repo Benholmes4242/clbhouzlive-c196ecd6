@@ -141,11 +141,11 @@ const AppleEngagementRailBase = ({
           'transition-transform duration-motion-fast ease-out-soft',
           isLiked && 'scale-110 motion-reduce:scale-100'
         )}>
-          <Heart
-            size={ICON_SIZE}
-            className={cn('transition-all', isLiked ? 'fill-like text-like' : 'text-white')}
-            style={{ display: 'block' }}
-          />
+          {isLiked ? (
+            <span style={{ fontSize: ICON_SIZE, lineHeight: 1, display: 'block' }}>🧡</span>
+          ) : (
+            <Heart size={ICON_SIZE} className="transition-all text-white" style={{ display: 'block' }} />
+          )}
         </div>
       </RailButton>
 

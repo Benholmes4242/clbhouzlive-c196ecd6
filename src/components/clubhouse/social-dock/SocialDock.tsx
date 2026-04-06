@@ -221,7 +221,11 @@ export const SocialDock: React.FC<SocialDockProps> = ({
                 hasLiked ? 'text-like' : 'text-white/85'
               )}
             >
-              <Heart className={cn('h-5 w-5', hasLiked && 'fill-like text-like')} />
+              {hasLiked ? (
+                <span style={{ fontSize: 20, lineHeight: 1 }}>🧡</span>
+              ) : (
+                <Heart className="h-5 w-5 text-white/85" />
+              )}
               {showCounts && likesCount > 0 && (
                 <span className="absolute -bottom-4 text-[11px] leading-none text-white/70">
                   {likesCount}

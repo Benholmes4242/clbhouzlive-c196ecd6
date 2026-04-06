@@ -66,12 +66,11 @@ export default function ShortsCardMeta({
           }}
           aria-label={`${isLiked ? 'Unlike' : 'Like'} post by ${author.name}`}
         >
-          <Heart 
-            className="scm__heart" 
-            size={14}
-            fill={isLiked ? '#F79E1B' : 'none'}
-            aria-hidden="true"
-          />
+          {isLiked ? (
+            <span className="scm__heart" style={{ fontSize: 14, lineHeight: 1 }} aria-hidden="true">🧡</span>
+          ) : (
+            <Heart className="scm__heart" size={14} fill="none" aria-hidden="true" />
+          )}
           <span className="scm__likes">{formatLikes(likeCount)}</span>
         </button>
       </div>

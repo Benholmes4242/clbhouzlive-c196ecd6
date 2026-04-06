@@ -232,9 +232,11 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
             aria-label={`${isLiked ? 'Unlike' : 'Like'} video`}
             className="flex items-center gap-1.5 text-xs min-h-[40px]"
           >
-            <Heart
-              className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
-            />
+            {isLiked ? (
+              <span style={{ fontSize: 18, lineHeight: 1 }}>🧡</span>
+            ) : (
+              <Heart className="h-[18px] w-[18px] text-muted-foreground" />
+            )}
             <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
               {formatCompact(likeCount)}
             </span>
