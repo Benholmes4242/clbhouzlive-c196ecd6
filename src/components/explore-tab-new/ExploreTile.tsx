@@ -73,10 +73,25 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
       )}
 
       {courseName && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent px-2 py-2">
-          <p className="text-center text-[11px] font-semibold text-white line-clamp-1">
+        <div
+          style={{
+            position: 'absolute', bottom: 7, left: 7,
+            display: 'flex', alignItems: 'center', gap: 4,
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: 6, padding: '3px 7px',
+            maxWidth: 'calc(100% - 14px)',
+          }}
+        >
+          <span style={{ fontSize: 9, flexShrink: 0, lineHeight: 1 }}>📍</span>
+          <span style={{
+            fontSize: 10, fontWeight: 600, color: '#fff',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {courseName}
-          </p>
+          </span>
         </div>
       )}
     </button>
