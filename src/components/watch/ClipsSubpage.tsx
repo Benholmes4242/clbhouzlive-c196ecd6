@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MapPin, ChevronLeft } from 'lucide-react';
+import PageRoot from '@/components/layout/PageRoot';
 import { useWatchCategoryChips } from './hooks/useWatchCategoryChips';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchAutoplay from './WatchAutoplay';
@@ -53,9 +54,9 @@ export default function ClipsSubpage() {
   } = useWatchFeed({ userId, filter: activeFilter, category: activeCategory });
 
   return (
-    <div className="bg-background min-h-screen">
+    <PageRoot className="bg-background min-h-screen" hasBottomNav={false}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-4" style={{ position: 'sticky', top: 0, zIndex: 29, paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', paddingBottom: 10, background: 'hsl(var(--background))', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}>
+      <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
         <button
           onClick={() => navigate(-1)}
           className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
@@ -96,6 +97,6 @@ export default function ClipsSubpage() {
         gridRef={gridRef as React.RefObject<HTMLDivElement>}
         userId={userId}
       />
-    </div>
+    </PageRoot>
   );
 }
