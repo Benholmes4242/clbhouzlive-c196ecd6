@@ -45,15 +45,17 @@ function SectionHeader({
   eyebrow,
   title,
   onSeeAll,
+  paddingTop = 12,
 }: {
   eyebrow: string;
   title: string;
   onSeeAll?: () => void;
+  paddingTop?: number;
 }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-      padding: '12px 16px 10px',
+      padding: `${paddingTop}px 16px 10px`,
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span style={{
@@ -163,9 +165,9 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         </Suspense>
       </div>
 
-      {/* ── Section 3: More clips — 2-col grid ── */}
-      <div>
-        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} />
+      <div style={{ marginTop: 1 }}>
+        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} paddingTop={0} />
+        <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchGrid
           posts={posts}
