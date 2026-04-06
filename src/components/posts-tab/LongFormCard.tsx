@@ -99,78 +99,87 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
         )}
       </div>
 
-      {/* Caption */}
+      {/* Caption — headline first, bold */}
       {post.caption && (
-        <div className="px-3 pt-2">
-          <p className={`text-sm font-semibold text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
+        <div style={{ padding: '11px 14px 0' }}>
+          <p
+            className={expanded ? '' : 'line-clamp-2'}
+            style={{ fontSize: 15, fontWeight: 700, color: 'hsl(var(--foreground))', lineHeight: 1.35, margin: 0, letterSpacing: '-0.01em' }}
+          >
             {post.caption}
           </p>
           {!expanded && post.caption.length > 100 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
-              className="text-xs font-semibold text-[#d97706] mt-0.5"
-            >
+            <button onClick={(e) => { e.stopPropagation(); setExpanded(true); }} className="text-xs font-semibold text-[#d97706] mt-0.5">
               See more
             </button>
           )}
           {expanded && post.caption.length > 100 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
-              className="text-xs font-semibold text-[#d97706] mt-0.5"
-            >
+            <button onClick={(e) => { e.stopPropagation(); setExpanded(false); }} className="text-xs font-semibold text-[#d97706] mt-0.5">
               less
             </button>
           )}
         </div>
       )}
 
-      {/* Creator row */}
-      <div className="flex items-center gap-2 px-3 py-1">
+      {/* Creator + time row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px 10px', flexWrap: 'wrap' }}>
         {post.avatarUrl && (
-          <SquircleAvatar
-            src={post.avatarUrl}
-            alt=""
-            size={20}
-            hideRing
-          />
+          <SquircleAvatar src={post.avatarUrl} alt="" size={26} hideRing />
         )}
-        <span className="text-xs text-muted-foreground truncate">
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
           {post.displayName}
         </span>
-        <span className="text-xs text-muted-foreground">·</span>
-        <span className="text-xs text-muted-foreground">{timeAgo}</span>
-
-        {/* Three dots — own post delete */}
+        <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>·</span>
+        <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>{timeAgo}</span>
+        <div style={{ flex: 1 }} />
         {isOwnPost && onDelete && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (window.confirm('Delete this post?')) onDelete();
-            }}
-            className="ml-auto p-2 -mr-1 text-muted-foreground hover:text-foreground"
+            onClick={(e) => { e.stopPropagation(); if (window.confirm('Delete this post?')) onDelete(); }}
+            className="p-1.5 -mr-1 text-muted-foreground"
           >
             <MoreHorizontal className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Engagement */}
-      <div className="flex items-center gap-4 px-3 pb-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Heart className="h-3.5 w-3.5" />
-          {formatCompact(post.likeCount)}
-        </span>
-        <span className="flex items-center gap-1">
-          <MessageCircle className="h-3.5 w-3.5" />
-          {formatCompact(post.commentCount)}
-        </span>
-        {post.shareCount > 0 && (
-          <span className="flex items-center gap-1">
-            <Share2 className="h-3.5 w-3.5" />
-            {formatCompact(post.shareCount)}
+      {/* Divider */}
+      <div style={{ height: 1, background: 'hsl(var(--border) / 0.5)', margin: '0 14px' }} />
+
+      {/* Engagement row */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '9px 14px 11px', gap: 4 }}>
+        <button
+          onClick={(e) => e.stopPropagation()}
+          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
+        >
+          <Heart className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+            {formatCompact(post.likeCount)}
           </span>
-        )}
+        </button>
+        <div style={{ width: 1, height: 18, background: 'hsl(var(--border))', margin: '0 10px' }} />
+        <button
+          onClick={(e) => e.stopPropagation()}
+          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          <MessageCircle className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+            {formatCompact(post.commentCount)}
+          </span>
+        </button>
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            minHeight: 34, padding: '0 14px', borderRadius: 20,
+            fontSize: 13, fontWeight: 600,
+            background: 'transparent',
+            border: '1.5px solid hsl(var(--border))',
+            color: 'hsl(var(--muted-foreground))',
+            cursor: 'pointer',
+          }}
+        >
+          <Share2 className="h-[14px] w-[14px]" />
+          Share
+        </button>
       </div>
-    </div>
-  );
-};

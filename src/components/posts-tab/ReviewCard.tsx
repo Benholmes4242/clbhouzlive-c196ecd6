@@ -153,34 +153,48 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
         </div>
       )}
 
-      {/* Engagement */}
-      <div className="flex items-center gap-4 px-3 pb-1 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Heart className="h-3.5 w-3.5" />
-          {formatCompact(post.likeCount)}
-        </span>
-        <span className="flex items-center gap-1">
-          <MessageCircle className="h-3.5 w-3.5" />
-          {formatCompact(post.commentCount)}
-        </span>
-      </div>
+      {/* Divider */}
+      <div style={{ height: 1, background: 'hsl(var(--border) / 0.5)', margin: '0 14px' }} />
 
-      {/* Creator + time */}
-      <div className="flex items-center gap-2 px-3 pb-3">
-        {post.avatarUrl && (
-          <SquircleAvatar
-            src={post.avatarUrl}
-            alt=""
-            size={16}
-            hideRing
-          />
+      {/* Engagement + creator combined row */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '9px 14px 11px', gap: 4 }}>
+        <button
+          onClick={(e) => e.stopPropagation()}
+          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
+        >
+          <Heart className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+            {formatCompact(post.likeCount)}
+          </span>
+        </button>
+        <div style={{ width: 1, height: 18, background: 'hsl(var(--border))', margin: '0 10px' }} />
+        <button
+          onClick={(e) => e.stopPropagation()}
+          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          <MessageCircle className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+            {formatCompact(post.commentCount)}
+          </span>
+        </button>
+        <div style={{ flex: 1 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {post.avatarUrl && (
+            <SquircleAvatar src={post.avatarUrl} alt="" size={22} hideRing />
+          )}
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
+            {post.displayName}
+          </span>
+          <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>· {timeAgo}</span>
+        </div>
+        {isOwnPost && onDelete && (
+          <button
+            onClick={(e) => { e.stopPropagation(); if (window.confirm('Delete this post?')) onDelete(); }}
+            className="p-1.5 -mr-1 text-muted-foreground ml-1"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </button>
         )}
-        <span className="text-xs text-muted-foreground truncate">
-          {post.displayName}
-        </span>
-        <span className="text-xs text-muted-foreground">·</span>
-        <span className="text-xs text-muted-foreground">{timeAgo}</span>
-      </div>
     </div>
   );
 };
