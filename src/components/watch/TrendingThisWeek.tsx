@@ -76,7 +76,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div style={{ background: '#0a0a0a' }}>
+    <div style={{ background: '#F8FAFC' }}>
       {/* ── Section label ── */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -112,9 +112,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         {/* #1 badge */}
         <div style={{
           position: 'absolute', bottom: 10, left: 12, zIndex: 4,
-          background: '#F7931E', color: '#fff',
-          fontSize: 10, fontWeight: 800,
-          padding: '3px 8px', borderRadius: 4,
+          fontSize: 18, lineHeight: 1,
           pointerEvents: 'none',
         }}>
           🔥
