@@ -5,18 +5,14 @@ import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
 const VIDEO_POOL_SIZE = 2;
 const AUTOPLAY_THRESHOLD = 0.5;
 
-const isDesignatedTile = (idx: number) => {
-  const row = Math.floor(idx / 3);
-  const rowMod = row % 4;
-  if (rowMod === 0) return idx % 3 === 0; // left col only
-  if (rowMod === 2) return idx % 3 === 2; // right col only
-  return false;
+const isDesignatedTile = (idx: number): boolean => {
+  const blockPos = idx % 8;
+  return blockPos === 0 || blockPos === 5;
 };
-const slotForTile = (idx: number) => {
-  const row = Math.floor(idx / 3);
-  const rowMod = row % 4;
-  if (rowMod === 0) return 0;
-  if (rowMod === 2) return 1;
+const slotForTile = (idx: number): number => {
+  const blockPos = idx % 8;
+  if (blockPos === 0) return 0;
+  if (blockPos === 5) return 1;
   return -1;
 };
 
