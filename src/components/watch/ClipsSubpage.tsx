@@ -44,6 +44,12 @@ export default function ClipsSubpage() {
   const [activeTag, setActiveTag] = useState<string>('all');
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // Force-remove dark body classes that may linger from KeepAlive clubhouse
+  useLayoutEffect(() => {
+    document.body.classList.remove('route-clubhouse');
+    document.body.classList.remove('route-hub');
+  }, []);
+
   const { data: categoryChips = [], isLoading: chipsLoading } = useWatchCategoryChips();
   const activeCategory = (activeTag === 'all' || activeTag === 'near') ? undefined : activeTag;
   const activeFilter = activeTag === 'near' ? 'near' as const : 'trending' as const;
