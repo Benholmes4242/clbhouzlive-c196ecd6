@@ -197,6 +197,39 @@ function VideoCard({
   return (
     <>
       <article className="bg-card overflow-hidden border-b border-border/50">
+        {/* ── TEMP DEBUG PANEL — remove after diagnosis ── */}
+        <div style={{
+          background: '#1a1a2e',
+          color: '#00ff88',
+          fontFamily: 'monospace',
+          fontSize: 10,
+          padding: '6px 8px',
+          lineHeight: 1.5,
+        }}>
+          <div style={{ color: '#ff6b6b', fontWeight: 'bold', marginBottom: 2 }}>🔍 DEBUG CARD {cardIndex}</div>
+          <div>displayName: <span style={{ color: '#fff' }}>{post.displayName || '❌ EMPTY'}</span></div>
+          <div>caption: <span style={{ color: '#fff' }}>{post.caption?.slice(0, 40) || '❌ EMPTY'}</span></div>
+          <div>likeCount: <span style={{ color: '#fff' }}>{post.likeCount}</span></div>
+          <div>commentCount: <span style={{ color: '#fff' }}>{post.commentCount}</span></div>
+          <div>avatarUrl: <span style={{ color: '#fff' }}>{post.avatarUrl ? '✅' : '❌ NULL'}</span></div>
+          <div>thumbnailUrl: <span style={{ color: '#fff' }}>{thumbnailUrl ? '✅' : '❌ NULL'}</span></div>
+          <div>duration: <span style={{ color: '#fff' }}>{duration}s</span></div>
+          <div>cleanedCaption: <span style={{ color: '#fff' }}>{cleanedCaption?.slice(0, 30) || '❌ EMPTY'}</span></div>
+          <div>courseNameToShow: <span style={{ color: '#fff' }}>{courseNameToShow || '— none'}</span></div>
+          <div style={{ marginTop: 4, color: '#ffd93d' }}>
+            --foreground CSS: <span style={{ color: '#fff' }}>
+              {typeof window !== 'undefined'
+                ? getComputedStyle(document.documentElement).getPropertyValue('--foreground').trim() || '❌ not set'
+                : 'SSR'}
+            </span>
+          </div>
+          <div style={{ color: '#ffd93d' }}>
+            body classes: <span style={{ color: '#fff' }}>
+              {typeof window !== 'undefined' ? document.body.className || '— none' : 'SSR'}
+            </span>
+          </div>
+        </div>
+        {/* ── END DEBUG PANEL ── */}
         {/* Thumbnail */}
         <button
           data-media-wrapper
