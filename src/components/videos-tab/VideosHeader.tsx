@@ -21,8 +21,8 @@ export function VideosHeader({
 }: VideosHeaderProps) {
   return (
     <div
-      className="sticky z-30 bg-background pb-0 pt-0 px-0"
-      style={{ top: '0px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      className="sticky bg-background pb-0 pt-0 px-0"
+      style={{ top: '111px', zIndex: 20, borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div className="px-4 pt-3 pb-2">
         <button
@@ -51,9 +51,9 @@ export function VideosHeader({
                 border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
                 color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 fontSize: 13,
-                fontWeight: isActive ? 500 : 400,
-                padding: '4px 14px',
-                minHeight: 28,
+                fontWeight: 600,
+                padding: '0 14px',
+                minHeight: 34,
               }}
             >
               {label}
