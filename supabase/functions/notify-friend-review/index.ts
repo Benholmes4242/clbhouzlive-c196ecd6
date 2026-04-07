@@ -33,6 +33,7 @@ serve(async (req) => {
       .select('id')
       .eq('type', 'friend_course_review')
       .eq('actor_id', reviewer_id)
+      .eq('entity_id', course_id)
       .contains('data', { review_id })
       .limit(1);
 

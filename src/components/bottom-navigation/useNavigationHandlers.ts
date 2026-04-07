@@ -7,12 +7,14 @@ import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideo
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { activeActor } = useActiveActor();
   const { markCoursesAsSeen } = useUnseenFriendReviews();
+  const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('clubhouse');
 
   useEffect(() => {
@@ -46,12 +48,14 @@ export const useNavigationHandlers = () => {
       // Clear courses badge when visiting courses tab
       if (tab.id === 'courses') {
         markCoursesAsSeen();
-        // Also mark friend_course_review notifications as read in DB
-        supabase
-          .from('notifications')
-          .update({ is_read: true })
-          .eq('type', 'friend_course_review')
-          .then(() => {});
+        if (user?.id) {
+          supabase
+            .from('notifications')
+            .update({ is_read: true })
+            .eq('user_id', user.id)
+            .eq('type', 'friend_course_review')
+            .then(() => {});
+        }
       }
 
       if (tab.path === '/profile') {
