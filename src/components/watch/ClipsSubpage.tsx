@@ -57,7 +57,7 @@ export default function ClipsSubpage() {
   return (
     <PageRoot className="bg-background min-h-screen" hasBottomNav={true}>
       {/* Sticky header + chips block */}
-      <div style={{ position: 'sticky', top: '0px', zIndex: 20, background: 'hsl(var(--background))' }}>
+      <div style={{ position: 'sticky', top: '55px', zIndex: 20, background: 'hsl(var(--background))' }}>
         {/* Header */}
         <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
           <button
