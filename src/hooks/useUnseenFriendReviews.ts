@@ -38,7 +38,7 @@ export function useUnseenFriendReviews() {
       if (!user?.id) return { count: 0, reviews: [] };
 
       const stored = localStorage.getItem(STORAGE_KEY(user.id));
-      const lastSeen = stored ? new Date(stored) : new Date();
+      const lastSeen = stored ? new Date(stored) : new Date(0);
 
       // Get accepted friend IDs
       const { data: friendships } = await supabase
