@@ -20,6 +20,7 @@ type MainKey = 'watch' | 'loop' | 'courses';
 
 const Discover = () => {
   const navigate = useNavigate();
+  const closeCount = useFullscreenFeedStore(s => s.closeCount);
 
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
@@ -46,7 +47,7 @@ const Discover = () => {
   // ============================================
 
   return (
-    <PageRoot className="min-h-screen text-foreground bg-background">
+    <PageRoot reapplyKey={closeCount} className="min-h-screen text-foreground bg-background">
       <FadeInContent>
         <main className="pb-20 bg-background">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
