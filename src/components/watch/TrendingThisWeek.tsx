@@ -158,7 +158,6 @@ function TrendingCard({
         pointerEvents: 'none',
       }}>
         {index + 1}
-        </span>
       </div>
 
       {/* Likes */}
