@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityNotification, ChipFilterKind, checkContentExists } from '@/hooks/useActivityFeed';
-import { ActivityNotificationRow } from '@/components/activity/ActivityNotificationRow';
 import { FeaturedNotificationCard } from '@/components/activity/FeaturedNotificationCard';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
@@ -318,63 +317,25 @@ const ActivityPage: React.FC = () => {
                 {/* Rate course nudge — shown to users with few ratings */}
                 <RateCourseNudge />
 
-                {/* Tier 1 — Featured cards for new/unread */}
-                {filteredNewItems.length > 0 && (
-                  <div className="px-4 space-y-3 pb-4">
-                    {filteredNewItems.map((item, i) => (
-                      <FeaturedNotificationCard
-                        key={item.id}
-                        notification={item}
-                        index={i}
-                        onClick={() => handleNotificationClick(item)}
-                        onOpenActionsSheet={() => openActionsSheet(item)}
-                        currentUserId={user?.id}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Suggested creators after new notifications */}
-                {filteredNewItems.length > 0 && (
-                  <SuggestedCreatorsShelf
-                    userId={user?.id}
-                    title="You might also know"
-                    showViewAll={false}
-                    containerStyle={{ marginTop: 4, marginBottom: 4 }}
-                  />
-                )}
-
-                {/* Tier 2 — Compact list for earlier */}
-                {filteredEarlierItems.length > 0 && (
-                  <div>
-                    {/* Divider label */}
-                    <div className="px-5 pt-2 pb-2">
-                      <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-muted-foreground/60">
-                        Earlier
-                      </span>
-                    </div>
-
-                    {/* White card container */}
-                    <div className="mx-3 rounded-2xl bg-background border border-border/50 overflow-hidden divide-y divide-border/40">
-                      {filteredEarlierItems.map((item, i) => (
-                        <motion.div
+                {/* Unified feed — all FeaturedNotificationCard */}
+                {(() => {
+                  const allFilteredItems = [...filteredNewItems, ...filteredEarlierItems];
+                  if (allFilteredItems.length === 0) return null;
+                  return (
+                    <div className="px-4 space-y-3 pb-6">
+                      {allFilteredItems.map((item, i) => (
+                        <FeaturedNotificationCard
                           key={item.id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.25 + i * 0.04 }}
-                        >
-                          <ActivityNotificationRow
-                            notification={item}
-                            onClick={() => handleNotificationClick(item)}
-                            onOpenActionsSheet={() => openActionsSheet(item)}
-                            currentUserId={user?.id}
-                            isSessionNew={false}
-                          />
-                        </motion.div>
+                          notification={item}
+                          index={i}
+                          onClick={() => handleNotificationClick(item)}
+                          onOpenActionsSheet={() => openActionsSheet(item)}
+                          currentUserId={user?.id}
+                        />
                       ))}
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             )}
           </div>
