@@ -18,7 +18,7 @@ export function LoopHeader({ activeMode, onModeChange, onOpenSearch }: LoopHeade
     <div
       className="sticky bg-background"
       style={{
-        top: '100px',
+        top: '45px',
         zIndex: 20,
         borderBottom: '1px solid hsl(var(--border) / 0.12)',
       }}
