@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import CoursesErrorBoundary from './CoursesErrorBoundary';
-import { Trophy, Search, X, Star, ChevronRight } from 'lucide-react';
+import { Search, X, Star, ChevronRight } from 'lucide-react';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -298,7 +298,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           <SegmentedControl
             tabs={[
               { id: 'explore', label: 'Explore' },
-              { id: 'top100', label: 'Top 100', icon: <Trophy className="h-4 w-4" /> },
+              { id: 'top100', label: 'Top 100' },
               { id: 'leaderboards', label: 'Rankings' },
             ]}
             activeTab={activeTab}
