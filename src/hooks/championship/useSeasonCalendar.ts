@@ -42,7 +42,7 @@ export function useSeasonCalendar() {
       const now = new Date().toISOString();
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('championship_seasons' as any)
-        .select('id, season_number, name, tagline, description, icon, color, status, start_date, end_date, sponsor_name, prize_description, season_winner_user_id, season_winner_courses, prize_claimed')
+        .select('id, season_number, name, tagline, description, icon, color, status, start_date, end_date, sponsor_name, prize_description, sponsor_url, season_winner_user_id, season_winner_courses, prize_claimed')
         .order('start_date', { ascending: true });
       
       if (fallbackError || !fallbackData) {
@@ -79,6 +79,7 @@ export function useSeasonCalendar() {
           days_until_start: daysUntilStart,
           sponsor_name: s.sponsor_name ?? null,
           prize_description: s.prize_description ?? null,
+          sponsor_url: s.sponsor_url ?? null,
           season_winner_user_id: s.season_winner_user_id ?? null,
           season_winner_courses: s.season_winner_courses ?? null,
           prize_claimed: s.prize_claimed ?? false,

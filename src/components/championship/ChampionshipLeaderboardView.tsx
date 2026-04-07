@@ -761,7 +761,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 {/* Sponsor */}
                 {currentSeason.sponsor_name && (
                   <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
-                    Sponsored by <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{currentSeason.sponsor_name}</span>
+                    Sponsored by{' '}
+                    {currentSeason.sponsor_url ? (
+                      <a
+                        href={currentSeason.sponsor_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline', textDecorationColor: 'rgba(247,147,30,0.4)' }}
+                      >
+                        {currentSeason.sponsor_name}
+                      </a>
+                    ) : (
+                      <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{currentSeason.sponsor_name}</span>
+                    )}
                   </div>
                 )}
                 {/* CTA */}
@@ -790,12 +802,30 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
                 {/* Leader bar */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div style={{
-                    width: 32, height: 32, borderRadius: '34%', flexShrink: 0,
-                    background: 'rgba(255,255,255,0.12)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 12, color: '#fff', fontWeight: 700,
-                  }}>1</div>
+                  <div style={{ position: 'relative', width: 32, height: 32, flexShrink: 0 }}>
+                    {allEntries[0]?.avatar_url ? (
+                      <img
+                        src={allEntries[0].avatar_url}
+                        alt=""
+                        style={{ width: 32, height: 32, borderRadius: '34%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 32, height: 32, borderRadius: '34%',
+                        background: 'rgba(255,255,255,0.12)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 12, color: '#fff', fontWeight: 700,
+                      }}>
+                        {(allEntries[0]?.display_name || '?').charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div style={{
+                      position: 'absolute', bottom: -3, right: -3,
+                      background: '#4ade80', borderRadius: 99, width: 14, height: 14,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 7, fontWeight: 900, color: '#fff', border: '1.5px solid #0a2a1a',
+                    }}>1</div>
+                  </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
                       <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Leader</span>
