@@ -146,26 +146,19 @@ function TrendingCard({
         }}
       />
 
-      {/* Glassy rank number — bottom left, outline style, baseline-aligned */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 4,
-        height: 44, overflow: 'hidden',
-        display: 'flex', alignItems: 'flex-end',
+      {/* Glassy rank number — bottom left, outline style */}
+      <span style={{
+        position: 'absolute', bottom: -6, left: 4,
+        fontSize: 56, fontWeight: 900,
+        lineHeight: 1, letterSpacing: '-3px',
+        fontFamily: 'Georgia, serif',
+        color: 'transparent',
+        WebkitTextStroke: '1.5px rgba(255,255,255,0.28)',
         pointerEvents: 'none', zIndex: 2,
         userSelect: 'none',
       }}>
-        <span style={{
-          fontSize: 56, fontWeight: 900,
-          lineHeight: 1, letterSpacing: '-3px',
-          fontFamily: 'Georgia, serif',
-          color: 'transparent',
-          WebkitTextStroke: '1.5px rgba(255,255,255,0.28)',
-          display: 'block',
-          paddingBottom: 2,
-        }}>
-          {index + 1}
-        </span>
-      </div>
+        {index + 1}
+      </span>
 
       {/* Likes */}
       <div
