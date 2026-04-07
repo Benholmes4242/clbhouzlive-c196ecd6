@@ -125,6 +125,7 @@ export function useReviewUpload(options: UseReviewUploadOptions) {
         playedAt: data.playedAt,
         isPrivate: data.isPrivate,
         selectedTags: data.selectedTags,
+        coverMediaId: data.coverMediaId ?? null,
       },
     });
     
