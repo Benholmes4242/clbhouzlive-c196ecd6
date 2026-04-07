@@ -181,9 +181,9 @@ export function usePGACard(userId?: string): {
 
   // ── Past winners at this venue (upcoming state only) ──
   const { data: pastWinnersRaw = [] } = useQuery({
-    queryKey: ['pga-card-past-winners', (nextUpcoming as any)?.venue_name],
+    queryKey: ['pga-card-past-winners', (effectiveUpcoming as any)?.venue_name],
     queryFn: async () => {
-      const venueName = (nextUpcoming as any)?.venue_name;
+      const venueName = (effectiveUpcoming as any)?.venue_name;
       if (!venueName) return [];
 
       // Extract first 2 distinctive words for a loose match
