@@ -226,6 +226,16 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
               )}
             </div>
           )}
+
+          {/* View review CTA — review notifications only */}
+          {isReviewNotif && (
+            <button
+              className="mt-2.5 w-full text-center text-[13px] font-bold py-2 rounded-lg"
+              style={{ background: 'rgba(247,147,30,0.12)', color: '#F7931E' }}
+            >
+              ⛳ View review
+            </button>
+          )}
         </div>
       </div>
     </motion.div>
