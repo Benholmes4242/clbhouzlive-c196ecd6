@@ -167,7 +167,7 @@ export const FeedSlide = memo(function FeedSlide({
     if (media?.[0]?.type === 'image') {
       const first = media[0];
       const isLandscape = (first.width ?? 0) > (first.height ?? 1);
-      const objectFit = isLandscape ? 'contain' : 'cover';
+      const objectFit = 'contain';
       const imgSrc = first.imageUrl || first.thumbnailUrl || '';
       return (
         <div className="absolute inset-0 overflow-hidden">
