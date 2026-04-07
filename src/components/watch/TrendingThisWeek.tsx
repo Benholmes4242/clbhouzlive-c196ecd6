@@ -148,12 +148,12 @@ function TrendingCard({
 
       {/* Glassy rank number — bottom left, outline style */}
       <span style={{
-        position: 'absolute', bottom: -6, left: 4,
-        fontSize: 56, fontWeight: 900,
-        lineHeight: 1, letterSpacing: '-3px',
+        position: 'absolute', bottom: 6, left: 6,
+        fontSize: 48, fontWeight: 900,
+        lineHeight: 1, letterSpacing: '-2px',
         fontFamily: 'Georgia, serif',
         color: 'transparent',
-        WebkitTextStroke: '1.5px rgba(255,255,255,0.28)',
+        WebkitTextStroke: '1.5px rgba(255,255,255,0.3)',
         pointerEvents: 'none', zIndex: 2,
         userSelect: 'none',
       }}>
