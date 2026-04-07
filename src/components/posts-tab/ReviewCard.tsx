@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Star, Play, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { Star, Play, Heart, MessageCircle, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCompact } from './utils';
@@ -19,32 +19,27 @@ interface ReviewCardProps {
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete, likeState, onLike, onComment }) => {
   const [expanded, setExpanded] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const review = post.review;
   const tileRef = useRef<HTMLDivElement>(null);
-  const hlsUrl = post.mediaItems[0]?.hlsUrl;
 
-  useEffect(() => {
-    const el = tileRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          // TODO Brief 3: onViewPreload
-        }
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hlsUrl]);
+  const currentMedia = post.mediaItems[currentMediaIndex] ?? post.mediaItems[0];
+  const userMedia = currentMedia;
+  const hlsUrl = currentMedia?.hlsUrl;
+  const thumbnailUrl = currentMedia?.thumbnailUrl || currentMedia?.imageUrl || review?.courseImageUrl;
+  const isVideo = currentMedia?.type === 'video';
+  const duration = currentMedia?.duration;
+  const hasMultipleMedia = post.mediaItems.length > 1;
 
-  if (!review) return null;
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(i => Math.max(0, i - 1));
+  };
 
-  const userMedia = post.mediaItems[0];
-  const thumbnailUrl = userMedia?.thumbnailUrl || userMedia?.imageUrl || review.courseImageUrl;
-  const isVideo = userMedia?.type === 'video';
-  const duration = userMedia?.duration;
-  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(i => Math.min(post.mediaItems.length - 1, i + 1));
+  };
   const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
 
   // Unified amber accent for all rating tiers
