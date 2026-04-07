@@ -160,7 +160,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
       {/* ── Section 2: Latest videos ── */}
       <div>
-        <SectionHeader eyebrow="Long-form" title="Latest videos" onSeeAll={() => navigate('/watch/videos')} paddingTop={26} />
+        <SectionHeader eyebrow="Videos" title="Latest videos" onSeeAll={() => navigate('/watch/videos')} paddingTop={26} />
         <Suspense fallback={<VideosFeedSkeleton />}>
           <VideosTabContent embedded={embedded} hideStickyHeader limitCards={3} />
         </Suspense>

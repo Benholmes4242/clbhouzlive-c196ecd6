@@ -1,9 +1,7 @@
-import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
-import WatchTile from './WatchTile';
-import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
@@ -31,96 +29,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   const heroPost = topPosts[heroIndex];
   const stripPosts = topPosts.filter((_, i) => i !== heroIndex).slice(0, 3);
 
-  // ── Dedicated trending autoplay ──
-  const heroRef = useRef<HTMLDivElement>(null);
-  const middleRef = useRef<HTMLDivElement>(null);
-  const videoRefs = useRef<HTMLVideoElement[]>([]);
-  const hlsRefs = useRef<(any | null)[]>([null, null]);
-
-  useEffect(() => {
-    const conn = (navigator as any).connection;
-    const ect = conn?.effectiveType ?? '4g';
-    if (ect === '2g' || ect === 'slow-2g') return;
-    if (topPosts.length === 0) return;
-
-    const videos: HTMLVideoElement[] = [0, 1].map(() => {
-      const v = document.createElement('video');
-      v.muted = true;
-      v.playsInline = true;
-      v.loop = true;
-      v.setAttribute('playsinline', '');
-      v.setAttribute('webkit-playsinline', '');
-      v.style.cssText = [
-        'position:absolute', 'inset:0', 'width:100%', 'height:100%',
-        'object-fit:cover', 'pointer-events:none', 'z-index:1',
-        'opacity:0', 'transition:opacity 250ms ease',
-      ].join(';');
-      return v;
-    });
-    videoRefs.current = videos;
-
-    const attach = async (
-      slot: number,
-      containerEl: HTMLDivElement | null,
-      post: (typeof topPosts)[0] | undefined,
-    ) => {
-      if (!containerEl || !post) return;
-      const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
-      if (!hlsUrl) return;
-
-      const video = videos[slot];
-      containerEl.appendChild(video);
-
-      const onCanPlay = () => { video.style.opacity = '1'; };
-      video.addEventListener('canplay', onCanPlay, { once: true });
-
-      try {
-        const hls = await attachHlsToTile({ hlsUrl, video });
-        hlsRefs.current[slot] = hls;
-      } catch { /* silent */ }
-    };
-
-    const heroPostTarget = topPosts[heroIndex];
-    const middleStripPost = stripPosts[1];
-
-    // Observe hero
-    const heroObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.intersectionRatio >= 0.5) {
-          heroObserver.disconnect();
-          attach(0, heroRef.current, heroPostTarget);
-        }
-      },
-      { threshold: 0.5 },
-    );
-    if (heroRef.current) heroObserver.observe(heroRef.current);
-
-    // Observe middle strip tile
-    const middleObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.intersectionRatio >= 0.5) {
-          middleObserver.disconnect();
-          attach(1, middleRef.current, middleStripPost);
-        }
-      },
-      { threshold: 0.5 },
-    );
-    if (middleRef.current) middleObserver.observe(middleRef.current);
-
-    return () => {
-      heroObserver.disconnect();
-      middleObserver.disconnect();
-      videos.forEach((v, slot) => {
-        v.pause();
-        if (v.parentElement) v.parentElement.removeChild(v);
-        hlsRefs.current[slot]?.destroy();
-        hlsRefs.current[slot] = null;
-      });
-      videoRefs.current = [];
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topPosts.length]);
-
   // ── Loading skeleton ──
   if (isLoading) {
     const shimmerBase = {
@@ -135,10 +43,9 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
           <div style={{ ...shimmerBase, width: 140, height: 12, borderRadius: 6, animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
           <div style={{ ...shimmerBase, width: 52, height: 12, borderRadius: 6, animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
         </div>
-        <div style={{ ...shimmerBase, width: '100%', aspectRatio: '16/9', animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
-        <div style={{ display: 'flex', gap: 2 }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{ ...shimmerBase, flex: 1, aspectRatio: '4/5', animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite` }} />
+        <div style={{ display: 'flex', gap: 10, padding: '0 16px 16px' }}>
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} style={{ ...shimmerBase, flexShrink: 0, width: 140, aspectRatio: '3/4', borderRadius: 12, animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite` }} />
           ))}
         </div>
       </div>
@@ -148,92 +55,96 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div>
-      {/* ── Label row ── */}
+    <div style={{ background: '#F8FAFC' }}>
+      {/* Label row */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 16px 8px',
       }}>
-        <div style={{
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
-          color: '#F7931E', textTransform: 'uppercase',
-        }}>
-          ⛳ Trending this week
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 16 }}>🔥</span>
+          <span style={{ fontSize: 13, fontWeight: 800, color: '#1a1a1a', letterSpacing: '-0.2px' }}>
+            Hot right now
+          </span>
         </div>
         <button
           onClick={() => navigate('/watch/clips')}
-          style={{
-            fontSize: 12, fontWeight: 600, color: '#F7931E',
-            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-          }}
+          style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
         >
           See all →
         </button>
       </div>
 
-      {/* ── Hero — full-bleed 16:9 ── */}
-      <div
-        ref={heroRef}
-        style={{
-          position: 'relative', width: '100%', aspectRatio: '16/9',
-          overflow: 'hidden', cursor: 'pointer', marginBottom: 4,
-        }}
-        data-watch-index={0}
-      >
-        <WatchTile post={heroPost} index={heroIndex} allPosts={topPosts} />
-        {/* Gradient */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.05) 45%, transparent 70%)',
-        }} />
-        {/* Bottom row: likes + duration */}
-        <div style={{
-          position: 'absolute', bottom: 12, left: 14, right: 14,
-          display: 'flex', alignItems: 'center', pointerEvents: 'none',
-        }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
-            🧡 {heroPost.likeCount}
-          </span>
-          <div style={{ flex: 1 }} />
-          <span style={{
-            background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 5, padding: '2px 7px',
-            fontSize: 11, fontWeight: 600, color: '#fff',
-          }}>
-            {heroPost.mediaItems[0]?.duration
-              ? `${Math.floor(heroPost.mediaItems[0].duration / 60)}:${String(Math.floor(heroPost.mediaItems[0].duration % 60)).padStart(2, '0')}`
-              : ''}
-          </span>
-        </div>
-      </div>
-
-      {/* ── Strip — 3 tiles, full-bleed, 4px gap ── */}
-      <div style={{ display: 'flex', gap: 4 }}>
-        {stripPosts.map((post, i) => (
-          <div
-            key={post.id}
-            ref={i === 1 ? middleRef : undefined}
-            style={{
-              flex: 1, aspectRatio: '4/5', overflow: 'hidden', position: 'relative', cursor: 'pointer',
-            }}
-            data-watch-index={i + 1}
-          >
-            <WatchTile post={post} index={topPosts.indexOf(post)} allPosts={topPosts} />
-            {/* Rank badge — skip for first strip tile (i===0) */}
-            {i > 0 && (
+      {/* Horizontal scroll — ranked cards */}
+      <div style={{
+        display: 'flex', gap: 10, overflowX: 'auto',
+        padding: '0 16px 16px', scrollbarWidth: 'none',
+        WebkitOverflowScrolling: 'touch',
+      }}>
+        {topPosts.map((post, i) => {
+          const media = post.mediaItems[0];
+          const thumb = media?.thumbnailUrl || media?.imageUrl || '';
+          const duration = media?.duration
+            ? `${Math.floor(media.duration / 60)}:${String(Math.floor(media.duration % 60)).padStart(2, '0')}`
+            : '';
+          return (
+            <div
+              key={post.id}
+              style={{
+                flexShrink: 0, position: 'relative',
+                width: 140, borderRadius: 12, overflow: 'hidden',
+                cursor: 'pointer', aspectRatio: '3/4',
+              }}
+              onClick={() => {
+                useFullscreenFeedStore.getState().open(topPosts, i);
+              }}
+            >
+              {/* Thumbnail */}
+              <img
+                src={thumb}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+              {/* Gradient */}
               <div style={{
-                position: 'absolute', top: 7, left: 7, pointerEvents: 'none',
-                width: 20, height: 20, borderRadius: '50%',
-                background: 'rgba(0,0,0,0.55)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 9, fontWeight: 800, color: '#fff',
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.1) 45%, transparent 70%)',
+              }} />
+              {/* Big rank number */}
+              <div style={{
+                position: 'absolute', bottom: -8, left: 8,
+                fontSize: 56, fontWeight: 900,
+                color: 'rgba(255,255,255,0.92)',
+                lineHeight: 1, letterSpacing: '-3px',
+                textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                fontFamily: 'Georgia, serif',
+                pointerEvents: 'none',
               }}>
-                {i + 2}
+                {i + 1}
               </div>
-            )}
-          </div>
-        ))}
+              {/* Duration badge */}
+              {duration && (
+                <div style={{
+                  position: 'absolute', top: 8, right: 8,
+                  background: 'rgba(0,0,0,0.5)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: 4, padding: '2px 6px',
+                  fontSize: 10, fontWeight: 600, color: '#fff',
+                }}>
+                  {duration}
+                </div>
+              )}
+              {/* Likes */}
+              <div style={{
+                position: 'absolute', bottom: 10, right: 10,
+                fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.9)',
+                pointerEvents: 'none',
+              }}>
+                🧡 {post.likeCount}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
