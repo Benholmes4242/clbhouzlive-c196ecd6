@@ -26,8 +26,7 @@ export const useNavigationHandlers = () => {
     } else if (location.pathname.startsWith('/tourhub')) {
       setActiveTab('tourhub');
     } else if (location.pathname === '/map' || location.pathname.startsWith('/courses')) {
-      setActiveTab('courses');
-      markCoursesAsSeen();
+  setActiveTab('courses');
     } else if (location.pathname === '/watch') {
       setActiveTab('watch');
     }
@@ -46,8 +45,7 @@ export const useNavigationHandlers = () => {
       setActiveTab(tab.id);
 
       // Clear courses badge when visiting courses tab
-      if (tab.id === 'courses') {
-        markCoursesAsSeen();
+if (tab.id === 'courses') {
         if (user?.id) {
           supabase
             .from('notifications')
