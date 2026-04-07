@@ -338,7 +338,8 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
           display: 'flex',
           gap: 10,
           overflowX: 'auto',
-          padding: '0 16px 16px',
+          padding: '4px 16px 16px',
+          overflowY: 'visible',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
