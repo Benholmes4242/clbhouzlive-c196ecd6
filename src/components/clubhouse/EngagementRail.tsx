@@ -43,7 +43,8 @@ const EngagementButton = ({
   isActive, 
   onClick, 
   className,
-  ariaLabel
+  ariaLabel,
+  isLikeButton = false,
 }: {
   icon: any;
   count: number;
@@ -51,6 +52,7 @@ const EngagementButton = ({
   onClick: () => void;
   className?: string;
   ariaLabel: string;
+  isLikeButton?: boolean;
 }) => {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -87,13 +89,22 @@ const EngagementButton = ({
               />
             )}
             
-            <Icon 
-              className={cn(
-                "w-5 h-5 transition-colors duration-200 relative z-10",
-                isActive ? "text-red-500 fill-red-500 stroke-red-500" : "text-white/90"
-              )}
-              strokeWidth={isActive ? 0 : 2}
-            />
+            {isLikeButton ? (
+              <span
+                className="relative z-10"
+                style={{ fontSize: 20, lineHeight: 1, opacity: isActive ? 1 : 0.85 }}
+              >
+                🧡
+              </span>
+            ) : (
+              <Icon 
+                className={cn(
+                  "w-5 h-5 transition-colors duration-200 relative z-10",
+                  isActive ? "text-red-500 fill-red-500 stroke-red-500" : "text-white/90"
+                )}
+                strokeWidth={isActive ? 0 : 2}
+              />
+            )}
           </div>
         </Squircle>
       </button>
@@ -234,6 +245,7 @@ const EngagementRail = ({
         icon={Heart}
         count={stats.likes}
         isActive={isLiked}
+        isLikeButton
         onClick={onLike}
         ariaLabel={isLiked ? 'Unlike' : 'Like'}
       />
