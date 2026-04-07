@@ -6,6 +6,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
@@ -45,6 +46,12 @@ export const useNavigationHandlers = () => {
       // Clear courses badge when visiting courses tab
       if (tab.id === 'courses') {
         markCoursesAsSeen();
+        // Also mark friend_course_review notifications as read in DB
+        supabase
+          .from('notifications')
+          .update({ is_read: true })
+          .eq('type', 'friend_course_review')
+          .then(() => {});
       }
 
       if (tab.path === '/profile') {

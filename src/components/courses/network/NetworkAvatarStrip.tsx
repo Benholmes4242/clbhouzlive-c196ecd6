@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { NetworkFriend } from '@/hooks/useNetworkActivity';
+import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 
 interface NetworkAvatarStripProps {
   friends: NetworkFriend[];
@@ -26,6 +27,8 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
+  const { unseenReviews } = useUnseenFriendReviews();
+  const unseenReviewerIds = new Set(unseenReviews.map(r => r.reviewer_id));
 
   // Filter to only friends who have activity (last_activity set)
   const activeFriends = friends.filter(f => f.last_activity !== null);
@@ -66,7 +69,8 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
               src={friend.profile_photo_url}
               alt={friend.display_name || friend.username}
               fallback={getInitials(friend)}
-              hideRing
+              hideRing={!unseenReviewerIds.has(friend.id)}
+              ringColor={unseenReviewerIds.has(friend.id) ? '#F7931E' : undefined}
             />
           </button>
         ))}
