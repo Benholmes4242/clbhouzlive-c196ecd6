@@ -48,10 +48,9 @@ export function useFollowMutation() {
       console.error('[Follow] Mutation failed:', error);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['media-feed'],
-        refetchType: 'none',
-      });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['user-follows'] });
+      queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
     },
   });
 }
