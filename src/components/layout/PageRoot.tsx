@@ -12,8 +12,6 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   hasBottomNav?: boolean;
   /** When true, pulls the page up into .app-shell's safe-area padding so hero images can bleed to viewport top */
   immersive?: boolean;
-  /** Optional key — when this changes, useMedianStatusBar re-fires (e.g. after fullscreen overlay closes) */
-  reapplyKey?: string | number;
 }
 
 /**
@@ -25,9 +23,9 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
  *  - Supports fixedHeight mode for pages that should not scroll (like Hub)
  */
 export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
-  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, immersive = false, reapplyKey, style, ...rest }, ref) => {
+  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, immersive = false, style, ...rest }, ref) => {
     // Default light chrome for all pages (disabled when child controls status bar)
-    useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar, reapplyKey);
+    useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
 
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
     const bottomPadding = hasBottomNav ? '94px' : undefined;
