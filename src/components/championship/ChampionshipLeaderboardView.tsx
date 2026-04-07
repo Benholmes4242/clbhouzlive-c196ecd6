@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 
 import {
   useChampionshipLeaderboard,
@@ -223,6 +224,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [showCelebration, setShowCelebration] = useState(false);
   const [previousRank, setPreviousRank] = useState<number | null>(null);
   const [userHandicap, setUserHandicap] = useState<number | null>(null);
+  const [showSponsorSheet, setShowSponsorSheet] = useState(false);
   const [userCountry, setUserCountry] = useState<string | null>(null);
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
@@ -763,14 +765,18 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
                     Sponsored by{' '}
                     {currentSeason.sponsor_url ? (
-                      <a
-                        href={currentSeason.sponsor_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline', textDecorationColor: 'rgba(247,147,30,0.4)' }}
+                      <button
+                        onClick={() => setShowSponsorSheet(true)}
+                        style={{
+                          background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                          color: '#F7931E', fontWeight: 600,
+                          textDecoration: 'underline',
+                          textDecorationColor: 'rgba(247,147,30,0.4)',
+                          fontSize: 'inherit',
+                        }}
                       >
                         {currentSeason.sponsor_name}
-                      </a>
+                      </button>
                     ) : (
                       <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{currentSeason.sponsor_name}</span>
                     )}
@@ -1258,6 +1264,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           }}
         />
       )}
+      <ExternalLinkSheet
+        isOpen={showSponsorSheet}
+        onClose={() => setShowSponsorSheet(false)}
+        url={currentSeason?.sponsor_url ?? ''}
+        title={`${currentSeason?.sponsor_name ?? 'Sponsor'} Website`}
+      />
       </div>{/* end body content */}
     </div>
   );
