@@ -2,18 +2,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from 'sonner';
+import { useFollowStore } from '@/store/followStore';
 
 /**
  * Hook to manage user follows
  * Provides follow state and toggle function with optimistic updates
- * Syncs across all pages via React Query cache
+ * Syncs across all pages via Zustand follow store + React Query cache
  */
 export function useUserFollow(targetUserId: string | null) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const { setFollowing, getFollowing } = useFollowStore();
 
   // Query: Check if current user follows this user
-  const { data: isFollowing = false, isLoading } = useQuery({
+  const { data: rawIsFollowing = false, isLoading } = useQuery({
     queryKey: ['user-follows', user?.id, targetUserId],
     queryFn: async () => {
       if (!user?.id || !targetUserId || user.id === targetUserId) {
@@ -35,8 +37,11 @@ export function useUserFollow(targetUserId: string | null) {
       return !!data;
     },
     enabled: !!user?.id && !!targetUserId && user.id !== targetUserId,
-    staleTime: 1000 * 60, // 1 minute
+    staleTime: 1000 * 60,
   });
+
+  // Read from global store first, fall back to server data
+  const isFollowing = getFollowing(targetUserId ?? '', rawIsFollowing);
 
   // Mutation: Toggle follow/unfollow
   const followMutation = useMutation({
@@ -56,8 +61,6 @@ export function useUserFollow(targetUserId: string | null) {
           .single();
         
         if (error) throw error;
-        // Notification is created by database trigger - no frontend insert needed
-
         return data;
       } else {
         const { error } = await supabase
@@ -71,37 +74,29 @@ export function useUserFollow(targetUserId: string | null) {
       }
     },
     onMutate: async ({ targetUserId, action }) => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['user-follows', user?.id, targetUserId] });
-      
-      // Snapshot previous value
       const previousFollowState = queryClient.getQueryData(['user-follows', user?.id, targetUserId]);
-      
-      // Optimistically update
       queryClient.setQueryData(['user-follows', user?.id, targetUserId], action === 'follow');
-      
+      setFollowing(targetUserId, action === 'follow');
       return { previousFollowState };
     },
     onError: (err, { targetUserId }, context) => {
-      // Rollback on error
       if (context?.previousFollowState !== undefined) {
         queryClient.setQueryData(['user-follows', user?.id, targetUserId], context.previousFollowState);
+        setFollowing(targetUserId, context.previousFollowState as boolean);
       }
       toast.error('Failed to update follow status');
       console.error('Follow mutation error:', err);
     },
     onSuccess: (_, { targetUserId, action }) => {
-      // Update cache
       queryClient.setQueryData(['user-follows', user?.id, targetUserId], action === 'follow');
-      
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['user-follows'] });
       queryClient.invalidateQueries({ queryKey: ['followers'] });
       queryClient.invalidateQueries({ queryKey: ['following'] });
       queryClient.invalidateQueries({ queryKey: ['social-counts'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      
-      // Show success message
+      queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
       toast.success(action === 'follow' ? 'Following' : 'Unfollowed');
     },
   });

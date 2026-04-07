@@ -1,8 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useFollowStore } from '@/store/followStore';
 
 interface UseClubhouseFollowsOptions {
   userId: string | undefined;
@@ -10,17 +11,11 @@ interface UseClubhouseFollowsOptions {
 
 /**
  * Manages optimistic follow state for the Clubhouse feed.
- * Uses refs for stable callbacks to prevent re-render cascades.
+ * Uses the global Zustand follow store for cross-page sync.
  */
 export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
   const followMutation = useFollowMutation();
-  const [followOverrides, setFollowOverrides] = useState<Map<string, boolean>>(new Map());
-
-  // Stable ref for followOverrides to avoid stale closures
-  const followOverridesRef = useRef(followOverrides);
-  useEffect(() => {
-    followOverridesRef.current = followOverrides;
-  }, [followOverrides]);
+  const { setFollowing, getFollowing } = useFollowStore();
 
   // Busy guard to prevent rapid-fire mutations
   const isMutatingRef = useRef(false);
@@ -32,17 +27,10 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
 
     isMutatingRef.current = true;
 
-    const currentOverrides = followOverridesRef.current;
-    const currentlyFollowed = currentOverrides.has(post.userId)
-      ? currentOverrides.get(post.userId)!
-      : post.isFollowedByMe;
+    const currentlyFollowed = getFollowing(post.userId, post.isFollowedByMe);
 
-    // Optimistic update
-    setFollowOverrides(prev => {
-      const next = new Map(prev);
-      next.set(post.userId, !currentlyFollowed);
-      return next;
-    });
+    // Optimistic update via global store
+    setFollowing(post.userId, !currentlyFollowed);
 
     analyticsEvents.track('feed_follow', { target_user_id: post.userId, action: currentlyFollowed ? 'unfollow' : 'follow' });
 
@@ -57,12 +45,8 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
       {
         onError: (error) => {
           console.error('[useClubhouseFollows] follow mutation failed:', error);
-          // Revert optimistic update
-          setFollowOverrides(prev => {
-            const next = new Map(prev);
-            next.set(post.userId, currentlyFollowed);
-            return next;
-          });
+          // Revert optimistic update in global store
+          setFollowing(post.userId, currentlyFollowed);
           toast.error('Could not update follow status. Please try again.');
         },
         onSettled: () => {
@@ -70,24 +54,20 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
         },
       }
     );
-  }, [userId, followMutation]);
+  }, [userId, followMutation, setFollowing, getFollowing]);
 
   const handleFollowChange = useCallback((targetUserId: string, isFollowed: boolean) => {
-    setFollowOverrides(prev => {
-      const next = new Map(prev);
-      next.set(targetUserId, isFollowed);
-      return next;
-    });
-  }, []);
+    setFollowing(targetUserId, isFollowed);
+  }, [setFollowing]);
 
   const getFollowState = useCallback((post: FeedPost | null): boolean => {
     if (!post) return false;
-    return followOverrides.has(post.userId) ? followOverrides.get(post.userId)! : post.isFollowedByMe;
-  }, [followOverrides]);
+    return getFollowing(post.userId, post.isFollowedByMe);
+  }, [getFollowing]);
 
   const resetFollows = useCallback(() => {
-    setFollowOverrides(new Map());
+    useFollowStore.getState().reset();
   }, []);
 
-  return { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows };
+  return { followOverrides: useFollowStore.getState().overrides, handleFollow, handleFollowChange, getFollowState, resetFollows };
 }
