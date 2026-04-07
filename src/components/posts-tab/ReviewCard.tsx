@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Star, Play, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { Star, Play, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCompact } from './utils';
@@ -166,7 +166,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
           onClick={(e) => e.stopPropagation()}
           style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
         >
-          <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+          <Heart className="w-4 h-4 text-muted-foreground" />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
             {formatCompact(post.likeCount)}
           </span>
