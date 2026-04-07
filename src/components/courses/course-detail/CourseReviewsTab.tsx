@@ -254,8 +254,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         hlsUrl: isVideo ? item.media_url : undefined,
         imageUrl: !isVideo ? item.media_url : undefined,
         thumbnailUrl: item.poster_url || undefined,
-        width: 1080,
-        height: 1920,
+        width: item.width || 1080,
+        height: item.height || 1080,
       };
       return {
         id: item.id,
