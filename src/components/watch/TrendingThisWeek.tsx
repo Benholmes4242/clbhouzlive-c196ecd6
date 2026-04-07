@@ -2,11 +2,244 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import Hls from 'hls.js';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
 }
 
+/* ── Per-card autoplay tile ── */
+function TrendingCard({
+  post,
+  index,
+  allPosts,
+}: {
+  post: any;
+  index: number;
+  allPosts: any[];
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
+  const [hasPlayed, setHasPlayed] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const media = post.mediaItems[0];
+  const thumb = media?.thumbnailUrl || media?.imageUrl || '';
+  const hlsUrl = media?.hlsUrl || '';
+  const duration = media?.duration
+    ? `${Math.floor(media.duration / 60)}:${String(Math.floor(media.duration % 60)).padStart(2, '0')}`
+    : '';
+
+  // Per-card IntersectionObserver — autoplay once when 40% visible
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el || !hlsUrl || hasPlayed) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasPlayed) {
+          startAutoplay();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl, hasPlayed]);
+
+  const startAutoplay = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || !hlsUrl) return;
+
+    video.muted = true;
+    video.playsInline = true;
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({ enableWorker: false, maxBufferLength: 4 });
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {});
+      });
+      hlsRef.current = hls;
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = hlsUrl;
+      video.play().catch(() => {});
+    }
+
+    setIsPlaying(true);
+
+    video.onended = () => {
+      setIsPlaying(false);
+      setHasPlayed(true);
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
+  }, [hlsUrl]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
+  }, []);
+
+  const handleTap = () => {
+    useFullscreenFeedStore.getState().open(allPosts, index);
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      style={{
+        flexShrink: 0,
+        position: 'relative',
+        width: 140,
+        borderRadius: 12,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        aspectRatio: '3/4',
+      }}
+      onClick={handleTap}
+    >
+      {/* Thumbnail */}
+      <img
+        src={thumb}
+        alt=""
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          display: 'block',
+          position: 'absolute',
+          inset: 0,
+        }}
+      />
+
+      {/* Autoplay video layer */}
+      {hlsUrl && (
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: isPlaying ? 1 : 0,
+            transition: 'opacity 0.3s',
+          }}
+        />
+      )}
+
+      {/* Gradient */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.1) 45%, transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Glassy outline rank number */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 6,
+          left: 8,
+          fontSize: 52,
+          fontWeight: 900,
+          lineHeight: 1,
+          letterSpacing: '-3px',
+          fontFamily: 'Georgia, serif',
+          color: 'transparent',
+          WebkitTextStroke: '1.5px rgba(255,255,255,0.45)',
+          pointerEvents: 'none',
+        }}
+      >
+        {index + 1}
+      </div>
+
+      {/* Duration badge */}
+      {duration && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            background: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: 4,
+            padding: '2px 6px',
+            fontSize: 10,
+            fontWeight: 600,
+            color: '#fff',
+          }}
+        >
+          {duration}
+        </div>
+      )}
+
+      {/* Likes */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 10,
+          right: 10,
+          fontSize: 11,
+          fontWeight: 600,
+          color: 'rgba(255,255,255,0.9)',
+          pointerEvents: 'none',
+        }}
+      >
+        🧡 {post.likeCount}
+      </div>
+
+      {/* Glass play button — shown after autoplay finishes */}
+      {hasPlayed && !isPlaying && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.2)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '10px solid rgba(255,255,255,0.9)',
+              borderTop: '6px solid transparent',
+              borderBottom: '6px solid transparent',
+              marginLeft: 2,
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Main component ── */
 export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekProps) {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
@@ -20,32 +253,57 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   const topPosts = posts.slice(0, 5);
 
-  // Find the first landscape video (width > height) for the hero slot
-  const landscapeIndex = topPosts.findIndex(post => {
-    const media = post.mediaItems[0];
-    return media && media.width > 0 && media.height > 0 && media.width > media.height;
-  });
-  const heroIndex = landscapeIndex !== -1 ? landscapeIndex : 0;
-  const heroPost = topPosts[heroIndex];
-  const stripPosts = topPosts.filter((_, i) => i !== heroIndex).slice(0, 3);
-
   // ── Loading skeleton ──
   if (isLoading) {
     const shimmerBase = {
       background: 'rgba(0,0,0,0.06)',
-      backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
+      backgroundImage:
+        'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
       backgroundSize: '200% 100%',
     } as React.CSSProperties;
 
     return (
       <div style={{ background: '#F8FAFC' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 16px 10px' }}>
-          <div style={{ ...shimmerBase, width: 140, height: 12, borderRadius: 6, animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
-          <div style={{ ...shimmerBase, width: 52, height: 12, borderRadius: 6, animation: 'clb-shimmer 1.5s ease-in-out infinite' }} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '4px 16px 10px',
+          }}
+        >
+          <div
+            style={{
+              ...shimmerBase,
+              width: 140,
+              height: 12,
+              borderRadius: 6,
+              animation: 'clb-shimmer 1.5s ease-in-out infinite',
+            }}
+          />
+          <div
+            style={{
+              ...shimmerBase,
+              width: 52,
+              height: 12,
+              borderRadius: 6,
+              animation: 'clb-shimmer 1.5s ease-in-out infinite',
+            }}
+          />
         </div>
         <div style={{ display: 'flex', gap: 10, padding: '0 16px 16px' }}>
-          {[0, 1, 2, 3].map(i => (
-            <div key={i} style={{ ...shimmerBase, flexShrink: 0, width: 140, aspectRatio: '3/4', borderRadius: 12, animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite` }} />
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              style={{
+                ...shimmerBase,
+                flexShrink: 0,
+                width: 140,
+                aspectRatio: '3/4',
+                borderRadius: 12,
+                animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite`,
+              }}
+            />
           ))}
         </div>
       </div>
@@ -57,94 +315,57 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   return (
     <div style={{ background: '#F8FAFC' }}>
       {/* Label row */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '12px 16px 8px',
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px 8px',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 16 }}>🔥</span>
-          <span style={{ fontSize: 13, fontWeight: 800, color: '#1a1a1a', letterSpacing: '-0.2px' }}>
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 800,
+              color: '#1a1a1a',
+              letterSpacing: '-0.2px',
+            }}
+          >
             Hot right now
           </span>
         </div>
         <button
           onClick={() => navigate('/watch/clips')}
-          style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: '#F7931E',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+          }}
         >
           See all →
         </button>
       </div>
 
       {/* Horizontal scroll — ranked cards */}
-      <div style={{
-        display: 'flex', gap: 10, overflowX: 'auto',
-        padding: '0 16px 16px', scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch',
-      }}>
-        {topPosts.map((post, i) => {
-          const media = post.mediaItems[0];
-          const thumb = media?.thumbnailUrl || media?.imageUrl || '';
-          const duration = media?.duration
-            ? `${Math.floor(media.duration / 60)}:${String(Math.floor(media.duration % 60)).padStart(2, '0')}`
-            : '';
-          return (
-            <div
-              key={post.id}
-              style={{
-                flexShrink: 0, position: 'relative',
-                width: 140, borderRadius: 12, overflow: 'hidden',
-                cursor: 'pointer', aspectRatio: '3/4',
-              }}
-              onClick={() => {
-                useFullscreenFeedStore.getState().open(topPosts, i);
-              }}
-            >
-              {/* Thumbnail */}
-              <img
-                src={thumb}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              />
-              {/* Gradient */}
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.1) 45%, transparent 70%)',
-              }} />
-              {/* Big rank number */}
-              <div style={{
-                position: 'absolute', bottom: -8, left: 8,
-                fontSize: 56, fontWeight: 900,
-                color: 'rgba(255,255,255,0.92)',
-                lineHeight: 1, letterSpacing: '-3px',
-                textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-                fontFamily: 'Georgia, serif',
-                pointerEvents: 'none',
-              }}>
-                {i + 1}
-              </div>
-              {/* Duration badge */}
-              {duration && (
-                <div style={{
-                  position: 'absolute', top: 8, right: 8,
-                  background: 'rgba(0,0,0,0.5)',
-                  backdropFilter: 'blur(8px)',
-                  borderRadius: 4, padding: '2px 6px',
-                  fontSize: 10, fontWeight: 600, color: '#fff',
-                }}>
-                  {duration}
-                </div>
-              )}
-              {/* Likes */}
-              <div style={{
-                position: 'absolute', bottom: 10, right: 10,
-                fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.9)',
-                pointerEvents: 'none',
-              }}>
-                🧡 {post.likeCount}
-              </div>
-            </div>
-          );
-        })}
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          overflowX: 'auto',
+          padding: '0 16px 16px',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {topPosts.map((post, i) => (
+          <TrendingCard key={post.id} post={post} index={i} allPosts={topPosts} />
+        ))}
       </div>
     </div>
   );
