@@ -70,10 +70,12 @@ export function FullscreenFeedOverlay() {
       return () => {
         document.body.style.overflow = "";
         document.body.classList.remove('route-fullscreen-overlay');
-        const appBg = '#F8FAFC';
-        if (shield) shield.style.backgroundColor = appBg;
-        document.documentElement.style.backgroundColor = appBg;
-        document.body.style.backgroundColor = appBg;
+        // Restore shield to app default — prevents transparent notch gap on return
+        if (shield) shield.style.backgroundColor = '#F8FAFC';
+        // Reset html/body to transparent — let .app-shell and PageRoot handle their own backgrounds
+        document.documentElement.style.backgroundColor = 'transparent';
+        document.body.style.backgroundColor = 'transparent';
+        // Re-apply Median light status bar for returning light pages
         try {
           (window as any).median?.statusbar?.set({
             style: 'light',
