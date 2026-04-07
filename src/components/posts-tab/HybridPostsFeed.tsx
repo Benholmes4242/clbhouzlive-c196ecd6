@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LongFormCard } from './LongFormCard';
 import { ReviewCard } from './ReviewCard';
@@ -6,6 +6,9 @@ import { CompactGridRow } from './CompactGridRow';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import { Loader2, Film } from 'lucide-react';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 
 type PostKind = 'longform' | 'review' | 'compact';
 
@@ -67,6 +70,21 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { deletePost } = usePostDeletion();
+  const { activeActor } = useActiveActor();
+  const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
+
+  const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
+  const [commentsCreatorId, setCommentsCreatorId] = useState<string | undefined>(undefined);
+  const [commentsCreatorName, setCommentsCreatorName] = useState<string | undefined>(undefined);
+  const [commentsCaption, setCommentsCaption] = useState<string | null>(null);
+
+  const openComments = (post: FeedPost) => {
+    setCommentsPostId(post.id);
+    setCommentsCreatorId(post.userId);
+    setCommentsCreatorName(post.displayName);
+    setCommentsCaption(post.caption ?? null);
+  };
+  const closeComments = () => setCommentsPostId(null);
 
   // Infinite scroll sentinel
   useEffect(() => {
@@ -187,6 +205,9 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
               postIndex={idx >= 0 ? idx : undefined}
               isOwnPost={isOwnProfile}
               onDelete={() => handleDelete(segment.post.id, segment.post.userId)}
+              likeState={getActiveLikeState(segment.post)}
+              onLike={() => handleLike(segment.post)}
+              onComment={() => openComments(segment.post)}
             />
           );
         }
@@ -200,6 +221,9 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
               postIndex={idx >= 0 ? idx : undefined}
               isOwnPost={isOwnProfile}
               onDelete={() => handleDelete(segment.post.id, segment.post.userId)}
+              likeState={getActiveLikeState(segment.post)}
+              onLike={() => handleLike(segment.post)}
+              onComment={() => openComments(segment.post)}
             />
           );
         }
@@ -224,6 +248,17 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
           <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
         </div>
       )}
+
+      <CommentsSheet
+        isOpen={!!commentsPostId}
+        onClose={closeComments}
+        postId={commentsPostId ?? ''}
+        currentUserId={userId}
+        creatorUserId={commentsCreatorId}
+        creatorName={commentsCreatorName}
+        caption={commentsCaption ?? undefined}
+        theme="light"
+      />
     </div>
   );
 };
