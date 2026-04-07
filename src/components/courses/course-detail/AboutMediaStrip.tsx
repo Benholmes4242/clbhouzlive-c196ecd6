@@ -63,7 +63,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         imageUrl: !isVideo ? item.url : undefined,
         thumbnailUrl: item.thumbnailUrl || undefined,
         width: item.width || 1080,
-        height: item.height || 1920,
+        height: item.height || 1080,
         duration: item.duration || undefined,
       };
       return {
