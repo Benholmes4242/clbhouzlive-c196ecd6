@@ -1,7 +1,6 @@
 /**
  * useUnseenFriendReviews
- * Counts friend course reviews posted since the user last visited the Courses tab.
- * Uses localStorage to persist the last-seen timestamp per user.
+ * Counts unread friend_course_review notifications for the current user.
  * Returns both the count and the actual review details for banner display.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +8,6 @@ import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
-const STORAGE_KEY = (userId: string) => `clbhouz_courses_last_seen_${userId}`;
 const MAX_BADGE = 99;
 
 export interface UnseenFriendReview {
@@ -37,50 +35,36 @@ export function useUnseenFriendReviews() {
     queryFn: async (): Promise<UnseenFriendReviewsData> => {
       if (!user?.id) return { count: 0, reviews: [] };
 
-      const stored = localStorage.getItem(STORAGE_KEY(user.id));
-      const lastSeen = stored ? new Date(stored) : new Date(0);
-
-      // Get accepted friend IDs
-      const { data: friendships } = await supabase
-        .from('user_friends')
-        .select('user_id, friend_id')
-        .eq('status', 'accepted')
-        .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
-
-      if (!friendships || friendships.length === 0) return { count: 0, reviews: [] };
-
-      const friendIds = friendships
-        .map(row => row.user_id === user.id ? row.friend_id : row.user_id)
-        .filter(Boolean) as string[];
-
-      // Fetch unseen reviews with course + reviewer info
-      const { data: ratings } = await supabase
-        .from('course_ratings')
+      // Read unseen friend_course_review notifications directly
+      // This keeps both the profile pill and courses dot in sync
+      const { data: notifications } = await supabase
+        .from('notifications')
         .select(`
           id,
-          course_id,
-          rating,
+          entity_id,
+          data,
           created_at,
-          user_id,
-          golf_courses!inner(name),
-          user_profiles!inner(display_name, username, profile_photo_url)
+          actor_id,
+          user_profiles!actor_id(display_name, username, profile_photo_url)
         `)
-        .in('user_id', friendIds)
-        .gt('created_at', lastSeen.toISOString())
+        .eq('user_id', user.id)
+        .eq('type', 'friend_course_review')
+        .eq('is_read', false)
+        .eq('is_deleted', false)
         .order('created_at', { ascending: false })
         .limit(10);
 
-      const reviews: UnseenFriendReview[] = (ratings || []).map((r: any) => ({
-        id: r.id,
-        course_id: r.course_id,
-        course_name: (r.golf_courses as any)?.name || 'a course',
-        rating: r.rating,
-        reviewer_id: r.user_id,
-        reviewer_name: (r.user_profiles as any)?.display_name
-          || (r.user_profiles as any)?.username
+      const reviews: UnseenFriendReview[] = (notifications || []).map((n: any) => ({
+        id: n.entity_id,
+        course_id: n.data?.course_id,
+        course_name: n.data?.course_name || 'a course',
+        rating: n.data?.rating,
+        reviewer_id: n.actor_id,
+        reviewer_name: n.user_profiles?.display_name
+          || n.user_profiles?.username
           || 'A friend',
-        reviewer_avatar: (r.user_profiles as any)?.profile_photo_url || null,
-        created_at: r.created_at,
+        reviewer_avatar: n.user_profiles?.profile_photo_url || null,
+        created_at: n.created_at,
       }));
 
       return {
@@ -95,7 +79,6 @@ export function useUnseenFriendReviews() {
 
   const markCoursesAsSeen = useCallback(() => {
     if (!user?.id) return;
-    localStorage.setItem(STORAGE_KEY(user.id), new Date().toISOString());
     queryClient.setQueryData(['unseen-friend-reviews', user.id], { count: 0, reviews: [] });
   }, [user?.id, queryClient]);
 
