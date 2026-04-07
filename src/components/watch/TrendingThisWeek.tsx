@@ -99,7 +99,7 @@ function TrendingCard({
         borderRadius: 12,
         overflow: 'hidden',
         cursor: 'pointer',
-        aspectRatio: '3/4',
+        aspectRatio: '9/16',
       }}
       onClick={handleTap}
     >
@@ -279,7 +279,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
                 ...shimmerBase,
                 flexShrink: 0,
                 width: 140,
-                aspectRatio: '3/4',
+                aspectRatio: '9/16',
                 borderRadius: 12,
                 animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite`,
               }}
