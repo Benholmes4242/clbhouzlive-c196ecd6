@@ -12,6 +12,13 @@ const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
 const PGA_TOUR_ID = 'b52068af-28e4-4e91-bdbb-037591b0ff84';
 const PGA_TOUR_SLUG = 'pga';
 
+const MAJOR_NAMES = [
+  'Masters Tournament',
+  'PGA Championship',
+  'U.S. Open',
+  'The Open Championship',
+];
+
 // ── Insight helper ──
 function getInsight(idx: number, leaderName: string | null, isTied: boolean, tiedCount: number): string | null {
   if (!leaderName && !isTied) return null;
@@ -128,25 +135,55 @@ export function usePGACard(userId?: string): {
     enabled: !topLive && !recentResult,
   });
 
+  // ── Next upcoming Major (any tour) ──
+  const { data: nextMajor } = useQuery({
+    queryKey: ['pga-card-next-major'],
+    queryFn: async () => {
+      const now = new Date().toISOString();
+      const { data } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, venue_course_name, defending_champion, status, season_id')
+        .in('status', ['scheduled', 'created'])
+        .gte('start_date', now)
+        .or(MAJOR_NAMES.map(n => `name.eq.${n}`).join(','))
+        .order('start_date', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      return data ?? null;
+    },
+    staleTime: 30 * 60_000,
+    enabled: !topLive && !recentResult,
+  });
+
+  // ── Pick major over PGA if it starts sooner ──
+  const effectiveUpcoming = useMemo(() => {
+    if (!nextMajor && !nextUpcoming) return null;
+    if (!nextMajor) return nextUpcoming;
+    if (!nextUpcoming) return nextMajor;
+    return new Date(nextMajor.start_date) <= new Date(nextUpcoming.start_date)
+      ? nextMajor
+      : nextUpcoming;
+  }, [nextMajor, nextUpcoming]);
+
   // ── Course image resolver ──
   const activeVenue = useMemo((): VenueInput | null => {
-    const t = topLive ?? (recentResult as any) ?? (nextUpcoming as any);
+    const t = topLive ?? (recentResult as any) ?? (effectiveUpcoming as any);
     if (!t?.venue_name && !t?.venueName) return null;
     return {
       venueName: t.venue_name ?? t.venueName,
       venueCourseName: t.venue_course_name ?? t.venueCourseName ?? null,
       city: t.venue_city ?? t.venueCity ?? null,
     };
-  }, [topLive, recentResult, nextUpcoming]);
+  }, [topLive, recentResult, effectiveUpcoming]);
 
   const { courseImage } = useSingleCourseImage(activeVenue);
   const courseImageUrl = courseImage?.imageUrl ?? null;
 
   // ── Past winners at this venue (upcoming state only) ──
   const { data: pastWinnersRaw = [] } = useQuery({
-    queryKey: ['pga-card-past-winners', (nextUpcoming as any)?.venue_name],
+    queryKey: ['pga-card-past-winners', (effectiveUpcoming as any)?.venue_name],
     queryFn: async () => {
-      const venueName = (nextUpcoming as any)?.venue_name;
+      const venueName = (effectiveUpcoming as any)?.venue_name;
       if (!venueName) return [];
 
       // Extract first 2 distinctive words for a loose match
@@ -207,7 +244,7 @@ export function usePGACard(userId?: string): {
         scoreDisplay: string | null;
       }>;
     },
-    enabled: !!nextUpcoming && !topLive && !recentResult,
+    enabled: !!effectiveUpcoming && !topLive && !recentResult,
     staleTime: 30 * 60_000,
   });
 
@@ -308,8 +345,8 @@ export function usePGACard(userId?: string): {
   });
 
   // ── Determine active tournament for post ID / counts ──
-  const activeTournamentId = topLive?.id ?? recentResult?.id ?? nextUpcoming?.id ?? null;
-  const activeTournamentName = topLive?.name ?? (recentResult as any)?.name ?? (nextUpcoming as any)?.name ?? '';
+  const activeTournamentId = topLive?.id ?? recentResult?.id ?? effectiveUpcoming?.id ?? null;
+  const activeTournamentName = topLive?.name ?? (recentResult as any)?.name ?? (effectiveUpcoming as any)?.name ?? '';
 
   const { data: postId = '' } = useQuery({
     queryKey: ['pga-card-post-id', activeTournamentId],
@@ -522,8 +559,8 @@ export function usePGACard(userId?: string): {
     }
 
     // UPCOMING state
-    if (nextUpcoming) {
-      const u = nextUpcoming as any;
+    if (effectiveUpcoming) {
+      const u = effectiveUpcoming as any;
       return {
         tournamentId: u.id,
         tournamentName: u.name,
@@ -554,7 +591,7 @@ export function usePGACard(userId?: string): {
     }
 
     return null;
-  }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId,
+  }, [topLive, recentResult, effectiveUpcoming, resultLeaderboard, postId,
       engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe,
       liveScorecards, resultScorecards, resultMeta, championSeasonStats, courseImageUrl, pastWinnersRaw]);
 
