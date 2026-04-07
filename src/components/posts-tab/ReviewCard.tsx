@@ -12,9 +12,12 @@ interface ReviewCardProps {
   postIndex?: number;
   isOwnPost?: boolean;
   onDelete?: () => void;
+  likeState?: { isLiked: boolean; count: number };
+  onLike?: () => void;
+  onComment?: () => void;
 }
 
-export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete }) => {
+export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete, likeState, onLike, onComment }) => {
   const [expanded, setExpanded] = useState(false);
   const review = post.review;
   const tileRef = useRef<HTMLDivElement>(null);
@@ -163,17 +166,21 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
       {/* Engagement + creator combined row */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '9px 14px 11px', gap: 4 }}>
         <button
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onLike?.(); }}
           style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
         >
-          <Heart className="w-4 h-4 text-muted-foreground" />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
-            {formatCompact(post.likeCount)}
+          <Heart
+            className="w-4 h-4"
+            style={{ color: likeState?.isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))' }}
+            fill={likeState?.isLiked ? '#F7931E' : 'none'}
+          />
+          <span style={{ fontSize: 13, fontWeight: 700, color: likeState?.isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))' }}>
+            {formatCompact(likeState?.count ?? post.likeCount)}
           </span>
         </button>
         <div style={{ width: 1, height: 18, background: 'hsl(var(--border))', margin: '0 10px' }} />
         <button
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onComment?.(); }}
           style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer' }}
         >
           <MessageCircle className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
