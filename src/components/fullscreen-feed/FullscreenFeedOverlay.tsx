@@ -6,6 +6,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { applyShieldColor } from '@/hooks/useMedianStatusBar';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
@@ -70,20 +71,10 @@ export function FullscreenFeedOverlay() {
       return () => {
         document.body.style.overflow = "";
         document.body.classList.remove('route-fullscreen-overlay');
-        // Restore shield to app default — prevents transparent notch gap on return
-        if (shield) shield.style.backgroundColor = '#F8FAFC';
-        // Reset html/body to transparent — let .app-shell and PageRoot handle their own backgrounds
+        if (shield) shield.style.backgroundColor = 'transparent';
         document.documentElement.style.backgroundColor = 'transparent';
         document.body.style.backgroundColor = 'transparent';
-        // Re-apply Median light status bar for returning light pages
-        try {
-          (window as any).median?.statusbar?.set({
-            style: 'light',
-            color: 'FFF8FAFC',
-            overlay: false,
-            blur: false,
-          });
-        } catch {}
+        applyShieldColor('#F8FAFC');
       };
     }
   }, [isOpen]);
