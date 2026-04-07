@@ -18,6 +18,7 @@ export interface Season {
   days_until_start: number | null;
   sponsor_name: string | null;
   prize_description: string | null;
+  sponsor_url: string | null;
   season_winner_user_id: string | null;
   season_winner_courses: number | null;
   prize_claimed: boolean;
