@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
@@ -165,11 +166,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     <>
       {/* Fallback always visible until image has fully loaded */}
       {(!imageLoaded || showFallback) && (
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground font-semibold select-none"
-          style={{ fontSize: `${fallbackFontSize}px` }}
-        >
-          {fallbackContent}
+        <div className="absolute inset-0 bg-muted">
+          <PlayerSilhouette />
         </div>
       )}
       {imageSrc && !showFallback && (
