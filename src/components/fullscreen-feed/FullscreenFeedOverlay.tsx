@@ -70,9 +70,18 @@ export function FullscreenFeedOverlay() {
       return () => {
         document.body.style.overflow = "";
         document.body.classList.remove('route-fullscreen-overlay');
-        if (shield) shield.style.backgroundColor = 'transparent';
-        document.documentElement.style.backgroundColor = 'transparent';
-        document.body.style.backgroundColor = 'transparent';
+        const appBg = '#F8FAFC';
+        if (shield) shield.style.backgroundColor = appBg;
+        document.documentElement.style.backgroundColor = appBg;
+        document.body.style.backgroundColor = appBg;
+        try {
+          (window as any).median?.statusbar?.set({
+            style: 'light',
+            color: 'FFF8FAFC',
+            overlay: false,
+            blur: false,
+          });
+        } catch {}
       };
     }
   }, [isOpen]);
