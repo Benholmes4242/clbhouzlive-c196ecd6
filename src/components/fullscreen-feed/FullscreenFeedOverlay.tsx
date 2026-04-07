@@ -6,7 +6,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
-import { applyShieldColor } from '@/hooks/useMedianStatusBar';
+
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
@@ -71,10 +71,9 @@ export function FullscreenFeedOverlay() {
       return () => {
         document.body.style.overflow = "";
         document.body.classList.remove('route-fullscreen-overlay');
-        if (shield) shield.style.backgroundColor = 'transparent';
+        if (shield) shield.style.backgroundColor = '#F8FAFC';
         document.documentElement.style.backgroundColor = 'transparent';
         document.body.style.backgroundColor = 'transparent';
-        applyShieldColor('#F8FAFC');
       };
     }
   }, [isOpen]);
