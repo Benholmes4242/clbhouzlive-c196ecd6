@@ -559,8 +559,8 @@ export function usePGACard(userId?: string): {
     }
 
     // UPCOMING state
-    if (nextUpcoming) {
-      const u = nextUpcoming as any;
+    if (effectiveUpcoming) {
+      const u = effectiveUpcoming as any;
       return {
         tournamentId: u.id,
         tournamentName: u.name,
