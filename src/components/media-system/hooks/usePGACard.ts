@@ -174,7 +174,7 @@ export function usePGACard(userId?: string): {
       venueCourseName: t.venue_course_name ?? t.venueCourseName ?? null,
       city: t.venue_city ?? t.venueCity ?? null,
     };
-  }, [topLive, recentResult, nextUpcoming]);
+  }, [topLive, recentResult, effectiveUpcoming]);
 
   const { courseImage } = useSingleCourseImage(activeVenue);
   const courseImageUrl = courseImage?.imageUrl ?? null;
