@@ -591,7 +591,7 @@ export function usePGACard(userId?: string): {
     }
 
     return null;
-  }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId,
+  }, [topLive, recentResult, effectiveUpcoming, resultLeaderboard, postId,
       engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe,
       liveScorecards, resultScorecards, resultMeta, championSeasonStats, courseImageUrl, pastWinnersRaw]);
 
