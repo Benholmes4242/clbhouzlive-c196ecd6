@@ -1,6 +1,4 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Star, AtSign } from 'lucide-react';
-import { FiMapPin } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -59,106 +57,65 @@ export function getActorAvatarUrl(notification: ActivityNotification): string | 
   return notification.actor_avatar_url;
 }
 
-export function getNotificationBadgeIcon(type: string) {
-  const iconClass = "h-3 w-3";
+export function getNotificationBadgeIcon(type: string): string {
   switch (type) {
-    case 'like':
-      return <Heart className={cn(iconClass, "text-[#F7931E]")} fill="currentColor" />;
+    case 'like':                              return '🧡';
     case 'comment':
-    case 'comment_reply':
-      return <MessageCircle className={cn(iconClass, "text-blue-500")} />;
+    case 'comment_reply':                     return '💬';
     case 'mention':
-    case 'tag':
-      return <MessageCircle className={cn(iconClass, "text-purple-500")} />;
-    case 'follow':
-      return <UserPlus className={cn(iconClass, "text-blue-500")} />;
+    case 'tag':                               return '💬';
+    case 'follow':                            return '➕';
     case 'friend_request':
     case 'friend_accept':
-    case 'friend_accepted':
-      return <Users className={cn(iconClass, "text-green-500")} />;
+    case 'friend_accepted':                   return '👥';
     case 'friend_request_sent':
     case 'friend_declined':
-    case 'friend_cancelled':
-      return <Users className={cn(iconClass, "text-muted-foreground")} />;
+    case 'friend_cancelled':                  return '👥';
     case 'message':
-    case 'dm':
-      return <Mail className={cn(iconClass, "text-violet-500")} />;
-    case 'achievement':
-      return <Trophy className={cn(iconClass, "text-amber-500")} />;
+    case 'dm':                                return '✉️';
+    case 'achievement':                       return '🏆';
     case 'club_update':
-    case 'course_update':
-      return <Building2 className={cn(iconClass, "text-gray-500")} />;
+    case 'course_update':                     return '📍';
     case 'business_verification_approved':
-      return <VerifiedBadge size="sm" />;
+    case 'golfer_verification_approved':      return '✅';
     case 'business_verification_submitted':
-    case 'business_verification_more_proof_requested':
-      return <Clock className={cn(iconClass, "text-amber-500")} />;
+    case 'golfer_verification_submitted':
+    case 'golfer_verification_invite':
+    case 'business_verification_more_proof_requested': return '⏳';
     case 'business_verification_rejected':
-      return <Building2 className={cn(iconClass, "text-gray-500")} />;
+    case 'golfer_verification_rejected':
     case 'business_verification_removed':
-    case 'business_verification_revoked':
-      return <ShieldOff className={cn(iconClass, "text-gray-500")} />;
+    case 'golfer_verification_removed':
+    case 'business_verification_revoked':     return '🚫';
     case 'business_member_added':
     case 'business_access_approved':
-      return <Building2 className={cn(iconClass, "text-gray-500")} />;
-    case 'business_access_request':
-      return <UserPlus className={cn(iconClass, "text-gray-500")} />;
-    case 'business_access_declined':
-      return <X className={cn(iconClass, "text-red-500")} />;
-    case 'golfer_verification_approved':
-      return <VerifiedBadge size="sm" />;
-    case 'golfer_verification_invite':
-    case 'golfer_verification_submitted':
-      return <Clock className={cn(iconClass, "text-amber-500")} />;
-    case 'golfer_verification_rejected':
-    case 'golfer_verification_removed':
-      return <ShieldOff className={cn(iconClass, "text-red-500")} />;
+    case 'business_access_request':           return '🏢';
+    case 'business_access_declined':          return '❌';
     case 'game_request':
-      return <UserPlus className={cn(iconClass, "text-amber-500")} />;
+    case 'trip_request':                      return '⛳';
     case 'game_request_accepted':
-      return <CheckCircle2 className={cn(iconClass, "text-emerald-500")} />;
-    case 'game_request_declined':
-      return <X className={cn(iconClass, "text-red-500")} />;
-    case 'game_cancelled':
-      return <X className={cn(iconClass, "text-red-500")} />;
-    case 'rsvp_update':
-      return <UserCheck className={cn(iconClass, "text-emerald-500")} />;
-    case 'game_reminder_24h':
-    case 'game_reminder_2h':
-      return <Bell className={cn(iconClass, "text-amber-500")} />;
-    case 'game_updated':
-      return <CalendarDays className={cn(iconClass, "text-blue-500")} />;
-    case 'game_completed':
-      return <CheckCircle2 className={cn(iconClass, "text-emerald-500")} />;
-    case 'trip_request':
-      return <UserPlus className={cn(iconClass, "text-amber-500")} />;
     case 'trip_request_accepted':
-      return <CheckCircle2 className={cn(iconClass, "text-emerald-500")} />;
+    case 'game_completed':
+    case 'rsvp_update':                       return '✅';
+    case 'game_request_declined':
     case 'trip_request_declined':
-      return <X className={cn(iconClass, "text-red-500")} />;
+    case 'game_cancelled':
+    case 'trip_cancelled':                    return '❌';
+    case 'game_reminder_24h':
+    case 'game_reminder_2h':                  return '🔔';
+    case 'game_updated':                      return '📅';
     case 'trip_invite':
-      return <MapPin className={cn(iconClass, "text-emerald-500")} />;
-    case 'trip_cancelled':
-      return <X className={cn(iconClass, "text-red-500")} />;
     case 'trip_created':
     case 'trip_game_added':
-    case 'trip_reminder':
-      return <MapPin className={cn(iconClass, "text-violet-500")} />;
+    case 'trip_reminder':                     return '🗺️';
     case 'friend_course_review':
-    case 'course_review':
-      return <FiMapPin className={cn(iconClass, "text-emerald-500")} />;
-    case 'business_course_review':
-      return <Star className={cn(iconClass, "text-emerald-500")} fill="currentColor" />;
+    case 'course_review':                     return '⛳';
+    case 'business_course_review':            return '⭐';
     case 'review_response':
-      return <MessageCircle className={cn(iconClass, "text-[#334E3D]")} />;
     case 'top_ten_comment':
-      return <MessageCircle className={cn(iconClass, "text-amber-500")} />;
-    case 'top_ten_reply':
-      return <MessageCircle className={cn(iconClass, "text-amber-500")} />;
-    case 'top_ten_mention':
-      return <AtSign className={cn(iconClass, "text-amber-500")} />;
-    default:
-      return <Bell className={cn(iconClass, "text-muted-foreground")} />;
+    case 'top_ten_reply':                     return '💬';
+    case 'top_ten_mention':                   return '💬';
+    default:                                  return '🔔';
   }
 }
 
