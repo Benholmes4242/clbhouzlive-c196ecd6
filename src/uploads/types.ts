@@ -129,6 +129,7 @@ export interface ReviewDataPayload {
   playedAt?: string;
   isPrivate?: boolean;
   selectedTags?: any[];
+  coverMediaId?: string | null;
 }
 
 export interface UploadJobInput {

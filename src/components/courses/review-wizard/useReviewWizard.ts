@@ -665,6 +665,20 @@ export function useReviewWizard({
     setIsSubmitting(true);
     
     try {
+      // Reorder files so cover is at index 0 for the pipeline
+      const effectiveCoverMediaId = state.coverMediaId
+        ?? (() => {
+          const firstVideoIdx = pendingFiles.findIndex(f => f.type.startsWith('video/'));
+          return firstVideoIdx >= 0 ? `pending-${firstVideoIdx}` : 'pending-0';
+        })();
+
+      const coverFileIndex = pendingFiles.findIndex(
+        (_, i) => `pending-${i}` === effectiveCoverMediaId
+      );
+      const orderedFiles = coverFileIndex > 0
+        ? [pendingFiles[coverFileIndex], ...pendingFiles.filter((_, i) => i !== coverFileIndex)]
+        : pendingFiles;
+
       await submitReview({
         courseId: course.id,
         courseName: course.name,
@@ -679,7 +693,8 @@ export function useReviewWizard({
         title: state.title || undefined,
         reviewText: state.review || undefined,
         isPrivate: false,
-        files: pendingFiles,
+        files: orderedFiles,
+        coverMediaId: effectiveCoverMediaId,
         selectedTags: state.selectedTags,
       });
       

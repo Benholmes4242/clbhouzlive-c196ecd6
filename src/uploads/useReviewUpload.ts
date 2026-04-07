@@ -36,6 +36,7 @@ export interface ReviewSubmitData {
   isPrivate?: boolean;
   files?: File[];
   selectedTags?: any[];
+  coverMediaId?: string | null;
 }
 
 export function useReviewUpload(options: UseReviewUploadOptions) {
