@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
@@ -70,6 +71,23 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   const subtext = getSubtext(notification);
   const courseName = notification.data?.course_name;
 
+  // Fetch course thumbnail for friend_course_review notifications
+  const [courseThumbnail, setCourseThumbnail] = useState<string | null>(null);
+  const courseId = notification.data?.course_id;
+  const isReviewNotif = notification.type === 'friend_course_review' || notification.type === 'course_review';
+
+  useEffect(() => {
+    if (!isReviewNotif || !courseId) return;
+    supabase
+      .from('golf_courses')
+      .select('thumbnail_image')
+      .eq('id', courseId)
+      .single()
+      .then(({ data }) => {
+        if (data?.thumbnail_image) setCourseThumbnail(data.thumbnail_image);
+      });
+  }, [courseId, isReviewNotif]);
+
   const showFollowBack =
     notification.type === 'follow' &&
     notification.actor_type === 'user' &&
@@ -91,24 +109,58 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
       className="cursor-pointer active:scale-[0.98] transition-transform"
     >
       <div className="rounded-2xl overflow-hidden bg-background shadow-sm border border-border/60">
-        {/* Layer 1 — Course/context strip */}
-        <div
-          className="relative h-[72px]"
-          style={{
-            backgroundImage: `${stripGradient}, radial-gradient(circle at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%)`,
-          }}
-        >
-          {/* Time ago — top right */}
-          <span className="absolute top-3 right-3 text-[11px] font-medium text-white/50">
-            {notification.time_ago}
-          </span>
-          {/* Course name — bottom left */}
-          {courseName && (
-            <span className="absolute bottom-2.5 left-3.5 text-[10px] font-semibold tracking-[0.06em] uppercase text-white/40">
-              {courseName}
+        {/* Layer 1 — Strip: photo hero for reviews, gradient for everything else */}
+        {isReviewNotif && courseThumbnail ? (
+          // ── PHOTO HERO — course review ──
+          <div className="relative" style={{ height: 110 }}>
+            <img
+              src={courseThumbnail}
+              alt={courseName || 'Course'}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* Dark gradient overlay */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.25) 100%)' }} />
+
+            {/* Time ago — top right */}
+            <span className="absolute top-3 right-3 text-[11px] font-medium text-white/50">
+              {notification.time_ago}
             </span>
-          )}
-        </div>
+            {/* Course name + rating badge — bottom */}
+            <div className="absolute bottom-2.5 left-3.5 right-3.5 flex items-end justify-between gap-2">
+              <span className="text-[11px] font-semibold tracking-[0.04em] text-white/80 line-clamp-1">
+                {notification.data?.course_name}
+              </span>
+              {notification.data?.rating != null && (
+                <div className="flex items-center gap-1 shrink-0" style={{
+                  background: 'rgba(247,147,30,0.85)', borderRadius: 6,
+                  padding: '2px 7px',
+                }}>
+                  <span style={{ fontSize: 10 }}>⭐</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>
+                    {Number(notification.data.rating).toFixed(1)}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          // ── GRADIENT STRIP — all other notification types ──
+          <div
+            className="relative h-[72px]"
+            style={{
+              backgroundImage: `${stripGradient}, radial-gradient(circle at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%)`,
+            }}
+          >
+            <span className="absolute top-3 right-3 text-[11px] font-medium text-white/50">
+              {notification.time_ago}
+            </span>
+            {courseName && (
+              <span className="absolute bottom-2.5 left-3.5 text-[10px] font-semibold tracking-[0.06em] uppercase text-white/40">
+                {courseName}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Layer 2 — Avatar overlapping the strip */}
         <div className="relative px-3.5" style={{ marginTop: -28 }}>
@@ -173,6 +225,16 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
                 />
               )}
             </div>
+          )}
+
+          {/* View review CTA — review notifications only */}
+          {isReviewNotif && (
+            <button
+              className="mt-2.5 w-full text-center text-[13px] font-bold py-2 rounded-lg"
+              style={{ background: 'rgba(247,147,30,0.12)', color: '#F7931E' }}
+            >
+              ⛳ View review
+            </button>
           )}
         </div>
       </div>
