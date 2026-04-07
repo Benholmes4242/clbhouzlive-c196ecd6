@@ -28,9 +28,6 @@ function TrendingCard({
   const media = post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const hlsUrl = media?.hlsUrl || '';
-  const duration = media?.duration
-    ? `${Math.floor(media.duration / 60)}:${String(Math.floor(media.duration % 60)).padStart(2, '0')}`
-    : '';
 
   // Per-card IntersectionObserver — autoplay once when 40% visible
   useEffect(() => {
