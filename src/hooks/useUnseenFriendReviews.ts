@@ -80,6 +80,14 @@ export function useUnseenFriendReviews() {
   const markCoursesAsSeen = useCallback(() => {
     if (!user?.id) return;
     queryClient.setQueryData(['unseen-friend-reviews', user.id], { count: 0, reviews: [] });
+    // Also mark the DB notifications as read so the dot stays cleared on refresh
+    supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', user.id)
+      .eq('type', 'friend_course_review')
+      .eq('is_read', false)
+      .then(() => {});
   }, [user?.id, queryClient]);
 
   return {
