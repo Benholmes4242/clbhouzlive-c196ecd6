@@ -244,7 +244,7 @@ export function usePGACard(userId?: string): {
         scoreDisplay: string | null;
       }>;
     },
-    enabled: !!nextUpcoming && !topLive && !recentResult,
+    enabled: !!effectiveUpcoming && !topLive && !recentResult,
     staleTime: 30 * 60_000,
   });
 
