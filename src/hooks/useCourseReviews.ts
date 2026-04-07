@@ -86,7 +86,9 @@ export function useCourseReviews(
             id,
             media_type,
             media_url,
-            poster_url
+            poster_url,
+            width,
+            height
           )
         `
         )
