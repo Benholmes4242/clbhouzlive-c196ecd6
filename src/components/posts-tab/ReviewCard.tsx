@@ -42,6 +42,9 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
   };
   const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
 
+  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
+
   // Unified amber accent for all rating tiers
   const accentColor = '#f59e0b';
 
