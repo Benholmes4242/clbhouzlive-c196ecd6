@@ -173,7 +173,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
           {/* Centered likes with heart icon */}
           <div className="justify-self-center flex items-center gap-1 tabular-nums">
-            <Heart className="w-3.5 h-3.5" />
+            <span style={{ fontSize: 13, lineHeight: 1 }}>🧡</span>
             <span>{formatLikes(item.likes || 0)}</span>
           </div>
 
