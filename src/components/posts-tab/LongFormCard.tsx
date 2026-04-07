@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Play, Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
+import { Play, Heart, MessageCircle, Share2, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCompact, formatDuration } from './utils';
@@ -19,11 +19,24 @@ interface LongFormCardProps {
 
 export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete, likeState, onLike, onComment }) => {
   const [expanded, setExpanded] = useState(false);
-  const firstMedia = post.mediaItems[0];
-  const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
-  const isVideo = firstMedia?.type === 'video';
-  const duration = firstMedia?.duration;
-  const hlsUrl = firstMedia?.hlsUrl;
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const currentMedia = post.mediaItems[currentMediaIndex] ?? post.mediaItems[0];
+  const firstMedia = currentMedia;
+  const thumbnailUrl = currentMedia?.thumbnailUrl || currentMedia?.imageUrl;
+  const isVideo = currentMedia?.type === 'video';
+  const duration = currentMedia?.duration;
+  const hlsUrl = currentMedia?.hlsUrl;
+  const hasMultipleMedia = post.mediaItems.length > 1;
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(i => Math.max(0, i - 1));
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(i => Math.min(post.mediaItems.length - 1, i + 1));
+  };
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const tileRef = useRef<HTMLDivElement>(null);
 
@@ -80,13 +93,47 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           </div>
         )}
 
-        {/* Carousel indicator — for multi-media posts */}
-        {!isVideo && post.mediaItems.length > 1 && (
+        {/* Left arrow */}
+        {hasMultipleMedia && currentMediaIndex > 0 && (
+          <button
+            onClick={handlePrev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
+            style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+            }}
+          >
+            <ChevronLeft className="w-4 h-4 text-white" />
+          </button>
+        )}
+
+        {/* Right arrow */}
+        {hasMultipleMedia && currentMediaIndex < post.mediaItems.length - 1 && (
+          <button
+            onClick={handleNext}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
+            style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+            }}
+          >
+            <ChevronRight className="w-4 h-4 text-white" />
+          </button>
+        )}
+
+        {/* Carousel indicator */}
+        {hasMultipleMedia && (
           <div
             className="absolute top-2 right-2 px-2 py-1 rounded-full text-[11px] font-semibold text-white"
             style={{ background: 'rgba(0,0,0,0.4)' }}
           >
-            1/{post.mediaItems.length}
+            {currentMediaIndex + 1}/{post.mediaItems.length}
           </div>
         )}
 
