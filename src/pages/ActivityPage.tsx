@@ -18,6 +18,7 @@ import { AlertCircle } from 'lucide-react';
 import { RateCourseNudge } from '@/components/activity/RateCourseNudge';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 
 const FRIEND_TYPES = new Set([
   'friend_request', 'friend_accept', 'friend_accepted',
@@ -48,6 +49,7 @@ const ActivityPage: React.FC = () => {
 
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const { markCoursesAsSeen } = useUnseenFriendReviews();
   const navigate = useNavigate();
 
   const hasMarkedSeen = useRef(false);
@@ -91,6 +93,7 @@ const ActivityPage: React.FC = () => {
         .lte('created_at', now);
 
       hasMarkedSeen.current = true;
+      markCoursesAsSeen();
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
     };
 

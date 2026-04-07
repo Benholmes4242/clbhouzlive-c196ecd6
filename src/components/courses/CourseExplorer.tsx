@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Search, MapPin, X, ChevronDown, RefreshCw, AlertCircle } from 'lucide-react';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { YourNetworkSection } from './network';
+import { UnseenReviewsBanner } from './network/UnseenReviewsBanner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -428,6 +429,9 @@ const CourseExplorer = () => {
 
   return (
     <div className="w-full space-y-5">
+      {/* Unseen friend reviews banner */}
+      <UnseenReviewsBanner />
+
       {/* Your Network Section - Shows activity from friends */}
       <YourNetworkSection className="mt-2 px-4" />
 
