@@ -292,7 +292,7 @@ export const LoopCard = React.memo(function LoopCard({
             {isLiked ? (
               <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
             ) : (
-              <Heart className="w-[17px] h-[17px] text-white" />
+              <Heart className="w-[17px] h-[17px] text-muted-foreground" />
             )}
             <span style={{
               fontSize: 13, fontWeight: 700,

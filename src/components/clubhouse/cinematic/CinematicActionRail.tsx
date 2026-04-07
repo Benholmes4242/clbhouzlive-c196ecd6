@@ -158,16 +158,22 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
           style={{ opacity: iconOpacity, transition: 'opacity 150ms ease' }}
         >
           {isLikeButton ? (
-            <span
-              style={{
-                fontSize: 20,
-                lineHeight: 1,
-                display: 'block',
-                filter: isActive ? 'none' : 'grayscale(0.08)',
-              }}
-            >
-              🧡
-            </span>
+            isActive ? (
+              <span
+                style={{
+                  fontSize: 20,
+                  lineHeight: 1,
+                  display: 'block',
+                }}
+              >
+                🧡
+              </span>
+            ) : (
+              <Icon
+                className="w-5 h-5 text-white"
+                strokeWidth={2}
+              />
+            )
           ) : (
             <Icon
               className={cn(
