@@ -15812,6 +15812,8 @@ export type Database = {
           business_name: string
           comment_count: number
           course_country: string
+          course_id: string
+          course_name: string
           course_region: string
           creator_avatar_url: string
           creator_display_name: string
@@ -15834,6 +15836,7 @@ export type Database = {
           post_created_at: string
           post_id: string
           post_status: string
+          post_tags: Json
           post_user_id: string
           poster_url: string
           review_course_country: string
@@ -15843,6 +15846,7 @@ export type Database = {
           review_course_region: string
           review_course_sub_country: string
           review_rating: number
+          review_text: string
           share_count: number
           source_review_id: string
           stream_id: string
@@ -15952,6 +15956,7 @@ export type Database = {
       get_suggested_feed: {
         Args: {
           p_cursor?: string
+          p_mode?: string
           p_page_size?: number
           p_seen_post_ids?: string[]
           p_user_id: string
@@ -15961,6 +15966,8 @@ export type Database = {
           business_logo_url: string
           business_name: string
           comment_count: number
+          course_id: string
+          course_name: string
           creator_avatar_url: string
           creator_display_name: string
           creator_is_verified: boolean
@@ -15982,6 +15989,7 @@ export type Database = {
           post_created_at: string
           post_id: string
           post_status: string
+          post_tags: Json
           post_type: string
           post_user_id: string
           poster_url: string
@@ -15992,6 +16000,7 @@ export type Database = {
           review_course_region: string
           review_course_sub_country: string
           review_rating: number
+          review_text: string
           share_count: number
           source_review_id: string
           stream_id: string
