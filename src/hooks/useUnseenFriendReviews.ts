@@ -89,8 +89,8 @@ export function useUnseenFriendReviews() {
       };
     },
     enabled: !!user?.id,
-    staleTime: 60_000,
-    refetchInterval: 120_000,
+    staleTime: 0,
+    refetchInterval: 60_000,
   });
 
   const markCoursesAsSeen = useCallback(() => {
