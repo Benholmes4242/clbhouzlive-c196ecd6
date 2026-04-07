@@ -89,10 +89,10 @@ const EngagementButton = ({
               />
             )}
             
-            {isLikeButton ? (
+            {isLikeButton && isActive ? (
               <span
                 className="relative z-10"
-                style={{ fontSize: 20, lineHeight: 1, opacity: isActive ? 1 : 0.85 }}
+                style={{ fontSize: 20, lineHeight: 1 }}
               >
                 🧡
               </span>

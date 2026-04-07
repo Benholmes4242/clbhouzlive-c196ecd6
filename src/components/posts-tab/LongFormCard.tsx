@@ -155,7 +155,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           onClick={(e) => e.stopPropagation()}
           style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
         >
-          <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+          <Heart className="w-4 h-4 text-muted-foreground" />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
             {formatCompact(post.likeCount)}
           </span>

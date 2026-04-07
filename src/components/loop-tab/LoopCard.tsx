@@ -289,13 +289,11 @@ export const LoopCard = React.memo(function LoopCard({
             aria-label={isLiked ? 'Unlike' : 'Like'}
             style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
           >
-            <span style={{
-              fontSize: 17,
-              lineHeight: 1,
-              opacity: isLiked ? 1 : 0.65,
-            }}>
-              🧡
-            </span>
+            {isLiked ? (
+              <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+            ) : (
+              <Heart className="w-[17px] h-[17px] text-white" />
+            )}
             <span style={{
               fontSize: 13, fontWeight: 700,
               color: isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))',
