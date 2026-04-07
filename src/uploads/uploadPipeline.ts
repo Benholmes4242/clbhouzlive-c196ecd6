@@ -1565,7 +1565,9 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
             aspect_ratio: aspectRatio,
             status: 'attached',
             owner_user_id: job.userId,
-            is_cover: index === 0, // First item is cover
+            is_cover: job.reviewData?.coverMediaId
+              ? `pending-${index}` === job.reviewData.coverMediaId
+              : index === 0,
           } as any)
           .select('id')
           .single();

@@ -448,8 +448,6 @@ export function useReviewWizard({
         return {
           id: m.id,
           type: m.media_type as 'image' | 'video',
-          // For videos: previewUrl must be the HLS/stream URL for playback
-          // For images: use media_url directly
           previewUrl: isVideo ? m.media_url : (m.poster_url || m.media_url),
           uploadedUrl: m.media_url,
           status: 'existing' as const,
@@ -467,6 +465,44 @@ export function useReviewWizard({
       }));
       
       console.log('[useReviewWizard] Loaded existing media:', mediaItems.length, 'items');
+      
+      // Load existing tags for edit mode
+      if (existingRating?.id) {
+        (async () => {
+          try {
+            const { data: existingTagData } = await supabase
+              .from('review_tags')
+              .select(`
+                tagged_entity_id,
+                start_index,
+                end_index,
+                taggable_entities!inner(
+                  id,
+                  entity_type,
+                  entity_id,
+                  name,
+                  username
+                )
+              `)
+              .eq('review_id', existingRating.id);
+
+            const loadedTags: ReviewTaggableEntity[] = (existingTagData || []).map((t: any) => ({
+              id: t.taggable_entities.id,
+              entity_type: t.taggable_entities.entity_type,
+              entity_id: t.taggable_entities.entity_id,
+              name: t.taggable_entities.name,
+              username: t.taggable_entities.username,
+            }));
+
+            if (loadedTags.length > 0) {
+              setState(prev => ({ ...prev, selectedTags: loadedTags }));
+              console.log('[useReviewWizard] Loaded existing tags:', loadedTags.length);
+            }
+          } catch (err) {
+            console.warn('[useReviewWizard] Failed to load existing tags:', err);
+          }
+        })();
+      }
     }
   }, [isEditMode, existingMedia]);
 
@@ -665,6 +701,20 @@ export function useReviewWizard({
     setIsSubmitting(true);
     
     try {
+      // Reorder files so cover is at index 0 for the pipeline
+      const effectiveCoverMediaId = state.coverMediaId
+        ?? (() => {
+          const firstVideoIdx = pendingFiles.findIndex(f => f.type.startsWith('video/'));
+          return firstVideoIdx >= 0 ? `pending-${firstVideoIdx}` : 'pending-0';
+        })();
+
+      const coverFileIndex = pendingFiles.findIndex(
+        (_, i) => `pending-${i}` === effectiveCoverMediaId
+      );
+      const orderedFiles = coverFileIndex > 0
+        ? [pendingFiles[coverFileIndex], ...pendingFiles.filter((_, i) => i !== coverFileIndex)]
+        : pendingFiles;
+
       await submitReview({
         courseId: course.id,
         courseName: course.name,
@@ -679,7 +729,8 @@ export function useReviewWizard({
         title: state.title || undefined,
         reviewText: state.review || undefined,
         isPrivate: false,
-        files: pendingFiles,
+        files: orderedFiles,
+        coverMediaId: effectiveCoverMediaId,
         selectedTags: state.selectedTags,
       });
       
