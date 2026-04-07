@@ -265,11 +265,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
             aria-label={`${isLiked ? 'Unlike' : 'Like'} post`}
             className="flex items-center gap-1 text-xs min-h-[44px]"
           >
-            {isLiked ? (
-              <span style={{ fontSize: 18, lineHeight: 1 }}>🧡</span>
-            ) : (
-              <Heart className="h-[18px] w-[18px] text-muted-foreground" />
-            )}
+            <span style={{ fontSize: 18, lineHeight: 1, opacity: isLiked ? 1 : 0.6 }}>🧡</span>
             <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
               {formatCompact(likeCount)}
             </span>
