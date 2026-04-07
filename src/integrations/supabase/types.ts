@@ -1662,6 +1662,7 @@ export type Database = {
           season_winner_courses: number | null
           season_winner_user_id: string | null
           sponsor_name: string | null
+          sponsor_url: string | null
           start_date: string
           status: string
           tagline: string | null
@@ -1680,6 +1681,7 @@ export type Database = {
           season_winner_courses?: number | null
           season_winner_user_id?: string | null
           sponsor_name?: string | null
+          sponsor_url?: string | null
           start_date: string
           status?: string
           tagline?: string | null
@@ -1698,6 +1700,7 @@ export type Database = {
           season_winner_courses?: number | null
           season_winner_user_id?: string | null
           sponsor_name?: string | null
+          sponsor_url?: string | null
           start_date?: string
           status?: string
           tagline?: string | null
