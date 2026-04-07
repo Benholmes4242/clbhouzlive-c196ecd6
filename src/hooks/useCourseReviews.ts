@@ -6,6 +6,8 @@ export interface ReviewMediaItem {
   media_type: 'image' | 'video';
   media_url: string;
   poster_url?: string | null;
+  width?: number | null;
+  height?: number | null;
 }
 
 export type CourseReview = {
@@ -84,7 +86,9 @@ export function useCourseReviews(
             id,
             media_type,
             media_url,
-            poster_url
+            poster_url,
+            width,
+            height
           )
         `
         )
