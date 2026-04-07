@@ -108,6 +108,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
+            style={{ pointerEvents: 'none' }}
           />
           {isVideo && (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -116,17 +117,58 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
               </div>
             </div>
           )}
+
+          {/* Left arrow */}
+          {hasMultipleMedia && currentMediaIndex > 0 && (
+            <button
+              onClick={handlePrev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
+              style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.45)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}
+            >
+              <ChevronLeft className="w-4 h-4 text-white" />
+            </button>
+          )}
+
+          {/* Right arrow */}
+          {hasMultipleMedia && currentMediaIndex < post.mediaItems.length - 1 && (
+            <button
+              onClick={handleNext}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
+              style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.45)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}
+            >
+              <ChevronRight className="w-4 h-4 text-white" />
+            </button>
+          )}
+
+          {/* Carousel indicator */}
+          {hasMultipleMedia && (
+            <div
+              className="absolute top-2 right-2 px-2 py-1 rounded-full text-[11px] font-semibold text-white"
+              style={{ background: 'rgba(0,0,0,0.4)' }}
+            >
+              {currentMediaIndex + 1}/{post.mediaItems.length}
+            </div>
+          )}
+
+          {/* Duration badge */}
           {isVideo && duration != null && duration > 0 && (
             <div
               className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-medium text-white"
               style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}
             >
               {Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}
-            </div>
-          )}
-          {post.mediaItems.length > 1 && (
-            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
-              1/{post.mediaItems.length}
             </div>
           )}
         </div>
