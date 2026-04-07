@@ -24,7 +24,7 @@ function ExploreHeaderInner({
 }: ExploreHeaderProps) {
   return (
     <div
-      className="sticky z-20 bg-background pb-0 pt-0 px-0"
+      className="sticky z-30 bg-background pb-0 pt-0 px-0"
       style={{ top: '45px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div className="px-4 pt-3.5 pb-2.5">
