@@ -19,7 +19,7 @@ export default function VideosSubpage() {
           paddingTop: 12,
           paddingBottom: 8,
           position: 'sticky',
-          top: '0px',
+          top: '55px',
           zIndex: 21,
           background: 'hsl(var(--background))',
         }}
