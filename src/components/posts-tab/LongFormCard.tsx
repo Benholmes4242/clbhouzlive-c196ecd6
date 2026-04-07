@@ -158,11 +158,11 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           onClick={(e) => { e.stopPropagation(); onLike?.(); }}
           style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
         >
-          <Heart
-            className="w-4 h-4"
-            style={{ color: likeState?.isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))' }}
-            fill={likeState?.isLiked ? '#F7931E' : 'none'}
-          />
+          {likeState?.isLiked ? (
+            <span style={{ fontSize: 16, lineHeight: 1 }}>🧡</span>
+          ) : (
+            <Heart className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
+          )}
           <span style={{ fontSize: 13, fontWeight: 700, color: likeState?.isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))' }}>
             {formatCompact(likeState?.count ?? post.likeCount)}
           </span>
