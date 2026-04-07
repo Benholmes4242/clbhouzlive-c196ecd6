@@ -78,6 +78,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
+            style={{ pointerEvents: 'none' }}
           />
         )}
 
