@@ -9,7 +9,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useNavigate } from 'react-router-dom';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+
 
 // Lazy load heavy/inactive components for better initial bundle size
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
@@ -20,7 +20,7 @@ type MainKey = 'watch' | 'loop' | 'courses';
 
 const Discover = () => {
   const navigate = useNavigate();
-  const closeCount = useFullscreenFeedStore(s => s.closeCount);
+  
 
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
@@ -47,7 +47,7 @@ const Discover = () => {
   // ============================================
 
   return (
-    <PageRoot reapplyKey={closeCount} className="min-h-screen text-foreground bg-background">
+    <PageRoot className="min-h-screen text-foreground bg-background">
       <FadeInContent>
         <main className="pb-20 bg-background">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
