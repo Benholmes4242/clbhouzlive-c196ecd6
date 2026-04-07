@@ -15907,6 +15907,7 @@ export type Database = {
           season_winner_courses: number
           season_winner_user_id: string
           sponsor_name: string
+          sponsor_url: string
           start_date: string
           status: string
           tagline: string
