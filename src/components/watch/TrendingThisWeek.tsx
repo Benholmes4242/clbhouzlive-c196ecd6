@@ -149,44 +149,35 @@ function TrendingCard({
         }}
       />
 
-      {/* Glassy outline rank number */}
+      {/* Glass rank number pill */}
       <div
         style={{
           position: 'absolute',
-          bottom: 6,
+          bottom: 8,
           left: 8,
-          fontSize: 52,
-          fontWeight: 900,
-          lineHeight: 1,
-          letterSpacing: '-3px',
-          fontFamily: 'Georgia, serif',
-          color: 'transparent',
-          WebkitTextStroke: '1.5px rgba(255,255,255,0.45)',
+          background: 'rgba(0,0,0,0.45)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: 8,
+          padding: '2px 8px',
           pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'baseline',
         }}
       >
-        {index + 1}
-      </div>
-
-      {/* Duration badge */}
-      {duration && (
-        <div
+        <span
           style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            background: 'rgba(0,0,0,0.5)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: 4,
-            padding: '2px 6px',
-            fontSize: 10,
-            fontWeight: 600,
-            color: '#fff',
+            fontSize: 22,
+            fontWeight: 900,
+            color: 'rgba(255,255,255,0.92)',
+            lineHeight: '28px',
+            fontFamily: 'Georgia, serif',
           }}
         >
-          {duration}
-        </div>
-      )}
+          {index + 1}
+        </span>
+      </div>
 
       {/* Likes */}
       <div
@@ -211,12 +202,13 @@ function TrendingCard({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             borderRadius: '50%',
-            background: 'rgba(255,255,255,0.2)',
+            background: 'rgba(0,0,0,0.45)',
             backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.3)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -227,9 +219,9 @@ function TrendingCard({
             style={{
               width: 0,
               height: 0,
-              borderLeft: '10px solid rgba(255,255,255,0.9)',
-              borderTop: '6px solid transparent',
-              borderBottom: '6px solid transparent',
+              borderLeft: '8px solid rgba(255,255,255,0.9)',
+              borderTop: '5px solid transparent',
+              borderBottom: '5px solid transparent',
               marginLeft: 2,
             }}
           />
