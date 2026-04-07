@@ -125,18 +125,22 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
             <span className="absolute top-3 right-3 text-[11px] font-medium text-white/50">
               {notification.time_ago}
             </span>
-            {/* Course name + rating badge — bottom */}
-            <div className="absolute bottom-2.5 left-3.5 right-3.5 flex items-end justify-between gap-2">
-              <span className="text-[11px] font-semibold tracking-[0.04em] text-white/80 line-clamp-1">
-                {notification.data?.course_name}
-              </span>
+            {/* Rating badge — bottom right */}
+            <div className="absolute bottom-2.5 right-3.5">
               {notification.data?.rating != null && (
-                <div className="flex items-center gap-1 shrink-0" style={{
-                  background: 'rgba(247,147,30,0.85)', borderRadius: 6,
-                  padding: '2px 7px',
-                }}>
-                  <span style={{ fontSize: 10 }}>⭐</span>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>
+                <div
+                  className="flex items-center gap-1 shrink-0"
+                  style={{
+                    background: 'rgba(0,0,0,0.45)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: 20,
+                    padding: '3px 9px',
+                  }}
+                >
+                  <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-3 h-3" />
+                  <span className="text-[13px] font-bold text-white">
                     {Number(notification.data.rating).toFixed(1)}
                   </span>
                 </div>
@@ -163,8 +167,12 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
         )}
 
         {/* Layer 2 — Avatar overlapping the strip */}
-        <div className="relative px-3.5" style={{ marginTop: -28 }}>
-          <div className="relative inline-block">
+        <div
+          className="relative px-3.5 flex items-end gap-2.5"
+          style={{ marginTop: -28 }}
+        >
+          {/* Avatar */}
+          <div className="relative inline-block shrink-0">
             <div
               style={{
                 border: '3px solid white',
@@ -181,11 +189,19 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
                 hideRing
               />
             </div>
-            {/* Badge icon */}
             <span className="absolute -bottom-0.5 -right-1.5 h-5 w-5 rounded-full bg-white ring-2 ring-white shadow-sm flex items-center justify-center">
               {badgeIcon}
             </span>
           </div>
+          {/* Course name — only for review notifications, sits right of avatar */}
+          {isReviewNotif && notification.data?.course_name && (
+            <span
+              className="text-[13px] font-bold text-foreground pb-1 truncate"
+              style={{ minWidth: 0, flex: 1 }}
+            >
+              {notification.data.course_name}
+            </span>
+          )}
         </div>
 
         {/* Layer 3 — Content area */}
