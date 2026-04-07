@@ -89,20 +89,26 @@ const EngagementButton = ({
               />
             )}
             
-            {isLikeButton && isActive ? (
-              <span
-                className="relative z-10"
-                style={{ fontSize: 20, lineHeight: 1 }}
-              >
-                🧡
-              </span>
+            {isLikeButton ? (
+              isActive ? (
+                <span
+                  className="relative z-10"
+                  style={{ fontSize: 20, lineHeight: 1 }}
+                >
+                  🧡
+                </span>
+              ) : (
+                <Icon 
+                  className="w-5 h-5 transition-colors duration-200 relative z-10 text-white"
+                  strokeWidth={2}
+                />
+              )
             ) : (
               <Icon 
                 className={cn(
                   "w-5 h-5 transition-colors duration-200 relative z-10",
-                  isActive ? "text-red-500 fill-red-500 stroke-red-500" : "text-white/90"
+                  isActive ? "text-accent fill-accent" : "text-white"
                 )}
-                strokeWidth={isActive ? 0 : 2}
               />
             )}
           </div>
