@@ -1753,7 +1753,7 @@ body.ecm-open .app-shell--with-header-padding {
 
 /* Clubhouse header: anchored to top */
 .clubhouse-header {
-  position: fixed;
+  position: relative;
   z-index: 60;
   /* NOTE: safe-area padding is handled inline by CompactHeader based on route */
   touch-action: pan-x; /* no vertical pull on header */
