@@ -51,7 +51,7 @@ const Discover = () => {
       <FadeInContent>
         <main className="pb-20 bg-background">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
-            <div className="px-1" style={{ position: 'sticky', top: '55px', zIndex: 19, background: 'hsl(var(--background))' }}>
+            <div className="px-1" style={{ position: 'sticky', top: '0px', zIndex: 19, background: 'hsl(var(--background))' }}>
               <SegmentedControl
                 tabs={[
                   { id: 'watch', label: 'Watch' },
