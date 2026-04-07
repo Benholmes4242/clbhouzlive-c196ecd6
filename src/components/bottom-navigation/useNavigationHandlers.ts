@@ -43,17 +43,7 @@ export const useNavigationHandlers = () => {
     if (tab.path) {
       setActiveTab(tab.id);
 
-      // Clear courses badge when visiting courses tab
-if (tab.id === 'courses') {
-        if (user?.id) {
-          supabase
-            .from('notifications')
-            .update({ is_read: true })
-            .eq('user_id', user.id)
-            .eq('type', 'friend_course_review')
-            .then(() => {});
-        }
-      }
+      // friend_course_review is_read is now handled by UnseenReviewsBanner on tap/dismiss
 
       if (tab.path === '/profile') {
         // Profile tab: navigate to business profile when acting as business
