@@ -135,9 +135,39 @@ export function usePGACard(userId?: string): {
     enabled: !topLive && !recentResult,
   });
 
+  // ── Next upcoming Major (any tour) ──
+  const { data: nextMajor } = useQuery({
+    queryKey: ['pga-card-next-major'],
+    queryFn: async () => {
+      const now = new Date().toISOString();
+      const { data } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, venue_course_name, defending_champion, status, season_id')
+        .in('status', ['scheduled', 'created'])
+        .gte('start_date', now)
+        .or(MAJOR_NAMES.map(n => `name.eq.${n}`).join(','))
+        .order('start_date', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      return data ?? null;
+    },
+    staleTime: 30 * 60_000,
+    enabled: !topLive && !recentResult,
+  });
+
+  // ── Pick major over PGA if it starts sooner ──
+  const effectiveUpcoming = useMemo(() => {
+    if (!nextMajor && !nextUpcoming) return null;
+    if (!nextMajor) return nextUpcoming;
+    if (!nextUpcoming) return nextMajor;
+    return new Date(nextMajor.start_date) <= new Date(nextUpcoming.start_date)
+      ? nextMajor
+      : nextUpcoming;
+  }, [nextMajor, nextUpcoming]);
+
   // ── Course image resolver ──
   const activeVenue = useMemo((): VenueInput | null => {
-    const t = topLive ?? (recentResult as any) ?? (nextUpcoming as any);
+    const t = topLive ?? (recentResult as any) ?? (effectiveUpcoming as any);
     if (!t?.venue_name && !t?.venueName) return null;
     return {
       venueName: t.venue_name ?? t.venueName,
