@@ -345,8 +345,8 @@ export function usePGACard(userId?: string): {
   });
 
   // ── Determine active tournament for post ID / counts ──
-  const activeTournamentId = topLive?.id ?? recentResult?.id ?? nextUpcoming?.id ?? null;
-  const activeTournamentName = topLive?.name ?? (recentResult as any)?.name ?? (nextUpcoming as any)?.name ?? '';
+  const activeTournamentId = topLive?.id ?? recentResult?.id ?? effectiveUpcoming?.id ?? null;
+  const activeTournamentName = topLive?.name ?? (recentResult as any)?.name ?? (effectiveUpcoming as any)?.name ?? '';
 
   const { data: postId = '' } = useQuery({
     queryKey: ['pga-card-post-id', activeTournamentId],
