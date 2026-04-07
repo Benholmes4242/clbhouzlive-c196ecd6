@@ -146,34 +146,18 @@ function TrendingCard({
         }}
       />
 
-      {/* Glass rank number pill */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 8,
-          left: 8,
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          borderRadius: 8,
-          padding: '2px 8px',
-          pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'baseline',
-        }}
-      >
-        <span
-          style={{
-            fontSize: 22,
-            fontWeight: 900,
-            color: 'rgba(255,255,255,0.92)',
-            lineHeight: '28px',
-            fontFamily: 'Georgia, serif',
-          }}
-        >
-          {index + 1}
-        </span>
+      {/* Big rank number */}
+      <div style={{
+        position: 'absolute', bottom: -8, left: 8,
+        fontSize: 56, fontWeight: 900,
+        color: 'transparent',
+        WebkitTextStroke: '1.5px rgba(255,255,255,0.45)',
+        lineHeight: 1, letterSpacing: '-3px',
+        textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+        fontFamily: 'Georgia, serif',
+        pointerEvents: 'none',
+      }}>
+        {index + 1}
       </div>
 
       {/* Likes */}
