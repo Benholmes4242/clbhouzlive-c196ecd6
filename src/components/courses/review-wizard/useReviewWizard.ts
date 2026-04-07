@@ -448,8 +448,6 @@ export function useReviewWizard({
         return {
           id: m.id,
           type: m.media_type as 'image' | 'video',
-          // For videos: previewUrl must be the HLS/stream URL for playback
-          // For images: use media_url directly
           previewUrl: isVideo ? m.media_url : (m.poster_url || m.media_url),
           uploadedUrl: m.media_url,
           status: 'existing' as const,
@@ -470,36 +468,40 @@ export function useReviewWizard({
       
       // Load existing tags for edit mode
       if (existingRating?.id) {
-        const { data: existingTagData } = await supabase
-          .from('review_tags')
-          .select(`
-            tagged_entity_id,
-            start_index,
-            end_index,
-            taggable_entities!inner(
-              id,
-              entity_type,
-              name,
-              username,
-              slug
-            )
-          `)
-          .eq('review_id', existingRating.id);
+        (async () => {
+          try {
+            const { data: existingTagData } = await supabase
+              .from('review_tags')
+              .select(`
+                tagged_entity_id,
+                start_index,
+                end_index,
+                taggable_entities!inner(
+                  id,
+                  entity_type,
+                  entity_id,
+                  name,
+                  username
+                )
+              `)
+              .eq('review_id', existingRating.id);
 
-        const loadedTags = (existingTagData || []).map((t: any) => ({
-          id: t.tagged_entity_id,
-          entity_type: t.taggable_entities.entity_type,
-          name: t.taggable_entities.name,
-          username: t.taggable_entities.username,
-          slug: t.taggable_entities.slug,
-          start_index: t.start_index,
-          end_index: t.end_index,
-        }));
+            const loadedTags: ReviewTaggableEntity[] = (existingTagData || []).map((t: any) => ({
+              id: t.taggable_entities.id,
+              entity_type: t.taggable_entities.entity_type,
+              entity_id: t.taggable_entities.entity_id,
+              name: t.taggable_entities.name,
+              username: t.taggable_entities.username,
+            }));
 
-        if (loadedTags.length > 0) {
-          setState(prev => ({ ...prev, selectedTags: loadedTags }));
-          console.log('[useReviewWizard] Loaded existing tags:', loadedTags.length);
-        }
+            if (loadedTags.length > 0) {
+              setState(prev => ({ ...prev, selectedTags: loadedTags }));
+              console.log('[useReviewWizard] Loaded existing tags:', loadedTags.length);
+            }
+          } catch (err) {
+            console.warn('[useReviewWizard] Failed to load existing tags:', err);
+          }
+        })();
       }
     }
   }, [isEditMode, existingMedia]);
