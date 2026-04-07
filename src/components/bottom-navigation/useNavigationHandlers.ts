@@ -5,7 +5,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -13,7 +12,7 @@ export const useNavigationHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { activeActor } = useActiveActor();
-  const { markCoursesAsSeen } = useUnseenFriendReviews();
+  
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('clubhouse');
 
@@ -30,7 +29,7 @@ export const useNavigationHandlers = () => {
     } else if (location.pathname === '/watch') {
       setActiveTab('watch');
     }
-  }, [location.pathname, markCoursesAsSeen]);
+  }, [location.pathname]);
 
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     // Track nav tab tap
