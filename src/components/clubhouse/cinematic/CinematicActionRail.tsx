@@ -154,16 +154,29 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
         {/* Icon with like pop animation (respects reduced motion) */}
         <motion.div
           animate={showLikePop && !prefersReducedMotion() ? likePop : {}}
-          className="relative z-10"
+          className="relative z-10 flex items-center justify-center"
           style={{ opacity: iconOpacity, transition: 'opacity 150ms ease' }}
         >
-          <Icon
-            className={cn(
-              'w-5 h-5',
-              isActive ? cn(activeColor, 'fill-current') : 'text-white'
-            )}
-            strokeWidth={isActive ? 0 : 2}
-          />
+          {isLikeButton ? (
+            <span
+              style={{
+                fontSize: 20,
+                lineHeight: 1,
+                display: 'block',
+                filter: isActive ? 'none' : 'grayscale(0.08)',
+              }}
+            >
+              🧡
+            </span>
+          ) : (
+            <Icon
+              className={cn(
+                'w-5 h-5',
+                isActive ? cn(activeColor, 'fill-current') : 'text-white'
+              )}
+              strokeWidth={isActive ? 0 : 2}
+            />
+          )}
         </motion.div>
       </motion.button>
 
