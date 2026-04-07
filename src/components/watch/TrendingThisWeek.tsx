@@ -146,18 +146,25 @@ function TrendingCard({
         }}
       />
 
-      {/* Big rank number */}
+      {/* Glassy rank number — bottom left, outline style, baseline-aligned */}
       <div style={{
-        position: 'absolute', bottom: -8, left: 8,
-        fontSize: 56, fontWeight: 900,
-        color: 'transparent',
-        WebkitTextStroke: '1.5px rgba(255,255,255,0.45)',
-        lineHeight: 1, letterSpacing: '-3px',
-        textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-        fontFamily: 'Georgia, serif',
-        pointerEvents: 'none',
+        position: 'absolute', bottom: 0, left: 4,
+        height: 44, overflow: 'hidden',
+        display: 'flex', alignItems: 'flex-end',
+        pointerEvents: 'none', zIndex: 2,
+        userSelect: 'none',
       }}>
-        {index + 1}
+        <span style={{
+          fontSize: 56, fontWeight: 900,
+          lineHeight: 1, letterSpacing: '-3px',
+          fontFamily: 'Georgia, serif',
+          color: 'transparent',
+          WebkitTextStroke: '1.5px rgba(255,255,255,0.28)',
+          display: 'block',
+          paddingBottom: 2,
+        }}>
+          {index + 1}
+        </span>
       </div>
 
       {/* Likes */}
@@ -224,7 +231,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
     enabled: !!userId && enabled,
   });
 
-  const topPosts = posts.slice(0, 5);
+  const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
 
   // ── Loading skeleton ──
   if (isLoading) {
