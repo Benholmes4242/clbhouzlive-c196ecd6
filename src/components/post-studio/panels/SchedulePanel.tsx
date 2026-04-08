@@ -95,7 +95,7 @@ export function SchedulePanel() {
   const [showDrumPicker, setShowDrumPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('schedule');
 
-  const { scheduledPosts, isLoading, deletePost, publishNow, isDeleting, isPublishing: isPublishingNow } = useScheduledPosts();
+  const { scheduledPosts, isLoading, refetch, deletePost, publishNow, isDeleting, isPublishing: isPublishingNow } = useScheduledPosts();
 
   const now = useMemo(() => new Date(), []);
 
