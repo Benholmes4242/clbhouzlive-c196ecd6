@@ -89,8 +89,8 @@ function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selec
 
 type Tab = 'schedule' | 'scheduled';
 
-export function SchedulePanel({ onScheduleConfirmed }: { onScheduleConfirmed?: (v: boolean) => void }) {
-  const { state, setScheduledAt, closePanel } = usePostStudioContext();
+export function SchedulePanel() {
+  const { state, setScheduledAt, closePanel, schedulePublishRef } = usePostStudioContext();
   const dragControls = useDragControls();
   const [showDrumPicker, setShowDrumPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('schedule');
@@ -162,11 +162,12 @@ export function SchedulePanel({ onScheduleConfirmed }: { onScheduleConfirmed?: (
 
   const handleCTA = useCallback(() => {
     if (state.scheduledAt) {
-      onScheduleConfirmed?.(true);
-      // scheduledAt is already set from quick-select, just close & let useEffect publish
+      schedulePublishRef.current = true;
+      // Re-set scheduledAt to trigger the useEffect in ComposeScreen
+      setScheduledAt(new Date(state.scheduledAt.getTime()));
     }
     closePanel();
-  }, [closePanel, state.scheduledAt, onScheduleConfirmed]);
+  }, [closePanel, state.scheduledAt, schedulePublishRef, setScheduledAt]);
 
   const scheduledCount = scheduledPosts.length;
 
