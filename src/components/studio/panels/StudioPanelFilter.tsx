@@ -65,17 +65,20 @@ const FilterCard = memo(function FilterCard({
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      className="rounded-xl overflow-hidden transition-all duration-150 active:scale-[0.98] snap-start"
-      style={{
-        border: isSelected ? '2.5px solid rgba(255,255,255,0.90)' : '1px solid rgba(255,255,255,0.1)',
-        boxShadow: isSelected ? '0 0 0 1px rgba(255,255,255,0.2)' : undefined,
-      }}
+      className="flex flex-col items-center gap-1.5 active:scale-[0.96] transition-transform"
+      style={{ width: 80, flexShrink: 0 }}
     >
-      <div className="aspect-square relative" style={{ background: '#2A2A2A' }}>
+      <div
+        className="w-full aspect-square overflow-hidden"
+        style={{
+          borderRadius: 12,
+          border: isSelected ? '2px solid #F7931E' : '2px solid rgba(255,255,255,0.08)',
+        }}
+      >
         {previewUrl ? (
-          <div className={`w-full h-full transition-all duration-150 ${isComparing ? '' : getFilterClass(filter.id)}`}>
-            <img 
-              src={previewUrl} 
+          <div className={`w-full h-full ${isComparing ? '' : getFilterClass(filter.id)}`}>
+            <img
+              src={previewUrl}
               alt={filter.label}
               className="w-full h-full object-cover"
               draggable={false}
@@ -84,36 +87,17 @@ const FilterCard = memo(function FilterCard({
         ) : (
           <div className={`w-full h-full bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 ${isComparing ? '' : getFilterClass(filter.id)}`} />
         )}
-        
-        {/* Selected checkmark — amber circle */}
-        <div
-          className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm transition-all duration-150"
-          style={{
-            background: 'rgba(255,255,255,0.90)',
-            opacity: isSelected ? 1 : 0,
-            transform: isSelected ? 'scale(1)' : 'scale(0.75)',
-          }}
-        >
-          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
+      </div>
 
-        {isComparing && (
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-white text-[9px] font-medium" style={{ background: 'rgba(0,0,0,0.6)' }}>
-            Original
-          </div>
-        )}
-      </div>
-      
-      <div className="py-1.5 px-1 text-center" style={{ background: 'rgba(10,10,10,0.98)' }}>
-        <span
-          className="text-[11px] font-medium block truncate"
-          style={{ color: isSelected ? '#FFFFFF' : 'rgba(255,255,255,0.45)' }}
-        >
-          {filter.label}
-        </span>
-      </div>
+      <span
+        className="text-[11px] block truncate w-full text-center"
+        style={{
+          color: isSelected ? '#F7931E' : 'rgba(255,255,255,0.45)',
+          fontWeight: isSelected ? 700 : 400,
+        }}
+      >
+        {filter.label}
+      </span>
     </button>
   );
 });
@@ -146,66 +130,79 @@ export default function StudioPanelFilter({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0">
-        <span className="text-sm font-semibold text-white">Filters</span>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            Selected: <span style={{ color: '#FFFFFF' }}>{selectedLabel}</span>
-          </span>
-          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Hold to compare</span>
-        </div>
-      </div>
-      
-      {/* Filter grid */}
-      <div 
-        className="flex-1 overflow-y-auto px-4 pt-2 pb-4"
-        style={{ scrollSnapType: 'y mandatory' }}
-      >
-        <div className="grid grid-cols-3 gap-3">
-          {FILTER_OPTIONS.map(filter => (
-            <FilterCard
-              key={filter.id}
-              filter={filter}
-              isSelected={selectedFilter === filter.id}
-              onSelect={handleSelectFilter}
-              previewUrl={previewUrl}
-              onCompareStart={onCompareStart}
-              onCompareEnd={onCompareEnd}
-            />
-          ))}
-        </div>
+      {/* Subtitle */}
+      <div className="px-4 pt-3 pb-2 flex-shrink-0">
+        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          Selected: <span style={{ color: 'rgba(255,255,255,0.70)' }}>{selectedLabel}</span> · Hold to compare
+        </span>
       </div>
 
-      {/* Intensity slider */}
+      {/* Horizontal scrolling filter rail */}
+      <div
+        className="flex-shrink-0"
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          gap: 8,
+          padding: '8px 16px',
+        }}
+      >
+        {FILTER_OPTIONS.map(filter => (
+          <FilterCard
+            key={filter.id}
+            filter={filter}
+            isSelected={selectedFilter === filter.id}
+            onSelect={handleSelectFilter}
+            previewUrl={previewUrl}
+            onCompareStart={onCompareStart}
+            onCompareEnd={onCompareEnd}
+          />
+        ))}
+      </div>
+
+      {/* Intensity section */}
       {showIntensity && (
-        <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,10,10,0.98)' }}>
-          <div className="flex items-center gap-3">
-            <label className="text-[11px] font-medium shrink-0" style={{ color: 'rgba(255,255,255,0.45)' }}>Intensity</label>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={1}
-              value={intensity}
-              onChange={(e) => handleIntensityChange(Number(e.target.value))}
-              className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer
-                [&::-webkit-slider-thumb]:appearance-none
-                [&::-webkit-slider-thumb]:w-5
-                [&::-webkit-slider-thumb]:h-5
-                [&::-webkit-slider-thumb]:rounded-full
-                [&::-webkit-slider-thumb]:shadow-md
-                [&::-webkit-slider-thumb]:cursor-grab
-                [&::-webkit-slider-thumb]:active:cursor-grabbing
-                [&::-moz-range-thumb]:w-5
-                [&::-moz-range-thumb]:h-5
-                [&::-moz-range-thumb]:rounded-full
-                [&::-moz-range-thumb]:border-0
-                [&::-moz-range-thumb]:shadow-md"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
-            />
-            <span className="text-[11px] font-mono w-8 text-right" style={{ color: 'rgba(255,255,255,0.45)' }}>{intensity}%</span>
+        <div className="px-4 pt-4 pb-3 flex-shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <span style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.28)',
+            }}>
+              Intensity
+            </span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>
+              {intensity}%
+            </span>
           </div>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={intensity}
+            onChange={(e) => handleIntensityChange(Number(e.target.value))}
+            className="w-full h-1.5 rounded-full appearance-none cursor-pointer
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:w-5
+              [&::-webkit-slider-thumb]:h-5
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:shadow-md
+              [&::-webkit-slider-thumb]:cursor-grab
+              [&::-webkit-slider-thumb]:active:cursor-grabbing
+              [&::-moz-range-thumb]:w-5
+              [&::-moz-range-thumb]:h-5
+              [&::-moz-range-thumb]:rounded-full
+              [&::-moz-range-thumb]:border-0
+              [&::-moz-range-thumb]:shadow-md"
+            style={{
+              background: `linear-gradient(to right, #F7931E ${intensity}%, rgba(255,255,255,0.10) ${intensity}%)`,
+            }}
+          />
         </div>
       )}
     </div>
