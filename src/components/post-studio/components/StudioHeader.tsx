@@ -55,7 +55,7 @@ export function StudioHeader({
         background: 'transparent',
       }}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', minHeight: 48, padding: '0 12px' }}>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, padding: '0 12px' }}>
         {/* Left action */}
         <div style={{ justifySelf: 'start' }}>
           {leftAction ? (
