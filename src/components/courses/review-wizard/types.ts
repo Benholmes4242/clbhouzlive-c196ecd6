@@ -85,6 +85,7 @@ export interface ReviewWizardProps {
   isOpen: boolean;
   onClose: () => void;
   isEditMode?: boolean;
+  alreadyShared?: boolean;
   existingRating?: ExistingRating;
   onRemoveFromPlayed?: () => void;
   /** Pre-populated media files from Post Wizard bridge flow */
