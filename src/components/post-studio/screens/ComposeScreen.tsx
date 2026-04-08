@@ -586,7 +586,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         setIsProcessing(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
         if (rearCameraInputRef.current) rearCameraInputRef.current.value = '';
-        if (frontCameraInputRef.current) frontCameraInputRef.current.value = '';
+        
       }
     },
     [state.mediaItems.length, addMedia]
