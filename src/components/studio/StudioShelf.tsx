@@ -228,7 +228,7 @@ export default function StudioShelf({
             <div
               ref={canvasRef}
               className="flex-1 relative bg-black flex items-center justify-center overflow-hidden min-h-0"
-              style={{ touchAction: 'none' }}
+              style={{ touchAction: 'none', marginTop: 12 }}
             >
               {/* Show CropEditor when crop tool is active for images */}
               {showCropOnCanvas ? (
