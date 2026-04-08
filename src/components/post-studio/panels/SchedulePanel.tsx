@@ -279,6 +279,7 @@ export function SchedulePanel() {
           borderRadius: '20px 20px 0 0',
           borderTop: '1px solid rgba(255,255,255,0.10)',
           maxHeight: '80vh',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
         }}
       >
         <div
