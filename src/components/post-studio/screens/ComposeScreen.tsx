@@ -244,6 +244,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
@@ -471,6 +472,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     <>
       {/* Caption area */}
       <div className="px-4 relative" style={{ paddingTop: 10 }}>
+        {/* Fake amber blinking cursor — visible until textarea is focused */}
+        {state.caption.length === 0 && !isFocused && (
+          <div style={{
+            position: 'absolute',
+            top: 10,
+            left: 16,
+            width: 2,
+            height: 24,
+            background: '#F7931E',
+            borderRadius: 1,
+            animation: 'studio-cursor-blink 1s step-end infinite',
+            zIndex: 2,
+            pointerEvents: 'none',
+          }} />
+        )}
         {/* Mention highlight layer */}
         {state.mentions.length > 0 && (
           <div
@@ -484,6 +500,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <textarea
           ref={textareaRef}
           value={state.caption}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           onChange={(e) => {
             handleCaptionChange(e);
             const el = e.target;
