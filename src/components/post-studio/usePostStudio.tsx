@@ -206,7 +206,6 @@ interface PostStudioContextValue {
   reset: () => void;
   onSuccess?: (postId: string) => void;
   schedulePublishRef: React.MutableRefObject<boolean>;
-  postNowRef: React.MutableRefObject<() => void>;
 }
 
 const PostStudioContext = createContext<PostStudioContextValue | null>(null);
@@ -263,7 +262,6 @@ export function PostStudioProvider({
   const setMentionTriggerIndex = useCallback((index: number) => dispatch({ type: 'SET_MENTION_TRIGGER', payload: index }), []);
   const reset = useCallback(() => dispatch({ type: 'RESET' }), []);
   const schedulePublishRef = useRef<boolean>(false);
-  const postNowRef = useRef<() => void>(() => {});
 
   const value = useMemo<PostStudioContextValue>(
     () => ({
@@ -292,7 +290,6 @@ export function PostStudioProvider({
       reset,
       onSuccess,
       schedulePublishRef,
-      postNowRef,
     }),
     [
       state,

@@ -1,6 +1,6 @@
 // SuccessScreen — Step 6: Dark celebration moment with staggered entrance + live upload progress
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useUploadProgress } from '@/hooks/useUploadProgress';
@@ -36,17 +36,10 @@ function Particle({ delay, angle, distance, opacity }: { delay: number; angle: n
 
 export function SuccessScreen({ onDone }: SuccessScreenProps) {
   const { state } = usePostStudioContext();
-  const hasCalledDone = useRef(false);
   const { isUploading, uploadedCount, totalCount } = useUploadProgress();
   const progress = totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0;
   const isComplete = uploadedCount >= totalCount && totalCount > 0;
   const isScheduled = state.scheduledAt !== null;
-
-  const handleDone = () => {
-    if (hasCalledDone.current) return;
-    hasCalledDone.current = true;
-    onDone();
-  };
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8 relative" style={{ background: '#0D0D0D' }}>
@@ -184,7 +177,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: isScheduled ? 0.75 : 1.0, duration: 0.4 }}
         whileTap={{ scale: 0.96 }}
-        onClick={handleDone}
+        onClick={onDone}
         className="w-full max-w-sm flex items-center justify-center gap-2 font-bold relative z-10"
         style={{
           background: '#F7931E',

@@ -169,7 +169,7 @@ function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, de
 type Tab = 'schedule' | 'scheduled';
 
 export function SchedulePanel() {
-  const { state, setScheduledAt, closePanel, schedulePublishRef, postNowRef } = usePostStudioContext();
+  const { state, setScheduledAt, closePanel, schedulePublishRef } = usePostStudioContext();
   const dragControls = useDragControls();
   const [showDrumPicker, setShowDrumPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('schedule');
@@ -249,13 +249,9 @@ export function SchedulePanel() {
       schedulePublishRef.current = true;
       // Re-set scheduledAt to trigger the useEffect in ComposeScreen
       setScheduledAt(new Date(state.scheduledAt.getTime()));
-      closePanel();
-    } else {
-      // "Post now" — close panel first, then trigger publish via ref
-      closePanel();
-      postNowRef.current();
     }
-  }, [closePanel, state.scheduledAt, state.mediaItems.length, schedulePublishRef, setScheduledAt, postNowRef]);
+    closePanel();
+  }, [closePanel, state.scheduledAt, state.mediaItems.length, schedulePublishRef, setScheduledAt]);
 
   const scheduledCount = scheduledPosts.length;
 
