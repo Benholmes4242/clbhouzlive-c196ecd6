@@ -78,7 +78,7 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
           onBlur={() => setIsFocused(false)}
           placeholder="Password"
           disabled={submitting}
-          className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+          className="w-full h-[54px] px-4 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
           style={{
             background: getInputBackground(),
             border: passwordError 
@@ -124,7 +124,7 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
         style={{
           fontWeight: 500,
           background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',

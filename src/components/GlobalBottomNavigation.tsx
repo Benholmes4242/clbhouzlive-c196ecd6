@@ -178,7 +178,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                     : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
                 backdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
                 WebkitBackdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
-                paddingBottom: '30px',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
             >
