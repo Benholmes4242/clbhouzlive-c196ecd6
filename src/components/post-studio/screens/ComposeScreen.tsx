@@ -832,17 +832,14 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <div className="flex gap-2.5" style={{ padding: '10px 12px' }}>
+            <div className="flex gap-2.5" style={{ padding: '14px 12px 16px', minHeight: 180 }}>
               {/* Preview */}
               <div
                 className="shrink-0 overflow-hidden relative"
                 style={{
-                  width: 90,
+                  width: 110,
                   borderRadius: 10,
-                  aspectRatio: trayItem.width && trayItem.height
-                    ? (trayItem.width > trayItem.height ? '16/9' : '3/4')
-                    : '3/4',
-                  alignSelf: 'flex-start',
+                  alignSelf: 'stretch',
                   background: '#000',
                 }}
               >
