@@ -5,6 +5,7 @@ import { Zap, Clock, Calendar, ChevronLeft, ChevronRight, X, Trash2 } from 'luci
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { usePostStudioContext } from '../usePostStudio';
 import { useScheduledPosts } from '@/hooks/useScheduledPosts';
+import { useQueryClient } from '@tanstack/react-query';
 import { SPRING } from '../constants';
 import { format } from 'date-fns';
 
@@ -134,7 +135,19 @@ function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, de
           </div>
 
           <button
-            onClick={() => publishNow(post.id)}
+            onClick={async () => {
+              try {
+                await publishNow(post.id);
+                queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+                queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+                queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
+                queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
+                closePanel();
+                toast.success('Your post is now live');
+              } catch {
+                // error toast handled by hook
+              }
+            }}
             disabled={isPublishingNow}
             className="flex items-center justify-center shrink-0"
             style={{
@@ -447,6 +460,7 @@ export function SchedulePanel() {
               deletePost={deletePost}
               isPublishingNow={isPublishingNow}
               isDeleting={isDeleting}
+              closePanel={closePanel}
             />
           )}
         </div>
