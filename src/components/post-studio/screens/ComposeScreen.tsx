@@ -22,6 +22,8 @@ import {
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { getFilterClass } from '@/utils/studioFilters';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -255,6 +257,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [coverIndex, setCoverIndex] = useState(0);
   const [trayIndex, setTrayIndex] = useState<number | null>(null);
   const trayAutoOpenedRef = useRef(false);
+  const trayPreviewRef = useRef<HTMLDivElement>(null);
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
@@ -781,7 +784,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <img
                   src={item.thumbnailUrl || item.previewUrl}
                   alt=""
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
                 />
                 {item.mediaType === 'video' && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -793,6 +796,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 {/* Dim overlay on inactive tiles */}
                 {!isActive && (
                   <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.35)' }} />
+                )}
+                {/* Amber dot for edited tiles */}
+                {item.edits && (item.edits.filter && item.edits.filter !== 'normal' || item.edits.textOverlays?.length || item.edits.rotate || item.edits.flipH || item.edits.flipV || item.edits.music) && (
+                  <div className="absolute pointer-events-none" style={{ top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: '#F7931E', zIndex: 3 }} />
                 )}
                 {/* Cover pill on active tile */}
                 {isActive && (
@@ -850,7 +857,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           >
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
               {/* Full-width preview */}
-              <div className="relative overflow-hidden" style={{ width: '100%', flex: 1, minHeight: 0, background: '#000' }}>
+              <div ref={trayPreviewRef} className="relative overflow-hidden" style={{ width: '100%', flex: 1, minHeight: 0, background: '#000' }}>
                 {/* Letterbox blur for landscape */}
                 {trayItem.width && trayItem.height && trayItem.width > trayItem.height && (
                   <>
@@ -858,6 +865,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
                   </>
                 )}
+                {/* Base image */}
                 <img
                   src={trayItem.thumbnailUrl || trayItem.previewUrl}
                   alt=""
@@ -867,11 +875,46 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     height: '100%',
                     maxHeight: '100%',
                     objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                    transform: [
+                      trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                      trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                      trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                    ].filter(Boolean).join(' ') || undefined,
                   }}
                 />
+                {/* Filter overlay with intensity */}
+                {trayItem.edits?.filter && trayItem.edits.filter !== 'normal' && (
+                  <img
+                    src={trayItem.thumbnailUrl || trayItem.previewUrl}
+                    alt=""
+                    className={`absolute inset-0 z-[1] ${getFilterClass(trayItem.edits.filter)}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '100%',
+                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                      opacity: (trayItem.edits?.filterIntensity ?? 100) / 100,
+                      transform: [
+                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                      ].filter(Boolean).join(' ') || undefined,
+                    }}
+                  />
+                )}
+                {/* Text overlays */}
+                {trayItem.edits?.textOverlays && trayItem.edits.textOverlays.length > 0 && trayPreviewRef.current && (
+                  <div className="absolute inset-0 z-[2] pointer-events-none">
+                    <TextOverlayRenderer
+                      textOverlays={trayItem.edits.textOverlays}
+                      isEditable={false}
+                      containerRef={trayPreviewRef as React.RefObject<HTMLDivElement>}
+                    />
+                  </div>
+                )}
                 {/* Cover badge */}
                 {trayIndex === coverIndex && (
-                  <div className="absolute z-[2]" style={{ top: 8, left: 8, background: 'rgba(247,147,30,0.85)', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, letterSpacing: 0.5 }}>
+                  <div className="absolute z-[3]" style={{ top: 8, left: 8, background: 'rgba(247,147,30,0.85)', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, letterSpacing: 0.5 }}>
                     Cover
                   </div>
                 )}
