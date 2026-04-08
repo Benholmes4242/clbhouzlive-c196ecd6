@@ -160,8 +160,13 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                     boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
                   }}
                 >
-                  {/* Handle + title */}
-                  <div className="flex items-center justify-between px-5 pt-4 pb-3">
+                  {/* Drag handle */}
+                  <div className="flex justify-center" style={{ padding: '10px 0 6px' }}>
+                    <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
+                  </div>
+
+                  {/* Title + close */}
+                  <div className="flex items-center justify-between px-5 pb-3">
                     <span className="text-[15px] font-bold" style={{ color: DARK_TEXT }}>Post settings</span>
                     <button
                       onClick={() => setSheetOpen(false)}
@@ -281,12 +286,14 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                     })}
                   </div>
 
-                  {/* Summary line */}
-                  <div className="mx-5 mb-4 px-4 py-3 rounded-xl" style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                  {/* Summary card */}
+                  <div className="mx-5 mb-4" style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 12,
+                    padding: '11px 14px',
                   }}>
-                    <p style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.50)' }}>
+                    <p style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
                       Posting as <span style={{ color: DARK_TEXT, fontWeight: 600 }}>{activeName}</span>
                       {' · visible to '}
                       <span style={{ color: DARK_TEXT, fontWeight: 600 }}>
