@@ -819,13 +819,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 const isLandscape = item.width && item.height && item.width > item.height;
                 if (!isLandscape) return null;
                 return (
-                  <div className="absolute inset-0" style={{ filter: 'blur(40px)', transform: 'scale(1.15)', opacity: 0.85, pointerEvents: 'none' }}>
-                    {item.mediaType === 'video' ? (
-                      <video src={item.previewUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
-                    ) : (
-                      <img src={item.previewUrl} alt="" className="w-full h-full object-cover" />
-                    )}
-                  </div>
+                  <>
+                    <div className="absolute inset-0" style={{ filter: 'blur(40px) brightness(0.4)', transform: 'scale(1.3)' }}>
+                      {item.mediaType === 'video' ? (
+                        <video src={item.previewUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
+                      ) : (
+                        <img src={item.previewUrl} alt="" className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
+                  </>
                 );
               })()}
 
