@@ -472,16 +472,22 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       console.error('[ComposeScreen] Failed to enqueue:', err);
       toast.error('Failed to start upload. Please try again.');
       setIsPublishing(false);
+      schedulePublishRef.current = false;
     }
-  }, [state, setStep, onSuccess, isPublishing]);
+  }, [state, setStep, onSuccess, isPublishing, schedulePublishRef]);
 
   // Auto-publish once scheduledAt is committed to state
   useEffect(() => {
-    if (state.scheduledAt !== null && schedulePublishRef.current) {
+    if (
+      schedulePublishRef.current &&
+      state.scheduledAt !== null &&
+      state.mediaItems.length > 0 &&
+      isValid
+    ) {
       schedulePublishRef.current = false;
       handlePublish();
     }
-  }, [state.scheduledAt, handlePublish, schedulePublishRef]);
+  }, [state.scheduledAt, handlePublish, schedulePublishRef, state.mediaItems.length, isValid]);
 
   // ── Tray item for inline edit ──
   const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
