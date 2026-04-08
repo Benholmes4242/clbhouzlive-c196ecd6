@@ -722,6 +722,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <div
           className="flex overflow-x-auto shrink-0"
           style={{
+            position: 'relative',
+            zIndex: 10,
             marginTop: 8,
             gap: 3,
             padding: '3px 0',
@@ -736,7 +738,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               <motion.button
                 key={item.id}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => {
+                onTap={() => {
                   if (trayIndex === i) {
                     setTrayIndex(null);
                   } else {
@@ -746,6 +748,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 }}
                 className="shrink-0 relative"
                 style={{
+                  cursor: 'pointer',
                   width: 68,
                   height: 68,
                   borderRadius: 0,
@@ -816,6 +819,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             transition={{ duration: 0.2 }}
             className="shrink-0 overflow-hidden"
             style={{
+              position: 'relative',
+              zIndex: 10,
               background: 'rgba(18,18,18,0.98)',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}
