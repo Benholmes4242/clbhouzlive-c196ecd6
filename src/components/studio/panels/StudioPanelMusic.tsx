@@ -46,7 +46,6 @@ function WaveformBars() {
 
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
   const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
-  const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
