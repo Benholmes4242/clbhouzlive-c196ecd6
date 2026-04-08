@@ -1044,9 +1044,15 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.18 }}
-                className="flex flex-wrap gap-1.5 py-1"
+                className="flex flex-col gap-1.5 py-1"
               >
-                {state.taggedCourses.map((course) => (
+                {/* Section label for multi-course */}
+                {state.taggedCourses.length > 1 && (
+                  <p className="text-[10px] font-bold uppercase tracking-[1.5px] mb-1" style={{ color: DARK_TEXT3 }}>
+                    Courses tagged
+                  </p>
+                )}
+                {state.taggedCourses.map((course, i) => (
                   <motion.button
                     key={course.courseId}
                     layout
@@ -1054,20 +1060,25 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.85, opacity: 0 }}
                     onClick={() => openPanel('course')}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
                     style={{
                       background: 'rgba(34,197,94,0.08)',
                       border: '1px solid rgba(34,197,94,0.18)',
                     }}
                   >
+                    {/* Numbered badge for multi-course, golf emoji for single */}
                     <div style={{
                       width: 28, height: 28, borderRadius: 8, flexShrink: 0,
                       background: 'rgba(34,197,94,0.12)',
                       border: '1px solid rgba(34,197,94,0.20)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 14,
-                    }}>⛳</div>
-                    <div className="text-left">
+                      fontSize: state.taggedCourses.length > 1 ? 13 : 14,
+                      fontWeight: 700,
+                      color: state.taggedCourses.length > 1 ? 'rgba(34,197,94,0.80)' : undefined,
+                    }}>
+                      {state.taggedCourses.length > 1 ? i + 1 : '⛳'}
+                    </div>
+                    <div className="text-left flex-1">
                       <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
                         {course.courseName}
                       </p>
@@ -1097,23 +1108,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     layout
                     whileTap={{ scale: 0.95 }}
                     onClick={() => openPanel('course')}
-                    className="flex items-center gap-1.5"
+                    className="flex items-center gap-2"
                     style={{
-                      display: 'inline-flex',
-                      alignSelf: 'flex-start',
-                      padding: '7px 12px 7px 8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '7px 12px',
                       borderRadius: 12,
-                      border: '1.5px dashed rgba(34,197,94,0.20)',
+                      border: '1.5px dashed rgba(34,197,94,0.18)',
                       background: 'transparent',
                       cursor: 'pointer',
                     }}
                   >
-                    <div style={{
-                      width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                      background: 'rgba(34,197,94,0.08)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12,
-                    }}>⛳</div>
+                    <span style={{ fontSize: 14 }}>⛳</span>
                     <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
                       Add course
                     </span>
