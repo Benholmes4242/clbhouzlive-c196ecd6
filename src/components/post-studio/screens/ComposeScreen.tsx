@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Camera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock,
+  Camera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock, FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -1061,6 +1061,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <Clock className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => openPanel('drafts')}
+              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+            >
+              <FileText className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+              {draftsCount > 0 && (
+                <div style={{
+                  position: 'absolute', top: 8, right: 8,
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: '#F7931E',
+                }} />
+              )}
             </motion.button>
           </div>
 
