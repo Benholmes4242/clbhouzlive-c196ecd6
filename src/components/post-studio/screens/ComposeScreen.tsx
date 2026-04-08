@@ -521,7 +521,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             style={{
               position: 'absolute',
               top: 10,
-              left: 0,
+              left: 16,
               width: 2,
               height: 24,
               background: '#F7931E',
