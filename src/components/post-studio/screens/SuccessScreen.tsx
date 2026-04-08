@@ -1,6 +1,6 @@
 // SuccessScreen — Step 6: Dark celebration moment with staggered entrance + live upload progress
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useUploadProgress } from '@/hooks/useUploadProgress';

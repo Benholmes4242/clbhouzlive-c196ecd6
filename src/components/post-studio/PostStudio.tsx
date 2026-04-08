@@ -241,9 +241,11 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
   }, [initialMedia, addMedia, setStep]);
 
   const handleClose = useCallback(() => {
+    // Never close via backdrop/escape while on SUCCESS screen
+    if (state.step === 'SUCCESS') return;
     if (state.isDirty) setDiscarding(true);
     else { reset(); onClose(); }
-  }, [state.isDirty, setDiscarding, reset, onClose]);
+  }, [state.step, state.isDirty, setDiscarding, reset, onClose]);
 
   // Escape key
   useEffect(() => {
