@@ -242,6 +242,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const mentionOverlayRef = useRef<HTMLDivElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
