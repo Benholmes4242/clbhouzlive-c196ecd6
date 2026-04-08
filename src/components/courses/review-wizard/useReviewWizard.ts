@@ -392,20 +392,9 @@ export function useReviewWizard({
         });
       }
 
-      // Notify friends about this review — fire and forget, never blocks UI
-      if (!isEditMode) {
-        supabase.functions.invoke('notify-friend-review', {
-          body: {
-            review_id: ratingId,
-            course_id: course?.id,
-            reviewer_id: currentUserId,
-            course_name: course?.name,
-            rating: state.rating,
-          },
-        }).catch(err => {
-          console.warn('[ReviewWizard] Failed to send friend review notifications:', err);
-        });
-      }
+      // Friend review notifications are handled by the DB trigger
+      // (notify_friends_on_course_review) which fires on course_ratings INSERT.
+      // Do NOT also call the notify-friend-review edge function — that causes duplicates.
 
       // Both edit and new reviews go to success
       onSuccess?.(ratingId);
