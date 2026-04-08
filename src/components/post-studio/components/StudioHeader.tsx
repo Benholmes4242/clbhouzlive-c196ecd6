@@ -27,14 +27,13 @@ interface StudioHeaderProps {
 }
 
 const STEP_LABELS = ['COMPOSE', 'REVIEW'] as const;
-const TOTAL_STEPS = 2;
+const TOTAL_STEPS = 1;
 
 const STEP_PROGRESS: Partial<Record<StudioStep, number>> = {
   COMPOSE:  1,
   TRIM:     1,
   POSTER:   1,
-  PUBLISH:  2,
-  SUCCESS:  3,
+  SUCCESS:  2,
 };
 
 export function StudioHeader({
