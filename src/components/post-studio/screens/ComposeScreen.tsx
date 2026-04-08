@@ -783,7 +783,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <img
                   src={item.thumbnailUrl || item.previewUrl}
                   alt=""
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
                 />
                 {item.mediaType === 'video' && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -795,6 +795,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 {/* Dim overlay on inactive tiles */}
                 {!isActive && (
                   <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.35)' }} />
+                )}
+                {/* Amber dot for edited tiles */}
+                {item.edits && (item.edits.filter && item.edits.filter !== 'normal' || item.edits.textOverlays?.length || item.edits.rotate || item.edits.flipH || item.edits.flipV || item.edits.music) && (
+                  <div className="absolute pointer-events-none" style={{ top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: '#F7931E', zIndex: 3 }} />
                 )}
                 {/* Cover pill on active tile */}
                 {isActive && (
