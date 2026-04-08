@@ -149,11 +149,12 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                   animate={{ y: 0 }}
                   exit={{ y: '100%' }}
                   transition={{ type: 'spring', damping: 32, stiffness: 380 }}
-                  className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px] flex flex-col"
+                  className="fixed bottom-0 left-0 right-0 z-[10001] w-full flex flex-col"
                   style={{
                     background: 'rgba(16,16,16,0.99)',
                     backdropFilter: 'blur(40px)',
                     WebkitBackdropFilter: 'blur(40px)',
+                    borderRadius: '20px 20px 0 0',
                     borderTop: '1px solid rgba(255,255,255,0.08)',
                     paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)',
                     boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
@@ -173,7 +174,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
 
                   {/* Posting as section */}
                   <div className="px-5 pb-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: DARK_TEXT3 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.28)' }}>
                       Posting as
                     </p>
                   </div>
@@ -181,9 +182,10 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                   <div className="px-5 pb-4 flex flex-col gap-2">
                     <button
                       onClick={() => { setActor('personal', null); setSheetOpen(false); }}
-                      className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
+                      className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                       style={{
-                        background: state.actorType === 'personal' ? 'rgba(247,147,30,0.08)' : 'rgba(255,255,255,0.04)',
+                        borderRadius: 14,
+                        background: state.actorType === 'personal' ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
                         border: state.actorType === 'personal' ? '1px solid rgba(247,147,30,0.25)' : '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
@@ -208,9 +210,10 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                         <button
                           key={biz.id}
                           onClick={() => { setActor('business', biz.id); setSheetOpen(false); }}
-                          className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
+                          className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                           style={{
-                            background: isActive ? 'rgba(247,147,30,0.08)' : 'rgba(255,255,255,0.04)',
+                            borderRadius: 14,
+                            background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
                             border: isActive ? '1px solid rgba(247,147,30,0.25)' : '1px solid rgba(255,255,255,0.08)',
                           }}
                         >
@@ -237,7 +240,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
 
                   {/* Who can see this section */}
                   <div className="px-5 pb-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: DARK_TEXT3 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.28)' }}>
                       Who can see this
                     </p>
                   </div>
@@ -256,8 +259,9 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                         <button
                           key={opt.value}
                           onClick={() => { setVisibility(opt.value); }}
-                          className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
+                          className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                           style={{
+                            borderRadius: 14,
                             background: isActive ? opt.activeBg : 'rgba(255,255,255,0.04)',
                             border: isActive ? opt.activeBorder : '1px solid rgba(255,255,255,0.08)',
                           }}
