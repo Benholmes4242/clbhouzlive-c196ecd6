@@ -324,6 +324,7 @@ export default function StudioShelf({
                         padding: '4px 10px',
                         pointerEvents: 'none',
                         zIndex: 20,
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {edits.filter === 'vivid' ? 'Fresh Cut' :
