@@ -257,6 +257,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [coverIndex, setCoverIndex] = useState(0);
   const [trayIndex, setTrayIndex] = useState<number | null>(null);
   const trayAutoOpenedRef = useRef(false);
+  const trayPreviewRef = useRef<HTMLDivElement>(null);
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
