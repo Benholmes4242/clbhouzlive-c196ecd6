@@ -22,6 +22,10 @@ import {
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
+import { enqueuePostUpload } from '@/uploads/uploadPipeline';
+import { supabase } from '@/integrations/supabase/client';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import type { UploadJobInput } from '@/uploads/types';
 
 // ─── Media processing helpers ─────────────────────────────────────────────────
 
@@ -502,7 +506,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, updateMediaEdits,
-    setMentions, setTaggedCourses, setMentionTriggerIndex, reset,
+    setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess,
   } = usePostStudioContext();
 
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
@@ -518,6 +522,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // static placeholder — no rotating prompts
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
@@ -684,6 +689,63 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     fileInputRef.current?.click();
   }, []);
 
+  // ── Publish handler (moved from PublishScreen — one-step flow) ──
+  const handlePublish = useCallback(async () => {
+    if (isPublishing) return;
+    setIsPublishing(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
+
+      const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
+      const selectedTags = state.mentions.map((m) => ({
+        id: m.entityId, entity_id: m.profileId, entity_type: m.entityType,
+        name: m.displayName, username: m.username ?? null,
+        start_index: m.start, end_index: m.end,
+      }));
+
+      const input: UploadJobInput = {
+        actorType: state.actorType, actorId: state.actorId ?? user.id, userId: user.id,
+        caption: state.caption, files,
+        mediaItems: state.mediaItems.map((item) => ({
+          id: item.id, file: item.file, type: item.mediaType,
+          width: item.width ?? undefined, height: item.height ?? undefined,
+          duration: item.duration ?? undefined,
+          trimStart: item.trimStart || null, trimEnd: item.trimEnd || null,
+          posterTimestamp: item.posterTimestamp || null,
+        })),
+        studioEditsByMediaId: Object.fromEntries(
+          state.mediaItems
+            .filter((item) => item.edits && Object.keys(item.edits).length > 0)
+            .map((item) => [item.id, item.edits!])
+        ),
+        courseIds: state.taggedCourses.map((c) => c.courseId),
+        courseInfo: state.taggedCourses[0]
+          ? { id: state.taggedCourses[0].courseId, name: state.taggedCourses[0].courseName, country: state.taggedCourses[0].country ?? '' }
+          : null,
+        selectedTags,
+        visibility: state.visibility,
+        scheduledAt: state.scheduledAt,
+      };
+
+      enqueuePostUpload(input);
+      analyticsEvents.track('post_published', {
+        media_count: state.mediaItems.length,
+        media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
+        has_caption: state.caption.trim().length > 0,
+        has_tagged_course: state.taggedCourses.length > 0,
+        visibility: state.visibility,
+        is_scheduled: !!state.scheduledAt,
+      });
+      onSuccess?.('');
+      setStep('SUCCESS');
+    } catch (err) {
+      console.error('[ComposeScreen] Failed to enqueue:', err);
+      toast.error('Failed to start upload. Please try again.');
+      setIsPublishing(false);
+    }
+  }, [state, setStep, onSuccess, isPublishing]);
+
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG }}>
@@ -708,11 +770,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         darkMode={true}
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
-          isValid
-            ? { label: 'Post', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
-            : state.isDirty
-              ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
-              : undefined
+          isValid && !isPublishing
+            ? { label: 'Share', onClick: handlePublish, variant: 'primary' as const }
+            : isPublishing
+              ? { label: 'Sharing…', onClick: () => {}, disabled: true, variant: 'primary' as const }
+              : state.isDirty
+                ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
+                : undefined
         }
       />
 
@@ -736,27 +800,26 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           }}
         >
 
-        {/* ── 4:5 Media Hero ── */}
-        <div className="px-4 pt-2 pb-2">
-          <div
-            style={{
-              aspectRatio: '4/5',
-              borderRadius: 18,
-              overflow: 'hidden',
-              background: 'rgba(255,255,255,0.04)',
-              border: `1px solid ${DARK_BORDER}`,
-              position: 'relative',
-            }}
-          >
-            {hasMedia ? (
-              <>
-                {/* Blurred background for letterboxing */}
-                {(() => {
-                  const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
-                  if (!item) return null;
-                  const isLandscape = item.width && item.height && item.width > item.height;
-                  if (!isLandscape) return null;
-                  return (
+        {/* ── Media Zone ── */}
+        {hasMedia ? (
+          <>
+            {/* Full bleed 4:5 hero — no horizontal padding */}
+            <div
+              style={{
+                aspectRatio: '4/5',
+                overflow: 'hidden',
+                position: 'relative',
+                background: 'rgba(0,0,0,0.95)',
+              }}
+            >
+              {/* Blurred background for letterboxing */}
+              {(() => {
+                const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+                if (!item) return null;
+                const isLandscape = item.width && item.height && item.width > item.height;
+                if (!isLandscape) return null;
+                return (
+                  <>
                     <div className="absolute inset-0" style={{ filter: 'blur(40px) brightness(0.4)', transform: 'scale(1.3)' }}>
                       {item.mediaType === 'video' ? (
                         <video src={item.previewUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
@@ -764,125 +827,126 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                         <img src={item.previewUrl} alt="" className="w-full h-full object-cover" />
                       )}
                     </div>
-                  );
-                })()}
+                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
+                  </>
+                );
+              })()}
 
-                {/* Main media — object-contain */}
-                {(() => {
-                  const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
-                  if (!item) return null;
-                  return item.mediaType === 'video' ? (
-                    <video
-                      src={item.previewUrl}
-                      autoPlay muted loop playsInline
-                      className="absolute inset-0 w-full h-full object-contain"
-                      style={{ pointerEvents: 'none' }}
-                    />
-                  ) : (
-                    <img
-                      src={item.previewUrl}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-contain"
-                    />
-                  );
-                })()}
+              {/* Main media — object-contain */}
+              {(() => {
+                const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+                if (!item) return null;
+                return item.mediaType === 'video' ? (
+                  <video
+                    src={item.previewUrl}
+                    autoPlay muted loop playsInline
+                    className="absolute inset-0 w-full h-full object-contain"
+                    style={{ pointerEvents: 'none' }}
+                  />
+                ) : (
+                  <img
+                    src={item.previewUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                );
+              })()}
 
-                {/* Cover badge + Edit button */}
-                <div className="absolute top-3 left-3 z-10">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.92)', color: '#0D0D0D' }}>
-                    Cover
-                  </span>
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleEdit(state.activeMediaIndex)}
-                  className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full"
-                  style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-                >
-                  <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-                  <span className="text-[11px] font-semibold text-white">Edit</span>
-                </motion.button>
+              {/* Top scrim for overlays */}
+              <div className="absolute top-0 inset-x-0 h-20 z-[1]" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.45), transparent)' }} />
 
-                {/* Thumbnail strip */}
-                {state.mediaItems.length > 1 && (
-                  <div
-                    className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto z-10"
-                    style={{ scrollbarWidth: 'none' }}
-                  >
-                    {state.mediaItems.slice(0, 4).map((item, i) => (
-                      <motion.button
-                        key={item.id}
-                        whileTap={{ scale: 0.92 }}
-                        onClick={() => { setCoverIndex(i); setActiveMedia(i); }}
-                        className="shrink-0 overflow-hidden"
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 10,
-                          border: i === coverIndex ? '2px solid #F7931E' : '1.5px solid rgba(255,255,255,0.25)',
-                        }}
-                      >
-                        {item.mediaType === 'video' ? (
-                          <video src={item.previewUrl} muted playsInline preload="metadata" className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
-                        ) : (
-                          <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-                        )}
-                      </motion.button>
-                    ))}
+              {/* Count badge — top left */}
+              <div className="absolute top-3 left-3 z-10">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  {coverIndex + 1} / {state.mediaItems.length}
+                </span>
+              </div>
 
-                    {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-                      <motion.button
-                        whileTap={{ scale: 0.88 }}
-                        onClick={() => fileInputRef.current?.click()}
-                        className="shrink-0 flex items-center justify-center"
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 10,
-                          background: 'rgba(255,255,255,0.08)',
-                          border: '1.5px dashed rgba(255,255,255,0.20)',
-                        }}
-                      >
-                        <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-                      </motion.button>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              /* Empty state */
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-                style={{ cursor: 'pointer' }}
+              {/* Edit pill — top right */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleEdit(state.activeMediaIndex)}
+                className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
-                <ImageIcon className="w-7 h-7" style={{ color: 'rgba(247,147,30,0.80)' }} strokeWidth={1.5} />
-                <div className="text-center">
-                  <p className="text-[14px] font-semibold" style={{ color: DARK_TEXT }}>Add photo or video</p>
-                  <p className="text-[12px] mt-1" style={{ color: DARK_TEXT3 }}>Share your round with the world</p>
-                </div>
-                <div className="flex gap-3 mt-2">
+                <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+                <span className="text-[11px] font-semibold text-white">Edit</span>
+              </motion.button>
+            </div>
+
+            {/* Full bleed thumbnail strip — 68px, sharp corners, all items */}
+            {state.mediaItems.length > 1 && (
+              <div
+                className="flex overflow-x-auto"
+                style={{ gap: 4, scrollbarWidth: 'none', padding: '4px 0' }}
+              >
+                {state.mediaItems.map((item, i) => (
                   <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                    className="px-4 py-2 rounded-xl text-[13px] font-semibold"
-                    style={{ background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.25)', color: '#F7931E' }}
+                    key={item.id}
+                    whileTap={{ scale: 0.92 }}
+                    onClick={() => { setCoverIndex(i); setActiveMedia(i); }}
+                    className="shrink-0 overflow-hidden relative"
+                    style={{
+                      width: 68,
+                      height: 68,
+                      borderRadius: 0,
+                      border: i === coverIndex ? '2px solid #F7931E' : 'none',
+                    }}
                   >
-                    Library
+                    {item.mediaType === 'video' ? (
+                      <video src={item.previewUrl} muted playsInline preload="metadata" className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
+                    ) : (
+                      <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+                    )}
+                    {/* Dim overlay on inactive tiles */}
+                    {i !== coverIndex && (
+                      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.40)' }} />
+                    )}
                   </motion.button>
+                ))}
+
+                {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
                   <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => { e.stopPropagation(); rearCameraInputRef.current?.click(); }}
-                    className="px-4 py-2 rounded-xl text-[13px] font-semibold"
-                    style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}`, color: DARK_TEXT2 }}
+                    whileTap={{ scale: 0.88 }}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="shrink-0 flex items-center justify-center"
+                    style={{
+                      width: 68,
+                      height: 68,
+                      borderRadius: 0,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1.5px dashed rgba(255,255,255,0.15)',
+                    }}
                   >
-                    Camera
+                    <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
                   </motion.button>
-                </div>
-              </button>
+                )}
+              </div>
             )}
-          </div>
-        </div>
+          </>
+        ) : (
+          /* Change 1 — Compact empty state */
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              width: '100%',
+              padding: '28px 0 24px',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', gap: 10,
+              borderRadius: 18,
+              background: 'rgba(255,255,255,0.03)',
+              border: `1.5px dashed rgba(247,147,30,0.25)`,
+              cursor: 'pointer',
+              margin: '8px 16px',
+            }}
+          >
+            <ImageIcon className="w-7 h-7" style={{ color: 'rgba(247,147,30,0.80)' }} strokeWidth={1.5} />
+            <div className="text-center">
+              <p className="text-[14px] font-semibold" style={{ color: DARK_TEXT }}>Add photo or video</p>
+              <p className="text-[12px] mt-1" style={{ color: DARK_TEXT3 }}>Tap Library or Camera below</p>
+            </div>
+          </button>
+        )}
 
         {/* ── Text input — dark text, static placeholder ── */}
         <div className="px-4 pt-3 pb-2 relative">
@@ -905,8 +969,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           {state.mentions.length > 0 && (
             <div
               aria-hidden="true"
-              className="absolute inset-x-4 top-3 text-[17px] leading-relaxed pointer-events-none whitespace-pre-wrap break-words"
-              style={{ wordBreak: 'break-word', height: 'clamp(72px, 12vh, 100px)', overflowY: 'auto' }}
+              className="absolute inset-x-4 top-3 text-[17px] pointer-events-none whitespace-pre-wrap break-words"
+              style={{ wordBreak: 'break-word', lineHeight: 1.55, minHeight: 26, maxHeight: 79, overflowY: 'auto' }}
             >
               {highlightedCaption}
             </div>
@@ -914,19 +978,28 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           <textarea
             ref={textareaRef}
             value={state.caption}
-            onChange={handleCaptionChange}
+            onChange={(e) => {
+              handleCaptionChange(e);
+              // Auto-resize textarea
+              const el = e.target;
+              el.style.height = 'auto';
+              el.style.height = Math.min(el.scrollHeight, 79) + 'px';
+            }}
             placeholder="What's on your mind?"
-            className="w-full resize-none outline-none leading-relaxed"
+            className="w-full resize-none outline-none"
             style={{
               background: 'transparent',
               fontSize: 17,
+              lineHeight: 1.55,
               fontWeight: 400,
               color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
               caretColor: '#F7931E',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-              height: 'clamp(72px, 12vh, 100px)',
+              minHeight: 26,
+              maxHeight: 79,
               overflowY: 'auto',
               resize: 'none',
+              scrollbarWidth: 'none',
               WebkitOverflowScrolling: 'touch',
             }}
             maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
@@ -971,9 +1044,15 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.18 }}
-                className="flex flex-wrap gap-1.5 py-1"
+                className="flex flex-col gap-1.5 py-1"
               >
-                {state.taggedCourses.map((course) => (
+                {/* Section label for multi-course */}
+                {state.taggedCourses.length > 1 && (
+                  <p className="text-[10px] font-bold uppercase tracking-[1.5px] mb-1" style={{ color: DARK_TEXT3 }}>
+                    Courses tagged
+                  </p>
+                )}
+                {state.taggedCourses.map((course, i) => (
                   <motion.button
                     key={course.courseId}
                     layout
@@ -981,20 +1060,25 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.85, opacity: 0 }}
                     onClick={() => openPanel('course')}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
                     style={{
                       background: 'rgba(34,197,94,0.08)',
                       border: '1px solid rgba(34,197,94,0.18)',
                     }}
                   >
+                    {/* Numbered badge for multi-course, golf emoji for single */}
                     <div style={{
                       width: 28, height: 28, borderRadius: 8, flexShrink: 0,
                       background: 'rgba(34,197,94,0.12)',
                       border: '1px solid rgba(34,197,94,0.20)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 14,
-                    }}>⛳</div>
-                    <div className="text-left">
+                      fontSize: state.taggedCourses.length > 1 ? 13 : 14,
+                      fontWeight: 700,
+                      color: state.taggedCourses.length > 1 ? 'rgba(34,197,94,0.80)' : undefined,
+                    }}>
+                      {state.taggedCourses.length > 1 ? i + 1 : '⛳'}
+                    </div>
+                    <div className="text-left flex-1">
                       <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
                         {course.courseName}
                       </p>
@@ -1024,23 +1108,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     layout
                     whileTap={{ scale: 0.95 }}
                     onClick={() => openPanel('course')}
-                    className="flex items-center gap-1.5"
+                    className="flex items-center gap-2"
                     style={{
-                      display: 'inline-flex',
-                      alignSelf: 'flex-start',
-                      padding: '7px 12px 7px 8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '7px 12px',
                       borderRadius: 12,
-                      border: '1.5px dashed rgba(34,197,94,0.20)',
+                      border: '1.5px dashed rgba(34,197,94,0.18)',
                       background: 'transparent',
                       cursor: 'pointer',
                     }}
                   >
-                    <div style={{
-                      width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                      background: 'rgba(34,197,94,0.08)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12,
-                    }}>⛳</div>
+                    <span style={{ fontSize: 14 }}>⛳</span>
                     <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
                       Add course
                     </span>

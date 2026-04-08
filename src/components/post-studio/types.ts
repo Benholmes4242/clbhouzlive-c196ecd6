@@ -12,7 +12,6 @@ export type StudioStep =
   | 'COMPOSE'
   | 'TRIM'
   | 'POSTER'
-  | 'PUBLISH'
   | 'SUCCESS';
 
 /** Bottom panel identifiers */

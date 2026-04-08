@@ -116,7 +116,7 @@ export function PublishScreen() {
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
         title="Review Post"
-        step="PUBLISH"
+        step="COMPOSE"
         leftAction={{ label: '', onClick: () => setStep('COMPOSE'), icon: 'back' as const }}
       />
 
