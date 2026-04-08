@@ -250,6 +250,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
   const [trayIndex, setTrayIndex] = useState<number | null>(null);
+  const trayAutoOpenedRef = useRef(false);
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
@@ -267,7 +268,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     if (state.mediaItems.length > 0) {
       const timer = setTimeout(() => textareaRef.current?.focus(), 150);
+      if (!trayAutoOpenedRef.current) {
+        trayAutoOpenedRef.current = true;
+        setTrayIndex(0);
+      }
       return () => clearTimeout(timer);
+    } else {
+      trayAutoOpenedRef.current = false;
     }
   }, [state.mediaItems.length]);
 
