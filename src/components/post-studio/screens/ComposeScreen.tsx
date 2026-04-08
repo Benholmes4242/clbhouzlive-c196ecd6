@@ -969,8 +969,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           {state.mentions.length > 0 && (
             <div
               aria-hidden="true"
-              className="absolute inset-x-4 top-3 text-[17px] leading-relaxed pointer-events-none whitespace-pre-wrap break-words"
-              style={{ wordBreak: 'break-word', height: 'clamp(72px, 12vh, 100px)', overflowY: 'auto' }}
+              className="absolute inset-x-4 top-3 text-[17px] pointer-events-none whitespace-pre-wrap break-words"
+              style={{ wordBreak: 'break-word', lineHeight: 1.55, minHeight: 26, maxHeight: 79, overflowY: 'auto' }}
             >
               {highlightedCaption}
             </div>
@@ -978,19 +978,28 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           <textarea
             ref={textareaRef}
             value={state.caption}
-            onChange={handleCaptionChange}
+            onChange={(e) => {
+              handleCaptionChange(e);
+              // Auto-resize textarea
+              const el = e.target;
+              el.style.height = 'auto';
+              el.style.height = Math.min(el.scrollHeight, 79) + 'px';
+            }}
             placeholder="What's on your mind?"
-            className="w-full resize-none outline-none leading-relaxed"
+            className="w-full resize-none outline-none"
             style={{
               background: 'transparent',
               fontSize: 17,
+              lineHeight: 1.55,
               fontWeight: 400,
               color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
               caretColor: '#F7931E',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-              height: 'clamp(72px, 12vh, 100px)',
+              minHeight: 26,
+              maxHeight: 79,
               overflowY: 'auto',
               resize: 'none',
+              scrollbarWidth: 'none',
               WebkitOverflowScrolling: 'touch',
             }}
             maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
