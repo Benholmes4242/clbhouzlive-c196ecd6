@@ -113,7 +113,7 @@ export function SuccessScreen({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[9999] flex flex-col"
-      style={{ background: '#F8FAFC' }}
+      style={{ background: '#F8FAFC', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
     >
       {/* Close button */}
       <button
