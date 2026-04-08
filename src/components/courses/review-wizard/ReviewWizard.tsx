@@ -60,6 +60,9 @@ export function ReviewWizard({
   const [autoShareComplete, setAutoShareComplete] = useState(false);
   const [isAutoSharing, setIsAutoSharing] = useState(false);
   const autoShareAttempted = useRef(false);
+  // Freeze previousRating at mount so it survives existingRating refetches
+  const previousRatingRef = useRef<number | null>(existingRating?.rating ?? null);
+  const stablePreviousRating = previousRatingRef.current;
   
   // Studio edits state (retained for media display)
   const [studioEditsByMediaId, setStudioEditsByMediaId] = useState<Record<string, StudioEdits>>({});
