@@ -4,6 +4,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useUploadProgress } from '@/hooks/useUploadProgress';
+import { usePostStudioContext } from '../usePostStudio';
+import { format } from 'date-fns';
 
 interface SuccessScreenProps {
   onDone: () => void;
@@ -33,9 +35,11 @@ function Particle({ delay, angle, distance, opacity }: { delay: number; angle: n
 }
 
 export function SuccessScreen({ onDone }: SuccessScreenProps) {
+  const { state } = usePostStudioContext();
   const { isUploading, uploadedCount, totalCount } = useUploadProgress();
   const progress = totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0;
   const isComplete = uploadedCount >= totalCount && totalCount > 0;
+  const isScheduled = state.scheduledAt !== null;
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8 relative" style={{ background: '#0D0D0D' }}>
@@ -101,73 +105,77 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
           fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
           textTransform: 'uppercase', color: 'rgba(247,147,30,0.60)',
         }}>
-          Moment shared
+          {isScheduled ? 'Post scheduled' : 'Moment shared'}
         </p>
         <h2 style={{
           fontSize: 34, fontWeight: 800,
           color: 'rgba(255,255,255,0.92)',
           letterSpacing: '-0.04em', lineHeight: 1.1,
         }}>
-          On the board.
+          {isScheduled ? 'Locked in.' : 'On the board.'}
         </h2>
         <p style={{
           fontSize: 14, color: 'rgba(255,255,255,0.50)',
           maxWidth: 230, margin: '0 auto', lineHeight: 1.5,
         }}>
-          Uploading in the background while you get back out there.
+          {isScheduled
+            ? `Your post will go live ${format(state.scheduledAt!, "EEE d MMM 'at' h:mm a")}.`
+            : 'Uploading in the background while you get back out there.'}
         </p>
       </motion.div>
 
-      {/* Phase 3 — Upload progress card (750ms) */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.75, duration: 0.4 }}
-        className="w-full max-w-sm relative z-10"
-        style={{
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 16,
-          padding: '14px 16px',
-        }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.92)' }}>
-            {isComplete ? 'Upload complete' : 'Uploading…'}
-          </span>
-          <span style={{
-            fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums',
-            color: isComplete ? 'rgba(34,197,94,0.80)' : '#F7931E',
-          }}>
-            {Math.round(progress)}%
-          </span>
-        </div>
-        <div style={{
-          width: '100%', height: 4, borderRadius: 999,
-          background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
-        }}>
+      {/* Phase 3 — Upload progress card (only for non-scheduled) */}
+      {!isScheduled && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.75, duration: 0.4 }}
+          className="w-full max-w-sm relative z-10"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 16,
+            padding: '14px 16px',
+          }}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.92)' }}>
+              {isComplete ? 'Upload complete' : 'Uploading…'}
+            </span>
+            <span style={{
+              fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums',
+              color: isComplete ? 'rgba(34,197,94,0.80)' : '#F7931E',
+            }}>
+              {Math.round(progress)}%
+            </span>
+          </div>
           <div style={{
-            height: '100%', borderRadius: 999,
-            transition: 'width 500ms, background 300ms',
-            width: `${progress}%`,
-            background: isComplete
-              ? 'rgba(34,197,94,0.70)'
-              : 'linear-gradient(90deg, #F7931E, #F59E0B)',
-          }} />
-        </div>
-        <p style={{
-          fontSize: 12, color: 'rgba(255,255,255,0.35)',
-          marginTop: 8,
-        }}>
-          {isComplete ? 'Your post is live on the feed' : "You can close the app — it'll keep going"}
-        </p>
-      </motion.div>
+            width: '100%', height: 4, borderRadius: 999,
+            background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+          }}>
+            <div style={{
+              height: '100%', borderRadius: 999,
+              transition: 'width 500ms, background 300ms',
+              width: `${progress}%`,
+              background: isComplete
+                ? 'rgba(34,197,94,0.70)'
+                : 'linear-gradient(90deg, #F7931E, #F59E0B)',
+            }} />
+          </div>
+          <p style={{
+            fontSize: 12, color: 'rgba(255,255,255,0.35)',
+            marginTop: 8,
+          }}>
+            {isComplete ? 'Your post is live on the feed' : "You can close the app — it'll keep going"}
+          </p>
+        </motion.div>
+      )}
 
-      {/* Phase 4 — CTA button (1000ms) */}
+      {/* Phase 4 — CTA button */}
       <motion.button
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0, duration: 0.4 }}
+        transition={{ delay: isScheduled ? 0.75 : 1.0, duration: 0.4 }}
         whileTap={{ scale: 0.96 }}
         onClick={onDone}
         className="w-full max-w-sm flex items-center justify-center gap-2 font-bold relative z-10"

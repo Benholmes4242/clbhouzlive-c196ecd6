@@ -19,9 +19,16 @@ export function UploadToastsBridge() {
     });
 
     const offComplete = uploadEventBus.on('upload:complete', (evt) => {
-      toast.success("Your moment is live.", {
-        duration: 4000,
-      });
+      if (evt.isScheduled) {
+        toast.success("Post scheduled", {
+          description: evt.scheduledAt ? `Goes live ${new Date(evt.scheduledAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at ${new Date(evt.scheduledAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : undefined,
+          duration: 4000,
+        });
+      } else {
+        toast.success("Your moment is live.", {
+          duration: 4000,
+        });
+      }
 
       // Still invalidate queries so content appears
       if (evt.isScheduled) {
