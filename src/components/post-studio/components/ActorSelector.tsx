@@ -95,7 +95,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
             style={{
               width: 28,
               height: 28,
-              borderRadius: '50%',
+              borderRadius: '34%',
               background: 'rgba(255,255,255,0.10)',
               border: '1px solid rgba(255,255,255,0.12)',
             }}
