@@ -228,7 +228,7 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
-    setCaption, openPanel, updateMediaEdits,
+    setCaption, openPanel, closePanel, updateMediaEdits,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef, postNowRef,
   } = usePostStudioContext();
 
