@@ -63,6 +63,12 @@ const RateCoursePage = () => {
 
   const alreadyShared = !!existingShare;
 
+  // Freeze isEditMode and previousRating at mount so they survive query refetches
+  const isEditModeRef = useRef<boolean>(!!existingRating);
+  const previousRatingRef = useRef<number | null>(existingRating?.rating ?? null);
+  const stableIsEditMode = isEditModeRef.current;
+  const stablePreviousRating = previousRatingRef.current;
+
   const handleClose = () => {
     // Set flag in sessionStorage to trigger highlight on next reviews tab view
     if (courseId) {
@@ -88,7 +94,7 @@ const RateCoursePage = () => {
         course={course}
         isOpen={true}
         onClose={handleClose}
-        isEditMode={!!existingRating}
+        isEditMode={stableIsEditMode}
         alreadyShared={alreadyShared}
         existingRating={existingRating}
       />
