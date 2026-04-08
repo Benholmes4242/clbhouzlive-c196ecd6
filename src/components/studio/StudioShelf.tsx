@@ -308,6 +308,35 @@ export default function StudioShelf({
                       safeAreaContext="create"
                     />
                   )}
+
+                  {/* Filter badge overlay */}
+                  {hasActiveFilter && !isComparing && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        background: 'rgba(247,147,30,0.85)',
+                        color: '#fff',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        borderRadius: 20,
+                        padding: '4px 10px',
+                        pointerEvents: 'none',
+                        zIndex: 20,
+                      }}
+                    >
+                      {edits.filter === 'vivid' ? 'Fresh Cut' :
+                       edits.filter === 'cool' ? 'Early Tee' :
+                       edits.filter === 'warm' ? 'Late Round' :
+                       edits.filter === 'pop' ? 'Sharp' :
+                       edits.filter === 'matte' ? 'Overcast' :
+                       edits.filter === 'fade' ? 'Mist' :
+                       edits.filter === 'vintage' ? 'Heritage' :
+                       edits.filter === 'dramatic' ? 'Depth' :
+                       edits.filter === 'bw' ? 'Classic' : edits.filter} · {filterIntensity}%
+                    </div>
+                  )}
                 </>
               )}
             </div>
