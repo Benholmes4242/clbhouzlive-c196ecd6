@@ -1,5 +1,5 @@
 // ComposeScreen — Single dark cinematic creation surface
-// No step progress dots. No review step for standard posts.
+// Two states: empty "Fairway" (text-first) and media-loaded (strip + edit tray)
 // Dark. Cinematic. Golf-native.
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
@@ -17,7 +17,6 @@ import { useSaveDraft } from '../hooks/useSaveDraft';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
 import {
   COMPOSE_BG, DARK_TEXT, DARK_TEXT2, DARK_TEXT3, DARK_ICON, DARK_BG, DARK_CARD, DARK_BORDER,
-  ICON_COLOR, TEXT_PRIMARY, TEXT_TERTIARY,
 } from '../tokens';
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
@@ -223,283 +222,6 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
   );
 }
 
-// ─── OverflowSheet — access hidden items beyond the 4-tile grid ──────────────
-
-interface OverflowSheetProps {
-  items: StudioMediaItem[];
-  startIndex: number;
-  onEdit: (index: number) => void;
-  onClose: () => void;
-}
-
-function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProps) {
-  return (
-    <AnimatePresence>
-      <motion.div
-        key="overflow-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000]"
-        style={{ background: 'rgba(0,0,0,0.55)' }}
-        onClick={onClose}
-      />
-      <motion.div
-        key="overflow-sheet"
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
-        style={{
-          background: 'rgba(16,16,16,0.99)',
-          backdropFilter: 'blur(40px)',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
-          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
-        }}
-      >
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        </div>
-
-        <div className="px-5 pb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: DARK_TEXT3 }}>
-            More media
-          </p>
-        </div>
-
-        <div className="flex gap-3 overflow-x-auto px-5 pb-2" style={{ scrollbarWidth: 'none' }}>
-          {items.map((item, i) => {
-            const actualIndex = startIndex + i;
-            return (
-              <div key={item.id} className="relative shrink-0" style={{ width: 100 }}>
-                <div className="overflow-hidden" style={{ borderRadius: 12, aspectRatio: '1/1' }}>
-                  {item.mediaType === 'video' ? (
-                    <video
-                      src={item.previewUrl}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="auto"
-                      className="w-full h-full object-cover"
-                      style={{ pointerEvents: 'none' }}
-                    />
-                  ) : (
-                    <img
-                      src={item.thumbnailUrl || item.previewUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                  {item.mediaType === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.50)' }}>
-                        <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" strokeWidth={0} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.88 }}
-                  onClick={() => { onEdit(actualIndex); onClose(); }}
-                  className="absolute bottom-1.5 right-1.5 w-7 h-7 flex items-center justify-center rounded-full"
-                  style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.20)' }}
-                >
-                  <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-                </motion.button>
-                <div
-                  className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
-                  style={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.80)' }}
-                >
-                  {actualIndex + 1}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
-// ─── Adaptive media grid with per-tile edit + cover selection ─────────────────
-
-interface MediaGridProps {
-  items: StudioMediaItem[];
-  activeIndex: number;
-  coverIndex: number;
-  onSelect: (index: number) => void;
-  onRemove: (id: string) => void;
-  onEdit: (index: number) => void;
-  onSetCover: (index: number) => void;
-  onOverflow: () => void;
-  onAddMore: () => void;
-}
-
-interface TileProps {
-  item: StudioMediaItem;
-  index: number;
-  coverIndex: number;
-  maxVisible: number;
-  overflow: number;
-  onSelect: (index: number) => void;
-  onRemove: (id: string) => void;
-  onEdit: (index: number) => void;
-  onSetCover: (index: number) => void;
-  onOverflow: () => void;
-  style?: React.CSSProperties;
-  borderRadius?: string;
-}
-
-function Tile({
-  item, index, coverIndex, maxVisible, overflow,
-  onSelect, onRemove, onEdit, onSetCover, onOverflow,
-  style, borderRadius,
-}: TileProps) {
-  const isCover = index === coverIndex;
-  const isOverflowTile = index === maxVisible - 1 && overflow > 0;
-
-  return (
-    <div
-      className="relative overflow-hidden cursor-pointer"
-      style={{ borderRadius: borderRadius ?? 14, ...style }}
-      onClick={() => onSelect(index)}
-    >
-      {item.mediaType === 'video' ? (
-        <video
-          src={item.previewUrl}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="w-full h-full object-cover"
-          style={{ pointerEvents: 'none' }}
-        />
-      ) : (
-        <img
-          src={item.thumbnailUrl || item.previewUrl}
-          alt=""
-          className="w-full h-full object-cover"
-        />
-      )}
-
-      {isOverflowTile && (
-        <motion.div
-          whileTap={{ scale: 0.97 }}
-          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
-          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
-          onClick={(e) => { e.stopPropagation(); onOverflow(); }}
-        >
-          <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
-          <span className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>tap to edit</span>
-        </motion.div>
-      )}
-
-      {!isOverflowTile && (
-        <>
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            onClick={(e) => { e.stopPropagation(); if (!isCover) onSetCover(index); }}
-            className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-            style={isCover ? {
-              background: 'rgba(255,255,255,0.92)',
-              color: '#0D0D0D',
-              border: 'none',
-            } : {
-              background: 'rgba(0,0,0,0.45)',
-              color: 'rgba(255,255,255,0.65)',
-              border: '1px solid rgba(255,255,255,0.30)',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            Cover
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
-            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-          >
-            <X className="w-3 h-3 text-white" strokeWidth={2.5} />
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            onClick={(e) => { e.stopPropagation(); onEdit(index); }}
-            className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-          >
-            <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-          </motion.button>
-        </>
-      )}
-    </div>
-  );
-}
-
-const MediaGrid = React.memo(function MediaGrid({
-  items, activeIndex, coverIndex,
-  onSelect, onRemove, onEdit, onSetCover, onOverflow, onAddMore,
-}: MediaGridProps) {
-  if (items.length === 0) return null;
-
-  const GAP = 2;
-  const MAX_VISIBLE = 4;
-  const visible = items.slice(0, MAX_VISIBLE);
-  const overflow = items.length - MAX_VISIBLE;
-
-  const tileProps = {
-    coverIndex, maxVisible: MAX_VISIBLE, overflow,
-    onSelect, onRemove, onEdit, onSetCover, onOverflow,
-  };
-
-  if (items.length === 1) {
-    const item = items[0];
-    const ratio = item.width && item.height
-      ? Math.min(Math.max(item.width / item.height, 4 / 5), 16 / 9)
-      : 4 / 3;
-    return (
-      <div className="mx-4 mb-2" style={{ borderRadius: 14, overflow: 'hidden', aspectRatio: String(ratio) }}>
-        <Tile item={item} index={0} style={{ width: '100%', height: '100%' }} borderRadius="14px" {...tileProps} />
-      </div>
-    );
-  }
-
-  if (items.length === 2) {
-    return (
-      <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '16/9' }}>
-        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" {...tileProps} />
-        <Tile item={items[1]} index={1} style={{ flex: 1, height: '100%' }} borderRadius="0 14px 14px 0" {...tileProps} />
-      </div>
-    );
-  }
-
-  if (items.length === 3) {
-    return (
-      <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '4/3' }}>
-        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" {...tileProps} />
-        <div className="flex flex-col flex-1" style={{ gap: GAP }}>
-          <Tile item={items[1]} index={1} style={{ flex: 1 }} borderRadius="0 14px 0 0" {...tileProps} />
-          <Tile item={items[2]} index={2} style={{ flex: 1 }} borderRadius="0 0 14px 0" {...tileProps} />
-        </div>
-      </div>
-    );
-  }
-
-  const cornerRadii = ['14px 0 0 0', '0 14px 0 0', '0 0 0 14px', '0 0 14px 0'];
-  return (
-    <div className="mx-4 mb-2 grid grid-cols-2" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '1/1' }}>
-      {visible.map((item, i) => (
-        <Tile key={item.id} item={item} index={i} style={{ aspectRatio: '1/1' }} borderRadius={cornerRadii[i]} {...tileProps} />
-      ))}
-    </div>
-  );
-});
-
 // ─── ComposeScreen ────────────────────────────────────────────────────────────
 
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
@@ -518,22 +240,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
-  
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  // static placeholder — no rotating prompts
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
+  const [trayIndex, setTrayIndex] = useState<number | null>(null);
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
-  const [overflowSheetOpen, setOverflowSheetOpen] = useState(false);
 
   const hasMedia = state.mediaItems.length > 0;
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
-  const activeIsVideo = activeItem?.mediaType === 'video';
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
   useEffect(() => {
@@ -543,13 +263,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Re-focus textarea after media is added (file input steals focus)
   useEffect(() => {
     if (state.mediaItems.length > 0) {
       const timer = setTimeout(() => textareaRef.current?.focus(), 150);
       return () => clearTimeout(timer);
     }
   }, [state.mediaItems.length]);
+
+  // Close tray if trayIndex is out of bounds
+  useEffect(() => {
+    if (trayIndex !== null && trayIndex >= state.mediaItems.length) {
+      setTrayIndex(null);
+    }
+  }, [state.mediaItems.length, trayIndex]);
 
   const charCount = useMemo(() => {
     try {
@@ -586,7 +312,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         setIsProcessing(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
         if (rearCameraInputRef.current) rearCameraInputRef.current.value = '';
-        
       }
     },
     [state.mediaItems.length, addMedia]
@@ -681,14 +406,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     setActiveMedia(index);
   }, [setActiveMedia]);
 
-  const handleOverflow = useCallback(() => {
-    setOverflowSheetOpen(true);
-  }, []);
-
-  const handleAddMore = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
   // ── Publish handler — one-step flow ──
   const handlePublish = useCallback(async () => {
     if (isPublishing) return;
@@ -746,6 +463,218 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state, setStep, onSuccess, isPublishing]);
 
+  // ── Tray item for inline edit ──
+  const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
+
+  // ── Shared caption + course tag block ──
+  const renderCaptionBlock = (minH: number, maxH: number) => (
+    <>
+      {/* Caption area */}
+      <div className="px-4 relative">
+        {/* Amber blinking cursor — only when caption is empty */}
+        {state.caption.length === 0 && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 16,
+            width: 2,
+            height: 24,
+            background: '#F7931E',
+            borderRadius: 1,
+            animation: 'studio-cursor-blink 1s step-end infinite',
+            zIndex: 2,
+            pointerEvents: 'none',
+          }} />
+        )}
+        {/* Mention highlight layer */}
+        {state.mentions.length > 0 && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-4 top-0 pointer-events-none whitespace-pre-wrap break-words"
+            style={{ fontSize: 20, fontWeight: 500, wordBreak: 'break-word', lineHeight: 1.45, minHeight: minH, maxHeight: maxH, overflowY: 'auto', paddingRight: 68 }}
+          >
+            {highlightedCaption}
+          </div>
+        )}
+        <textarea
+          ref={textareaRef}
+          value={state.caption}
+          onChange={(e) => {
+            handleCaptionChange(e);
+            const el = e.target;
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
+          }}
+          placeholder="What's on your mind?"
+          className="w-full resize-none outline-none"
+          style={{
+            background: 'transparent',
+            fontSize: 20,
+            lineHeight: 1.45,
+            fontWeight: 500,
+            color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
+            caretColor: '#F7931E',
+            WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
+            minHeight: minH,
+            maxHeight: maxH,
+            overflowY: 'auto',
+            resize: 'none',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+            paddingRight: 68,
+          }}
+          maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
+        />
+        {/* Amber orb — opens library picker */}
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => fileInputRef.current?.click()}
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 16,
+            width: 42,
+            height: 42,
+            borderRadius: '50%',
+            background: 'rgba(247,147,30,0.10)',
+            border: '1px solid rgba(247,147,30,0.28)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 3,
+          }}
+        >
+          <Plus className="w-5 h-5" style={{ color: '#F7931E' }} strokeWidth={2} />
+        </motion.button>
+      </div>
+
+      {/* Hairline */}
+      <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginTop: 14 }} />
+
+      {/* Course tag */}
+      <div className="px-4 mt-3 mb-3">
+        <AnimatePresence mode="wait">
+          {state.taggedCourses.length === 0 ? (
+            <motion.button
+              key="prompt"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => openPanel('course')}
+              className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
+              style={{
+                background: 'rgba(34,197,94,0.08)',
+                border: '1px solid rgba(34,197,94,0.18)',
+              }}
+            >
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.22)' }}
+              >
+                <span className="text-base">⛳</span>
+              </div>
+              <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
+                Tag where you played
+              </span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
+                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </motion.button>
+          ) : (
+            <motion.div
+              key="tagged"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="flex flex-col gap-1.5 py-1"
+            >
+              {state.taggedCourses.length > 1 && (
+                <p className="text-[10px] font-bold uppercase tracking-[1.5px] mb-1" style={{ color: DARK_TEXT3 }}>
+                  Courses tagged
+                </p>
+              )}
+              {state.taggedCourses.map((course, i) => (
+                <motion.button
+                  key={course.courseId}
+                  layout
+                  initial={{ scale: 0.85, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.85, opacity: 0 }}
+                  onClick={() => openPanel('course')}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
+                  style={{
+                    background: 'rgba(34,197,94,0.08)',
+                    border: '1px solid rgba(34,197,94,0.18)',
+                  }}
+                >
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: 'rgba(34,197,94,0.12)',
+                    border: '1px solid rgba(34,197,94,0.20)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: state.taggedCourses.length > 1 ? 13 : 14,
+                    fontWeight: 700,
+                    color: state.taggedCourses.length > 1 ? 'rgba(34,197,94,0.80)' : undefined,
+                  }}>
+                    {state.taggedCourses.length > 1 ? i + 1 : '⛳'}
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
+                      {course.courseName}
+                    </p>
+                    {course.country && (
+                      <p className="text-[10px] mt-0.5 leading-none" style={{ color: DARK_TEXT3 }}>
+                        {course.region ? `${course.region}, ${course.country}` : course.country}
+                      </p>
+                    )}
+                  </div>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
+                    }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
+                    className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
+                    style={{ background: 'rgba(255,255,255,0.08)' }}
+                  >
+                    <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
+                  </div>
+                </motion.button>
+              ))}
+              {state.taggedCourses.length < 5 && (
+                <motion.button
+                  layout
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => openPanel('course')}
+                  className="flex items-center gap-2"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '7px 12px',
+                    borderRadius: 12,
+                    border: '1.5px dashed rgba(34,197,94,0.18)',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span style={{ fontSize: 14 }}>⛳</span>
+                  <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
+                    Add course
+                  </span>
+                </motion.button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
+  );
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG }}>
@@ -782,356 +711,238 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
-      
 
-      {/* ── Scrollable compose area ── */}
-      <div
-        className="flex-1 overflow-y-auto relative"
-        style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
-      >
-        {/* ── Centering wrapper — centres content when empty, anchors top when active ── */}
+      {/* ── Thumbnail strip (media state only) ── */}
+      {hasMedia && (
         <div
+          className="flex overflow-x-auto shrink-0"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100%',
-            justifyContent: hasMedia || state.caption.length > 0 ? 'flex-start' : 'center',
-            paddingBottom: 'clamp(12px, 3vh, 24px)',
+            gap: 3,
+            padding: '3px 0',
+            scrollbarWidth: 'none',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            background: COMPOSE_BG,
           }}
         >
-
-        {/* ── Media Zone ── */}
-        {hasMedia ? (
-          <>
-            {/* Full bleed 4:5 hero — no horizontal padding */}
-            <div
-              style={{
-                aspectRatio: '4/5',
-                overflow: 'hidden',
-                position: 'relative',
-                background: 'rgba(0,0,0,0.95)',
-              }}
-            >
-              {/* Blurred background for letterboxing */}
-              {(() => {
-                const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
-                if (!item) return null;
-                const isLandscape = item.width && item.height && item.width > item.height;
-                if (!isLandscape) return null;
-                return (
-                  <>
-                    <div className="absolute inset-0" style={{ filter: 'blur(40px) brightness(0.4)', transform: 'scale(1.3)' }}>
-                      {item.mediaType === 'video' ? (
-                        <video src={item.previewUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
-                      ) : (
-                        <img src={item.previewUrl} alt="" className="w-full h-full object-cover" />
-                      )}
-                    </div>
-                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
-                  </>
-                );
-              })()}
-
-              {/* Main media — object-contain */}
-              {(() => {
-                const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
-                if (!item) return null;
-                return item.mediaType === 'video' ? (
-                  <video
-                    src={item.previewUrl}
-                    autoPlay muted loop playsInline
-                    className="absolute inset-0 w-full h-full object-contain"
-                    style={{ pointerEvents: 'none' }}
-                  />
-                ) : (
-                  <img
-                    src={item.previewUrl}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-contain"
-                  />
-                );
-              })()}
-
-              {/* Top scrim for overlays */}
-              <div className="absolute top-0 inset-x-0 h-20 z-[1]" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.45), transparent)' }} />
-
-              {/* Count badge — top left */}
-              <div className="absolute top-3 left-3 z-10">
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                  {coverIndex + 1} / {state.mediaItems.length}
-                </span>
-              </div>
-
-              {/* Edit pill — top right */}
+          {state.mediaItems.map((item, i) => {
+            const isActive = i === coverIndex;
+            return (
               <motion.button
+                key={item.id}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleEdit(state.activeMediaIndex)}
-                className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full"
-                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-              >
-                <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-                <span className="text-[11px] font-semibold text-white">Edit</span>
-              </motion.button>
-            </div>
-
-            {/* Full bleed thumbnail strip — 68px, sharp corners, all items */}
-            {state.mediaItems.length > 1 && (
-              <div
-                className="flex overflow-x-auto"
-                style={{ gap: 4, scrollbarWidth: 'none', padding: '4px 0' }}
-              >
-                {state.mediaItems.map((item, i) => (
-                  <motion.button
-                    key={item.id}
-                    whileTap={{ scale: 0.92 }}
-                    onClick={() => { setCoverIndex(i); setActiveMedia(i); }}
-                    className="shrink-0 overflow-hidden relative"
-                    style={{
-                      width: 68,
-                      height: 68,
-                      borderRadius: 0,
-                      border: i === coverIndex ? '2px solid #F7931E' : 'none',
-                    }}
-                  >
-                    {item.mediaType === 'video' ? (
-                      <video src={item.previewUrl} muted playsInline preload="metadata" className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
-                    ) : (
-                      <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-                    )}
-                    {/* Dim overlay on inactive tiles */}
-                    {i !== coverIndex && (
-                      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.40)' }} />
-                    )}
-                  </motion.button>
-                ))}
-
-                {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-                  <motion.button
-                    whileTap={{ scale: 0.88 }}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="shrink-0 flex items-center justify-center"
-                    style={{
-                      width: 68,
-                      height: 68,
-                      borderRadius: 0,
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1.5px dashed rgba(255,255,255,0.15)',
-                    }}
-                  >
-                    <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
-                  </motion.button>
-                )}
-              </div>
-            )}
-          </>
-        ) : (
-          /* Change 1 — Compact empty state */
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            style={{
-              width: '100%',
-              padding: '28px 0 24px',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', gap: 10,
-              borderRadius: 18,
-              background: 'rgba(255,255,255,0.03)',
-              border: `1.5px dashed rgba(247,147,30,0.25)`,
-              cursor: 'pointer',
-              margin: '8px 16px',
-            }}
-          >
-            <ImageIcon className="w-7 h-7" style={{ color: 'rgba(247,147,30,0.80)' }} strokeWidth={1.5} />
-            <div className="text-center">
-              <p className="text-[14px] font-semibold" style={{ color: DARK_TEXT }}>Add photo or video</p>
-              <p className="text-[12px] mt-1" style={{ color: DARK_TEXT3 }}>Tap Library or Camera below</p>
-            </div>
-          </button>
-        )}
-
-        {/* ── Text input — dark text, static placeholder ── */}
-        <div className="px-4 pt-3 pb-2 relative">
-          {/* Flashing cursor — shows when canvas is blank */}
-          {state.caption.length === 0 && (
-            <div style={{
-              position: 'absolute',
-              top: 12,
-              left: 16,
-              width: 2,
-              height: 22,
-              background: '#F7931E',
-              borderRadius: 1,
-              animation: 'studio-cursor-blink 1s step-end infinite',
-              zIndex: 2,
-              pointerEvents: 'none',
-            }} />
-          )}
-          {/* Mention highlight layer */}
-          {state.mentions.length > 0 && (
-            <div
-              aria-hidden="true"
-              className="absolute inset-x-4 top-3 text-[17px] pointer-events-none whitespace-pre-wrap break-words"
-              style={{ wordBreak: 'break-word', lineHeight: 1.55, minHeight: 26, maxHeight: 79, overflowY: 'auto' }}
-            >
-              {highlightedCaption}
-            </div>
-          )}
-          <textarea
-            ref={textareaRef}
-            value={state.caption}
-            onChange={(e) => {
-              handleCaptionChange(e);
-              // Auto-resize textarea
-              const el = e.target;
-              el.style.height = 'auto';
-              el.style.height = Math.min(el.scrollHeight, 79) + 'px';
-            }}
-            placeholder="What's on your mind?"
-            className="w-full resize-none outline-none"
-            style={{
-              background: 'transparent',
-              fontSize: 17,
-              lineHeight: 1.55,
-              fontWeight: 400,
-              color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
-              caretColor: '#F7931E',
-              WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-              minHeight: 26,
-              maxHeight: 79,
-              overflowY: 'auto',
-              resize: 'none',
-              scrollbarWidth: 'none',
-              WebkitOverflowScrolling: 'touch',
-            }}
-            maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
-          />
-        </div>
-
-        {/* ── Course tag ── */}
-        <div className="px-4 mb-3">
-          <AnimatePresence mode="wait">
-            {state.taggedCourses.length === 0 ? (
-              <motion.button
-                key="prompt"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.18 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => openPanel('course')}
-                className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
+                onClick={() => {
+                  if (trayIndex === i) {
+                    setTrayIndex(null);
+                  } else {
+                    setTrayIndex(i);
+                    setCoverIndex(i);
+                    setActiveMedia(i);
+                  }
+                }}
+                className="shrink-0 relative"
                 style={{
-                  background: 'rgba(34,197,94,0.08)',
-                  border: '1px solid rgba(34,197,94,0.18)',
+                  width: 68,
+                  height: 68,
+                  borderRadius: 0,
+                  overflow: 'hidden',
+                  outline: isActive ? '2.5px solid #F7931E' : 'none',
+                  outlineOffset: isActive ? '-2.5px' : undefined,
                 }}
               >
-                <div
-                  className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.22)' }}
-                >
-                  <span className="text-base">⛳</span>
-                </div>
-                <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
-                  Tag where you played
-                </span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
-                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <img
+                  src={item.thumbnailUrl || item.previewUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+                {item.mediaType === 'video' && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.60)' }}>
+                      <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" strokeWidth={0} />
+                    </div>
+                  </div>
+                )}
+                {/* Dim overlay on inactive tiles */}
+                {!isActive && (
+                  <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.35)' }} />
+                )}
+                {/* Cover pill on active tile */}
+                {isActive && (
+                  <div className="absolute bottom-1 left-1 pointer-events-none" style={{
+                    fontSize: 7, fontWeight: 700, textTransform: 'uppercase',
+                    background: 'rgba(247,147,30,0.85)',
+                    padding: '2px 6px', borderRadius: 20,
+                    color: 'white', letterSpacing: 0.5,
+                  }}>
+                    Cover
+                  </div>
+                )}
               </motion.button>
-            ) : (
-              <motion.div
-                key="tagged"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.18 }}
-                className="flex flex-col gap-1.5 py-1"
-              >
-                {/* Section label for multi-course */}
-                {state.taggedCourses.length > 1 && (
-                  <p className="text-[10px] font-bold uppercase tracking-[1.5px] mb-1" style={{ color: DARK_TEXT3 }}>
-                    Courses tagged
-                  </p>
-                )}
-                {state.taggedCourses.map((course, i) => (
-                  <motion.button
-                    key={course.courseId}
-                    layout
-                    initial={{ scale: 0.85, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.85, opacity: 0 }}
-                    onClick={() => openPanel('course')}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
-                    style={{
-                      background: 'rgba(34,197,94,0.08)',
-                      border: '1px solid rgba(34,197,94,0.18)',
-                    }}
-                  >
-                    {/* Numbered badge for multi-course, golf emoji for single */}
-                    <div style={{
-                      width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                      background: 'rgba(34,197,94,0.12)',
-                      border: '1px solid rgba(34,197,94,0.20)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: state.taggedCourses.length > 1 ? 13 : 14,
-                      fontWeight: 700,
-                      color: state.taggedCourses.length > 1 ? 'rgba(34,197,94,0.80)' : undefined,
-                    }}>
-                      {state.taggedCourses.length > 1 ? i + 1 : '⛳'}
-                    </div>
-                    <div className="text-left flex-1">
-                      <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
-                        {course.courseName}
-                      </p>
-                      {course.country && (
-                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: DARK_TEXT3 }}>
-                          {course.region ? `${course.region}, ${course.country}` : course.country}
-                        </p>
-                      )}
-                    </div>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
-                      }}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
-                      className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ background: 'rgba(255,255,255,0.08)' }}
-                    >
-                      <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
-                    </div>
-                  </motion.button>
-                ))}
-                {state.taggedCourses.length < 5 && (
-                  <motion.button
-                    layout
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => openPanel('course')}
-                    className="flex items-center gap-2"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '7px 12px',
-                      borderRadius: 12,
-                      border: '1.5px dashed rgba(34,197,94,0.18)',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <span style={{ fontSize: 14 }}>⛳</span>
-                    <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
-                      Add course
-                    </span>
-                  </motion.button>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            );
+          })}
 
-        {/* Close centering wrapper */}
+          {/* Add more tile */}
+          {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => fileInputRef.current?.click()}
+              className="shrink-0 flex items-center justify-center"
+              style={{
+                width: 68,
+                height: 68,
+                borderRadius: 0,
+                background: 'rgba(255,255,255,0.04)',
+                borderLeft: '1px dashed rgba(255,255,255,0.10)',
+              }}
+            >
+              <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.22)' }} strokeWidth={2} />
+            </motion.button>
+          )}
         </div>
+      )}
+
+      {/* ── Edit tray (inline, below strip) ── */}
+      <AnimatePresence>
+        {trayItem && trayIndex !== null && (
+          <motion.div
+            key="edit-tray"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="shrink-0 overflow-hidden"
+            style={{
+              background: 'rgba(18,18,18,0.98)',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <div className="flex gap-2.5" style={{ padding: '10px 12px' }}>
+              {/* Preview */}
+              <div
+                className="shrink-0 overflow-hidden relative"
+                style={{
+                  width: 90,
+                  borderRadius: 10,
+                  aspectRatio: trayItem.width && trayItem.height
+                    ? (trayItem.width > trayItem.height ? '16/9' : '3/4')
+                    : '3/4',
+                  alignSelf: 'flex-start',
+                  background: '#000',
+                }}
+              >
+                {/* Letterbox for landscape */}
+                {trayItem.width && trayItem.height && trayItem.width > trayItem.height && (
+                  <>
+                    <img src={trayItem.thumbnailUrl || trayItem.previewUrl} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(20px) brightness(0.4)', transform: 'scale(1.3)' }} />
+                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.35)' }} />
+                  </>
+                )}
+                <img
+                  src={trayItem.thumbnailUrl || trayItem.previewUrl}
+                  alt=""
+                  className="w-full h-full object-contain relative z-[1]"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-1.5 flex-1 justify-center">
+                {/* Set as cover — only when not already cover */}
+                {trayIndex !== coverIndex && (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => { handleSetCover(trayIndex); }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" style={{ color: DARK_ICON }} strokeWidth={2} />
+                    <span className="text-[12px] font-medium" style={{ color: DARK_TEXT }}>Set as cover</span>
+                  </motion.button>
+                )}
+
+                {/* Edit */}
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setTrayIndex(null); handleEdit(trayIndex); }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                >
+                  <Pencil className="w-3.5 h-3.5" style={{ color: DARK_ICON }} strokeWidth={2} />
+                  <span className="text-[12px] font-medium" style={{ color: DARK_TEXT }}>Edit</span>
+                </motion.button>
+
+                {/* Trim — only for video, greyed for images */}
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    if (trayItem.mediaType === 'video') {
+                      setTrayIndex(null);
+                      setActiveMedia(trayIndex);
+                      setStep('TRIM');
+                    }
+                  }}
+                  disabled={trayItem.mediaType !== 'video'}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    opacity: trayItem.mediaType !== 'video' ? 0.4 : 1,
+                  }}
+                >
+                  <Scissors className="w-3.5 h-3.5" style={{ color: DARK_ICON }} strokeWidth={2} />
+                  <span className="text-[12px] font-medium" style={{ color: DARK_TEXT }}>Trim</span>
+                </motion.button>
+
+                {/* Remove */}
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    const id = trayItem.id;
+                    setTrayIndex(null);
+                    removeMedia(id);
+                    if (coverIndex >= state.mediaItems.length - 1) setCoverIndex(Math.max(0, state.mediaItems.length - 2));
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                >
+                  <X className="w-3.5 h-3.5" style={{ color: 'rgba(239,68,68,0.8)' }} strokeWidth={2} />
+                  <span className="text-[12px] font-medium" style={{ color: 'rgba(239,68,68,0.8)' }}>Remove</span>
+                </motion.button>
+              </div>
+
+              {/* Close X */}
+              <motion.button
+                whileTap={{ scale: 0.85 }}
+                onClick={() => setTrayIndex(null)}
+                className="self-start w-6 h-6 flex items-center justify-center rounded-full shrink-0"
+                style={{ background: 'rgba(255,255,255,0.08)' }}
+              >
+                <X className="w-3 h-3" style={{ color: DARK_ICON }} strokeWidth={2.5} />
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Main content area ── */}
+      <div
+        className="flex-1 overflow-y-auto relative flex flex-col"
+        style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
+      >
+        {hasMedia ? (
+          <>
+            {/* Spacer pushes caption to bottom */}
+            <div className="flex-1" />
+            {renderCaptionBlock(52, 110)}
+          </>
+        ) : (
+          <>
+            {/* Empty Fairway state — textarea dominant */}
+            <div className="pt-4">
+              {renderCaptionBlock(90, 210)}
+            </div>
+            {/* Spacer pushes course tag to bottom */}
+            <div className="flex-1" />
+          </>
+        )}
 
         {/* Processing indicator */}
         <AnimatePresence>
@@ -1148,8 +959,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             </motion.div>
           )}
         </AnimatePresence>
-
-        <div className="h-2" />
       </div>
 
       {/* ── Bottom action rail — always dark ── */}
@@ -1170,7 +979,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
         <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0 }}>
 
-          {/* Zone A — Library first (amber primary), then Camera */}
+          {/* Zone A — Library + Camera only */}
           <div className="flex items-center" style={{ gap: 4 }}>
             {/* Library — amber tinted, primary action */}
             <motion.button
@@ -1191,7 +1000,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
 
-            {/* Rear camera */}
+            {/* Camera */}
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={() => rearCameraInputRef.current?.click()}
@@ -1209,7 +1018,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               </div>
               <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Camera</span>
             </motion.button>
-
           </div>
 
           {/* Divider */}
@@ -1270,29 +1078,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               setStep('POSTER');
             }}
             onClose={() => setVideoToolSheetIndex(null)}
-          />,
-          document.body
-        )
-      }
-
-      {/* Overflow sheet — hidden items beyond tile 4 */}
-      {overflowSheetOpen &&
-        createPortal(
-          <OverflowSheet
-            items={state.mediaItems.slice(3)}
-            startIndex={3}
-            onEdit={(index) => {
-              setActiveMedia(index);
-              const item = state.mediaItems[index];
-              if (!item) return;
-              if (item.mediaType === 'video') {
-                setVideoToolSheetIndex(index);
-              } else {
-                setActiveTool(null);
-                setShelfOpen(true);
-              }
-            }}
-            onClose={() => setOverflowSheetOpen(false)}
           />,
           document.body
         )
