@@ -144,7 +144,7 @@ export function StudioHeader({
         </div>
 
         {/* Right action */}
-        <div style={{ justifySelf: 'end' }}>
+        <div style={{ flexShrink: 0 }}>
           {rightAction && (
             rightAction.variant === 'primary' ? (
               <motion.button
