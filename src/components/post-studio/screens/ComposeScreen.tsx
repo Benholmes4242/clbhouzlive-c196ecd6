@@ -474,6 +474,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state, setStep, onSuccess, isPublishing]);
 
+  // Register publish handler on context ref for SchedulePanel access
+  useEffect(() => {
+    publishRef.current = handlePublish;
+    return () => { publishRef.current = null; };
+  }, [handlePublish, publishRef]);
+
   // ── Tray item for inline edit ──
   const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
 
