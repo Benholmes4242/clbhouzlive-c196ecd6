@@ -467,7 +467,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
 
   // ── Shared caption + course tag block ──
-  const renderCaptionBlock = (minH: number, maxH: number) => (
+  const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false) => (
     <>
       {/* Caption area */}
       <div className="px-4 relative">
