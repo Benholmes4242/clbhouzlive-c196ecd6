@@ -467,7 +467,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
 
   // ── Shared caption + course tag block ──
-  const renderCaptionBlock = (minH: number, maxH: number) => (
+  const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false) => (
     <>
       {/* Caption area */}
       <div className="px-4 relative">
@@ -475,8 +475,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         {state.caption.length === 0 && (
           <div style={{
             position: 'absolute',
-            top: 0,
-            left: 16,
+            top: 16,
             width: 2,
             height: 24,
             background: '#F7931E',
@@ -549,8 +548,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         </motion.button>
       </div>
 
-      {/* Hairline */}
+      {/* Hairline below textarea */}
       <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginTop: 14 }} />
+
+      {pushCourseToBottom && <div className="flex-1" />}
+
+      {/* Course tag */}
 
       {/* Course tag */}
       <div className="px-4 mt-3 mb-3">
@@ -936,11 +939,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         ) : (
           <>
             {/* Empty Fairway state — textarea dominant */}
-            <div className="pt-4">
-              {renderCaptionBlock(90, 210)}
+            <div className="pt-4 flex-1 flex flex-col">
+              {renderCaptionBlock(90, 210, true)}
             </div>
-            {/* Spacer pushes course tag to bottom */}
-            <div className="flex-1" />
+          
           </>
         )}
 
@@ -1052,7 +1054,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           <div className="flex-1" />
 
           {/* Zone C — Character count */}
-          <div className="flex items-center justify-center" style={{ width: 36, height: 36 }}>
+          <div className="flex items-center justify-center" style={{ width: 36, height: 36, opacity: charCount === 0 ? 0 : 1, transition: 'opacity 0.15s' }}>
             <CharacterRing count={charCount} />
           </div>
         </div>
