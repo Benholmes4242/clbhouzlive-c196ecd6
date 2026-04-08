@@ -123,10 +123,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   return (
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
       {/* ── Chip filter row (dark bg) ── */}
-      <div style={{ padding: '12px 0 0', background: '#F8FAFC', position: 'sticky', top: '45px', zIndex: 20 }}>
+      <div style={{ background: '#F8FAFC', position: 'sticky', top: '45px', zIndex: 20 }}>
         <div
           className="flex gap-2 overflow-x-auto px-4"
-          style={{ scrollbarWidth: 'none', paddingBottom: 10 }}
+          style={{ scrollbarWidth: 'none', paddingTop: 12, paddingBottom: 10 }}
         >
           <ChipButton
             label="For you"

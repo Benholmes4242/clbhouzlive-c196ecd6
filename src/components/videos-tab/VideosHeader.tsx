@@ -22,7 +22,7 @@ export function VideosHeader({
   return (
     <div
       className="sticky bg-background pb-0 pt-0 px-0"
-      style={{ top: '111px', zIndex: 20, borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      style={{ top: '45px', zIndex: 20, borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div className="px-4 pt-3 pb-2">
         <button
