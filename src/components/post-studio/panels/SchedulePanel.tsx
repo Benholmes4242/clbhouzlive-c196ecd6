@@ -400,7 +400,7 @@ export function SchedulePanel() {
                     {post.content || 'No caption'}
                   </p>
                   <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
-                    {post.scheduled_at ? format(new Date(post.scheduled_at), "EEE d MMM · h:mm a") : ''}
+                    {post.scheduledAt ? format(new Date(post.scheduledAt), "EEE d MMM · h:mm a") : ''}
                   </p>
                 </div>
 
