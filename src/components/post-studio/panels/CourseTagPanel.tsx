@@ -79,7 +79,7 @@ export function CourseTagPanel() {
         }}
         className="absolute inset-x-0 bottom-0 z-40 flex flex-col"
         style={{
-          maxHeight: '72%',
+          maxHeight: '72vh',
           background: '#161616',
           borderRadius: '20px 20px 0 0',
           borderTop: '1px solid rgba(255,255,255,0.10)',
@@ -189,13 +189,17 @@ export function CourseTagPanel() {
           {results.map((course, i) => {
             const isTagged = state.taggedCourses.some((c) => c.courseId === course.id);
             return (
-              <div
+              <button
                 key={course.id}
-                className="flex items-center gap-3"
+                onClick={() => !isTagged && handleSelect(course)}
+                disabled={isTagged}
+                className="w-full flex items-center gap-3"
                 style={{
-                  padding: '11px 0',
+                  padding: '11px 0', minHeight: 56,
                   borderBottom: i < results.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
                   opacity: isTagged ? 0.45 : 1,
+                  cursor: isTagged ? 'default' : 'pointer',
+                  background: 'transparent', border: 'none', textAlign: 'left',
                 }}
               >
                 {/* Course icon */}
@@ -223,18 +227,17 @@ export function CourseTagPanel() {
                 {isTagged ? (
                   <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.28)', flexShrink: 0 }}>Added</span>
                 ) : (
-                  <button
-                    onClick={() => handleSelect(course)}
+                  <div
                     className="flex items-center justify-center shrink-0"
                     style={{
                       width: 28, height: 28, borderRadius: '50%',
-                      background: '#F7931E',
+                      background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.22)',
                     }}
                   >
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#fff', lineHeight: 1 }}>+</span>
-                  </button>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#F7931E', lineHeight: 1 }}>+</span>
+                  </div>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>
