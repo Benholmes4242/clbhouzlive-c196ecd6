@@ -89,8 +89,8 @@ function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selec
 
 type Tab = 'schedule' | 'scheduled';
 
-export function SchedulePanel() {
-  const { state, setScheduledAt, closePanel, publishRef } = usePostStudioContext();
+export function SchedulePanel({ onScheduleConfirmed }: { onScheduleConfirmed?: (v: boolean) => void }) {
+  const { state, setScheduledAt, closePanel } = usePostStudioContext();
   const dragControls = useDragControls();
   const [showDrumPicker, setShowDrumPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('schedule');
@@ -161,12 +161,12 @@ export function SchedulePanel() {
   }, [now, dayIdx, hourIdx, minIdx, setScheduledAt]);
 
   const handleCTA = useCallback(() => {
-    closePanel();
-    if (state.scheduledAt && publishRef.current) {
-      // Small delay to let panel close animation start
-      setTimeout(() => publishRef.current?.(), 50);
+    if (state.scheduledAt) {
+      onScheduleConfirmed?.(true);
+      // scheduledAt is already set from quick-select, just close & let useEffect publish
     }
-  }, [closePanel, state.scheduledAt, publishRef]);
+    closePanel();
+  }, [closePanel, state.scheduledAt, onScheduleConfirmed]);
 
   const scheduledCount = scheduledPosts.length;
 
