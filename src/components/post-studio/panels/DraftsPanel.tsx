@@ -1,12 +1,25 @@
-// DraftsPanel — Saved drafts list bottom sheet, light mode
+// DraftsPanel — Dark sheet, row layout, 3:4 thumbnails, relative timestamps
 import React, { useCallback } from 'react';
-import { Trash2, FileText } from 'lucide-react';
+import { Trash2, FileText, Layers, X } from 'lucide-react';
 import { motion, useDragControls } from 'framer-motion';
 import { useDrafts } from '@/hooks/useDrafts';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
-import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG } from '../tokens';
 import type { PostStudioState } from '../types';
+
+function relativeTime(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diffMs = now - then;
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return `${diffH}h ago`;
+  if (diffH < 48) return 'Yesterday';
+  const diffD = Math.floor(diffH / 24);
+  return `${diffD} days ago`;
+}
 
 export function DraftsPanel() {
   const { dispatch, closePanel } = usePostStudioContext();
@@ -28,32 +41,21 @@ export function DraftsPanel() {
         country: draft.courseCountry ?? undefined,
       }];
     }
-
-    // Restore media from storage
     if (draft.media && draft.media.length > 0) {
       partialState.mediaItems = draft.media.map((m) => {
         const isVideo = m.mediaType === 'video';
         return {
-          id: m.id,
-          file: null as any,
-          mediaType: m.mediaType,
+          id: m.id, file: null as any, mediaType: m.mediaType,
           previewUrl: isVideo ? (m.posterUrl || m.mediaUrl) : m.mediaUrl,
           thumbnailUrl: isVideo ? m.posterUrl || undefined : undefined,
-          duration: m.durationSeconds ?? null,
-          trimStart: 0,
-          trimEnd: m.durationSeconds ?? null,
-          posterTimestamp: 0,
-          posterPreviewUrl: isVideo ? (m.posterUrl ?? null) : null,
-          width: m.width ?? null,
-          height: m.height ?? null,
-          validationError: null,
-          isRestored: true,
-          restoredMediaUrl: m.mediaUrl,
+          duration: m.durationSeconds ?? null, trimStart: 0, trimEnd: m.durationSeconds ?? null,
+          posterTimestamp: 0, posterPreviewUrl: isVideo ? (m.posterUrl ?? null) : null,
+          width: m.width ?? null, height: m.height ?? null, validationError: null,
+          isRestored: true, restoredMediaUrl: m.mediaUrl,
           restoredStreamId: isVideo ? (m.streamId ?? undefined) : undefined,
         } as any;
       });
     }
-
     dispatch({ type: 'LOAD_DRAFT', payload: { draftId: draft.id, state: partialState } });
     closePanel();
   }, [dispatch, closePanel]);
@@ -70,7 +72,7 @@ export function DraftsPanel() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 z-30"
-        style={{ background: 'rgba(0,0,0,0.25)' }}
+        style={{ background: 'rgba(0,0,0,0.55)' }}
         onClick={closePanel}
       />
 
@@ -87,88 +89,151 @@ export function DraftsPanel() {
         onDragEnd={(_e, info) => {
           if (info.offset.y > 80 || info.velocity.y > 400) closePanel();
         }}
-        className="absolute inset-x-0 bottom-0 z-40 rounded-t-[24px] max-h-[75vh] flex flex-col"
+        className="absolute inset-x-0 bottom-0 z-40 flex flex-col"
         style={{
-          background: 'rgba(255,255,255,0.98)',
-          backdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(0,0,0,0.06)',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.08)',
+          maxHeight: '76%',
+          background: '#161616',
+          borderRadius: '20px 20px 0 0',
+          borderTop: '1px solid rgba(255,255,255,0.10)',
         }}
       >
+        {/* Drag handle */}
         <div
           className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing"
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(0,0,0,0.12)' }} />
+          <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
         </div>
 
-        <div className="px-4 pb-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: TEXT_TERTIARY }}>Saved</p>
-          <h3 className="text-sm font-semibold" style={{ color: TEXT_PRIMARY }}>Your Drafts</h3>
+        {/* Header */}
+        <div className="px-5 pb-3 flex items-start justify-between">
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)' }}>Saved</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
+              Your Drafts{drafts.length > 0 && <span style={{ fontSize: 14, fontWeight: 400, color: 'rgba(255,255,255,0.35)', marginLeft: 8 }}>{drafts.length}</span>}
+            </h3>
+          </div>
+          <button
+            onClick={closePanel}
+            className="flex items-center justify-center"
+            style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }}
+          >
+            <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2.5} />
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <div className="flex-1 overflow-y-auto px-5 pb-4" style={{ scrollbarWidth: 'none' }}>
           {isLoading && (
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square rounded-[18px] animate-pulse" style={{ background: 'rgba(0,0,0,0.04)' }} />
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex gap-3" style={{ padding: '12px 0' }}>
+                  <div className="animate-pulse" style={{ width: 72, aspectRatio: '3/4', borderRadius: 10, background: 'rgba(255,255,255,0.04)' }} />
+                  <div className="flex-1 space-y-2 pt-1">
+                    <div className="animate-pulse" style={{ width: '70%', height: 14, borderRadius: 4, background: 'rgba(255,255,255,0.04)' }} />
+                    <div className="animate-pulse" style={{ width: '40%', height: 10, borderRadius: 4, background: 'rgba(255,255,255,0.04)' }} />
+                  </div>
+                </div>
               ))}
             </div>
           )}
 
           {!isLoading && drafts.length === 0 && (
             <div className="flex flex-col items-center text-center py-10">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: ICON_BG, border: '1px solid rgba(0,0,0,0.06)' }}>
-                <FileText className="w-5 h-5" style={{ color: TEXT_TERTIARY }} strokeWidth={1.75} />
+              <div className="flex items-center justify-center mb-3" style={{
+                width: 52, height: 52, borderRadius: 16,
+                background: 'rgba(247,147,30,0.06)', border: '1px solid rgba(247,147,30,0.12)',
+              }}>
+                <FileText className="w-5 h-5" style={{ color: 'rgba(247,147,30,0.50)' }} strokeWidth={1.75} />
               </div>
-              <p className="font-semibold text-sm" style={{ color: TEXT_PRIMARY }}>No drafts yet</p>
-              <p className="text-xs mt-1 max-w-[200px]" style={{ color: TEXT_SECONDARY }}>Start a post and save it to pick up where you left off</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.50)' }}>No drafts yet</p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 4, maxWidth: 200 }}>
+                Start a post and save it to pick up where you left off
+              </p>
             </div>
           )}
 
-          {!isLoading && drafts.length > 0 && (
-            <div className="grid grid-cols-2 gap-3">
-              {drafts.map((draft) => {
-                const firstMedia = draft.media?.[0];
-                const thumbnailUrl = firstMedia?.posterUrl || firstMedia?.mediaUrl;
-                const date = new Date(draft.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                return (
-                  <div
-                    key={draft.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleLoadDraft(draft)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleLoadDraft(draft); } }}
-                    className="relative aspect-square overflow-hidden text-left cursor-pointer"
-                    style={{ borderRadius: 18, border: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)' }}
-                  >
-                    {thumbnailUrl ? (
-                      <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: ICON_BG }}>
-                        <FileText className="w-8 h-8" style={{ color: TEXT_TERTIARY }} strokeWidth={1.5} />
-                      </div>
-                    )}
+          {!isLoading && drafts.length > 0 && drafts.map((draft) => {
+            const firstMedia = draft.media?.[0];
+            const thumbnailUrl = firstMedia?.posterUrl || firstMedia?.mediaUrl;
+            const mediaCount = draft.media?.length ?? 0;
 
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-2">
-                      {draft.content ? (
-                        <p className="text-[10px] line-clamp-2" style={{ color: 'rgba(255,255,255,0.90)' }}>{draft.content}</p>
-                      ) : null}
-                      <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{date}</p>
+            return (
+              <div
+                key={draft.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleLoadDraft(draft)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleLoadDraft(draft); } }}
+                className="flex gap-3 cursor-pointer"
+                style={{
+                  padding: '12px 0',
+                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  alignItems: 'flex-start',
+                }}
+              >
+                {/* Thumbnail */}
+                <div className="relative shrink-0 overflow-hidden" style={{
+                  width: 72, aspectRatio: '3/4', borderRadius: 10,
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                  {thumbnailUrl ? (
+                    <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(247,147,30,0.06)' }}>
+                      <FileText className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.20)' }} strokeWidth={1.5} />
                     </div>
+                  )}
+                  {mediaCount > 1 && (
+                    <div className="absolute bottom-1 right-1 flex items-center gap-0.5 px-1 py-0.5 rounded" style={{
+                      background: 'rgba(0,0,0,0.60)', fontSize: 9, fontWeight: 700, color: '#F7931E',
+                    }}>
+                      <Layers className="w-2.5 h-2.5" strokeWidth={2} />
+                      {mediaCount}
+                    </div>
+                  )}
+                </div>
 
-                    <button
-                      onClick={(e) => handleDelete(e, draft.id)}
-                      className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.12)' }}
-                    >
-                      <Trash2 className="w-3 h-3 text-white" />
-                    </button>
+                {/* Content */}
+                <div className="flex-1 min-w-0 pt-0.5">
+                  {draft.content ? (
+                    <p style={{
+                      fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.92)',
+                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}>
+                      {draft.content}
+                    </p>
+                  ) : (
+                    <p style={{ fontSize: 14, fontStyle: 'italic', color: 'rgba(255,255,255,0.28)' }}>No caption</p>
+                  )}
+                  <div className="flex items-center gap-2 mt-1.5">
+                    {draft.courseName && (
+                      <span className="px-2 py-0.5 rounded-full" style={{
+                        fontSize: 11, fontWeight: 600,
+                        background: 'rgba(34,197,94,0.08)', color: 'rgba(34,197,94,0.60)',
+                        border: '1px solid rgba(34,197,94,0.15)',
+                      }}>
+                        ⛳ {draft.courseName}
+                      </span>
+                    )}
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>{relativeTime(draft.updatedAt)}</span>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                </div>
+
+                {/* Delete */}
+                <button
+                  onClick={(e) => handleDelete(e, draft.id)}
+                  className="flex items-center justify-center shrink-0"
+                  style={{
+                    width: 30, height: 30, borderRadius: '50%',
+                    background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.14)',
+                  }}
+                >
+                  <Trash2 className="w-3 h-3" style={{ color: 'rgba(239,68,68,0.65)' }} />
+                </button>
+              </div>
+            );
+          })}
         </div>
       </motion.div>
     </>

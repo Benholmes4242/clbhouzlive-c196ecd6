@@ -1,35 +1,159 @@
-// SchedulePanel — Schedule date/time picker, light mode
-import React, { useState, useMemo } from 'react';
-import { Clock, Calendar } from 'lucide-react';
+// SchedulePanel — Dark sheet, smart quick options, custom drum picker, no native inputs
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { Zap, Clock, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
-import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG, ICON_COLOR } from '../tokens';
 
-const pad = (n: number) => n.toString().padStart(2, '0');
-const toDateStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const toTimeStr = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const fmt = (d: Date) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+type QuickOption = { id: string; label: string; sub: string; icon: React.ReactNode; getDate: () => Date | null };
+
+function getNextWeekendMorning(): Date {
+  const now = new Date();
+  const day = now.getDay();
+  const daysUntilSat = day === 6 ? 7 : (6 - day);
+  const sat = new Date(now);
+  sat.setDate(sat.getDate() + daysUntilSat);
+  sat.setHours(8, 0, 0, 0);
+  return sat;
+}
+
+function getTonightDate(): Date {
+  const d = new Date();
+  d.setHours(20, 0, 0, 0);
+  if (d <= new Date()) { d.setDate(d.getDate() + 1); }
+  return d;
+}
+
+function getTomorrowMorning(): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(8, 0, 0, 0);
+  return d;
+}
+
+const ITEM_H = 44;
+
+function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selectedIndex: number; onSelect: (i: number) => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = selectedIndex * ITEM_H;
+    }
+  }, []);
+
+  return (
+    <div className="relative flex-1" style={{ height: ITEM_H * 3, overflow: 'hidden' }}>
+      {/* Highlight band */}
+      <div className="absolute inset-x-0 pointer-events-none z-10" style={{
+        top: ITEM_H, height: ITEM_H,
+        background: 'rgba(247,147,30,0.10)',
+        border: '1px solid rgba(247,147,30,0.18)',
+        borderRadius: 10,
+      }} />
+      {/* Fade top/bottom */}
+      <div className="absolute inset-x-0 top-0 z-20 pointer-events-none" style={{ height: ITEM_H, background: 'linear-gradient(to bottom, #161616, transparent)' }} />
+      <div className="absolute inset-x-0 bottom-0 z-20 pointer-events-none" style={{ height: ITEM_H, background: 'linear-gradient(to top, #161616, transparent)' }} />
+
+      <div
+        ref={containerRef}
+        className="h-full overflow-y-auto"
+        style={{ scrollbarWidth: 'none', scrollSnapType: 'y mandatory', paddingTop: ITEM_H, paddingBottom: ITEM_H }}
+      >
+        {items.map((item, i) => {
+          const isSelected = i === selectedIndex;
+          return (
+            <button
+              key={i}
+              onClick={() => onSelect(i)}
+              className="w-full flex items-center justify-center"
+              style={{
+                height: ITEM_H, scrollSnapAlign: 'center',
+                fontSize: isSelected ? 17 : 15,
+                fontWeight: isSelected ? 700 : 400,
+                color: isSelected ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.28)',
+                transition: 'all 150ms',
+              }}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function SchedulePanel() {
   const { state, setScheduledAt, closePanel } = usePostStudioContext();
   const dragControls = useDragControls();
-  const [isScheduling, setIsScheduling] = useState(state.scheduledAt !== null);
+  const [showDrumPicker, setShowDrumPicker] = useState(false);
 
-  const minDate = useMemo(() => { const d = new Date(); d.setMinutes(d.getMinutes() + 5); return d; }, []);
+  const now = useMemo(() => new Date(), []);
 
-  const initDate = state.scheduledAt ?? minDate;
-  const [dateValue, setDateValue] = useState(toDateStr(initDate));
-  const [timeValue, setTimeValue] = useState(toTimeStr(initDate));
+  const quickOptions: QuickOption[] = useMemo(() => [
+    { id: 'now', label: 'Post now', sub: 'Goes live immediately', icon: <Zap className="w-4 h-4" />, getDate: () => null },
+    { id: '1h', label: 'In 1 hour', sub: fmt(new Date(now.getTime() + 3600000)), icon: <Clock className="w-4 h-4" />, getDate: () => new Date(now.getTime() + 3600000) },
+    { id: 'tonight', label: 'Tonight', sub: '8:00 PM', icon: <Clock className="w-4 h-4" />, getDate: getTonightDate },
+    { id: 'tomorrow', label: 'Tomorrow morning', sub: '8:00 AM', icon: <Clock className="w-4 h-4" />, getDate: getTomorrowMorning },
+    { id: 'weekend', label: 'This weekend', sub: 'Sat 8:00 AM', icon: <Clock className="w-4 h-4" />, getDate: getNextWeekendMorning },
+    { id: 'custom', label: 'Pick a time', sub: 'Choose date & time', icon: <Calendar className="w-4 h-4" />, getDate: () => null },
+  ], [now]);
 
-  const combineAndSet = (d: string, t: string) => {
-    const combined = new Date(`${d}T${t}`);
-    if (!isNaN(combined.getTime()) && combined >= minDate) setScheduledAt(combined);
-  };
+  const activeId = useMemo(() => {
+    if (!state.scheduledAt) return 'now';
+    for (const opt of quickOptions) {
+      if (opt.id === 'now' || opt.id === 'custom') continue;
+      const d = opt.getDate();
+      if (d && Math.abs(d.getTime() - state.scheduledAt.getTime()) < 60000) return opt.id;
+    }
+    return 'custom';
+  }, [state.scheduledAt, quickOptions]);
 
-  const handleToggle = () => {
-    if (isScheduling) { setIsScheduling(false); setScheduledAt(null); }
-    else { setIsScheduling(true); combineAndSet(dateValue, timeValue); }
-  };
+  // Drum picker state
+  const dayLabels = useMemo(() => {
+    const labels: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() + i);
+      labels.push(d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+    }
+    return labels;
+  }, [now]);
+
+  const hourLabels = useMemo(() => {
+    const labels: string[] = [];
+    for (let h = 6; h <= 22; h++) {
+      labels.push(h <= 12 ? `${h === 0 ? 12 : h} AM` : `${h - 12} PM`);
+    }
+    return labels;
+  }, []);
+
+  const minuteLabels = ['00', '15', '30', '45'];
+
+  const [dayIdx, setDayIdx] = useState(0);
+  const [hourIdx, setHourIdx] = useState(2); // 8 AM
+  const [minIdx, setMinIdx] = useState(0);
+
+  const handleQuickSelect = useCallback((opt: QuickOption) => {
+    if (opt.id === 'custom') {
+      setShowDrumPicker(true);
+      return;
+    }
+    const d = opt.getDate();
+    setScheduledAt(d);
+  }, [setScheduledAt]);
+
+  const handleDrumConfirm = useCallback(() => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + dayIdx);
+    d.setHours(6 + hourIdx, parseInt(minuteLabels[minIdx]), 0, 0);
+    setScheduledAt(d);
+    setShowDrumPicker(false);
+  }, [now, dayIdx, hourIdx, minIdx, setScheduledAt]);
 
   return (
     <>
@@ -38,7 +162,7 @@ export function SchedulePanel() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 z-30"
-        style={{ background: 'rgba(0,0,0,0.25)' }}
+        style={{ background: 'rgba(0,0,0,0.55)' }}
         onClick={closePanel}
       />
 
@@ -55,109 +179,131 @@ export function SchedulePanel() {
         onDragEnd={(_e, info) => {
           if (info.offset.y > 80 || info.velocity.y > 400) closePanel();
         }}
-        className="absolute inset-x-0 bottom-0 z-40 rounded-t-[24px]"
+        className="absolute inset-x-0 bottom-0 z-40 flex flex-col"
         style={{
-          background: 'rgba(255,255,255,0.98)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(0,0,0,0.06)',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.08)',
+          background: '#161616',
+          borderRadius: '20px 20px 0 0',
+          borderTop: '1px solid rgba(255,255,255,0.10)',
         }}
       >
         <div
-          className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing"
+          className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing"
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(0,0,0,0.12)' }} />
+          <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
         </div>
 
         <div className="px-5 pb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: TEXT_TERTIARY }}>Schedule</p>
-          <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: TEXT_PRIMARY }}>When to post?</h3>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)' }}>Schedule</p>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>When to post?</h3>
         </div>
 
-        <div className="px-5 pb-8 space-y-3">
-          <div
-            className="flex items-center justify-between px-4 py-4 rounded-2xl"
-            style={{ background: isScheduling ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: ICON_BG }}>
-                <Clock className="w-5 h-5" style={{ color: ICON_COLOR }} strokeWidth={1.75} />
-              </div>
-              <div>
-                <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>
-                  {isScheduling ? 'Schedule for later' : 'Post now'}
-                </p>
-                <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
-                  {isScheduling ? 'Choose a date and time' : 'Goes live immediately'}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleToggle}
-              className="flex items-center px-0.5 transition-all"
-              style={{
-                width: 48, height: 28, borderRadius: 99,
-                background: isScheduling ? 'rgba(15,23,42,0.90)' : 'rgba(0,0,0,0.08)',
-              }}
+        <AnimatePresence mode="wait">
+          {showDrumPicker ? (
+            <motion.div
+              key="drum"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="px-5 pb-6"
             >
-              <motion.div
-                animate={{ x: isScheduling ? 20 : 0 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                className="w-6 h-6 rounded-full"
-                style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
-              />
-            </button>
-          </div>
-
-          <AnimatePresence>
-            {isScheduling && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ type: 'spring', damping: 28, stiffness: 360 }}
-                className="overflow-hidden"
+              <button
+                onClick={() => setShowDrumPicker(false)}
+                className="flex items-center gap-1 mb-4"
+                style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.50)' }}
               >
-                <div className="space-y-3 pt-1">
-                  <div className="flex items-center gap-2.5 px-1">
-                    <Calendar className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} strokeWidth={1.75} />
-                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: TEXT_TERTIARY }}>
-                      Select date & time
-                    </span>
-                  </div>
+                <ChevronLeft className="w-4 h-4" /> Back
+              </button>
 
-                  <input
-                    type="date"
-                    value={dateValue}
-                    min={toDateStr(new Date())}
-                    onChange={(e) => { setDateValue(e.target.value); combineAndSet(e.target.value, timeValue); }}
-                    className="w-full px-4 py-3 rounded-xl text-[15px] font-medium outline-none"
-                    style={{ background: '#F8FAFC', border: '1px solid rgba(0,0,0,0.08)', color: TEXT_PRIMARY, colorScheme: 'light' }}
-                  />
+              <div className="flex gap-2 mb-4">
+                <DrumPicker items={dayLabels} selectedIndex={dayIdx} onSelect={setDayIdx} />
+                <DrumPicker items={hourLabels} selectedIndex={hourIdx} onSelect={setHourIdx} />
+                <DrumPicker items={minuteLabels} selectedIndex={minIdx} onSelect={setMinIdx} />
+              </div>
 
-                  <input
-                    type="time"
-                    value={timeValue}
-                    onChange={(e) => { setTimeValue(e.target.value); combineAndSet(dateValue, e.target.value); }}
-                    className="w-full px-4 py-3 rounded-xl text-[15px] font-medium outline-none"
-                    style={{ background: '#F8FAFC', border: '1px solid rgba(0,0,0,0.08)', color: TEXT_PRIMARY, colorScheme: 'light' }}
-                  />
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={handleDrumConfirm}
+                className="w-full flex items-center justify-center"
+                style={{
+                  background: '#F7931E', borderRadius: 16,
+                  fontSize: 15, fontWeight: 700, color: '#fff',
+                  minHeight: 48,
+                }}
+              >
+                Confirm time
+              </motion.button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="quick"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="px-5 pb-4"
+            >
+              <div className="flex flex-col gap-1.5">
+                {quickOptions.map((opt) => {
+                  const isActive = activeId === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleQuickSelect(opt)}
+                      className="w-full flex items-center gap-3"
+                      style={{
+                        padding: '12px 14px', borderRadius: 14,
+                        background: isActive ? 'rgba(247,147,30,0.10)' : 'transparent',
+                        border: isActive ? '1px solid rgba(247,147,30,0.28)' : '1px solid transparent',
+                      }}
+                    >
+                      <div className="shrink-0 flex items-center justify-center" style={{
+                        width: 36, height: 36, borderRadius: 10,
+                        background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
+                        color: isActive ? '#F7931E' : 'rgba(255,255,255,0.35)',
+                      }}>
+                        {opt.icon}
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>{opt.label}</p>
+                        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 1 }}>{opt.sub}</p>
+                      </div>
+                      {opt.id === 'custom' && <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.20)' }} />}
+                      {isActive && opt.id !== 'custom' && (
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ background: '#F7931E' }} />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
 
-                  {state.scheduledAt && (
-                    <p className="px-1 text-xs" style={{ color: TEXT_SECONDARY }}>
-                      Will post {state.scheduledAt.toLocaleDateString('en-GB', {
-                        weekday: 'long', day: 'numeric', month: 'long',
-                        hour: 'numeric', minute: '2-digit',
-                      })}
-                    </p>
-                  )}
+              {/* Confirmation line */}
+              {state.scheduledAt && (
+                <div className="flex items-center gap-2 mt-3 px-3 py-2.5 rounded-xl" style={{
+                  background: 'rgba(247,147,30,0.07)', border: '1px solid rgba(247,147,30,0.14)',
+                }}>
+                  <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />
+                  <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(247,147,30,0.80)' }}>
+                    Will post {fmtDate(state.scheduledAt)}
+                  </span>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+              )}
+
+              {/* CTA */}
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={closePanel}
+                className="w-full flex items-center justify-center mt-3"
+                style={{
+                  borderRadius: 16, fontSize: 15, fontWeight: 700, minHeight: 48,
+                  background: state.scheduledAt ? '#F7931E' : 'rgba(255,255,255,0.08)',
+                  color: state.scheduledAt ? '#fff' : 'rgba(255,255,255,0.55)',
+                }}
+              >
+                {state.scheduledAt ? 'Schedule post' : 'Post now'}
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </>
   );
