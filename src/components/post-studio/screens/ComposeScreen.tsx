@@ -918,7 +918,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <div className="flex-1" />
             {/* Hairline above caption */}
             <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
-            {renderCaptionBlock(52, 110)}
+            {renderCaptionBlock(52, 72)}
           </>
         ) : (
           <>
