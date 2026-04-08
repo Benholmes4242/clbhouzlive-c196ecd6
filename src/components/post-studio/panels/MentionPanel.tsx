@@ -1,11 +1,11 @@
-// MentionPanel — @mention search, light glass bottom sheet
+// MentionPanel — @mention search, dark bottom sheet (matches studio theme)
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Search, X, UserRound } from 'lucide-react';
 import { motion, useDragControls } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
-import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG } from '../tokens';
+import { DARK_TEXT, DARK_TEXT2, DARK_TEXT3, DARK_CARD, DARK_BORDER, DARK_BG, COMPOSE_BG } from '../tokens';
 import type { MentionToken } from '../types';
 
 interface TaggableResult {
