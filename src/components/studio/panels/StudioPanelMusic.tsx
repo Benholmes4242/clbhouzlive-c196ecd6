@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Play, Pause, Music2, VolumeX, X } from 'lucide-react';
+import { Search, Pause, Music2, VolumeX, X } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
 import { MUSIC_LIBRARY, MUSIC_MOODS, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
 
@@ -17,6 +17,32 @@ const MOOD_DESCRIPTORS: Record<string, string> = {
   hype: 'Hype · Energetic',
   upbeat: 'Upbeat · Bright',
 };
+
+/* Animated waveform bars for playing state */
+function WaveformBars() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 14 }}>
+      {[0, 0.15, 0.3, 0.1].map((delay, i) => (
+        <div
+          key={i}
+          style={{
+            width: 3,
+            height: 14,
+            borderRadius: 1.5,
+            background: '#F7931E',
+            animation: `wavebar 0.8s ease-in-out ${delay}s infinite alternate`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes wavebar {
+          0% { transform: scaleY(0.3); }
+          100% { transform: scaleY(1); }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
   const [activeMood, setActiveMood] = useState<string>('all');
@@ -98,18 +124,26 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         <div className="flex items-center gap-1.5 min-w-0">
           {selectedTrack ? (
             <>
-              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.70)' }} />
+              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
               <span className="text-[11px] font-medium truncate" style={{ color: 'rgba(255,255,255,0.70)' }}>
                 {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
               </span>
             </>
           ) : (
-            <>
-              <VolumeX className="w-3 h-3 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.45)' }} />
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <div
+              className="flex items-center gap-1.5"
+              style={{
+                background: 'rgba(247,147,30,0.07)',
+                border: '1px solid rgba(247,147,30,0.14)',
+                borderRadius: 8,
+                padding: '6px 10px',
+              }}
+            >
+              <VolumeX className="w-3 h-3 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.70)' }} />
+              <span style={{ fontSize: 11, color: 'rgba(247,147,30,0.70)' }}>
                 Mutes original audio
               </span>
-            </>
+            </div>
           )}
         </div>
         {selectedTrack && (
@@ -128,7 +162,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       <div className="px-3 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="relative">
           <Search
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 transition-colors"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 transition-colors"
             style={{ color: searchFocused ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.45)' }}
           />
           <input
@@ -138,32 +172,43 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-lg text-sm focus:outline-none text-white"
+            className="w-full focus:outline-none"
             style={{
               background: 'rgba(255,255,255,0.06)',
-              border: searchFocused ? '1.5px solid rgba(255,255,255,0.40)' : '1.5px solid rgba(255,255,255,0.08)',
-              caretColor: '#FFFFFF',
-              boxShadow: searchFocused ? '0 0 0 3px rgba(255,255,255,0.06)' : undefined,
-              // @ts-ignore
-              '--placeholder-color': 'rgba(255,255,255,0.45)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 14,
+              padding: '11px 14px 11px 36px',
+              fontSize: 15,
+              color: 'rgba(255,255,255,0.92)',
+              caretColor: '#F7931E',
             }}
           />
         </div>
       </div>
 
       {/* Mood Tabs */}
-      <div className="flex gap-1.5 px-3 py-2 overflow-x-auto" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="flex gap-1.5 px-3 py-2 overflow-x-auto" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', scrollbarWidth: 'none' }}>
         {MUSIC_MOODS.map(mood => (
           <button
             key={mood.key}
             onClick={() => setActiveMood(mood.key)}
-            className="px-2.5 py-1 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors"
+            className="whitespace-nowrap transition-colors"
             style={activeMood === mood.key ? {
-               background: 'rgba(255,255,255,0.90)',
-              color: '#FFFFFF',
+              background: 'rgba(255,255,255,0.92)',
+              color: '#0D0D0D',
+              borderRadius: 20,
+              padding: '5px 12px',
+              fontSize: 12,
+              fontWeight: 600,
+              border: '1px solid transparent',
             } : {
-              background: 'rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.45)',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 20,
+              padding: '5px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.55)',
             }}
           >
             {mood.label}
@@ -192,8 +237,16 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                   className="px-3 py-2 flex items-center gap-2.5 transition-colors cursor-pointer"
                   style={{
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    background: isSelected ? 'rgba(255,255,255,0.06)' : undefined,
-                    borderLeft: isSelected ? '2px solid rgba(255,255,255,0.90)' : '2px solid transparent',
+                    background: isPlaying
+                      ? 'rgba(247,147,30,0.10)'
+                      : isSelected
+                        ? 'rgba(255,255,255,0.06)'
+                        : undefined,
+                    borderLeft: isPlaying
+                      ? '2px solid rgba(247,147,30,0.50)'
+                      : isSelected
+                        ? '2px solid rgba(255,255,255,0.90)'
+                        : '2px solid transparent',
                   }}
                   onClick={() => handleSelectTrack(track)}
                 >
@@ -205,17 +258,19 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     }}
                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-90"
                     style={isPlaying ? {
-                      background: 'rgba(255,255,255,0.90)',
-                      color: '#FFFFFF',
+                      background: 'rgba(247,147,30,0.15)',
+                      border: '1px solid rgba(247,147,30,0.28)',
                     } : {
                       background: 'rgba(255,255,255,0.08)',
                       color: 'rgba(255,255,255,0.45)',
                     }}
                   >
                     {isPlaying ? (
-                      <Pause className="w-3.5 h-3.5" />
+                      <WaveformBars />
                     ) : (
-                      <Play className="w-3.5 h-3.5 ml-0.5" style={{ color: 'rgba(255,255,255,0.90)' }} />
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M3.5 2L11.5 7L3.5 12V2Z" fill="rgba(255,255,255,0.90)" />
+                      </svg>
                     )}
                   </button>
 
@@ -236,7 +291,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
 
                   {/* Selected indicator */}
                   {isSelected && (
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.90)' }} />
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
                   )}
                 </div>
               );
