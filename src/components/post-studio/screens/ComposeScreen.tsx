@@ -490,6 +490,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             const el = e.target;
             el.style.height = 'auto';
             el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
+            requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
           }}
           placeholder="What's on your mind?"
           className="w-full resize-none outline-none placeholder:text-white/[.16]"
