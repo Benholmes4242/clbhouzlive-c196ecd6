@@ -242,6 +242,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const mentionOverlayRef = useRef<HTMLDivElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
@@ -474,9 +475,26 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         {/* Mention highlight layer */}
         {state.mentions.length > 0 && (
           <div
+            ref={mentionOverlayRef}
             aria-hidden="true"
-            className="absolute inset-x-4 top-0 pointer-events-none whitespace-pre-wrap break-words"
-            style={{ fontSize: 20, fontWeight: 500, wordBreak: 'break-word', lineHeight: 1.45, minHeight: minH, maxHeight: maxH, overflowY: 'auto', paddingRight: 68, paddingTop: 10 }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 16,
+              right: 16,
+              height: 72,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              pointerEvents: 'none',
+              fontSize: 20,
+              fontWeight: 500,
+              lineHeight: 1.45,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              paddingTop: 10,
+              paddingRight: 68,
+              scrollbarWidth: 'none',
+            }}
           >
             {highlightedCaption}
           </div>
@@ -487,6 +505,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           autoFocus
           onChange={(e) => {
             handleCaptionChange(e);
+          }}
+          onScroll={(e) => {
+            if (mentionOverlayRef.current) {
+              mentionOverlayRef.current.scrollTop = e.currentTarget.scrollTop;
+            }
           }}
           placeholder="What's on your mind?"
           className="w-full resize-none outline-none placeholder:text-white/[.16]"
