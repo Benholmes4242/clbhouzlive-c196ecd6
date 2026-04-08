@@ -782,7 +782,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
-      <input ref={frontCameraInputRef} type="file" accept="image/*,video/*" capture="user" onChange={handleFileSelect} className="hidden" />
+      
 
       {/* ── Scrollable compose area ── */}
       <div
