@@ -250,6 +250,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
   const [trayIndex, setTrayIndex] = useState<number | null>(null);
+  const trayAutoOpenedRef = useRef(false);
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
