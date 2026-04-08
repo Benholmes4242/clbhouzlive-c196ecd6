@@ -405,12 +405,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const item = state.mediaItems[index];
     if (!item) return;
     setActiveMedia(index);
-    if (item.mediaType === 'video') {
-      setVideoToolSheetIndex(index);
-    } else {
-      setActiveTool(null);
-      setShelfOpen(true);
-    }
+    setActiveTool(null);
+    setShelfOpen(true);
   }, [state.mediaItems, setActiveMedia]);
 
   const handleSetCover = useCallback((index: number) => {
