@@ -187,7 +187,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                       {isPlaying ? (
                         <WaveformBars />
                       ) : (
-                        <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+                        <svg width="12" height="14" viewBox="0 0 12 14" fill="none" style={{ marginLeft: 2 }}>
                           <path d="M1 1.5L10.5 7L1 12.5V1.5Z" fill="rgba(255,255,255,0.55)" />
                         </svg>
                       )}
