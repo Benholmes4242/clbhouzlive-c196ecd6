@@ -120,12 +120,12 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
   return (
     <div className="flex flex-col h-full">
       {/* Status row */}
-      <div className="px-3 py-1.5 flex items-center justify-between gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="px-4 py-2 flex items-center justify-between gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="flex items-center gap-1.5 min-w-0">
           {selectedTrack ? (
             <>
               <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
-              <span className="text-[11px] font-medium truncate" style={{ color: 'rgba(255,255,255,0.70)' }}>
+              <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.70)' }} className="truncate">
                 {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
               </span>
             </>
@@ -149,21 +149,21 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         {selectedTrack && (
           <button
             onClick={handleRemoveTrack}
-            className="flex items-center gap-1 text-sm px-2 py-0.5 rounded transition-colors flex-shrink-0"
-            style={{ color: '#EF4444' }}
+            className="flex items-center gap-1 px-2 py-0.5 rounded transition-colors flex-shrink-0"
+            style={{ fontSize: 11, color: '#EF4444' }}
           >
             <X className="w-3 h-3" />
-            Remove music
+            Remove
           </button>
         )}
       </div>
 
       {/* Search */}
-      <div className="px-3 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="px-4 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="relative">
           <Search
             className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 transition-colors"
-            style={{ color: searchFocused ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.45)' }}
+            style={{ color: searchFocused ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.40)' }}
           />
           <input
             type="text"
@@ -186,8 +186,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         </div>
       </div>
 
-      {/* Mood Tabs */}
-      <div className="flex gap-1.5 px-3 py-2 overflow-x-auto" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', scrollbarWidth: 'none' }}>
+      {/* Genre chips */}
+      <div className="flex gap-1.5 px-4 py-2 overflow-x-auto flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', scrollbarWidth: 'none' }}>
         {MUSIC_MOODS.map(mood => (
           <button
             key={mood.key}
@@ -217,79 +217,76 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       </div>
 
       {/* Track list */}
-      <div className="flex-1 min-h-0 overflow-y-auto relative" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="flex-1 min-h-0 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
         {filteredTracks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 px-4">
-            <Music2 className="w-10 h-10 mb-2" style={{ color: 'rgba(255,255,255,0.45)' }} />
-            <p className="text-[12px] text-center" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <Music2 className="w-8 h-8 mb-2" style={{ color: 'rgba(255,255,255,0.20)' }} />
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)' }}>
               No tracks found
             </p>
           </div>
         ) : (
-          <div className="pb-6">
-            {filteredTracks.map(track => {
+          <div className="px-4">
+            {filteredTracks.map((track, i) => {
               const isPlaying = previewingTrack === track.id;
               const isSelected = selectedTrack === track.id;
               
               return (
                 <div
                   key={track.id}
-                  className="px-3 py-2 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  className="flex items-center gap-3 cursor-pointer"
                   style={{
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    background: isPlaying
-                      ? 'rgba(247,147,30,0.10)'
-                      : isSelected
-                        ? 'rgba(255,255,255,0.06)'
-                        : undefined,
-                    borderLeft: isPlaying
-                      ? '2px solid rgba(247,147,30,0.50)'
-                      : isSelected
-                        ? '2px solid rgba(255,255,255,0.90)'
-                        : '2px solid transparent',
+                    padding: '12px 0',
+                    borderBottom: i < filteredTracks.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                    background: isPlaying ? 'rgba(247,147,30,0.08)' : 'transparent',
+                    marginLeft: isPlaying ? -16 : 0,
+                    marginRight: isPlaying ? -16 : 0,
+                    paddingLeft: isPlaying ? 16 : 0,
+                    paddingRight: isPlaying ? 16 : 0,
+                    borderRadius: isPlaying ? 10 : 0,
                   }}
                   onClick={() => handleSelectTrack(track)}
                 >
-                  {/* Preview button */}
+                  {/* Play button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePreviewToggle(track);
                     }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-90"
-                    style={isPlaying ? {
-                      background: 'rgba(247,147,30,0.15)',
-                      border: '1px solid rgba(247,147,30,0.28)',
-                    } : {
-                      background: 'rgba(255,255,255,0.08)',
-                      color: 'rgba(255,255,255,0.45)',
+                    className="flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: '50%',
+                      background: isPlaying ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
+                      border: isPlaying ? '1px solid rgba(247,147,30,0.28)' : '1px solid rgba(255,255,255,0.08)',
                     }}
                   >
                     {isPlaying ? (
                       <WaveformBars />
                     ) : (
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M3.5 2L11.5 7L3.5 12V2Z" fill="rgba(255,255,255,0.90)" />
+                      <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+                        <path d="M1 1.5L10.5 7L1 12.5V1.5Z" fill="rgba(255,255,255,0.55)" />
                       </svg>
                     )}
                   </button>
 
                   {/* Track info */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-[13px] font-medium truncate leading-tight text-white">
+                    <div className="truncate leading-tight" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.90)' }}>
                       {track.title}
                     </div>
-                    <div className="text-[11px] truncate leading-tight" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                    <div className="truncate leading-tight" style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', marginTop: 2 }}>
                       {MOOD_DESCRIPTORS[track.mood] || track.mood}
                     </div>
                   </div>
 
                   {/* Duration */}
-                  <div className="text-[11px] flex-shrink-0 font-mono" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <div className="flex-shrink-0 font-mono" style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)' }}>
                     {track.duration}
                   </div>
 
-                  {/* Selected indicator */}
+                  {/* Selected dot */}
                   {isSelected && (
                     <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
                   )}
@@ -298,9 +295,6 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             })}
           </div>
         )}
-        
-        {/* Bottom fade gradient */}
-        <div className="sticky bottom-0 left-0 right-0 h-8 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(10,10,10,0.98), transparent)' }} />
       </div>
     </div>
   );
