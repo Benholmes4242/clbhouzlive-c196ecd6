@@ -205,6 +205,7 @@ interface PostStudioContextValue {
   setMentionTriggerIndex: (index: number) => void;
   reset: () => void;
   onSuccess?: (postId: string) => void;
+  publishRef: React.MutableRefObject<(() => void) | null>;
 }
 
 const PostStudioContext = createContext<PostStudioContextValue | null>(null);
