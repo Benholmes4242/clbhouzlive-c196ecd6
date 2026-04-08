@@ -51,9 +51,9 @@ export function TrimScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D' }}>
+    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D', minHeight: 0, overflow: 'hidden' }}>
       {/* Header */}
-      <header className="flex items-center justify-between px-4 shrink-0" style={{ paddingTop: 'env(safe-area-inset-top, 12px)', minHeight: 52 }}>
+      <header className="flex items-center justify-between px-4 shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', minHeight: 52 }}>
         <button onClick={() => setStep('COMPOSE')} style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
           Cancel
         </button>
@@ -113,10 +113,11 @@ export function TrimScreen() {
       </div>
 
       {/* Trim controls */}
-      <div style={{
+      <div className="shrink-0" style={{
         background: 'rgba(12,12,12,0.98)',
         borderTop: '1px solid rgba(255,255,255,0.08)',
-        padding: '16px 16px 24px',
+        padding: '16px 16px',
+        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
       }}>
         {/* Timestamp row */}
         <div className="flex items-center justify-between mb-3.5">
