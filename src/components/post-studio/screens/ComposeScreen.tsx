@@ -935,45 +935,43 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         )}
       </AnimatePresence>
 
-      {/* ── Main content area ── */}
-      <div
-        className="flex-1 overflow-y-auto relative flex flex-col"
-        style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
-      >
-        {hasMedia ? (
-          <>
-            {/* Spacer pushes caption to bottom */}
-            <div className="flex-1" />
-            {/* Hairline above caption */}
+      {hasMedia ? (
+        <>
+          {/* Spacer — only when tray is closed, pushes caption to bottom */}
+          {trayIndex === null && <div className="flex-1" />}
+
+          {/* Caption block — fixed, directly below tray */}
+          <div className="shrink-0">
             <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
             {renderCaptionBlock(52, 72)}
-          </>
-        ) : (
-          <>
-            {/* Empty Fairway state — textarea dominant */}
-            <div className="pt-4 flex-1 flex flex-col">
-              {renderCaptionBlock(90, 210, true)}
-            </div>
-          
-          </>
-        )}
+          </div>
 
-        {/* Processing indicator */}
-        <AnimatePresence>
-          {isProcessing && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center gap-2 px-4 py-2 text-sm"
-              style={{ color: DARK_TEXT3 }}
-            >
-              <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.12)', borderTopColor: 'transparent' }} />
-              Processing…
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          {/* Processing indicator */}
+          <AnimatePresence>
+            {isProcessing && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="shrink-0 flex items-center gap-2 px-4 py-2 text-sm"
+                style={{ color: DARK_TEXT3 }}
+              >
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.12)', borderTopColor: 'transparent' }} />
+                Processing…
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      ) : (
+        <div
+          className="flex-1 overflow-y-auto relative flex flex-col"
+          style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
+        >
+          <div className="pt-4 flex-1 flex flex-col">
+            {renderCaptionBlock(90, 210, true)}
+          </div>
+        </div>
+      )}
 
       {/* ── Bottom action rail — always dark ── */}
       <div
