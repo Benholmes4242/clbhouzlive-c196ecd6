@@ -829,7 +829,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               position: 'relative',
               zIndex: 10,
               background: 'rgba(18,18,18,0.98)',
-              borderBottom: '1px solid rgba(255,255,255,0.08)',
+               borderBottom: 'none',
+               marginBottom: 0,
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -852,7 +853,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 />
                 {/* Cover badge */}
                 {trayIndex === coverIndex && (
-                  <div className="absolute top-2 left-2 z-[2] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)', fontSize: 9, fontWeight: 700, color: '#111', letterSpacing: 0.5 }}>
+                  <div className="absolute z-[2]" style={{ top: 8, left: 8, background: 'rgba(247,147,30,0.85)', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, letterSpacing: 0.5 }}>
                     Cover
                   </div>
                 )}
@@ -863,7 +864,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 display: 'grid',
                 gridTemplateColumns: trayIndex !== coverIndex ? 'repeat(4,1fr)' : 'repeat(3,1fr)',
                 gap: 4,
-                padding: 8,
+                padding: '4px 8px 0',
               }}>
                 {/* Cover */}
                 {trayIndex !== coverIndex && (
