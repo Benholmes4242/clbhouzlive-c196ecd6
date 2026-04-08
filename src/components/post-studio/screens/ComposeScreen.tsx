@@ -476,6 +476,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state, setStep, onSuccess, isPublishing, schedulePublishRef]);
 
+  // Register handlePublish on context ref so SchedulePanel "Post now" can call it
+  postNowRef.current = handlePublish;
+
   // Auto-publish once scheduledAt is committed to state
   useEffect(() => {
     if (

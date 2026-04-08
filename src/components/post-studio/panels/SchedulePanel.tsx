@@ -169,7 +169,7 @@ function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, de
 type Tab = 'schedule' | 'scheduled';
 
 export function SchedulePanel() {
-  const { state, setScheduledAt, closePanel, schedulePublishRef } = usePostStudioContext();
+  const { state, setScheduledAt, closePanel, schedulePublishRef, postNowRef } = usePostStudioContext();
   const dragControls = useDragControls();
   const [showDrumPicker, setShowDrumPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('schedule');
