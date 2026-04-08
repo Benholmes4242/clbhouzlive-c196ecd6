@@ -51,7 +51,7 @@ export function StudioHeader({
     <header
       className="flex flex-col shrink-0"
       style={{
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        paddingTop: 'env(safe-area-inset-top, 12px)',
         background: 'transparent',
       }}
     >

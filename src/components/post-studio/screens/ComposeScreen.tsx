@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Camera, SwitchCamera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock,
+  Camera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -518,7 +518,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
-  const frontCameraInputRef = useRef<HTMLInputElement>(null);
+  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // static placeholder — no rotating prompts
   const [isProcessing, setIsProcessing] = useState(false);
@@ -586,7 +586,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         setIsProcessing(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
         if (rearCameraInputRef.current) rearCameraInputRef.current.value = '';
-        if (frontCameraInputRef.current) frontCameraInputRef.current.value = '';
+        
       }
     },
     [state.mediaItems.length, addMedia]
@@ -782,7 +782,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
-      <input ref={frontCameraInputRef} type="file" accept="image/*,video/*" capture="user" onChange={handleFileSelect} className="hidden" />
+      
 
       {/* ── Scrollable compose area ── */}
       <div
@@ -1031,7 +1031,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   <span className="text-base">⛳</span>
                 </div>
                 <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
-                  Where did you play?
+                  Tag where you played
                 </span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1168,7 +1168,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 80%, transparent 100%)`,
         }} />
 
-        <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
+        <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0 }}>
 
           {/* Zone A — Library first (amber primary), then Camera */}
           <div className="flex items-center" style={{ gap: 4 }}>
@@ -1207,27 +1207,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               }}>
                 <Camera className="w-[18px] h-[18px]" style={{ color: DARK_ICON }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Rear</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Camera</span>
             </motion.button>
 
-            {/* Front */}
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => frontCameraInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex flex-col items-center justify-center disabled:opacity-40"
-              style={{ width: 52, height: 54, gap: 3 }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 13,
-                background: DARK_CARD,
-                border: `1px solid ${DARK_BORDER}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: DARK_ICON }} strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Selfie</span>
-            </motion.button>
           </div>
 
           {/* Divider */}

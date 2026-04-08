@@ -9,12 +9,14 @@ interface PostStudioStoreState {
   initialMedia: File[];
   initialActorType: StudioActorType;
   initialActorId: string | null;
+  returnPath: string;
 
   /** Open the studio (optionally with pre-selected media or actor) */
   openPostStudio: (opts?: {
     media?: File[];
     actorType?: StudioActorType;
     actorId?: string | null;
+    returnPath?: string;
   }) => void;
 
   /** Close the studio and reset trigger state */
@@ -26,6 +28,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
   initialMedia: [],
   initialActorType: 'personal',
   initialActorId: null,
+  returnPath: '/',
 
   openPostStudio: (opts) =>
     set({
@@ -33,6 +36,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       initialMedia: opts?.media ?? [],
       initialActorType: opts?.actorType ?? 'personal',
       initialActorId: opts?.actorId ?? null,
+      returnPath: opts?.returnPath ?? window.location.pathname,
     }),
 
   closePostStudio: () =>
@@ -41,5 +45,6 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       initialMedia: [],
       initialActorType: 'personal',
       initialActorId: null,
+      returnPath: '/',
     }),
 }));
