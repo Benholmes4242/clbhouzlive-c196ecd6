@@ -832,43 +832,49 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <div className="flex gap-2.5" style={{ padding: '14px 12px 16px', minHeight: 180 }}>
-              {/* Preview */}
-              <div
-                className="shrink-0 overflow-hidden relative"
-                style={{
-                  width: 110,
-                  borderRadius: 10,
-                  alignSelf: 'stretch',
-                  background: '#000',
-                }}
-              >
-                {/* Letterbox for landscape */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Full-width preview */}
+              <div className="relative overflow-hidden" style={{ width: '100%', height: 160, background: '#000' }}>
+                {/* Letterbox blur for landscape */}
                 {trayItem.width && trayItem.height && trayItem.width > trayItem.height && (
                   <>
-                    <img src={trayItem.thumbnailUrl || trayItem.previewUrl} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(20px) brightness(0.4)', transform: 'scale(1.3)' }} />
-                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.35)' }} />
+                    <img src={trayItem.thumbnailUrl || trayItem.previewUrl} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(40px) brightness(0.5)', transform: 'scale(1.15)', opacity: 0.6 }} />
+                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
                   </>
                 )}
                 <img
                   src={trayItem.thumbnailUrl || trayItem.previewUrl}
                   alt=""
-                  className="w-full h-full object-contain relative z-[1]"
+                  className="relative z-[1] w-full h-full"
+                  style={{
+                    objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                  }}
                 />
+                {/* Cover badge */}
+                {trayIndex === coverIndex && (
+                  <div className="absolute top-2 left-2 z-[2] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)', fontSize: 9, fontWeight: 700, color: '#111', letterSpacing: 0.5 }}>
+                    Cover
+                  </div>
+                )}
               </div>
 
-              {/* Actions */}
-              <div className="flex flex-col gap-1.5 flex-1 justify-center">
-                {/* Set as cover — only when not already cover */}
+              {/* Button row */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: trayIndex !== coverIndex ? 'repeat(4,1fr)' : 'repeat(3,1fr)',
+                gap: 4,
+                padding: 8,
+              }}>
+                {/* Cover */}
                 {trayIndex !== coverIndex && (
                   <motion.button
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => { setCoverIndex(trayIndex); setTrayIndex(null); }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                    style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.22)' }}
+                    onClick={() => setCoverIndex(trayIndex)}
+                    className="flex flex-col items-center justify-center"
+                    style={{ background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.25)', borderRadius: 8, padding: '6px 0' }}
                   >
-                    <ImageIcon className="w-3.5 h-3.5" style={{ color: '#F7931E' }} strokeWidth={2} />
-                    <span className="text-[12px] font-medium" style={{ color: '#F7931E' }}>Set as cover</span>
+                    <ImageIcon className="w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2} />
+                    <span style={{ fontSize: 8, fontWeight: 600, color: '#F7931E', marginTop: 2 }}>Cover</span>
                   </motion.button>
                 )}
 
@@ -876,14 +882,14 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setTrayIndex(null); handleEdit(trayIndex); }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                  className="flex flex-col items-center justify-center"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 0' }}
                 >
-                  <Pencil className="w-3.5 h-3.5" style={{ color: DARK_ICON }} strokeWidth={2} />
-                  <span className="text-[12px] font-medium" style={{ color: DARK_TEXT }}>Edit</span>
+                  <Pencil className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
+                  <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.70)', marginTop: 2 }}>Edit</span>
                 </motion.button>
 
-                {/* Trim — only for video, greyed for images */}
+                {/* Trim */}
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
@@ -894,15 +900,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     }
                   }}
                   disabled={trayItem.mediaType !== 'video'}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                  className="flex flex-col items-center justify-center"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
+                    background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 8,
+                    padding: '6px 0',
                     opacity: trayItem.mediaType !== 'video' ? 0.4 : 1,
                   }}
                 >
-                  <Scissors className="w-3.5 h-3.5" style={{ color: DARK_ICON }} strokeWidth={2} />
-                  <span className="text-[12px] font-medium" style={{ color: DARK_TEXT }}>Trim</span>
+                  <Scissors className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
+                  <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.70)', marginTop: 2 }}>Trim</span>
                 </motion.button>
 
                 {/* Remove */}
@@ -914,23 +922,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     removeMedia(id);
                     if (coverIndex >= state.mediaItems.length - 1) setCoverIndex(Math.max(0, state.mediaItems.length - 2));
                   }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                  className="flex flex-col items-center justify-center"
+                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 8, padding: '6px 0' }}
                 >
-                  <X className="w-3.5 h-3.5" style={{ color: 'rgba(239,68,68,0.8)' }} strokeWidth={2} />
-                  <span className="text-[12px] font-medium" style={{ color: 'rgba(239,68,68,0.8)' }}>Remove</span>
+                  <X className="w-4 h-4" style={{ color: 'rgba(239,68,68,0.70)' }} strokeWidth={2} />
+                  <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(239,68,68,0.70)', marginTop: 2 }}>Remove</span>
                 </motion.button>
               </div>
-
-              {/* Close X */}
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={() => setTrayIndex(null)}
-                className="self-start w-6 h-6 flex items-center justify-center rounded-full shrink-0"
-                style={{ background: 'rgba(255,255,255,0.08)' }}
-              >
-                <X className="w-3 h-3" style={{ color: DARK_ICON }} strokeWidth={2.5} />
-              </motion.button>
             </div>
           </motion.div>
         )}
