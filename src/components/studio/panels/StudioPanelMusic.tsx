@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Pause, Music2, VolumeX, X } from 'lucide-react';
+import { Music2, X } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
-import { MUSIC_LIBRARY, MUSIC_MOODS, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
+import { MUSIC_LIBRARY, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
 
 type StudioPanelMusicProps = {
   edits: StudioEdits;
@@ -45,20 +45,11 @@ function WaveformBars() {
 }
 
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
-  const [activeMood, setActiveMood] = useState<string>('all');
   const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
-  const [searchQuery, setSearchQuery] = useState('');
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const filteredTracks = MUSIC_LIBRARY.filter(track => {
-    const matchesMood = activeMood === 'all' || track.mood === activeMood;
-    const matchesSearch = !searchQuery || 
-      track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      track.artist.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesMood && matchesSearch;
-  });
+  const filteredTracks = MUSIC_LIBRARY;
 
   useEffect(() => {
     return () => {
@@ -119,34 +110,15 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
 
   return (
     <div className="flex flex-col h-full">
-      {/* Status row */}
-      <div className="px-4 py-2 flex items-center justify-between gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="flex items-center gap-1.5 min-w-0">
-          {selectedTrack ? (
-            <>
-              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
-              <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.70)' }} className="truncate">
-                {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
-              </span>
-            </>
-          ) : (
-            <div
-              className="flex items-center gap-1.5"
-              style={{
-                background: 'rgba(247,147,30,0.07)',
-                border: '1px solid rgba(247,147,30,0.14)',
-                borderRadius: 8,
-                padding: '6px 10px',
-              }}
-            >
-              <VolumeX className="w-3 h-3 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.70)' }} />
-              <span style={{ fontSize: 11, color: 'rgba(247,147,30,0.70)' }}>
-                Mutes original audio
-              </span>
-            </div>
-          )}
-        </div>
-        {selectedTrack && (
+      {/* Selected track status + remove */}
+      {selectedTrack && (
+        <div className="px-4 py-2 flex items-center justify-between gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
+            <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.70)' }} className="truncate">
+              {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
+            </span>
+          </div>
           <button
             onClick={handleRemoveTrack}
             className="flex items-center gap-1 px-2 py-0.5 rounded transition-colors flex-shrink-0"
@@ -155,66 +127,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             <X className="w-3 h-3" />
             Remove
           </button>
-        )}
-      </div>
-
-      {/* Search */}
-      <div className="px-4 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="relative">
-          <Search
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 transition-colors"
-            style={{ color: searchFocused ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.40)' }}
-          />
-          <input
-            type="text"
-            placeholder="Search music..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
-            className="w-full focus:outline-none"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 14,
-              padding: '11px 14px 11px 36px',
-              fontSize: 15,
-              color: 'rgba(255,255,255,0.92)',
-              caretColor: '#F7931E',
-            }}
-          />
         </div>
-      </div>
-
-      {/* Genre chips */}
-      <div className="flex gap-1.5 px-4 py-2 overflow-x-auto flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', scrollbarWidth: 'none' }}>
-        {MUSIC_MOODS.map(mood => (
-          <button
-            key={mood.key}
-            onClick={() => setActiveMood(mood.key)}
-            className="whitespace-nowrap transition-colors"
-            style={activeMood === mood.key ? {
-              background: 'rgba(255,255,255,0.92)',
-              color: '#0D0D0D',
-              borderRadius: 20,
-              padding: '5px 12px',
-              fontSize: 12,
-              fontWeight: 600,
-              border: '1px solid transparent',
-            } : {
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 20,
-              padding: '5px 12px',
-              fontSize: 12,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.55)',
-            }}
-          >
-            {mood.label}
-          </button>
-        ))}
-      </div>
+      )}
 
       {/* Track list */}
       <div className="flex-1 min-h-0 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
@@ -255,7 +169,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     }}
                     onClick={() => handleSelectTrack(track)}
                   >
-                    {/* Play button */}
+                    {/* Play button — squircle */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -265,7 +179,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                       style={{
                         width: 36,
                         height: 36,
-                        borderRadius: '50%',
+                        borderRadius: 10,
                         background: isPlaying ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
                         border: isPlaying ? '1px solid rgba(247,147,30,0.28)' : '1px solid rgba(255,255,255,0.08)',
                       }}
