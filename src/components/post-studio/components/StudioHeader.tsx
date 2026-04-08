@@ -55,9 +55,9 @@ export function StudioHeader({
         background: 'transparent',
       }}
     >
-      <div className="flex items-center justify-between px-3 relative" style={{ minHeight: '48px' }}>
-        {/* Left action — round pill */}
-        <div className="flex items-center gap-1 min-w-[72px]">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', minHeight: 48, padding: '0 12px' }}>
+        {/* Left action */}
+        <div style={{ justifySelf: 'start' }}>
           {leftAction ? (
             leftAction.icon === 'close' ? (
               <motion.button
@@ -86,8 +86,8 @@ export function StudioHeader({
           ) : <div />}
         </div>
 
-        {/* Centre — absolutely positioned for true centering */}
-        <div className="absolute left-1/2 top-0 bottom-0 flex items-center" style={{ transform: 'translateX(-50%)' }}>
+        {/* Centre — grid auto column guarantees true center */}
+        <div className="flex items-center">
           {showProgress ? (
             <div className="flex items-center gap-4">
               {STEP_LABELS.map((label, i) => {
@@ -143,8 +143,8 @@ export function StudioHeader({
           ) : null}
         </div>
 
-        {/* Right action — amber Post CTA in dark mode */}
-        <div className="flex items-center min-w-[72px] justify-end">
+        {/* Right action */}
+        <div style={{ justifySelf: 'end' }}>
           {rightAction && (
             rightAction.variant === 'primary' ? (
               <motion.button
