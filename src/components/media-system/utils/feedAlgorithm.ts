@@ -46,8 +46,8 @@ function seededRandom(postId: string): number {
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
 function isEditorialCard(p: FeedPost): boolean {
-  return ['pga_card', 'history_card', 'course_of_week_card', 'debate_card',
-          'review_of_week_card', 'tournament_live'].includes(p.postType ?? '');
+  return ['pga_card', 'course_of_week_card',
+          'tournament_live'].includes(p.postType ?? '');
 }
 
 function isReviewPost(p: FeedPost): boolean {
@@ -330,20 +330,8 @@ export function injectPGACard(feedPosts: FeedPost[], pgaCard: FeedPost | null): 
   return ensureEditorialCard(feedPosts, pgaCard, 'pga_card');
 }
 
-export function injectHistoryCard(feedPosts: FeedPost[], card: FeedPost | null): FeedPost[] {
-  return ensureEditorialCard(feedPosts, card, 'history_card');
-}
-
 export function injectCourseOfWeekCard(feedPosts: FeedPost[], card: FeedPost | null): FeedPost[] {
   return ensureEditorialCard(feedPosts, card, 'course_of_week_card');
-}
-
-export function injectDebateCard(feedPosts: FeedPost[], card: FeedPost | null): FeedPost[] {
-  return ensureEditorialCard(feedPosts, card, 'debate_card');
-}
-
-export function injectReviewOfWeekCard(feedPosts: FeedPost[], card: FeedPost | null): FeedPost[] {
-  return ensureEditorialCard(feedPosts, card, 'review_of_week_card');
 }
 
 // ── Combined Orbit pipeline — posts + editorial cards scored together ──────

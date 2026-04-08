@@ -73,10 +73,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   if (
     activePost.postType === 'tournament_result' ||
     activePost.postType === 'pga_card' ||
-    activePost.postType === 'course_of_week_card' ||
-    activePost.postType === 'history_card' ||
-    activePost.postType === 'debate_card' ||
-    activePost.postType === 'review_of_week_card'
+    activePost.postType === 'course_of_week_card'
   ) return null;
 
   const likeState = getLikeState(activePost);
