@@ -45,20 +45,12 @@ function WaveformBars() {
 }
 
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
-  const [activeMood, setActiveMood] = useState<string>('all');
   const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const filteredTracks = MUSIC_LIBRARY.filter(track => {
-    const matchesMood = activeMood === 'all' || track.mood === activeMood;
-    const matchesSearch = !searchQuery || 
-      track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      track.artist.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesMood && matchesSearch;
-  });
+  const filteredTracks = MUSIC_LIBRARY;
 
   useEffect(() => {
     return () => {
