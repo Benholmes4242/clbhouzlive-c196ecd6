@@ -847,8 +847,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <img
                   src={trayItem.thumbnailUrl || trayItem.previewUrl}
                   alt=""
-                  className="relative z-[1] w-full h-full"
+                  className="relative z-[1]"
                   style={{
+                    width: '100%',
+                    height: '100%',
+                    maxHeight: '100%',
                     objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
                   }}
                 />
