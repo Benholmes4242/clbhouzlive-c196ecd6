@@ -36,12 +36,17 @@ function Particle({ delay, angle, distance, opacity }: { delay: number; angle: n
 
 export function SuccessScreen({ onDone }: SuccessScreenProps) {
   const { state } = usePostStudioContext();
+  const hasCalledDone = useRef(false);
   const { isUploading, uploadedCount, totalCount } = useUploadProgress();
   const progress = totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0;
   const isComplete = uploadedCount >= totalCount && totalCount > 0;
   const isScheduled = state.scheduledAt !== null;
 
-  console.log('[DEBUG] SuccessScreen RENDER, isScheduled:', isScheduled, 'step:', state.step);
+  const handleDone = () => {
+    if (hasCalledDone.current) return;
+    hasCalledDone.current = true;
+    onDone();
+  };
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8 relative" style={{ background: '#0D0D0D' }}>
