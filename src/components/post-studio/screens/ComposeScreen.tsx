@@ -1168,7 +1168,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 80%, transparent 100%)`,
         }} />
 
-        <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
+        <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0 }}>
 
           {/* Zone A — Library first (amber primary), then Camera */}
           <div className="flex items-center" style={{ gap: 4 }}>
