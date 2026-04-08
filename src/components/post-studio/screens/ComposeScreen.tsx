@@ -228,9 +228,9 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
 // ─── ComposeScreen ────────────────────────────────────────────────────────────
 
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
-  const {
+   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
-    setCaption, openPanel, updateMediaEdits,
+    setCaption, openPanel, closePanel, updateMediaEdits,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
 
@@ -466,6 +466,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         is_scheduled: !!state.scheduledAt,
       });
       onSuccess?.('');
+      closePanel();
       setStep('SUCCESS');
     } catch (err) {
       console.error('[ComposeScreen] Failed to enqueue:', err);
