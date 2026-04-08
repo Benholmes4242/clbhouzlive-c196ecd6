@@ -241,12 +241,17 @@ export function SchedulePanel() {
 
   const handleCTA = useCallback(() => {
     if (state.scheduledAt) {
+      if (state.mediaItems.length === 0) {
+        toast.error('Add a photo or video before scheduling');
+        closePanel();
+        return;
+      }
       schedulePublishRef.current = true;
       // Re-set scheduledAt to trigger the useEffect in ComposeScreen
       setScheduledAt(new Date(state.scheduledAt.getTime()));
     }
     closePanel();
-  }, [closePanel, state.scheduledAt, schedulePublishRef, setScheduledAt]);
+  }, [closePanel, state.scheduledAt, state.mediaItems.length, schedulePublishRef, setScheduledAt]);
 
   const scheduledCount = scheduledPosts.length;
 
