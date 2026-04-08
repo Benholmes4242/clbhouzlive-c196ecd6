@@ -55,9 +55,9 @@ export function StudioHeader({
         background: 'transparent',
       }}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', minHeight: 48, padding: '0 12px' }}>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, padding: '0 12px' }}>
         {/* Left action */}
-        <div style={{ justifySelf: 'start' }}>
+        <div style={{ flexShrink: 0 }}>
           {leftAction ? (
             leftAction.icon === 'close' ? (
               <motion.button
@@ -86,8 +86,8 @@ export function StudioHeader({
           ) : <div />}
         </div>
 
-        {/* Centre — grid auto column guarantees true center */}
-        <div className="flex items-center">
+        {/* Centre — absolutely positioned for true visual centering */}
+        <div className="flex items-center" style={{ position: 'absolute', left: '50%', transform: rightAction ? 'translateX(calc(-50% - 21px))' : 'translateX(-50%)' }}>
           {showProgress ? (
             <div className="flex items-center gap-4">
               {STEP_LABELS.map((label, i) => {
@@ -144,7 +144,7 @@ export function StudioHeader({
         </div>
 
         {/* Right action */}
-        <div style={{ justifySelf: 'end' }}>
+        <div style={{ flexShrink: 0 }}>
           {rightAction && (
             rightAction.variant === 'primary' ? (
               <motion.button
