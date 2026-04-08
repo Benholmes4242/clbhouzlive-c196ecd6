@@ -22,6 +22,8 @@ import {
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { getFilterClass } from '@/utils/studioFilters';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
