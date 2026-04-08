@@ -30,6 +30,16 @@ export function useRemoveRating({
 
       // Delete rating if it exists
       if (existingRating) {
+        // Delete any shared posts linked to this review first
+        const { error: postsError } = await supabase
+          .from('posts')
+          .delete()
+          .eq('source_review_id', existingRating.id);
+        
+        if (postsError) {
+          console.warn('[Delete Rating] Failed to delete shared posts:', postsError);
+        }
+
         const { error: ratingError } = await supabase
           .from('course_ratings')
           .delete()
