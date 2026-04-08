@@ -1054,7 +1054,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           <div className="flex-1" />
 
           {/* Zone C — Character count */}
-          <div className="flex items-center justify-center" style={{ width: 36, height: 36 }}>
+          <div className="flex items-center justify-center" style={{ width: 36, height: 36, opacity: charCount === 0 ? 0 : 1, transition: 'opacity 0.15s' }}>
             <CharacterRing count={charCount} />
           </div>
         </div>
