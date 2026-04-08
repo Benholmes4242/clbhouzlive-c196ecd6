@@ -420,12 +420,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   // ── Publish handler — one-step flow ──
   const handlePublish = useCallback(async () => {
-    console.log('[DEBUG] handlePublish called, isPublishing:', isPublishing);
-    if (isPublishing) { console.log('[DEBUG] handlePublish EARLY RETURN — isPublishing=true'); return; }
+    if (isPublishing) return;
     setIsPublishing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      console.log('[DEBUG] getUser resolved, user:', !!user);
       if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
 
       const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
@@ -459,9 +457,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         scheduledAt: state.scheduledAt,
       };
 
-      console.log('[DEBUG] about to enqueuePostUpload');
       enqueuePostUpload(input);
-      console.log('[DEBUG] after enqueuePostUpload');
       analyticsEvents.track('post_published', {
         media_count: state.mediaItems.length,
         media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
@@ -471,13 +467,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         is_scheduled: !!state.scheduledAt,
       });
       onSuccess?.('');
-      console.log('[DEBUG] calling closePanel');
       closePanel();
-      console.log('[DEBUG] calling setStep SUCCESS');
       setStep('SUCCESS');
-      console.log('[DEBUG] setStep SUCCESS called');
     } catch (err) {
-      console.error('[DEBUG] handlePublish error:', err);
+      console.error('[ComposeScreen] Failed to enqueue:', err);
       toast.error('Failed to start upload. Please try again.');
       setIsPublishing(false);
       schedulePublishRef.current = false;
