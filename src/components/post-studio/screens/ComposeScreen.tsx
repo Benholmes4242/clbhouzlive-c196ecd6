@@ -704,6 +704,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <div
           className="flex overflow-x-auto shrink-0"
           style={{
+            marginTop: 8,
             gap: 3,
             padding: '3px 0',
             scrollbarWidth: 'none',
