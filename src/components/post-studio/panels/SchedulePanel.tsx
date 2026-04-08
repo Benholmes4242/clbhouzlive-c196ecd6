@@ -1,6 +1,6 @@
 // SchedulePanel — Dark sheet, smart quick options, custom drum picker, no native inputs
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Zap, Clock, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Zap, Clock, Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
@@ -193,9 +193,18 @@ export function SchedulePanel() {
           <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
         </div>
 
-        <div className="px-5 pb-4">
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)' }}>Schedule</p>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>When to post?</h3>
+        <div className="flex items-center justify-between px-5 pb-4">
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)' }}>Schedule</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>When to post?</h3>
+          </div>
+          <button
+            onClick={closePanel}
+            className="flex items-center justify-center shrink-0"
+            style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2.5} />
+          </button>
         </div>
 
         <AnimatePresence mode="wait">
@@ -252,14 +261,14 @@ export function SchedulePanel() {
                       className="w-full flex items-center gap-3"
                       style={{
                         padding: '12px 14px', borderRadius: 14,
-                        background: isActive ? 'rgba(247,147,30,0.10)' : 'transparent',
+                        background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
                         border: isActive ? '1px solid rgba(247,147,30,0.28)' : '1px solid transparent',
                       }}
                     >
                       <div className="shrink-0 flex items-center justify-center" style={{
                         width: 36, height: 36, borderRadius: 10,
                         background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
-                        color: isActive ? '#F7931E' : 'rgba(255,255,255,0.35)',
+                        color: isActive ? '#F7931E' : 'rgba(255,255,255,0.40)',
                       }}>
                         {opt.icon}
                       </div>
@@ -297,6 +306,7 @@ export function SchedulePanel() {
                   borderRadius: 16, fontSize: 15, fontWeight: 700, minHeight: 48,
                   background: state.scheduledAt ? '#F7931E' : 'rgba(255,255,255,0.08)',
                   color: state.scheduledAt ? '#fff' : 'rgba(255,255,255,0.55)',
+                  boxShadow: state.scheduledAt ? '0 4px 20px rgba(247,147,30,0.28)' : 'none',
                 }}
               >
                 {state.scheduledAt ? 'Schedule post' : 'Post now'}
