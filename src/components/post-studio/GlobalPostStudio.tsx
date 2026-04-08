@@ -12,6 +12,8 @@ export function GlobalPostStudio() {
   const navigate = useNavigate();
 
   const handleClose = useCallback(() => {
+    console.log('[DEBUG] GlobalPostStudio handleClose called');
+    console.trace('[DEBUG] GlobalPostStudio handleClose stack');
     closePostStudio();
     navigate(returnPath || '/');
   }, [closePostStudio, navigate, returnPath]);
