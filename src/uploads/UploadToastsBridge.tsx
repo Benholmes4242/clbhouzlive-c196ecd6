@@ -41,6 +41,9 @@ export function UploadToastsBridge() {
       queryClient.invalidateQueries({ 
         queryKey: postKeys.trending() 
       });
+
+      // Invalidate Clubhouse media feeds so new post appears immediately
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
     });
 
     const offFailed = uploadEventBus.on('upload:failed', (evt) => {
