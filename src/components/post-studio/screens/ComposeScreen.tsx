@@ -853,7 +853,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 />
                 {/* Cover badge */}
                 {trayIndex === coverIndex && (
-                  <div className="absolute top-2 left-2 z-[2] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)', fontSize: 9, fontWeight: 700, color: '#111', letterSpacing: 0.5 }}>
+                  <div className="absolute z-[2]" style={{ top: 8, left: 8, background: 'rgba(247,147,30,0.85)', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, letterSpacing: 0.5 }}>
                     Cover
                   </div>
                 )}
