@@ -689,7 +689,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   );
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG }}>
+    <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG, minHeight: 0, overflow: 'hidden' }}>
       <StudioHeader
         centerContent={
           <ActorSelector
