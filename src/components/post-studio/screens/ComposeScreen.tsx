@@ -470,27 +470,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false) => (
     <>
       {/* Caption area */}
-      <div className="px-4 relative">
-        {/* Amber blinking cursor — only when caption is empty */}
-        {state.caption.length === 0 && (
-          <div style={{
-            position: 'absolute',
-            top: 16,
-            width: 2,
-            height: 24,
-            background: '#F7931E',
-            borderRadius: 1,
-            animation: 'studio-cursor-blink 1s step-end infinite',
-            zIndex: 2,
-            pointerEvents: 'none',
-          }} />
-        )}
+      <div className="px-4 relative" style={{ paddingTop: 10 }}>
         {/* Mention highlight layer */}
         {state.mentions.length > 0 && (
           <div
             aria-hidden="true"
             className="absolute inset-x-4 top-0 pointer-events-none whitespace-pre-wrap break-words"
-            style={{ fontSize: 20, fontWeight: 500, wordBreak: 'break-word', lineHeight: 1.45, minHeight: minH, maxHeight: maxH, overflowY: 'auto', paddingRight: 68 }}
+            style={{ fontSize: 20, fontWeight: 500, wordBreak: 'break-word', lineHeight: 1.45, minHeight: minH, maxHeight: maxH, overflowY: 'auto', paddingRight: 68, paddingTop: 10 }}
           >
             {highlightedCaption}
           </div>
@@ -505,7 +491,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
           }}
           placeholder="What's on your mind?"
-          className="w-full resize-none outline-none"
+          className="w-full resize-none outline-none placeholder:text-white/[.16]"
           style={{
             background: 'transparent',
             fontSize: 20,
@@ -979,7 +965,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 80%, transparent 100%)`,
         }} />
 
-        <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0 }}>
+        <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0, paddingTop: 8 }}>
 
           {/* Zone A — Library + Camera only */}
           <div className="flex items-center" style={{ gap: 4 }}>
