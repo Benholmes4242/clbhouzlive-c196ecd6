@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Camera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock,
+  Camera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock, FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { useSaveDraft } from '../hooks/useSaveDraft';
+import { useDrafts } from '@/hooks/useDrafts';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
 import {
   COMPOSE_BG, DARK_TEXT, DARK_TEXT2, DARK_TEXT3, DARK_ICON, DARK_BG, DARK_CARD, DARK_BORDER,
@@ -232,6 +233,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   } = usePostStudioContext();
 
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
+  const { drafts } = useDrafts();
+  const draftsCount = drafts?.length ?? 0;
 
   const handleSaveDraft = useCallback(async () => {
     const ok = await saveDraft();
@@ -1061,6 +1064,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <Clock className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => openPanel('drafts')}
+              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+            >
+              <FileText className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+              {draftsCount > 0 && (
+                <div style={{
+                  position: 'absolute', top: 8, right: 8,
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: '#F7931E',
+                }} />
+              )}
             </motion.button>
           </div>
 
