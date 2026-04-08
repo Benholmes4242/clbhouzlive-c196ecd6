@@ -8,7 +8,7 @@ import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
 import type { TaggedCourse } from '../types';
 
-interface CourseResult { id: string; name: string; country: string; region: string | null; }
+interface CourseResult { id: string; name: string; country: string; region: string | null; global_rank: number | null; }
 
 export function CourseTagPanel() {
   const { state, closePanel, setTaggedCourses } = usePostStudioContext();
@@ -29,7 +29,7 @@ export function CourseTagPanel() {
       try {
         const { data, error } = await supabase
           .from('golf_courses')
-          .select('id, name, country, region')
+          .select('id, name, country, region, global_rank')
           .ilike('name', `%${query}%`)
           .limit(20);
         if (!error && data) setResults(data as CourseResult[]);
@@ -222,6 +222,18 @@ export function CourseTagPanel() {
                     </p>
                   </div>
                 </div>
+
+                {/* Top 100 badge */}
+                {course.global_rank != null && (
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+                    padding: '3px 7px', borderRadius: 20, flexShrink: 0,
+                    background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.22)',
+                    color: '#F7931E', whiteSpace: 'nowrap',
+                  }}>
+                    Top 100
+                  </span>
+                )}
 
                 {/* Action */}
                 {isTagged ? (
