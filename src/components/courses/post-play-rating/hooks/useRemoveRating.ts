@@ -40,6 +40,17 @@ export function useRemoveRating({
           console.warn('[Delete Rating] Failed to delete shared posts:', postsError);
         }
 
+        // Delete associated friend_course_review notifications
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .delete()
+          .eq('entity_id', existingRating.id)
+          .eq('type', 'friend_course_review');
+
+        if (notifError) {
+          console.warn('[Delete Rating] Failed to delete notifications:', notifError);
+        }
+
         const { error: ratingError } = await supabase
           .from('course_ratings')
           .delete()
@@ -81,9 +92,13 @@ export function useRemoveRating({
       queryClient.invalidateQueries({ queryKey: ['media-feed'] });
       queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
       queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
+      queryClient.invalidateQueries({ queryKey: ['friends-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
       queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
       queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
       queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['unseen-friend-reviews'] });
 
       // Trigger badge checking for the user (non-blocking)
       try {

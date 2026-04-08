@@ -134,6 +134,20 @@ const EditRatingModal = ({
       const { data: userResponse } = await supabase.auth.getUser();
       if (!userResponse.user) throw new Error('Not authenticated');
 
+      // Delete shared posts linked to this review
+      await supabase
+        .from('posts')
+        .delete()
+        .eq('source_review_id', ratingId)
+        .eq('user_id', userResponse.user.id);
+
+      // Delete associated notifications
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('entity_id', ratingId)
+        .eq('type', 'friend_course_review');
+
       const { error } = await supabase
         .from('course_ratings')
         .delete()
