@@ -229,7 +229,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, updateMediaEdits,
-    setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
+    setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef, postNowRef,
   } = usePostStudioContext();
 
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
@@ -475,6 +475,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       schedulePublishRef.current = false;
     }
   }, [state, setStep, onSuccess, isPublishing, schedulePublishRef]);
+
+  // Register handlePublish on context ref so SchedulePanel "Post now" can call it
+  postNowRef.current = handlePublish;
 
   // Auto-publish once scheduledAt is committed to state
   useEffect(() => {
