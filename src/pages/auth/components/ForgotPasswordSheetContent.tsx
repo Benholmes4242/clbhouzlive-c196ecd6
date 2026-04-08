@@ -53,7 +53,7 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
         </p>
         <button
           onClick={onBack}
-          className="w-full h-[52px] flex items-center justify-center rounded-full font-medium text-[15px] transition-all active:scale-[0.98] mt-4"
+          className="w-full h-[52px] flex items-center justify-center rounded-full font-medium text-[16px] transition-all active:scale-[0.98] mt-4"
           style={{
             background: 'rgba(255, 255, 255, 0.08)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -78,7 +78,7 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
         >
           <ArrowLeft className="w-4 h-4 text-white/70" />
         </button>
-        <span className="text-white text-[15px] font-medium">Reset password</span>
+        <span className="text-white text-[16px] font-medium">Reset password</span>
       </div>
       
       <p className="text-white/60 text-[14px]">
@@ -94,7 +94,7 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="Email address"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[16px] focus:outline-none transition-colors"
           style={{
             background: 'rgba(255, 255, 255, 0.06)',
             border: errorMessage ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
@@ -110,7 +110,7 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[52px] flex items-center justify-center rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full h-[52px] flex items-center justify-center rounded-full bg-white text-[#0D0F11] font-medium text-[16px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {submitting ? (
           <Loader2 className="w-5 h-5 animate-spin" />

@@ -218,7 +218,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             placeholder="Username"
             maxLength={20}
             disabled={submitting}
-            className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+            className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
             style={{
               background: getInputBackground(usernameFocused),
               border: getInputBorderColor(usernameAvailable, true),
@@ -297,7 +297,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             onBlur={() => setPasswordFocused(false)}
             placeholder="Create password"
             disabled={isPasswordDisabled}
-            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
             style={{
               background: getInputBackground(passwordFocused, isPasswordDisabled),
               border: passwordError 
@@ -367,7 +367,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             onBlur={() => setConfirmPasswordFocused(false)}
             placeholder="Confirm password"
             disabled={isConfirmPasswordDisabled}
-            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
             style={{
               background: getInputBackground(confirmPasswordFocused, isConfirmPasswordDisabled),
               border: showMismatchError 
@@ -424,7 +424,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
       <button
         onClick={onSubmit}
         disabled={isSubmitDisabled}
-        className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
         style={{
           fontWeight: 500,
           background: isSubmitDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',

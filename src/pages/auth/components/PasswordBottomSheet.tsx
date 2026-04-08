@@ -94,7 +94,7 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                   Enter password
                 </h2>
                 <p
-                  className="text-[15px] text-neutral-400 mt-1"
+                  className="text-[16px] text-neutral-400 mt-1"
                 >
                   Welcome back.
                 </p>
@@ -108,7 +108,7 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                     <ArrowLeft className="w-4 h-4 text-neutral-400" />
                   </div>
                   <span
-                    className="text-[15px] text-neutral-300"
+                    className="text-[16px] text-neutral-300"
                   >
                     {email}
                   </span>
@@ -126,7 +126,7 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                       placeholder="Password"
                       disabled={submitting}
                       autoComplete="current-password"
-                      className="w-full h-[56px] px-5 pr-12 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
+                      className="w-full h-[56px] px-5 pr-12 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[16px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
                     />
                     <button
                       type="button"
@@ -146,7 +146,7 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                   <button
                     type="submit"
                     disabled={submitting || !password.trim()}
-                    className={`w-full h-[56px] flex items-center justify-center rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 ${
+                    className={`w-full h-[56px] flex items-center justify-center rounded-full font-medium text-[16px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 ${
                       password.trim() 
                         ? 'bg-white text-[#0D0F11] hover:bg-gray-50 active:brightness-95' 
                         : 'hover:bg-white/[0.08]'
