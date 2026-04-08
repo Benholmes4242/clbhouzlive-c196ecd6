@@ -134,19 +134,28 @@ const EditRatingModal = ({
       const { data: userResponse } = await supabase.auth.getUser();
       if (!userResponse.user) throw new Error('Not authenticated');
 
-      // Delete shared posts linked to this review
-      await supabase
-        .from('posts')
-        .delete()
-        .eq('source_review_id', ratingId)
-        .eq('user_id', userResponse.user.id);
+      // Find the rating ID for cleanup of related records
+      const { data: ratingRow } = await supabase
+        .from('course_ratings')
+        .select('id')
+        .eq('course_id', courseId)
+        .eq('user_id', userResponse.user.id)
+        .maybeSingle();
 
-      // Delete associated notifications
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('entity_id', ratingId)
-        .eq('type', 'friend_course_review');
+      if (ratingRow?.id) {
+        // Delete shared posts linked to this review
+        await supabase
+          .from('posts')
+          .delete()
+          .eq('source_review_id', ratingRow.id);
+
+        // Delete associated notifications
+        await supabase
+          .from('notifications')
+          .delete()
+          .eq('entity_id', ratingRow.id)
+          .eq('type', 'friend_course_review');
+      }
 
       const { error } = await supabase
         .from('course_ratings')
