@@ -88,11 +88,12 @@ export function TrimScreen() {
         >
           <div className="flex items-center justify-center" style={{
             width: 56, height: 56, borderRadius: '50%',
-            background: 'rgba(0,0,0,0.52)', backdropFilter: 'blur(8px)',
+            background: 'rgba(247,147,30,0.90)',
+            boxShadow: '0 4px 20px rgba(247,147,30,0.30)',
           }}>
             {isPlaying
-              ? <Pause className="w-6 h-6" style={{ color: '#F7931E' }} fill="#F7931E" />
-              : <Play className="w-6 h-6 ml-0.5" style={{ color: '#F7931E' }} fill="#F7931E" />
+              ? <Pause className="w-6 h-6" style={{ color: '#fff' }} fill="#fff" />
+              : <Play className="w-6 h-6 ml-0.5" style={{ color: '#fff' }} fill="#fff" />
             }
           </div>
         </button>
