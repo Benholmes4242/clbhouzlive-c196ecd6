@@ -58,7 +58,7 @@ export function BusinessProfilePosts({
     if (businessActor) {
       setActiveActor(businessActor);
     }
-    openPostStudio({ actorType: 'business', actorId: businessId });
+    openPostStudio({ actorType: 'business', actorId: businessId, returnPath: window.location.pathname });
   }, [businessId, availableActors, setActiveActor, openPostStudio]);
 
   // Filter posts based on active filter

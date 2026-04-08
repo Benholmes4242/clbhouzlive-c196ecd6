@@ -13,7 +13,7 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
 
   const handleClick = () => {
-    openPostStudio();
+    openPostStudio({ returnPath: window.location.pathname });
   };
 
   if (variant === 'floating') {
