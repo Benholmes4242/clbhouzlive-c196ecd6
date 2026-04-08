@@ -522,6 +522,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // static placeholder — no rotating prompts
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
