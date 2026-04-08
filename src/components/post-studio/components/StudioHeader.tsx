@@ -57,7 +57,7 @@ export function StudioHeader({
     >
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, padding: '0 12px' }}>
         {/* Left action */}
-        <div style={{ justifySelf: 'start' }}>
+        <div style={{ flexShrink: 0 }}>
           {leftAction ? (
             leftAction.icon === 'close' ? (
               <motion.button
