@@ -249,9 +249,13 @@ export function SchedulePanel() {
       schedulePublishRef.current = true;
       // Re-set scheduledAt to trigger the useEffect in ComposeScreen
       setScheduledAt(new Date(state.scheduledAt.getTime()));
+      closePanel();
+    } else {
+      // "Post now" — close panel first, then trigger publish via ref
+      closePanel();
+      postNowRef.current();
     }
-    closePanel();
-  }, [closePanel, state.scheduledAt, state.mediaItems.length, schedulePublishRef, setScheduledAt]);
+  }, [closePanel, state.scheduledAt, state.mediaItems.length, schedulePublishRef, setScheduledAt, postNowRef]);
 
   const scheduledCount = scheduledPosts.length;
 
