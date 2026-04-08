@@ -820,22 +820,23 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         {trayItem && trayIndex !== null && (
           <motion.div
             key="edit-tray"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="shrink-0 overflow-hidden"
             style={{
+              flex: 1,
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
               position: 'relative',
               zIndex: 10,
               background: 'rgba(18,18,18,0.98)',
-               borderBottom: 'none',
-               marginBottom: 0,
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
               {/* Full-width preview */}
-              <div className="relative overflow-hidden" style={{ width: '100%', height: 160, background: '#000' }}>
+              <div className="relative overflow-hidden" style={{ width: '100%', flex: 1, minHeight: 0, background: '#000' }}>
                 {/* Letterbox blur for landscape */}
                 {trayItem.width && trayItem.height && trayItem.width > trayItem.height && (
                   <>
@@ -860,7 +861,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               </div>
 
               {/* Button row */}
-              <div style={{
+              <div className="shrink-0" style={{
                 display: 'grid',
                 gridTemplateColumns: trayIndex !== coverIndex ? 'repeat(4,1fr)' : 'repeat(3,1fr)',
                 gap: 4,
