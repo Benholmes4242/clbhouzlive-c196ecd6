@@ -583,11 +583,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               transition={{ duration: 0.18 }}
               className="flex flex-col gap-1.5 py-1"
             >
-              {state.taggedCourses.length > 1 && (
-                <p className="text-[10px] font-bold uppercase tracking-[1.5px] mb-1" style={{ color: DARK_TEXT3 }}>
-                  Courses tagged
-                </p>
-              )}
               {state.taggedCourses.map((course, i) => (
                 <motion.button
                   key={course.courseId}
@@ -840,12 +835,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 {trayIndex !== coverIndex && (
                   <motion.button
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => { handleSetCover(trayIndex); }}
+                    onClick={() => { setCoverIndex(trayIndex); setTrayIndex(null); }}
                     className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.22)' }}
                   >
-                    <ImageIcon className="w-3.5 h-3.5" style={{ color: DARK_ICON }} strokeWidth={2} />
-                    <span className="text-[12px] font-medium" style={{ color: DARK_TEXT }}>Set as cover</span>
+                    <ImageIcon className="w-3.5 h-3.5" style={{ color: '#F7931E' }} strokeWidth={2} />
+                    <span className="text-[12px] font-medium" style={{ color: '#F7931E' }}>Set as cover</span>
                   </motion.button>
                 )}
 
@@ -922,6 +917,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           <>
             {/* Spacer pushes caption to bottom */}
             <div className="flex-1" />
+            {/* Hairline above caption */}
+            <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
             {renderCaptionBlock(52, 110)}
           </>
         ) : (
