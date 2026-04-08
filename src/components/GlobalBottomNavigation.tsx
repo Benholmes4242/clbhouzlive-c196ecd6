@@ -126,7 +126,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      openPostStudio();
+      openPostStudio({ returnPath: location.pathname });
     } else if (tab.id === 'debug') {
       const current = localStorage.getItem('CLBHOUZ_VIDEO_DEBUG') === 'true';
       localStorage.setItem('CLBHOUZ_VIDEO_DEBUG', current ? 'false' : 'true');
