@@ -1527,8 +1527,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
                   width: i === currentIndex ? 14 : 5,
                   borderRadius: 99,
                   background: i === currentIndex
-                    ? 'rgba(255,255,255,0.85)'
-                    : 'rgba(255,255,255,0.18)',
+                    ? 'rgba(255,255,255,0.35)'
+                    : 'rgba(255,255,255,0.12)',
                   border: i === currentIndex
                     ? '1px solid rgba(255,255,255,0.40)'
                     : '1px solid rgba(255,255,255,0.15)',
