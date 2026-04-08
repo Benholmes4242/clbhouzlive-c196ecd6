@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Pause, Music2, VolumeX, X } from 'lucide-react';
+import { Music2, X } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
-import { MUSIC_LIBRARY, MUSIC_MOODS, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
+import { MUSIC_LIBRARY, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
 
 type StudioPanelMusicProps = {
   edits: StudioEdits;
