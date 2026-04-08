@@ -86,8 +86,8 @@ export function StudioHeader({
           ) : <div />}
         </div>
 
-        {/* Centre — grid auto column guarantees true center */}
-        <div className="flex items-center">
+        {/* Centre — absolutely positioned for true visual centering */}
+        <div className="flex items-center" style={{ position: 'absolute', left: '50%', transform: rightAction ? 'translateX(calc(-50% - 21px))' : 'translateX(-50%)' }}>
           {showProgress ? (
             <div className="flex items-center gap-4">
               {STEP_LABELS.map((label, i) => {
