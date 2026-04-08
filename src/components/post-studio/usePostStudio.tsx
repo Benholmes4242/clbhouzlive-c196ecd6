@@ -29,6 +29,7 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
         ...state,
         previousStep: state.step,
         step: action.payload,
+        isDirty: action.payload === 'SUCCESS' ? false : state.isDirty,
       };
 
     case 'SET_ACTOR':
