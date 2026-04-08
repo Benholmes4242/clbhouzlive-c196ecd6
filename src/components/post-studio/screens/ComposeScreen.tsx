@@ -506,6 +506,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           onChange={(e) => {
             handleCaptionChange(e);
           }}
+          onScroll={(e) => {
+            if (mentionOverlayRef.current) {
+              mentionOverlayRef.current.scrollTop = e.currentTarget.scrollTop;
+            }
+          }}
           placeholder="What's on your mind?"
           className="w-full resize-none outline-none placeholder:text-white/[.16]"
           style={{
