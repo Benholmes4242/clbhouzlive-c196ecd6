@@ -169,7 +169,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     }}
                     onClick={() => handleSelectTrack(track)}
                   >
-                    {/* Play button */}
+                    {/* Play button — squircle */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -179,7 +179,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                       style={{
                         width: 36,
                         height: 36,
-                        borderRadius: '50%',
+                        borderRadius: 10,
                         background: isPlaying ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
                         border: isPlaying ? '1px solid rgba(247,147,30,0.28)' : '1px solid rgba(255,255,255,0.08)',
                       }}
