@@ -229,6 +229,9 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                     })}
                   </div>
 
+                  {/* Divider */}
+                  <div className="mx-5 mb-3" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
+
                   {/* Who can see this section */}
                   <div className="px-5 pb-2">
                     <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: DARK_TEXT3 }}>
@@ -236,11 +239,14 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                     </p>
                   </div>
 
-                  <div className="px-5 pb-4 flex flex-col gap-2">
+                  <div className="px-5 pb-3 flex flex-col gap-2">
                     {([
-                      { value: 'anyone' as const, label: 'Everyone', desc: 'Visible to all Clbhouz users', icon: '🌍' },
-                      { value: 'followers' as const, label: 'Friends', desc: 'Only people who follow you', icon: '👥' },
-                      { value: 'private' as const, label: 'Only me', desc: 'Private — only you can see this', icon: '🔒' },
+                      { value: 'anyone' as const, label: 'Everyone', desc: 'Visible to all Clbhouz users', icon: '🌍',
+                        activeBg: 'rgba(247,147,30,0.10)', activeBorder: '1px solid rgba(247,147,30,0.28)', checkColor: '#F7931E' },
+                      { value: 'followers' as const, label: 'Friends only', desc: 'Only people who follow you', icon: '👥',
+                        activeBg: 'rgba(34,197,94,0.08)', activeBorder: '1px solid rgba(34,197,94,0.25)', checkColor: '#22c55e' },
+                      { value: 'private' as const, label: 'Only me', desc: 'Private — only you can see this', icon: '🔒',
+                        activeBg: 'rgba(255,255,255,0.07)', activeBorder: '1px solid rgba(255,255,255,0.15)', checkColor: 'rgba(255,255,255,0.55)' },
                     ]).map((opt) => {
                       const isActive = state.visibility === opt.value;
                       return (
@@ -249,8 +255,8 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                           onClick={() => { setVisibility(opt.value); }}
                           className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
                           style={{
-                            background: isActive ? 'rgba(0,103,71,0.12)' : 'rgba(255,255,255,0.04)',
-                            border: isActive ? '1px solid rgba(0,103,71,0.30)' : '1px solid rgba(255,255,255,0.08)',
+                            background: isActive ? opt.activeBg : 'rgba(255,255,255,0.04)',
+                            border: isActive ? opt.activeBorder : '1px solid rgba(255,255,255,0.08)',
                           }}
                         >
                           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)', fontSize: 16 }}>
@@ -261,11 +267,25 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                             <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>{opt.desc}</p>
                           </div>
                           {isActive && (
-                            <Check className="w-5 h-5 shrink-0" style={{ color: '#22c55e' }} strokeWidth={2.5} />
+                            <Check className="w-5 h-5 shrink-0" style={{ color: opt.checkColor }} strokeWidth={2.5} />
                           )}
                         </button>
                       );
                     })}
+                  </div>
+
+                  {/* Summary line */}
+                  <div className="mx-5 mb-4 px-4 py-3 rounded-xl" style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}>
+                    <p style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.50)' }}>
+                      Posting as <span style={{ color: DARK_TEXT, fontWeight: 600 }}>{activeName}</span>
+                      {' · visible to '}
+                      <span style={{ color: DARK_TEXT, fontWeight: 600 }}>
+                        {state.visibility === 'anyone' ? 'Everyone' : state.visibility === 'followers' ? 'Friends only' : 'Only me'}
+                      </span>
+                    </p>
                   </div>
                 </motion.div>
               </>

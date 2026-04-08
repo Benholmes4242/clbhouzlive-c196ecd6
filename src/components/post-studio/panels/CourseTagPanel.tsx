@@ -239,24 +239,26 @@ export function CourseTagPanel() {
           })}
         </div>
 
-        {/* Done CTA */}
-        <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          padding: '10px 20px 24px',
-        }}>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={closePanel}
-            className="w-full flex items-center justify-center"
-            style={{
-              background: '#F7931E', borderRadius: 16,
-              fontSize: 15, fontWeight: 700, color: '#fff',
-              minHeight: 48,
-            }}
-          >
-            Done — {state.taggedCourses.length} course{state.taggedCourses.length !== 1 ? 's' : ''} tagged
-          </motion.button>
-        </div>
+        {/* Done CTA — only when 1+ courses tagged */}
+        {state.taggedCourses.length > 0 && (
+          <div style={{
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            padding: '10px 20px 24px',
+          }}>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={closePanel}
+              className="w-full flex items-center justify-center"
+              style={{
+                background: '#F7931E', borderRadius: 16,
+                fontSize: 15, fontWeight: 700, color: '#fff',
+                minHeight: 48,
+              }}
+            >
+              Done — {state.taggedCourses.length} course{state.taggedCourses.length !== 1 ? 's' : ''} tagged
+            </motion.button>
+          </div>
+        )}
       </motion.div>
     </>
   );
