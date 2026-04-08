@@ -30,6 +30,16 @@ export function useRemoveRating({
 
       // Delete rating if it exists
       if (existingRating) {
+        // Delete any shared posts linked to this review first
+        const { error: postsError } = await supabase
+          .from('posts')
+          .delete()
+          .eq('source_review_id', existingRating.id);
+        
+        if (postsError) {
+          console.warn('[Delete Rating] Failed to delete shared posts:', postsError);
+        }
+
         const { error: ratingError } = await supabase
           .from('course_ratings')
           .delete()
@@ -66,6 +76,14 @@ export function useRemoveRating({
       await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
       await queryClient.refetchQueries({ queryKey: ['course-personal-status'], type: 'active', exact: false });
       await queryClient.refetchQueries({ queryKey: ['user-course-moments'], type: 'active', exact: false });
+
+      // Invalidate feed queries so deleted shared posts disappear
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
 
       // Trigger badge checking for the user (non-blocking)
       try {
