@@ -57,8 +57,9 @@ export default function StudioPanelText({
   onSelectOverlay
 }: StudioPanelTextProps) {
   const [textBoxes, setTextBoxes] = useState<TextOverlay[]>(edits?.textOverlays || []);
-  
-  const [internalSelectedBox, setInternalSelectedBox] = useState<string | null>(null);
+  const [newText, setNewText] = useState('');
+  const [newColor, setNewColor] = useState('#FFFFFF');
+  const [newScale, setNewScale] = useState(1.2);
   const selectedBox = activeOverlayId !== undefined ? activeOverlayId : internalSelectedBox;
   
   const handleSelectBox = useCallback((id: string | null) => {
