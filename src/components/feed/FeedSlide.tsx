@@ -4,12 +4,9 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
-import { HistoryCard } from '@/components/clubhouse/cinematic/HistoryCard';
 import { CourseOfWeekCard } from '@/components/clubhouse/cinematic/CourseOfWeekCard';
-import { WeeklyDebateCard } from '@/components/clubhouse/cinematic/WeeklyDebateCard';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
-import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost, ReviewOfWeekCardFeedPost } from '@/components/media-system/types/media';
-import { ReviewOfWeekCard } from '@/components/clubhouse/cinematic/ReviewOfWeekCard';
+import type { FeedPost, PGACardFeedPost, CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -77,20 +74,6 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
-    // History editorial card
-    if (post.postType === 'history_card') {
-      return (
-        <HistoryCard
-          post={post as unknown as HistoryCardFeedPost}
-          onComment={() => onComment?.()}
-          onLike={() => onLike?.(post)}
-          getLikeState={getLikeState}
-          getCommentCount={getCommentCount}
-          currentUserId={user?.id}
-        />
-      );
-    }
-
     // Course of the week editorial card
     if (post.postType === 'course_of_week_card') {
       return (
@@ -100,29 +83,6 @@ export const FeedSlide = memo(function FeedSlide({
           onLike={() => onLike?.(post)}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
-          currentUserId={user?.id}
-        />
-      );
-    }
-
-    // Weekly debate editorial card
-    if (post.postType === 'debate_card') {
-      return (
-        <WeeklyDebateCard
-          post={post as unknown as DebateCardFeedPost}
-          onComment={() => onComment?.()}
-        />
-      );
-    }
-
-    // Review of the Week card
-    if (post.postType === 'review_of_week_card') {
-      return (
-        <ReviewOfWeekCard
-          post={post as unknown as ReviewOfWeekCardFeedPost}
-          onComment={() => onComment?.()}
-          onLike={() => onLike?.(post)}
-          onShare={() => onShare?.(post)}
           currentUserId={user?.id}
         />
       );
@@ -227,10 +187,7 @@ export const FeedSlide = memo(function FeedSlide({
     >
       {/* PGA card sentinel for IntersectionObserver */}
       {(post.postType === 'pga_card' ||
-        post.postType === 'history_card' ||
-        post.postType === 'course_of_week_card' ||
-        post.postType === 'debate_card' ||
-        post.postType === 'review_of_week_card') && (
+        post.postType === 'course_of_week_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
       {renderContent()}
