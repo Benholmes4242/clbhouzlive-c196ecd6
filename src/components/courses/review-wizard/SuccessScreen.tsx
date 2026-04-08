@@ -1,11 +1,11 @@
 /**
- * Success Screen — Frosted glass + amber gradient checkmark
- * With opt-in Clubhouse share prompt
+ * Success Screen — Two variants: New Review (auto-shared) & Updated Review
+ * Light theme #F8FAFC background with amber hero zone
  */
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Eye, ExternalLink, X } from 'lucide-react';
+import { Check, Eye, Home, X, RotateCw, ArrowRight, Star } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { getScoreTier } from '@/utils/getScoreTier';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
@@ -16,12 +16,50 @@ interface SuccessScreenProps {
   ratingId: string;
   rating?: number | null;
   isEditMode?: boolean;
+  previousRating?: number | null;
   postId?: string;
+  isAutoSharing?: boolean;
+  autoShareComplete?: boolean;
   onViewReview?: () => void;
   onViewPost?: () => void;
+  onGoToClubhouse?: () => void;
   onDone: () => void;
+  onOptOutShare?: () => void;
   onShareToClubhouse?: () => void;
   isSharing?: boolean;
+}
+
+/* ---------- Loading skeleton shown while auto-share is in flight ---------- */
+function ShareLoadingSkeleton() {
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center px-5"
+      style={{ background: '#F8FAFC' }}
+    >
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: -800px 0; }
+          100% { background-position: 800px 0; }
+        }
+        .skel {
+          background: linear-gradient(90deg, #e9eef4 25%, #f1f5f9 50%, #e9eef4 75%);
+          background-size: 800px 100%;
+          animation: shimmer 1.6s infinite linear;
+          border-radius: 12px;
+        }
+      `}</style>
+      {/* Circle */}
+      <div className="skel" style={{ width: 80, height: 80, borderRadius: '50%', marginBottom: 24 }} />
+      {/* Text lines */}
+      <div className="skel" style={{ width: 120, height: 12, marginBottom: 10 }} />
+      <div className="skel" style={{ width: 200, height: 20, marginBottom: 12 }} />
+      {/* Card */}
+      <div className="skel" style={{ width: '80%', maxWidth: 300, height: 72, marginBottom: 24 }} />
+      {/* Buttons */}
+      <div className="skel" style={{ width: '100%', maxWidth: 340, height: 52, marginBottom: 10 }} />
+      <div className="skel" style={{ width: '100%', maxWidth: 340, height: 48 }} />
+    </div>
+  );
 }
 
 export function SuccessScreen({
@@ -30,191 +68,373 @@ export function SuccessScreen({
   ratingId,
   rating,
   isEditMode = false,
+  previousRating,
   postId,
+  isAutoSharing = false,
+  autoShareComplete = false,
   onViewReview,
   onViewPost,
+  onGoToClubhouse,
   onDone,
+  onOptOutShare,
   onShareToClubhouse,
   isSharing = false,
 }: SuccessScreenProps) {
-  const isShared = variant === 'shared';
   const tierData = rating ? getScoreTier(rating) : null;
-  const [showShareBlock, setShowShareBlock] = useState(false);
+  const [optedOut, setOptedOut] = useState(false);
 
-  // Confetti on all success variants
+  // Confetti on mount (after loading)
   useEffect(() => {
+    if (isAutoSharing) return;
     confetti({
       particleCount: 60,
       spread: 60,
       origin: { y: 0.6 },
       colors: ['#F7931E', '#FBBC2E', '#ffffff', '#d97706'],
     });
-  }, []);
+  }, [isAutoSharing]);
 
-  // Fade in share block after 700ms
-  useEffect(() => {
-    if (onShareToClubhouse && !isShared) {
-      const timer = setTimeout(() => setShowShareBlock(true), 700);
-      return () => clearTimeout(timer);
-    }
-  }, [onShareToClubhouse, isShared]);
-  
+  // Show loading skeleton while auto-sharing
+  if (isAutoSharing) {
+    return <ShareLoadingSkeleton />;
+  }
+
+  const courseName = course?.name || 'the course';
+  const isNewReview = !isEditMode;
+
+  const handleOptOut = () => {
+    setOptedOut(true);
+    onOptOutShare?.();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center px-6"
-      style={{
-        background: 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(40px) saturate(200%)',
-      }}
+      className="fixed inset-0 z-[9999] flex flex-col"
+      style={{ background: '#F8FAFC' }}
     >
       {/* Close button */}
       <button
         onClick={onDone}
-        className="absolute top-4 right-4 z-50 w-11 h-11 rounded-full flex items-center justify-center transition-colors active:scale-[0.97]"
+        className="absolute z-50 flex items-center justify-center transition-colors active:scale-[0.97]"
         style={{
-          background: 'hsl(var(--muted) / 0.8)',
-          border: '1.5px solid hsl(var(--border))',
+          top: 16,
+          left: 16,
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          background: 'rgba(0,0,0,0.06)',
         }}
         aria-label="Close"
       >
-        <X className="h-5 w-5 text-foreground" />
+        <X className="h-4 w-4" style={{ color: '#64748b' }} />
       </button>
 
-      {/* Amber gradient checkmark */}
-      <motion.div
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
-        className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-        style={{
-          background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
-          boxShadow: '0 8px 32px rgba(247, 147, 30, 0.3)',
-        }}
-      >
-        <Check className="w-10 h-10 text-white" strokeWidth={3} />
-      </motion.div>
-
-      {/* Title */}
-      <motion.h2
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="text-2xl font-bold text-foreground"
-      >
-        {isShared ? 'Your verdict is live' : (isEditMode ? 'Verdict updated' : 'Verdict saved')}
-      </motion.h2>
-
-      {/* Description */}
-      <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="text-sm text-muted-foreground mt-2 text-center px-8"
-      >
-        {isShared 
-          ? (course?.name || 'Your review')
-          : isEditMode
-            ? `Your updated take on ${course?.name || 'the course'} is live`
-            : `Your take on ${course?.name || 'the course'} is on the record`
-        }
-      </motion.p>
-
-      {/* Rating pill */}
-      {rating != null && tierData && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-6 px-5 py-2.5 rounded-full"
+      {/* Scrollable content */}
+      <div className="flex-1 flex flex-col items-center overflow-y-auto" style={{ padding: '0 20px' }}>
+        {/* Hero zone */}
+        <div
+          className="relative flex items-center justify-center flex-shrink-0"
           style={{
-            background: 'linear-gradient(135deg, rgba(247,147,30,0.1), rgba(247,147,30,0.05))',
-            border: '1.5px solid rgba(247,147,30,0.2)',
+            width: '100%',
+            height: 180,
+            background: 'linear-gradient(180deg, rgba(247,147,30,0.07) 0%, rgba(248,250,252,0) 100%)',
           }}
         >
-          <span className="text-xl font-bold" style={{ color: tierData.accent }}>
-            {rating === 10 ? '10' : rating.toFixed(1)}
-          </span>
-          <span className="text-sm text-muted-foreground ml-1">/10</span>
-          <span className="text-sm text-muted-foreground ml-2">{tierData.label}</span>
-        </motion.div>
-      )}
+          {/* Outer ring */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: 160,
+              height: 160,
+              border: '1px solid rgba(247,147,30,0.10)',
+            }}
+          />
+          {/* Inner ring */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: 120,
+              height: 120,
+              border: '1px solid rgba(247,147,30,0.14)',
+            }}
+          />
+          {/* Amber orb */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
+            className="relative flex items-center justify-center rounded-full"
+            style={{
+              width: 80,
+              height: 80,
+              background: 'rgba(247,147,30,0.12)',
+              border: '1.5px solid rgba(247,147,30,0.28)',
+            }}
+          >
+            {isEditMode ? (
+              <RotateCw className="w-8 h-8" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+            ) : (
+              <Check className="w-8 h-8" style={{ color: '#F7931E' }} strokeWidth={3} />
+            )}
+          </motion.div>
+        </div>
 
-      {/* Opt-in share block — fades in after 700ms */}
-      {onShareToClubhouse && !isShared && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: showShareBlock ? 1 : 0, y: showShareBlock ? 0 : 12 }}
-          transition={{ duration: 0.4 }}
-          className="w-full max-w-[340px] mt-7 rounded-2xl p-5"
-          style={{ background: 'hsl(var(--muted) / 0.6)' }}
+        {/* Eyebrow */}
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: '#F7931E',
+            marginBottom: 8,
+          }}
         >
-          <p className="text-[15px] font-bold text-foreground text-center">
-            Share to Clubhouse?
-          </p>
-          <p className="text-[13px] text-muted-foreground text-center mt-1">
-            Post your verdict so friends can see it in their feed
-          </p>
-          <button
-            type="button"
-            onClick={onShareToClubhouse}
-            disabled={isSharing}
-            className="w-full mt-4 rounded-full text-[14px] font-semibold text-white active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center disabled:opacity-60"
-            style={{ background: '#1C1C1E' }}
-          >
-            {isSharing ? 'Sharing…' : 'Share to Clubhouse'}
-          </button>
-          <button
-            type="button"
-            onClick={onDone}
-            className="w-full mt-2 rounded-full text-[13px] font-medium text-muted-foreground active:scale-[0.97] transition-all min-h-[36px] flex items-center justify-center"
-          >
-            Maybe later
-          </button>
-        </motion.div>
-      )}
+          {isEditMode ? 'RATING UPDATED' : 'COURSE RATED'}
+        </motion.p>
 
-      {/* Actions */}
+        {/* Headline */}
+        <motion.h2
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="success-headline"
+          style={{
+            fontSize: 28,
+            fontWeight: 800,
+            color: '#0f172a',
+            letterSpacing: '-0.5px',
+            margin: 0,
+          }}
+        >
+          {isEditMode ? 'Verdict revised.' : 'On the card.'}
+        </motion.h2>
+
+        {/* Sub-copy */}
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          style={{
+            fontSize: 13,
+            color: '#94a3b8',
+            textAlign: 'center',
+            marginTop: 6,
+            marginBottom: 20,
+            maxWidth: 280,
+          }}
+        >
+          {isEditMode
+            ? `Your updated take on ${courseName} is live`
+            : `Your verdict on ${courseName} is live on clbhouz`}
+        </motion.p>
+
+        {/* Rating card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.55 }}
+          style={{
+            background: '#fff',
+            border: '1px solid #e2e8f0',
+            borderRadius: 16,
+            padding: '14px 16px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+            width: '100%',
+            maxWidth: 340,
+          }}
+        >
+          {isEditMode && previousRating != null ? (
+            /* Before → After card for edits */
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+              {/* Before */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                  BEFORE
+                </span>
+                <span style={{ fontSize: 22, fontWeight: 700, color: '#cbd5e1' }}>
+                  {previousRating === 10 ? '10' : previousRating.toFixed(1)}
+                </span>
+              </div>
+              {/* Arrow */}
+              <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: '#F7931E' }} />
+              {/* Now */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                  NOW
+                </span>
+                <span style={{ fontSize: 24, fontWeight: 800, color: '#F7931E' }}>
+                  {rating != null ? (rating === 10 ? '10' : rating.toFixed(1)) : '—'}
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Standard rating card for new reviews */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+              {/* Score row */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E', marginRight: 2, position: 'relative', top: 1 }} />
+                <span style={{ fontSize: 22, fontWeight: 800, color: tierData?.accent || '#F7931E' }}>
+                  {rating != null ? (rating === 10 ? '10' : rating.toFixed(1)) : '—'}
+                </span>
+                <span style={{ fontSize: 13, color: '#94a3b8' }}>/10</span>
+                {tierData && (
+                  <span style={{ fontSize: 13, color: '#94a3b8', marginLeft: 4 }}>{tierData.label}</span>
+                )}
+              </div>
+
+              {/* In Clubhouse pill */}
+              {isNewReview && !optedOut && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    background: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    borderRadius: 20,
+                    padding: '4px 10px',
+                  }}
+                >
+                  <Check className="w-3 h-3" style={{ color: '#16a34a' }} strokeWidth={3} />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a' }}>
+                    In Clubhouse
+                  </span>
+                </div>
+              )}
+
+              {isNewReview && optedOut && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    background: '#f1f5f9',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: 20,
+                    padding: '4px 10px',
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>
+                    Not shared
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Sub-label for new reviews */}
+        {isNewReview && !optedOut && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.65 }}
+            style={{ fontSize: 11, color: '#cbd5e1', marginTop: 8 }}
+          >
+            Shared to your Clubhouse feed
+          </motion.p>
+        )}
+
+        {/* Spacer to push buttons down */}
+        <div style={{ flex: 1, minHeight: 24 }} />
+      </div>
+
+      {/* Bottom buttons — pinned */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
-        className="flex gap-3 mt-6"
+        className="flex-shrink-0 flex flex-col"
+        style={{
+          padding: '0 20px',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+          gap: 8,
+        }}
       >
-        {isShared ? (
+        {/* Primary CTA */}
+        <button
+          onClick={onViewReview}
+          className="active:scale-[0.98] transition-transform"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            width: '100%',
+            background: '#F7931E',
+            borderRadius: 16,
+            padding: 15,
+            fontSize: 15,
+            fontWeight: 700,
+            color: '#fff',
+            boxShadow: '0 4px 16px rgba(247,147,30,0.28)',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          <Eye className="w-4 h-4" />
+          View my review →
+        </button>
+
+        {/* Secondary CTA */}
+        <button
+          onClick={isEditMode ? onDone : onGoToClubhouse}
+          className="active:scale-[0.98] transition-transform"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            width: '100%',
+            background: '#fff',
+            border: '1px solid #e2e8f0',
+            borderRadius: 16,
+            padding: 14,
+            fontSize: 13,
+            fontWeight: 500,
+            color: '#64748b',
+            cursor: 'pointer',
+          }}
+        >
+          <Home className="w-4 h-4" />
+          {isEditMode ? 'Back to clbhouz' : 'Go to Clubhouse'}
+        </button>
+
+        {/* Ghost opt-out for new reviews only */}
+        {isNewReview && !optedOut && onOptOutShare && (
           <button
-            onClick={onViewPost}
-            className="px-6 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center"
-            style={{ background: '#1C1C1E' }}
+            onClick={handleOptOut}
+            style={{
+              fontSize: 11,
+              color: '#d1d5db',
+              textDecoration: 'underline',
+              textUnderlineOffset: '3px',
+              cursor: 'pointer',
+              textAlign: 'center',
+              marginTop: 4,
+              background: 'none',
+              border: 'none',
+              width: '100%',
+            }}
           >
-            <span className="flex items-center gap-2">
-              <ExternalLink className="h-4 w-4" />
-              View on clbhouz
-            </span>
-          </button>
-        ) : (
-          <button
-            onClick={onViewReview}
-            className="px-6 rounded-full text-sm font-semibold text-white active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center"
-            style={{ background: '#1C1C1E' }}
-          >
-            <span className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              View my review
-            </span>
+            Don't share to Clubhouse
           </button>
         )}
-        
-        <button
-          onClick={onDone}
-          className="px-6 rounded-full text-sm font-semibold text-foreground active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center"
-          style={{ border: '1.5px solid hsl(var(--border))' }}
-        >
-          Done
-        </button>
       </motion.div>
+
+      {/* Responsive headline style */}
+      <style>{`
+        @media (max-width: 375px) {
+          .success-headline { font-size: 24px !important; }
+        }
+      `}</style>
     </motion.div>
   );
 }

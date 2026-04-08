@@ -2,7 +2,7 @@
  * Review Wizard - Multi-step review flow (Full-Screen)
  * Immersive full-viewport experience with scroll-lock
  * 
- * Flow: Steps 1-3 → Submit → Success (with opt-in share)
+ * Flow: Steps 1-3 → Submit → Success (auto-share for new reviews)
  */
 
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react';
@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,6 +45,7 @@ export function ReviewWizard({
   initialMediaFiles,
 }: ReviewWizardProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const { shareReview, isSharing } = useShareReview();
   const { activeActor, availableActors } = useActiveActor();
@@ -56,6 +57,9 @@ export function ReviewWizard({
   const [showPostingOptions, setShowPostingOptions] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
+  const [autoShareComplete, setAutoShareComplete] = useState(false);
+  const [isAutoSharing, setIsAutoSharing] = useState(false);
+  const autoShareAttempted = useRef(false);
   
   // Studio edits state (retained for media display)
   const [studioEditsByMediaId, setStudioEditsByMediaId] = useState<Record<string, StudioEdits>>({});
@@ -146,6 +150,90 @@ export function ReviewWizard({
   // All steps use light status bar
   useMedianStatusBar("light", "transparent", isOpen, false);
 
+  // ---- AUTO-SHARE for new reviews ----
+  useEffect(() => {
+    if (
+      wizard.state.step === 'success' &&
+      !isEditMode &&
+      !alreadyShared &&
+      !autoShareAttempted.current &&
+      wizard.submittedRatingId &&
+      activeCourse
+    ) {
+      autoShareAttempted.current = true;
+      setIsAutoSharing(true);
+
+      (async () => {
+        try {
+          // Fetch media from DB (same as handleShareFromPreview)
+          const { data: dbMedia } = await supabase
+            .from('course_review_media')
+            .select('id, media_url, media_type, poster_url, stream_id, is_cover')
+            .eq('review_id', wizard.submittedRatingId!)
+            .in('status', ['attached', 'ready'])
+            .order('created_at', { ascending: true });
+
+          const media = (dbMedia || []).map(m => ({
+            id: m.id,
+            media_url: m.media_url,
+            media_type: m.media_type,
+            poster_url: m.poster_url,
+            stream_id: m.stream_id,
+            is_cover: m.is_cover ?? false,
+          }));
+
+          const result = await shareReview({
+            ratingId: wizard.submittedRatingId!,
+            courseId: activeCourse.id,
+            reviewText: wizard.state.review || null,
+            media,
+          });
+
+          if (result.success) {
+            setSharedPostId(result.postId || null);
+            setAutoShareComplete(true);
+            // Invalidate feed queries
+            queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+            queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+            queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
+            queryClient.invalidateQueries({ queryKey: ['review-shared', wizard.submittedRatingId] });
+          }
+        } catch (err) {
+          console.error('[ReviewWizard] Auto-share failed:', err);
+        } finally {
+          setIsAutoSharing(false);
+        }
+      })();
+    }
+  }, [wizard.state.step, isEditMode, alreadyShared, wizard.submittedRatingId, activeCourse]);
+
+  // ---- OPT-OUT: remove shared post ----
+  const handleOptOutShare = useCallback(async () => {
+    if (!wizard.submittedRatingId) return;
+    try {
+      await supabase
+        .from('posts')
+        .delete()
+        .eq('source_review_id', wizard.submittedRatingId);
+
+      setSharedPostId(null);
+      setAutoShareComplete(false);
+
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
+      queryClient.invalidateQueries({ queryKey: ['review-shared', wizard.submittedRatingId] });
+      queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+
+      toast.success('Removed from Clubhouse');
+    } catch (err) {
+      console.error('[ReviewWizard] Opt-out share failed:', err);
+      toast.error('Could not remove. Try again.');
+    }
+  }, [wizard.submittedRatingId, queryClient]);
+
   // Navigation guard
   const hasUnsavedChanges = wizard.state.rating !== null || 
     wizard.state.review.length > 0 || 
@@ -188,6 +276,16 @@ export function ReviewWizard({
       navigate(`/courses/${activeCourse.id}?tab=reviews&review=${wizard.submittedRatingId}`, { replace: true });
     }
   }, [wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
+
+  const handleGoToClubhouse = useCallback(() => {
+    wizard.cleanup();
+    onClose();
+    if (sharedPostId) {
+      navigate(`/clubhouse?focusPostId=${sharedPostId}`);
+    } else {
+      navigate('/clubhouse');
+    }
+  }, [sharedPostId, wizard, onClose, navigate]);
 
   const handleViewPost = useCallback(() => {
     wizard.cleanup();
@@ -333,10 +431,13 @@ export function ReviewWizard({
                         ratingId={wizard.submittedRatingId || ''}
                         rating={wizard.state.rating}
                         isEditMode={isEditMode}
+                        previousRating={existingRating?.rating ?? null}
+                        isAutoSharing={isAutoSharing}
+                        autoShareComplete={autoShareComplete}
                         onViewReview={handleViewReview}
+                        onGoToClubhouse={handleGoToClubhouse}
                         onDone={handleDone}
-                        onShareToClubhouse={!alreadyShared ? handleShareFromPreview : undefined}
-                        isSharing={!alreadyShared ? isSharing : false}
+                        onOptOutShare={handleOptOutShare}
                       />
                     ) : wizard.state.step === 'share-success' ? (
                       <SuccessScreen
