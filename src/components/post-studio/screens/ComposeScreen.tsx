@@ -721,7 +721,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     setTrayIndex(null);
                   } else {
                     setTrayIndex(i);
-                    setCoverIndex(i);
                     setActiveMedia(i);
                   }
                 }}

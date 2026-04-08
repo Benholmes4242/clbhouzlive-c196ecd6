@@ -55,7 +55,7 @@ export function StudioHeader({
         background: 'transparent',
       }}
     >
-      <div className="flex items-center justify-between px-3" style={{ minHeight: '48px' }}>
+      <div className="flex items-center justify-between px-3 relative" style={{ minHeight: '48px' }}>
         {/* Left action — round pill */}
         <div className="flex items-center gap-1 min-w-[72px]">
           {leftAction ? (
@@ -86,8 +86,8 @@ export function StudioHeader({
           ) : <div />}
         </div>
 
-        {/* Centre */}
-        <div className="flex-1 flex items-center justify-center">
+        {/* Centre — absolutely positioned for true centering */}
+        <div className="absolute left-1/2 top-0 bottom-0 flex items-center" style={{ transform: 'translateX(-50%)' }}>
           {showProgress ? (
             <div className="flex items-center gap-4">
               {STEP_LABELS.map((label, i) => {
