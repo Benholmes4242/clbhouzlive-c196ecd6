@@ -689,6 +689,63 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     fileInputRef.current?.click();
   }, []);
 
+  // ── Publish handler (moved from PublishScreen — one-step flow) ──
+  const handlePublish = useCallback(async () => {
+    if (isPublishing) return;
+    setIsPublishing(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
+
+      const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
+      const selectedTags = state.mentions.map((m) => ({
+        id: m.entityId, entity_id: m.profileId, entity_type: m.entityType,
+        name: m.displayName, username: m.username ?? null,
+        start_index: m.start, end_index: m.end,
+      }));
+
+      const input: UploadJobInput = {
+        actorType: state.actorType, actorId: state.actorId ?? user.id, userId: user.id,
+        caption: state.caption, files,
+        mediaItems: state.mediaItems.map((item) => ({
+          id: item.id, file: item.file, type: item.mediaType,
+          width: item.width ?? undefined, height: item.height ?? undefined,
+          duration: item.duration ?? undefined,
+          trimStart: item.trimStart || null, trimEnd: item.trimEnd || null,
+          posterTimestamp: item.posterTimestamp || null,
+        })),
+        studioEditsByMediaId: Object.fromEntries(
+          state.mediaItems
+            .filter((item) => item.edits && Object.keys(item.edits).length > 0)
+            .map((item) => [item.id, item.edits!])
+        ),
+        courseIds: state.taggedCourses.map((c) => c.courseId),
+        courseInfo: state.taggedCourses[0]
+          ? { id: state.taggedCourses[0].courseId, name: state.taggedCourses[0].courseName, country: state.taggedCourses[0].country ?? '' }
+          : null,
+        selectedTags,
+        visibility: state.visibility,
+        scheduledAt: state.scheduledAt,
+      };
+
+      enqueuePostUpload(input);
+      analyticsEvents.track('post_published', {
+        media_count: state.mediaItems.length,
+        media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
+        has_caption: state.caption.trim().length > 0,
+        has_tagged_course: state.taggedCourses.length > 0,
+        visibility: state.visibility,
+        is_scheduled: !!state.scheduledAt,
+      });
+      onSuccess?.('');
+      setStep('SUCCESS');
+    } catch (err) {
+      console.error('[ComposeScreen] Failed to enqueue:', err);
+      toast.error('Failed to start upload. Please try again.');
+      setIsPublishing(false);
+    }
+  }, [state, setStep, onSuccess, isPublishing]);
+
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG }}>
@@ -713,11 +770,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         darkMode={true}
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
-          isValid
-            ? { label: 'Post', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
-            : state.isDirty
-              ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
-              : undefined
+          isValid && !isPublishing
+            ? { label: 'Share', onClick: handlePublish, variant: 'primary' as const }
+            : isPublishing
+              ? { label: 'Sharing…', onClick: () => {}, disabled: true, variant: 'primary' as const }
+              : state.isDirty
+                ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
+                : undefined
         }
       />
 
