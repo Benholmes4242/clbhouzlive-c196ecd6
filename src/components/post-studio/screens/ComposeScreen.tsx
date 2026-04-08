@@ -800,27 +800,26 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           }}
         >
 
-        {/* ── 4:5 Media Hero ── */}
-        <div className="px-4 pt-2 pb-2">
-          <div
-            style={{
-              aspectRatio: '4/5',
-              borderRadius: 18,
-              overflow: 'hidden',
-              background: 'rgba(255,255,255,0.04)',
-              border: `1px solid ${DARK_BORDER}`,
-              position: 'relative',
-            }}
-          >
-            {hasMedia ? (
-              <>
-                {/* Blurred background for letterboxing */}
-                {(() => {
-                  const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
-                  if (!item) return null;
-                  const isLandscape = item.width && item.height && item.width > item.height;
-                  if (!isLandscape) return null;
-                  return (
+        {/* ── Media Zone ── */}
+        {hasMedia ? (
+          <>
+            {/* Full bleed 4:5 hero — no horizontal padding */}
+            <div
+              style={{
+                aspectRatio: '4/5',
+                overflow: 'hidden',
+                position: 'relative',
+                background: 'rgba(0,0,0,0.95)',
+              }}
+            >
+              {/* Blurred background for letterboxing */}
+              {(() => {
+                const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+                if (!item) return null;
+                const isLandscape = item.width && item.height && item.width > item.height;
+                if (!isLandscape) return null;
+                return (
+                  <>
                     <div className="absolute inset-0" style={{ filter: 'blur(40px) brightness(0.4)', transform: 'scale(1.3)' }}>
                       {item.mediaType === 'video' ? (
                         <video src={item.previewUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
@@ -828,125 +827,126 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                         <img src={item.previewUrl} alt="" className="w-full h-full object-cover" />
                       )}
                     </div>
-                  );
-                })()}
+                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
+                  </>
+                );
+              })()}
 
-                {/* Main media — object-contain */}
-                {(() => {
-                  const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
-                  if (!item) return null;
-                  return item.mediaType === 'video' ? (
-                    <video
-                      src={item.previewUrl}
-                      autoPlay muted loop playsInline
-                      className="absolute inset-0 w-full h-full object-contain"
-                      style={{ pointerEvents: 'none' }}
-                    />
-                  ) : (
-                    <img
-                      src={item.previewUrl}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-contain"
-                    />
-                  );
-                })()}
+              {/* Main media — object-contain */}
+              {(() => {
+                const item = state.mediaItems[coverIndex] ?? state.mediaItems[0];
+                if (!item) return null;
+                return item.mediaType === 'video' ? (
+                  <video
+                    src={item.previewUrl}
+                    autoPlay muted loop playsInline
+                    className="absolute inset-0 w-full h-full object-contain"
+                    style={{ pointerEvents: 'none' }}
+                  />
+                ) : (
+                  <img
+                    src={item.previewUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                );
+              })()}
 
-                {/* Cover badge + Edit button */}
-                <div className="absolute top-3 left-3 z-10">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.92)', color: '#0D0D0D' }}>
-                    Cover
-                  </span>
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleEdit(state.activeMediaIndex)}
-                  className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full"
-                  style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-                >
-                  <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-                  <span className="text-[11px] font-semibold text-white">Edit</span>
-                </motion.button>
+              {/* Top scrim for overlays */}
+              <div className="absolute top-0 inset-x-0 h-20 z-[1]" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.45), transparent)' }} />
 
-                {/* Thumbnail strip */}
-                {state.mediaItems.length > 1 && (
-                  <div
-                    className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto z-10"
-                    style={{ scrollbarWidth: 'none' }}
-                  >
-                    {state.mediaItems.slice(0, 4).map((item, i) => (
-                      <motion.button
-                        key={item.id}
-                        whileTap={{ scale: 0.92 }}
-                        onClick={() => { setCoverIndex(i); setActiveMedia(i); }}
-                        className="shrink-0 overflow-hidden"
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 10,
-                          border: i === coverIndex ? '2px solid #F7931E' : '1.5px solid rgba(255,255,255,0.25)',
-                        }}
-                      >
-                        {item.mediaType === 'video' ? (
-                          <video src={item.previewUrl} muted playsInline preload="metadata" className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
-                        ) : (
-                          <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-                        )}
-                      </motion.button>
-                    ))}
+              {/* Count badge — top left */}
+              <div className="absolute top-3 left-3 z-10">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  {coverIndex + 1} / {state.mediaItems.length}
+                </span>
+              </div>
 
-                    {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-                      <motion.button
-                        whileTap={{ scale: 0.88 }}
-                        onClick={() => fileInputRef.current?.click()}
-                        className="shrink-0 flex items-center justify-center"
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 10,
-                          background: 'rgba(255,255,255,0.08)',
-                          border: '1.5px dashed rgba(255,255,255,0.20)',
-                        }}
-                      >
-                        <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-                      </motion.button>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              /* Empty state */
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-                style={{ cursor: 'pointer' }}
+              {/* Edit pill — top right */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleEdit(state.activeMediaIndex)}
+                className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
-                <ImageIcon className="w-7 h-7" style={{ color: 'rgba(247,147,30,0.80)' }} strokeWidth={1.5} />
-                <div className="text-center">
-                  <p className="text-[14px] font-semibold" style={{ color: DARK_TEXT }}>Add photo or video</p>
-                  <p className="text-[12px] mt-1" style={{ color: DARK_TEXT3 }}>Share your round with the world</p>
-                </div>
-                <div className="flex gap-3 mt-2">
+                <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+                <span className="text-[11px] font-semibold text-white">Edit</span>
+              </motion.button>
+            </div>
+
+            {/* Full bleed thumbnail strip — 68px, sharp corners, all items */}
+            {state.mediaItems.length > 1 && (
+              <div
+                className="flex overflow-x-auto"
+                style={{ gap: 4, scrollbarWidth: 'none', padding: '4px 0' }}
+              >
+                {state.mediaItems.map((item, i) => (
                   <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                    className="px-4 py-2 rounded-xl text-[13px] font-semibold"
-                    style={{ background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.25)', color: '#F7931E' }}
+                    key={item.id}
+                    whileTap={{ scale: 0.92 }}
+                    onClick={() => { setCoverIndex(i); setActiveMedia(i); }}
+                    className="shrink-0 overflow-hidden relative"
+                    style={{
+                      width: 68,
+                      height: 68,
+                      borderRadius: 0,
+                      border: i === coverIndex ? '2px solid #F7931E' : 'none',
+                    }}
                   >
-                    Library
+                    {item.mediaType === 'video' ? (
+                      <video src={item.previewUrl} muted playsInline preload="metadata" className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
+                    ) : (
+                      <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+                    )}
+                    {/* Dim overlay on inactive tiles */}
+                    {i !== coverIndex && (
+                      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.40)' }} />
+                    )}
                   </motion.button>
+                ))}
+
+                {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
                   <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => { e.stopPropagation(); rearCameraInputRef.current?.click(); }}
-                    className="px-4 py-2 rounded-xl text-[13px] font-semibold"
-                    style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}`, color: DARK_TEXT2 }}
+                    whileTap={{ scale: 0.88 }}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="shrink-0 flex items-center justify-center"
+                    style={{
+                      width: 68,
+                      height: 68,
+                      borderRadius: 0,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1.5px dashed rgba(255,255,255,0.15)',
+                    }}
                   >
-                    Camera
+                    <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
                   </motion.button>
-                </div>
-              </button>
+                )}
+              </div>
             )}
-          </div>
-        </div>
+          </>
+        ) : (
+          /* Change 1 — Compact empty state */
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              width: '100%',
+              padding: '28px 0 24px',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', gap: 10,
+              borderRadius: 18,
+              background: 'rgba(255,255,255,0.03)',
+              border: `1.5px dashed rgba(247,147,30,0.25)`,
+              cursor: 'pointer',
+              margin: '8px 16px',
+            }}
+          >
+            <ImageIcon className="w-7 h-7" style={{ color: 'rgba(247,147,30,0.80)' }} strokeWidth={1.5} />
+            <div className="text-center">
+              <p className="text-[14px] font-semibold" style={{ color: DARK_TEXT }}>Add photo or video</p>
+              <p className="text-[12px] mt-1" style={{ color: DARK_TEXT3 }}>Tap Library or Camera below</p>
+            </div>
+          </button>
+        )}
 
         {/* ── Text input — dark text, static placeholder ── */}
         <div className="px-4 pt-3 pb-2 relative">
