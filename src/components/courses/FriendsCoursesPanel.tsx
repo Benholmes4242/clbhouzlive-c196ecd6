@@ -191,7 +191,7 @@ const FriendsCoursesPanel: React.FC = () => {
             </div>
             <FriendsActivityFeed
               recent={recent}
-              courses={courses}
+              courses={heroCourse ? courses.filter(c => c.course_id !== heroCourse.course_id) : courses}
               trendingCourseIds={trendingCourseIds}
               userPlayedCourseIds={userPlayedCourseIds}
             />
