@@ -41,6 +41,8 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
   const dir = getDirection(state.previousStep, state.step);
 
   const handleSuccessDone = useCallback(() => {
+    console.log('[DEBUG] handleSuccessDone called');
+    console.trace('[DEBUG] handleSuccessDone stack');
     reset();
     onClose();
   }, [reset, onClose]);
