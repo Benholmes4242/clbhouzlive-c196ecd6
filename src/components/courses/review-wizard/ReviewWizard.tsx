@@ -434,7 +434,7 @@ export function ReviewWizard({
                         ratingId={wizard.submittedRatingId || ''}
                         rating={wizard.state.rating}
                         isEditMode={isEditMode}
-                        previousRating={existingRating?.rating ?? null}
+                        previousRating={stablePreviousRating}
                         isAutoSharing={isAutoSharing}
                         autoShareComplete={autoShareComplete}
                         onViewReview={handleViewReview}
