@@ -856,7 +856,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           >
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
               {/* Full-width preview */}
-              <div className="relative overflow-hidden" style={{ width: '100%', flex: 1, minHeight: 0, background: '#000' }}>
+              <div ref={trayPreviewRef} className="relative overflow-hidden" style={{ width: '100%', flex: 1, minHeight: 0, background: '#000' }}>
                 {/* Letterbox blur for landscape */}
                 {trayItem.width && trayItem.height && trayItem.width > trayItem.height && (
                   <>
@@ -864,6 +864,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
                   </>
                 )}
+                {/* Base image */}
                 <img
                   src={trayItem.thumbnailUrl || trayItem.previewUrl}
                   alt=""
@@ -873,11 +874,46 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     height: '100%',
                     maxHeight: '100%',
                     objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                    transform: [
+                      trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                      trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                      trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                    ].filter(Boolean).join(' ') || undefined,
                   }}
                 />
+                {/* Filter overlay with intensity */}
+                {trayItem.edits?.filter && trayItem.edits.filter !== 'normal' && (
+                  <img
+                    src={trayItem.thumbnailUrl || trayItem.previewUrl}
+                    alt=""
+                    className={`absolute inset-0 z-[1] ${getFilterClass(trayItem.edits.filter)}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '100%',
+                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                      opacity: (trayItem.edits?.filterIntensity ?? 100) / 100,
+                      transform: [
+                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                      ].filter(Boolean).join(' ') || undefined,
+                    }}
+                  />
+                )}
+                {/* Text overlays */}
+                {trayItem.edits?.textOverlays && trayItem.edits.textOverlays.length > 0 && trayPreviewRef.current && (
+                  <div className="absolute inset-0 z-[2] pointer-events-none">
+                    <TextOverlayRenderer
+                      textOverlays={trayItem.edits.textOverlays}
+                      isEditable={false}
+                      containerRef={trayPreviewRef as React.RefObject<HTMLDivElement>}
+                    />
+                  </div>
+                )}
                 {/* Cover badge */}
                 {trayIndex === coverIndex && (
-                  <div className="absolute z-[2]" style={{ top: 8, left: 8, background: 'rgba(247,147,30,0.85)', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, letterSpacing: 0.5 }}>
+                  <div className="absolute z-[3]" style={{ top: 8, left: 8, background: 'rgba(247,147,30,0.85)', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, letterSpacing: 0.5 }}>
                     Cover
                   </div>
                 )}
