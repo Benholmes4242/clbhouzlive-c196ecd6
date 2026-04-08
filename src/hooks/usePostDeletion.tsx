@@ -55,34 +55,62 @@ export const usePostDeletion = () => {
       // Show delete toast
       showToast("Post deleted");
 
-      // Optimistically remove the deleted post from the infinite query cache
-      // instead of invalidating (which causes seenPostIds ref issues)
-      if (actorType && actorId && userId) {
-        const profilePostsKey = ['profile-posts', actorType, actorId, userId];
-        queryClient.setQueryData(profilePostsKey, (old: any) => {
-          if (!old?.pages) return old;
+      // Helper: strip deleted post from any infinite-query or array cache
+      const stripPost = (old: any) => {
+        if (!old) return old;
+        // Infinite query shape ({ pages })
+        if (old.pages) {
           return {
             ...old,
             pages: old.pages.map((page: any) => ({
               ...page,
-              posts: (page.posts ?? []).filter((p: any) => p.id !== postId),
+              posts: (page.posts ?? page.data ?? []).filter((p: any) => p.id !== postId),
+              ...(page.data ? { data: (page.data ?? []).filter((p: any) => p.id !== postId) } : {}),
             })),
           };
-        });
+        }
+        // Plain array
+        if (Array.isArray(old)) return old.filter((p: any) => p.id !== postId);
+        return old;
+      };
+
+      // Optimistically remove from all known caches instantly
+      const allQueries = queryClient.getQueryCache().getAll();
+      for (const q of allQueries) {
+        const key = q.queryKey as string[];
+        const k0 = key[0];
+        if (
+          k0 === 'media-feed' ||
+          k0 === 'profile-posts' ||
+          k0 === 'actor-posts' ||
+          k0 === 'trending-posts' ||
+          k0 === 'infinite-followed-posts' ||
+          k0 === 'activity-posts' ||
+          k0 === 'userPosts' ||
+          k0 === 'followedUsersPosts' ||
+          k0 === 'explore-content' ||
+          k0 === 'pinned-posts' ||
+          k0 === 'featured-post'
+        ) {
+          queryClient.setQueryData(key, stripPost);
+        }
       }
-      
-      // If we know the actor type/id, optimistically decrement count and invalidate
+
+      // Decrement count instantly
       if (actorType && actorId) {
-        // Instant count decrement — no refetch needed for immediate UI feedback
         const countKey = postKeys.actorPostsCount(actorType, actorId);
         queryClient.setQueryData(countKey, (old: number | undefined) =>
           Math.max((old ?? 1) - 1, 0)
         );
-        queryClient.invalidateQueries({ queryKey: postKeys.actorPosts(actorType, actorId) });
-        queryClient.invalidateQueries({ queryKey: countKey });
       }
-      
-      // Invalidate other feed caches (but NOT profile-posts or actor-posts broadly)
+
+      // Then invalidate everything to refetch clean data
+      if (actorType && actorId) {
+        queryClient.invalidateQueries({ queryKey: postKeys.actorPosts(actorType, actorId) });
+        queryClient.invalidateQueries({ queryKey: postKeys.profilePosts(actorType, actorId) });
+        queryClient.invalidateQueries({ queryKey: postKeys.actorPostsCount(actorType, actorId) });
+      }
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
       queryClient.invalidateQueries({ queryKey: postKeys.trending() });
       queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'] });
       queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
