@@ -11,7 +11,7 @@ import {
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',     icon: HomeIcon,        path: '/clubhouse' },
   { id: 'discover',  label: 'Discover', icon: IoCompassOutline, path: '/discover' },
-  { id: 'post',      label: 'Moment',   icon: CameraIcon,      path: null, isAction: true },
+  { id: 'post',      label: 'Share',    icon: CameraIcon,      path: null, isAction: true },
   { id: 'tourhub',   label: 'Tours',    icon: TrophyIcon,      path: '/tourhub' },
   { id: 'courses',   label: 'Courses',  icon: MapPinIcon,      path: '/courses' },
 ];

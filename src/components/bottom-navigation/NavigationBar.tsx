@@ -134,8 +134,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               )}
             </div>
             
-            {/* Label — hidden for action tabs (Moment/Camera) */}
-            {!tab.isAction && (
+            {/* Label */}
+            {(
               <span 
                 className={cn(
                   "text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap overflow-hidden text-ellipsis w-full text-center",
