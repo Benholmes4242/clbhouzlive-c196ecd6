@@ -235,7 +235,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
   const { drafts } = useDrafts();
   const draftsCount = drafts?.length ?? 0;
-  const [shouldAutoPublish, setShouldAutoPublish] = useState(false);
+  
 
   const handleSaveDraft = useCallback(async () => {
     const ok = await saveDraft();
