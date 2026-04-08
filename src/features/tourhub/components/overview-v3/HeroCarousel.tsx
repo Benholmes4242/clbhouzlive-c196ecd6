@@ -1527,17 +1527,17 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
                   width: i === currentIndex ? 14 : 5,
                   borderRadius: 99,
                   background: i === currentIndex
-                    ? 'rgba(255,255,255,0.35)'
-                    : 'rgba(255,255,255,0.12)',
+                    ? 'rgba(0, 0, 0, 0.45)'
+                    : 'rgba(0, 0, 0, 0.35)',
                   border: i === currentIndex
-                    ? '1px solid rgba(255,255,255,0.40)'
-                    : '1px solid rgba(255,255,255,0.15)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
+                    ? '1px solid rgba(255, 255, 255, 0.18)'
+                    : '1px solid rgba(255, 255, 255, 0.10)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
                   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                   boxShadow: i === currentIndex
-                    ? '0 1px 4px rgba(0,0,0,0.30)'
-                    : 'none',
+                    ? '0 2px 8px rgba(0,0,0,0.25)'
+                    : '0 1px 4px rgba(0,0,0,0.15)',
                 }}
               />
             </button>
