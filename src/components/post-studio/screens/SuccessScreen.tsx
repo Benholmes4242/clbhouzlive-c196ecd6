@@ -184,7 +184,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: isScheduled ? 0.75 : 1.0, duration: 0.4 }}
         whileTap={{ scale: 0.96 }}
-        onClick={onDone}
+        onClick={handleDone}
         className="w-full max-w-sm flex items-center justify-center gap-2 font-bold relative z-10"
         style={{
           background: '#F7931E',
