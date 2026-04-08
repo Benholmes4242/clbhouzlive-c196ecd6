@@ -1,6 +1,6 @@
 // SchedulePanel — Dark sheet, smart quick options, custom drum picker, scheduled posts tab
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Zap, Clock, Calendar, ChevronLeft, ChevronRight, X, Trash2, Play } from 'lucide-react';
+import { Zap, Clock, Calendar, ChevronLeft, ChevronRight, X, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { usePostStudioContext } from '../usePostStudio';
 import { useScheduledPosts } from '@/hooks/useScheduledPosts';
@@ -369,68 +369,15 @@ export function SchedulePanel() {
           </AnimatePresence>
         ) : (
           /* Scheduled posts tab */
-          <div className="flex-1 overflow-y-auto px-5 pb-6" style={{ scrollbarWidth: 'none' }}>
-            {isLoading && (
-              <div className="flex items-center justify-center py-8">
-                <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.10)', borderTopColor: 'transparent' }} />
-              </div>
-            )}
-
-            {!isLoading && scheduledPosts.length === 0 && (
-              <div className="flex flex-col items-center text-center py-10">
-                <Clock className="w-6 h-6 mb-2" style={{ color: 'rgba(255,255,255,0.20)' }} strokeWidth={1.5} />
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.50)' }}>No scheduled posts</p>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 4 }}>Posts you schedule will appear here</p>
-              </div>
-            )}
-
-            {!isLoading && scheduledPosts.map((post, i) => (
-              <div
-                key={post.id}
-                className="flex items-center gap-3"
-                style={{
-                  padding: '12px 0',
-                  borderBottom: i < scheduledPosts.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                }}
-              >
-                <div className="flex-1 min-w-0">
-                  <p style={{
-                    fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.85)',
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>
-                    {post.content || 'No caption'}
-                  </p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
-                    {post.scheduledAt ? format(new Date(post.scheduledAt), "EEE d MMM · h:mm a") : ''}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => publishNow(post.id)}
-                  disabled={isPublishingNow}
-                  className="flex items-center justify-center shrink-0"
-                  style={{
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.22)',
-                  }}
-                >
-                  <Play className="w-3.5 h-3.5" style={{ color: '#22c55e' }} strokeWidth={2.5} />
-                </button>
-
-                <button
-                  onClick={() => deletePost(post.id)}
-                  disabled={isDeleting}
-                  className="flex items-center justify-center shrink-0"
-                  style={{
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.18)',
-                  }}
-                >
-                  <Trash2 className="w-3.5 h-3.5" style={{ color: 'rgba(239,68,68,0.70)' }} strokeWidth={2} />
-                </button>
-              </div>
-            ))}
-          </div>
+          <ScheduledPostsList
+            scheduledPosts={scheduledPosts}
+            isLoading={isLoading}
+            refetch={refetch}
+            publishNow={publishNow}
+            deletePost={deletePost}
+            isPublishingNow={isPublishingNow}
+            isDeleting={isDeleting}
+          />
         )}
       </motion.div>
     </>
