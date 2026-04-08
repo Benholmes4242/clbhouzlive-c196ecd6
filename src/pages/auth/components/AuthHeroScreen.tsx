@@ -293,7 +293,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   onKeyDown={handleEmailKeyDown}
                   placeholder="Email address"
                   disabled={submitting}
-                  className="w-full h-[56px] px-5 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
+                  className="w-full h-[56px] px-5 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[16px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
                   autoComplete="email"
                   inputMode="email"
                 />
