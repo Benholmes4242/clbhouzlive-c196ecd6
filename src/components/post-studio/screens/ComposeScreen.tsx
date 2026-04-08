@@ -467,6 +467,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         is_scheduled: !!state.scheduledAt,
       });
       onSuccess?.('');
+      closePanel();
       setStep('SUCCESS');
     } catch (err) {
       console.error('[ComposeScreen] Failed to enqueue:', err);
@@ -474,7 +475,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       setIsPublishing(false);
       schedulePublishRef.current = false;
     }
-  }, [state, setStep, onSuccess, isPublishing, schedulePublishRef]);
+  }, [state, setStep, closePanel, onSuccess, isPublishing, schedulePublishRef]);
 
   // Register handlePublish on context ref so SchedulePanel "Post now" can call it
   postNowRef.current = handlePublish;
