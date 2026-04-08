@@ -28,6 +28,13 @@ const COLORS = [
   '#F1F5F9', '#6B7280', '#F97316', '#06B6D4', '#EC4899', '#14B8A6', '#D97706', '#6366F1',
 ];
 
+const SIZES: { id: string; label: string; scale: number }[] = [
+  { id: 'S', label: 'S', scale: 0.8 },
+  { id: 'M', label: 'M', scale: 1.2 },
+  { id: 'L', label: 'L', scale: 1.8 },
+  { id: 'XL', label: 'XL', scale: 2.5 },
+];
+
 const PREVIEW_FONTS: Record<TextStyle, string> = {
   modern_bold: 'font-sans font-extrabold',
   classic_serif: 'font-serif italic',
