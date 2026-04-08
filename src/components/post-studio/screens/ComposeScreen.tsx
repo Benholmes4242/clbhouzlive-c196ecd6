@@ -14,6 +14,7 @@ import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { useSaveDraft } from '../hooks/useSaveDraft';
+import { useDrafts } from '@/hooks/useDrafts';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
 import {
   COMPOSE_BG, DARK_TEXT, DARK_TEXT2, DARK_TEXT3, DARK_ICON, DARK_BG, DARK_CARD, DARK_BORDER,
