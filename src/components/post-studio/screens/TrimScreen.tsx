@@ -1,29 +1,47 @@
-// TrimScreen — Step 3: Video trimmer
-import React, { useRef, useEffect } from 'react';
-import { StudioHeader } from '../components/StudioHeader';
+// TrimScreen — Dark, full-bleed video preview with amber waveform trimmer
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { Play, Pause } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { VideoTrimmer } from '../components/VideoTrimmer';
 import { usePostStudioContext } from '../usePostStudio';
-import { BG_BASE } from '../tokens';
+
+const fmt = (s: number) => {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+};
 
 export function TrimScreen() {
   const { state, setStep, updateTrim } = usePostStudioContext();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
 
   const activeItem = state.mediaItems[state.activeMediaIndex];
   const isVideo = activeItem?.mediaType === 'video';
   const trimStart = isVideo ? activeItem.trimStart : 0;
   const trimEnd = isVideo ? (activeItem.trimEnd ?? activeItem.duration ?? 0) : 0;
+  const totalDuration = activeItem?.duration ?? 0;
+  const clipDuration = trimEnd - trimStart;
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isVideo) return;
     video.currentTime = trimStart;
     const handleTimeUpdate = () => {
+      setCurrentTime(video.currentTime);
       if (video.currentTime >= trimEnd) video.currentTime = trimStart;
     };
     video.addEventListener('timeupdate', handleTimeUpdate);
     return () => video.removeEventListener('timeupdate', handleTimeUpdate);
   }, [isVideo, trimStart, trimEnd]);
+
+  const togglePlay = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setIsPlaying(true); }
+    else { v.pause(); setIsPlaying(false); }
+  }, []);
 
   if (!activeItem || !isVideo) return null;
 
@@ -32,60 +50,94 @@ export function TrimScreen() {
     if (videoRef.current) videoRef.current.currentTime = newStart;
   };
 
-  const aspectRatio = activeItem.width && activeItem.height
-    ? activeItem.width / activeItem.height
-    : 16 / 9;
-  const isPortrait = aspectRatio < 1;
-
   return (
-    <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
-      <StudioHeader
-        title="Trim"
-        step="TRIM"
-        leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSE') }}
-        rightAction={{ label: 'Done', onClick: () => setStep('COMPOSE'), variant: 'primary' }}
-      />
-
-      <div className="flex-1 flex items-center justify-center px-5 py-4">
-        <div
-          className="relative overflow-hidden"
-          style={{
-            borderRadius: 20,
-            boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-            aspectRatio: isPortrait ? '4/5' : String(aspectRatio),
-            width: isPortrait ? 'auto' : '100%',
-            height: isPortrait ? '48vh' : 'auto',
-            maxWidth: '100%',
-          }}
+    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D' }}>
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 shrink-0" style={{ paddingTop: 'env(safe-area-inset-top, 12px)', minHeight: 52 }}>
+        <button onClick={() => setStep('COMPOSE')} style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
+          Cancel
+        </button>
+        <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>Trim</span>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => setStep('COMPOSE')}
+          className="px-4 py-1.5 rounded-full"
+          style={{ background: '#F7931E', color: '#fff', fontSize: 14, fontWeight: 700 }}
         >
-          <video
-            ref={videoRef}
-            src={activeItem.previewUrl}
-            muted
-            playsInline
-            autoPlay
-            loop
-            className="w-full h-full object-cover"
-          />
+          Done
+        </motion.button>
+      </header>
+
+      {/* Full-bleed video preview */}
+      <div className="flex-1 relative overflow-hidden" style={{ background: '#111' }}>
+        <video
+          ref={videoRef}
+          src={activeItem.previewUrl}
+          muted playsInline autoPlay loop
+          className="w-full h-full object-cover"
+        />
+        {/* Top scrim */}
+        <div className="absolute top-0 inset-x-0" style={{ height: 70, background: 'linear-gradient(to bottom, rgba(0,0,0,0.40), transparent)' }} />
+        {/* Bottom scrim */}
+        <div className="absolute bottom-0 inset-x-0" style={{ height: '30%', background: 'linear-gradient(to top, rgba(0,0,0,0.70), transparent)' }} />
+
+        {/* Play/pause */}
+        <button
+          onClick={togglePlay}
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <div className="flex items-center justify-center" style={{
+            width: 56, height: 56, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.52)', backdropFilter: 'blur(8px)',
+          }}>
+            {isPlaying
+              ? <Pause className="w-6 h-6" style={{ color: '#F7931E' }} fill="#F7931E" />
+              : <Play className="w-6 h-6 ml-0.5" style={{ color: '#F7931E' }} fill="#F7931E" />
+            }
+          </div>
+        </button>
+
+        {/* Playback timer — bottom left */}
+        <div className="absolute bottom-3 left-3 z-10" style={{ fontSize: 13, fontWeight: 600, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+          {fmt(currentTime - trimStart)} / {fmt(clipDuration)}
+        </div>
+
+        {/* Clip duration badge — bottom right */}
+        <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full" style={{
+          background: 'rgba(247,147,30,0.18)', border: '1px solid rgba(247,147,30,0.30)',
+          fontSize: 12, fontWeight: 600, color: '#F7931E',
+        }}>
+          {fmt(clipDuration)} clip
         </div>
       </div>
 
-      <div
-        className="mx-4 mb-4 px-5 py-4"
-        style={{
-          borderRadius: 24,
-          background: 'rgba(255,255,255,0.97)',
-          border: '1px solid rgba(0,0,0,0.08)',
-          boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
-        }}
-      >
-        <p
-          className="text-[12px] font-medium mb-3 text-center uppercase tracking-wide"
-          style={{ color: 'rgba(15,23,42,0.35)', letterSpacing: '0.08em' }}
-        >
-          Drag handles to trim
-        </p>
+      {/* Trim controls */}
+      <div style={{
+        background: 'rgba(12,12,12,0.98)',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+        padding: '16px 16px 24px',
+      }}>
+        {/* Timestamp row */}
+        <div className="flex items-center justify-between mb-3.5">
+          <div>
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Start</span>
+            <p style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)', fontVariantNumeric: 'tabular-nums' }}>{fmt(trimStart)}</p>
+          </div>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>Drag handles to trim</span>
+          <div className="text-right">
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>End</span>
+            <p style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)', fontVariantNumeric: 'tabular-nums' }}>{fmt(trimEnd)}</p>
+          </div>
+        </div>
+
         <VideoTrimmer item={activeItem} onTrimChange={handleTrimChange} />
+
+        {/* Full duration row */}
+        <div className="flex items-center justify-between mt-2">
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>0:00</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>Full video: {fmt(totalDuration)}</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>{fmt(totalDuration)}</span>
+        </div>
       </div>
     </div>
   );

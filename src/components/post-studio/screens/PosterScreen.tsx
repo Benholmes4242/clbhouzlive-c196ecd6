@@ -1,9 +1,14 @@
-// PosterScreen — Step 4: Cover frame selection
-import React, { useRef, useEffect } from 'react';
-import { StudioHeader } from '../components/StudioHeader';
+// PosterScreen — Dark, full-bleed cover preview with amber filmstrip needle
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { PosterPicker } from '../components/PosterPicker';
 import { usePostStudioContext } from '../usePostStudio';
-import { BG_BASE } from '../tokens';
+
+const fmt = (s: number) => {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+};
 
 export function PosterScreen() {
   const { state, setStep, updatePoster } = usePostStudioContext();
@@ -11,6 +16,7 @@ export function PosterScreen() {
 
   const activeItem = state.mediaItems[state.activeMediaIndex];
   const isVideo = activeItem?.mediaType === 'video';
+  const totalDuration = activeItem?.duration ?? 0;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -26,58 +32,77 @@ export function PosterScreen() {
     if (videoRef.current) videoRef.current.currentTime = timestamp;
   };
 
-  const aspectRatio = activeItem.width && activeItem.height
-    ? activeItem.width / activeItem.height
-    : 16 / 9;
-  const isPortrait = aspectRatio < 1;
-
   return (
-    <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
-      <StudioHeader
-        title="Cover"
-        step="POSTER"
-        leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSE') }}
-        rightAction={{ label: 'Done', onClick: () => setStep('COMPOSE'), variant: 'primary' }}
-      />
-
-      <div className="flex-1 flex items-center justify-center px-5 py-4">
-        <div
-          className="relative overflow-hidden"
-          style={{
-            borderRadius: 20,
-            boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-            aspectRatio: isPortrait ? '4/5' : String(aspectRatio),
-            width: isPortrait ? 'auto' : '100%',
-            height: isPortrait ? '48vh' : 'auto',
-            maxWidth: '100%',
-          }}
+    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D' }}>
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 shrink-0" style={{ paddingTop: 'env(safe-area-inset-top, 12px)', minHeight: 52 }}>
+        <button onClick={() => setStep('COMPOSE')} style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
+          Cancel
+        </button>
+        <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>Cover</span>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => setStep('COMPOSE')}
+          className="px-4 py-1.5 rounded-full"
+          style={{ background: '#F7931E', color: '#fff', fontSize: 14, fontWeight: 700 }}
         >
-          <video
-            ref={videoRef}
-            src={activeItem.previewUrl}
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
+          Done
+        </motion.button>
+      </header>
+
+      {/* Full-bleed cover preview */}
+      <div className="flex-1 relative overflow-hidden" style={{ background: '#111' }}>
+        <video
+          ref={videoRef}
+          src={activeItem.previewUrl}
+          muted playsInline
+          className="w-full h-full object-cover"
+        />
+        {/* Top scrim */}
+        <div className="absolute top-0 inset-x-0" style={{ height: 70, background: 'linear-gradient(to bottom, rgba(0,0,0,0.30), transparent)' }} />
+        {/* Bottom scrim */}
+        <div className="absolute bottom-0 inset-x-0" style={{ height: '30%', background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)' }} />
+
+        {/* "Cover" badge — top left */}
+        <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full" style={{
+          background: 'rgba(255,255,255,0.92)', color: '#0D0D0D',
+          fontSize: 11, fontWeight: 700,
+        }}>
+          Cover
+        </div>
+
+        {/* Timestamp badge — bottom right */}
+        <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full" style={{
+          background: 'rgba(247,147,30,0.18)', border: '1px solid rgba(247,147,30,0.30)',
+          fontSize: 12, fontWeight: 600, color: '#F7931E', fontVariantNumeric: 'tabular-nums',
+        }}>
+          {fmt(activeItem.posterTimestamp)}
         </div>
       </div>
 
-      <div
-        className="mx-4 mb-4 px-5 py-4"
-        style={{
-          borderRadius: 24,
-          background: 'rgba(255,255,255,0.97)',
-          border: '1px solid rgba(0,0,0,0.08)',
-          boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
-        }}
-      >
-        <p
-          className="text-[12px] font-medium mb-3 text-center uppercase tracking-wide"
-          style={{ color: 'rgba(15,23,42,0.35)', letterSpacing: '0.08em' }}
-        >
-          Drag to choose cover frame
-        </p>
+      {/* Filmstrip scrubber */}
+      <div style={{
+        background: 'rgba(12,12,12,0.98)',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+        padding: '16px 16px 28px',
+      }}>
+        {/* Timestamp row */}
+        <div className="flex items-center justify-between mb-3">
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>0:00</span>
+          <div className="px-2.5 py-0.5 rounded-full" style={{
+            background: 'rgba(247,147,30,0.18)', border: '1px solid rgba(247,147,30,0.30)',
+            fontSize: 13, fontWeight: 700, color: '#F7931E', fontVariantNumeric: 'tabular-nums',
+          }}>
+            {fmt(activeItem.posterTimestamp)}
+          </div>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>{fmt(totalDuration)}</span>
+        </div>
+
         <PosterPicker item={activeItem} onPosterChange={handlePosterChange} />
+
+        <p className="text-center mt-3" style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>
+          This frame will be your cover photo on the feed
+        </p>
       </div>
     </div>
   );
