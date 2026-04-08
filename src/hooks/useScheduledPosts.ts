@@ -69,7 +69,6 @@ export function useScheduledPosts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SCHEDULED_POSTS_KEY });
       queryClient.invalidateQueries({ queryKey: SCHEDULED_COUNT_KEY });
-      toast.success('Posted');
     },
     onError: () => {
       toast.error("Couldn't publish");
