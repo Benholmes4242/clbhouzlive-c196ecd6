@@ -250,6 +250,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mentionOverlayRef = useRef<HTMLDivElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [textareaFocused, setTextareaFocused] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
@@ -265,21 +266,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      textareaRef.current?.focus();
-    }, 150);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     if (state.mediaItems.length > 0) {
-      const timer = setTimeout(() => textareaRef.current?.focus(), 150);
       if (!trayAutoOpenedRef.current) {
         trayAutoOpenedRef.current = true;
         setTrayIndex(0);
       }
-      return () => clearTimeout(timer);
     } else {
       trayAutoOpenedRef.current = false;
     }
@@ -318,7 +311,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         const items = await filesToMediaItems(toProcess, (msg) => toast.error(msg));
         if (items.length > 0) {
           addMedia(items);
-          setTimeout(() => textareaRef.current?.focus(), 100);
         }
       } catch (err) {
         console.error('[ComposeScreen] Failed to process files:', err);
@@ -524,10 +516,28 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             {highlightedCaption}
           </div>
         )}
+        {state.caption === '' && !textareaFocused && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 10,
+              left: 0,
+              width: 2,
+              height: 24,
+              background: '#F7931E',
+              borderRadius: 1,
+              animation: 'blink 1s step-end infinite',
+              pointerEvents: 'none',
+              zIndex: 2,
+            }}
+          />
+        )}
+        <style>{`@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
         <textarea
           ref={textareaRef}
           value={state.caption}
-          autoFocus
+          onFocus={() => setTextareaFocused(true)}
+          onBlur={() => setTextareaFocused(false)}
           onChange={(e) => {
             handleCaptionChange(e);
           }}
