@@ -126,20 +126,29 @@ export function MentionPanel() {
           className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing"
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
+          <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
         </div>
 
-        <div className="px-5 pb-3 shrink-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: DARK_TEXT3 }}>
-            Mention
-          </p>
-          <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: DARK_TEXT }}>
-            Tag a golfer
-          </h3>
+        <div className="flex items-center justify-between px-5 pb-3 shrink-0">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: DARK_TEXT3 }}>
+              Mention
+            </p>
+            <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: DARK_TEXT }}>
+              Tag a golfer
+            </h3>
+          </div>
+          <button
+            onClick={closePanel}
+            className="flex items-center justify-center shrink-0"
+            style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2.5} />
+          </button>
         </div>
 
         <div className="px-5 pb-3">
-          <div className="flex items-center gap-2.5 px-3.5 py-3" style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}`, borderRadius: 14 }}>
+          <div className="flex items-center gap-2.5" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '11px 14px' }}>
             <Search className="w-4 h-4 shrink-0" style={{ color: DARK_TEXT3 }} />
             <input
               ref={inputRef}
@@ -183,7 +192,7 @@ export function MentionPanel() {
               transition={{ delay: i * 0.04 }}
               onClick={() => handleSelect(entity)}
               className="w-full flex items-center gap-3 py-3 min-h-[56px]"
-              style={{ borderBottom: i < results.length - 1 ? `1px solid ${DARK_BORDER}` : 'none' }}
+              style={{ borderBottom: i < results.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
             >
               <div className="w-10 h-10 overflow-hidden shrink-0" style={{ background: DARK_CARD, borderRadius: '34%' }}>
                 {entity.profile_image_url
@@ -199,7 +208,7 @@ export function MentionPanel() {
                   <p className="text-xs mt-0.5" style={{ color: DARK_TEXT2 }}>@{entity.username}</p>
                 )}
               </div>
-              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: DARK_CARD, color: DARK_TEXT3 }}>
+              <span style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 20, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.40)', padding: '2px 8px' }}>
                 {entity.entity_type === 'business' ? 'Club' : 'Golfer'}
               </span>
             </motion.button>
