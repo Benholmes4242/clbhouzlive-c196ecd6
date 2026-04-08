@@ -738,7 +738,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               <motion.button
                 key={item.id}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => {
+                onTap={() => {
                   if (trayIndex === i) {
                     setTrayIndex(null);
                   } else {
@@ -748,6 +748,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 }}
                 className="shrink-0 relative"
                 style={{
+                  cursor: 'pointer',
                   width: 68,
                   height: 68,
                   borderRadius: 0,
