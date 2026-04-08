@@ -819,6 +819,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             transition={{ duration: 0.2 }}
             className="shrink-0 overflow-hidden"
             style={{
+              position: 'relative',
+              zIndex: 10,
               background: 'rgba(18,18,18,0.98)',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}
