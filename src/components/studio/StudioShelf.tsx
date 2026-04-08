@@ -407,25 +407,27 @@ export default function StudioShelf({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <div className="text-center px-6 py-8">
-                      <motion.div
-                        className="flex items-center justify-center mb-3"
-                        animate={{ opacity: [0.7, 1, 0.7] }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ background: 'rgba(255,255,255,0.07)' }}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '35vh' }}>
+                      <div className="text-center px-6">
+                        <motion.div
+                          className="flex items-center justify-center mb-3"
+                          animate={{ opacity: [0.7, 1, 0.7] }}
+                          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                         >
-                          <Sparkles className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} />
-                        </div>
-                      </motion.div>
-                      <p className="text-sm font-semibold text-white">
-                        Enhance your moment
-                      </p>
-                      <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                        Add music, text, filters or crop
-                      </p>
+                          <div
+                            className="w-10 h-10 rounded-full flex items-center justify-center"
+                            style={{ background: 'rgba(255,255,255,0.07)' }}
+                          >
+                            <Sparkles className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} />
+                          </div>
+                        </motion.div>
+                        <p className="text-sm font-semibold text-white">
+                          Enhance your moment
+                        </p>
+                        <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                          Add music, text, filters or crop
+                        </p>
+                      </div>
                     </div>
                   </motion.div>
                 )}
