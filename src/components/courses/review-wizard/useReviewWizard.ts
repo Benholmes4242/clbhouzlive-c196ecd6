@@ -785,6 +785,17 @@ export function useReviewWizard({
         console.warn('[ReviewWizard] Failed to delete shared posts:', postsError);
       }
 
+      // 2b. Delete associated friend_course_review notifications
+      const { error: notifError } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('entity_id', reviewId)
+        .eq('type', 'friend_course_review');
+
+      if (notifError) {
+        console.warn('[ReviewWizard] Failed to delete notifications:', notifError);
+      }
+
       // 3. Delete the rating - cascade will handle course_review_media and votes
       const { error } = await supabase
         .from('course_ratings')
