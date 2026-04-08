@@ -226,73 +226,77 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             </p>
           </div>
         ) : (
-          <div className="px-4">
-            {filteredTracks.map((track, i) => {
-              const isPlaying = previewingTrack === track.id;
-              const isSelected = selectedTrack === track.id;
-              
-              return (
-                <div
-                  key={track.id}
-                  className="flex items-center gap-3 cursor-pointer"
-                  style={{
-                    padding: '12px 0',
-                    borderBottom: i < filteredTracks.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                    background: isPlaying ? 'rgba(247,147,30,0.08)' : 'transparent',
-                    marginLeft: isPlaying ? -16 : 0,
-                    marginRight: isPlaying ? -16 : 0,
-                    paddingLeft: isPlaying ? 16 : 0,
-                    paddingRight: isPlaying ? 16 : 0,
-                    borderRadius: isPlaying ? 10 : 0,
-                  }}
-                  onClick={() => handleSelectTrack(track)}
-                >
-                  {/* Play button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePreviewToggle(track);
-                    }}
-                    className="flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+          <div className="px-4 pt-1 pb-6">
+            {/* Section label */}
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.28)', padding: '8px 0 6px' }}>
+              ADD MUSIC
+            </p>
+
+            <div className="flex flex-col gap-2">
+              {filteredTracks.map((track) => {
+                const isPlaying = previewingTrack === track.id;
+                const isSelected = selectedTrack === track.id;
+
+                return (
+                  <div
+                    key={track.id}
+                    className="flex items-center gap-3 cursor-pointer"
                     style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: '50%',
-                      background: isPlaying ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
-                      border: isPlaying ? '1px solid rgba(247,147,30,0.28)' : '1px solid rgba(255,255,255,0.08)',
+                      padding: '10px 12px',
+                      borderRadius: 12,
+                      background: isPlaying
+                        ? 'rgba(247,147,30,0.08)'
+                        : isSelected
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(255,255,255,0.04)',
+                      border: isPlaying
+                        ? '1px solid rgba(247,147,30,0.18)'
+                        : '1px solid rgba(255,255,255,0.06)',
                     }}
+                    onClick={() => handleSelectTrack(track)}
                   >
-                    {isPlaying ? (
-                      <WaveformBars />
-                    ) : (
-                      <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
-                        <path d="M1 1.5L10.5 7L1 12.5V1.5Z" fill="rgba(255,255,255,0.55)" />
-                      </svg>
+                    {/* Play button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePreviewToggle(track);
+                      }}
+                      className="flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: '50%',
+                        background: isPlaying ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
+                        border: isPlaying ? '1px solid rgba(247,147,30,0.28)' : '1px solid rgba(255,255,255,0.08)',
+                      }}
+                    >
+                      {isPlaying ? (
+                        <WaveformBars />
+                      ) : (
+                        <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+                          <path d="M1 1.5L10.5 7L1 12.5V1.5Z" fill="rgba(255,255,255,0.55)" />
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* Track info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate leading-tight" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.90)' }}>
+                        {track.title}
+                      </div>
+                      <div className="truncate leading-tight" style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', marginTop: 2 }}>
+                        {MOOD_DESCRIPTORS[track.mood] || track.mood} · {track.duration}
+                      </div>
+                    </div>
+
+                    {/* Selected dot */}
+                    {isSelected && (
+                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
                     )}
-                  </button>
-
-                  {/* Track info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate leading-tight" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.90)' }}>
-                      {track.title}
-                    </div>
-                    <div className="truncate leading-tight" style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', marginTop: 2 }}>
-                      {MOOD_DESCRIPTORS[track.mood] || track.mood}
-                    </div>
                   </div>
-
-                  {/* Duration */}
-                  <div className="flex-shrink-0 font-mono" style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)' }}>
-                    {track.duration}
-                  </div>
-
-                  {/* Selected dot */}
-                  {isSelected && (
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
