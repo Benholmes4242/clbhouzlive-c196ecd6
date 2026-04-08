@@ -76,8 +76,11 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
   if (compact) {
     return (
       <>
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => setSheetOpen(true)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheetOpen(true); } }}
           className="relative flex items-center"
           style={{
             gap: 8,
@@ -126,7 +129,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
           </div>
 
           <ChevronDown className="w-[10px] h-[10px] shrink-0 ml-auto" style={{ color: 'rgba(255,255,255,0.35)' }} />
-        </button>
+        </div>
 
         {createPortal(
           <AnimatePresence>
