@@ -39,6 +39,7 @@ export function ReviewWizard({
   isOpen,
   onClose,
   isEditMode = false,
+  alreadyShared = false,
   existingRating,
   onRemoveFromPlayed,
   initialMediaFiles,
@@ -334,8 +335,8 @@ export function ReviewWizard({
                         isEditMode={isEditMode}
                         onViewReview={handleViewReview}
                         onDone={handleDone}
-                        onShareToClubhouse={!isEditMode ? handleShareFromPreview : undefined}
-                        isSharing={!isEditMode ? isSharing : false}
+                        onShareToClubhouse={!alreadyShared ? handleShareFromPreview : undefined}
+                        isSharing={!alreadyShared ? isSharing : false}
                       />
                     ) : wizard.state.step === 'share-success' ? (
                       <SuccessScreen
