@@ -1,7 +1,7 @@
 // Post Studio — State Machine
 // Single useReducer + React Context for the entire studio
 
-import React, { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useMemo, useRef } from 'react';
 import type { StudioEdits } from '@/types/studio';
 import type {
   PostStudioState,
@@ -205,6 +205,7 @@ interface PostStudioContextValue {
   setMentionTriggerIndex: (index: number) => void;
   reset: () => void;
   onSuccess?: (postId: string) => void;
+  publishRef: React.MutableRefObject<(() => void) | null>;
 }
 
 const PostStudioContext = createContext<PostStudioContextValue | null>(null);
@@ -260,6 +261,7 @@ export function PostStudioProvider({
   const setDiscarding = useCallback((value: boolean) => dispatch({ type: 'SET_DISCARDING', payload: value }), []);
   const setMentionTriggerIndex = useCallback((index: number) => dispatch({ type: 'SET_MENTION_TRIGGER', payload: index }), []);
   const reset = useCallback(() => dispatch({ type: 'RESET' }), []);
+  const publishRef = useRef<(() => void) | null>(null);
 
   const value = useMemo<PostStudioContextValue>(
     () => ({
@@ -287,6 +289,7 @@ export function PostStudioProvider({
       setMentionTriggerIndex,
       reset,
       onSuccess,
+      publishRef,
     }),
     [
       state,
