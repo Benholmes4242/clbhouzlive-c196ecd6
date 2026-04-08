@@ -88,11 +88,12 @@ function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selec
   );
 }
 
-function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, deletePost, isPublishingNow, isDeleting }: {
+function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, deletePost, isPublishingNow, isDeleting, closePanel }: {
   scheduledPosts: any[]; isLoading: boolean; refetch: () => void;
   publishNow: (id: string) => Promise<any>; deletePost: (id: string) => Promise<any>;
-  isPublishingNow: boolean; isDeleting: boolean;
+  isPublishingNow: boolean; isDeleting: boolean; closePanel: () => void;
 }) {
+  const queryClient = useQueryClient();
   useEffect(() => { refetch(); }, []);
 
   return (
