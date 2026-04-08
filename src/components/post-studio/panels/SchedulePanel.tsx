@@ -90,7 +90,7 @@ function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selec
 type Tab = 'schedule' | 'scheduled';
 
 export function SchedulePanel() {
-  const { state, setScheduledAt, closePanel, publishRef } = usePostStudioContext();
+  const { state, setScheduledAt, closePanel, schedulePublishRef } = usePostStudioContext();
   const dragControls = useDragControls();
   const [showDrumPicker, setShowDrumPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('schedule');
@@ -161,12 +161,13 @@ export function SchedulePanel() {
   }, [now, dayIdx, hourIdx, minIdx, setScheduledAt]);
 
   const handleCTA = useCallback(() => {
-    closePanel();
-    if (state.scheduledAt && publishRef.current) {
-      // Small delay to let panel close animation start
-      setTimeout(() => publishRef.current?.(), 50);
+    if (state.scheduledAt) {
+      schedulePublishRef.current = true;
+      // Re-set scheduledAt to trigger the useEffect in ComposeScreen
+      setScheduledAt(new Date(state.scheduledAt.getTime()));
     }
-  }, [closePanel, state.scheduledAt, publishRef]);
+    closePanel();
+  }, [closePanel, state.scheduledAt, schedulePublishRef, setScheduledAt]);
 
   const scheduledCount = scheduledPosts.length;
 

@@ -229,12 +229,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, updateMediaEdits,
-    setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, publishRef,
+    setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
 
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
   const { drafts } = useDrafts();
   const draftsCount = drafts?.length ?? 0;
+  
 
   const handleSaveDraft = useCallback(async () => {
     const ok = await saveDraft();
@@ -474,11 +475,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state, setStep, onSuccess, isPublishing]);
 
-  // Register publish handler on context ref for SchedulePanel access
+  // Auto-publish once scheduledAt is committed to state
   useEffect(() => {
-    publishRef.current = handlePublish;
-    return () => { publishRef.current = null; };
-  }, [handlePublish, publishRef]);
+    if (state.scheduledAt !== null && schedulePublishRef.current) {
+      schedulePublishRef.current = false;
+      handlePublish();
+    }
+  }, [state.scheduledAt, handlePublish, schedulePublishRef]);
 
   // ── Tray item for inline edit ──
   const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
