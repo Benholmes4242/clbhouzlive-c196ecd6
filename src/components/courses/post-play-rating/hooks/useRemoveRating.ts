@@ -77,6 +77,14 @@ export function useRemoveRating({
       await queryClient.refetchQueries({ queryKey: ['course-personal-status'], type: 'active', exact: false });
       await queryClient.refetchQueries({ queryKey: ['user-course-moments'], type: 'active', exact: false });
 
+      // Invalidate feed queries so deleted shared posts disappear
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
+
       // Trigger badge checking for the user (non-blocking)
       try {
         const { data: userResponse } = await supabase.auth.getUser();
