@@ -829,7 +829,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               position: 'relative',
               zIndex: 10,
               background: 'rgba(18,18,18,0.98)',
-              borderBottom: '1px solid rgba(255,255,255,0.08)',
+               borderBottom: 'none',
+               marginBottom: 0,
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -863,7 +864,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 display: 'grid',
                 gridTemplateColumns: trayIndex !== coverIndex ? 'repeat(4,1fr)' : 'repeat(3,1fr)',
                 gap: 4,
-                padding: 8,
+                padding: '4px 8px 0',
               }}>
                 {/* Cover */}
                 {trayIndex !== coverIndex && (
