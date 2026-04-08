@@ -336,126 +336,137 @@ export function SchedulePanel() {
           })}
         </div>
 
-        {/* Tab content */}
-        {activeTab === 'schedule' ? (
-          <AnimatePresence mode="wait">
-            {showDrumPicker ? (
-              <motion.div
-                key="drum"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="px-5 pb-6"
-              >
-                <button
-                  onClick={() => setShowDrumPicker(false)}
-                  className="flex items-center gap-1 mb-4"
-                  style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.50)' }}
+        {/* Scrollable content */}
+        <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', minHeight: 0 }}>
+          {activeTab === 'schedule' ? (
+            <AnimatePresence mode="wait">
+              {showDrumPicker ? (
+                <motion.div
+                  key="drum"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="px-5 pb-4"
                 >
-                  <ChevronLeft className="w-4 h-4" /> Back
-                </button>
+                  <button
+                    onClick={() => setShowDrumPicker(false)}
+                    className="flex items-center gap-1 mb-4"
+                    style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.50)' }}
+                  >
+                    <ChevronLeft className="w-4 h-4" /> Back
+                  </button>
 
-                <div className="flex gap-2 mb-4">
-                  <DrumPicker items={dayLabels} selectedIndex={dayIdx} onSelect={setDayIdx} />
-                  <DrumPicker items={hourLabels} selectedIndex={hourIdx} onSelect={setHourIdx} />
-                  <DrumPicker items={minuteLabels} selectedIndex={minIdx} onSelect={setMinIdx} />
-                </div>
-
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleDrumConfirm}
-                  className="w-full flex items-center justify-center"
-                  style={{
-                    background: '#F7931E', borderRadius: 16,
-                    fontSize: 15, fontWeight: 700, color: '#fff',
-                    minHeight: 48,
-                  }}
-                >
-                  Confirm time
-                </motion.button>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="quick"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="px-5 pb-4"
-              >
-                <div className="flex flex-col gap-1.5">
-                  {quickOptions.map((opt) => {
-                    const isActive = activeId === opt.id;
-                    return (
-                      <button
-                        key={opt.id}
-                        onClick={() => handleQuickSelect(opt)}
-                        className="w-full flex items-center gap-3"
-                        style={{
-                          padding: '12px 14px', borderRadius: 14,
-                          background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
-                          border: isActive ? '1px solid rgba(247,147,30,0.28)' : '1px solid transparent',
-                        }}
-                      >
-                        <div className="shrink-0 flex items-center justify-center" style={{
-                          width: 36, height: 36, borderRadius: 10,
-                          background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
-                          color: isActive ? '#F7931E' : 'rgba(255,255,255,0.40)',
-                        }}>
-                          {opt.icon}
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>{opt.label}</p>
-                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 1 }}>{opt.sub}</p>
-                        </div>
-                        {opt.id === 'custom' && <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.20)' }} />}
-                        {isActive && opt.id !== 'custom' && (
-                          <div className="w-2 h-2 rounded-full shrink-0" style={{ background: '#F7931E' }} />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Confirmation line */}
-                {state.scheduledAt && (
-                  <div className="flex items-center gap-2 mt-3 px-3 py-2.5 rounded-xl" style={{
-                    background: 'rgba(247,147,30,0.07)', border: '1px solid rgba(247,147,30,0.14)',
-                  }}>
-                    <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />
-                    <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(247,147,30,0.80)' }}>
-                      Will post {fmtDate(state.scheduledAt)}
-                    </span>
+                  <div className="flex gap-2 mb-4">
+                    <DrumPicker items={dayLabels} selectedIndex={dayIdx} onSelect={setDayIdx} />
+                    <DrumPicker items={hourLabels} selectedIndex={hourIdx} onSelect={setHourIdx} />
+                    <DrumPicker items={minuteLabels} selectedIndex={minIdx} onSelect={setMinIdx} />
                   </div>
-                )}
 
-                {/* CTA */}
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleCTA}
-                  className="w-full flex items-center justify-center mt-3"
-                  style={{
-                    borderRadius: 16, fontSize: 15, fontWeight: 700, minHeight: 48,
-                    background: state.scheduledAt ? '#F7931E' : 'rgba(255,255,255,0.08)',
-                    color: state.scheduledAt ? '#fff' : 'rgba(255,255,255,0.55)',
-                    boxShadow: state.scheduledAt ? '0 4px 20px rgba(247,147,30,0.28)' : 'none',
-                  }}
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleDrumConfirm}
+                    className="w-full flex items-center justify-center"
+                    style={{
+                      background: '#F7931E', borderRadius: 16,
+                      fontSize: 15, fontWeight: 700, color: '#fff',
+                      minHeight: 48,
+                    }}
+                  >
+                    Confirm time
+                  </motion.button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="quick"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="px-5 pb-4"
                 >
-                  {state.scheduledAt ? 'Schedule post' : 'Post now'}
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        ) : (
-          /* Scheduled posts tab */
-          <ScheduledPostsList
-            scheduledPosts={scheduledPosts}
-            isLoading={isLoading}
-            refetch={refetch}
-            publishNow={publishNow}
-            deletePost={deletePost}
-            isPublishingNow={isPublishingNow}
-            isDeleting={isDeleting}
-          />
+                  <div className="flex flex-col gap-1.5">
+                    {quickOptions.map((opt) => {
+                      const isActive = activeId === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleQuickSelect(opt)}
+                          className="w-full flex items-center gap-3"
+                          style={{
+                            padding: '12px 14px', borderRadius: 14,
+                            background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
+                            border: isActive ? '1px solid rgba(247,147,30,0.28)' : '1px solid transparent',
+                          }}
+                        >
+                          <div className="shrink-0 flex items-center justify-center" style={{
+                            width: 36, height: 36, borderRadius: 10,
+                            background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
+                            color: isActive ? '#F7931E' : 'rgba(255,255,255,0.40)',
+                          }}>
+                            {opt.icon}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>{opt.label}</p>
+                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 1 }}>{opt.sub}</p>
+                          </div>
+                          {opt.id === 'custom' && <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.20)' }} />}
+                          {isActive && opt.id !== 'custom' && (
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: '#F7931E' }} />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Confirmation line */}
+                  {state.scheduledAt && (
+                    <div className="flex items-center gap-2 mt-3 px-3 py-2.5 rounded-xl" style={{
+                      background: 'rgba(247,147,30,0.07)', border: '1px solid rgba(247,147,30,0.14)',
+                    }}>
+                      <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />
+                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(247,147,30,0.80)' }}>
+                        Will post {fmtDate(state.scheduledAt)}
+                      </span>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          ) : (
+            <ScheduledPostsList
+              scheduledPosts={scheduledPosts}
+              isLoading={isLoading}
+              refetch={refetch}
+              publishNow={publishNow}
+              deletePost={deletePost}
+              isPublishingNow={isPublishingNow}
+              isDeleting={isDeleting}
+            />
+          )}
+        </div>
+
+        {/* CTA — always pinned to bottom */}
+        {activeTab === 'schedule' && !showDrumPicker && (
+          <div style={{
+            flexShrink: 0,
+            padding: '12px 20px',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgba(22,22,22,0.98)',
+          }}>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={handleCTA}
+              className="w-full flex items-center justify-center"
+              style={{
+                borderRadius: 16, fontSize: 15, fontWeight: 700, minHeight: 48,
+                background: state.scheduledAt ? '#F7931E' : 'rgba(255,255,255,0.08)',
+                color: state.scheduledAt ? '#fff' : 'rgba(255,255,255,0.55)',
+                boxShadow: state.scheduledAt ? '0 4px 20px rgba(247,147,30,0.28)' : 'none',
+              }}
+            >
+              {state.scheduledAt ? 'Schedule post' : 'Post now'}
+            </motion.button>
+          </div>
         )}
       </motion.div>
     </>
