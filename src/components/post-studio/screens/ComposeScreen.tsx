@@ -1031,7 +1031,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   <span className="text-base">⛳</span>
                 </div>
                 <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
-                  Where did you play?
+                  Tag where you played
                 </span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
