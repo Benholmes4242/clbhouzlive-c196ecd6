@@ -252,8 +252,11 @@ export function SchedulePanel() {
       closePanel();
     } else {
       // "Post now" — close panel first, then trigger publish via ref
+      console.log('[DEBUG] Post now tapped, calling closePanel then handlePublish');
       closePanel();
+      console.log('[DEBUG] closePanel called, now calling postNowRef.current()');
       postNowRef.current();
+      console.log('[DEBUG] postNowRef.current() invoked');
     }
   }, [closePanel, state.scheduledAt, state.mediaItems.length, schedulePublishRef, setScheduledAt, postNowRef]);
 
