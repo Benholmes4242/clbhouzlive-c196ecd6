@@ -10,7 +10,6 @@ type StudioPanelEditProps = {
   updateEdits: (patch: Partial<StudioEdits>) => void;
   mediaType: 'image' | 'video';
   mediaUrl?: string;
-  /** When false, hides the embedded CropEditor (used when crop is on the fullscreen canvas) */
   showCropCanvas?: boolean;
 };
 
@@ -89,30 +88,40 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
-        {/* Crop ratios */}
+        {/* Aspect Ratio */}
         <div>
-          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: 'rgba(255,255,255,0.45)' }}>Crop Ratio</label>
-          <div className="grid grid-cols-5 gap-1.5">
-            {CROP_RATIOS.map(ratio => (
-              <button
-                key={ratio}
-                onClick={() => handleCropRatio(ratio)}
-                className="py-1.5 px-2 rounded-md text-xs font-medium transition-colors"
-                style={cropRatio === ratio ? {
-                  background: 'rgba(255,255,255,0.90)',
-                  color: '#FFFFFF',
-                } : {
-                  background: 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.45)',
-                }}
-              >
-                {ratio === 'original' ? 'Free' : ratio}
-              </button>
-            ))}
+          <span style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase' as const,
+            color: 'rgba(255,255,255,0.28)',
+          }}>
+            Aspect Ratio
+          </span>
+          <div className="flex gap-2 mt-2">
+            {CROP_RATIOS.map(ratio => {
+              const isActive = cropRatio === ratio;
+              return (
+                <button
+                  key={ratio}
+                  onClick={() => handleCropRatio(ratio)}
+                  className="py-1.5 px-3 text-xs font-semibold transition-colors"
+                  style={{
+                    borderRadius: 20,
+                    background: isActive ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.06)',
+                    border: isActive ? '1px solid rgba(247,147,30,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                    color: isActive ? '#F7931E' : 'rgba(255,255,255,0.45)',
+                  }}
+                >
+                  {ratio === 'original' ? 'Original' : ratio}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Embedded crop editor (only shown when showCropCanvas=true, i.e. legacy/non-fullscreen usage) */}
+        {/* Embedded crop editor */}
         {showEmbeddedCrop && (
           <div className="h-[280px]">
             <CropEditor
@@ -136,61 +145,60 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
         )}
 
         {/* Divider */}
-        <div className="h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+        <div className="h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
 
-        {/* Transform controls */}
+        {/* Transform */}
         <div>
-          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: 'rgba(255,255,255,0.45)' }}>Transform</label>
-          <div className="flex gap-2">
+          <span style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase' as const,
+            color: 'rgba(255,255,255,0.28)',
+          }}>
+            Transform
+          </span>
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {/* Rotate */}
             <button
               onClick={handleRotate}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
-              style={rotation > 0 ? {
-                background: 'rgba(255,255,255,0.90)',
-                color: '#FFFFFF',
-                border: '1px solid transparent',
-              } : {
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: '#FFFFFF',
+              className="flex flex-col items-center gap-1.5 py-3 rounded-xl transition-colors"
+              style={{
+                background: rotation > 0 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
-              <RotateCw className="w-4 h-4" />
-              <span className="text-xs font-medium">90°</span>
-              {rotation > 0 && (
-                <span className="text-[10px] ml-0.5 opacity-70">({rotation}°)</span>
-              )}
-            </button>
-            
-            <button
-              onClick={handleFlipH}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
-              style={flipH ? {
-                background: 'rgba(255,255,255,0.90)',
-                color: '#FFFFFF',
-                border: '1px solid transparent',
-              } : {
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: '#FFFFFF',
-              }}
-            >
-              <FlipHorizontal className="w-4 h-4" />
-              <span className="text-xs font-medium">Flip H</span>
+              <RotateCw className="w-5 h-5" style={{ color: rotation > 0 ? '#F7931E' : 'rgba(255,255,255,0.45)' }} />
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.55)' }}>Rotate</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.30)' }}>{rotation}°</span>
             </button>
 
+            {/* Flip H */}
             <button
-              onClick={handleFlipV}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
-              style={flipV ? {
-                background: 'rgba(255,255,255,0.90)',
-                color: '#FFFFFF',
-                border: '1px solid transparent',
-              } : {
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: '#FFFFFF',
+              onClick={handleFlipH}
+              className="flex flex-col items-center gap-1.5 py-3 rounded-xl transition-colors"
+              style={{
+                background: flipH ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
-              <FlipVertical className="w-4 h-4" />
-              <span className="text-xs font-medium">Flip V</span>
+              <FlipHorizontal className="w-5 h-5" style={{ color: flipH ? '#F7931E' : 'rgba(255,255,255,0.45)' }} />
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.55)' }}>Flip H</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.30)' }}>{flipH ? 'On' : 'Off'}</span>
+            </button>
+
+            {/* Flip V */}
+            <button
+              onClick={handleFlipV}
+              className="flex flex-col items-center gap-1.5 py-3 rounded-xl transition-colors"
+              style={{
+                background: flipV ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <FlipVertical className="w-5 h-5" style={{ color: flipV ? '#F7931E' : 'rgba(255,255,255,0.45)' }} />
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.55)' }}>Flip V</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.30)' }}>{flipV ? 'On' : 'Off'}</span>
             </button>
           </div>
         </div>
