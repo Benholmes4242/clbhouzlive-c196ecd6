@@ -487,10 +487,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           autoFocus
           onChange={(e) => {
             handleCaptionChange(e);
-            const el = e.target;
-            el.style.height = 'auto';
-            el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
-            requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
           }}
           placeholder="What's on your mind?"
           className="w-full resize-none outline-none placeholder:text-white/[.16]"
@@ -503,8 +499,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
             caretColor: '#F7931E',
             WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-            minHeight: minH,
-            maxHeight: maxH,
+            height: 72,
             overflowY: 'auto',
             resize: 'none',
             scrollbarWidth: 'none',
