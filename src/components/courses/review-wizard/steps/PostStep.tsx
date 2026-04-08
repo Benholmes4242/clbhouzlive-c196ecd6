@@ -336,52 +336,6 @@ export function PostStep({
         )}
       </div>
 
-      {/* Submit CTA */}
-      <div className="mt-auto pt-4">
-        <button
-          type="button"
-          onClick={canSubmit ? onSubmit : undefined}
-          disabled={!canSubmit}
-          className="w-full flex items-center justify-center transition-all"
-          style={{
-            height: 56,
-            borderRadius: 16,
-            background: canSubmit
-              ? 'linear-gradient(135deg, #F7931E, #FBBC2E)'
-              : '#EBEBED',
-            boxShadow: canSubmit
-              ? '0 8px 28px rgba(247,147,30,0.38)'
-              : 'none',
-            color: canSubmit ? '#FFFFFF' : '#AEAEB2',
-            fontSize: 16,
-            fontWeight: 900,
-            cursor: canSubmit ? 'pointer' : 'not-allowed',
-            ...(canSubmit ? {} : {}),
-          }}
-          {...(canSubmit ? {
-            onPointerDown: (e: React.PointerEvent) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(0.98)';
-            },
-            onPointerUp: (e: React.PointerEvent) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-            },
-            onPointerLeave: (e: React.PointerEvent) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-            },
-          } : {})}
-        >
-          {isSubmitting
-            ? '⏳ Posting your review…'
-            : canSubmit
-              ? (isEditMode ? 'Update Review ✦' : 'Post Review ✦')
-              : 'Add a rating to post'}
-        </button>
-        {!canSubmit && !isSubmitting && (
-          <p className="text-[12px] text-muted-foreground text-center mt-2">
-            Go back to Step 1 to add your rating
-          </p>
-        )}
-      </div>
 
       {/* Fullscreen media preview */}
       {previewMediaIndex !== null && (
