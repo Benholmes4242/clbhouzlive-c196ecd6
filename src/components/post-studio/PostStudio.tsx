@@ -17,7 +17,7 @@ import { PosterScreen } from './screens/PosterScreen';
 import { SuccessScreen } from './screens/SuccessScreen';
 import { MentionPanel } from './panels/MentionPanel';
 import { CourseTagPanel } from './panels/CourseTagPanel';
-import { AudiencePanel } from './panels/AudiencePanel';
+// AudiencePanel removed — merged into Account & Visibility sheet
 import { SchedulePanel } from './panels/SchedulePanel';
 import { DraftsPanel } from './panels/DraftsPanel';
 import { useSaveDraft } from './hooks/useSaveDraft';
@@ -78,7 +78,7 @@ function PanelRouter() {
     <AnimatePresence>
       {state.activePanelId === 'mention'  && <MentionPanel />}
       {state.activePanelId === 'course'   && <CourseTagPanel />}
-      {state.activePanelId === 'audience' && <AudiencePanel />}
+      
       {state.activePanelId === 'schedule' && <SchedulePanel />}
       {state.activePanelId === 'drafts'   && <DraftsPanel />}
     </AnimatePresence>
