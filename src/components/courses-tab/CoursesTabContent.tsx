@@ -36,10 +36,7 @@ export default function CoursesTabContent({ embedded = false }: CoursesTabConten
 
   return (
     <div className="bg-background min-h-screen">
-      {/* A: Featured hero carousel — only when no region filter active */}
-      {activeRegion === null && <div className="pt-3"><FeaturedCoursesCarousel onRegionSelect={handleRegionChange} /></div>}
-
-      {/* B: Region filter chips + search (existing ExploreHeader) */}
+      {/* A: Region filter chips + search (existing ExploreHeader) */}
       <ExploreHeader
         activeRegion={activeRegion}
         regions={regions}
@@ -48,6 +45,9 @@ export default function CoursesTabContent({ embedded = false }: CoursesTabConten
         onOpenSearch={() => setIsSearchOpen(true)}
         embedded={embedded}
       />
+
+      {/* B: Featured hero carousel — only when no region filter active */}
+      {activeRegion === null && <div className="pt-3"><FeaturedCoursesCarousel onRegionSelect={handleRegionChange} /></div>}
 
       {/* C: Echo CTA */}
       <div style={{ padding: '8px 12px 14px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
