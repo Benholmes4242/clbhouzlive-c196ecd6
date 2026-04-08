@@ -13,7 +13,7 @@ import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
 import { ComposeScreen } from './screens/ComposeScreen';
 import { TrimScreen } from './screens/TrimScreen';
 import { PosterScreen } from './screens/PosterScreen';
-// PublishScreen removed — one-step flow (publish from ComposeScreen)
+
 import { SuccessScreen } from './screens/SuccessScreen';
 import { MentionPanel } from './panels/MentionPanel';
 import { CourseTagPanel } from './panels/CourseTagPanel';

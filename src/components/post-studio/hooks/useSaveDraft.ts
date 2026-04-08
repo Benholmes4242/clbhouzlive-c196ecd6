@@ -1,5 +1,5 @@
 // useSaveDraft — Shared save-draft logic for PostStudio
-// Used by StudioExitSheet (Fix 1), ComposeScreen header (Fix 2), and PublishScreen (Fix 4)
+// Used by StudioExitSheet and ComposeScreen header
 
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';

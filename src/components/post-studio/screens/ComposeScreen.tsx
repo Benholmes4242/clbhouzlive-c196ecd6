@@ -689,7 +689,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     fileInputRef.current?.click();
   }, []);
 
-  // ── Publish handler (moved from PublishScreen — one-step flow) ──
+  // ── Publish handler — one-step flow ──
   const handlePublish = useCallback(async () => {
     if (isPublishing) return;
     setIsPublishing(true);
