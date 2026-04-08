@@ -8,11 +8,11 @@ export const BG_CARD_HVR = 'rgba(0,0,0,0.055)';
 export const BG_GLASS    = 'rgba(248,250,252,0.97)';
 
 // Amber/gold scale — warm refined tone, not luminous orange
-export const AMBER       = '#E8980A';
-export const AMBER_DEEP  = '#C7870A';
-export const AMBER_DIM   = 'rgba(232,152,10,0.70)';
-export const AMBER_GHOST = 'rgba(232,152,10,0.08)';
-export const AMBER_GLOW  = '0 0 16px rgba(232,152,10,0.15)';
+export const AMBER       = '#F7931E';
+export const AMBER_DEEP  = '#E8870A';
+export const AMBER_DIM   = 'rgba(247,147,30,0.70)';
+export const AMBER_GHOST = 'rgba(247,147,30,0.08)';
+export const AMBER_GLOW  = '0 0 16px rgba(247,147,30,0.15)';
 
 // Text scale
 export const TEXT_PRIMARY   = 'rgba(15,23,42,0.92)';

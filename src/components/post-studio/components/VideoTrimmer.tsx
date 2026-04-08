@@ -1,15 +1,13 @@
-// VideoTrimmer — Waveform trim handles, light mode
+// VideoTrimmer — Dark amber waveform trim handles
 import React, { useRef, useState, useCallback } from 'react';
-import { TEXT_PRIMARY, TEXT_SECONDARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 
 interface VideoTrimmerProps {
   item: StudioMediaItem;
   onTrimChange: (trimStart: number, trimEnd: number) => void;
-  darkMode?: boolean;
 }
 
-const HANDLE_WIDTH = 16;
+const HANDLE_WIDTH = 20;
 const MIN_TRIM_DURATION = 1;
 
 export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
@@ -55,62 +53,71 @@ export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
 
   const handlePointerUp = useCallback(() => setIsDragging(null), []);
 
-  const fmt = (secs: number) => {
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
-
-  const trimDuration = trimEnd - trimStart;
-
   return (
-    <div className="w-full space-y-2.5">
-      <div className="text-center">
-        <span className="text-xs" style={{ color: TEXT_SECONDARY }}>
-          {fmt(trimStart)} — {fmt(trimEnd)}{' '}
-          <span style={{ color: TEXT_PRIMARY, fontWeight: 600 }}>
-            ({Math.round(trimDuration)}s)
-          </span>
-        </span>
-      </div>
-
+    <div className="w-full">
       <div
         ref={containerRef}
         className="relative rounded-xl overflow-hidden touch-none select-none"
-        style={{ height: 56, background: 'rgba(0,0,0,0.04)' }}
+        style={{ height: 56, background: 'rgba(255,255,255,0.04)' }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
         {/* Waveform bars */}
-        <div className="absolute inset-0 flex items-center justify-evenly px-2" style={{ opacity: 0.20 }}>
+        <div className="absolute inset-0 flex items-center justify-evenly px-1">
           {Array.from({ length: 44 }).map((_, i) => {
             const height = 20 + Math.sin(i * 0.8) * 15 + ((i * 37 + 11) % 13);
+            const barPercent = (i / 44) * 100;
+            const isInSelection = barPercent >= startPercent && barPercent <= endPercent;
             return (
-              <div key={i} className="rounded-full" style={{ width: 2, height: `${height}%`, background: 'rgba(15,23,42,0.70)' }} />
+              <div
+                key={i}
+                className="rounded-full"
+                style={{
+                  width: 2,
+                  height: `${height}%`,
+                  background: isInSelection ? '#F7931E' : 'rgba(255,255,255,0.12)',
+                  transition: 'background 150ms',
+                }}
+              />
             );
           })}
         </div>
 
         {/* Dimmed before trim */}
-        <div className="absolute inset-y-0 left-0 z-10" style={{ width: `${startPercent}%`, background: 'rgba(255,255,255,0.65)' }} />
+        <div className="absolute inset-y-0 left-0 z-10" style={{ width: `${startPercent}%`, background: 'rgba(0,0,0,0.55)' }} />
 
-        {/* Selected region */}
-        <div className="absolute inset-y-0 z-10" style={{ left: `${startPercent}%`, width: `${endPercent - startPercent}%`, background: 'rgba(15,23,42,0.04)', borderTop: '2px solid rgba(15,23,42,0.50)', borderBottom: '2px solid rgba(15,23,42,0.50)' }} />
+        {/* Selected region — amber top/bottom border */}
+        <div className="absolute inset-y-0 z-10" style={{
+          left: `${startPercent}%`,
+          width: `${endPercent - startPercent}%`,
+          borderTop: '2px solid #F7931E',
+          borderBottom: '2px solid #F7931E',
+        }} />
 
         {/* Dimmed after trim */}
-        <div className="absolute inset-y-0 right-0 z-10" style={{ width: `${100 - endPercent}%`, background: 'rgba(255,255,255,0.65)' }} />
+        <div className="absolute inset-y-0 right-0 z-10" style={{ width: `${100 - endPercent}%`, background: 'rgba(0,0,0,0.55)' }} />
 
-        {/* Start handle */}
+        {/* Start handle — amber, 20px */}
         <div onPointerDown={handlePointerDown('start')} className="absolute inset-y-0 z-20 flex items-center cursor-ew-resize" style={{ left: `calc(${startPercent}% - ${HANDLE_WIDTH / 2}px)` }}>
-          <div className="flex items-center justify-center" style={{ width: HANDLE_WIDTH, height: '100%', background: 'rgba(15,23,42,0.85)', borderRadius: '6px 0 0 6px', boxShadow: '0 0 8px rgba(15,23,42,0.15)' }}>
-            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(255,255,255,0.55)' }} />
+          <div className="flex items-center justify-center" style={{
+            width: HANDLE_WIDTH, height: '100%',
+            background: '#F7931E',
+            borderRadius: '6px 0 0 6px',
+            boxShadow: '0 0 8px rgba(247,147,30,0.30)',
+          }}>
+            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(13,13,13,0.50)' }} />
           </div>
         </div>
 
-        {/* End handle */}
+        {/* End handle — amber, 20px */}
         <div onPointerDown={handlePointerDown('end')} className="absolute inset-y-0 z-20 flex items-center cursor-ew-resize" style={{ left: `calc(${endPercent}% - ${HANDLE_WIDTH / 2}px)` }}>
-          <div className="flex items-center justify-center" style={{ width: HANDLE_WIDTH, height: '100%', background: 'rgba(15,23,42,0.85)', borderRadius: '0 6px 6px 0', boxShadow: '0 0 8px rgba(15,23,42,0.15)' }}>
-            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(255,255,255,0.55)' }} />
+          <div className="flex items-center justify-center" style={{
+            width: HANDLE_WIDTH, height: '100%',
+            background: '#F7931E',
+            borderRadius: '0 6px 6px 0',
+            boxShadow: '0 0 8px rgba(247,147,30,0.30)',
+          }}>
+            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(13,13,13,0.50)' }} />
           </div>
         </div>
       </div>
