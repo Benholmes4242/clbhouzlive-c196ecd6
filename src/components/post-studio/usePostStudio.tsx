@@ -292,6 +292,7 @@ export function PostStudioProvider({
       reset,
       onSuccess,
       schedulePublishRef,
+      postNowRef,
     }),
     [
       state,
