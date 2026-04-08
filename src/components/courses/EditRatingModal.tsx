@@ -172,6 +172,13 @@ const EditRatingModal = ({
       // Additional delete-specific invalidations
       queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friends-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['unseen-friend-reviews'] });
 
       // Force refetch critical queries
       await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', courseId] });
