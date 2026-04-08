@@ -266,21 +266,24 @@ export default function StudioPanelText({
                         {/* Size pills */}
                         <div>
                           <label className="block text-[11px] font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Size</label>
-                          <div className="flex gap-2">
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, width: '100%' }}>
                             {SIZES.map(size => {
                               const isActive = Math.abs(selected.scale - size.scale) < 0.05;
                               return (
                                 <button
                                   key={size.id}
                                   onClick={() => updateBox(selected.id, { scale: size.scale })}
-                                  className="text-[13px] transition-all"
+                                  className="transition-all"
                                   style={{
-                                    padding: '6px 14px',
+                                    width: '100%',
+                                    padding: '8px 0',
+                                    textAlign: 'center',
+                                    fontSize: 13,
+                                    fontWeight: isActive ? 700 : 600,
                                     borderRadius: 8,
                                     background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
                                     border: isActive ? '1px solid rgba(247,147,30,0.30)' : '1px solid rgba(255,255,255,0.08)',
                                     color: isActive ? '#F7931E' : 'rgba(255,255,255,0.55)',
-                                    fontWeight: isActive ? 700 : 400,
                                   }}
                                 >
                                   {size.label}
@@ -352,21 +355,24 @@ export default function StudioPanelText({
         </div>
 
         {/* Size pills */}
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, width: '100%' }}>
           {SIZES.map(size => {
             const isActive = activeSize === size.id;
             return (
               <button
                 key={size.id}
                 onClick={() => setNewScale(size.scale)}
-                className="text-[13px] transition-all"
+                className="transition-all"
                 style={{
-                  padding: '6px 14px',
+                  width: '100%',
+                  padding: '8px 0',
+                  textAlign: 'center',
+                  fontSize: 13,
+                  fontWeight: isActive ? 700 : 600,
                   borderRadius: 8,
                   background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
                   border: isActive ? '1px solid rgba(247,147,30,0.30)' : '1px solid rgba(255,255,255,0.08)',
                   color: isActive ? '#F7931E' : 'rgba(255,255,255,0.55)',
-                  fontWeight: isActive ? 700 : 400,
                 }}
               >
                 {size.label}
