@@ -112,7 +112,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
           color: 'rgba(255,255,255,0.92)',
           letterSpacing: '-0.04em', lineHeight: 1.1,
         }}>
-          {isScheduled ? 'Locked in.' : 'On the board.'}
+          {isScheduled ? 'Locked in.' : 'Your moment is live.'}
         </h2>
         <p style={{
           fontSize: 14, color: 'rgba(255,255,255,0.50)',
