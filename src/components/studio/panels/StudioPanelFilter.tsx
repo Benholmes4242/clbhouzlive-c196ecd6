@@ -69,8 +69,10 @@ const FilterCard = memo(function FilterCard({
       style={{ width: 80, flexShrink: 0 }}
     >
       <div
-        className="w-full aspect-square overflow-hidden"
+        className="overflow-hidden"
         style={{
+          width: 80,
+          height: 80,
           borderRadius: 12,
           border: isSelected ? '2px solid #F7931E' : '2px solid rgba(255,255,255,0.08)',
         }}
@@ -133,7 +135,7 @@ export default function StudioPanelFilter({
       {/* Subtitle */}
       <div className="px-4 pt-3 pb-2 flex-shrink-0">
         <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-          Selected: <span style={{ color: 'rgba(255,255,255,0.70)' }}>{selectedLabel}</span> · Hold to compare
+          Selected: <span style={{ color: 'rgba(255,255,255,0.70)' }}>{selectedLabel}</span>
         </span>
       </div>
 
@@ -186,21 +188,29 @@ export default function StudioPanelFilter({
             step={1}
             value={intensity}
             onChange={(e) => handleIntensityChange(Number(e.target.value))}
-            className="w-full h-1.5 rounded-full appearance-none cursor-pointer
+            className="w-full rounded-full appearance-none cursor-pointer
+              [&::-webkit-slider-runnable-track]:h-[3px]
+              [&::-webkit-slider-runnable-track]:rounded-full
               [&::-webkit-slider-thumb]:appearance-none
               [&::-webkit-slider-thumb]:w-5
               [&::-webkit-slider-thumb]:h-5
               [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:shadow-md
+              [&::-webkit-slider-thumb]:bg-[#F7931E]
+              [&::-webkit-slider-thumb]:shadow-[0_0_0_3px_rgba(247,147,30,0.25)]
               [&::-webkit-slider-thumb]:cursor-grab
               [&::-webkit-slider-thumb]:active:cursor-grabbing
+              [&::-webkit-slider-thumb]:-mt-[8.5px]
+              [&::-moz-range-track]:h-[3px]
+              [&::-moz-range-track]:rounded-full
               [&::-moz-range-thumb]:w-5
               [&::-moz-range-thumb]:h-5
               [&::-moz-range-thumb]:rounded-full
               [&::-moz-range-thumb]:border-0
-              [&::-moz-range-thumb]:shadow-md"
+              [&::-moz-range-thumb]:bg-[#F7931E]
+              [&::-moz-range-thumb]:shadow-[0_0_0_3px_rgba(247,147,30,0.25)]"
             style={{
               background: `linear-gradient(to right, #F7931E ${intensity}%, rgba(255,255,255,0.10) ${intensity}%)`,
+              height: 3,
             }}
           />
         </div>

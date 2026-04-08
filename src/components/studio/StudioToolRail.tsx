@@ -43,8 +43,6 @@ export default function StudioToolRail({ activeTool, setActiveTool }: StudioTool
       className="grid grid-cols-4 gap-2.5 px-4 py-2.5 flex-shrink-0"
       style={{
         background: 'rgba(10,10,10,0.98)',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
       }}
     >
       <ToolButton
