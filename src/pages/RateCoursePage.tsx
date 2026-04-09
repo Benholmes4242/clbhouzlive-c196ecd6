@@ -46,30 +46,43 @@ const RateCoursePage = () => {
     enabled: !!courseId && !!user,
   });
 
-  // Don't render wizard until we know definitively whether this is edit mode
-  // This ensures the useRef below captures the correct value
-  if (ratingLoading) {
-    return null;
-  }
+  // Check if this review has already been shared to Clubhouse
+  const { data: existingShare } = useQuery({
+    queryKey: ['review-shared', existingRating?.id],
+    queryFn: async () => {
+      if (!existingRating?.id) return null;
+      const { data } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('source_review_id', existingRating.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!existingRating?.id,
+  });
+
+  const alreadyShared = !!existingShare;
 
   const handleClose = () => {
-    // Set flag in sessionStorage to trigger highlight on next reviews tab view
     if (courseId) {
       sessionStorage.setItem(`highlight-review-${courseId}`, 'true');
     }
     
-    // Pop the Rate Course page off the history stack
-    // Check if there's history to go back to (handles direct URL access edge case)
     const hasHistory = window.history.state && window.history.state.idx > 0;
     
     if (hasHistory) {
       navigate(-1);
     } else {
-      // Fallback if user landed here directly via URL
       navigate(`/courses/${courseId}`, { replace: true });
     }
   };
 
+  // Don't render wizard until we know definitively whether this is edit mode.
+  // This ensures the ReviewWizard mounts with the correct isEditMode from the start,
+  // so all edit-mode initialization (state, breakdowns, media) fires correctly.
+  if (ratingLoading) {
+    return null;
+  }
 
   return (
     <AccessControl requireAuth={true} noBlockingLoader={true}>
@@ -77,7 +90,7 @@ const RateCoursePage = () => {
         course={course}
         isOpen={true}
         onClose={handleClose}
-        isEditMode={stableIsEditMode}
+        isEditMode={!!existingRating}
         alreadyShared={alreadyShared}
         existingRating={existingRating}
       />
