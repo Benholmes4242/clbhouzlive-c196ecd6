@@ -25,6 +25,7 @@ export interface ClubResult {
   country: string;
   region?: string | null;
   global_rank?: number | null;
+  user_has_rated?: boolean;
   type: 'course';
 }
 
