@@ -836,8 +836,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   style={{
                     position: 'relative',
                     flexShrink: 0,
-                    width: 160,
-                    height: 160,
+                    height: '100%',
+                    aspectRatio: '1',
                     borderRadius: 12,
                     overflow: 'hidden',
                     outline: isActive ? '2.5px solid #F7931E' : '2.5px solid transparent',
