@@ -313,6 +313,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFiredRef = useRef(false);
 
 
   const hasMedia = state.mediaItems.length > 0;
@@ -802,7 +804,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           {/* ── Scrollable thumbnail carousel ── */}
           <div style={{
             flexShrink: 0,
-            height: 'calc(100vh - 279px)',
+            height: 160,
             display: 'flex',
             overflowX: 'auto',
             overflowY: 'hidden',
@@ -818,12 +820,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               return (
                 <motion.div
                   key={item.id}
-                  onTap={() => setActiveMedia(i)}
+                  onTap={() => {
+                    if (longPressFiredRef.current) return;
+                    setActiveMedia(i);
+                  }}
+                  onPointerDown={() => {
+                    longPressFiredRef.current = false;
+                    longPressTimerRef.current = setTimeout(() => {
+                      longPressFiredRef.current = true;
+                      handleSetCover(i);
+                    }, 400);
+                  }}
+                  onPointerUp={() => { if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; } }}
+                  onPointerCancel={() => { if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; } }}
                   style={{
                     position: 'relative',
                     flexShrink: 0,
-                    width: 'calc(100vh - 279px)',
-                    height: '100%',
+                    width: 160,
+                    height: 160,
                     borderRadius: 12,
                     overflow: 'hidden',
                     outline: isActive ? '2.5px solid #F7931E' : '2.5px solid transparent',
@@ -932,8 +946,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => fileInputRef.current?.click()}
                 style={{
                   flexShrink: 0,
-                  width: 'calc(100vh - 279px)',
-                  height: '100%',
+                  width: 160,
+                  height: 160,
                   borderRadius: 12,
                   background: 'rgba(255,255,255,0.04)',
                   border: '1.5px dashed rgba(255,255,255,0.12)',
