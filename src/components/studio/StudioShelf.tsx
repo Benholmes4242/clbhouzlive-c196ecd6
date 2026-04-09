@@ -243,313 +243,324 @@ export default function StudioShelf({
       {open && (
         <>
           <motion.div
-            className="fixed inset-0 z-[9999] flex flex-col"
-            style={{
-              background: E.bg,
-              paddingBottom: 'env(safe-area-inset-bottom)',
-            }}
+            className="fixed inset-0 z-[9999]"
+            style={{ background: E.bg }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            {/* ── Top bar ── */}
-            <div
-              className="flex-shrink-0"
-              style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)', background: E.bg }}
-            >
-              <div className="flex items-center justify-between px-4 h-11">
-                {/* Back */}
-                <button
-                  onClick={handleCancelAttempt}
-                  className="flex items-center justify-center min-h-[44px]"
-                  style={{ width: 36 }}
-                >
-                  <ArrowLeft className="w-5 h-5" style={{ color: E.text }} />
-                </button>
-
-                {/* Thumbnail navigator — centre */}
-                <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none', maxWidth: '60%' }}>
-                  {(allMediaItems || [{ id: activeMediaId, mediaType: activeMediaType, previewUrl: activeMediaPreviewUrl, thumbnailUrl: activeMediaThumbnailUrl }]).map((m, i) => {
-                    const on = i === activeMediaIndex;
-                    return (
-                      <button
-                        key={m.id}
-                        onClick={() => onNavigateMedia?.(i)}
-                        style={{
-                          padding: 0, border: 'none', background: 'none', cursor: 'pointer', flexShrink: 0,
-                        }}
-                      >
-                        <div style={{
-                          width: 32, height: 32, borderRadius: 8, overflow: 'hidden',
-                          border: on ? '1.5px solid rgba(255,255,255,0.90)' : '1.5px solid rgba(255,255,255,0.12)',
-                          opacity: on ? 1 : 0.5,
-                          transition: 'all 0.15s',
-                        }}>
-                          {m.thumbnailUrl || m.previewUrl ? (
-                            <img src={m.thumbnailUrl || m.previewUrl || ''} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full" style={{ background: E.ghost }} />
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Right — Reset + Done */}
-                <div className="flex items-center gap-2">
-                  {hasChanges && (
-                    <button
-                      onClick={handleResetAll}
-                      style={{ fontSize: 12, fontWeight: 600, color: E.mid, minHeight: 44, display: 'flex', alignItems: 'center' }}
-                    >
-                      Reset
-                    </button>
-                  )}
+            {/* ── Zone 1: Media canvas (top) ── */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, bottom: '42vh',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              {/* ── Top bar ── */}
+              <div
+                className="flex-shrink-0"
+                style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)', background: E.bg }}
+              >
+                <div className="flex items-center justify-between px-4 h-11">
+                  {/* Back */}
                   <button
-                    onClick={() => onClose()}
-                    style={{
-                      height: 32, padding: '0 16px', borderRadius: 20,
-                      border: `1px solid ${E.border}`,
-                      background: 'transparent',
-                      color: E.text, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                    }}
+                    onClick={handleCancelAttempt}
+                    className="flex items-center justify-center min-h-[44px]"
+                    style={{ width: 36 }}
                   >
-                    Done
+                    <ArrowLeft className="w-5 h-5" style={{ color: E.text }} />
                   </button>
-                </div>
-              </div>
-            </div>
 
-            {/* ── Media Canvas ── */}
-            <div
-              ref={canvasRef}
-              className="flex-1 relative flex items-center justify-center overflow-hidden min-h-0"
-              style={{ touchAction: 'none', margin: '12px 16px 0', position: 'relative' }}
-            >
-              {/* Ambient glow */}
-              <div style={{
-                position: 'absolute', inset: -40,
-                background: `radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 70%)`,
-                pointerEvents: 'none', zIndex: 0,
-              }} />
-
-              {/* Photo/video card */}
-              <div style={{
-                position: 'relative', zIndex: 1,
-                maxWidth: '100%', maxHeight: '100%',
-                borderRadius: 16, overflow: 'hidden',
-                boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-              }}>
-                {showCropOnCanvas ? (
-                  <div style={{ width: '100%', height: '100%', minHeight: 200 }}>
-                    <CropEditor
-                      imageSrc={activeMediaPreviewUrl!}
-                      aspectRatio={cropAspect}
-                      initialZoom={edits.crop?.zoom || 1}
-                      initialCrop={edits.crop?.area ? {
-                        x: edits.crop.area.x,
-                        y: edits.crop.area.y,
-                      } : undefined}
-                      onCropComplete={handleCropComplete}
-                      onZoomChange={handleCropZoomChange}
-                    />
+                  {/* Thumbnail navigator — centre */}
+                  <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none', maxWidth: '60%' }}>
+                    {(allMediaItems || [{ id: activeMediaId, mediaType: activeMediaType, previewUrl: activeMediaPreviewUrl, thumbnailUrl: activeMediaThumbnailUrl }]).map((m, i) => {
+                      const on = i === activeMediaIndex;
+                      return (
+                        <button
+                          key={m.id}
+                          onClick={() => onNavigateMedia?.(i)}
+                          style={{
+                            padding: 0, border: 'none', background: 'none', cursor: 'pointer', flexShrink: 0,
+                          }}
+                        >
+                          <div style={{
+                            width: 32, height: 32, borderRadius: 8, overflow: 'hidden',
+                            border: on ? '1.5px solid rgba(255,255,255,0.90)' : '1.5px solid rgba(255,255,255,0.12)',
+                            opacity: on ? 1 : 0.5,
+                            transition: 'all 0.15s',
+                          }}>
+                            {m.thumbnailUrl || m.previewUrl ? (
+                              <img src={m.thumbnailUrl || m.previewUrl || ''} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full" style={{ background: E.ghost }} />
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
-                ) : (
-                  <>
-                    <div className="relative flex items-center justify-center" style={{ filter: lightFilterStyle }}>
-                      {activeMediaType === 'video' ? (
-                        <video
-                          src={activeMediaPreviewUrl || undefined}
-                          poster={activeMediaThumbnailUrl || undefined}
-                          className="max-w-full max-h-full object-contain"
-                          style={{ transform: mediaTransform, maxHeight: '55vh' }}
-                          autoPlay loop muted playsInline
-                        />
-                      ) : (
-                        <img
-                          src={activeMediaPreviewUrl || undefined}
-                          className="max-w-full max-h-full object-contain"
-                          style={{ transform: mediaTransform, maxHeight: '55vh' }}
-                          alt="Studio preview"
-                        />
-                      )}
 
-                      {showFilterOnCanvas && (
-                        <>
-                          {activeMediaType === 'video' ? (
-                            <video
-                              src={activeMediaPreviewUrl || undefined}
-                              poster={activeMediaThumbnailUrl || undefined}
-                              className={`absolute inset-0 max-w-full max-h-full object-contain m-auto ${filterClass}`}
-                              style={{ transform: mediaTransform, opacity: filterIntensity / 100, maxHeight: '55vh' }}
-                              autoPlay loop muted playsInline
-                            />
-                          ) : (
-                            <img
-                              src={activeMediaPreviewUrl || undefined}
-                              className={`absolute inset-0 max-w-full max-h-full object-contain m-auto ${filterClass}`}
-                              style={{ transform: mediaTransform, opacity: filterIntensity / 100, maxHeight: '55vh' }}
-                              alt=""
-                            />
-                          )}
-                        </>
-                      )}
-                    </div>
-
-                    {edits.textOverlays && edits.textOverlays.length > 0 && (
-                      <TextOverlayRenderer
-                        textOverlays={edits.textOverlays}
-                        isEditable={activeTool === 'text'}
-                        onChange={handleTextOverlayChange}
-                        containerRef={canvasRef as React.RefObject<HTMLDivElement>}
-                        activeOverlayId={activeOverlayId}
-                        onSelectOverlay={onSelectOverlay}
-                        safeAreaContext="create"
-                      />
+                  {/* Right — Reset + Done */}
+                  <div className="flex items-center gap-2">
+                    {hasChanges && (
+                      <button
+                        onClick={handleResetAll}
+                        style={{ fontSize: 12, fontWeight: 600, color: E.mid, minHeight: 44, display: 'flex', alignItems: 'center' }}
+                      >
+                        Reset
+                      </button>
                     )}
-
-                    {/* Filter badge — top-left */}
-                    {hasActiveFilter && !isComparing && (
-                      <div style={{
-                        position: 'absolute', top: 10, left: 10,
-                        background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                        color: E.text, border: `1px solid ${E.border}`,
-                        fontSize: 10, fontWeight: 600, borderRadius: 16, padding: '3px 10px',
-                        pointerEvents: 'none', zIndex: 20, whiteSpace: 'nowrap',
-                      }}>
-                        {FILTER_LABELS[edits.filter!] || edits.filter} · {filterIntensity}%
-                      </div>
-                    )}
-
-                    {/* Music badge — bottom-left */}
-                    {edits.music && (
-                      <div style={{
-                        position: 'absolute', bottom: 10, left: 10,
-                        background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                        color: E.mid, border: `1px solid ${E.border}`,
-                        fontSize: 10, fontWeight: 500, borderRadius: 16, padding: '3px 10px',
-                        pointerEvents: 'none', zIndex: 20, whiteSpace: 'nowrap',
-                      }}>
-                        ♫ {edits.music.title}
-                      </div>
-                    )}
-                  </>
-                )}
+                    <button
+                      onClick={() => onClose()}
+                      style={{
+                        height: 32, padding: '0 16px', borderRadius: 20,
+                        border: `1px solid ${E.border}`,
+                        background: 'transparent',
+                        color: E.text, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                      }}
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Intensity pill — floats below photo, only for filter tool */}
-              {hasActiveFilter && activeTool === 'filter' && (
+              {/* ── Media Canvas ── */}
+              <div
+                ref={canvasRef}
+                className="flex-1 relative flex items-center justify-center overflow-hidden min-h-0"
+                style={{ touchAction: 'none', margin: '12px 16px 0', position: 'relative' }}
+              >
+                {/* Ambient glow */}
                 <div style={{
-                  position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  background: 'rgba(0,0,0,0.70)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                  border: `1px solid ${E.border}`, borderRadius: 24, padding: '6px 14px',
-                  zIndex: 30,
+                  position: 'absolute', inset: -40,
+                  background: `radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 70%)`,
+                  pointerEvents: 'none', zIndex: 0,
+                }} />
+
+                {/* Photo/video card */}
+                <div style={{
+                  position: 'relative', zIndex: 1,
+                  maxWidth: '100%', maxHeight: '100%',
+                  borderRadius: 16, overflow: 'hidden',
+                  boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
                 }}>
-                  <span style={{ fontSize: 10, fontWeight: 600, color: E.mid }}>Intensity</span>
-                  <input
-                    type="range"
-                    min={0} max={100} step={1}
-                    value={filterIntensity}
-                    onChange={(e) => updateEdits({ filterIntensity: Number(e.target.value) })}
-                    className="appearance-none cursor-pointer
-                      [&::-webkit-slider-runnable-track]:h-[2px]
-                      [&::-webkit-slider-runnable-track]:rounded-full
-                      [&::-webkit-slider-thumb]:appearance-none
-                      [&::-webkit-slider-thumb]:w-3
-                      [&::-webkit-slider-thumb]:h-3
-                      [&::-webkit-slider-thumb]:rounded-full
-                      [&::-webkit-slider-thumb]:bg-white
-                      [&::-webkit-slider-thumb]:shadow-[0_1px_4px_rgba(0,0,0,0.5)]
-                      [&::-webkit-slider-thumb]:-mt-[5px]
-                      [&::-moz-range-track]:h-[2px]
-                      [&::-moz-range-track]:rounded-full
-                      [&::-moz-range-thumb]:w-3
-                      [&::-moz-range-thumb]:h-3
-                      [&::-moz-range-thumb]:rounded-full
-                      [&::-moz-range-thumb]:border-0
-                      [&::-moz-range-thumb]:bg-white"
-                    style={{
-                      width: 90,
-                      background: `linear-gradient(to right, #ffffff ${filterIntensity}%, rgba(255,255,255,0.10) ${filterIntensity}%)`,
-                    }}
-                  />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: E.text, fontVariantNumeric: 'tabular-nums', minWidth: 28, textAlign: 'right' }}>
-                    {filterIntensity}%
-                  </span>
+                  {showCropOnCanvas ? (
+                    <div style={{ width: '100%', height: '100%', minHeight: 200 }}>
+                      <CropEditor
+                        imageSrc={activeMediaPreviewUrl!}
+                        aspectRatio={cropAspect}
+                        initialZoom={edits.crop?.zoom || 1}
+                        initialCrop={edits.crop?.area ? {
+                          x: edits.crop.area.x,
+                          y: edits.crop.area.y,
+                        } : undefined}
+                        onCropComplete={handleCropComplete}
+                        onZoomChange={handleCropZoomChange}
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="relative flex items-center justify-center" style={{ filter: lightFilterStyle }}>
+                        {activeMediaType === 'video' ? (
+                          <video
+                            src={activeMediaPreviewUrl || undefined}
+                            poster={activeMediaThumbnailUrl || undefined}
+                            className="max-w-full max-h-full object-contain"
+                            style={{ transform: mediaTransform, maxHeight: '50vh' }}
+                            autoPlay loop muted playsInline
+                          />
+                        ) : (
+                          <img
+                            src={activeMediaPreviewUrl || undefined}
+                            className="max-w-full max-h-full object-contain"
+                            style={{ transform: mediaTransform, maxHeight: '50vh' }}
+                            alt="Studio preview"
+                          />
+                        )}
+
+                        {showFilterOnCanvas && (
+                          <>
+                            {activeMediaType === 'video' ? (
+                              <video
+                                src={activeMediaPreviewUrl || undefined}
+                                poster={activeMediaThumbnailUrl || undefined}
+                                className={`absolute inset-0 max-w-full max-h-full object-contain m-auto ${filterClass}`}
+                                style={{ transform: mediaTransform, opacity: filterIntensity / 100, maxHeight: '50vh' }}
+                                autoPlay loop muted playsInline
+                              />
+                            ) : (
+                              <img
+                                src={activeMediaPreviewUrl || undefined}
+                                className={`absolute inset-0 max-w-full max-h-full object-contain m-auto ${filterClass}`}
+                                style={{ transform: mediaTransform, opacity: filterIntensity / 100, maxHeight: '50vh' }}
+                                alt=""
+                              />
+                            )}
+                          </>
+                        )}
+                      </div>
+
+                      {edits.textOverlays && edits.textOverlays.length > 0 && (
+                        <TextOverlayRenderer
+                          textOverlays={edits.textOverlays}
+                          isEditable={activeTool === 'text'}
+                          onChange={handleTextOverlayChange}
+                          containerRef={canvasRef as React.RefObject<HTMLDivElement>}
+                          activeOverlayId={activeOverlayId}
+                          onSelectOverlay={onSelectOverlay}
+                          safeAreaContext="create"
+                        />
+                      )}
+
+                      {/* Filter badge — top-left */}
+                      {hasActiveFilter && !isComparing && (
+                        <div style={{
+                          position: 'absolute', top: 10, left: 10,
+                          background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                          color: E.text, border: `1px solid ${E.border}`,
+                          fontSize: 10, fontWeight: 600, borderRadius: 16, padding: '3px 10px',
+                          pointerEvents: 'none', zIndex: 20, whiteSpace: 'nowrap',
+                        }}>
+                          {FILTER_LABELS[edits.filter!] || edits.filter} · {filterIntensity}%
+                        </div>
+                      )}
+
+                      {/* Music badge — bottom-left */}
+                      {edits.music && (
+                        <div style={{
+                          position: 'absolute', bottom: 10, left: 10,
+                          background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                          color: E.mid, border: `1px solid ${E.border}`,
+                          fontSize: 10, fontWeight: 500, borderRadius: 16, padding: '3px 10px',
+                          pointerEvents: 'none', zIndex: 20, whiteSpace: 'nowrap',
+                        }}>
+                          ♫ {edits.music.title}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
-              )}
+
+                {/* Intensity pill — floats below photo, only for filter tool */}
+                {hasActiveFilter && activeTool === 'filter' && (
+                  <div style={{
+                    position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    background: 'rgba(0,0,0,0.70)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                    border: `1px solid ${E.border}`, borderRadius: 24, padding: '6px 14px',
+                    zIndex: 30,
+                  }}>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: E.mid }}>Intensity</span>
+                    <input
+                      type="range"
+                      min={0} max={100} step={1}
+                      value={filterIntensity}
+                      onChange={(e) => updateEdits({ filterIntensity: Number(e.target.value) })}
+                      className="appearance-none cursor-pointer
+                        [&::-webkit-slider-runnable-track]:h-[2px]
+                        [&::-webkit-slider-runnable-track]:rounded-full
+                        [&::-webkit-slider-thumb]:appearance-none
+                        [&::-webkit-slider-thumb]:w-3
+                        [&::-webkit-slider-thumb]:h-3
+                        [&::-webkit-slider-thumb]:rounded-full
+                        [&::-webkit-slider-thumb]:bg-white
+                        [&::-webkit-slider-thumb]:shadow-[0_1px_4px_rgba(0,0,0,0.5)]
+                        [&::-webkit-slider-thumb]:-mt-[5px]
+                        [&::-moz-range-track]:h-[2px]
+                        [&::-moz-range-track]:rounded-full
+                        [&::-moz-range-thumb]:w-3
+                        [&::-moz-range-thumb]:h-3
+                        [&::-moz-range-thumb]:rounded-full
+                        [&::-moz-range-thumb]:border-0
+                        [&::-moz-range-thumb]:bg-white"
+                      style={{
+                        width: 90,
+                        background: `linear-gradient(to right, #ffffff ${filterIntensity}%, rgba(255,255,255,0.10) ${filterIntensity}%)`,
+                      }}
+                    />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: E.text, fontVariantNumeric: 'tabular-nums', minWidth: 28, textAlign: 'right' }}>
+                      {filterIntensity}%
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* ── The Dial ── */}
-            <StudioDial
-              activeTool={activeTool}
-              setActiveTool={setActiveTool}
-              activeMediaType={activeMediaType}
-            />
+            {/* ── Zone 2: Panel (fixed to bottom) ── */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: '42vh',
+              display: 'flex', flexDirection: 'column',
+              background: 'rgba(10,10,10,0.98)',
+              paddingBottom: 'env(safe-area-inset-bottom)',
+            }}>
+              {/* ── The Dial ── */}
+              <StudioDial
+                activeTool={activeTool}
+                setActiveTool={setActiveTool}
+                activeMediaType={activeMediaType}
+              />
 
-            {/* ── Panel Area ── */}
-            <div
-              className="overflow-y-auto flex-shrink-0"
-              style={{ maxHeight: '30vh', background: E.bg }}
-            >
-              <AnimatePresence mode="wait">
-                {activeTool === 'music' && (
-                  <motion.div key="music" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
-                    <StudioPanelMusic edits={edits} updateEdits={updateEdits} onApply={handleApply} onReset={handleReset} />
-                  </motion.div>
-                )}
+              {/* ── Panel Content ── */}
+              <div style={{
+                flex: 1, overflowY: 'auto', scrollbarWidth: 'none',
+                WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain',
+              }}>
+                <AnimatePresence mode="wait">
+                  {activeTool === 'music' && (
+                    <motion.div key="music" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
+                      <StudioPanelMusic edits={edits} updateEdits={updateEdits} onApply={handleApply} onReset={handleReset} />
+                    </motion.div>
+                  )}
 
-                {activeTool === 'text' && (
-                  <motion.div key="text" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
-                    <StudioPanelText edits={edits} updateEdits={updateEdits} onApply={handleApply} onReset={handleReset} activeOverlayId={activeOverlayId} onSelectOverlay={onSelectOverlay} />
-                  </motion.div>
-                )}
+                  {activeTool === 'text' && (
+                    <motion.div key="text" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
+                      <StudioPanelText edits={edits} updateEdits={updateEdits} onApply={handleApply} onReset={handleReset} activeOverlayId={activeOverlayId} onSelectOverlay={onSelectOverlay} />
+                    </motion.div>
+                  )}
 
-                {activeTool === 'filter' && (
-                  <motion.div key="filter" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
-                    <StudioPanelFilter
-                      edits={edits} updateEdits={updateEdits} onApply={handleApply} onReset={handleReset}
-                      previewUrl={activeMediaThumbnailUrl || activeMediaPreviewUrl}
-                      onCompareStart={() => setIsComparing(true)}
-                      onCompareEnd={() => setIsComparing(false)}
-                    />
-                  </motion.div>
-                )}
+                  {activeTool === 'filter' && (
+                    <motion.div key="filter" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
+                      <StudioPanelFilter
+                        edits={edits} updateEdits={updateEdits} onApply={handleApply} onReset={handleReset}
+                        previewUrl={activeMediaThumbnailUrl || activeMediaPreviewUrl}
+                        onCompareStart={() => setIsComparing(true)}
+                        onCompareEnd={() => setIsComparing(false)}
+                      />
+                    </motion.div>
+                  )}
 
-                {activeTool === 'edit' && (
-                  <motion.div key="edit" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
-                    <StudioPanelEdit edits={edits} updateEdits={updateEdits} mediaType={activeMediaType} mediaUrl={activeMediaPreviewUrl || undefined} showCropCanvas={false} />
-                  </motion.div>
-                )}
+                  {activeTool === 'edit' && (
+                    <motion.div key="edit" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
+                      <StudioPanelEdit edits={edits} updateEdits={updateEdits} mediaType={activeMediaType} mediaUrl={activeMediaPreviewUrl || undefined} showCropCanvas={false} />
+                    </motion.div>
+                  )}
 
-                {activeTool === 'light' && (
-                  <motion.div key="light" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
-                    <StudioPanelLight edits={edits} updateEdits={updateEdits} />
-                  </motion.div>
-                )}
+                  {activeTool === 'light' && (
+                    <motion.div key="light" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
+                      <StudioPanelLight edits={edits} updateEdits={updateEdits} />
+                    </motion.div>
+                  )}
 
-                {activeTool === 'trim' && activeMediaType === 'video' && (
-                  <motion.div key="trim" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
-                    <StudioPanelTrim
-                      trimStart={trimStart}
-                      trimEnd={trimEnd}
-                      duration={duration}
-                      onTrimChange={onTrimChange || (() => {})}
-                    />
-                  </motion.div>
-                )}
+                  {activeTool === 'trim' && activeMediaType === 'video' && (
+                    <motion.div key="trim" className="h-full" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.15 }}>
+                      <StudioPanelTrim
+                        trimStart={trimStart}
+                        trimEnd={trimEnd}
+                        duration={duration}
+                        onTrimChange={onTrimChange || (() => {})}
+                      />
+                    </motion.div>
+                  )}
 
-                {activeTool === 'trim' && activeMediaType === 'image' && (
-                  <motion.div key="trim-na" className="h-full flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <p style={{ fontSize: 13, color: E.mid, textAlign: 'center', padding: 24 }}>
-                      Trim is only available for video clips
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  {activeTool === 'trim' && activeMediaType === 'image' && (
+                    <motion.div key="trim-na" className="h-full flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                      <p style={{ fontSize: 13, color: E.mid, textAlign: 'center', padding: 24 }}>
+                        Trim is only available for video clips
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </motion.div>
 
