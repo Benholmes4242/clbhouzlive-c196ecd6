@@ -803,8 +803,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
           {/* ── Scrollable thumbnail carousel ── */}
           <div style={{
-            flexShrink: 0,
-            height: 160,
+            flex: 1,
+            minHeight: 0,
             display: 'flex',
             overflowX: 'auto',
             overflowY: 'hidden',
@@ -836,8 +836,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   style={{
                     position: 'relative',
                     flexShrink: 0,
-                    width: 160,
-                    height: 160,
+                    height: '100%',
+                    aspectRatio: '1',
                     borderRadius: 12,
                     overflow: 'hidden',
                     outline: isActive ? '2.5px solid #F7931E' : '2.5px solid transparent',
@@ -946,8 +946,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => fileInputRef.current?.click()}
                 style={{
                   flexShrink: 0,
-                  width: 160,
-                  height: 160,
+                  height: '100%',
+                  aspectRatio: '1',
                   borderRadius: 12,
                   background: 'rgba(255,255,255,0.04)',
                   border: '1.5px dashed rgba(255,255,255,0.12)',
