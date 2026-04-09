@@ -287,7 +287,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
    const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
-    setCaption, openPanel, closePanel, updateMediaEdits,
+    setCaption, openPanel, closePanel, updateMediaEdits, updateTrim,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
 
@@ -1136,10 +1136,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           trimEnd={activeItem.trimEnd ?? activeItem.duration ?? 0}
           duration={activeItem.duration ?? 0}
           onTrimChange={(start, end) => {
-            if (activeItem) {
-              // updateTrim is already destructured from usePostStudioContext at top
-              const ctx = usePostStudioContext;
-            }
+            if (activeItem) updateTrim(activeItem.id, start, end);
           }}
         />
       )}
