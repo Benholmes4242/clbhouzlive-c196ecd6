@@ -1669,59 +1669,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         ))}
       </AnimatePresence>
 
-      {/* ── Slide position dots — top of hero, below safe area ── */}
-      {safeSlides.length > 1 && !isExpanded && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(max(env(safe-area-inset-top, 47px), 47px) + 12px)',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            zIndex: 35,
-            pointerEvents: 'none',
-          }}
-        >
-          {safeSlides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              style={{
-                pointerEvents: 'auto',
-                padding: 4,
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <div
-                style={{
-                  height: 5,
-                  width: i === currentIndex ? 14 : 5,
-                  borderRadius: 99,
-                  background: i === currentIndex
-                    ? 'rgba(255, 255, 255, 0.95)'
-                    : 'rgba(255, 255, 255, 0.45)',
-                  border: i === currentIndex
-                    ? '1px solid rgba(255, 255, 255, 0.30)'
-                    : '1px solid rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: i === currentIndex
-                    ? '0 2px 8px rgba(0,0,0,0.25)'
-                    : '0 1px 4px rgba(0,0,0,0.15)',
-                }}
-              />
-            </button>
-          ))}
-        </div>
-      )}
+
+
 
 
     </div>
