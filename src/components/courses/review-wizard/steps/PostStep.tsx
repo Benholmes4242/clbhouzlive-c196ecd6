@@ -221,7 +221,7 @@ export function PostStep({
               )}
             </div>
             <p className="text-[11px] text-muted-foreground mt-2 text-center">
-              {media.length}/{MAX_MEDIA_ITEMS} · first photo is cover
+              {media.length}/{MAX_MEDIA_ITEMS}
             </p>
           </div>
         )}
