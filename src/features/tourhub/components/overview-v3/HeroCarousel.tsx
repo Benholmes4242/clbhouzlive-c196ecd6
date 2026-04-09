@@ -854,7 +854,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 /* ── Compact topbar — burger + title + tour badge ── */
                 <div style={{
                   flexShrink: 0,
-                  paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)',
                 }}>
                   <div style={{
                     display: 'flex', alignItems: 'center',
