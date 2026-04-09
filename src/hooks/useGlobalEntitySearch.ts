@@ -1,6 +1,7 @@
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { useRef, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { searchAnalytics } from '@/utils/searchAnalytics';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 
@@ -25,6 +26,7 @@ export interface ClubResult {
   country: string;
   region?: string | null;
   global_rank?: number | null;
+  user_has_rated?: boolean;
   type: 'course';
 }
 
@@ -132,7 +134,7 @@ const searchPeople = async (query: string, limit: number = 6): Promise<PersonRes
   }));
 };
 
-const searchClubs = async (query: string, limit: number = 6): Promise<ClubResult[]> => {
+const searchClubs = async (query: string, limit: number = 6, userId?: string): Promise<ClubResult[]> => {
   if (!query.trim()) return [];
 
   const { data, error } = await supabase
@@ -154,15 +156,31 @@ const searchClubs = async (query: string, limit: number = 6): Promise<ClubResult
     throw new Error('Failed to search clubs');
   }
 
-  return (data || []).map(course => ({
+  const courses = (data || []).map(course => ({
     id: course.id,
     name: course.name,
     logo_url: course.thumbnail_image,
     country: course.country,
     region: course.region,
     global_rank: course.global_rank,
+    user_has_rated: false,
     type: 'course' as const
   }));
+
+  // Batch check which courses the user has rated
+  if (userId && courses.length > 0) {
+    const courseIds = courses.map(c => c.id);
+    const { data: userRatings } = await supabase
+      .from('course_ratings')
+      .select('course_id')
+      .eq('user_id', userId)
+      .in('course_id', courseIds);
+
+    const ratedSet = new Set(userRatings?.map(r => r.course_id) ?? []);
+    courses.forEach(c => { c.user_has_rated = ratedSet.has(c.id); });
+  }
+
+  return courses;
 };
 
 // Format duration helper
@@ -342,6 +360,7 @@ export const useGlobalEntitySearch = ({
   enabled = true,
   limits = { people: 6, clubs: 6, videos: 6, pages: 6, businesses: 6 }
 }: UseGlobalEntitySearchProps): GlobalSearchResults => {
+  const { user } = useSupabaseSession();
   // Track query changes for analytics
   const prevQuery = useRef<string>('');
   useEffect(() => {
@@ -373,8 +392,8 @@ export const useGlobalEntitySearch = ({
   });
 
   const clubsQuery = useQuery({
-    queryKey: ['global-search', 'clubs', normalizedQuery],
-    queryFn: () => searchClubs(normalizedQuery, limits.clubs || 6),
+    queryKey: ['global-search', 'clubs', normalizedQuery, user?.id],
+    queryFn: () => searchClubs(normalizedQuery, limits.clubs || 6, user?.id),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     enabled: enabled && hasQuery

@@ -487,22 +487,40 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               >
                                 View course
                               </button>
-                              <button
-                                type="button"
-                                onClick={() => selectCourseRate(course)}
-                                style={{
-                                  display: 'flex', alignItems: 'center', gap: 4,
-                                  padding: '5px 12px', borderRadius: 7,
-                                  background: 'rgba(245,158,11,0.10)',
-                                  border: '1px solid rgba(245,158,11,0.28)',
-                                  fontSize: 11, fontWeight: 700,
-                                  color: '#92400E',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                <Star size={10} />
-                                Rate this course
-                              </button>
+                              {course.user_has_rated ? (
+                                <button
+                                  type="button"
+                                  onClick={() => selectCourseRate(course)}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: 4,
+                                    padding: '5px 12px', borderRadius: 7,
+                                    background: 'rgba(0,103,71,0.10)',
+                                    border: '1px solid rgba(0,103,71,0.25)',
+                                    fontSize: 11, fontWeight: 700,
+                                    color: '#006747',
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  ✓ Played
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => selectCourseRate(course)}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: 4,
+                                    padding: '5px 12px', borderRadius: 7,
+                                    background: 'rgba(245,158,11,0.10)',
+                                    border: '1px solid rgba(245,158,11,0.28)',
+                                    fontSize: 11, fontWeight: 700,
+                                    color: '#92400E',
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <Star size={10} />
+                                  Rate this course
+                                </button>
+                              )}
                             </div>
                             {idx < clubs.length - 1 && <CardDivider />}
                           </div>
