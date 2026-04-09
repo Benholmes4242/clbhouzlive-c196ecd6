@@ -960,6 +960,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           {/* 24px gap below carousel */}
           <div style={{ flexShrink: 0, height: 24 }} />
 
+          {/* Course tag — below carousel */}
+          <div className="shrink-0">
+            {renderCaptionBlock(0, 0, false, true).props.children[3]}
+          </div>
+
           {/* Processing indicator */}
           <AnimatePresence>
             {isProcessing && (
