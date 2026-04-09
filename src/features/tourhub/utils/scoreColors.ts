@@ -15,19 +15,19 @@
 export const SCORE_COLORS = {
   // Eagle or better (includes hole-in-one on par 3+, albatross, condor)
   eagle: {
-    text: '#FACC15',           // yellow-400
-    bg: 'rgba(250, 204, 21, 0.15)',
-    ring: 'rgba(250, 204, 21, 0.30)',
-    tailwindText: 'text-yellow-400',
-    tailwindBg: 'bg-yellow-400/15 ring-1 ring-yellow-400/30',
+    text: '#F7931E',           // amber — same as birdie
+    bg: 'rgba(247, 147, 30, 0.20)',
+    ring: 'rgba(247, 147, 30, 0.35)',
+    tailwindText: 'text-[#F7931E]',
+    tailwindBg: 'bg-[#F7931E]/20 ring-1 ring-[#F7931E]/35',
   },
   // Birdie
   birdie: {
-    text: '#22C55E',           // green-500
-    bg: 'rgba(34, 197, 94, 0.15)',
-    ring: 'rgba(34, 197, 94, 0.30)',
-    tailwindText: 'text-green-500',
-    tailwindBg: 'bg-green-500/15 ring-1 ring-green-500/30',
+    text: '#F7931E',           // amber
+    bg: 'rgba(247, 147, 30, 0.15)',
+    ring: 'rgba(247, 147, 30, 0.30)',
+    tailwindText: 'text-[#F7931E]',
+    tailwindBg: 'bg-[#F7931E]/15 ring-1 ring-[#F7931E]/30',
   },
   // Par
   par: {

@@ -188,7 +188,7 @@ function LeaderHeroStrip({
   const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, p.headshot_override);
   const score = leaderEntry.score ?? 0;
   const scoreDisplay = score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`;
-  const scoreColor = score < 0 ? '#22C55E' : score > 0 ? '#EF4444' : 'rgba(255,255,255,0.75)';
+  const scoreColor = score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : 'rgba(255,255,255,0.55)';
 
   const thruRaw = leaderEntry.thru;
   const thruDisplay = leaderEntry.status === 'cut' ? 'CUT'
@@ -213,10 +213,10 @@ function LeaderHeroStrip({
     : todayScore === 0 ? 'E'
     : todayScore > 0 ? `+${todayScore}`
     : `${todayScore}`;
-  const todayColor = todayScore === null ? 'rgba(255,255,255,0.75)'
-    : todayScore < 0 ? '#22C55E'
+  const todayColor = todayScore === null ? 'rgba(255,255,255,0.55)'
+    : todayScore < 0 ? '#F7931E'
     : todayScore > 0 ? '#EF4444'
-    : 'rgba(255,255,255,0.75)';
+    : 'rgba(255,255,255,0.55)';
 
   return (
     <div style={{ padding: '0 16px', flexShrink: 0 }}>
@@ -271,7 +271,7 @@ function LeaderHeroStrip({
             <span style={{
               fontSize: 44, fontWeight: 800, lineHeight: 1,
               color: scoreColor,
-              textShadow: score < 0 ? '0 0 16px rgba(34,197,94,0.35)' : score > 0 ? '0 0 16px rgba(239,68,68,0.35)' : 'none',
+              textShadow: score < 0 ? '0 0 16px rgba(247,147,30,0.35)' : score > 0 ? '0 0 16px rgba(239,68,68,0.35)' : 'none',
               fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px',
             }}>
               {scoreDisplay}
@@ -280,8 +280,8 @@ function LeaderHeroStrip({
             {todayDisplay !== null && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 4,
-                background: todayScore! < 0 ? 'rgba(34,197,94,0.10)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${todayScore! < 0 ? 'rgba(34,197,94,0.20)' : 'rgba(255,255,255,0.08)'}`,
+                background: todayScore! < 0 ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${todayScore! < 0 ? 'rgba(247,147,30,0.20)' : 'rgba(255,255,255,0.08)'}`,
                 borderRadius: 20, padding: '2px 9px',
               }}>
                 <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.5px' }}>TODAY</span>
