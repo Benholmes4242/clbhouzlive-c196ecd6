@@ -169,6 +169,14 @@ function LeaderHeroStrip({
 }) {
   const [imgErr, setImgErr] = useState(false);
   const p = leaderEntry.player;
+
+  const derivedRound = [4,3,2,1].find(n =>
+    leaderEntry[`round_${n}`] !== null
+  ) ?? currentRound;
+
+  const playerId = leaderEntry?.player_id ?? leaderEntry?.player?.id ?? null;
+  const { data: holeScores = [] } = useLeaderHoleScores(tournamentId, playerId, derivedRound);
+
   if (!p) return null;
 
   const fullName = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
@@ -182,13 +190,6 @@ function LeaderHeroStrip({
     : thruRaw === 18 ? 'F'
     : thruRaw === 0 || thruRaw == null ? '-'
     : `${thruRaw}`;
-
-  const derivedRound = [4,3,2,1].find(n =>
-    leaderEntry[`round_${n}`] !== null
-  ) ?? currentRound;
-
-  const playerId = leaderEntry?.player_id ?? leaderEntry?.player?.id ?? null;
-  const { data: holeScores = [] } = useLeaderHoleScores(tournamentId, playerId, derivedRound);
 
   const statsToShow = leaderStats ? [
     { v: leaderStats.eagles,       label: 'Eagles',  color: '#F59E0B' },
