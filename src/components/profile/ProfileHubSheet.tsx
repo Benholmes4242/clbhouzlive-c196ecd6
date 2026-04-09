@@ -188,7 +188,6 @@ function ProfileHubSheet({
   const quickActions = [
     {
       emoji: '👤',
-      bg: 'rgba(99,102,241,0.10)',
       label: 'View Profile',
       route: `/profile/${localActiveId}`,
       badge: 0,
@@ -211,9 +210,9 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { emoji: '✏️', bg: 'rgba(99,102,241,0.10)', label: 'Edit profile', route: '/edit-profile' },
-    { emoji: '🏢', bg: 'rgba(0,0,0,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
-    { emoji: '⚙️', bg: 'rgba(0,0,0,0.05)', label: 'Settings', route: '/settings' },
+    { emoji: '✏️', bg: 'rgba(0,0,0,0.06)', label: 'Edit profile', route: '/edit-profile' },
+    { emoji: '🏢', bg: 'rgba(0,0,0,0.06)', label: 'Manage business profiles', route: '/businesses/manage' },
+    { emoji: '⚙️', bg: 'rgba(0,0,0,0.06)', label: 'Settings', route: '/settings' },
   ];
 
   // ── Section label class ──
@@ -408,7 +407,7 @@ function ProfileHubSheet({
 
               {/* ── Quick actions — 3 column grid ── */}
               <div className="grid grid-cols-3 gap-2 py-4">
-                {quickActions.map(({ emoji, bg, label, route, badge, badgeColor }) => (
+                {quickActions.map(({ emoji, label, route, badge, badgeColor }) => (
                     <button
                       key={label}
                       type="button"
@@ -455,8 +454,13 @@ function ProfileHubSheet({
                             ? badgeColor === 'emerald'
                               ? 'rgba(16,185,129,0.10)'
                               : 'rgba(247,147,30,0.10)'
-                            : (bg || 'rgba(0,0,0,0.05)'),
-                          transition: 'background 0.2s ease',
+                            : 'rgba(100,116,139,0.08)',
+                          boxShadow: badge > 0
+                            ? badgeColor === 'emerald'
+                              ? '0 0 0 1px rgba(16,185,129,0.20)'
+                              : '0 0 0 1px rgba(247,147,30,0.20)'
+                            : 'none',
+                          transition: 'background 0.2s ease, box-shadow 0.2s ease',
                         }}
                       >
                         <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
