@@ -107,7 +107,6 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           src={creator.avatarUrl}
           alt={creator.displayName}
           fallback={initials}
-          ringColor="rgba(245, 158, 11, 0.85)"
           hideRing={true}
         />
         {creator.isVerified && (
