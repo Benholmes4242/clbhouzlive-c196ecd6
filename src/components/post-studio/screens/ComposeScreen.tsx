@@ -820,8 +820,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               return (
                 <motion.div
                   key={item.id}
-                  onTap={() => setActiveMedia(i)}
-                  onLongPress={() => handleSetCover(i)}
+                  onTap={() => {
+                    if (longPressFiredRef.current) return;
+                    setActiveMedia(i);
+                  }}
+                  onPointerDown={() => {
+                    longPressFiredRef.current = false;
+                    longPressTimerRef.current = setTimeout(() => {
+                      longPressFiredRef.current = true;
+                      handleSetCover(i);
+                    }, 400);
+                  }}
+                  onPointerUp={() => { if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; } }}
+                  onPointerCancel={() => { if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; } }}
                   style={{
                     position: 'relative',
                     flexShrink: 0,
