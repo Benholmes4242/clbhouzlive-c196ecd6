@@ -321,7 +321,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
-
+                  {/* Text overlay indicator — top-right */}
+                  {item.edits?.textOverlays && item.edits.textOverlays.length > 0 && (
+                    <div style={{
+                      position: 'absolute', top: 6, right: 6,
+                      width: 16, height: 16, borderRadius: 5,
+                      background: 'rgba(0,0,0,0.55)',
+                      backdropFilter: 'blur(6px)',
+                      border: '1px solid rgba(255,255,255,0.18)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.85)',
+                      pointerEvents: 'none', zIndex: 3,
+                    }}>
+                      T
+                    </div>
+                  )}
 
   const charCount = useMemo(() => {
     try {
