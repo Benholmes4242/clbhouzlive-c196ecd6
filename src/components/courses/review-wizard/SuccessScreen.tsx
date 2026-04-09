@@ -113,14 +113,27 @@ export function SuccessScreen({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[9999] flex flex-col"
-      style={{ background: '#F8FAFC', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      style={{ background: '#F8FAFC' }}
     >
-      {/* Close button */}
+      {/* Amber gradient that extends into the notch/safe area */}
+      <div
+        className="absolute inset-x-0 top-0"
+        style={{
+          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 180px)',
+          background: 'linear-gradient(180deg, rgba(247,147,30,0.07) 0%, rgba(248,250,252,0) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Safe area spacer */}
+      <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', flexShrink: 0 }} />
+
+      {/* Close button — positioned below safe area, matching fullscreen view */}
       <button
         onClick={onDone}
         className="absolute z-50 flex items-center justify-center transition-colors active:scale-[0.97]"
         style={{
-          top: 16,
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 10px)',
           left: 16,
           width: 32,
           height: 32,
@@ -140,7 +153,6 @@ export function SuccessScreen({
           style={{
             width: '100%',
             height: 180,
-            background: 'linear-gradient(180deg, rgba(247,147,30,0.07) 0%, rgba(248,250,252,0) 100%)',
           }}
         >
           {/* Outer ring */}
