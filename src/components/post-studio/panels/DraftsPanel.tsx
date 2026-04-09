@@ -141,9 +141,9 @@ export function DraftsPanel() {
             <div className="flex flex-col items-center text-center py-10">
               <div className="flex items-center justify-center mb-3" style={{
                 width: 52, height: 52, borderRadius: 16,
-                background: 'rgba(247,147,30,0.06)', border: '1px solid rgba(247,147,30,0.12)',
+                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
               }}>
-                <FileText className="w-5 h-5" style={{ color: 'rgba(247,147,30,0.50)' }} strokeWidth={1.75} />
+                <FileText className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.35)' }} strokeWidth={1.75} />
               </div>
               <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.50)' }}>No drafts yet</p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 4, maxWidth: 200 }}>
@@ -179,13 +179,13 @@ export function DraftsPanel() {
                   {thumbnailUrl ? (
                     <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(247,147,30,0.06)' }}>
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)' }}>
                       <FileText className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.20)' }} strokeWidth={1.5} />
                     </div>
                   )}
                   {mediaCount > 1 && (
                     <div className="absolute bottom-1 right-1 flex items-center gap-0.5 px-1 py-0.5 rounded" style={{
-                      background: 'rgba(0,0,0,0.60)', fontSize: 9, fontWeight: 700, color: '#F7931E',
+                      background: 'rgba(0,0,0,0.60)', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.80)',
                     }}>
                       <Layers className="w-2.5 h-2.5" strokeWidth={2} />
                       {mediaCount}

@@ -1,4 +1,4 @@
-// CourseTagPanel — Dark sheet with numbered amber pills, Top 100 badge, Done CTA
+// CourseTagPanel — Dark sheet with numbered white pills, Top 100 badge, Done CTA
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { Search, X, MapPin, Flag } from 'lucide-react';
@@ -112,18 +112,18 @@ export function CourseTagPanel() {
           </button>
         </div>
 
-        {/* Tagged courses — amber numbered pills */}
+        {/* Tagged courses — white numbered pills */}
         {state.taggedCourses.length > 0 && (
           <div className="flex flex-wrap gap-1.5 px-5 pb-3">
             {state.taggedCourses.map((course, i) => (
               <span key={course.courseId} className="inline-flex items-center gap-1.5" style={{
                 padding: '5px 10px 5px 6px', borderRadius: 999,
-                background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.22)',
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)',
               }}>
                 <span className="flex items-center justify-center" style={{
                   width: 20, height: 20, borderRadius: '50%',
-                  background: 'rgba(247,147,30,0.15)',
-                  fontSize: 11, fontWeight: 700, color: '#F7931E',
+                  background: 'rgba(255,255,255,0.10)',
+                  fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
                 }}>
                   {i + 1}
                 </span>
@@ -156,7 +156,7 @@ export function CourseTagPanel() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search golf courses…"
               className="flex-1 bg-transparent text-sm outline-none"
-              style={{ color: 'rgba(255,255,255,0.92)', caretColor: '#F7931E' }}
+              style={{ color: 'rgba(255,255,255,0.92)', caretColor: '#ffffff' }}
             />
             {query.length > 0 && (
               <button onClick={() => setQuery('')} className="shrink-0">
@@ -228,8 +228,8 @@ export function CourseTagPanel() {
                   <span style={{
                     fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
                     padding: '3px 7px', borderRadius: 20, flexShrink: 0,
-                    background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.22)',
-                    color: '#F7931E', whiteSpace: 'nowrap',
+                    background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.14)',
+                    color: 'rgba(255,255,255,0.90)', whiteSpace: 'nowrap',
                   }}>
                     Top 100
                   </span>
@@ -243,10 +243,10 @@ export function CourseTagPanel() {
                     className="flex items-center justify-center shrink-0"
                     style={{
                       width: 28, height: 28, borderRadius: '50%',
-                      background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.22)',
+                      background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
                     }}
                   >
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#F7931E', lineHeight: 1 }}>+</span>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.70)', lineHeight: 1 }}>+</span>
                   </div>
                 )}
               </button>
@@ -265,8 +265,8 @@ export function CourseTagPanel() {
               onClick={closePanel}
               className="w-full flex items-center justify-center"
               style={{
-                background: '#F7931E', borderRadius: 16,
-                fontSize: 15, fontWeight: 700, color: '#fff',
+                background: 'rgba(255,255,255,0.92)', borderRadius: 16,
+                fontSize: 15, fontWeight: 700, color: '#0D0D0D',
                 minHeight: 48,
               }}
             >

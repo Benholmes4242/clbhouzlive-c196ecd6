@@ -1,4 +1,4 @@
-// VideoTrimmer — Dark amber waveform trim handles
+// VideoTrimmer — Dark white waveform trim handles
 import React, { useRef, useState, useCallback } from 'react';
 import type { StudioMediaItem } from '../types';
 
@@ -75,7 +75,7 @@ export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
                 style={{
                   width: 2,
                   height: `${height}%`,
-                  background: isInSelection ? '#F7931E' : 'rgba(255,255,255,0.12)',
+                  background: isInSelection ? 'rgba(255,255,255,0.80)' : 'rgba(255,255,255,0.12)',
                   transition: 'background 150ms',
                 }}
               />
@@ -86,36 +86,36 @@ export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
         {/* Dimmed before trim */}
         <div className="absolute inset-y-0 left-0 z-10" style={{ width: `${startPercent}%`, background: 'rgba(0,0,0,0.55)' }} />
 
-        {/* Selected region — amber top/bottom border */}
+        {/* Selected region — white top/bottom border */}
         <div className="absolute inset-y-0 z-10" style={{
           left: `${startPercent}%`,
           width: `${endPercent - startPercent}%`,
-          borderTop: '2px solid #F7931E',
-          borderBottom: '2px solid #F7931E',
+          borderTop: '2px solid rgba(255,255,255,0.90)',
+          borderBottom: '2px solid rgba(255,255,255,0.90)',
         }} />
 
         {/* Dimmed after trim */}
         <div className="absolute inset-y-0 right-0 z-10" style={{ width: `${100 - endPercent}%`, background: 'rgba(0,0,0,0.55)' }} />
 
-        {/* Start handle — amber, 20px */}
+        {/* Start handle — white */}
         <div onPointerDown={handlePointerDown('start')} className="absolute inset-y-0 z-20 flex items-center cursor-ew-resize" style={{ left: `calc(${startPercent}% - ${HANDLE_WIDTH / 2}px)` }}>
           <div className="flex items-center justify-center" style={{
             width: HANDLE_WIDTH, height: '100%',
-            background: '#F7931E',
+            background: '#ffffff',
             borderRadius: '6px 0 0 6px',
-            boxShadow: '0 0 8px rgba(247,147,30,0.30)',
+            boxShadow: '0 0 8px rgba(255,255,255,0.15)',
           }}>
             <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(13,13,13,0.50)' }} />
           </div>
         </div>
 
-        {/* End handle — amber, 20px */}
+        {/* End handle — white */}
         <div onPointerDown={handlePointerDown('end')} className="absolute inset-y-0 z-20 flex items-center cursor-ew-resize" style={{ left: `calc(${endPercent}% - ${HANDLE_WIDTH / 2}px)` }}>
           <div className="flex items-center justify-center" style={{
             width: HANDLE_WIDTH, height: '100%',
-            background: '#F7931E',
+            background: '#ffffff',
             borderRadius: '0 6px 6px 0',
-            boxShadow: '0 0 8px rgba(247,147,30,0.30)',
+            boxShadow: '0 0 8px rgba(255,255,255,0.15)',
           }}>
             <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(13,13,13,0.50)' }} />
           </div>
