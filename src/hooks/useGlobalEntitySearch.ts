@@ -392,8 +392,8 @@ export const useGlobalEntitySearch = ({
   });
 
   const clubsQuery = useQuery({
-    queryKey: ['global-search', 'clubs', normalizedQuery],
-    queryFn: () => searchClubs(normalizedQuery, limits.clubs || 6),
+    queryKey: ['global-search', 'clubs', normalizedQuery, user?.id],
+    queryFn: () => searchClubs(normalizedQuery, limits.clubs || 6, user?.id),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     enabled: enabled && hasQuery
