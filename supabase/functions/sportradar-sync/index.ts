@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
     } = await req.json();
 
     const effectiveYear = year || seasonYear || 2026;
-    const effectiveTour = tourId || 'pga';
+    const effectiveTour = normaliseTourSlug(tourId || 'pga');
     
     // Validate roundType - use 'rounds' for REST API path (not 'stroke')
     let effectiveRoundType = 'rounds';
