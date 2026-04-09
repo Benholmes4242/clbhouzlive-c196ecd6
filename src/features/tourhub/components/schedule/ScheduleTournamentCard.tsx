@@ -42,7 +42,7 @@ function getDayNum(dateStr: string): string {
 
 function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'hsl(var(--muted-foreground))';
-  if (score < 0) return TOUR_COLORS.liveGreen;
+  if (score < 0) return '#F7931E';
   if (score > 0) return '#EF4444';
   return 'hsl(var(--muted-foreground))';
 }
