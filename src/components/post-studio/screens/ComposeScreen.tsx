@@ -1105,17 +1105,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
 
       {/* Studio Shelf */}
-      {activeItem && (
+      {state.mediaItems[state.activeMediaIndex] && (
         <StudioShelf
           open={shelfOpen}
           onClose={() => setShelfOpen(false)}
           activeTool={activeTool}
           setActiveTool={setActiveTool}
-          activeMediaId={activeItem.id}
-          activeMediaType={activeItem.mediaType}
-          activeMediaPreviewUrl={activeItem.previewUrl}
-          activeMediaThumbnailUrl={activeItem.thumbnailUrl}
-          edits={activeItem.edits ?? {}}
+          activeMediaId={state.mediaItems[state.activeMediaIndex].id}
+          activeMediaType={state.mediaItems[state.activeMediaIndex].mediaType}
+          activeMediaPreviewUrl={state.mediaItems[state.activeMediaIndex].previewUrl}
+          activeMediaThumbnailUrl={state.mediaItems[state.activeMediaIndex].thumbnailUrl}
+          edits={state.mediaItems[state.activeMediaIndex].edits ?? {}}
           updateEdits={handleUpdateEdits}
           clearEdits={handleClearEdits}
           activeOverlayId={activeOverlayId}
@@ -1128,11 +1128,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           }))}
           activeMediaIndex={state.activeMediaIndex}
           onNavigateMedia={(index) => setActiveMedia(index)}
-          trimStart={activeItem.trimStart || 0}
-          trimEnd={activeItem.trimEnd ?? activeItem.duration ?? 0}
-          duration={activeItem.duration ?? 0}
+          trimStart={state.mediaItems[state.activeMediaIndex].trimStart || 0}
+          trimEnd={state.mediaItems[state.activeMediaIndex].trimEnd ?? state.mediaItems[state.activeMediaIndex].duration ?? 0}
+          duration={state.mediaItems[state.activeMediaIndex].duration ?? 0}
           onTrimChange={(start, end) => {
-            if (activeItem) updateTrim(activeItem.id, start, end);
+            const item = state.mediaItems[state.activeMediaIndex];
+            if (item) updateTrim(item.id, start, end);
           }}
         />
       )}
