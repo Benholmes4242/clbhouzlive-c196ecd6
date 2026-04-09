@@ -16,6 +16,22 @@ const getTourBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/gol
 // Base for global endpoints (no tour): /golf/{access_level}/v3/{lang}
 const getGlobalBaseUrl = () => `https://api.sportradar.com/golf/${getAccessLevel()}/v3/en`;
 
+// Normalise incoming tourId values to Sportradar URL slugs
+// Handles both internal codes (eur, champions-tour) and already-correct slugs (euro, champ)
+const normaliseTourSlug = (tour: string): string => {
+  const map: Record<string, string> = {
+    'eur': 'euro',
+    'champions-tour': 'champ',
+    'euro': 'euro',
+    'champ': 'champ',
+    'pga': 'pga',
+    'lpga': 'lpga',
+    'pgad': 'pgad',
+    'liv': 'liv',
+  };
+  return map[tour.toLowerCase()] ?? tour.toLowerCase();
+};
+
 // Comprehensive tour name → Sportradar API slug mapping
 // Returns null for tours where Sportradar doesn't provide hole statistics
 function getTourSlug(tourName: string): string | null {
@@ -81,7 +97,7 @@ Deno.serve(async (req) => {
     } = await req.json();
 
     const effectiveYear = year || seasonYear || 2026;
-    const effectiveTour = tourId || 'pga';
+    const effectiveTour = normaliseTourSlug(tourId || 'pga');
     
     // Validate roundType - use 'rounds' for REST API path (not 'stroke')
     let effectiveRoundType = 'rounds';
