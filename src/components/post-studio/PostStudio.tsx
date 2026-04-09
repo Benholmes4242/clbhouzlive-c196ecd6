@@ -36,15 +36,14 @@ function getDirection(from: StudioStep | null, to: StudioStep): 'forward' | 'bac
 }
 
 // ─── Screen Router ────────────────────────────────────────────────────────────
-function StudioScreenRouter({ onClose }: { onClose: () => void }) {
+function StudioScreenRouter({ onClose, onSuccessClose }: { onClose: () => void; onSuccessClose: () => void }) {
   const { state, reset } = usePostStudioContext();
   const dir = getDirection(state.previousStep, state.step);
 
   const handleSuccessDone = useCallback(() => {
-    console.log('[DEBUG] handleSuccessDone fired, calling onClose');
-    onClose();
+    onSuccessClose();
     reset();
-  }, [reset, onClose]);
+  }, [reset, onSuccessClose]);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -330,7 +329,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
 
         {/* Screen router */}
         <div className="relative flex-1 min-h-0">
-          <StudioScreenRouter onClose={handleClose} />
+          <StudioScreenRouter onClose={handleClose} onSuccessClose={onClose} />
         </div>
 
         {/* Panel router */}
