@@ -77,7 +77,9 @@ export function useNetworkActivity(userId: string | undefined) {
         };
       }
 
-      // Step 1: Get friend IDs from user_friends (bidirectional)
+      // Step 1: Get friend IDs from user_friends AND mutual follows
+
+      // Source 1: user_friends (accepted)
       const { data: friendships, error: friendshipError } = await supabase
         .from('user_friends')
         .select('user_id, friend_id')
@@ -89,9 +91,22 @@ export function useNetworkActivity(userId: string | undefined) {
         throw friendshipError;
       }
 
-      const friendIds = (friendships || [])
+      const friendIdsFromFriends = (friendships || [])
         .map((row) => (row.user_id === userId ? row.friend_id : row.user_id))
         .filter(Boolean) as string[];
+
+      // Source 2: mutual follows (both directions exist)
+      const [{ data: followsData }, { data: followersData }] = await Promise.all([
+        supabase.from('user_follows').select('following_id').eq('follower_id', userId),
+        supabase.from('user_follows').select('follower_id').eq('following_id', userId),
+      ]);
+
+      const followingIds = new Set(followsData?.map(f => f.following_id) ?? []);
+      const followerIds = new Set(followersData?.map(f => f.follower_id) ?? []);
+      const mutualFollowIds = [...followingIds].filter(id => followerIds.has(id));
+
+      // Combine & deduplicate
+      const friendIds = [...new Set([...friendIdsFromFriends, ...mutualFollowIds])];
 
       if (friendIds.length === 0) {
         return {
