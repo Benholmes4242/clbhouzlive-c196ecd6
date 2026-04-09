@@ -35,68 +35,152 @@ const debugEvent = (msg: string) => {
   try { window.dispatchEvent(new CustomEvent('clbhouz-debug', { detail: msg })); } catch {}
 };
 
+const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+
+function isLikelyBlackFrame(canvas: HTMLCanvasElement): boolean {
+  const probe = document.createElement('canvas');
+  probe.width = 16;
+  probe.height = 16;
+  const probeCtx = probe.getContext('2d');
+  if (!probeCtx) return false;
+
+  probeCtx.drawImage(canvas, 0, 0, 16, 16);
+  const { data } = probeCtx.getImageData(0, 0, 16, 16);
+
+  let min = 255;
+  let max = 0;
+  let total = 0;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const luminance = (0.299 * data[i]) + (0.587 * data[i + 1]) + (0.114 * data[i + 2]);
+    min = Math.min(min, luminance);
+    max = Math.max(max, luminance);
+    total += luminance;
+  }
+
+  const avg = total / (data.length / 4);
+  return max < 18 || (avg < 10 && max - min < 8);
+}
+
 async function generatePoster(file: File): Promise<string> {
   return new Promise((resolve) => {
     const video = document.createElement('video');
-    video.preload = 'auto';
+    video.preload = 'metadata';
     video.muted = true;
+    video.defaultMuted = true;
     video.playsInline = true;
+    video.setAttribute('muted', 'true');
+    video.setAttribute('playsinline', 'true');
 
     const url = URL.createObjectURL(file);
     let settled = false;
+    let lastDataUrl = '';
+    let seekTimes: number[] = [0.001];
+    let seekIndex = 0;
+
+    const cleanup = () => {
+      video.onloadedmetadata = null;
+      video.onseeked = null;
+      video.onerror = null;
+      video.src = '';
+      URL.revokeObjectURL(url);
+    };
+
+    const buildSeekTimes = (duration: number) => {
+      const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
+      const candidates = [
+        0.001,
+        0.1,
+        safeDuration > 0 ? Math.min(0.35, safeDuration / 3) : 0.35,
+        safeDuration > 0 ? Math.min(0.75, safeDuration / 2) : 0.75,
+      ]
+        .filter((time) => safeDuration <= 0 || time < safeDuration)
+        .map((time) => Math.max(0.001, Number(time.toFixed(3))));
+
+      return Array.from(new Set(candidates));
+    };
+
+    const seekTo = (time: number) => {
+      window.setTimeout(() => {
+        if (settled) return;
+        try {
+          video.currentTime = time;
+        } catch (error) {
+          debugEvent(`[Poster] Error: ${error instanceof Error ? error.message : String(error)}`);
+          finish(lastDataUrl || '');
+        }
+      }, 1);
+    };
+
     const finish = (result: string) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
       debugEvent(`[Poster] Resolved: length=${result.length}`);
       resolve(result);
     };
 
-    const capture = () => {
+    const capture = async () => {
       if (settled) return;
       if (video.videoWidth === 0 || video.videoHeight === 0) return;
-      settled = true;
-      clearTimeout(timeout);
+
       try {
+        await wait(120);
+
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
-        if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
+        if (!ctx) {
+          finish(lastDataUrl || '');
+          return;
+        }
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        debugEvent(`[Poster] Canvas result: length=${dataUrl.length} blank=${dataUrl.length < 5000}`);
-        finish(dataUrl.length > 100 ? dataUrl : '');
+        const blank = isLikelyBlackFrame(canvas);
+        debugEvent(`[Poster] Canvas result: length=${dataUrl.length} blank=${blank}`);
+
+        if (dataUrl.length > 100) {
+          lastDataUrl = dataUrl;
+        }
+
+        if (!blank || seekIndex >= seekTimes.length - 1) {
+          finish(lastDataUrl || '');
+          return;
+        }
+
+        seekIndex += 1;
+        debugEvent(`[Poster] Blank frame retry: seeking ${seekTimes[seekIndex]}`);
+        seekTo(seekTimes[seekIndex]);
       } catch (error) {
         debugEvent(`[Poster] Error: ${error instanceof Error ? error.message : String(error)}`);
-        URL.revokeObjectURL(url);
-        finish('');
+        finish(lastDataUrl || '');
       }
     };
 
     const timeout = setTimeout(() => {
       if (!settled) {
-        settled = true;
-        URL.revokeObjectURL(url);
         debugEvent('[Poster] Timeout — resolving empty');
-        finish('');
+        finish(lastDataUrl || '');
       }
-    }, 10000);
+    }, 12000);
 
     video.onloadedmetadata = () => {
       debugEvent(`[Poster] Metadata loaded: w=${video.videoWidth} h=${video.videoHeight} duration=${video.duration}`);
-      video.currentTime = 0.5;
+      seekTimes = buildSeekTimes(video.duration);
+      seekIndex = 0;
+      seekTo(seekTimes[seekIndex] ?? 0.001);
     };
     video.onseeked = () => {
       debugEvent(`[Poster] Seeked to ${video.currentTime}`);
-      capture();
+      void capture();
     };
-    video.ontimeupdate = () => { if (video.currentTime > 0) capture(); };
-    video.onloadeddata = () => { if (video.readyState >= 2) capture(); };
     video.onerror = (error) => {
       clearTimeout(timeout);
       if (!settled) {
-        settled = true;
-        URL.revokeObjectURL(url);
         debugEvent(`[Poster] Error: ${String(error)}`);
-        finish('');
+        finish(lastDataUrl || '');
       }
     };
 
@@ -173,6 +257,30 @@ async function filesToMediaItems(
     }
   }
   return items;
+}
+
+function getPreviewStillSrc(item: StudioMediaItem): string {
+  if (item.mediaType === 'video') {
+    return item.posterPreviewUrl || item.thumbnailUrl || '';
+  }
+
+  return item.thumbnailUrl || item.previewUrl;
+}
+
+function getPreviewTransform(edits?: StudioEdits): string | undefined {
+  return [
+    edits?.rotate ? `rotate(${edits.rotate}deg)` : '',
+    edits?.flipH ? 'scaleX(-1)' : '',
+    edits?.flipV ? 'scaleY(-1)' : '',
+  ].filter(Boolean).join(' ') || undefined;
+}
+
+function getPreviewObjectFit(item: StudioMediaItem): 'contain' | 'cover' {
+  return item.width && item.height && item.width > item.height ? 'contain' : 'cover';
+}
+
+function hasActiveFilter(edits?: StudioEdits): boolean {
+  return !!edits?.filter && edits.filter !== 'normal';
 }
 
 // ─── VideoToolSheet — intermediate tool picker for videos ────────────────────
@@ -539,6 +647,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   // ── Tray item for inline edit ──
   const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
+  const trayPreviewStillSrc = trayItem ? getPreviewStillSrc(trayItem) : '';
+  const trayPreviewTransform = trayItem ? getPreviewTransform(trayItem.edits) : undefined;
+  const trayPreviewObjectFit = trayItem ? getPreviewObjectFit(trayItem) : 'cover';
 
   // ── Shared caption + course tag block ──
   const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false) => (
@@ -825,6 +936,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         >
           {state.mediaItems.map((item, i) => {
             const isActive = i === coverIndex;
+            const stillSrc = getPreviewStillSrc(item);
+            const previewTransform = getPreviewTransform(item.edits);
             return (
               <motion.button
                 key={item.id}
@@ -851,17 +964,40 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 {item.mediaType === 'video' ? (
                   <>
                     {(() => {
-                      debugEvent(`[Strip] Rendering video tile: poster=${item.thumbnailUrl?.substring(0, 30) || 'EMPTY'} previewUrl=${item.previewUrl?.substring(0, 30)}`);
+                      debugEvent(`[Strip] Rendering video tile: poster=${stillSrc.substring(0, 30) || 'EMPTY'} previewUrl=${item.previewUrl?.substring(0, 30)}`);
                       return null;
                     })()}
-                    <video
-                      src={item.previewUrl}
-                      poster={item.thumbnailUrl || undefined}
-                      className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                      playsInline
-                      muted
-                      preload="metadata"
-                    />
+                    {stillSrc ? (
+                      <>
+                        <img
+                          src={stillSrc}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          style={{ transform: previewTransform }}
+                        />
+                        {hasActiveFilter(item.edits) && (
+                          <img
+                            src={stillSrc}
+                            alt=""
+                            className={`absolute inset-0 w-full h-full object-cover ${getFilterClass(item.edits!.filter!)}`}
+                            style={{
+                              opacity: (item.edits?.filterIntensity ?? 100) / 100,
+                              transform: previewTransform,
+                            }}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <video
+                        src={item.previewUrl}
+                        poster={item.thumbnailUrl || undefined}
+                        className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                        style={{ transform: previewTransform }}
+                        playsInline
+                        muted
+                        preload="metadata"
+                      />
+                    )}
                   </>
                 ) : (
                   <img
@@ -945,12 +1081,25 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 {/* Letterbox blur for landscape */}
                 {trayItem.width && trayItem.height && trayItem.width > trayItem.height && (
                   <>
-                    <img src={trayItem.thumbnailUrl || trayItem.previewUrl} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(40px) brightness(0.5)', transform: 'scale(1.15)', opacity: 0.6 }} />
+                    <img src={trayPreviewStillSrc || trayItem.previewUrl} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(40px) brightness(0.5)', transform: 'scale(1.15)', opacity: 0.6 }} />
                     <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
                   </>
                 )}
                 {/* Base preview */}
-                {trayItem.mediaType === 'video' ? (
+                {trayItem.mediaType === 'video' && trayPreviewStillSrc ? (
+                  <img
+                    src={trayPreviewStillSrc}
+                    alt=""
+                    className="relative z-[1]"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '100%',
+                      objectFit: trayPreviewObjectFit,
+                      transform: trayPreviewTransform,
+                    }}
+                  />
+                ) : trayItem.mediaType === 'video' ? (
                   <video
                     src={trayItem.previewUrl}
                     poster={trayItem.thumbnailUrl || undefined}
@@ -959,12 +1108,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       width: '100%',
                       height: '100%',
                       maxHeight: '100%',
-                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
-                      transform: [
-                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
-                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
-                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
-                      ].filter(Boolean).join(' ') || undefined,
+                      objectFit: trayPreviewObjectFit,
+                      transform: trayPreviewTransform,
                     }}
                     playsInline
                     muted
@@ -979,32 +1124,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       width: '100%',
                       height: '100%',
                       maxHeight: '100%',
-                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
-                      transform: [
-                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
-                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
-                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
-                      ].filter(Boolean).join(' ') || undefined,
+                      objectFit: trayPreviewObjectFit,
+                      transform: trayPreviewTransform,
                     }}
                   />
                 )}
                 {/* Filter overlay with intensity */}
-                {trayItem.edits?.filter && trayItem.edits.filter !== 'normal' && (
+                {trayPreviewStillSrc && hasActiveFilter(trayItem.edits) && (
                   <img
-                    src={trayItem.thumbnailUrl || trayItem.previewUrl}
+                    src={trayPreviewStillSrc}
                     alt=""
                     className={`absolute inset-0 z-[1] ${getFilterClass(trayItem.edits.filter)}`}
                     style={{
                       width: '100%',
                       height: '100%',
                       maxHeight: '100%',
-                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                      objectFit: trayPreviewObjectFit,
                       opacity: (trayItem.edits?.filterIntensity ?? 100) / 100,
-                      transform: [
-                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
-                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
-                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
-                      ].filter(Boolean).join(' ') || undefined,
+                      transform: trayPreviewTransform,
                     }}
                   />
                 )}
