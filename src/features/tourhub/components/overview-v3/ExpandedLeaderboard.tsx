@@ -142,7 +142,8 @@ const ColumnHeaders = React.memo(function ColumnHeaders() {
     >
       <span style={{ width: 32, textAlign: 'center', flexShrink: 0 }}>POS</span>
       <span style={{ flex: 1, paddingLeft: 8 }}>PLAYER</span>
-      <span style={{ width: 56, textAlign: 'right', flexShrink: 0 }}>TO PAR</span>
+      <span style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>TOTAL</span>
+      <span style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>TODAY</span>
       <span style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>THRU</span>
     </div>
   );
@@ -256,17 +257,34 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
         </span>
       </div>
 
-      {/* To Par */}
+      {/* Total (to par) */}
       <span style={{
-        width: 56,
+        width: 46,
         textAlign: 'right',
         flexShrink: 0,
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: 700,
         color: getScoreColor(entry.score ?? null),
         fontVariantNumeric: 'tabular-nums',
       }}>
         {formatScore(entry.score ?? null)}
+      </span>
+
+      {/* Today (current round score) */}
+      <span style={{
+        width: 46,
+        textAlign: 'right',
+        flexShrink: 0,
+        fontSize: 13,
+        fontWeight: 600,
+        color: getScoreColor(
+          (entry[`round_${currentRound}` as keyof typeof entry] as number | null) ?? null
+        ),
+        fontVariantNumeric: 'tabular-nums',
+      }}>
+        {formatScore(
+          (entry[`round_${currentRound}` as keyof typeof entry] as number | null) ?? null
+        )}
       </span>
 
       {/* Thru */}
