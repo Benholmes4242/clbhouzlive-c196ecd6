@@ -31,6 +31,10 @@ import type { UploadJobInput } from '@/uploads/types';
 
 // ─── Media processing helpers ─────────────────────────────────────────────────
 
+const debugEvent = (msg: string) => {
+  try { window.dispatchEvent(new CustomEvent('clbhouz-debug', { detail: msg })); } catch {}
+};
+
 async function generatePoster(file: File): Promise<string> {
   return new Promise((resolve) => {
     const video = document.createElement('video');
@@ -40,6 +44,10 @@ async function generatePoster(file: File): Promise<string> {
 
     const url = URL.createObjectURL(file);
     let settled = false;
+    const finish = (result: string) => {
+      debugEvent(`[Poster] Resolved: length=${result.length}`);
+      resolve(result);
+    };
 
     const capture = () => {
       if (settled) return;
@@ -54,27 +62,46 @@ async function generatePoster(file: File): Promise<string> {
         if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         URL.revokeObjectURL(url);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(dataUrl.length > 100 ? dataUrl : '');
-      } catch {
+        debugEvent(`[Poster] Canvas result: length=${dataUrl.length} blank=${dataUrl.length < 5000}`);
+        finish(dataUrl.length > 100 ? dataUrl : '');
+      } catch (error) {
+        debugEvent(`[Poster] Error: ${error instanceof Error ? error.message : String(error)}`);
         URL.revokeObjectURL(url);
-        resolve('');
+        finish('');
       }
     };
 
     const timeout = setTimeout(() => {
-      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
+      if (!settled) {
+        settled = true;
+        URL.revokeObjectURL(url);
+        debugEvent('[Poster] Timeout — resolving empty');
+        finish('');
+      }
     }, 10000);
 
-    video.onloadedmetadata = () => { video.currentTime = 0.5; };
-    video.onseeked = () => { capture(); };
+    video.onloadedmetadata = () => {
+      debugEvent(`[Poster] Metadata loaded: w=${video.videoWidth} h=${video.videoHeight} duration=${video.duration}`);
+      video.currentTime = 0.5;
+    };
+    video.onseeked = () => {
+      debugEvent(`[Poster] Seeked to ${video.currentTime}`);
+      capture();
+    };
     video.ontimeupdate = () => { if (video.currentTime > 0) capture(); };
     video.onloadeddata = () => { if (video.readyState >= 2) capture(); };
-    video.onerror = () => {
+    video.onerror = (error) => {
       clearTimeout(timeout);
-      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
+      if (!settled) {
+        settled = true;
+        URL.revokeObjectURL(url);
+        debugEvent(`[Poster] Error: ${String(error)}`);
+        finish('');
+      }
     };
 
     video.src = url;
+    debugEvent(`[Poster] Starting capture: ${file.name}`);
     video.load();
   });
 }
@@ -135,10 +162,14 @@ async function filesToMediaItems(
         vWidth = dimVideo.videoWidth || null;
         vHeight = dimVideo.videoHeight || null;
       } catch { /* ignore */ }
-      items.push({ id: crypto.randomUUID(), file, mediaType: 'video', previewUrl, thumbnailUrl: thumbnailUrl || undefined, duration, trimStart: 0, trimEnd: duration, posterTimestamp: 0, posterPreviewUrl: null, width: vWidth, height: vHeight, validationError: null });
+      const mediaItem: StudioMediaItem = { id: crypto.randomUUID(), file, mediaType: 'video', previewUrl, thumbnailUrl: thumbnailUrl || undefined, duration, trimStart: 0, trimEnd: duration, posterTimestamp: 0, posterPreviewUrl: null, width: vWidth, height: vHeight, validationError: null };
+      items.push(mediaItem);
+      debugEvent(`[MediaItem] created: type=video previewUrl=${previewUrl.substring(0, 30)} thumbnailUrl length=${thumbnailUrl.length} thumbnailUrl start=${thumbnailUrl.substring(0, 30)}`);
     } else {
       const dims = await getImageDimensions(file);
-      items.push({ id: crypto.randomUUID(), file, mediaType: 'image', previewUrl, duration: null, trimStart: 0, trimEnd: null, posterTimestamp: 0, posterPreviewUrl: null, width: dims?.width ?? null, height: dims?.height ?? null, validationError: null });
+      const mediaItem: StudioMediaItem = { id: crypto.randomUUID(), file, mediaType: 'image', previewUrl, duration: null, trimStart: 0, trimEnd: null, posterTimestamp: 0, posterPreviewUrl: null, width: dims?.width ?? null, height: dims?.height ?? null, validationError: null };
+      items.push(mediaItem);
+      debugEvent(`[MediaItem] created: type=image previewUrl=${previewUrl.substring(0, 30)} thumbnailUrl length=0 thumbnailUrl start=`);
     }
   }
   return items;
