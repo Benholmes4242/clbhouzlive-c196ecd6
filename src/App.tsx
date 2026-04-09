@@ -120,6 +120,7 @@ const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
 const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
+const ReviewSuccessDebug = lazy(() => import("./pages/ReviewSuccessDebug"));
 const ShareReviewPage = lazy(() => import("./pages/ShareReviewPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
