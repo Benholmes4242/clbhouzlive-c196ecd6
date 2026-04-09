@@ -1527,11 +1527,11 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
                   width: i === currentIndex ? 14 : 5,
                   borderRadius: 99,
                   background: i === currentIndex
-                    ? 'rgba(0, 0, 0, 0.45)'
-                    : 'rgba(0, 0, 0, 0.35)',
+                    ? 'rgba(255, 255, 255, 0.95)'
+                    : 'rgba(255, 255, 255, 0.45)',
                   border: i === currentIndex
-                    ? '1px solid rgba(255, 255, 255, 0.18)'
-                    : '1px solid rgba(255, 255, 255, 0.10)',
+                    ? '1px solid rgba(255, 255, 255, 0.30)'
+                    : '1px solid rgba(255, 255, 255, 0.15)',
                   backdropFilter: 'blur(20px)',
                   WebkitBackdropFilter: 'blur(20px)',
                   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
