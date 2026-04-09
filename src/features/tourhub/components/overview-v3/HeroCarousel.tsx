@@ -795,25 +795,79 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     </div>
                   </div>
                 </>
+              ) : isLive ? (
+                /* ── Compact topbar — burger + title + tour badge ── */
+                <div style={{
+                  flexShrink: 0,
+                  paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)',
+                }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center',
+                    gap: 10, padding: '0 16px', height: 52,
+                  }}>
+                    {/* Burger */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); }}
+                      style={{
+                        width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                        background: 'rgba(255,255,255,0.07)',
+                        backdropFilter: 'blur(12px)',
+                        border: '1px solid rgba(255,255,255,0.09)',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 3.5, cursor: 'pointer',
+                      }}
+                    >
+                      {[0,1,2].map(i => (
+                        <div key={i} style={{ width: 13, height: 1.5, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />
+                      ))}
+                    </button>
+
+                    {/* Title block */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 1 }}>
+                        <span className="live-dot" style={{ width: 7, height: 7 }} />
+                        <span style={{ fontSize: 10, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
+                          LIVE · {getCurrentRoundLabel(leaders, tournament.startDate)}
+                        </span>
+                      </div>
+                      <div style={{
+                        fontSize: 17, fontWeight: 800, color: '#fff',
+                        letterSpacing: -0.3, lineHeight: 1,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {tournament.name}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
+                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
+                      </div>
+                    </div>
+
+                    {/* Tour badge */}
+                    <div style={{
+                      flexShrink: 0,
+                      background: 'rgba(0,0,0,0.30)',
+                      backdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255,255,255,0.09)',
+                      borderRadius: 16, padding: '4px 10px',
+                    }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.80)' }}>
+                        {getTourDisplayName(tournament.tourSlug)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               ) : (
+                /* Upcoming header */
                 <>
                 <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
                     <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
-                      {isLive ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className="live-dot" />
-                          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
-                        </div>
-                      ) : isUpcoming ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
-                          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
-                            Upcoming
-                          </span>
-                        </div>
-                      ) : (
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
+                          Upcoming
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
                         {!tournament.isMajor && (
@@ -823,7 +877,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           </span>
                         </div>
                         )}
-                          {isUpcoming && tournament.startDate && tournament.endDate && (
+                          {tournament.startDate && tournament.endDate && (
                             <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
                               {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                               {' – '}
