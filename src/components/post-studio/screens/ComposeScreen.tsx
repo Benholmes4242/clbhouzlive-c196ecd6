@@ -103,7 +103,7 @@ async function generatePoster(file: File): Promise<string> {
         try {
           video.currentTime = time;
         } catch (error) {
-          debugEvent(`[Poster] Error: ${error instanceof Error ? error.message : String(error)}`);
+          // error seeking
           finish(lastDataUrl || '');
         }
       }, 1);
@@ -113,7 +113,7 @@ async function generatePoster(file: File): Promise<string> {
       if (settled) return;
       settled = true;
       cleanup();
-      debugEvent(`[Poster] Resolved: length=${result.length}`);
+      
       resolve(result);
     };
 
@@ -136,7 +136,7 @@ async function generatePoster(file: File): Promise<string> {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
         const blank = isLikelyBlackFrame(canvas);
-        debugEvent(`[Poster] Canvas result: length=${dataUrl.length} blank=${blank}`);
+        
 
         if (dataUrl.length > 100) {
           lastDataUrl = dataUrl;
@@ -148,41 +148,41 @@ async function generatePoster(file: File): Promise<string> {
         }
 
         seekIndex += 1;
-        debugEvent(`[Poster] Blank frame retry: seeking ${seekTimes[seekIndex]}`);
+        
         seekTo(seekTimes[seekIndex]);
       } catch (error) {
-        debugEvent(`[Poster] Error: ${error instanceof Error ? error.message : String(error)}`);
+        
         finish(lastDataUrl || '');
       }
     };
 
     const timeout = setTimeout(() => {
       if (!settled) {
-        debugEvent('[Poster] Timeout — resolving empty');
+        
         finish(lastDataUrl || '');
       }
     }, 12000);
 
     video.onloadedmetadata = () => {
-      debugEvent(`[Poster] Metadata loaded: w=${video.videoWidth} h=${video.videoHeight} duration=${video.duration}`);
+      
       seekTimes = buildSeekTimes(video.duration);
       seekIndex = 0;
       seekTo(seekTimes[seekIndex] ?? 0.001);
     };
     video.onseeked = () => {
-      debugEvent(`[Poster] Seeked to ${video.currentTime}`);
+      
       void capture();
     };
     video.onerror = (error) => {
       clearTimeout(timeout);
       if (!settled) {
-        debugEvent(`[Poster] Error: ${String(error)}`);
+        
         finish(lastDataUrl || '');
       }
     };
 
     video.src = url;
-    debugEvent(`[Poster] Starting capture: ${file.name}`);
+    
     video.load();
   });
 }
@@ -245,12 +245,12 @@ async function filesToMediaItems(
       } catch { /* ignore */ }
       const mediaItem: StudioMediaItem = { id: crypto.randomUUID(), file, mediaType: 'video', previewUrl, thumbnailUrl: thumbnailUrl || undefined, duration, trimStart: 0, trimEnd: duration, posterTimestamp: 0, posterPreviewUrl: null, width: vWidth, height: vHeight, validationError: null };
       items.push(mediaItem);
-      debugEvent(`[MediaItem] created: type=video previewUrl=${previewUrl.substring(0, 30)} thumbnailUrl length=${thumbnailUrl.length} thumbnailUrl start=${thumbnailUrl.substring(0, 30)}`);
+      
     } else {
       const dims = await getImageDimensions(file);
       const mediaItem: StudioMediaItem = { id: crypto.randomUUID(), file, mediaType: 'image', previewUrl, duration: null, trimStart: 0, trimEnd: null, posterTimestamp: 0, posterPreviewUrl: null, width: dims?.width ?? null, height: dims?.height ?? null, validationError: null };
       items.push(mediaItem);
-      debugEvent(`[MediaItem] created: type=image previewUrl=${previewUrl.substring(0, 30)} thumbnailUrl length=0 thumbnailUrl start=`);
+      
     }
   }
   return items;
@@ -411,10 +411,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
-  // ── Debug helper — dispatches to global overlay ──
-  const addDebug = useCallback((msg: string) => {
-    try { window.dispatchEvent(new CustomEvent('clbhouz-debug', { detail: msg })); } catch {}
-  }, []);
 
   const hasMedia = state.mediaItems.length > 0;
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
@@ -462,10 +458,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       if (toProcess.length === 0) return;
       setIsProcessing(true);
       try {
-        // Debug: log each file before processing
-        toProcess.forEach(f => addDebug(`File selected: ${f.name} | type: ${f.type || 'EMPTY'} | size: ${(f.size/1024).toFixed(0)}KB`));
         const items = await filesToMediaItems(toProcess, (msg) => toast.error(msg));
-        items.forEach((item, i) => addDebug(`Item ${i}: mediaType=${item.mediaType} | dur=${item.duration} | w=${item.width} h=${item.height} | poster=${(item.thumbnailUrl?.length ?? 0)} | fileType=${item.file?.type || 'EMPTY'} | size=${((item.file?.size||0)/1024).toFixed(0)}KB`));
+        
         if (items.length > 0) {
           addMedia(items);
         }
@@ -570,10 +564,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const handlePublish = useCallback(async () => {
     if (isPublishing) return;
     setIsPublishing(true);
-    addDebug(`Publishing: ${state.mediaItems.length} items`);
-    state.mediaItems.forEach((item, i) => {
-      addDebug(`Pub item ${i}: type=${item.mediaType} | file=${!!item.file} | fileType=${item.file?.type || 'EMPTY'} | size=${((item.file?.size||0)/1024).toFixed(0)}KB`);
-    });
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
@@ -960,10 +950,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               >
                 {item.mediaType === 'video' ? (
                   <>
-                    {(() => {
-                      debugEvent(`[Strip] Rendering video tile: poster=${stillSrc.substring(0, 30) || 'EMPTY'} previewUrl=${item.previewUrl?.substring(0, 30)}`);
-                      return null;
-                    })()}
                     {stillSrc ? (
                       <>
                         <img

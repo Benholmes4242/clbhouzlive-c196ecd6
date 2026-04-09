@@ -460,7 +460,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 
         let publicUrl = '';
         const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
-        debugEvent(`[Upload] file=${file.name} | type=${file.type || 'EMPTY'} | size=${(file.size/1024).toFixed(0)}KB | mediaType=${mediaType}`);
+        
 
         // Track stream_id and poster_url for videos
         let streamId: string | null = null;
@@ -475,7 +475,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
         // Upload based on file type
         if (file.type.startsWith('video/') || (!file.type && /\.(mov|mp4|m4v)$/i.test(file.name))) {
           // === TUS RESUMABLE VIDEO UPLOAD ===
-          debugEvent(`[Upload] Starting TUS: ${file.name} | ${file.type} | ${(file.size / (1024 * 1024)).toFixed(1)}MB`);
+          
           console.log(`[uploadPipeline] Using TUS for video: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
           
           const speedTracker = new UploadSpeedTracker();
@@ -508,12 +508,12 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
                 });
               },
               onSuccess: (streamId) => {
-                debugEvent(`[Upload] TUS complete: streamId=${streamId}`);
+                
                 console.log(`[uploadPipeline] TUS upload complete: ${streamId}`);
                 resolve({ streamId });
               },
               onError: (error) => {
-                debugEvent(`[Upload] TUS error: ${error?.message || JSON.stringify(error)}`);
+                
                 console.error(`[uploadPipeline] TUS upload failed:`, error);
                 reject(error);
               },
@@ -530,7 +530,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             uploadedStreamUids.push(streamId);
           }
           
-          debugEvent(`[Upload] Stream ready: ${streamId} | url=${publicUrl?.substring(0, 60)}...`);
+          
           console.log(`[uploadPipeline] Video uploaded via TUS, streamId: ${streamId}`);
           
         } else {
