@@ -1,6 +1,8 @@
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { useRef, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { searchAnalytics } from '@/utils/searchAnalytics';
 import { searchAnalytics } from '@/utils/searchAnalytics';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 
@@ -359,6 +361,7 @@ export const useGlobalEntitySearch = ({
   enabled = true,
   limits = { people: 6, clubs: 6, videos: 6, pages: 6, businesses: 6 }
 }: UseGlobalEntitySearchProps): GlobalSearchResults => {
+  const { user } = useSupabaseSession();
   // Track query changes for analytics
   const prevQuery = useRef<string>('');
   useEffect(() => {
