@@ -69,8 +69,14 @@ export type StudioEdits = {
     volume?: number;   // 0..1
   } | null;
   audioMode?: AudioMode;  // Controls whether original video audio plays
+  // Light adjustments — 0-100, visual centre at 50
+  exposure?: number;
+  contrast?: number;
+  highlights?: number;
+  shadows?: number;
+  saturation?: number;
 };
 
 export type StudioState = Record<string /* mediaId */, StudioEdits>;
 
-export type StudioTool = 'music' | 'text' | 'filter' | 'edit' | null;
+export type StudioTool = 'music' | 'text' | 'filter' | 'edit' | 'trim' | 'light' | null;
