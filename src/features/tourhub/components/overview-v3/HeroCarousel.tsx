@@ -157,11 +157,15 @@ function MiniAvatar({ src, alt, size = 32 }: { src: string; alt: string; size?: 
 function LeaderHeroStrip({ 
   leaderEntry, 
   tourSlug, 
-  leaderStats 
+  leaderStats,
+  tournamentId,
+  currentRound,
 }: { 
   leaderEntry: any; 
   tourSlug: string; 
   leaderStats: LeaderStats | null | undefined;
+  tournamentId: string;
+  currentRound: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
   const p = leaderEntry.player;
@@ -179,6 +183,13 @@ function LeaderHeroStrip({
     : thruRaw === 0 || thruRaw == null ? '-'
     : `${thruRaw}`;
 
+  const derivedRound = [4,3,2,1].find(n =>
+    leaderEntry[`round_${n}`] !== null
+  ) ?? currentRound;
+
+  const playerId = leaderEntry?.player_id ?? leaderEntry?.player?.id ?? null;
+  const { data: holeScores = [] } = useLeaderHoleScores(tournamentId, playerId, derivedRound);
+
   const statsToShow = leaderStats ? [
     { v: leaderStats.eagles,       label: 'Eagles',  color: '#F59E0B' },
     { v: leaderStats.birdies,      label: 'Birdies', color: '#4ade80' },
@@ -189,34 +200,73 @@ function LeaderHeroStrip({
 
   return (
     <div style={{ padding: '0 16px', flexShrink: 0 }}>
-      {/* Leader pill */}
+      {/* Top section: Left = avatar+name+thru | Right = score+today+rounds */}
       <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
         background: 'rgba(255,255,255,0.07)',
         border: '1px solid rgba(255,255,255,0.11)',
         borderRadius: 12,
         padding: '10px 12px',
         marginBottom: 6,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 18, textAlign: 'center', flexShrink: 0 }}>1</span>
-          <div style={{ width: 36, height: 38, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.20)', background: 'rgba(255,255,255,0.07)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Left — avatar + name + thru */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+          <div style={{ width: 40, height: 42, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.20)', background: 'rgba(255,255,255,0.07)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {photoUrl && !imgErr ? (
               <img src={photoUrl} alt="" onError={() => setImgErr(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
             ) : (
-              <PlayerSilhouette size={24} />
+              <PlayerSilhouette size={26} />
             )}
           </div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{fullName}</div>
-            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>
-              {thruDisplay === 'F' ? 'Finished' : thruDisplay === '-' ? 'Not started' : `Thru ${thruDisplay}`}
-            </span>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, color: '#FACC15', marginBottom: 1 }}>
+              🥇 Leader
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {fullName}
+            </div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>
+              {thruDisplay === 'F' ? 'Finished' : thruDisplay === '-' ? 'Starting soon' : `Thru ${thruDisplay}`}
+              {` · Round ${derivedRound}`}
+            </div>
           </div>
         </div>
-        <span style={{ fontSize: 22, fontWeight: 800, color: score < 0 ? '#4ade80' : score === 0 ? 'rgba(255,255,255,0.75)' : '#f87171', lineHeight: 1, flexShrink: 0 }}>
-          {scoreDisplay}
-        </span>
+
+        {/* Right — total score + today + round history */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, marginLeft: 8 }}>
+          <span style={{
+            fontSize: 26, fontWeight: 900, lineHeight: 1,
+            color: score < 0 ? '#22C55E' : score === 0 ? 'rgba(255,255,255,0.75)' : '#EF4444',
+            textShadow: score < 0 ? '0 0 16px rgba(34,197,94,0.35)' : score > 0 ? '0 0 16px rgba(239,68,68,0.35)' : 'none',
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px',
+          }}>
+            {scoreDisplay}
+          </span>
+
+          {/* Today pill */}
+          {derivedRound > 1 && leaderEntry[`round_${derivedRound}`] !== null && (() => {
+            const todayScore = leaderEntry[`round_${derivedRound}`] as number;
+            const todayDisplay = todayScore === 0 ? 'E' : todayScore > 0 ? `+${todayScore}` : `${todayScore}`;
+            const todayColor = todayScore < 0 ? '#22C55E' : todayScore > 0 ? '#EF4444' : 'rgba(255,255,255,0.70)';
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 2 }}>
+                <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' as const }}>TODAY</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: todayColor }}>{todayDisplay}</span>
+              </div>
+            );
+          })()}
+
+          {/* Round history pills */}
+          {derivedRound > 1 && (
+            <RoundHistoryPills
+              round1={leaderEntry.round_1 ?? null}
+              round2={leaderEntry.round_2 ?? null}
+              round3={leaderEntry.round_3 ?? null}
+              round4={leaderEntry.round_4 ?? null}
+              currentRound={derivedRound}
+            />
+          )}
+        </div>
       </div>
 
       {/* Stat strip */}
@@ -225,16 +275,26 @@ function LeaderHeroStrip({
           {statsToShow.map(stat => (
             <div key={stat.label} style={{ flex: 1, textAlign: 'center', padding: '6px 2px 5px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: 14, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-              <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>{stat.label}</div>
+              <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 3 }}>{stat.label}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Hole-by-hole dots with sparkline */}
+      {holeScores.length > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          <HoleStripWithSparkline
+            holes={holeScores}
+            label={`R${derivedRound} · Hole by hole`}
+          />
         </div>
       )}
 
       {/* In Contention separator */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
-        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>In Contention</span>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>In Contention</span>
         <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
       </div>
     </div>
