@@ -36,7 +36,17 @@ export function MediaThumbnail({
       style={{ width: 'clamp(160px, 45vw, 208px)', height: 'clamp(160px, 45vw, 208px)' }}
     >
       <button onClick={onExpand} className="w-full h-full">
-        <img src={src} alt="" className="w-full h-full object-cover" draggable={false} />
+        {isVideo && !item.thumbnailUrl ? (
+          <video
+            src={item.previewUrl}
+            className="w-full h-full object-cover pointer-events-none"
+            muted
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <img src={src} alt="" className="w-full h-full object-cover" draggable={false} />
+        )}
       </button>
 
       {/* Video indicator */}
