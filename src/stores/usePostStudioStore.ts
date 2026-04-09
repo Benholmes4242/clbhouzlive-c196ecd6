@@ -30,14 +30,17 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
   initialActorId: null,
   returnPath: '/',
 
-  openPostStudio: (opts) =>
+  openPostStudio: (opts) => {
+    const path = opts?.returnPath ?? window.location.pathname;
+    console.log('[DEBUG] openPostStudio called, capturing returnPath:', path);
     set({
       isOpen: true,
       initialMedia: opts?.media ?? [],
       initialActorType: opts?.actorType ?? 'personal',
       initialActorId: opts?.actorId ?? null,
-      returnPath: opts?.returnPath ?? window.location.pathname,
-    }),
+      returnPath: path,
+    });
+  },
 
   closePostStudio: () =>
     set({
