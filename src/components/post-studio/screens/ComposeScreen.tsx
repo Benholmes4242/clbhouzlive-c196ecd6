@@ -287,7 +287,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
    const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
-    setCaption, openPanel, closePanel, updateMediaEdits,
+    setCaption, openPanel, closePanel, updateMediaEdits, updateTrim,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
 
@@ -439,7 +439,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const item = state.mediaItems[index];
     if (!item) return;
     setActiveMedia(index);
-    setActiveTool(null);
+    setActiveTool('filter');
     setShelfOpen(true);
   }, [state.mediaItems, setActiveMedia]);
 
@@ -1124,6 +1124,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           clearEdits={handleClearEdits}
           activeOverlayId={activeOverlayId}
           onSelectOverlay={setActiveOverlayId}
+          allMediaItems={state.mediaItems.map(m => ({
+            id: m.id,
+            mediaType: m.mediaType,
+            previewUrl: m.previewUrl,
+            thumbnailUrl: m.thumbnailUrl,
+          }))}
+          activeMediaIndex={state.activeMediaIndex}
+          onNavigateMedia={(index) => setActiveMedia(index)}
+          trimStart={activeItem.trimStart || 0}
+          trimEnd={activeItem.trimEnd ?? activeItem.duration ?? 0}
+          duration={activeItem.duration ?? 0}
+          onTrimChange={(start, end) => {
+            if (activeItem) updateTrim(activeItem.id, start, end);
+          }}
         />
       )}
 

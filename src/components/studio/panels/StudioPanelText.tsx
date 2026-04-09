@@ -48,10 +48,10 @@ const PREVIEW_FONTS: Record<TextStyle, string> = {
   classic: 'font-serif italic',
 };
 
-export default function StudioPanelText({ 
-  edits, 
-  updateEdits, 
-  onApply, 
+export default function StudioPanelText({
+  edits,
+  updateEdits,
+  onApply,
   onReset,
   activeOverlayId,
   onSelectOverlay
@@ -60,10 +60,10 @@ export default function StudioPanelText({
   const [newText, setNewText] = useState('');
   const [newColor, setNewColor] = useState('#FFFFFF');
   const [newScale, setNewScale] = useState(1.2);
-  
+
   const [internalSelectedBox, setInternalSelectedBox] = useState<string | null>(null);
   const selectedBox = activeOverlayId !== undefined ? activeOverlayId : internalSelectedBox;
-  
+
   const handleSelectBox = useCallback((id: string | null) => {
     if (onSelectOverlay) {
       onSelectOverlay(id);
@@ -80,7 +80,7 @@ export default function StudioPanelText({
     const baseY = 0.4;
     const yOffset = textBoxes.length * 0.08;
     const newY = Math.min(baseY + yOffset, 0.75);
-    
+
     const newBox: TextOverlay = {
       id: nanoid(),
       text: text || 'New text',
@@ -104,7 +104,7 @@ export default function StudioPanelText({
   }, [newText, newColor, newScale, addTextBox]);
 
   const updateBox = useCallback((id: string, changes: Partial<TextOverlay>) => {
-    const updated = textBoxes.map(box => 
+    const updated = textBoxes.map(box =>
       box.id === id ? { ...box, ...changes } : box
     );
     setTextBoxes(updated);
@@ -119,7 +119,7 @@ export default function StudioPanelText({
       handleSelectBox(updated.length > 0 ? updated[updated.length - 1].id : null);
     }
   }, [textBoxes, updateEdits, selectedBox, handleSelectBox]);
-  
+
   const bringToFront = useCallback((id: string) => {
     const index = textBoxes.findIndex(box => box.id === id);
     if (index === -1 || index === textBoxes.length - 1) return;
@@ -132,12 +132,10 @@ export default function StudioPanelText({
 
   const selected = textBoxes.find(box => box.id === selectedBox);
   const hasTextLayers = textBoxes.length > 0;
-
   const activeSize = SIZES.find(s => Math.abs(s.scale - newScale) < 0.05)?.id || 'M';
 
   return (
     <div className="flex flex-col h-full">
-      {/* Layers section - only when layers exist */}
       {hasTextLayers && (
         <>
           <div className="px-3 pt-2 pb-1.5 flex items-center gap-2">
@@ -145,13 +143,13 @@ export default function StudioPanelText({
             <span className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Layers</span>
             <span className="text-[11px] ml-auto" style={{ color: 'rgba(255,255,255,0.70)' }}>{textBoxes.length}</span>
           </div>
-          
+
           <div className="px-3 pb-2">
             <div className="space-y-1">
               {[...textBoxes].reverse().map((box, reverseIndex) => {
                 const isSelected = selectedBox === box.id;
                 const isTopLayer = reverseIndex === 0;
-                
+
                 return (
                   <div key={box.id}>
                     <div
@@ -199,7 +197,6 @@ export default function StudioPanelText({
                       </div>
                     </div>
 
-                    {/* Inline controls for selected layer */}
                     {isSelected && selected && (
                       <div className="mt-1.5 space-y-2.5 pb-2">
                         <input
@@ -209,16 +206,15 @@ export default function StudioPanelText({
                           placeholder="Enter text..."
                           className="w-full focus:outline-none text-white"
                           style={{
-                            background: 'rgba(255,255,255,0.06)',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: 14,
-                            padding: '11px 14px',
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.10)',
+                            borderRadius: 12,
+                            padding: '12px 16px',
                             fontSize: 15,
-                            caretColor: '#F7931E',
+                            caretColor: '#ffffff',
                           }}
                         />
 
-                        {/* Style selector */}
                         <div>
                           <label className="block text-[11px] font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Style</label>
                           <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
@@ -244,7 +240,6 @@ export default function StudioPanelText({
                           </div>
                         </div>
 
-                        {/* Color picker */}
                         <div>
                           <label className="block text-[11px] font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Color</label>
                           <div className="flex gap-1.5 flex-wrap">
@@ -263,7 +258,6 @@ export default function StudioPanelText({
                           </div>
                         </div>
 
-                        {/* Size pills */}
                         <div>
                           <label className="block text-[11px] font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Size</label>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, width: '100%' }}>
@@ -281,9 +275,9 @@ export default function StudioPanelText({
                                     fontSize: 13,
                                     fontWeight: isActive ? 700 : 600,
                                     borderRadius: 8,
-                                    background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
-                                    border: isActive ? '1px solid rgba(247,147,30,0.30)' : '1px solid rgba(255,255,255,0.08)',
-                                    color: isActive ? '#F7931E' : 'rgba(255,255,255,0.55)',
+                                    background: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.05)',
+                                    border: isActive ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                                    color: isActive ? '#050505' : 'rgba(255,255,255,0.45)',
                                   }}
                                 >
                                   {size.label}
@@ -300,14 +294,11 @@ export default function StudioPanelText({
             </div>
           </div>
 
-          {/* Divider */}
           <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '0 12px' }} />
         </>
       )}
 
-      {/* ADD TEXT section — always visible */}
       <div className="px-3 pt-3 pb-3 flex-1 overflow-y-auto">
-        {/* Eyebrow */}
         <span style={{
           fontSize: 10,
           fontWeight: 700,
@@ -318,7 +309,6 @@ export default function StudioPanelText({
           Add text
         </span>
 
-        {/* Input */}
         <input
           type="text"
           value={newText}
@@ -327,16 +317,15 @@ export default function StudioPanelText({
           placeholder="Type something..."
           className="w-full focus:outline-none text-white mt-2"
           style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 14,
-            padding: '11px 14px',
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            borderRadius: 12,
+            padding: '12px 16px',
             fontSize: 15,
-            caretColor: '#F7931E',
+            caretColor: '#ffffff',
           }}
         />
 
-        {/* Colour swatches */}
         <div className="mt-3">
           <div className="flex gap-1.5 flex-wrap">
             {COLORS.map(color => (
@@ -354,7 +343,6 @@ export default function StudioPanelText({
           </div>
         </div>
 
-        {/* Size pills */}
         <div className="mt-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, width: '100%' }}>
           {SIZES.map(size => {
             const isActive = activeSize === size.id;
@@ -370,9 +358,9 @@ export default function StudioPanelText({
                   fontSize: 13,
                   fontWeight: isActive ? 700 : 600,
                   borderRadius: 8,
-                  background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
-                  border: isActive ? '1px solid rgba(247,147,30,0.30)' : '1px solid rgba(255,255,255,0.08)',
-                  color: isActive ? '#F7931E' : 'rgba(255,255,255,0.55)',
+                  background: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.05)',
+                  border: isActive ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                  color: isActive ? '#050505' : 'rgba(255,255,255,0.45)',
                 }}
               >
                 {size.label}
@@ -381,15 +369,14 @@ export default function StudioPanelText({
           })}
         </div>
 
-        {/* Add button */}
         {newText.trim() && (
           <button
             onClick={handleAddFromInput}
             className="w-full mt-3 py-2 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold transition-colors"
             style={{
-              background: 'rgba(247,147,30,0.15)',
-              border: '1px solid rgba(247,147,30,0.28)',
-              color: '#F7931E',
+              background: 'rgba(255,255,255,0.10)',
+              border: '1px solid rgba(255,255,255,0.20)',
+              color: 'rgba(255,255,255,0.95)',
             }}
           >
             <Plus className="w-3.5 h-3.5" />

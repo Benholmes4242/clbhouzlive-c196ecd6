@@ -18,18 +18,17 @@ const MOOD_DESCRIPTORS: Record<string, string> = {
   upbeat: 'Upbeat · Bright',
 };
 
-/* Animated waveform bars for playing state */
 function WaveformBars() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 14 }}>
-      {[0, 0.15, 0.3, 0.1].map((delay, i) => (
+      {[0, 0.07, 0.14, 0.21].map((delay, i) => (
         <div
           key={i}
           style={{
             width: 3,
             height: 14,
             borderRadius: 1.5,
-            background: '#F7931E',
+            background: 'rgba(255,255,255,0.80)',
             animation: `wavebar 0.8s ease-in-out ${delay}s infinite alternate`,
           }}
         />
@@ -110,11 +109,10 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
 
   return (
     <div className="flex flex-col h-full">
-      {/* Selected track status + remove */}
       {selectedTrack && (
         <div className="px-4 py-2 flex items-center justify-between gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div className="flex items-center gap-1.5 min-w-0">
-            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
+            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.85)' }} />
             <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.70)' }} className="truncate">
               {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
             </span>
@@ -130,7 +128,6 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         </div>
       )}
 
-      {/* Track list */}
       <div className="flex-1 min-h-0 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
         {filteredTracks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 px-4">
@@ -141,7 +138,6 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
           </div>
         ) : (
           <div className="px-4 pt-1 pb-6">
-            {/* Section label */}
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.28)', padding: '8px 0 6px' }}>
               ADD MUSIC
             </p>
@@ -157,19 +153,20 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     className="flex items-center gap-3 cursor-pointer"
                     style={{
                       padding: '10px 12px',
-                      borderRadius: 12,
+                      borderRadius: isSelected || isPlaying ? 14 : 12,
                       background: isPlaying
-                        ? 'rgba(247,147,30,0.08)'
+                        ? 'rgba(255,255,255,0.07)'
                         : isSelected
-                          ? 'rgba(255,255,255,0.08)'
+                          ? 'rgba(255,255,255,0.07)'
                           : 'rgba(255,255,255,0.04)',
                       border: isPlaying
-                        ? '1px solid rgba(247,147,30,0.18)'
-                        : '1px solid rgba(255,255,255,0.06)',
+                        ? '1px solid rgba(255,255,255,0.12)'
+                        : isSelected
+                          ? '1px solid rgba(255,255,255,0.12)'
+                          : '1px solid rgba(255,255,255,0.06)',
                     }}
                     onClick={() => handleSelectTrack(track)}
                   >
-                    {/* Play button — squircle */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -180,8 +177,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                         width: 36,
                         height: 36,
                         borderRadius: 10,
-                        background: isPlaying ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
-                        border: isPlaying ? '1px solid rgba(247,147,30,0.28)' : '1px solid rgba(255,255,255,0.08)',
+                        background: isPlaying ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.06)',
+                        border: isPlaying ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
                       {isPlaying ? (
@@ -193,7 +190,6 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                       )}
                     </button>
 
-                    {/* Track info */}
                     <div className="flex-1 min-w-0">
                       <div className="truncate leading-tight" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.90)' }}>
                         {track.title}
@@ -203,9 +199,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                       </div>
                     </div>
 
-                    {/* Selected dot */}
                     {isSelected && (
-                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#F7931E' }} />
+                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.85)' }} />
                     )}
                   </div>
                 );
