@@ -1256,6 +1256,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           onSelectOverlay={setActiveOverlayId}
         />
       )}
-    </div>
+
+      {/* Debug overlay for iOS video diagnostics */}
+      {debugLog.length > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 120, left: 8, right: 8,
+          background: 'rgba(0,0,0,0.85)', borderRadius: 8, padding: 8,
+          zIndex: 99999, maxHeight: 180, overflowY: 'auto',
+        }}>
+          {debugLog.map((log, i) => (
+            <div key={i} style={{ fontSize: 10, color: '#F7931E', fontFamily: 'monospace', marginBottom: 2 }}>
+              {log}
+            </div>
+          ))}
+        </div>
+      )}
   );
 }
