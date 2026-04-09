@@ -168,8 +168,8 @@ function countryToFlag(country: string | null | undefined): string | null {
     'Colombia': '🇨🇴', 'New Zealand': '🇳🇿', 'Philippines': '🇵🇭', 'Singapore': '🇸🇬',
     'Malaysia': '🇲🇾', 'Indonesia': '🇮🇩', 'Vietnam': '🇻🇳', 'Zimbabwe': '🇿🇼',
     'Fiji': '🇫🇯', 'Paraguay': '🇵🇾', 'Venezuela': '🇻🇪', 'Puerto Rico': '🇵🇷',
-    'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Poland': '🇵🇱', 'Czech Republic': '🇨🇿', 'Portugal': '🇵🇹',
-    'Taiwan': '🇹🇼', 'Hong Kong': '🇭🇰',
+    'Poland': '🇵🇱', 'Czech Republic': '🇨🇿', 'Portugal': '🇵🇹',
+    'Taiwan': '🇹🇼', 'Hong Kong': '🇭🇰', 'Greece': '🇬🇷', 'Turkey': '🇹🇷',
   };
   return MAP[country] ?? null;
 }
