@@ -16,7 +16,6 @@ import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
-import { openTourNav } from '../../contexts/TourNavContext';
 
 import { cn } from '@/lib/utils';
 import { 
@@ -494,6 +493,8 @@ function getDefendingChampionSubtext(tournament: {
 function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
+  
+  
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
   
@@ -804,13 +805,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
-            {/* Safe area spacer */}
-            {isLive && (
-              <div style={{
-                height: 'max(env(safe-area-inset-top, 0px), 47px)',
-                flexShrink: 0,
-              }} />
-            )}
 
             {/* ─── Tournament header — hidden when scorecard is open ─── */}
             {!selectedPlayer && (
@@ -853,27 +847,24 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 /* ── Compact topbar — burger + title + tour badge ── */
                 <div style={{
                   flexShrink: 0,
+                  paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)',
                 }}>
                   <div style={{
                     display: 'flex', alignItems: 'center',
                     gap: 10, padding: '0 16px', height: 52,
                   }}>
-
-                    {/* Functional burger for live topbar */}
+                    {/* Burger */}
                     <button
-                      className="flex flex-col items-center justify-center gap-[3.5px] active:scale-[0.97] transition-transform"
+                      onClick={(e) => { e.stopPropagation(); }}
                       style={{
-                        width: 34,
-                        height: 34,
-                        flexShrink: 0,
-                        borderRadius: 10,
+                        width: 34, height: 34, borderRadius: 10, flexShrink: 0,
                         background: 'rgba(255,255,255,0.07)',
                         backdropFilter: 'blur(12px)',
-                        WebkitBackdropFilter: 'blur(12px)',
                         border: '1px solid rgba(255,255,255,0.09)',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 3.5, cursor: 'pointer',
                       }}
-                      onClick={() => openTourNav()}
-                      aria-label="Open tour menu"
                     >
                       {[0,1,2].map(i => (
                         <div key={i} style={{ width: 13, height: 1.5, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />

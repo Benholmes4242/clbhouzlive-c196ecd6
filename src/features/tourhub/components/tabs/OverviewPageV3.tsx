@@ -20,7 +20,6 @@ import {
   LiveRightNow,
   UnifiedWorldRankings,
 } from '../overview-v3';
-import { useHeroCarouselData } from '../../hooks/useHeroCarouselData';
 import { WhatsComing } from '../overview-v3/WhatsComing';
 import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
@@ -36,8 +35,6 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
-  const { data: heroSlides = [] } = useHeroCarouselData();
-  const hasLiveSlide = Array.isArray(heroSlides) && heroSlides.length > 0 && heroSlides[0].type === 'live';
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
@@ -84,29 +81,29 @@ export function OverviewPageV3() {
           style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
         >
           <HeroCarousel hasHeader={false} />
-          {/* Burger menu — glass pill (hidden on live slides which have their own topbar) */}
-          {!hasLiveSlide && (
-            <button
-              className="absolute z-20 flex flex-col items-center justify-center gap-[3.5px] active:scale-[0.97] transition-transform"
-              style={{
-                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 9px)',
-                left: '16px',
-                width: 34,
-                height: 34,
-                borderRadius: 10,
-                background: 'rgba(255,255,255,0.07)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.09)',
-              }}
-              onClick={() => openTourNav()}
-              aria-label="Open tour menu"
-            >
-              {[0,1,2].map(i => (
-                <div key={i} style={{ width: 13, height: 1.5, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />
-              ))}
-            </button>
-          )}
+          {/* Burger menu — glass pill */}
+          <button
+            className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+            style={{
+              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+              left: '16px',
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: 'rgba(0,0,0,0.28)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+            }}
+            onClick={() => openTourNav()}
+            aria-label="Open tour menu"
+          >
+            <Menu
+              className="w-[18px] h-[18px]"
+              strokeWidth={2}
+              style={{ color: '#FFFFFF' }}
+            />
+          </button>
         </motion.div>
 
         {/* Content sections */}
