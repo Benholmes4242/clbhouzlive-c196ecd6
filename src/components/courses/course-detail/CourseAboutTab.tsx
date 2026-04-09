@@ -299,7 +299,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 12. Visit Website */}
       {course.website_url && (
-        <section className="px-4 pt-2 pb-4">
+        <section className="px-4 pt-2 pb-4 flex justify-center">
           <button
             onClick={handleWebsiteClick}
             className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] rounded-full bg-card border border-border/60 hover:bg-muted transition-colors active:scale-[0.98] text-foreground text-sm font-semibold"
