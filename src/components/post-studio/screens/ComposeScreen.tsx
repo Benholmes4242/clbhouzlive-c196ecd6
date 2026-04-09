@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 
 import {
-  Camera, Layers, AtSign, X, Pencil, Play, Plus, Clock, FileText,
+  Camera, ImagePlus, AtSign, X, Pencil, Play, Plus, Clock, FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -842,8 +842,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     aspectRatio: '1',
                     borderRadius: 12,
                     overflow: 'hidden',
-                    outline: isActive ? '2.5px solid #F7931E' : '2.5px solid transparent',
-                    outlineOffset: -2,
+                    outline: 'none',
                     cursor: 'pointer',
                   }}
                 >
@@ -1030,7 +1029,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 border: '1px solid rgba(247,147,30,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Layers className="w-[18px] h-[18px]" style={{ color: '#F7931E' }} strokeWidth={2} />
+                <ImagePlus className="w-[18px] h-[18px]" style={{ color: '#F7931E' }} strokeWidth={2} />
               </div>
               <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
