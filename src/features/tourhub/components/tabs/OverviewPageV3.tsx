@@ -83,7 +83,7 @@ export function OverviewPageV3() {
           <HeroCarousel hasHeader={false} />
           {/* Burger menu — glass pill */}
           <button
-            className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+            className="absolute z-20 flex flex-col items-center justify-center gap-[3.5px] active:scale-[0.97] transition-transform"
             style={{
               top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 9px)',
               left: '16px',
