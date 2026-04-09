@@ -33,6 +33,7 @@ function makeInitial(profile: any): ProfileFormData {
     country: profile?.country ?? '',
     city: profile?.city ?? '',
     isPublic: profile?.is_public ?? true,
+    gender: profile?.gender ?? '',
   };
 }
 

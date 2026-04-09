@@ -37,6 +37,7 @@ export interface ProfileFormData {
   country: string;
   city: string;
   isPublic: boolean;
+  gender: string;
 }
 
 export const STEP_TITLES: Record<WizardStep, string> = {

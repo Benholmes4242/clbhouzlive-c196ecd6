@@ -82,6 +82,7 @@ export function useProfileSave(userId: string) {
             .trim(),
           country: form.country.trim(),
           city: form.city.trim(),
+          gender: form.gender || null,
           has_completed_onboarding: true,
           username_is_custom: true,
           updated_at: new Date().toISOString(),
