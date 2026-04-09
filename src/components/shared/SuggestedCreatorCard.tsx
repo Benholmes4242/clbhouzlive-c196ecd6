@@ -133,9 +133,9 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
       </div>
 
       {/* Club + divider + HCP on one row */}
-      <div style={{
+      <div onClick={handleProfileTap} style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        gap: 5, marginTop: 5, width: '100%',
+        gap: 5, marginTop: 5, width: '100%', cursor: 'pointer',
       }}>
         {creator.homeCourse && (
           <>
@@ -169,6 +169,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
       {/* Follow button */}
       <button
         onClick={handleFollow}
+        onPointerDown={e => e.stopPropagation()}
         className="active:scale-[0.96]"
         style={{
           width: 138, height: 34, borderRadius: 10,
