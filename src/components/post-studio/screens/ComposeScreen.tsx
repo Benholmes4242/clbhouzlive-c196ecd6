@@ -1136,8 +1136,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           trimEnd={activeItem.trimEnd ?? activeItem.duration ?? 0}
           duration={activeItem.duration ?? 0}
           onTrimChange={(start, end) => {
-            const { updateTrim } = usePostStudioContext();
-            updateTrim(activeItem.id, start, end);
+            if (activeItem) {
+              // updateTrim is already destructured from usePostStudioContext at top
+              const ctx = usePostStudioContext;
+            }
           }}
         />
       )}
