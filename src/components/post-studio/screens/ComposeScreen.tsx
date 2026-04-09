@@ -849,14 +849,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 }}
               >
                 {item.mediaType === 'video' ? (
-                  <video
-                    src={item.previewUrl}
-                    poster={item.thumbnailUrl || undefined}
-                    className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                    playsInline
-                    muted
-                    preload="metadata"
-                  />
+                  <>
+                    {debugEvent(`[Strip] Rendering video tile: poster=${item.thumbnailUrl?.substring(0, 30) || 'EMPTY'} previewUrl=${item.previewUrl?.substring(0, 30)}`) && null}
+                    <video
+                      src={item.previewUrl}
+                      poster={item.thumbnailUrl || undefined}
+                      className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                      playsInline
+                      muted
+                      preload="metadata"
+                    />
+                  </>
                 ) : (
                   <img
                     src={item.thumbnailUrl || item.previewUrl}
