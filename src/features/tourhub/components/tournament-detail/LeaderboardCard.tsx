@@ -44,7 +44,7 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
         color: score < 0 
           ? 'hsl(var(--accent-amber))' 
           : score > 0 
-            ? 'hsl(var(--foreground))' 
+            ? '#EF4444' 
             : 'hsl(var(--muted-foreground))' 
       }}
     >
