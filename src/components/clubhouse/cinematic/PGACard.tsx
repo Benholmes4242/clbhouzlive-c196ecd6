@@ -49,6 +49,12 @@ const SQUIRCLE_RADIUS = '34%';
 const ACCENT = '#E8980A';
 const ACCENT_LIGHT = '#F59E0B';
 
+const MAJOR_KEYWORDS = ['masters tournament', 'the open championship', 'u.s. open', 'us open', 'pga championship'];
+const isMajorTournament = (name: string) => {
+  const lower = name.toLowerCase();
+  return MAJOR_KEYWORDS.some(k => lower.includes(k));
+};
+
 // ── Stat Tile (live state) ──
 const StatTile: React.FC<{ label: string; value: number; color: string }> = ({ label, value, color }) => (
   <div className="flex-1 text-center">
@@ -451,7 +457,8 @@ export const PGACard: React.FC<PGACardProps> = ({
             pointerEvents: 'none',
           }} />
 
-          {/* Tour badge — top left */}
+          {/* Tour badge — top left (hidden for majors) */}
+          {!isMajorTournament(cd.tournamentName) && (
           <div style={{
             position: 'absolute', top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 12,
             display: 'flex', alignItems: 'center', gap: 6,
@@ -473,6 +480,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               FINAL
             </span>
           </div>
+          )}
 
           {/* Winner info — bottom */}
           <div style={{
@@ -895,7 +903,8 @@ export const PGACard: React.FC<PGACardProps> = ({
             pointerEvents: 'none',
           }} />
 
-          {/* Tour badge — top left */}
+          {/* Tour badge — top left (hidden for majors) */}
+          {!isMajorTournament(cd.tournamentName) && (
           <div style={{
             position: 'absolute', top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 12,
             display: 'flex', alignItems: 'center', gap: 6,
@@ -917,6 +926,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               UPCOMING
             </span>
           </div>
+          )}
 
           {/* Bottom content */}
           <div style={{
