@@ -33,6 +33,7 @@ function makeInitial(profile: any): ProfileFormData {
     country: profile?.country ?? '',
     city: profile?.city ?? '',
     isPublic: profile?.is_public ?? true,
+    gender: profile?.gender ?? '',
   };
 }
 
@@ -82,7 +83,8 @@ export function useProfileForm(profile: any, loading?: boolean) {
       JSON.stringify(form.websites) !== JSON.stringify(initialData.websites) ||
       JSON.stringify(form.additionalClubs) !== JSON.stringify(initialData.additionalClubs) ||
       form.homeClubVisibility !== initialData.homeClubVisibility ||
-      form.additionalClubsVisibility !== initialData.additionalClubsVisibility
+      form.additionalClubsVisibility !== initialData.additionalClubsVisibility ||
+      form.gender !== initialData.gender
     );
   }, [form, initialData]);
 

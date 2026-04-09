@@ -1,0 +1,1 @@
+ALTER TABLE user_profiles ADD COLUMN gender text CHECK (gender IN ('male', 'female', 'prefer_not_to_say'));

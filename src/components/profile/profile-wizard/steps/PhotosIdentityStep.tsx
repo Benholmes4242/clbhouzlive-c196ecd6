@@ -11,6 +11,12 @@ interface Props {
   onFieldChange: <K extends keyof ProfileFormData>(field: K, value: ProfileFormData[K]) => void;
 }
 
+const GENDER_OPTIONS = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
+] as const;
+
 export function PhotosIdentityStep({
   form, usernameIsLocked, displayNameError, onFieldChange,
 }: Props) {
@@ -73,7 +79,7 @@ export function PhotosIdentityStep({
           </div>
 
           {/* Username field */}
-          <div className="px-4 pt-3 pb-4">
+          <div className="px-4 pt-3 pb-4 border-b border-border/50">
             <div className="flex justify-between items-baseline mb-2">
               <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                 Username
@@ -102,6 +108,37 @@ export function PhotosIdentityStep({
                 placeholder="username"
                 className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-8 pr-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
+            </div>
+          </div>
+
+          {/* Gender field */}
+          <div className="px-4 pt-3 pb-4">
+            <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2 block">
+              Gender
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {GENDER_OPTIONS.map((opt) => {
+                const isActive = form.gender === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => onFieldChange('gender', isActive ? '' : opt.value)}
+                    className="transition-all active:scale-[0.97]"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: 14,
+                      fontWeight: isActive ? 600 : 400,
+                      borderRadius: 20,
+                      background: isActive ? 'rgba(247,147,30,0.12)' : 'rgba(0,0,0,0.05)',
+                      border: isActive ? '1px solid rgba(247,147,30,0.35)' : '1px solid #e2e8f0',
+                      color: isActive ? '#F7931E' : '#64748b',
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

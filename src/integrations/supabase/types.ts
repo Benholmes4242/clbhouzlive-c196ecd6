@@ -12307,6 +12307,7 @@ export type Database = {
           email_change_requested_at: string | null
           email_change_token: string | null
           featured_post_id: string | null
+          gender: string | null
           golfer_verified_at: string | null
           golfer_verified_by: string | null
           handicap_sync_interest: boolean | null
@@ -12420,6 +12421,7 @@ export type Database = {
           email_change_requested_at?: string | null
           email_change_token?: string | null
           featured_post_id?: string | null
+          gender?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
           handicap_sync_interest?: boolean | null
@@ -12533,6 +12535,7 @@ export type Database = {
           email_change_requested_at?: string | null
           email_change_token?: string | null
           featured_post_id?: string | null
+          gender?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
           handicap_sync_interest?: boolean | null
