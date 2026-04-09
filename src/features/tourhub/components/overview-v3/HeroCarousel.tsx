@@ -154,22 +154,20 @@ function MiniAvatar({ src, alt, size = 32 }: { src: string; alt: string; size?: 
 }
 
 /** Leader hero strip — sticky above scrollable leaderboard in expanded live state */
-function LeaderHeroStrip({ 
-  leaderEntry, 
-  tourSlug, 
+function LeaderHeroStrip({
+  leaderEntry,
+  tourSlug,
   leaderStats,
   tournamentId,
   currentRound,
-}: { 
-  leaderEntry: any; 
-  tourSlug: string; 
+}: {
+  leaderEntry: any;
+  tourSlug: string;
   leaderStats: LeaderStats | null | undefined;
   tournamentId: string;
   currentRound: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
-  const p = leaderEntry.player;
-
   const derivedRound = [4,3,2,1].find(n =>
     leaderEntry[`round_${n}`] !== null
   ) ?? currentRound;
@@ -177,6 +175,7 @@ function LeaderHeroStrip({
   const playerId = leaderEntry?.player_id ?? leaderEntry?.player?.id ?? null;
   const { data: holeScores = [] } = useLeaderHoleScores(tournamentId, playerId, derivedRound);
 
+  const p = leaderEntry.player;
   if (!p) return null;
 
   const fullName = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
@@ -184,6 +183,8 @@ function LeaderHeroStrip({
   const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, p.headshot_override);
   const score = leaderEntry.score ?? 0;
   const scoreDisplay = score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`;
+  const scoreColor = score < 0 ? '#22C55E' : score > 0 ? '#EF4444' : 'rgba(255,255,255,0.75)';
+
   const thruRaw = leaderEntry.thru;
   const thruDisplay = leaderEntry.status === 'cut' ? 'CUT'
     : leaderEntry.status === 'wd' ? 'WD'
@@ -191,46 +192,66 @@ function LeaderHeroStrip({
     : thruRaw === 0 || thruRaw == null ? '-'
     : `${thruRaw}`;
 
+  const todayScore = leaderEntry[`round_${derivedRound}`] as number | null;
+  const todayDisplay = todayScore === null ? null
+    : todayScore === 0 ? 'E'
+    : todayScore > 0 ? `+${todayScore}`
+    : `${todayScore}`;
+  const todayColor = todayScore === null ? 'rgba(255,255,255,0.75)'
+    : todayScore < 0 ? '#22C55E'
+    : todayScore > 0 ? '#EF4444'
+    : 'rgba(255,255,255,0.75)';
 
   return (
     <div style={{ padding: '0 16px', flexShrink: 0 }}>
-      {/* Top section: Left = avatar+name+thru | Right = score+today+rounds */}
+      {/* ── Leader card ── */}
       <div style={{
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+        display: 'flex', alignItems: 'flex-start', gap: 12,
         background: 'rgba(255,255,255,0.07)',
         border: '1px solid rgba(255,255,255,0.11)',
-        borderRadius: 12,
-        padding: '10px 12px',
-        marginBottom: 6,
+        borderRadius: 14, padding: '12px 14px', marginBottom: 10,
       }}>
         {/* Left — avatar + name + thru */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
-          <div style={{ width: 40, height: 42, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.20)', background: 'rgba(255,255,255,0.07)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, minWidth: 0 }}>
+          <div style={{
+            width: 38, height: 40, borderRadius: '34%',
+            border: '1.5px solid rgba(255,255,255,0.20)',
+            background: 'rgba(255,255,255,0.07)',
+            overflow: 'hidden', flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
             {photoUrl && !imgErr ? (
-              <img src={photoUrl} alt="" onError={() => setImgErr(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+              <img src={photoUrl} alt="" onError={() => setImgErr(true)}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
             ) : (
-              <PlayerSilhouette size={26} />
+              <PlayerSilhouette size={24} />
             )}
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, color: '#FACC15', marginBottom: 1 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 2 }}>
               🥇 Leader
             </div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {fullName}
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>
-              {thruDisplay === 'F' ? 'Finished' : thruDisplay === '-' ? 'Starting soon' : `Thru ${thruDisplay}`}
-              {` · Round ${derivedRound}`}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
+              {thruDisplay !== '-' && thruDisplay !== 'F' && (
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
+              )}
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>
+                {thruDisplay === 'F' ? 'Finished' : thruDisplay === '-' ? 'Starting soon' : `Thru ${thruDisplay}`}
+                {` · Round ${derivedRound}`}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Right — total score + today + round history */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, marginLeft: 8 }}>
+        {/* Right — big total score + today pill + round pills */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
+          {/* Total score — large */}
           <span style={{
-            fontSize: 26, fontWeight: 900, lineHeight: 1,
-            color: score < 0 ? '#22C55E' : score === 0 ? 'rgba(255,255,255,0.75)' : '#EF4444',
+            fontSize: 44, fontWeight: 800, lineHeight: 1,
+            color: scoreColor,
             textShadow: score < 0 ? '0 0 16px rgba(34,197,94,0.35)' : score > 0 ? '0 0 16px rgba(239,68,68,0.35)' : 'none',
             fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px',
           }}>
@@ -238,46 +259,48 @@ function LeaderHeroStrip({
           </span>
 
           {/* Today pill */}
-          {derivedRound > 1 && leaderEntry[`round_${derivedRound}`] !== null && (() => {
-            const todayScore = leaderEntry[`round_${derivedRound}`] as number;
-            const todayDisplay = todayScore === 0 ? 'E' : todayScore > 0 ? `+${todayScore}` : `${todayScore}`;
-            const todayColor = todayScore < 0 ? '#22C55E' : todayScore > 0 ? '#EF4444' : 'rgba(255,255,255,0.70)';
-            return (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 2 }}>
-                <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' as const }}>TODAY</span>
-                <span style={{ fontSize: 10, fontWeight: 800, color: todayColor }}>{todayDisplay}</span>
-              </div>
-            );
-          })()}
+          {todayDisplay !== null && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              background: todayScore! < 0 ? 'rgba(34,197,94,0.10)' : 'rgba(255,255,255,0.06)',
+              border: `1px solid ${todayScore! < 0 ? 'rgba(34,197,94,0.20)' : 'rgba(255,255,255,0.08)'}`,
+              borderRadius: 20, padding: '2px 9px',
+            }}>
+              <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.5px' }}>TODAY</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: todayColor, fontVariantNumeric: 'tabular-nums' }}>{todayDisplay}</span>
+            </div>
+          )}
 
-          {/* Round history pills */}
+          {/* Round history pills — only when R2+ */}
           {derivedRound > 1 && (
             <RoundHistoryPills
-              round1={leaderEntry.round_1 ?? null}
-              round2={leaderEntry.round_2 ?? null}
-              round3={leaderEntry.round_3 ?? null}
-              round4={leaderEntry.round_4 ?? null}
+              round1={leaderEntry.round_1}
+              round2={leaderEntry.round_2}
+              round3={leaderEntry.round_3}
+              round4={leaderEntry.round_4}
               currentRound={derivedRound}
             />
           )}
         </div>
       </div>
 
-
-      {/* Hole-by-hole dots with sparkline */}
+      {/* ── Hole dots + sparkline ── */}
       {holeScores.length > 0 && (
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 10 }}>
           <HoleStripWithSparkline
             holes={holeScores}
+            totalHoles={18}
             label={`R${derivedRound} · Hole by hole`}
           />
         </div>
       )}
 
-      {/* In Contention separator */}
+      {/* ── In Contention separator ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
-        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>In Contention</span>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.30)', flexShrink: 0 }}>
+          In Contention
+        </span>
         <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
       </div>
     </div>
