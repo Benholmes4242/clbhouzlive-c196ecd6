@@ -322,7 +322,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
 
-
   const charCount = useMemo(() => {
     try {
       const S = (Intl as Record<string, unknown>).Segmenter as
@@ -889,8 +888,23 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   {/* Inactive dim */}
                   {!isActive && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.40)', pointerEvents: 'none' }} />}
 
+                  {/* Text overlay indicator — top-right */}
+                  {item.edits?.textOverlays && item.edits.textOverlays.length > 0 && (
+                    <div style={{
+                      position: 'absolute', top: 6, right: 6,
+                      width: 16, height: 16, borderRadius: 5,
+                      background: 'rgba(0,0,0,0.55)',
+                      backdropFilter: 'blur(6px)',
+                      border: '1px solid rgba(255,255,255,0.18)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.85)',
+                      pointerEvents: 'none', zIndex: 3,
+                    }}>
+                      T
+                    </div>
+                  )}
 
-                  {/* Cover indicator — frosted glass tag, top-left */}
+
                   {isCover && (
                     <div style={{
                       position: 'absolute', top: 7, left: 7,
@@ -1105,17 +1119,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
 
       {/* Studio Shelf */}
-      {activeItem && (
+      {state.mediaItems[state.activeMediaIndex] && (
         <StudioShelf
           open={shelfOpen}
           onClose={() => setShelfOpen(false)}
           activeTool={activeTool}
           setActiveTool={setActiveTool}
-          activeMediaId={activeItem.id}
-          activeMediaType={activeItem.mediaType}
-          activeMediaPreviewUrl={activeItem.previewUrl}
-          activeMediaThumbnailUrl={activeItem.thumbnailUrl}
-          edits={activeItem.edits ?? {}}
+          activeMediaId={state.mediaItems[state.activeMediaIndex].id}
+          activeMediaType={state.mediaItems[state.activeMediaIndex].mediaType}
+          activeMediaPreviewUrl={state.mediaItems[state.activeMediaIndex].previewUrl}
+          activeMediaThumbnailUrl={state.mediaItems[state.activeMediaIndex].thumbnailUrl}
+          edits={state.mediaItems[state.activeMediaIndex].edits ?? {}}
           updateEdits={handleUpdateEdits}
           clearEdits={handleClearEdits}
           activeOverlayId={activeOverlayId}
@@ -1128,11 +1142,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           }))}
           activeMediaIndex={state.activeMediaIndex}
           onNavigateMedia={(index) => setActiveMedia(index)}
-          trimStart={activeItem.trimStart || 0}
-          trimEnd={activeItem.trimEnd ?? activeItem.duration ?? 0}
-          duration={activeItem.duration ?? 0}
+          trimStart={state.mediaItems[state.activeMediaIndex].trimStart || 0}
+          trimEnd={state.mediaItems[state.activeMediaIndex].trimEnd ?? state.mediaItems[state.activeMediaIndex].duration ?? 0}
+          duration={state.mediaItems[state.activeMediaIndex].duration ?? 0}
           onTrimChange={(start, end) => {
-            if (activeItem) updateTrim(activeItem.id, start, end);
+            const item = state.mediaItems[state.activeMediaIndex];
+            if (item) updateTrim(item.id, start, end);
           }}
         />
       )}
