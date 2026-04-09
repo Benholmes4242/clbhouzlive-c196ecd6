@@ -439,7 +439,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const item = state.mediaItems[index];
     if (!item) return;
     setActiveMedia(index);
-    setActiveTool(null);
+    setActiveTool('filter');
     setShelfOpen(true);
   }, [state.mediaItems, setActiveMedia]);
 
