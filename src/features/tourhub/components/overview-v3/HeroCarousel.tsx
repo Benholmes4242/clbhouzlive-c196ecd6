@@ -493,8 +493,6 @@ function getDefendingChampionSubtext(tournament: {
 function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
-  
-  
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
   
@@ -859,6 +857,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     display: 'flex', alignItems: 'center',
                     gap: 10, padding: '0 16px', height: 52,
                   }}>
+
+                    {/* Spacer for burger (rendered by OverviewPageV3) */}
+                    <div style={{ width: 34, height: 34, flexShrink: 0 }} />
 
                     {/* Title block */}
                     <div style={{ flex: 1, minWidth: 0 }}>

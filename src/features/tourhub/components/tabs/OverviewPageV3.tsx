@@ -83,26 +83,24 @@ export function OverviewPageV3() {
           <HeroCarousel hasHeader={false} />
           {/* Burger menu — glass pill */}
           <button
-            className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+            className="absolute z-20 flex flex-col items-center justify-center gap-[3.5px] active:scale-[0.97] transition-transform"
             style={{
-              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
+              top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 9px)',
               left: '16px',
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               borderRadius: 10,
-              background: 'rgba(0,0,0,0.28)',
+              background: 'rgba(255,255,255,0.07)',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.15)',
+              border: '1px solid rgba(255,255,255,0.09)',
             }}
             onClick={() => openTourNav()}
             aria-label="Open tour menu"
           >
-            <Menu
-              className="w-[18px] h-[18px]"
-              strokeWidth={2}
-              style={{ color: '#FFFFFF' }}
-            />
+            {[0,1,2].map(i => (
+              <div key={i} style={{ width: 13, height: 1.5, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />
+            ))}
           </button>
         </motion.div>
 
