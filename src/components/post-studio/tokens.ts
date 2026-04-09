@@ -7,12 +7,12 @@ export const BG_CARD     = 'rgba(0,0,0,0.030)';
 export const BG_CARD_HVR = 'rgba(0,0,0,0.055)';
 export const BG_GLASS    = 'rgba(248,250,252,0.97)';
 
-// Amber/gold scale — warm refined tone, not luminous orange
-export const AMBER       = '#F7931E';
-export const AMBER_DEEP  = '#E8870A';
-export const AMBER_DIM   = 'rgba(247,147,30,0.70)';
-export const AMBER_GHOST = 'rgba(247,147,30,0.08)';
-export const AMBER_GLOW  = '0 0 16px rgba(247,147,30,0.15)';
+// White scale — clean monochrome for dark surfaces
+export const AMBER       = 'rgba(255,255,255,0.92)';
+export const AMBER_DEEP  = 'rgba(255,255,255,0.85)';
+export const AMBER_DIM   = 'rgba(255,255,255,0.55)';
+export const AMBER_GHOST = 'rgba(255,255,255,0.05)';
+export const AMBER_GLOW  = '0 0 16px rgba(255,255,255,0.08)';
 
 // Text scale
 export const TEXT_PRIMARY   = 'rgba(15,23,42,0.92)';
@@ -22,11 +22,11 @@ export const TEXT_TERTIARY  = 'rgba(15,23,42,0.30)';
 // Borders
 export const BORDER_SUBTLE  = '1px solid rgba(0,0,0,0.06)';
 export const BORDER_CARD    = '1px solid rgba(0,0,0,0.08)';
-export const BORDER_AMBER   = '1px solid rgba(232,152,10,0.25)';
+export const BORDER_AMBER   = '1px solid rgba(255,255,255,0.14)';
 
-// Gradients — matches Outstanding rating bar: amber → gold
-export const AMBER_GRADIENT = 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)';
-export const AMBER_LINE     = 'linear-gradient(90deg, transparent 0%, rgba(232,152,10,0.5) 30%, rgba(232,152,10,0.75) 50%, rgba(232,152,10,0.5) 70%, transparent 100%)';
+// Gradients
+export const AMBER_GRADIENT = 'linear-gradient(135deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.70) 100%)';
+export const AMBER_LINE     = 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.50) 50%, rgba(255,255,255,0.35) 70%, transparent 100%)';
 
 // New light-mode tokens
 export const ICON_BG    = 'rgba(0,0,0,0.06)';

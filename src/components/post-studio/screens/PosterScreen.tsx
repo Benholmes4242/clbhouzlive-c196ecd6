@@ -1,4 +1,4 @@
-// PosterScreen — Dark, full-bleed cover preview with amber filmstrip needle
+// PosterScreen — Dark, full-bleed cover preview with white filmstrip needle
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { PosterPicker } from '../components/PosterPicker';
@@ -44,7 +44,7 @@ export function PosterScreen() {
           whileTap={{ scale: 0.96 }}
           onClick={() => setStep('COMPOSE')}
           className="px-4 py-1.5 rounded-full"
-          style={{ background: '#F7931E', color: '#fff', fontSize: 14, fontWeight: 700 }}
+          style={{ background: 'rgba(255,255,255,0.92)', color: '#0D0D0D', fontSize: 14, fontWeight: 700 }}
         >
           Done
         </motion.button>
@@ -73,8 +73,8 @@ export function PosterScreen() {
 
         {/* Timestamp badge — bottom right */}
         <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full" style={{
-          background: 'rgba(247,147,30,0.18)', border: '1px solid rgba(247,147,30,0.30)',
-          fontSize: 12, fontWeight: 600, color: '#F7931E', fontVariantNumeric: 'tabular-nums',
+          background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+          fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.75)', fontVariantNumeric: 'tabular-nums',
         }}>
           {fmt(activeItem.posterTimestamp)}
         </div>
@@ -90,8 +90,8 @@ export function PosterScreen() {
         <div className="flex items-center justify-between mb-3">
           <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>0:00</span>
           <div className="px-2.5 py-0.5 rounded-full" style={{
-            background: 'rgba(247,147,30,0.18)', border: '1px solid rgba(247,147,30,0.30)',
-            fontSize: 13, fontWeight: 700, color: '#F7931E', fontVariantNumeric: 'tabular-nums',
+            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+            fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)', fontVariantNumeric: 'tabular-nums',
           }}>
             {fmt(activeItem.posterTimestamp)}
           </div>

@@ -1,5 +1,5 @@
 // StudioHeader — Unified with Review Wizard design language
-// Amber progress bar, rounded pill buttons, transparent header
+// White progress indicators, amber Share button preserved
 // Dark mode support for ComposeScreen
 
 import React from 'react';
@@ -104,21 +104,21 @@ export function StudioHeader({
                         height: 10,
                         borderRadius: 99,
                         background: isCompleted
-                          ? '#F7931E'
+                          ? 'rgba(255,255,255,0.92)'
                           : isActive
                             ? 'transparent'
                             : '#D1D5DB',
-                        border: isActive ? '2px solid #F7931E' : 'none',
+                        border: isActive ? '2px solid rgba(255,255,255,0.90)' : 'none',
                       }}
                     >
                       {isCompleted && (
-                        <span style={{ fontSize: 7, color: '#fff', fontWeight: 700 }}>✓</span>
+                        <span style={{ fontSize: 7, color: '#0D0D0D', fontWeight: 700 }}>✓</span>
                       )}
                     </div>
                     <span
                       className="text-[9px] font-semibold tracking-wider"
                       style={{
-                        color: isCompleted || isActive ? '#F7931E' : '#9CA3AF',
+                        color: isCompleted || isActive ? 'rgba(255,255,255,0.92)' : '#9CA3AF',
                       }}
                     >
                       {label}
@@ -178,13 +178,13 @@ export function StudioHeader({
         </div>
       </div>
 
-      {/* Amber progress bar — matching Wizard */}
+      {/* Progress bar */}
       {showProgress && (
         <div className="px-4 pt-1 pb-2">
           <div className="h-[3px] rounded-full overflow-hidden bg-muted">
             <motion.div
               className="h-full rounded-full"
-              style={{ background: 'linear-gradient(90deg, #F7931E, #FBBC2E)' }}
+              style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.90), rgba(255,255,255,0.60))' }}
               initial={{ width: '0%' }}
               animate={{ width: `${(currentStepNum / TOTAL_STEPS) * 100}%` }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -200,7 +200,7 @@ export function StudioHeader({
                   key={label}
                   className="text-[9px] font-semibold tracking-wider"
                   style={{
-                    color: isCompleted || isActive ? '#F7931E' : '#9CA3AF',
+                    color: isCompleted || isActive ? 'rgba(255,255,255,0.92)' : '#9CA3AF',
                   }}
                 >
                   {label}

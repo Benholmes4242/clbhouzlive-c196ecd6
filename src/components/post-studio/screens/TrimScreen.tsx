@@ -1,4 +1,4 @@
-// TrimScreen — Dark, full-bleed video preview with amber waveform trimmer
+// TrimScreen — Dark, full-bleed video preview with white waveform trimmer
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -62,7 +62,7 @@ export function TrimScreen() {
           whileTap={{ scale: 0.96 }}
           onClick={() => setStep('COMPOSE')}
           className="px-4 py-1.5 rounded-full"
-          style={{ background: '#F7931E', color: '#fff', fontSize: 14, fontWeight: 700 }}
+          style={{ background: 'rgba(255,255,255,0.92)', color: '#0D0D0D', fontSize: 14, fontWeight: 700 }}
         >
           Done
         </motion.button>
@@ -88,25 +88,25 @@ export function TrimScreen() {
         >
           <div className="flex items-center justify-center" style={{
             width: 56, height: 56, borderRadius: '50%',
-            background: 'rgba(247,147,30,0.90)',
-            boxShadow: '0 4px 20px rgba(247,147,30,0.30)',
+            background: 'rgba(255,255,255,0.90)',
+            boxShadow: '0 4px 20px rgba(255,255,255,0.12)',
           }}>
             {isPlaying
-              ? <Pause className="w-6 h-6" style={{ color: '#fff' }} fill="#fff" />
-              : <Play className="w-6 h-6 ml-0.5" style={{ color: '#fff' }} fill="#fff" />
+              ? <Pause className="w-6 h-6" style={{ color: '#0D0D0D' }} fill="#0D0D0D" />
+              : <Play className="w-6 h-6 ml-0.5" style={{ color: '#0D0D0D' }} fill="#0D0D0D" />
             }
           </div>
         </button>
 
         {/* Playback timer — bottom left */}
-        <div className="absolute bottom-3 left-3 z-10" style={{ fontSize: 13, fontWeight: 600, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+        <div className="absolute bottom-3 left-3 z-10" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontVariantNumeric: 'tabular-nums' }}>
           {fmt(currentTime - trimStart)} / {fmt(clipDuration)}
         </div>
 
         {/* Clip duration badge — bottom right */}
         <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full" style={{
-          background: 'rgba(247,147,30,0.18)', border: '1px solid rgba(247,147,30,0.30)',
-          fontSize: 12, fontWeight: 600, color: '#F7931E',
+          background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+          fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
         }}>
           {fmt(clipDuration)} clip
         </div>

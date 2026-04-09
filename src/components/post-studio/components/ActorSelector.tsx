@@ -190,8 +190,8 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                       className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                       style={{
                         borderRadius: 14,
-                        background: state.actorType === 'personal' ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
-                        border: state.actorType === 'personal' ? '1px solid rgba(247,147,30,0.25)' : '1px solid rgba(255,255,255,0.08)',
+                        background: state.actorType === 'personal' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
+                        border: state.actorType === 'personal' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
                       <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.08)' }}>
@@ -205,7 +205,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                         <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>Personal profile</p>
                       </div>
                       {state.actorType === 'personal' && (
-                        <Check className="w-5 h-5 shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+                        <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.90)' }} strokeWidth={2.5} />
                       )}
                     </button>
 
@@ -218,8 +218,8 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                           className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                           style={{
                             borderRadius: 14,
-                            background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
-                            border: isActive ? '1px solid rgba(247,147,30,0.25)' : '1px solid rgba(255,255,255,0.08)',
+                            background: isActive ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
+                            border: isActive ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(255,255,255,0.08)',
                           }}
                         >
                           <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.08)' }}>
@@ -233,7 +233,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                             <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>Business profile</p>
                           </div>
                           {isActive && (
-                            <Check className="w-5 h-5 shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+                            <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.90)' }} strokeWidth={2.5} />
                           )}
                         </button>
                       );
@@ -253,7 +253,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                   <div className="px-5 pb-3 flex flex-col gap-2">
                     {([
                       { value: 'anyone' as const, label: 'Everyone', desc: 'Visible to all Clbhouz users', icon: '🌍',
-                        activeBg: 'rgba(247,147,30,0.10)', activeBorder: '1px solid rgba(247,147,30,0.28)', checkColor: '#F7931E' },
+                        activeBg: 'rgba(255,255,255,0.06)', activeBorder: '1px solid rgba(255,255,255,0.14)', checkColor: 'rgba(255,255,255,0.90)' },
                       { value: 'followers' as const, label: 'Friends only', desc: 'Only people who follow you', icon: '👥',
                         activeBg: 'rgba(34,197,94,0.08)', activeBorder: '1px solid rgba(34,197,94,0.25)', checkColor: '#22c55e' },
                       { value: 'private' as const, label: 'Only me', desc: 'Private — only you can see this', icon: '🔒',

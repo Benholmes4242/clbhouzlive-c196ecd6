@@ -418,7 +418,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
       if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last, m.start)}</span>);
-      parts.push(<span key={`m-${partIndex++}`} style={{ color: '#F7931E', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
+      parts.push(<span key={`m-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.90)', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
       last = m.end;
     }
     if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last)}</span>);
@@ -562,7 +562,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               left: 16,
               width: 1.5,
               height: 29,
-              background: '#F7931E',
+              background: 'rgba(255,255,255,0.80)',
               borderRadius: 0.75,
               animation: 'blink 1s step-end infinite',
               pointerEvents: 'none',
@@ -615,8 +615,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             width: 42,
             height: 42,
             borderRadius: '50%',
-            background: 'rgba(247,147,30,0.10)',
-            border: '1px solid rgba(247,147,30,0.28)',
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.14)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -624,7 +624,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             zIndex: 3,
           }}
         >
-          <ImagePlus className="w-5 h-5" style={{ color: '#F7931E' }} strokeWidth={2} />
+          <ImagePlus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
         </motion.button>
       </div>
 
@@ -891,7 +891,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
                   {/* Edited amber dot — top-left */}
                   {item.edits && (item.edits.filter && item.edits.filter !== 'normal' || item.edits.textOverlays?.length || item.edits.rotate || item.edits.flipH || item.edits.flipV || item.edits.music) && (
-                    <div style={{ position: 'absolute', top: 7, left: isCover ? undefined : 7, right: isCover ? undefined : undefined, width: 7, height: 7, borderRadius: '50%', background: '#F7931E', pointerEvents: 'none', zIndex: 3 }} />
+                    <div style={{ position: 'absolute', top: 7, left: isCover ? undefined : 7, right: isCover ? undefined : undefined, width: 7, height: 7, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', pointerEvents: 'none', zIndex: 3 }} />
                   )}
 
                   {/* Cover indicator — frosted glass tag, top-left */}
@@ -902,16 +902,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       background: 'rgba(0,0,0,0.58)',
                       backdropFilter: 'blur(8px)',
                       WebkitBackdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(247,147,30,0.30)',
+                      border: '1px solid rgba(255,255,255,0.20)',
                       borderRadius: 7,
                       padding: '3px 6px',
                       pointerEvents: 'none',
                       zIndex: 4,
                     }}>
-                      <svg width="7" height="7" viewBox="0 0 24 24" fill="#F7931E" stroke="none">
+                      <svg width="7" height="7" viewBox="0 0 24 24" fill="rgba(255,255,255,0.90)" stroke="none">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                       </svg>
-                      <span style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#F7931E' }}>
+                      <span style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: 'rgba(255,255,255,0.90)' }}>
                         Cover
                       </span>
                     </div>
@@ -1025,11 +1025,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(247,147,30,0.12)',
-                border: '1px solid rgba(247,147,30,0.25)',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <ImagePlus className="w-[18px] h-[18px]" style={{ color: '#F7931E' }} strokeWidth={2} />
+                <ImagePlus className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
               </div>
               <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
@@ -1091,7 +1091,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <div style={{
                   position: 'absolute', top: 8, right: 8,
                   width: 7, height: 7, borderRadius: '50%',
-                  background: '#F7931E',
+                  background: 'rgba(255,255,255,0.85)',
                 }} />
               )}
             </motion.button>

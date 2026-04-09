@@ -53,8 +53,8 @@ function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selec
     <div className="relative flex-1" style={{ height: ITEM_H * 3, overflow: 'hidden' }}>
       <div className="absolute inset-x-0 pointer-events-none z-10" style={{
         top: ITEM_H, height: ITEM_H,
-        background: 'rgba(247,147,30,0.10)',
-        border: '1px solid rgba(247,147,30,0.18)',
+        background: 'rgba(255,255,255,0.07)',
+        border: '1px solid rgba(255,255,255,0.12)',
         borderRadius: 10,
       }} />
       <div className="absolute inset-x-0 top-0 z-20 pointer-events-none" style={{ height: ITEM_H, background: 'linear-gradient(to bottom, #161616, transparent)' }} />
@@ -151,13 +151,13 @@ function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, de
             disabled={isPublishingNow}
             className="flex items-center justify-center shrink-0"
             style={{
-              background: 'rgba(247,147,30,0.10)',
-              border: '1px solid rgba(247,147,30,0.22)',
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: 20,
               padding: '4px 10px',
               fontSize: 11,
               fontWeight: 600,
-              color: '#F7931E',
+              color: 'rgba(255,255,255,0.85)',
             }}
           >
             Post now
@@ -346,7 +346,7 @@ export function SchedulePanel() {
                   <span style={{
                     fontSize: 10, fontWeight: 700, minWidth: 16, height: 16,
                     borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    background: '#F7931E', color: '#fff', padding: '0 4px',
+                    background: 'rgba(255,255,255,0.85)', color: '#0D0D0D', padding: '0 4px',
                   }}>
                     {scheduledCount}
                   </span>
@@ -387,8 +387,8 @@ export function SchedulePanel() {
                     onClick={handleDrumConfirm}
                     className="w-full flex items-center justify-center"
                     style={{
-                      background: '#F7931E', borderRadius: 16,
-                      fontSize: 15, fontWeight: 700, color: '#fff',
+                      background: 'rgba(255,255,255,0.92)', borderRadius: 16,
+                      fontSize: 15, fontWeight: 700, color: '#0D0D0D',
                       minHeight: 48,
                     }}
                   >
@@ -413,14 +413,14 @@ export function SchedulePanel() {
                           className="w-full flex items-center gap-3"
                           style={{
                             padding: '12px 14px', borderRadius: 14,
-                            background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
-                            border: isActive ? '1px solid rgba(247,147,30,0.28)' : '1px solid transparent',
+                            background: isActive ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
+                            border: isActive ? '1px solid rgba(255,255,255,0.14)' : '1px solid transparent',
                           }}
                         >
                           <div className="shrink-0 flex items-center justify-center" style={{
                             width: 36, height: 36, borderRadius: 10,
-                            background: isActive ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.06)',
-                            color: isActive ? '#F7931E' : 'rgba(255,255,255,0.40)',
+                            background: isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                            color: isActive ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.40)',
                           }}>
                             {opt.icon}
                           </div>
@@ -430,7 +430,7 @@ export function SchedulePanel() {
                           </div>
                           {opt.id === 'custom' && <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.20)' }} />}
                           {isActive && opt.id !== 'custom' && (
-                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: '#F7931E' }} />
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: 'rgba(255,255,255,0.85)' }} />
                           )}
                         </button>
                       );
@@ -440,10 +440,10 @@ export function SchedulePanel() {
                   {/* Confirmation line */}
                   {state.scheduledAt && (
                     <div className="flex items-center gap-2 mt-3 px-3 py-2.5 rounded-xl" style={{
-                      background: 'rgba(247,147,30,0.07)', border: '1px solid rgba(247,147,30,0.14)',
+                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
                     }}>
-                      <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />
-                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(247,147,30,0.80)' }}>
+                      <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(255,255,255,0.55)' }} />
+                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.60)' }}>
                         Will post {fmtDate(state.scheduledAt)}
                       </span>
                     </div>
@@ -480,9 +480,9 @@ export function SchedulePanel() {
               className="w-full flex items-center justify-center"
               style={{
                 borderRadius: 16, fontSize: 15, fontWeight: 700, minHeight: 48,
-                background: state.scheduledAt ? '#F7931E' : 'rgba(255,255,255,0.08)',
-                color: state.scheduledAt ? '#fff' : 'rgba(255,255,255,0.55)',
-                boxShadow: state.scheduledAt ? '0 4px 20px rgba(247,147,30,0.28)' : 'none',
+                background: state.scheduledAt ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.08)',
+                color: state.scheduledAt ? '#0D0D0D' : 'rgba(255,255,255,0.55)',
+                boxShadow: state.scheduledAt ? '0 4px 20px rgba(255,255,255,0.12)' : 'none',
               }}
             >
               {state.scheduledAt ? 'Schedule post' : 'Post now'}
