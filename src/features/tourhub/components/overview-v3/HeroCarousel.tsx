@@ -805,6 +805,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
+            {/* Safe area spacer */}
+            {isLive && (
+              <div style={{
+                height: 'max(env(safe-area-inset-top, 0px), 47px)',
+                flexShrink: 0,
+              }} />
+            )}
 
             {/* ─── Tournament header — hidden when scorecard is open ─── */}
             {!selectedPlayer && (
