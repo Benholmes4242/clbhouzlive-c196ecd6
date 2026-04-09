@@ -225,7 +225,7 @@ export function SuccessScreen({
             margin: 0,
           }}
         >
-          {isEditMode ? 'Verdict revised.' : 'On the card.'}
+          {isEditMode ? 'Verdict revised.' : 'Course review saved.'}
         </motion.h2>
 
         {/* Sub-copy */}
@@ -316,7 +316,7 @@ export function SuccessScreen({
                 >
                   <Check className="w-3 h-3" style={{ color: '#16a34a' }} strokeWidth={3} />
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a' }}>
-                    In Clubhouse
+                    Review saved
                   </span>
                 </div>
               )}
