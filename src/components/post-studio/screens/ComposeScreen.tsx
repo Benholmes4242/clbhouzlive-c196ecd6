@@ -54,15 +54,15 @@ async function generatePoster(file: File): Promise<string> {
         if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         URL.revokeObjectURL(url);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(dataUrl.length > 100 ? dataUrl : URL.createObjectURL(file));
+        resolve(dataUrl.length > 100 ? dataUrl : '');
       } catch {
         URL.revokeObjectURL(url);
-        resolve(URL.createObjectURL(file));
+        resolve('');
       }
     };
 
     const timeout = setTimeout(() => {
-      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(URL.createObjectURL(file)); }
+      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
     }, 10000);
 
     video.onloadedmetadata = () => { video.currentTime = 0.5; };
@@ -71,7 +71,7 @@ async function generatePoster(file: File): Promise<string> {
     video.onloadeddata = () => { if (video.readyState >= 2) capture(); };
     video.onerror = () => {
       clearTimeout(timeout);
-      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(URL.createObjectURL(file)); }
+      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
     };
 
     video.src = url;
@@ -188,6 +188,7 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
         <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: item.height && item.width && item.height > item.width ? '4/5' : '16/9' }}>
           <video
             src={item.previewUrl}
+            poster={item.thumbnailUrl || undefined}
             autoPlay
             muted
             loop
@@ -819,6 +820,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 {item.mediaType === 'video' ? (
                   <video
                     src={item.previewUrl}
+                    poster={item.thumbnailUrl || undefined}
                     className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
                     playsInline
                     muted
@@ -914,6 +916,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 {trayItem.mediaType === 'video' ? (
                   <video
                     src={trayItem.previewUrl}
+                    poster={trayItem.thumbnailUrl || undefined}
                     className="relative z-[1]"
                     style={{
                       width: '100%',
