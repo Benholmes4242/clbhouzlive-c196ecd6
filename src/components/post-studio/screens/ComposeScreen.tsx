@@ -54,15 +54,15 @@ async function generatePoster(file: File): Promise<string> {
         if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         URL.revokeObjectURL(url);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(dataUrl.length > 100 ? dataUrl : '');
+        resolve(dataUrl.length > 100 ? dataUrl : URL.createObjectURL(file));
       } catch {
         URL.revokeObjectURL(url);
-        resolve('');
+        resolve(URL.createObjectURL(file));
       }
     };
 
     const timeout = setTimeout(() => {
-      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
+      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(URL.createObjectURL(file)); }
     }, 10000);
 
     video.onloadedmetadata = () => { video.currentTime = 0.5; };
@@ -71,7 +71,7 @@ async function generatePoster(file: File): Promise<string> {
     video.onloadeddata = () => { if (video.readyState >= 2) capture(); };
     video.onerror = () => {
       clearTimeout(timeout);
-      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
+      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(URL.createObjectURL(file)); }
     };
 
     video.src = url;
@@ -115,7 +115,9 @@ async function filesToMediaItems(
 ): Promise<StudioMediaItem[]> {
   const items: StudioMediaItem[] = [];
   for (const file of files) {
-    const isVideo = file.type.startsWith('video/');
+    const isVideo = file.type.startsWith('video/') || 
+      file.type === 'video/quicktime' ||
+      (!file.type && /\.(mov|mp4|m4v)$/i.test(file.name));
     let duration: number | null = null;
     if (isVideo) duration = await getVideoDuration(file);
     const validation = validateMediaFile(file, duration ?? undefined);
@@ -123,7 +125,17 @@ async function filesToMediaItems(
     const previewUrl = URL.createObjectURL(file);
     if (isVideo) {
       const thumbnailUrl = await generatePoster(file);
-      items.push({ id: crypto.randomUUID(), file, mediaType: 'video', previewUrl, thumbnailUrl: thumbnailUrl || undefined, duration, trimStart: 0, trimEnd: duration, posterTimestamp: 0, posterPreviewUrl: null, width: null, height: null, validationError: null });
+      // Attempt to get video dimensions from metadata
+      let vWidth: number | null = null;
+      let vHeight: number | null = null;
+      try {
+        const dimVideo = document.createElement('video');
+        dimVideo.src = previewUrl;
+        await new Promise<void>(r => { dimVideo.onloadedmetadata = () => r(); setTimeout(r, 3000); });
+        vWidth = dimVideo.videoWidth || null;
+        vHeight = dimVideo.videoHeight || null;
+      } catch { /* ignore */ }
+      items.push({ id: crypto.randomUUID(), file, mediaType: 'video', previewUrl, thumbnailUrl: thumbnailUrl || undefined, duration, trimStart: 0, trimEnd: duration, posterTimestamp: 0, posterPreviewUrl: null, width: vWidth, height: vHeight, validationError: null });
     } else {
       const dims = await getImageDimensions(file);
       items.push({ id: crypto.randomUUID(), file, mediaType: 'image', previewUrl, duration: null, trimStart: 0, trimEnd: null, posterTimestamp: 0, posterPreviewUrl: null, width: dims?.width ?? null, height: dims?.height ?? null, validationError: null });
@@ -792,11 +804,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   outlineOffset: isActive ? '-2.5px' : undefined,
                 }}
               >
-                <img
-                  src={item.thumbnailUrl || item.previewUrl}
-                  alt=""
-                  className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                />
+                {item.mediaType === 'video' ? (
+                  <video
+                    src={item.previewUrl}
+                    className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                    playsInline
+                    muted
+                    preload="metadata"
+                  />
+                ) : (
+                  <img
+                    src={item.thumbnailUrl || item.previewUrl}
+                    alt=""
+                    className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                  />
+                )}
                 {item.mediaType === 'video' && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.60)' }}>
@@ -876,23 +898,44 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
                   </>
                 )}
-                {/* Base image */}
-                <img
-                  src={trayItem.thumbnailUrl || trayItem.previewUrl}
-                  alt=""
-                  className="relative z-[1]"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    maxHeight: '100%',
-                    objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
-                    transform: [
-                      trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
-                      trayItem.edits?.flipH ? 'scaleX(-1)' : '',
-                      trayItem.edits?.flipV ? 'scaleY(-1)' : '',
-                    ].filter(Boolean).join(' ') || undefined,
-                  }}
-                />
+                {/* Base preview */}
+                {trayItem.mediaType === 'video' ? (
+                  <video
+                    src={trayItem.previewUrl}
+                    className="relative z-[1]"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '100%',
+                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                      transform: [
+                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                      ].filter(Boolean).join(' ') || undefined,
+                    }}
+                    playsInline
+                    muted
+                    preload="metadata"
+                  />
+                ) : (
+                  <img
+                    src={trayItem.thumbnailUrl || trayItem.previewUrl}
+                    alt=""
+                    className="relative z-[1]"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '100%',
+                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                      transform: [
+                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                      ].filter(Boolean).join(' ') || undefined,
+                    }}
+                  />
+                )}
                 {/* Filter overlay with intensity */}
                 {trayItem.edits?.filter && trayItem.edits.filter !== 'normal' && (
                   <img
