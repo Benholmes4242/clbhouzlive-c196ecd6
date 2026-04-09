@@ -481,13 +481,6 @@ export const PGACard: React.FC<PGACardProps> = ({
             </span>
           </div>
           )}
-            <span style={{
-              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
-              color: 'rgba(255,255,255,0.5)',
-            }}>
-              FINAL
-            </span>
-          </div>
 
           {/* Winner info — bottom */}
           <div style={{
