@@ -9,6 +9,7 @@
 // Includes network awareness for offline handling
 
 import { supabase } from '@/integrations/supabase/client';
+import { devLog, devError } from '@/components/debug/ConsoleLogCapture';
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
 import { createPost } from '@/services/posts/createPost';
@@ -460,6 +461,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 
         let publicUrl = '';
         const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+        devLog(`[VideoUpload] file=${file.name} type=${file.type || 'EMPTY'} size=${(file.size/1024).toFixed(0)}KB mediaType=${mediaType}`);
 
         // Track stream_id and poster_url for videos
         let streamId: string | null = null;
@@ -472,8 +474,9 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
         let orientation: string | null = null;
 
         // Upload based on file type
-        if (file.type.startsWith('video/')) {
+        if (file.type.startsWith('video/') || (!file.type && /\.(mov|mp4|m4v)$/i.test(file.name))) {
           // === TUS RESUMABLE VIDEO UPLOAD ===
+          devLog(`[VideoUpload] Starting TUS: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB) type=${file.type}`);
           console.log(`[uploadPipeline] Using TUS for video: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
           
           const speedTracker = new UploadSpeedTracker();
@@ -506,10 +509,12 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
                 });
               },
               onSuccess: (streamId) => {
+                devLog(`[VideoUpload] TUS complete: streamId=${streamId}`);
                 console.log(`[uploadPipeline] TUS upload complete: ${streamId}`);
                 resolve({ streamId });
               },
               onError: (error) => {
+                devError(`[VideoUpload] TUS error: ${error?.message || error}`);
                 console.error(`[uploadPipeline] TUS upload failed:`, error);
                 reject(error);
               },
@@ -526,6 +531,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             uploadedStreamUids.push(streamId);
           }
           
+          devLog(`[VideoUpload] Stream ready: ${streamId} | url=${publicUrl?.substring(0, 60)}...`);
           console.log(`[uploadPipeline] Video uploaded via TUS, streamId: ${streamId}`);
           
         } else {
