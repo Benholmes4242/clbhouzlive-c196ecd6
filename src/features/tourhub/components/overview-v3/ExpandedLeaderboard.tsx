@@ -18,10 +18,10 @@ export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
 }
 
 function getScoreColor(toPar: number | null): string {
-  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.7)';
-  if (toPar < 0) return '#4ade80';   // under par — green
-  if (toPar === 0) return 'rgba(255,255,255,0.75)'; // even — soft white
-  return '#f87171';                   // over par — red
+  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.55)';
+  if (toPar < 0) return '#F7931E';   // amber — under par
+  if (toPar === 0) return 'rgba(255,255,255,0.55)'; // grey — even
+  return '#EF4444';                   // red — over par
 }
 
 function formatScore(toPar: number | null): string {

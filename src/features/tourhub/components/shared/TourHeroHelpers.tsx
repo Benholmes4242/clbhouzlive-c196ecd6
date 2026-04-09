@@ -12,14 +12,17 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 
-/** Score color — live state: pure white (#FFFFFF) matching scrubber fill, regardless of par */
-export function getScoreColor(_score: number | null): string {
-  return '#FFFFFF';
+/** Score color — amber for under par, red for over, grey for even */
+export function getScoreColor(score: number | null): string {
+  if (score === null || score === undefined) return 'rgba(255,255,255,0.55)';
+  if (score < 0) return '#F7931E';
+  if (score > 0) return '#EF4444';
+  return 'rgba(255,255,255,0.55)';
 }
 
-/** Score color for FINISHED state — white to match live leaderboard */
-export function getFinishedScoreColor(_score: number | null): string {
-  return '#FFFFFF';
+/** Score color for FINISHED state — same palette */
+export function getFinishedScoreColor(score: number | null): string {
+  return getScoreColor(score);
 }
 
 export function formatPurse(purse: number | null): string {
