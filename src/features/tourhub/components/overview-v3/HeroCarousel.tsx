@@ -708,35 +708,65 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             onTouchStart={(e) => { onCardTouchStart(e); }}
             onTouchMove={(e) => { onCardTouchMove(e); }}
             onTouchEnd={(e) => { onCardTouchEnd(e); }}
-            style={{ 
+            style={{
               position: 'absolute',
-              bottom: isExpanded ? 16 : 20,
-              left: isExpanded ? 12 : 16,
-              ...(isExpanded
-                ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 120px)' }
+              ...(isExpanded && isLive
+                ? {
+                    inset: 0,
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: 0,
+                    backdropFilter: 'none',
+                    WebkitBackdropFilter: 'none',
+                    boxShadow: 'none',
+                    padding: 0,
+                    zIndex: 20,
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column' as const,
+                    pointerEvents: 'auto' as const,
+                  }
+                : isExpanded
+                ? {
+                    right: 12,
+                    top: 'calc(env(safe-area-inset-top, 20px) + 120px)',
+                    bottom: 16,
+                    left: 12,
+                    borderRadius: 16,
+                    background: 'rgba(0,0,0,0.45)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    padding: '20px 0 8px 0',
+                    zIndex: 20,
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column' as const,
+                    pointerEvents: 'auto' as const,
+                  }
                 : {
+                    bottom: 20,
+                    left: 16,
                     maxWidth: 'min(350px, calc(100% - 32px))',
                     maxHeight: 'calc(100% - max(env(safe-area-inset-top, 47px), 47px) - 110px)',
                     overflowY: 'auto' as const,
+                    minWidth: '280px',
+                    borderRadius: 12,
+                    background: 'rgba(0,0,0,0.35)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+                    padding: '20px 20px 14px 20px',
+                    border: tournament.isMajor
+                      ? '1px solid rgba(250,204,21,0.35)'
+                      : tournament.isSignature
+                      ? '1px solid rgba(16,185,129,0.25)'
+                      : '1px solid rgba(255,255,255,0.10)',
+                    zIndex: 10,
+                    overflow: 'hidden',
+                    pointerEvents: 'auto' as const,
                   }
               ),
-              minWidth: isExpanded ? undefined : '280px',
-              borderRadius: isExpanded ? 16 : 12,
-              background: isExpanded ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
-              WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
-              boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
-              padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
-              border: tournament.isMajor
-                ? '1px solid rgba(250, 204, 21, 0.35)'
-                : tournament.isSignature
-                ? '1px solid rgba(16, 185, 129, 0.25)'
-                : '1px solid rgba(255, 255, 255, 0.10)',
-              overflow: 'hidden',
-              zIndex: isExpanded ? 20 : 10,
-              pointerEvents: 'auto' as const,
-              display: isExpanded ? 'flex' : 'block',
-              flexDirection: isExpanded ? 'column' as const : undefined,
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
