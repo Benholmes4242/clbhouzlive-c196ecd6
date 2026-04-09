@@ -170,6 +170,31 @@ export default function StudioShelf({
   const filterIntensity = edits.filterIntensity ?? 100;
   const hasActiveFilter = !!(edits.filter && edits.filter !== 'normal');
 
+  const lightFilterStyle = useMemo(() => {
+    const filters: string[] = [];
+    if (edits.exposure !== undefined && edits.exposure !== 50) {
+      const brightness = 0.4 + (edits.exposure / 100) * 1.4;
+      filters.push(`brightness(${brightness.toFixed(2)})`);
+    }
+    if (edits.contrast !== undefined && edits.contrast !== 50) {
+      const contrast = 0.5 + (edits.contrast / 100) * 1.3;
+      filters.push(`contrast(${contrast.toFixed(2)})`);
+    }
+    if (edits.highlights !== undefined && edits.highlights !== 50) {
+      const val = (edits.highlights - 50) / 50;
+      if (val !== 0) filters.push(`brightness(${(1 + val * 0.3).toFixed(2)})`);
+    }
+    if (edits.shadows !== undefined && edits.shadows !== 50) {
+      const val = (edits.shadows - 50) / 50;
+      if (val !== 0) filters.push(`brightness(${(1 + val * 0.2).toFixed(2)})`);
+    }
+    if (edits.saturation !== undefined && edits.saturation !== 50) {
+      const saturate = edits.saturation / 50;
+      filters.push(`saturate(${saturate.toFixed(2)})`);
+    }
+    return filters.length > 0 ? filters.join(' ') : undefined;
+  }, [edits.exposure, edits.contrast, edits.highlights, edits.shadows, edits.saturation]);
+
   const [isComparing, setIsComparing] = useState(false);
 
   const cropAspect = useMemo(() => {
@@ -333,7 +358,7 @@ export default function StudioShelf({
                   </div>
                 ) : (
                   <>
-                    <div className="relative flex items-center justify-center">
+                    <div className="relative flex items-center justify-center" style={{ filter: lightFilterStyle }}>
                       {activeMediaType === 'video' ? (
                         <video
                           src={activeMediaPreviewUrl || undefined}
