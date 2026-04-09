@@ -147,9 +147,9 @@
   white-space: nowrap;
 }
 
-.score-under { color: #22C55E; }
-.score-over { color: #EF4444; }
-.score-even { color: rgba(255,255,255,0.75); }
+.score-under { color: #FFFFFF; }
+.score-over { color: #FFFFFF; }
+.score-even { color: #FFFFFF; }
 
 /* ============================================
    4. LIVE INDICATOR - Animated Pulse with Glow
