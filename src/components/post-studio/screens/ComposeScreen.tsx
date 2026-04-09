@@ -966,7 +966,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
           {/* Course tag — below carousel */}
           <div className="shrink-0">
-            {renderCaptionBlock(0, 0, false, true).props.children[3]}
+            {renderCourseTag()}
           </div>
 
           {/* Processing indicator */}
