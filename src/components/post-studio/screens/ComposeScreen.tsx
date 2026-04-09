@@ -274,18 +274,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
-  // ── Debug overlay for iOS video diagnostics ──
-  const [debugLog, setDebugLog] = useState<string[]>([]);
+  // ── Debug helper — dispatches to global overlay ──
   const addDebug = useCallback((msg: string) => {
-    setDebugLog(prev => [...prev.slice(-12), `${new Date().toLocaleTimeString()}: ${msg}`]);
+    try { window.dispatchEvent(new CustomEvent('clbhouz-debug', { detail: msg })); } catch {}
   }, []);
-
-  // Listen for upload pipeline debug events
-  useEffect(() => {
-    const handler = (e: Event) => addDebug((e as CustomEvent).detail);
-    window.addEventListener('clbhouz-debug', handler);
-    return () => window.removeEventListener('clbhouz-debug', handler);
-  }, [addDebug]);
 
   const hasMedia = state.mediaItems.length > 0;
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
@@ -1264,28 +1256,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         />
       )}
 
-      {/* Debug overlay for iOS video diagnostics — always visible */}
-      <div style={{
-        position: 'fixed', bottom: 120, left: 8, right: 8,
-        background: 'rgba(0,0,0,0.90)', borderRadius: 8, padding: 8,
-        zIndex: 99999, maxHeight: 220, overflowY: 'auto',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace' }}>DEBUG</span>
-          <button
-            onClick={() => navigator.clipboard.writeText(debugLog.join('\n'))}
-            style={{ fontSize: 10, color: '#F7931E', background: 'rgba(247,147,30,0.15)', border: '1px solid rgba(247,147,30,0.30)', borderRadius: 4, padding: '2px 8px', fontFamily: 'monospace' }}
-          >
-            Copy
-          </button>
-        </div>
-        {debugLog.length === 0
-          ? <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>Waiting for events...</div>
-          : debugLog.map((log, i) => (
-            <div key={i} style={{ fontSize: 10, color: '#F7931E', fontFamily: 'monospace', marginBottom: 2 }}>{log}</div>
-          ))
-        }
-      </div>
     </div>
   );
 }
