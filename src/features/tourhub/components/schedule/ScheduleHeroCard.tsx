@@ -255,9 +255,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     MAJOR
                   </span>
                 )}
+                {!isMajor && (
                 <div className="tour-badge">
                   <span>{tourLabel}</span>
                 </div>
+                )}
               </div>
               <button
                 onClick={(e) => { e.preventDefault(); navigate(`/tourhub/tournament/${tournament.id}`); }}
@@ -305,9 +307,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     MAJOR
                   </span>
                 )}
+                {!isMajor && (
                 <div className="tour-badge">
                   <span>{tourLabel}</span>
                 </div>
+                )}
               </div>
             </div>
 

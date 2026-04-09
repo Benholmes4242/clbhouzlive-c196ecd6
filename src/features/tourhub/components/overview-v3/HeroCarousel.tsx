@@ -707,9 +707,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         }}>
                           FINAL
                         </span>
+                        {!tournament.isMajor && (
                         <div className="tour-badge" style={{ fontSize: 9, padding: '2px 8px' }}>
                           <span>{getTourDisplayName(tournament.tourSlug)}</span>
                         </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -735,11 +737,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       )}
                       <div className="flex items-center gap-2">
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-                          <div className="tour-badge">
-                            <span>
-                              {getTourDisplayName(tournament.tourSlug)}
-                            </span>
-                          </div>
+                        {!tournament.isMajor && (
+                        <div className="tour-badge">
+                          <span>
+                            {getTourDisplayName(tournament.tourSlug)}
+                          </span>
+                        </div>
+                        )}
                           {isUpcoming && tournament.startDate && tournament.endDate && (
                             <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
                               {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
