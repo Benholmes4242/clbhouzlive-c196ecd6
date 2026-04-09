@@ -65,16 +65,23 @@ const FilterCard = memo(function FilterCard({
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      className="flex flex-col items-center gap-1.5 active:scale-[0.96] transition-transform"
-      style={{ width: 80, flexShrink: 0 }}
+      className="flex flex-col items-center gap-1.5 active:scale-[0.96] transition-all"
+      style={{
+        width: 56,
+        flexShrink: 0,
+        opacity: isSelected ? 1 : 0.55,
+        transform: isSelected ? 'scale(1.06)' : undefined,
+        transition: 'all 0.18s cubic-bezier(0.34,1.56,0.64,1)',
+      }}
     >
       <div
         className="overflow-hidden"
         style={{
-          width: 80,
-          height: 80,
-          borderRadius: 12,
-          border: isSelected ? '2px solid #F7931E' : '2px solid rgba(255,255,255,0.08)',
+          width: 56,
+          height: 56,
+          borderRadius: 10,
+          outline: isSelected ? '1.5px solid rgba(255,255,255,0.90)' : 'none',
+          outlineOffset: 2,
         }}
       >
         {previewUrl ? (
@@ -92,9 +99,9 @@ const FilterCard = memo(function FilterCard({
       </div>
 
       <span
-        className="text-[11px] block truncate w-full text-center"
+        className="text-[10px] block truncate w-full text-center"
         style={{
-          color: isSelected ? '#F7931E' : 'rgba(255,255,255,0.45)',
+          color: isSelected ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.40)',
           fontWeight: isSelected ? 700 : 400,
         }}
       >
@@ -104,31 +111,23 @@ const FilterCard = memo(function FilterCard({
   );
 });
 
-export default function StudioPanelFilter({ 
-  edits, 
-  updateEdits, 
+export default function StudioPanelFilter({
+  edits,
+  updateEdits,
   previewUrl,
   onCompareStart,
   onCompareEnd,
 }: StudioPanelFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
-  const [intensity, setIntensity] = useState(edits?.filterIntensity ?? 100);
 
   const handleSelectFilter = useCallback((filterId: FilterId) => {
     setSelectedFilter(filterId);
-    setIntensity(100);
     requestAnimationFrame(() => {
       updateEdits({ filter: filterId, filterIntensity: 100 });
     });
   }, [updateEdits]);
 
-  const handleIntensityChange = useCallback((value: number) => {
-    setIntensity(value);
-    updateEdits({ filterIntensity: value });
-  }, [updateEdits]);
-
   const selectedLabel = FILTER_OPTIONS.find(f => f.id === selectedFilter)?.label || 'Pure';
-  const showIntensity = selectedFilter !== 'normal';
 
   return (
     <div className="flex flex-col h-full">
@@ -147,7 +146,7 @@ export default function StudioPanelFilter({
           flexDirection: 'row',
           overflowX: 'auto',
           scrollbarWidth: 'none',
-          gap: 8,
+          gap: 10,
           padding: '8px 16px',
         }}
       >
@@ -163,58 +162,6 @@ export default function StudioPanelFilter({
           />
         ))}
       </div>
-
-      {/* Intensity section */}
-      {showIntensity && (
-        <div className="px-4 pt-4 pb-3 flex-shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <span style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.10em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.28)',
-            }}>
-              Intensity
-            </span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>
-              {intensity}%
-            </span>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            step={1}
-            value={intensity}
-            onChange={(e) => handleIntensityChange(Number(e.target.value))}
-            className="w-full rounded-full appearance-none cursor-pointer
-              [&::-webkit-slider-runnable-track]:h-[3px]
-              [&::-webkit-slider-runnable-track]:rounded-full
-              [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-5
-              [&::-webkit-slider-thumb]:h-5
-              [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-[#F7931E]
-              [&::-webkit-slider-thumb]:shadow-[0_0_0_3px_rgba(247,147,30,0.25)]
-              [&::-webkit-slider-thumb]:cursor-grab
-              [&::-webkit-slider-thumb]:active:cursor-grabbing
-              [&::-webkit-slider-thumb]:-mt-[8.5px]
-              [&::-moz-range-track]:h-[3px]
-              [&::-moz-range-track]:rounded-full
-              [&::-moz-range-thumb]:w-5
-              [&::-moz-range-thumb]:h-5
-              [&::-moz-range-thumb]:rounded-full
-              [&::-moz-range-thumb]:border-0
-              [&::-moz-range-thumb]:bg-[#F7931E]
-              [&::-moz-range-thumb]:shadow-[0_0_0_3px_rgba(247,147,30,0.25)]"
-            style={{
-              background: `linear-gradient(to right, #F7931E ${intensity}%, rgba(255,255,255,0.10) ${intensity}%)`,
-              height: 3,
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 }
