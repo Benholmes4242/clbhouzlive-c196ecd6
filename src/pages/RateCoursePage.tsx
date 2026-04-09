@@ -85,7 +85,7 @@ const RateCoursePage = () => {
   }
 
   const isEditMode = !!existingRating;
-  console.log('[RateCoursePage] rendering wizard - existingRating:', existingRating, 'isEditMode:', isEditMode);
+  
 
   return (
     <AccessControl requireAuth={true} noBlockingLoader={true}>
