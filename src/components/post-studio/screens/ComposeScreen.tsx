@@ -1271,5 +1271,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           ))}
         </div>
       )}
+    </div>
   );
 }
