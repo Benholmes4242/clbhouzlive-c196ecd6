@@ -22,8 +22,8 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
   const max = Math.max(...running, 0);
   const range = max - min || 1;
 
-  const DOT_AREA = 26;
-  const SPARK_H = 44;
+  const DOT_AREA = 32;
+  const SPARK_H = 48;
   const TOTAL_H = DOT_AREA + SPARK_H;
 
   const allHoles: (LeaderHoleScore | null)[] = [
@@ -36,7 +36,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
   return (
     <div style={{ width: '100%' }}>
       {label && (
-        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.3)', marginBottom: 6 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.30)', marginBottom: 6 }}>
           {label}
         </div>
       )}
@@ -50,7 +50,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
         >
           <defs>
             <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(34,197,94,0.25)" />
+              <stop offset="0%" stopColor="rgba(34,197,94,0.30)" />
               <stop offset="100%" stopColor="rgba(34,197,94,0)" />
             </linearGradient>
           </defs>
@@ -85,7 +85,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
               return `${x},${y}`;
             }).join(' ');
             return (
-              <polyline points={pts} fill="none" stroke="#22C55E" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+              <polyline points={pts} fill="none" stroke="#22C55E" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
             );
           })()}
 
@@ -94,7 +94,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             const lastIdx = running.length - 1;
             const x = (lastIdx / (totalHoles - 1)) * svgWidth;
             const y = SPARK_H - ((running[lastIdx] - min) / range) * (SPARK_H - 6) - 3;
-            return <circle cx={x} cy={y} r={3} fill="#22C55E" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
+            return <circle cx={x} cy={y} r={3.5} fill="#22C55E" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
           })()}
         </svg>
 
@@ -113,24 +113,24 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
 
             return (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flex: 1 }}>
-                <span style={{ fontSize: 7, fontWeight: 600, color: 'rgba(255,255,255,0.25)', lineHeight: 1 }}>
+                <span style={{ fontSize: 8, fontWeight: 600, color: isPlayed ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.18)', lineHeight: 1 }}>
                   {i + 1}
                 </span>
                 <div style={{
-                  width: 13, height: 13,
+                  width: 16, height: 16,
                   borderRadius: isCircle ? '50%' : isSquare ? 3 : '50%',
                   background: isPlayed
-                    ? (score === 0 ? 'rgba(255,255,255,0.12)' : colors!.bg)
-                    : 'rgba(255,255,255,0.06)',
-                  border: isPlayed && score !== 0
-                    ? `1px solid ${colors!.ring}`
-                    : '1px solid rgba(255,255,255,0.08)',
+                    ? (score === 0 ? 'rgba(255,255,255,0.10)' : colors!.bg)
+                    : 'transparent',
+                  border: isPlayed
+                    ? (score !== 0 ? `1.5px solid ${colors!.ring}` : '1.5px solid rgba(255,255,255,0.10)')
+                    : '1.5px dashed rgba(255,255,255,0.12)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   boxShadow: isPlayed && score !== 0 ? `0 0 6px ${colors!.ring}` : 'none',
                 }}>
                   {isPlayed && score !== 0 && (
-                    <span style={{ fontSize: 6, fontWeight: 800, color: colors!.text, lineHeight: 1 }}>
-                      {score <= -2 ? '−2' : score === -1 ? '−1' : `+${score}`}
+                    <span style={{ fontSize: 7, fontWeight: 800, color: colors!.text, lineHeight: 1 }}>
+                      {score <= -2 ? `${score}` : score === -1 ? '−1' : `+${score}`}
                     </span>
                   )}
                 </div>
