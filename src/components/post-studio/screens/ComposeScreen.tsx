@@ -624,7 +624,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             zIndex: 3,
           }}
         >
-          <Plus className="w-5 h-5" style={{ color: '#F7931E' }} strokeWidth={2} />
+          <ImagePlus className="w-5 h-5" style={{ color: '#F7931E' }} strokeWidth={2} />
         </motion.button>
       </div>
 
