@@ -509,10 +509,17 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
       }
     },
     onSettled: () => {
-      // Force immediate refetch to replace optimistic data with real server data
       queryClient.refetchQueries({ queryKey: ['post-comments-with-replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
+      queryClient.invalidateQueries({ queryKey: ['explore-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['real-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['watch-feed'] });
     },
   });
 
