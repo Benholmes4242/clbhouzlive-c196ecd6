@@ -31,9 +31,6 @@ import type { UploadJobInput } from '@/uploads/types';
 
 // ─── Media processing helpers ─────────────────────────────────────────────────
 
-const debugEvent = (msg: string) => {
-  try { window.dispatchEvent(new CustomEvent('clbhouz-debug', { detail: msg })); } catch {}
-};
 
 const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
 

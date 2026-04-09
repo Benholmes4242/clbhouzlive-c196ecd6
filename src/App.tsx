@@ -744,51 +744,8 @@ const App: React.FC = () => {
           </Top100DebugProvider>
         </ThemeProvider>
       </AppShell>
-      <GlobalDebugOverlay />
     </>
   );
 };
-
-function GlobalDebugOverlay() {
-  const [logs, setLogs] = useState<string[]>([]);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const msg = (e as CustomEvent).detail;
-      setLogs(prev => [...prev.slice(-20), `${new Date().toLocaleTimeString()}: ${msg}`]);
-      setVisible(true);
-    };
-    window.addEventListener('clbhouz-debug', handler);
-    return () => window.removeEventListener('clbhouz-debug', handler);
-  }, []);
-  if (!visible) return null;
-  return (
-    <div style={{
-      position: 'fixed', bottom: 100, left: 8, right: 8,
-      background: 'rgba(0,0,0,0.92)', borderRadius: 8, padding: 8,
-      zIndex: 999999, maxHeight: 260, overflowY: 'auto',
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, flexShrink: 0 }}>
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace' }}>DEBUG LOG</span>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={() => navigator.clipboard.writeText(logs.join('\n')).then(() => alert('Copied!'))}
-            style={{ fontSize: 10, color: '#F7931E', background: 'rgba(247,147,30,0.15)', border: '1px solid rgba(247,147,30,0.30)', borderRadius: 4, padding: '2px 8px', fontFamily: 'monospace' }}
-          >Copy</button>
-          <button
-            onClick={() => { setVisible(false); setLogs([]); }}
-            style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 4, padding: '2px 8px', fontFamily: 'monospace' }}
-          >✕</button>
-        </div>
-      </div>
-      {logs.length === 0
-        ? <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>Waiting for events...</div>
-        : logs.map((log, i) => (
-          <div key={i} style={{ fontSize: 10, color: '#F7931E', fontFamily: 'monospace', marginBottom: 2, wordBreak: 'break-all' }}>{log}</div>
-        ))
-      }
-    </div>
-  );
-}
 
 export default App;

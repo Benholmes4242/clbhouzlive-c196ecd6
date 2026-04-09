@@ -9,9 +9,6 @@
 // Includes network awareness for offline handling
 
 import { supabase } from '@/integrations/supabase/client';
-const debugEvent = (msg: string) => {
-  try { window.dispatchEvent(new CustomEvent('clbhouz-debug', { detail: msg })); } catch {}
-};
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
 import { createPost } from '@/services/posts/createPost';
