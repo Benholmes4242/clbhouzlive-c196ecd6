@@ -889,10 +889,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   {/* Inactive dim */}
                   {!isActive && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.40)', pointerEvents: 'none' }} />}
 
-                  {/* Edited amber dot — top-left */}
-                  {item.edits && (item.edits.filter && item.edits.filter !== 'normal' || item.edits.textOverlays?.length || item.edits.rotate || item.edits.flipH || item.edits.flipV || item.edits.music) && (
-                    <div style={{ position: 'absolute', top: 7, left: isCover ? undefined : 7, right: isCover ? undefined : undefined, width: 7, height: 7, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', pointerEvents: 'none', zIndex: 3 }} />
-                  )}
 
                   {/* Cover indicator — frosted glass tag, top-left */}
                   {isCover && (
