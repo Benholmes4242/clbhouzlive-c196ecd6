@@ -41,7 +41,7 @@ export function MediaPreviewViewer({
       className="fixed inset-0 z-[9999] bg-black flex flex-col"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 shrink-0">
+      <div className="flex items-center justify-between shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', paddingLeft: 16, paddingRight: 16, paddingBottom: 12 }}>
         <button onClick={onClose} className="w-11 h-11 flex items-center justify-center">
           <X className="w-6 h-6 text-white" />
         </button>
@@ -60,13 +60,13 @@ export function MediaPreviewViewer({
       </div>
 
       {/* Media */}
-      <div className="flex-1 flex items-center justify-center relative">
+      <div className="flex-1 flex items-center justify-center relative" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
         {item.type === 'video' ? (
           <video
             src={item.previewUrl}
             controls
             playsInline
-            className="max-w-full max-h-full object-contain"
+            className="w-full h-full object-contain"
           />
         ) : (
           <div ref={zoomRef} style={zoomStyle}>
@@ -74,7 +74,7 @@ export function MediaPreviewViewer({
               ref={imgRef}
               src={item.previewUrl}
               alt=""
-              className="max-w-full max-h-full object-contain"
+              className="w-full h-full object-contain"
               draggable={false}
             />
           </div>
