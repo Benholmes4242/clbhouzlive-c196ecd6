@@ -3,9 +3,9 @@
 // Dark. Cinematic. Golf-native.
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+
 import {
-  Camera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock, FileText,
+  Camera, Layers, AtSign, X, Pencil, Play, Plus, Clock, FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -22,7 +22,7 @@ import {
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
-import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+
 import { getFilterClass } from '@/utils/studioFilters';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
@@ -280,99 +280,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
   return !!edits?.filter && edits.filter !== 'normal';
 }
 
-// ─── VideoToolSheet — intermediate tool picker for videos ────────────────────
-
-interface VideoToolSheetProps {
-  item: StudioMediaItem;
-  onEdit: () => void;
-  onTrim: () => void;
-  onCover: () => void;
-  onClose: () => void;
-}
-
-function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolSheetProps) {
-  return (
-    <AnimatePresence>
-      <motion.div
-        key="video-tool-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000]"
-        style={{ background: 'rgba(0,0,0,0.55)' }}
-        onClick={onClose}
-      />
-      <motion.div
-        key="video-tool-sheet"
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
-        style={{
-          background: 'rgba(16,16,16,0.99)',
-          backdropFilter: 'blur(40px)',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
-          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
-        }}
-      >
-        <div className="flex justify-center pt-3 pb-4">
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        </div>
-
-        <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: item.height && item.width && item.height > item.width ? '4/5' : '16/9' }}>
-          <video
-            src={item.previewUrl}
-            poster={item.thumbnailUrl || undefined}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-            style={{ pointerEvents: 'none' }}
-          />
-        </div>
-
-        <div className="flex gap-3 px-4 pb-2">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onEdit}
-            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
-          >
-            <Pencil className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Edit</span>
-            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Music, filters, text</span>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onTrim}
-            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
-          >
-            <Scissors className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Trim</span>
-            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Cut start & end</span>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onCover}
-            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
-          >
-            <ImageIcon className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Cover</span>
-            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Choose thumbnail</span>
-          </motion.button>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
+// VideoToolSheet removed — edit actions now inline on each thumbnail tile
 
 // ─── ComposeScreen ────────────────────────────────────────────────────────────
 
@@ -405,11 +313,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
-  const [trayIndex, setTrayIndex] = useState<number | null>(null);
-  const trayAutoOpenedRef = useRef(false);
-  const trayPreviewRef = useRef<HTMLDivElement>(null);
-
-  const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
 
   const hasMedia = state.mediaItems.length > 0;
@@ -417,23 +320,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
 
-  useEffect(() => {
-    if (state.mediaItems.length > 0) {
-      if (!trayAutoOpenedRef.current) {
-        trayAutoOpenedRef.current = true;
-        setTrayIndex(0);
-      }
-    } else {
-      trayAutoOpenedRef.current = false;
-    }
-  }, [state.mediaItems.length]);
-
-  // Close tray if trayIndex is out of bounds
-  useEffect(() => {
-    if (trayIndex !== null && trayIndex >= state.mediaItems.length) {
-      setTrayIndex(null);
-    }
-  }, [state.mediaItems.length, trayIndex]);
 
   const charCount = useMemo(() => {
     try {
@@ -558,6 +444,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const handleSetCover = useCallback((index: number) => {
     setCoverIndex(index);
     setActiveMedia(index);
+    toast.success('Cover updated');
   }, [setActiveMedia]);
 
   // ── Publish handler — one-step flow ──
@@ -632,11 +519,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state.scheduledAt, handlePublish, schedulePublishRef, state.mediaItems.length, isValid]);
 
-  // ── Tray item for inline edit ──
-  const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
-  const trayPreviewStillSrc = trayItem ? getPreviewStillSrc(trayItem) : '';
-  const trayPreviewTransform = trayItem ? getPreviewTransform(trayItem.edits) : undefined;
-  const trayPreviewObjectFit = trayItem ? getPreviewObjectFit(trayItem) : 'cover';
 
   // ── Shared caption + course tag block ──
   const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false) => (
@@ -906,351 +788,165 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
 
-      {/* ── Thumbnail strip (media state only) ── */}
-      {hasMedia && (
-        <div
-          className="flex overflow-x-auto shrink-0"
-          style={{
-            position: 'relative',
-            zIndex: 10,
-            marginTop: 8,
-            gap: 3,
-            padding: '3px 0',
-            scrollbarWidth: 'none',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
-            background: COMPOSE_BG,
-          }}
-        >
-          {state.mediaItems.map((item, i) => {
-            const isActive = i === coverIndex;
-            const stillSrc = getPreviewStillSrc(item);
-            const previewTransform = getPreviewTransform(item.edits);
-            return (
-              <motion.button
-                key={item.id}
-                whileTap={{ scale: 0.95 }}
-                onTap={() => {
-                  if (trayIndex === i) {
-                    setTrayIndex(null);
-                  } else {
-                    setTrayIndex(i);
-                    setActiveMedia(i);
-                  }
-                }}
-                className="shrink-0 relative"
-                style={{
-                  cursor: 'pointer',
-                  width: 68,
-                  height: 68,
-                  borderRadius: 0,
-                  overflow: 'hidden',
-                  outline: isActive ? '2.5px solid #F7931E' : 'none',
-                  outlineOffset: isActive ? '-2.5px' : undefined,
-                }}
-              >
-                {item.mediaType === 'video' ? (
-                  <>
-                    {stillSrc ? (
-                      <>
-                        <img
-                          src={stillSrc}
-                          alt=""
-                          className="w-full h-full object-cover"
-                          style={{ transform: previewTransform }}
-                        />
-                        {hasActiveFilter(item.edits) && (
-                          <img
-                            src={stillSrc}
-                            alt=""
-                            className={`absolute inset-0 w-full h-full object-cover ${getFilterClass(item.edits!.filter!)}`}
-                            style={{
-                              opacity: (item.edits?.filterIntensity ?? 100) / 100,
-                              transform: previewTransform,
-                            }}
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <video
-                        src={item.previewUrl}
-                        poster={item.thumbnailUrl || undefined}
-                        className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                        style={{ transform: previewTransform }}
-                        playsInline
-                        muted
-                        preload="metadata"
-                      />
-                    )}
-                  </>
-                ) : (
-                  <img
-                    src={item.thumbnailUrl || item.previewUrl}
-                    alt=""
-                    className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                  />
-                )}
-                {item.mediaType === 'video' && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.60)' }}>
-                      <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" strokeWidth={0} />
-                    </div>
-                  </div>
-                )}
-                {/* Dim overlay on inactive tiles */}
-                {!isActive && (
-                  <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.35)' }} />
-                )}
-                {/* Amber dot for edited tiles */}
-                {item.edits && (item.edits.filter && item.edits.filter !== 'normal' || item.edits.textOverlays?.length || item.edits.rotate || item.edits.flipH || item.edits.flipV || item.edits.music) && (
-                  <div className="absolute pointer-events-none" style={{ top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: '#F7931E', zIndex: 3 }} />
-                )}
-                {/* Cover pill on active tile */}
-                {isActive && (
-                  <div className="absolute bottom-1 left-1 pointer-events-none" style={{
-                    fontSize: 7, fontWeight: 700, textTransform: 'uppercase',
-                    background: 'rgba(247,147,30,0.85)',
-                    padding: '2px 6px', borderRadius: 20,
-                    color: 'white', letterSpacing: 0.5,
-                  }}>
-                    Cover
-                  </div>
-                )}
-              </motion.button>
-            );
-          })}
-
-          {/* Add more tile */}
-          {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => fileInputRef.current?.click()}
-              className="shrink-0 flex items-center justify-center"
-              style={{
-                width: 68,
-                height: 68,
-                borderRadius: 0,
-                background: 'rgba(255,255,255,0.04)',
-                borderLeft: '1px dashed rgba(255,255,255,0.10)',
-              }}
-            >
-              <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.22)' }} strokeWidth={2} />
-            </motion.button>
-          )}
-        </div>
-      )}
-
-      {/* ── Edit tray (inline, below strip) ── */}
-      <AnimatePresence>
-        {trayItem && trayIndex !== null && (
-          <motion.div
-            key="edit-tray"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{
-              flex: 1,
-              minHeight: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'relative',
-              zIndex: 10,
-              background: 'rgba(18,18,18,0.98)',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-              {/* Full-width preview */}
-              <div ref={trayPreviewRef} className="relative overflow-hidden" style={{ width: '100%', flex: 1, minHeight: 0, background: '#000' }}>
-                {/* Letterbox blur for landscape */}
-                {trayItem.width && trayItem.height && trayItem.width > trayItem.height && (
-                  <>
-                    <img src={trayPreviewStillSrc || trayItem.previewUrl} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(40px) brightness(0.5)', transform: 'scale(1.15)', opacity: 0.6 }} />
-                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
-                  </>
-                )}
-                {/* Base preview */}
-                {trayItem.mediaType === 'video' && trayPreviewStillSrc ? (
-                  <img
-                    src={trayPreviewStillSrc}
-                    alt=""
-                    className="relative z-[1]"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      maxHeight: '100%',
-                      objectFit: trayPreviewObjectFit,
-                      transform: trayPreviewTransform,
-                    }}
-                  />
-                ) : trayItem.mediaType === 'video' ? (
-                  <video
-                    src={trayItem.previewUrl}
-                    poster={trayItem.thumbnailUrl || undefined}
-                    className="relative z-[1]"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      maxHeight: '100%',
-                      objectFit: trayPreviewObjectFit,
-                      transform: trayPreviewTransform,
-                    }}
-                    playsInline
-                    muted
-                    preload="metadata"
-                  />
-                ) : (
-                  <img
-                    src={trayItem.thumbnailUrl || trayItem.previewUrl}
-                    alt=""
-                    className="relative z-[1]"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      maxHeight: '100%',
-                      objectFit: trayPreviewObjectFit,
-                      transform: trayPreviewTransform,
-                    }}
-                  />
-                )}
-                {/* Filter overlay with intensity */}
-                {trayPreviewStillSrc && hasActiveFilter(trayItem.edits) && (
-                  <img
-                    src={trayPreviewStillSrc}
-                    alt=""
-                    className={`absolute inset-0 z-[1] ${getFilterClass(trayItem.edits.filter)}`}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      maxHeight: '100%',
-                      objectFit: trayPreviewObjectFit,
-                      opacity: (trayItem.edits?.filterIntensity ?? 100) / 100,
-                      transform: trayPreviewTransform,
-                    }}
-                  />
-                )}
-                {/* Text overlays */}
-                {trayItem.edits?.textOverlays && trayItem.edits.textOverlays.length > 0 && trayPreviewRef.current && (
-                  <div className="absolute inset-0 z-[2] pointer-events-none">
-                    <TextOverlayRenderer
-                      textOverlays={trayItem.edits.textOverlays}
-                      isEditable={false}
-                      containerRef={trayPreviewRef as React.RefObject<HTMLDivElement>}
-                    />
-                  </div>
-                )}
-                {/* Cover badge */}
-                {trayIndex === coverIndex && (
-                  <div className="absolute z-[3]" style={{ top: 8, left: 8, background: 'rgba(247,147,30,0.85)', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, letterSpacing: 0.5 }}>
-                    Cover
-                  </div>
-                )}
-              </div>
-
-              {/* Button row */}
-              <div className="shrink-0" style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                width: '100%',
-                padding: '4px 8px 0',
-              }}>
-                {/* Cover */}
-                {trayIndex !== coverIndex && (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCoverIndex(trayIndex)}
-                    style={{
-                      display: 'flex', flexDirection: 'column', alignItems: 'center',
-                      justifyContent: 'center', gap: 5, flex: 1, height: 54,
-                      borderRadius: 14, cursor: 'pointer',
-                      background: 'rgba(247,147,30,0.10)',
-                      border: '1px solid rgba(247,147,30,0.22)',
-                    }}
-                  >
-                    <ImageIcon className="w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2} />
-                    <span style={{ fontSize: 10, fontWeight: 600, color: '#F7931E', letterSpacing: '0.02em' }}>Cover</span>
-                  </motion.button>
-                )}
-
-                {/* Edit */}
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => { setTrayIndex(null); handleEdit(trayIndex); }}
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    justifyContent: 'center', gap: 5, flex: 1, height: 54,
-                    borderRadius: 14, cursor: 'pointer',
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
-                  <Pencil className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
-                  <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.02em' }}>Edit</span>
-                </motion.button>
-
-                {/* Trim */}
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    if (trayItem.mediaType === 'video') {
-                      setTrayIndex(null);
-                      setActiveMedia(trayIndex);
-                      setStep('TRIM');
-                    }
-                  }}
-                  disabled={trayItem.mediaType !== 'video'}
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    justifyContent: 'center', gap: 5, flex: 1, height: 54,
-                    borderRadius: 14, cursor: 'pointer',
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    opacity: trayItem.mediaType !== 'video' ? 0.4 : 1,
-                  }}
-                >
-                  <Scissors className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
-                  <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.02em' }}>Trim</span>
-                </motion.button>
-
-                {/* Separator */}
-                <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
-
-                {/* Remove */}
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    const id = trayItem.id;
-                    setTrayIndex(null);
-                    removeMedia(id);
-                    if (coverIndex >= state.mediaItems.length - 1) setCoverIndex(Math.max(0, state.mediaItems.length - 2));
-                  }}
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    justifyContent: 'center', gap: 5, flex: 1, height: 54,
-                    borderRadius: 14, cursor: 'pointer',
-                    background: 'rgba(239,68,68,0.08)',
-                    border: '1px solid rgba(239,68,68,0.18)',
-                  }}
-                >
-                  <X className="w-4 h-4" style={{ color: 'rgba(239,68,68,0.70)' }} strokeWidth={2} />
-                  <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(239,68,68,0.70)', letterSpacing: '0.02em' }}>Remove</span>
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* ── Media state: caption at top, then carousel ── */}
       {hasMedia ? (
         <>
-          {/* Spacer — only when tray is closed, pushes caption to bottom */}
-          {trayIndex === null && <div className="flex-1" />}
-
-          {/* Caption block — fixed, directly below tray */}
+          {/* Caption block — at top, directly below topbar */}
           <div className="shrink-0">
-            <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
             {renderCaptionBlock(52, 72)}
           </div>
+
+          {/* 24px gap above carousel */}
+          <div style={{ flexShrink: 0, height: 24 }} />
+
+          {/* ── Scrollable thumbnail carousel ── */}
+          <div style={{
+            flexShrink: 0,
+            height: 'calc(100vh - 279px)',
+            display: 'flex',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            scrollbarWidth: 'none',
+            gap: 6,
+            padding: '0 16px',
+          }}>
+            {state.mediaItems.map((item, i) => {
+              const isActive = i === coverIndex;
+              const isCover = i === coverIndex;
+              const stillSrc = getPreviewStillSrc(item);
+              const previewTransform = getPreviewTransform(item.edits);
+              return (
+                <motion.div
+                  key={item.id}
+                  onTap={() => setActiveMedia(i)}
+                  style={{
+                    position: 'relative',
+                    flexShrink: 0,
+                    width: 'calc(100vh - 279px)',
+                    height: '100%',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                    outline: isActive ? '2.5px solid #F7931E' : '2.5px solid transparent',
+                    outlineOffset: -2,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {/* Media render */}
+                  {item.mediaType === 'video' ? (
+                    <>
+                      {stillSrc ? (
+                        <>
+                          <img src={stillSrc} alt="" className="w-full h-full object-cover" style={{ transform: previewTransform }} />
+                          {hasActiveFilter(item.edits) && (
+                            <img
+                              src={stillSrc}
+                              alt=""
+                              className={`absolute inset-0 w-full h-full object-cover ${getFilterClass(item.edits!.filter!)}`}
+                              style={{ opacity: (item.edits?.filterIntensity ?? 100) / 100, transform: previewTransform }}
+                            />
+                          )}
+                        </>
+                      ) : (
+                        <video
+                          src={item.previewUrl}
+                          poster={item.thumbnailUrl || undefined}
+                          className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                          style={{ transform: previewTransform }}
+                          playsInline muted preload="metadata"
+                        />
+                      )}
+                      {/* Play icon */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.60)' }}>
+                          <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" strokeWidth={0} />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <img
+                      src={item.thumbnailUrl || item.previewUrl}
+                      alt=""
+                      className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                      style={{ transform: previewTransform }}
+                    />
+                  )}
+
+                  {/* Inactive dim */}
+                  {!isActive && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.40)', pointerEvents: 'none' }} />}
+
+                  {/* Edited amber dot — top-left */}
+                  {item.edits && (item.edits.filter && item.edits.filter !== 'normal' || item.edits.textOverlays?.length || item.edits.rotate || item.edits.flipH || item.edits.flipV || item.edits.music) && (
+                    <div style={{ position: 'absolute', top: 7, left: isCover ? undefined : 7, right: isCover ? undefined : undefined, width: 7, height: 7, borderRadius: '50%', background: '#F7931E', pointerEvents: 'none', zIndex: 3 }} />
+                  )}
+
+                  {/* Cover indicator — frosted glass tag, top-left */}
+                  {isCover && (
+                    <div style={{
+                      position: 'absolute', top: 7, left: 7,
+                      display: 'flex', alignItems: 'center', gap: 3,
+                      background: 'rgba(0,0,0,0.58)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(247,147,30,0.30)',
+                      borderRadius: 7,
+                      padding: '3px 6px',
+                      pointerEvents: 'none',
+                      zIndex: 4,
+                    }}>
+                      <svg width="7" height="7" viewBox="0 0 24 24" fill="#F7931E" stroke="none">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                      <span style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#F7931E' }}>
+                        Cover
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Edit button — bottom-right */}
+                  <button
+                    onPointerDown={e => e.stopPropagation()}
+                    onClick={e => { e.stopPropagation(); handleEdit(i); }}
+                    style={{
+                      position: 'absolute', bottom: 8, right: 8,
+                      display: 'flex', alignItems: 'center', gap: 4,
+                      background: 'rgba(0,0,0,0.58)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255,255,255,0.16)',
+                      borderRadius: 8, padding: '4px 8px',
+                      cursor: 'pointer', color: '#fff',
+                      zIndex: 4,
+                    }}
+                  >
+                    <Pencil className="w-[11px] h-[11px]" />
+                    <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.2 }}>Edit</span>
+                  </button>
+                </motion.div>
+              );
+            })}
+
+            {/* Add more tile */}
+            {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  flexShrink: 0,
+                  width: 'calc(100vh - 279px)',
+                  height: '100%',
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1.5px dashed rgba(255,255,255,0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Plus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.25)' }} />
+              </motion.button>
+            )}
+          </div>
+
+          {/* 24px gap below carousel */}
+          <div style={{ flexShrink: 0, height: 24 }} />
 
           {/* Processing indicator */}
           <AnimatePresence>
@@ -1391,30 +1087,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         </div>
       </div>
 
-      {/* Video tool picker sheet */}
-      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] &&
-        createPortal(
-          <VideoToolSheet
-            item={state.mediaItems[videoToolSheetIndex]}
-            onEdit={() => {
-              setVideoToolSheetIndex(null);
-              setActiveTool(null);
-              setShelfOpen(true);
-            }}
-            onTrim={() => {
-              setVideoToolSheetIndex(null);
-              setStep('TRIM');
-            }}
-            onCover={() => {
-              if (videoToolSheetIndex !== null) setActiveMedia(videoToolSheetIndex);
-              setVideoToolSheetIndex(null);
-              setStep('POSTER');
-            }}
-            onClose={() => setVideoToolSheetIndex(null)}
-          />,
-          document.body
-        )
-      }
 
       {/* Studio Shelf */}
       {activeItem && (
