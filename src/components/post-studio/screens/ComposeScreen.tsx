@@ -280,99 +280,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
   return !!edits?.filter && edits.filter !== 'normal';
 }
 
-// ─── VideoToolSheet — intermediate tool picker for videos ────────────────────
-
-interface VideoToolSheetProps {
-  item: StudioMediaItem;
-  onEdit: () => void;
-  onTrim: () => void;
-  onCover: () => void;
-  onClose: () => void;
-}
-
-function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolSheetProps) {
-  return (
-    <AnimatePresence>
-      <motion.div
-        key="video-tool-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000]"
-        style={{ background: 'rgba(0,0,0,0.55)' }}
-        onClick={onClose}
-      />
-      <motion.div
-        key="video-tool-sheet"
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
-        style={{
-          background: 'rgba(16,16,16,0.99)',
-          backdropFilter: 'blur(40px)',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
-          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
-        }}
-      >
-        <div className="flex justify-center pt-3 pb-4">
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        </div>
-
-        <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: item.height && item.width && item.height > item.width ? '4/5' : '16/9' }}>
-          <video
-            src={item.previewUrl}
-            poster={item.thumbnailUrl || undefined}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-            style={{ pointerEvents: 'none' }}
-          />
-        </div>
-
-        <div className="flex gap-3 px-4 pb-2">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onEdit}
-            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
-          >
-            <Pencil className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Edit</span>
-            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Music, filters, text</span>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onTrim}
-            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
-          >
-            <Scissors className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Trim</span>
-            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Cut start & end</span>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onCover}
-            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: DARK_CARD, border: `1px solid ${DARK_BORDER}` }}
-          >
-            <ImageIcon className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: DARK_TEXT }}>Cover</span>
-            <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>Choose thumbnail</span>
-          </motion.button>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
+// VideoToolSheet removed — edit actions now inline on each thumbnail tile
 
 // ─── ComposeScreen ────────────────────────────────────────────────────────────
 
@@ -405,11 +313,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
-  const [trayIndex, setTrayIndex] = useState<number | null>(null);
-  const trayAutoOpenedRef = useRef(false);
-  const trayPreviewRef = useRef<HTMLDivElement>(null);
-
-  const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
 
   const hasMedia = state.mediaItems.length > 0;
@@ -417,23 +320,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
 
-  useEffect(() => {
-    if (state.mediaItems.length > 0) {
-      if (!trayAutoOpenedRef.current) {
-        trayAutoOpenedRef.current = true;
-        setTrayIndex(0);
-      }
-    } else {
-      trayAutoOpenedRef.current = false;
-    }
-  }, [state.mediaItems.length]);
-
-  // Close tray if trayIndex is out of bounds
-  useEffect(() => {
-    if (trayIndex !== null && trayIndex >= state.mediaItems.length) {
-      setTrayIndex(null);
-    }
-  }, [state.mediaItems.length, trayIndex]);
 
   const charCount = useMemo(() => {
     try {
@@ -558,6 +444,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const handleSetCover = useCallback((index: number) => {
     setCoverIndex(index);
     setActiveMedia(index);
+    toast.success('Cover updated');
   }, [setActiveMedia]);
 
   // ── Publish handler — one-step flow ──
@@ -632,11 +519,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state.scheduledAt, handlePublish, schedulePublishRef, state.mediaItems.length, isValid]);
 
-  // ── Tray item for inline edit ──
-  const trayItem = trayIndex !== null ? state.mediaItems[trayIndex] ?? null : null;
-  const trayPreviewStillSrc = trayItem ? getPreviewStillSrc(trayItem) : '';
-  const trayPreviewTransform = trayItem ? getPreviewTransform(trayItem.edits) : undefined;
-  const trayPreviewObjectFit = trayItem ? getPreviewObjectFit(trayItem) : 'cover';
 
   // ── Shared caption + course tag block ──
   const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false) => (
