@@ -71,7 +71,7 @@ async function generatePoster(file: File): Promise<string> {
     video.onloadeddata = () => { if (video.readyState >= 2) capture(); };
     video.onerror = () => {
       clearTimeout(timeout);
-      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
+      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(URL.createObjectURL(file)); }
     };
 
     video.src = url;
