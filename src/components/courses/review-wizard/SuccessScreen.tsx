@@ -225,7 +225,7 @@ export function SuccessScreen({
             margin: 0,
           }}
         >
-          {isEditMode ? 'Verdict revised.' : 'Course review saved.'}
+          {isEditMode ? 'Verdict revised.' : 'Your take is live.'}
         </motion.h2>
 
         {/* Sub-copy */}
