@@ -793,8 +793,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <>
           {/* Caption block — at top, directly below topbar */}
           <div className="shrink-0">
-            {renderCaptionBlock(52, 72)}
-      </div>}
+            {renderCaptionBlock(52, 72, false, false)}
+          </div>
 
           {/* 24px gap above carousel */}
           <div style={{ flexShrink: 0, height: 24 }} />
