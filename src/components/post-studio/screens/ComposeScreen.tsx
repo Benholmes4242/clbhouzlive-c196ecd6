@@ -803,8 +803,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
           {/* ── Scrollable thumbnail carousel ── */}
           <div style={{
-            flexShrink: 0,
-            height: 160,
+            flex: 1,
+            minHeight: 0,
             display: 'flex',
             overflowX: 'auto',
             overflowY: 'hidden',
