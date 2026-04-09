@@ -859,23 +859,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     display: 'flex', alignItems: 'center',
                     gap: 10, padding: '0 16px', height: 52,
                   }}>
-                    {/* Burger */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); }}
-                      style={{
-                        width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-                        background: 'rgba(255,255,255,0.07)',
-                        backdropFilter: 'blur(12px)',
-                        border: '1px solid rgba(255,255,255,0.09)',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center',
-                        gap: 3.5, cursor: 'pointer',
-                      }}
-                    >
-                      {[0,1,2].map(i => (
-                        <div key={i} style={{ width: 13, height: 1.5, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />
-                      ))}
-                    </button>
 
                     {/* Title block */}
                     <div style={{ flex: 1, minWidth: 0 }}>
