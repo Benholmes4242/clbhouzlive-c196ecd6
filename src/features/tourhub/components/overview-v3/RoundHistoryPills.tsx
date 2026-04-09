@@ -17,7 +17,7 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
   ].filter(r => r.roundNum <= currentRound);
 
   return (
-    <div style={{ display: 'flex', gap: 5, marginTop: 6 }}>
+    <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
       {rounds.map(r => {
         const isLive = r.roundNum === currentRound;
         const isDone = r.score !== null && !isLive;
@@ -26,20 +26,20 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
 
         return (
           <div key={r.label} style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
-            padding: '4px 8px', borderRadius: 8, minWidth: 36,
-            background: isLive ? 'rgba(34,197,94,0.10)' : 'rgba(255,255,255,0.05)',
-            border: isLive ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(255,255,255,0.10)',
+            display: 'flex', alignItems: 'center', gap: 3,
+            padding: '2px 6px', borderRadius: 6,
+            background: isLive ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.06)',
+            border: isLive ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(255,255,255,0.08)',
           }}>
-            <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.40)', letterSpacing: '0.5px' }}>
+            <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.5px' }}>
               {r.label}
             </span>
             {isLive ? (
-              <span style={{ fontSize: 10, fontWeight: 800, color: '#22C55E' }}>
+              <span style={{ fontSize: 8, fontWeight: 700, color: '#22C55E' }}>
                 Live
               </span>
             ) : isDone ? (
-              <span style={{ fontSize: 12, fontWeight: 800, color: colors!.text }}>
+              <span style={{ fontSize: 8, fontWeight: 800, color: colors!.text }}>
                 {fmtScore}
               </span>
             ) : null}
