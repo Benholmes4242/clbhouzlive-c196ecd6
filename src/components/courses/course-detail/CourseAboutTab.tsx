@@ -300,15 +300,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 12. Visit Website */}
       {course.website_url && (
         <section className="px-4 pt-2 pb-4">
-          <Button
+          <button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 h-9 font-semibold active:scale-[0.98] transition-all"
-            variant="ghost"
-            style={{ borderRadius: 10, background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))', border: 'none' }}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] rounded-full bg-card border border-border/60 hover:bg-muted transition-colors active:scale-[0.98] text-foreground text-sm font-semibold"
           >
             <ExternalLink className="h-4 w-4" />
             Official course website
-          </Button>
+          </button>
         </section>
       )}
 
