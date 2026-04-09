@@ -1,9 +1,9 @@
 // SuccessScreen — Step 6: Dark celebration moment with staggered entrance + live upload progress
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { useUploadProgress } from '@/hooks/useUploadProgress';
+import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { usePostStudioContext } from '../usePostStudio';
 import { format } from 'date-fns';
 
@@ -37,10 +37,39 @@ function Particle({ delay, angle, distance, opacity }: { delay: number; angle: n
 export function SuccessScreen({ onDone }: SuccessScreenProps) {
   const { state } = usePostStudioContext();
   const hasCalledDone = useRef(false);
-  const { isUploading, uploadedCount, totalCount } = useUploadProgress();
-  const progress = totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0;
-  const isComplete = uploadedCount >= totalCount && totalCount > 0;
   const isScheduled = state.scheduledAt !== null;
+
+  // Live upload progress via uploadEventBus (replaces dead useUploadProgress hook)
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadComplete, setUploadComplete] = useState(false);
+
+  useEffect(() => {
+    const offProgress = uploadEventBus.on('upload:progress', (evt) => {
+      if (evt.progress) {
+        const { uploadedFiles, totalFiles } = evt.progress;
+        if (totalFiles > 0) {
+          setUploadProgress(Math.round((uploadedFiles / totalFiles) * 100));
+        }
+      }
+    });
+
+    const offFileProgress = uploadEventBus.on('file:upload-progress', (evt) => {
+      if (evt.progress !== undefined) {
+        setUploadProgress(Math.round(evt.progress));
+      }
+    });
+
+    const offComplete = uploadEventBus.on('upload:complete', () => {
+      setUploadProgress(100);
+      setUploadComplete(true);
+    });
+
+    return () => {
+      offProgress();
+      offFileProgress();
+      offComplete();
+    };
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8 relative" style={{ background: '#0D0D0D' }}>
@@ -141,13 +170,13 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         >
           <div className="flex items-center justify-between mb-2">
             <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.92)' }}>
-              {isComplete ? 'Upload complete' : 'Uploading…'}
+              {uploadComplete ? 'Upload complete' : 'Uploading…'}
             </span>
             <span style={{
               fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums',
-              color: isComplete ? 'rgba(34,197,94,0.80)' : '#F7931E',
+              color: uploadComplete ? 'rgba(34,197,94,0.80)' : '#F7931E',
             }}>
-              {Math.round(progress)}%
+              {uploadComplete ? 'Complete ✓' : `${uploadProgress}%`}
             </span>
           </div>
           <div style={{
@@ -157,8 +186,8 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
             <div style={{
               height: '100%', borderRadius: 999,
               transition: 'width 500ms, background 300ms',
-              width: `${progress}%`,
-              background: isComplete
+              width: `${uploadProgress}%`,
+              background: uploadComplete
                 ? 'rgba(34,197,94,0.70)'
                 : 'linear-gradient(90deg, #F7931E, #F59E0B)',
             }} />
@@ -167,7 +196,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
             fontSize: 12, color: 'rgba(255,255,255,0.35)',
             marginTop: 8,
           }}>
-            {isComplete ? 'Your post is live on the feed' : "You can close the app — it'll keep going"}
+            {uploadComplete ? 'Your moment is live in Clubhouse' : "You can close the app — it'll keep going"}
           </p>
         </motion.div>
       )}
