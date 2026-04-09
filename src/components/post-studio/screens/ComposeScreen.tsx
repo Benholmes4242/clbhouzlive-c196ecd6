@@ -850,7 +850,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               >
                 {item.mediaType === 'video' ? (
                   <>
-                    {debugEvent(`[Strip] Rendering video tile: poster=${item.thumbnailUrl?.substring(0, 30) || 'EMPTY'} previewUrl=${item.previewUrl?.substring(0, 30)}`) && null}
+                    {(() => {
+                      debugEvent(`[Strip] Rendering video tile: poster=${item.thumbnailUrl?.substring(0, 30) || 'EMPTY'} previewUrl=${item.previewUrl?.substring(0, 30)}`);
+                      return null;
+                    })()}
                     <video
                       src={item.previewUrl}
                       poster={item.thumbnailUrl || undefined}
