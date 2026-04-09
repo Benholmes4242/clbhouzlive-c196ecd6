@@ -804,11 +804,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   outlineOffset: isActive ? '-2.5px' : undefined,
                 }}
               >
-                <img
-                  src={item.thumbnailUrl || item.previewUrl}
-                  alt=""
-                  className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                />
+                {item.mediaType === 'video' ? (
+                  <video
+                    src={item.previewUrl}
+                    className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                    playsInline
+                    muted
+                    preload="metadata"
+                  />
+                ) : (
+                  <img
+                    src={item.thumbnailUrl || item.previewUrl}
+                    alt=""
+                    className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
+                  />
+                )}
                 {item.mediaType === 'video' && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.60)' }}>
@@ -888,23 +898,44 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
                   </>
                 )}
-                {/* Base image */}
-                <img
-                  src={trayItem.thumbnailUrl || trayItem.previewUrl}
-                  alt=""
-                  className="relative z-[1]"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    maxHeight: '100%',
-                    objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
-                    transform: [
-                      trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
-                      trayItem.edits?.flipH ? 'scaleX(-1)' : '',
-                      trayItem.edits?.flipV ? 'scaleY(-1)' : '',
-                    ].filter(Boolean).join(' ') || undefined,
-                  }}
-                />
+                {/* Base preview */}
+                {trayItem.mediaType === 'video' ? (
+                  <video
+                    src={trayItem.previewUrl}
+                    className="relative z-[1]"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '100%',
+                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                      transform: [
+                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                      ].filter(Boolean).join(' ') || undefined,
+                    }}
+                    playsInline
+                    muted
+                    preload="metadata"
+                  />
+                ) : (
+                  <img
+                    src={trayItem.thumbnailUrl || trayItem.previewUrl}
+                    alt=""
+                    className="relative z-[1]"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '100%',
+                      objectFit: trayItem.width && trayItem.height && trayItem.width > trayItem.height ? 'contain' : 'cover',
+                      transform: [
+                        trayItem.edits?.rotate ? `rotate(${trayItem.edits.rotate}deg)` : '',
+                        trayItem.edits?.flipH ? 'scaleX(-1)' : '',
+                        trayItem.edits?.flipV ? 'scaleY(-1)' : '',
+                      ].filter(Boolean).join(' ') || undefined,
+                    }}
+                  />
+                )}
                 {/* Filter overlay with intensity */}
                 {trayItem.edits?.filter && trayItem.edits.filter !== 'normal' && (
                   <img

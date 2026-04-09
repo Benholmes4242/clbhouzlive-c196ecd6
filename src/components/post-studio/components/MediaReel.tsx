@@ -36,7 +36,11 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
                 background: 'rgba(0,0,0,0.03)',
               }}
             >
-              <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+              {item.mediaType === 'video' ? (
+                <video src={item.previewUrl} className="w-full h-full object-cover" playsInline muted preload="metadata" />
+              ) : (
+                <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+              )}
               {item.mediaType === 'video' && (
                 <div className="absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.70)' }}>
                   <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" strokeWidth={0} />
