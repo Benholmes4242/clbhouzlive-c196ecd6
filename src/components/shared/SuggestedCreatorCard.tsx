@@ -225,9 +225,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
             ? isDark
               ? { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', border: 'none' }
               : { background: 'transparent', color: 'hsl(var(--muted-foreground))', border: '1px solid hsl(var(--border))' }
-            : isDark
-              ? { background: '#ffffff', color: '#000000', border: 'none' }
-              : { background: 'hsl(var(--foreground))', color: 'hsl(var(--background))', border: 'none' }),
+            : { background: 'rgba(247,147,30,0.10)', color: '#F7931E', border: '1px solid rgba(247,147,30,0.25)' }),
         }}
       >
         {following ? 'Following' : 'Follow'}
