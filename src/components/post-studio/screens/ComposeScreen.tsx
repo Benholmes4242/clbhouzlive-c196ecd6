@@ -634,9 +634,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       {pushCourseToBottom && <div className="flex-1" />}
 
       {/* Course tag */}
-
-      {/* Course tag */}
-      <div className="px-4 mt-3 mb-3">
+      {includeCourseTag && <div className="px-4 mt-3 mb-3">
         <AnimatePresence mode="wait">
           {state.taggedCourses.length === 0 ? (
             <motion.button
