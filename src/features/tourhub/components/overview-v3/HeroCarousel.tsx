@@ -16,6 +16,7 @@ import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
+import { openTourNav } from '../../contexts/TourNavContext';
 
 import { cn } from '@/lib/utils';
 import { 
@@ -858,8 +859,26 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     gap: 10, padding: '0 16px', height: 52,
                   }}>
 
-                    {/* Spacer for burger (rendered by OverviewPageV3) */}
-                    <div style={{ width: 34, height: 34, flexShrink: 0 }} />
+                    {/* Functional burger for live topbar */}
+                    <button
+                      className="flex flex-col items-center justify-center gap-[3.5px] active:scale-[0.97] transition-transform"
+                      style={{
+                        width: 34,
+                        height: 34,
+                        flexShrink: 0,
+                        borderRadius: 10,
+                        background: 'rgba(255,255,255,0.07)',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                        border: '1px solid rgba(255,255,255,0.09)',
+                      }}
+                      onClick={() => openTourNav()}
+                      aria-label="Open tour menu"
+                    >
+                      {[0,1,2].map(i => (
+                        <div key={i} style={{ width: 13, height: 1.5, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />
+                      ))}
+                    </button>
 
                     {/* Title block */}
                     <div style={{ flex: 1, minWidth: 0 }}>
