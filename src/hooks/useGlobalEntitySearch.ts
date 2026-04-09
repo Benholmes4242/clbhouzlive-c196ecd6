@@ -133,7 +133,7 @@ const searchPeople = async (query: string, limit: number = 6): Promise<PersonRes
   }));
 };
 
-const searchClubs = async (query: string, limit: number = 6): Promise<ClubResult[]> => {
+const searchClubs = async (query: string, limit: number = 6, userId?: string): Promise<ClubResult[]> => {
   if (!query.trim()) return [];
 
   const { data, error } = await supabase
@@ -155,15 +155,31 @@ const searchClubs = async (query: string, limit: number = 6): Promise<ClubResult
     throw new Error('Failed to search clubs');
   }
 
-  return (data || []).map(course => ({
+  const courses = (data || []).map(course => ({
     id: course.id,
     name: course.name,
     logo_url: course.thumbnail_image,
     country: course.country,
     region: course.region,
     global_rank: course.global_rank,
+    user_has_rated: false,
     type: 'course' as const
   }));
+
+  // Batch check which courses the user has rated
+  if (userId && courses.length > 0) {
+    const courseIds = courses.map(c => c.id);
+    const { data: userRatings } = await supabase
+      .from('course_ratings')
+      .select('course_id')
+      .eq('user_id', userId)
+      .in('course_id', courseIds);
+
+    const ratedSet = new Set(userRatings?.map(r => r.course_id) ?? []);
+    courses.forEach(c => { c.user_has_rated = ratedSet.has(c.id); });
+  }
+
+  return courses;
 };
 
 // Format duration helper
