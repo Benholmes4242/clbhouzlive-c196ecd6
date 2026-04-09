@@ -274,6 +274,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
 
+  // ── Debug overlay for iOS video diagnostics ──
+  const [debugLog, setDebugLog] = useState<string[]>([]);
+  const addDebug = useCallback((msg: string) => {
+    setDebugLog(prev => [...prev.slice(-8), `${new Date().toLocaleTimeString()}: ${msg}`]);
+  }, []);
+
   const hasMedia = state.mediaItems.length > 0;
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
@@ -320,7 +326,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       if (toProcess.length === 0) return;
       setIsProcessing(true);
       try {
+        // Debug: log each file before processing
+        toProcess.forEach(f => addDebug(`File selected: ${f.name} | type: ${f.type || 'EMPTY'} | size: ${(f.size/1024).toFixed(0)}KB`));
         const items = await filesToMediaItems(toProcess, (msg) => toast.error(msg));
+        items.forEach((item, i) => addDebug(`Item ${i}: mediaType=${item.mediaType} | dur=${item.duration} | w=${item.width} h=${item.height} | poster=${(item.thumbnailUrl?.length ?? 0)} | fileType=${item.file?.type || 'EMPTY'} | size=${((item.file?.size||0)/1024).toFixed(0)}KB`));
         if (items.length > 0) {
           addMedia(items);
         }
@@ -425,6 +434,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const handlePublish = useCallback(async () => {
     if (isPublishing) return;
     setIsPublishing(true);
+    addDebug(`Publishing: ${state.mediaItems.length} items`);
+    state.mediaItems.forEach((item, i) => {
+      addDebug(`Pub item ${i}: type=${item.mediaType} | file=${!!item.file} | fileType=${item.file?.type || 'EMPTY'} | size=${((item.file?.size||0)/1024).toFixed(0)}KB`);
+    });
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
@@ -1242,6 +1255,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           activeOverlayId={activeOverlayId}
           onSelectOverlay={setActiveOverlayId}
         />
+      )}
+
+      {/* Debug overlay for iOS video diagnostics */}
+      {debugLog.length > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 120, left: 8, right: 8,
+          background: 'rgba(0,0,0,0.85)', borderRadius: 8, padding: 8,
+          zIndex: 99999, maxHeight: 180, overflowY: 'auto',
+        }}>
+          {debugLog.map((log, i) => (
+            <div key={i} style={{ fontSize: 10, color: '#F7931E', fontFamily: 'monospace', marginBottom: 2 }}>
+              {log}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
