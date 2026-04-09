@@ -18,10 +18,11 @@ export function useLeaderHoleScores(
 
       const { data, error } = await supabase
         .from('sr_scorecards')
-        .select('hole_number, score_to_par')
+        .select('hole_number, score_to_par, strokes')
         .eq('tournament_id', tournamentId)
         .eq('player_id', playerId)
         .eq('round_number', currentRound)
+        .gt('strokes', 0)
         .gte('hole_number', 1)
         .order('hole_number', { ascending: true });
 
