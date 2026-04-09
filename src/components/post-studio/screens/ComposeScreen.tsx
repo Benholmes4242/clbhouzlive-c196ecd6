@@ -748,7 +748,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </div>}
     </>
   );
 
