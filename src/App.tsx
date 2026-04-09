@@ -790,6 +790,5 @@ function GlobalDebugOverlay() {
     </div>
   );
 }
-};
 
 export default App;
