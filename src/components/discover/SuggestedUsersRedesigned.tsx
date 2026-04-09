@@ -879,48 +879,29 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 </motion.div>
               </motion.button>
 
-              {/* Right: Follow Button - Accessible & Optimized */}
+              {/* Right: Follow Button - Discover pill style */}
               <motion.button
                 aria-label={`Follow ${user.displayName}`}
+                data-follow-button
                 onClick={handleFollowClick}
                 disabled={isFollowLoading || isDismissLoading || isTransitioning}
-                whileTap={{ scale: 0.98 }}
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
-                }}
+                whileTap={{ scale: 0.95 }}
                 transition={{ 
                   type: "spring", 
                   stiffness: 400, 
                   damping: 25,
                   duration: prefersReducedMotion ? 0.1 : 0.25
                 }}
-                className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
+                className="discover-pill discover-pill--active"
                 style={{
-                  // Smaller size: 28px instead of 36px
-                  width: '28px',
-                  height: '28px',
-                  minWidth: '28px',
-                  minHeight: '28px',
-                  background: 'hsl(var(--glass-dark) / 0.9)', 
-                  backdropFilter: 'blur(16px) saturate(1.2)',
-                  border: '1px solid hsl(var(--glass-border) / 0.4)',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                  minHeight: 32,
+                  padding: '6px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  gap: 4,
                 }}
               >
-                {/* Enhanced glow effects with performance optimization */}
-                <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-300 
-                             group-hover:bg-white/10 group-active:bg-white/15" />
-                <div className="absolute inset-0 bg-accent/10 rounded-full transition-all duration-300 
-                             group-hover:bg-accent/20 group-active:bg-accent/30" />
-                
-                {/* Icon with enhanced contrast */}
-                <div className="relative z-10 flex items-center justify-center w-full h-full">
-                  <FaThumbsUp 
-                    className="text-white text-base" 
-                    style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }}
-                  />
-                </div>
+                Follow
               </motion.button>
             </div>
           </motion.div>
