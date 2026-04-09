@@ -178,6 +178,13 @@ function LeaderHeroStrip({
   const p = leaderEntry.player;
   if (!p) return null;
 
+  const countryCode = p.country ?? '';
+  const flagEmoji = countryCode
+    ? countryCode.toUpperCase().replace(/./g, (c: string) =>
+        String.fromCodePoint(c.charCodeAt(0) + 127397)
+      )
+    : '';
+
   const fullName = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
   const effectiveTourCode = p.tour_codes?.[0] ?? tourSlug ?? 'pga';
   const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, p.headshot_override);
@@ -244,7 +251,7 @@ function LeaderHeroStrip({
             </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 2 }}>
-                🥇 Leader
+                🥇 Leader {flagEmoji && <span style={{ fontSize: 12 }}>{flagEmoji}</span>}
               </div>
               <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {fullName}
@@ -284,15 +291,13 @@ function LeaderHeroStrip({
               </div>
             )}
 
-            {derivedRound > 1 && (
-              <RoundHistoryPills
-                round1={leaderEntry.round_1}
-                round2={leaderEntry.round_2}
-                round3={leaderEntry.round_3}
-                round4={leaderEntry.round_4}
-                currentRound={derivedRound}
-              />
-            )}
+            <RoundHistoryPills
+              round1={leaderEntry.round_1}
+              round2={leaderEntry.round_2}
+              round3={leaderEntry.round_3}
+              round4={leaderEntry.round_4}
+              currentRound={derivedRound}
+            />
           </div>
         </div>
 
@@ -308,14 +313,6 @@ function LeaderHeroStrip({
         )}
       </div>
 
-      {/* ── In Contention separator ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
-        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.30)', flexShrink: 0 }}>
-          In Contention
-        </span>
-        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
-      </div>
     </div>
   );
 }

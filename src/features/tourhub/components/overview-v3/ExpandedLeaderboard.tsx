@@ -326,6 +326,19 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
 
   return (
     <>
+      {/* Column headers */}
+      <div style={{
+        display: 'flex', alignItems: 'center',
+        padding: '0 16px 6px',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        marginBottom: 2,
+      }}>
+        <span style={{ width: 22, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}></span>
+        <span style={{ flex: 1, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, paddingLeft: 44 }}>PLAYER</span>
+        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'right' }}>TOTAL</span>
+        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'right' }}>TODAY</span>
+        <span style={{ width: 40, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'right' }}>THRU</span>
+      </div>
       <div
         role="list"
         aria-label="Tournament leaderboard"
@@ -338,7 +351,7 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
           touchAction: 'pan-y',
-          paddingTop: 8,
+          paddingTop: 4,
         }}
         onScroll={handleScroll}
         onTouchStart={onTouchStart}
