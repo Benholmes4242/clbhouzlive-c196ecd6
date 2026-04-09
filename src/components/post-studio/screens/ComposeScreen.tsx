@@ -807,10 +807,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             flex: 1,
             minHeight: 0,
             display: 'flex',
+            alignItems: 'center',
             overflowX: 'auto',
             overflowY: 'hidden',
             scrollbarWidth: 'none',
-            gap: 6,
+            gap: 5,
             padding: '0 16px',
           }}>
             {state.mediaItems.map((item, i) => {
@@ -837,7 +838,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   style={{
                     position: 'relative',
                     flexShrink: 0,
-                    height: '100%',
+                    height: '80%',
                     aspectRatio: '1',
                     borderRadius: 12,
                     overflow: 'hidden',
@@ -957,7 +958,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => fileInputRef.current?.click()}
                 style={{
                   flexShrink: 0,
-                  height: '100%',
+                  height: '80%',
                   aspectRatio: '1',
                   borderRadius: 12,
                   background: 'rgba(255,255,255,0.04)',
