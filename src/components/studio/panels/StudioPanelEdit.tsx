@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { RotateCw, FlipHorizontal, FlipVertical } from 'lucide-react';
 import { Area } from 'react-easy-crop';
 import { StudioEdits, CropSettings } from '@/types/studio';
@@ -40,6 +40,12 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
     } : null
   );
   const [zoom, setZoom] = useState(edits?.crop?.zoom || 1);
+
+  useEffect(() => {
+    setRotation(edits?.rotate ?? 0);
+    setFlipH(edits?.flipH ?? false);
+    setFlipV(edits?.flipV ?? false);
+  }, [edits?.rotate, edits?.flipH, edits?.flipV]);
 
   const handleRotate = () => {
     const newRotation = (rotation + 90) % 360;

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { StudioEdits } from '@/types/studio';
 
 type StudioPanelLightProps = {
@@ -22,6 +22,16 @@ export default function StudioPanelLight({ edits, updateEdits }: StudioPanelLigh
     shadows: edits.shadows ?? 50,
     saturation: edits.saturation ?? 50,
   }));
+
+  useEffect(() => {
+    setValues({
+      exposure: edits.exposure ?? 50,
+      contrast: edits.contrast ?? 50,
+      highlights: edits.highlights ?? 50,
+      shadows: edits.shadows ?? 50,
+      saturation: edits.saturation ?? 50,
+    });
+  }, [edits.exposure, edits.contrast, edits.highlights, edits.shadows, edits.saturation]);
 
   const handleChange = useCallback((key: keyof typeof values, val: number) => {
     setValues(prev => ({ ...prev, [key]: val }));
