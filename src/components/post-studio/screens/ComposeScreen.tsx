@@ -3,9 +3,9 @@
 // Dark. Cinematic. Golf-native.
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+
 import {
-  Camera, Layers, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon, Clock, FileText,
+  Camera, Layers, AtSign, X, Pencil, Play, Plus, Clock, FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -22,7 +22,7 @@ import {
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
-import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+
 import { getFilterClass } from '@/utils/studioFilters';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
