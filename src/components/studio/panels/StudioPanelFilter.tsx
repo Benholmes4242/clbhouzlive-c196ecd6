@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, memo } from 'react';
+import { useState, useCallback, useRef, memo, useEffect } from 'react';
 import { StudioEdits, FilterId } from '@/types/studio';
 import { getFilterClass } from '@/utils/studioFilters';
 
@@ -119,6 +119,10 @@ export default function StudioPanelFilter({
   onCompareEnd,
 }: StudioPanelFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
+
+  useEffect(() => {
+    setSelectedFilter(edits?.filter || 'normal');
+  }, [edits?.filter]);
 
   const handleSelectFilter = useCallback((filterId: FilterId) => {
     setSelectedFilter(filterId);

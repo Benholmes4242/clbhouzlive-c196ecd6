@@ -328,7 +328,7 @@ export default function StudioShelf({
               <div
                 ref={canvasRef}
                 className="flex-1 relative flex items-center justify-center overflow-hidden min-h-0"
-                style={{ touchAction: 'none', margin: '12px 16px 0', position: 'relative' }}
+                style={{ touchAction: 'none', margin: '12px 16px 12px', position: 'relative' }}
               >
                 {/* Ambient glow */}
                 <div style={{
