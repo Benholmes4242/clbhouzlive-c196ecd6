@@ -523,7 +523,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
 
   // ── Shared caption + course tag block ──
-  const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false) => (
+  const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false, includeCourseTag = true) => (
     <>
       {/* Caption area */}
       <div className="px-4 relative">
