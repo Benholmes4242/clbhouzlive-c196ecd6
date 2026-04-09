@@ -712,9 +712,9 @@ function getTourSlug(tourName: string): string | null {
   const map: Record<string, string | null> = {
     'PGA': 'pga',
     'LPGA': 'lpga',
-    'EURO': 'eur',
-    'DP': 'eur',
-    'CHAMP': 'champions-tour',
+    'EURO': 'euro',
+    'DP': 'euro',
+    'CHAMP': 'champ',
     'PGAD': 'pgad',
     'LIV': null,
     'OLY': null,
@@ -729,9 +729,9 @@ function getTourSlugForTeeTimes(tourName: string): string | null {
   const map: Record<string, string | null> = {
     'PGA': 'pga',
     'LPGA': 'lpga',
-    'EURO': 'eur',
-    'DP': 'eur',
-    'CHAMP': 'champions-tour',
+    'EURO': 'euro',
+    'DP': 'euro',
+    'CHAMP': 'champ',
     'PGAD': 'pgad',
     'LIV': 'liv',
     'OLY': null,
@@ -898,6 +898,7 @@ async function syncLeaderboard(
       const rounds = roundsRaw.map((r: any) => ({
         thru: typeof r?.thru === 'number' ? r.thru : parseInt(String(r?.thru ?? ''), 10) || 0,
         strokes: typeof r?.strokes === 'number' ? r.strokes : parseInt(String(r?.strokes ?? ''), 10) || 0,
+        score: typeof r?.score === 'number' ? r.score : null,
       }));
 
       const activeRound = rounds.length > 0
@@ -924,10 +925,10 @@ async function syncLeaderboard(
         // Set thru_updated_at when we have a valid thru value
         thru_updated_at: derivedThru !== null && derivedThru > 0 ? new Date().toISOString() : null,
         // Only store round strokes when the round is complete (thru >= 18) and strokes > 0
-        round_1: rounds.length > 0 && rounds[0]?.thru >= 18 && rounds[0]?.strokes > 0 ? rounds[0]?.strokes : null,
-        round_2: rounds.length > 1 && rounds[1]?.thru >= 18 && rounds[1]?.strokes > 0 ? rounds[1]?.strokes : null,
-        round_3: rounds.length > 2 && rounds[2]?.thru >= 18 && rounds[2]?.strokes > 0 ? rounds[2]?.strokes : null,
-        round_4: rounds.length > 3 && rounds[3]?.thru >= 18 && rounds[3]?.strokes > 0 ? rounds[3]?.strokes : null,
+        round_1: rounds.length > 0 && rounds[0]?.thru >= 18 && rounds[0]?.strokes > 0 ? rounds[0]?.score : null,
+        round_2: rounds.length > 1 && rounds[1]?.thru >= 18 && rounds[1]?.strokes > 0 ? rounds[1]?.score : null,
+        round_3: rounds.length > 2 && rounds[2]?.thru >= 18 && rounds[2]?.strokes > 0 ? rounds[2]?.score : null,
+        round_4: rounds.length > 3 && rounds[3]?.thru >= 18 && rounds[3]?.strokes > 0 ? rounds[3]?.score : null,
         money: entry.money,
         points: entry.points,
         status: derivedStatus,
