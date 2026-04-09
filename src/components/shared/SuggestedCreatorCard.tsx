@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check, Users } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
@@ -140,17 +140,13 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
       }}>
         {creator.homeCourse && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 0,
+            <span style={{
+              fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap', maxWidth: 90,
               color: isDark ? 'rgba(255,255,255,0.50)' : 'hsl(var(--muted-foreground))',
             }}>
-              <Users className="w-[10px] h-[10px] shrink-0" />
-              <span style={{
-                fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap', maxWidth: 76,
-              }}>
-                {creator.homeCourse}
-              </span>
-            </div>
+              {creator.homeCourse}
+            </span>
             {creator.handicap != null && (
               <div style={{ width: 1, height: 10, background: isDark ? 'rgba(255,255,255,0.12)' : 'hsl(var(--border))', flexShrink: 0 }} />
             )}
