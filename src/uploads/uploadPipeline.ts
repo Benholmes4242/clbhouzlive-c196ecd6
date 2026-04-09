@@ -976,20 +976,8 @@ async function finalizePost(jobId: string, postId: string, job: any, uploadedStr
     }
   }
 
-  // Mark complete
+  // Mark complete (also emits upload:complete event)
   uploadManager.markComplete(jobId, postId);
-  
-  uploadEventBus.emit('upload:complete', {
-    type: 'upload:complete',
-    jobId,
-    postId,
-    actorType: job.actorType,
-    actorId: job.actorId,
-    isScheduled: !!job.scheduledAt,
-    scheduledAt: job.scheduledAt instanceof Date 
-      ? job.scheduledAt.toISOString() 
-      : job.scheduledAt || undefined,
-  });
 }
 
 /**
