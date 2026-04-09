@@ -98,11 +98,9 @@ export function OverviewPageV3() {
             onClick={() => openTourNav()}
             aria-label="Open tour menu"
           >
-            <Menu
-              className="w-[18px] h-[18px]"
-              strokeWidth={2}
-              style={{ color: '#FFFFFF' }}
-            />
+            {[0,1,2].map(i => (
+              <div key={i} style={{ width: 13, height: 1.5, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />
+            ))}
           </button>
         </motion.div>
 
