@@ -270,22 +270,24 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
         {formatScore(entry.score ?? null)}
       </span>
 
-      {/* Today (current round score) */}
-      <span style={{
-        width: 46,
-        textAlign: 'right',
-        flexShrink: 0,
-        fontSize: 13,
-        fontWeight: 600,
-        color: getScoreColor(
-          (entry[`round_${currentRound}` as keyof typeof entry] as number | null) ?? null
-        ),
-        fontVariantNumeric: 'tabular-nums',
-      }}>
-        {formatScore(
-          (entry[`round_${currentRound}` as keyof typeof entry] as number | null) ?? null
-        )}
-      </span>
+      {/* Today (current round score-to-par) */}
+      {(() => {
+        // round_N stores raw strokes, not to-par — only show today for R1 where total === today
+        const todayToPar = currentRound === 1 ? (entry.score ?? null) : null;
+        return (
+          <span style={{
+            width: 46,
+            textAlign: 'right',
+            flexShrink: 0,
+            fontSize: 13,
+            fontWeight: 600,
+            color: getScoreColor(todayToPar),
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {formatScore(todayToPar)}
+          </span>
+        );
+      })()}
 
       {/* Thru */}
       <span style={{
