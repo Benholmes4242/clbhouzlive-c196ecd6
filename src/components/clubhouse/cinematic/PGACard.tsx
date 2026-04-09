@@ -49,6 +49,12 @@ const SQUIRCLE_RADIUS = '34%';
 const ACCENT = '#E8980A';
 const ACCENT_LIGHT = '#F59E0B';
 
+const MAJOR_KEYWORDS = ['masters tournament', 'the open championship', 'u.s. open', 'us open', 'pga championship'];
+const isMajorTournament = (name: string) => {
+  const lower = name.toLowerCase();
+  return MAJOR_KEYWORDS.some(k => lower.includes(k));
+};
+
 // ── Stat Tile (live state) ──
 const StatTile: React.FC<{ label: string; value: number; color: string }> = ({ label, value, color }) => (
   <div className="flex-1 text-center">
