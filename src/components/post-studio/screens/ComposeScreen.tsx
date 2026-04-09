@@ -1124,6 +1124,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           clearEdits={handleClearEdits}
           activeOverlayId={activeOverlayId}
           onSelectOverlay={setActiveOverlayId}
+          allMediaItems={state.mediaItems.map(m => ({
+            id: m.id,
+            mediaType: m.mediaType,
+            previewUrl: m.previewUrl,
+            thumbnailUrl: m.thumbnailUrl,
+          }))}
+          activeMediaIndex={state.activeMediaIndex}
+          onNavigateMedia={(index) => setActiveMedia(index)}
+          trimStart={activeItem.trimStart || 0}
+          trimEnd={activeItem.trimEnd ?? activeItem.duration ?? 0}
+          duration={activeItem.duration ?? 0}
+          onTrimChange={(start, end) => {
+            const { updateTrim } = usePostStudioContext();
+            updateTrim(activeItem.id, start, end);
+          }}
         />
       )}
 
