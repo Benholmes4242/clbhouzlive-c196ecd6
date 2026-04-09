@@ -708,7 +708,22 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             onTouchStart={(e) => { onCardTouchStart(e); }}
             onTouchMove={(e) => { onCardTouchMove(e); }}
             onTouchEnd={(e) => { onCardTouchEnd(e); }}
-            style={{ 
+            style={isLive ? {
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              borderRadius: 0,
+              background: 'transparent',
+              border: 'none',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
+              boxShadow: 'none',
+              padding: 0,
+              overflow: 'hidden',
+              zIndex: 20,
+              pointerEvents: 'auto' as const,
+              display: 'flex',
+              flexDirection: 'column' as const,
+            } : {
               position: 'absolute',
               bottom: isExpanded ? 16 : 20,
               left: isExpanded ? 12 : 16,
