@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface ClaimCourseCTAProps {
   clubId: string;
@@ -32,14 +31,13 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
         <p className="text-sm text-muted-foreground mb-4">
           Claim this course to respond to reviews, update information, and access insights.
         </p>
-        <Button
+        <button
           onClick={handleClaim}
-          className="h-9 px-6 font-semibold active:scale-[0.97] transition-all"
-          variant="ghost"
-          style={{ borderRadius: 10, background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))', border: 'none' }}
+          className="discover-pill discover-pill--active active:scale-[0.97] transition-all"
+          style={{ fontSize: 14, fontWeight: 600 }}
         >
           Claim this course →
-        </Button>
+        </button>
       </div>
     </section>
   );
