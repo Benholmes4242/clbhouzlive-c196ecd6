@@ -819,11 +819,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <motion.div
                   key={item.id}
                   onTap={() => setActiveMedia(i)}
+                  onLongPress={() => handleSetCover(i)}
                   style={{
                     position: 'relative',
                     flexShrink: 0,
-                    width: 'calc(100vh - 279px)',
-                    height: '100%',
+                    width: 160,
+                    height: 160,
                     borderRadius: 12,
                     overflow: 'hidden',
                     outline: isActive ? '2.5px solid #F7931E' : '2.5px solid transparent',
