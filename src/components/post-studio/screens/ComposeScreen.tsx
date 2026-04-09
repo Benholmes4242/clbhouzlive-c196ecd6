@@ -313,6 +313,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFiredRef = useRef(false);
 
 
   const hasMedia = state.mediaItems.length > 0;
