@@ -892,7 +892,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   damping: 25,
                   duration: prefersReducedMotion ? 0.1 : 0.25
                 }}
-                className="discover-pill discover-pill--active"
+                className="discover-pill"
                 style={{
                   minHeight: 32,
                   padding: '6px 16px',
