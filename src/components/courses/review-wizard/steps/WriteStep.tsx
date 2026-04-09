@@ -168,7 +168,7 @@ export function WriteStep({
   onReviewChange,
   onTagsChange,
 }: WriteStepProps) {
-  console.log('[WriteStep] render - title prop:', title);
+  
   const reviewLength = countGraphemes(review);
   const titleLength = countGraphemes(title);
   const [isTitleFocused, setIsTitleFocused] = useState(false);

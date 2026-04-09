@@ -191,7 +191,6 @@ export function useReviewWizard({
 
   // Wizard state
   const [state, setState] = useState<WizardState>(() => {
-    console.log('[EditMode] useState init - isEditMode:', isEditMode, 'title:', existingRating?.title, 'existingRating:', existingRating);
     if (isEditMode && existingRating) {
       return {
         ...INITIAL_STATE,
@@ -211,7 +210,7 @@ export function useReviewWizard({
 
   // Initialize state when existingRating loads asynchronously (handles race condition)
   useEffect(() => {
-    console.log('[EditMode] useEffect init - isEditMode:', isEditMode, 'hasInitialized:', hasInitializedFromExisting.current, 'title:', existingRating?.title);
+    
     if (isEditMode && existingRating && !hasInitializedFromExisting.current) {
       hasInitializedFromExisting.current = true;
       
@@ -228,7 +227,7 @@ export function useReviewWizard({
         review: existingRating.review || '',
       }));
       
-      console.log('[useReviewWizard] Initialized edit mode with existing rating:', existingRating.rating);
+      
     }
   }, [isEditMode, existingRating]);
 

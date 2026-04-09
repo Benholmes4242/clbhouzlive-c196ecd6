@@ -22,7 +22,7 @@ export function useUserCourseRating(courseId: string | undefined, userId: string
 
       const { data, error } = await supabase
         .from('course_ratings')
-        .select('id, rating, review, design_score, condition_score, clubhouse_score, facilities_score, created_at, updated_at')
+        .select('id, rating, title, review, design_score, condition_score, clubhouse_score, facilities_score, created_at, updated_at')
         .eq('course_id', courseId)
         .eq('user_id', userId)
         .maybeSingle();
