@@ -72,6 +72,22 @@ function getStartLabel(date: string): string {
   return format(startDate, 'MMM d');
 }
 
+const COUNTRY_TO_FLAG: Record<string, string> = {
+  'UNITED STATES': '🇺🇸', 'ENGLAND': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'NORTHERN IRELAND': '🇬🇧',
+  'SCOTLAND': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'WALES': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'IRELAND': '🇮🇪',
+  'AUSTRALIA': '🇦🇺', 'CANADA': '🇨🇦', 'JAPAN': '🇯🇵', 'SOUTH AFRICA': '🇿🇦',
+  'SPAIN': '🇪🇸', 'GERMANY': '🇩🇪', 'FRANCE': '🇫🇷', 'SWEDEN': '🇸🇪',
+  'NORWAY': '🇳🇴', 'DENMARK': '🇩🇰', 'SOUTH KOREA': '🇰🇷', 'CHINA': '🇨🇳',
+  'THAILAND': '🇹🇭', 'NEW ZEALAND': '🇳🇿', 'ARGENTINA': '🇦🇷', 'COLOMBIA': '🇨🇴',
+  'CHILE': '🇨🇱', 'ITALY': '🇮🇹', 'BELGIUM': '🇧🇪', 'AUSTRIA': '🇦🇹',
+  'SWITZERLAND': '🇨🇭', 'NETHERLANDS': '🇳🇱', 'CZECH REPUBLIC': '🇨🇿', 'ZIMBABWE': '🇿🇼',
+  'INDIA': '🇮🇳', 'FINLAND': '🇫🇮', 'CHINESE TAIPEI': '🇹🇼', 'VENEZUELA': '🇻🇪',
+  'MEXICO': '🇲🇽', 'BRAZIL': '🇧🇷', 'PARAGUAY': '🇵🇾', 'PHILIPPINES': '🇵🇭',
+  'MALAYSIA': '🇲🇾', 'SINGAPORE': '🇸🇬', 'NAMIBIA': '🇳🇦', 'PORTUGAL': '🇵🇹',
+  'POLAND': '🇵🇱', 'GREECE': '🇬🇷', 'TURKEY': '🇹🇷', 'FIJI': '🇫🇯',
+  'TRINIDAD AND TOBAGO': '🇹🇹', 'JAMAICA': '🇯🇲', 'BAHAMAS': '🇧🇸',
+};
+
 function getScoreClass(score: number): string {
   if (score < 0) return 'score-under';
   if (score > 0) return 'score-over';
@@ -178,10 +194,7 @@ function LeaderHeroStrip({
   const p = leaderEntry.player;
   if (!p) return null;
 
-  const countryCode = (p.country ?? '').trim().toUpperCase();
-  const flagEmoji = countryCode.length === 2
-    ? String.fromCodePoint(...countryCode.split('').map((c: string) => c.charCodeAt(0) + 127397))
-    : '';
+  const flagEmoji = COUNTRY_TO_FLAG[(p.country ?? '').toUpperCase()] ?? '';
 
   const fullName = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
   const effectiveTourCode = p.tour_codes?.[0] ?? tourSlug ?? 'pga';
@@ -249,7 +262,7 @@ function LeaderHeroStrip({
             </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 2 }}>
-                🥇 Leader {flagEmoji && <span style={{ fontSize: 12 }}>{flagEmoji}</span>}
+                🥇 Leader{flagEmoji ? ` · ${flagEmoji}` : ''}
               </div>
               <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {fullName}
@@ -289,13 +302,15 @@ function LeaderHeroStrip({
               </div>
             )}
 
-            <RoundHistoryPills
-              round1={leaderEntry.round_1}
-              round2={leaderEntry.round_2}
-              round3={leaderEntry.round_3}
-              round4={leaderEntry.round_4}
-              currentRound={derivedRound}
-            />
+            <div style={{ alignSelf: 'stretch' }}>
+              <RoundHistoryPills
+                round1={leaderEntry.round_1}
+                round2={leaderEntry.round_2}
+                round3={leaderEntry.round_3}
+                round4={leaderEntry.round_4}
+                currentRound={derivedRound}
+              />
+            </div>
           </div>
         </div>
 
