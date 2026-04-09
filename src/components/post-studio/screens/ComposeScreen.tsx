@@ -807,10 +807,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             flex: 1,
             minHeight: 0,
             display: 'flex',
+            alignItems: 'center',
             overflowX: 'auto',
             overflowY: 'hidden',
             scrollbarWidth: 'none',
-            gap: 6,
+            gap: 5,
             padding: '0 16px',
           }}>
             {state.mediaItems.map((item, i) => {
