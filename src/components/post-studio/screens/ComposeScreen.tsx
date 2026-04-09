@@ -838,7 +838,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   style={{
                     position: 'relative',
                     flexShrink: 0,
-                    height: '100%',
+                    height: '80%',
                     aspectRatio: '1',
                     borderRadius: 12,
                     overflow: 'hidden',
@@ -958,7 +958,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => fileInputRef.current?.click()}
                 style={{
                   flexShrink: 0,
-                  height: '100%',
+                  height: '80%',
                   aspectRatio: '1',
                   borderRadius: 12,
                   background: 'rgba(255,255,255,0.04)',
