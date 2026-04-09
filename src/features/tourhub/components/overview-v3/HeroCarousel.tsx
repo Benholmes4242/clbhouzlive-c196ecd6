@@ -178,11 +178,9 @@ function LeaderHeroStrip({
   const p = leaderEntry.player;
   if (!p) return null;
 
-  const countryCode = p.country ?? '';
-  const flagEmoji = countryCode
-    ? countryCode.toUpperCase().replace(/./g, (c: string) =>
-        String.fromCodePoint(c.charCodeAt(0) + 127397)
-      )
+  const countryCode = (p.country ?? '').trim().toUpperCase();
+  const flagEmoji = countryCode.length === 2
+    ? String.fromCodePoint(...countryCode.split('').map((c: string) => c.charCodeAt(0) + 127397))
     : '';
 
   const fullName = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
