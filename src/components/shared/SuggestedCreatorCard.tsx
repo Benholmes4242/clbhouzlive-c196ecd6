@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check } from 'lucide-react';
+import { Check, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
@@ -60,11 +60,9 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
             follower_id: currentUserId,
             following_id: creator.userId,
           });
-          // Animate out after 1200ms
           onFollowed?.(creator.userId);
           setTimeout(() => setRemoving(true), 1200);
         }
-        // Optimistically remove followed user from cache, then background refetch
         queryClient.setQueryData(
           ['suggested-creators', currentUserId],
           (old: SuggestedCreator[] | undefined) =>
@@ -80,7 +78,6 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
     [busy, following, creator.userId, currentUserId, queryClient, onFollowed],
   );
 
-  // After removing animation completes, hide card
   useEffect(() => {
     if (removing) {
       const t = setTimeout(() => setRemoved(true), 350);
@@ -96,19 +93,15 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
     <div
       className="flex-shrink-0 flex flex-col items-center"
       style={{
-        width: 120,
+        width: 150,
         scrollSnapAlign: 'start',
         overflow: 'hidden',
         transition: removing ? 'width 350ms ease, opacity 350ms ease' : undefined,
         ...(removing ? { width: 0, opacity: 0 } : {}),
       }}
     >
-      {/* Avatar — SquircleAvatar for consistent shape across all surfaces */}
-      <div
-        onClick={handleProfileTap}
-        className="cursor-pointer relative"
-        style={{ width: 88, flexShrink: 0 }}
-      >
+      {/* Avatar */}
+      <div onClick={handleProfileTap} className="cursor-pointer relative" style={{ width: 88, flexShrink: 0 }}>
         <SquircleAvatar
           size={88}
           src={creator.avatarUrl}
@@ -117,94 +110,64 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           ringColor="rgba(245, 158, 11, 0.85)"
           hideRing={false}
         />
-
-        {/* Verified badge */}
         {creator.isVerified && (
-          <div
-            className="flex items-center justify-center"
-            style={{
-              position: 'absolute',
-              bottom: -2,
-              right: -2,
-              width: 18,
-              height: 18,
-              borderRadius: '50%',
-              background: '#D97706',
-              border: isDark ? '2px solid #000' : '2px solid hsl(var(--background))',
-              zIndex: 2,
-            }}
-          >
+          <div className="flex items-center justify-center" style={{
+            position: 'absolute', bottom: -2, right: -2,
+            width: 18, height: 18, borderRadius: '50%',
+            background: '#D97706',
+            border: isDark ? '2px solid #000' : '2px solid hsl(var(--background))',
+            zIndex: 2,
+          }}>
             <Check className="text-white" style={{ width: 10, height: 10 }} strokeWidth={3} />
           </div>
         )}
       </div>
 
-      {/* Name — two lines, fixed height so buttons align */}
-      <div
-        onClick={handleProfileTap}
-        className="text-center cursor-pointer"
-        style={{ maxWidth: 108, marginTop: 8, height: 33, overflow: 'hidden' }}
-      >
-        <p
-          className="truncate"
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: isDark ? '#ffffff' : 'hsl(var(--foreground))',
-            lineHeight: '16px',
-          }}
-        >
-          {splitName(creator.displayName).first}
+      {/* Full name */}
+      <div onClick={handleProfileTap} className="cursor-pointer text-center" style={{ marginTop: 8, width: '100%' }}>
+        <p className="truncate" style={{
+          fontSize: 13, fontWeight: 600, lineHeight: '16px',
+          color: isDark ? '#ffffff' : 'hsl(var(--foreground))',
+        }}>
+          {creator.displayName}
         </p>
-        {splitName(creator.displayName).last && (
-          <p
-            className="truncate"
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: isDark ? '#ffffff' : 'hsl(var(--foreground))',
-              lineHeight: '16px',
-              marginTop: 1,
-            }}
-          >
-            {splitName(creator.displayName).last}
-          </p>
-        )}
       </div>
 
-      {/* Stat pill + home club — fixed height so Follow button stays aligned */}
-      <div style={{ height: 36, marginTop: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
-        {creator.handicap != null && (
-          <div
-            className="flex items-center justify-center rounded-full"
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              padding: '3px 10px',
-              lineHeight: '1',
-              borderRadius: 9999,
-              ...(isDark
-                ? { background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }
-                : { background: '#FEF3C7', color: '#92400E' }),
-            }}
-          >
-            {`HCP ${creator.handicap}`}
-          </div>
-        )}
+      {/* Club + divider + HCP on one row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: 5, marginTop: 5, width: '100%',
+      }}>
         {creator.homeCourse && (
-          <p
-            className="text-center truncate"
-            style={{
-              fontSize: 11,
-              fontWeight: 400,
-              color: isDark ? 'rgba(255,255,255,0.5)' : 'hsl(var(--muted-foreground))',
-              maxWidth: 108,
-              marginTop: 2,
-              lineHeight: '14px',
-            }}
-          >
-            {creator.homeCourse}
-          </p>
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 0,
+              color: isDark ? 'rgba(255,255,255,0.50)' : 'hsl(var(--muted-foreground))',
+            }}>
+              <Users className="w-[10px] h-[10px] shrink-0" />
+              <span style={{
+                fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap', maxWidth: 76,
+              }}>
+                {creator.homeCourse}
+              </span>
+            </div>
+            {creator.handicap != null && (
+              <div style={{ width: 1, height: 10, background: isDark ? 'rgba(255,255,255,0.12)' : 'hsl(var(--border))', flexShrink: 0 }} />
+            )}
+          </>
+        )}
+        {creator.handicap != null && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center',
+            fontSize: 9, fontWeight: 700, lineHeight: 1.4,
+            padding: '2px 6px', borderRadius: 999,
+            whiteSpace: 'nowrap',
+            ...(isDark
+              ? { background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }
+              : { background: '#FEF3C7', color: '#92400E' }),
+          }}>
+            HCP {creator.handicap}
+          </div>
         )}
       </div>
 
@@ -213,19 +176,17 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         onClick={handleFollow}
         className="active:scale-[0.96]"
         style={{
-          width: 108,
-          height: 34,
-          borderRadius: 10,
-          fontSize: following ? 10 : 12,
-          fontWeight: 600,
-          marginTop: 8,
-          cursor: 'pointer',
+          width: 138, height: 34, borderRadius: 10,
+          fontSize: following ? 10 : 12, fontWeight: 600,
+          marginTop: 10, cursor: 'pointer',
           transition: 'transform 100ms ease',
           ...(following
             ? isDark
               ? { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', border: 'none' }
               : { background: 'transparent', color: 'hsl(var(--muted-foreground))', border: '1px solid hsl(var(--border))' }
-            : { background: 'rgba(247,147,30,0.10)', color: '#F7931E', border: '1px solid rgba(247,147,30,0.25)' }),
+            : isDark
+              ? { background: '#ffffff', color: '#000000', border: 'none' }
+              : { background: 'hsl(var(--foreground))', color: 'hsl(var(--background))', border: 'none' }),
         }}
       >
         {following ? 'Following' : 'Follow'}
@@ -236,7 +197,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
 
 /** Shimmer placeholder for loading state */
 export const SuggestedCreatorCardShimmer: React.FC = () => (
-  <div className="flex-shrink-0 flex flex-col items-center" style={{ width: 120, gap: 8 }}>
+  <div className="flex-shrink-0 flex flex-col items-center" style={{ width: 150, gap: 8 }}>
     <div
       className="animate-[shimmer_1.5s_infinite]"
       style={{
@@ -250,7 +211,7 @@ export const SuggestedCreatorCardShimmer: React.FC = () => (
     <div
       className="rounded animate-[shimmer_1.5s_infinite]"
       style={{
-        width: 64,
+        width: 90,
         height: 12,
         background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
         backgroundSize: '200% 100%',
