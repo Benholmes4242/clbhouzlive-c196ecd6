@@ -457,7 +457,8 @@ export const PGACard: React.FC<PGACardProps> = ({
             pointerEvents: 'none',
           }} />
 
-          {/* Tour badge — top left */}
+          {/* Tour badge — top left (hidden for majors) */}
+          {!isMajorTournament(cd.tournamentName) && (
           <div style={{
             position: 'absolute', top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 12,
             display: 'flex', alignItems: 'center', gap: 6,
@@ -472,6 +473,14 @@ export const PGACard: React.FC<PGACardProps> = ({
             }}>
               PGA TOUR
             </span>
+            <span style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
+              color: 'rgba(255,255,255,0.5)',
+            }}>
+              FINAL
+            </span>
+          </div>
+          )}
             <span style={{
               fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
               color: 'rgba(255,255,255,0.5)',
