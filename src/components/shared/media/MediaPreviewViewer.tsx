@@ -31,6 +31,13 @@ export function MediaPreviewViewer({
     resetZoom();
   }, [currentIndex, resetZoom]);
 
+  // Signal pages to re-apply status bar when viewer unmounts
+  useEffect(() => {
+    return () => {
+      window.dispatchEvent(new CustomEvent('media-viewer-closed'));
+    };
+  }, []);
+
   if (!item) return null;
 
   return (
