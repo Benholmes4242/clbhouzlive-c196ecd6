@@ -892,13 +892,13 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   damping: 25,
                   duration: prefersReducedMotion ? 0.1 : 0.25
                 }}
-                className="discover-pill"
+                className=""
                 style={{
-                  minHeight: 32,
-                  padding: '6px 16px',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  gap: 4,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '6px 16px', borderRadius: 999, minHeight: 32,
+                  background: 'rgba(247,147,30,0.10)',
+                  border: '1px solid rgba(247,147,30,0.25)',
+                  color: '#F7931E', fontSize: 13, fontWeight: 600,
                 }}
               >
                 Follow

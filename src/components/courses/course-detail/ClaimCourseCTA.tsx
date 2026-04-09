@@ -33,8 +33,14 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
         </p>
         <button
           onClick={handleClaim}
-          className="discover-pill active:scale-[0.97] transition-all"
-          style={{ fontSize: 14, fontWeight: 600 }}
+          className="active:scale-[0.97] transition-all"
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: '10px 24px', borderRadius: 999,
+            background: 'rgba(247,147,30,0.10)',
+            border: '1px solid rgba(247,147,30,0.25)',
+            color: '#F7931E', fontSize: 14, fontWeight: 600,
+          }}
         >
           Claim this course →
         </button>
