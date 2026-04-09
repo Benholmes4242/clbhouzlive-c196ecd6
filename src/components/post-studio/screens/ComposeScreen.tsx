@@ -1148,9 +1148,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
               {/* Button row */}
               <div className="shrink-0" style={{
-                display: 'grid',
-                gridTemplateColumns: trayIndex !== coverIndex ? 'repeat(4,1fr)' : 'repeat(3,1fr)',
-                gap: 4,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                width: '100%',
                 padding: '4px 8px 0',
               }}>
                 {/* Cover */}
@@ -1158,11 +1159,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setCoverIndex(trayIndex)}
-                    className="flex flex-col items-center justify-center"
-                    style={{ background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.25)', borderRadius: 8, padding: '6px 0' }}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                      justifyContent: 'center', gap: 5, flex: 1, height: 54,
+                      borderRadius: 14, cursor: 'pointer',
+                      background: 'rgba(247,147,30,0.10)',
+                      border: '1px solid rgba(247,147,30,0.22)',
+                    }}
                   >
                     <ImageIcon className="w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2} />
-                    <span style={{ fontSize: 8, fontWeight: 600, color: '#F7931E', marginTop: 2 }}>Cover</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: '#F7931E', letterSpacing: '0.02em' }}>Cover</span>
                   </motion.button>
                 )}
 
@@ -1170,11 +1176,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setTrayIndex(null); handleEdit(trayIndex); }}
-                  className="flex flex-col items-center justify-center"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 0' }}
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    justifyContent: 'center', gap: 5, flex: 1, height: 54,
+                    borderRadius: 14, cursor: 'pointer',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}
                 >
-                  <Pencil className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
-                  <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.70)', marginTop: 2 }}>Edit</span>
+                  <Pencil className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
+                  <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.02em' }}>Edit</span>
                 </motion.button>
 
                 {/* Trim */}
@@ -1188,18 +1199,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     }
                   }}
                   disabled={trayItem.mediaType !== 'video'}
-                  className="flex flex-col items-center justify-center"
                   style={{
-                    background: 'rgba(255,255,255,0.05)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    justifyContent: 'center', gap: 5, flex: 1, height: 54,
+                    borderRadius: 14, cursor: 'pointer',
+                    background: 'rgba(255,255,255,0.06)',
                     border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: 8,
-                    padding: '6px 0',
                     opacity: trayItem.mediaType !== 'video' ? 0.4 : 1,
                   }}
                 >
-                  <Scissors className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
-                  <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.70)', marginTop: 2 }}>Trim</span>
+                  <Scissors className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
+                  <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.02em' }}>Trim</span>
                 </motion.button>
+
+                {/* Separator */}
+                <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
 
                 {/* Remove */}
                 <motion.button
@@ -1210,11 +1224,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     removeMedia(id);
                     if (coverIndex >= state.mediaItems.length - 1) setCoverIndex(Math.max(0, state.mediaItems.length - 2));
                   }}
-                  className="flex flex-col items-center justify-center"
-                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 8, padding: '6px 0' }}
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    justifyContent: 'center', gap: 5, flex: 1, height: 54,
+                    borderRadius: 14, cursor: 'pointer',
+                    background: 'rgba(239,68,68,0.08)',
+                    border: '1px solid rgba(239,68,68,0.18)',
+                  }}
                 >
                   <X className="w-4 h-4" style={{ color: 'rgba(239,68,68,0.70)' }} strokeWidth={2} />
-                  <span style={{ fontSize: 8, fontWeight: 600, color: 'rgba(239,68,68,0.70)', marginTop: 2 }}>Remove</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(239,68,68,0.70)', letterSpacing: '0.02em' }}>Remove</span>
                 </motion.button>
               </div>
             </div>
