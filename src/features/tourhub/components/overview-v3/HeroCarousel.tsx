@@ -270,17 +270,6 @@ function LeaderHeroStrip({
         </div>
       </div>
 
-      {/* Stat strip */}
-      {statsToShow.length > 0 && (
-        <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
-          {statsToShow.map(stat => (
-            <div key={stat.label} style={{ flex: 1, textAlign: 'center', padding: '6px 2px 5px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-              <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 3 }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* Hole-by-hole dots with sparkline */}
       {holeScores.length > 0 && (
@@ -652,32 +641,52 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           scale: { duration: 5, ease: 'linear' }
         }}
       >
-        {hasRealImage ? (
+        {hasRealImage && !isLive ? (
           <img
             src={backgroundImage}
             alt={tournament.venueName || tournament.name}
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
-          <div className={cn("absolute inset-0 w-full h-full bg-gradient-to-br", bgGradient)}>
-            <div 
-              className="absolute inset-0 opacity-10"
-              style={{
-                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-              }}
-            />
+          <div
+            className="absolute inset-0 w-full h-full"
+            style={{
+              background: isLive
+                ? `radial-gradient(ellipse 120% 55% at 50% 25%, #2d5a1e 0%, #1a3a0e 45%, #0a1a05 100%)`
+                : undefined,
+            }}
+          >
+            {!isLive && (
+              <div className={cn("absolute inset-0 w-full h-full bg-gradient-to-br", bgGradient)} />
+            )}
           </div>
         )}
       </motion.div>
+
+      {/* Sky tint overlay for live */}
+      {isLive && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '38%',
+          background: 'linear-gradient(180deg, #4a7ab5 0%, #2a5a8e 35%, transparent 100%)',
+          opacity: 0.55,
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}/>
+      )}
 
       {/* Legibility gradient overlay */}
       <div 
         className="absolute inset-0 pointer-events-none z-5"
         style={{
-          background: `
-            linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
-            linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)
-          `,
+          background: isLive
+            ? `linear-gradient(180deg,
+                rgba(0,0,0,0.55) 0%,
+                rgba(0,0,0,0.30) 20%,
+                rgba(0,0,0,0.70) 45%,
+                rgba(0,0,0,0.92) 65%,
+                rgba(0,0,0,0.97) 100%)`
+            : `linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
+               linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)`,
         }}
       />
 
