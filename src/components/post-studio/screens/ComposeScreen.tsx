@@ -635,121 +635,125 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
       {/* Course tag */}
       {includeCourseTag && renderCourseTag()}
-        <AnimatePresence mode="wait">
-          {state.taggedCourses.length === 0 ? (
-            <motion.button
-              key="prompt"
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.18 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => openPanel('course')}
-              className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
-              style={{
-                background: 'rgba(34,197,94,0.08)',
-                border: '1px solid rgba(34,197,94,0.18)',
-              }}
-            >
-              <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.22)' }}
-              >
-                <span className="text-base">⛳</span>
-              </div>
-              <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
-                Tag where you played
-              </span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
-                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </motion.button>
-          ) : (
-            <motion.div
-              key="tagged"
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-col gap-1.5 py-1"
-            >
-              {state.taggedCourses.map((course, i) => (
-                <motion.button
-                  key={course.courseId}
-                  layout
-                  initial={{ scale: 0.85, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.85, opacity: 0 }}
-                  onClick={() => openPanel('course')}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
-                  style={{
-                    background: 'rgba(34,197,94,0.08)',
-                    border: '1px solid rgba(34,197,94,0.18)',
-                  }}
-                >
-                  <div style={{
-                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                    background: 'rgba(34,197,94,0.12)',
-                    border: '1px solid rgba(34,197,94,0.20)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: state.taggedCourses.length > 1 ? 13 : 14,
-                    fontWeight: 700,
-                    color: state.taggedCourses.length > 1 ? 'rgba(34,197,94,0.80)' : undefined,
-                  }}>
-                    {state.taggedCourses.length > 1 ? i + 1 : '⛳'}
-                  </div>
-                  <div className="text-left flex-1">
-                    <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
-                      {course.courseName}
-                    </p>
-                    {course.country && (
-                      <p className="text-[10px] mt-0.5 leading-none" style={{ color: DARK_TEXT3 }}>
-                        {course.region ? `${course.region}, ${course.country}` : course.country}
-                      </p>
-                    )}
-                  </div>
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
-                    }}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
-                    className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                    style={{ background: 'rgba(255,255,255,0.08)' }}
-                  >
-                    <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
-                  </div>
-                </motion.button>
-              ))}
-              {state.taggedCourses.length < 5 && (
-                <motion.button
-                  layout
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => openPanel('course')}
-                  className="flex items-center gap-2"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '7px 12px',
-                    borderRadius: 12,
-                    border: '1.5px dashed rgba(34,197,94,0.18)',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span style={{ fontSize: 14 }}>⛳</span>
-                  <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
-                    Add course
-                  </span>
-                </motion.button>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>}
     </>
+  );
+
+  const renderCourseTag = () => (
+    <div className="px-4 mt-3 mb-3">
+      <AnimatePresence mode="wait">
+        {state.taggedCourses.length === 0 ? (
+          <motion.button
+            key="prompt"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => openPanel('course')}
+            className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
+            style={{
+              background: 'rgba(34,197,94,0.08)',
+              border: '1px solid rgba(34,197,94,0.18)',
+            }}
+          >
+            <div
+              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.22)' }}
+            >
+              <span className="text-base">⛳</span>
+            </div>
+            <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
+              Tag where you played
+            </span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
+              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </motion.button>
+        ) : (
+          <motion.div
+            key="tagged"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18 }}
+            className="flex flex-col gap-1.5 py-1"
+          >
+            {state.taggedCourses.map((course, i) => (
+              <motion.button
+                key={course.courseId}
+                layout
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.85, opacity: 0 }}
+                onClick={() => openPanel('course')}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
+                style={{
+                  background: 'rgba(34,197,94,0.08)',
+                  border: '1px solid rgba(34,197,94,0.18)',
+                }}
+              >
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                  background: 'rgba(34,197,94,0.12)',
+                  border: '1px solid rgba(34,197,94,0.20)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: state.taggedCourses.length > 1 ? 13 : 14,
+                  fontWeight: 700,
+                  color: state.taggedCourses.length > 1 ? 'rgba(34,197,94,0.80)' : undefined,
+                }}>
+                  {state.taggedCourses.length > 1 ? i + 1 : '⛳'}
+                </div>
+                <div className="text-left flex-1">
+                  <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
+                    {course.courseName}
+                  </p>
+                  {course.country && (
+                    <p className="text-[10px] mt-0.5 leading-none" style={{ color: DARK_TEXT3 }}>
+                      {course.region ? `${course.region}, ${course.country}` : course.country}
+                    </p>
+                  )}
+                </div>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
+                  }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
+                  className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
+                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                >
+                  <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
+                </div>
+              </motion.button>
+            ))}
+            {state.taggedCourses.length < 5 && (
+              <motion.button
+                layout
+                whileTap={{ scale: 0.95 }}
+                onClick={() => openPanel('course')}
+                className="flex items-center gap-2"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '7px 12px',
+                  borderRadius: 12,
+                  border: '1.5px dashed rgba(34,197,94,0.18)',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 14 }}>⛳</span>
+                <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
+                  Add course
+                </span>
+              </motion.button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 
   return (
