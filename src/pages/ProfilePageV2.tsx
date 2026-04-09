@@ -116,8 +116,15 @@ const ProfilePageV2Content: React.FC = () => {
   
   // Hide global header for full-bleed immersive profile
   useHideHeader();
+  // Re-apply status bar when returning from fullscreen media viewer
+  const [statusBarKey, setStatusBarKey] = useState(0);
+  useEffect(() => {
+    const handler = () => setStatusBarKey(k => k + 1);
+    window.addEventListener('media-viewer-closed', handler);
+    return () => window.removeEventListener('media-viewer-closed', handler);
+  }, []);
   // Transparent status bar for immersive hero bleed into safe area
-  useMedianStatusBar("dark", "transparent", true, false);
+  useMedianStatusBar("dark", "transparent", true, false, true, statusBarKey);
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   // Resolve profileUserId — cached query for username routes, synchronous for own profile
