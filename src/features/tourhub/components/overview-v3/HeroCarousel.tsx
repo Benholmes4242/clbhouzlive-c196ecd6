@@ -892,7 +892,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                               {(() => {
                                 const leaderEntry = (fullLeaderboard as any[]).find(e => e.position === 1);
                                 if (!leaderEntry) return null;
-                                return <LeaderHeroStrip leaderEntry={leaderEntry} tourSlug={tournament.tourSlug} leaderStats={leaderStats} />;
+                                const currentRound = [4,3,2,1].find(n => leaderEntry[`round_${n}`] !== null) ?? 1;
+                                return (
+                                  <LeaderHeroStrip
+                                    leaderEntry={leaderEntry}
+                                    tourSlug={tournament.tourSlug}
+                                    leaderStats={leaderStats}
+                                    tournamentId={tournament.id}
+                                    currentRound={currentRound}
+                                  />
+                                );
                               })()}
                               <ExpandedLeaderboardList
                                 entries={fullLeaderboard}
