@@ -946,8 +946,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => fileInputRef.current?.click()}
                 style={{
                   flexShrink: 0,
-                  width: 'calc(100vh - 279px)',
-                  height: '100%',
+                  width: 160,
+                  height: 160,
                   borderRadius: 12,
                   background: 'rgba(255,255,255,0.04)',
                   border: '1.5px dashed rgba(255,255,255,0.12)',
