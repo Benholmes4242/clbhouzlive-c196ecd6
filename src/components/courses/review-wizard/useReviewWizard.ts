@@ -227,7 +227,7 @@ export function useReviewWizard({
         review: existingRating.review || '',
       }));
       
-      console.log('[useReviewWizard] Initialized edit mode with existing rating:', existingRating.rating);
+      
     }
   }, [isEditMode, existingRating]);
 
