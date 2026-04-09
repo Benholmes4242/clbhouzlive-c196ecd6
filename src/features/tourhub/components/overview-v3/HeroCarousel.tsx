@@ -45,6 +45,9 @@ import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, Podium
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { useLeaderScorecardStats, type LeaderStats } from '../../hooks/useLeaderScorecardStats';
+import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
+import { HoleStripWithSparkline } from './HoleStripWithSparkline';
+import { RoundHistoryPills } from './RoundHistoryPills';
 import '@/styles/hero-glass.css';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
