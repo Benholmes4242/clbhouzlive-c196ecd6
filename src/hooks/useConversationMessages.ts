@@ -26,6 +26,13 @@ export function useConversationMessages(conversationId: string | null): UseConve
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const offsetRef = useRef(0);
+  const [deletedForMeIds, setDeletedForMeIds] = useState<Set<string>>(new Set());
+  const deletedForMeIdsRef = useRef<Set<string>>(new Set());
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    deletedForMeIdsRef.current = deletedForMeIds;
+  }, [deletedForMeIds]);
 
   const fetchMessages = useCallback(async (offset = 0, append = false) => {
     if (!conversationId || !user) {
@@ -50,6 +57,17 @@ export function useConversationMessages(conversationId: string | null): UseConve
         .range(offset, offset + PAGE_SIZE - 1);
 
       if (messagesError) throw messagesError;
+
+      // Fetch IDs this user has deleted for themselves
+      // Uses 'as any' because the RPC exists in production but types.ts is read-only
+      const { data: deletedIds } = await (supabase.rpc as any)(
+        'get_deleted_message_ids_for_me',
+        { p_conversation_id: conversationId }
+      );
+      const fetchedDeletedIds = new Set<string>(
+        (deletedIds as string[] | null) ?? []
+      );
+      setDeletedForMeIds(fetchedDeletedIds);
 
       if (!messagesData?.length) {
         if (!append) {
@@ -126,10 +144,15 @@ export function useConversationMessages(conversationId: string | null): UseConve
       // Reverse to show oldest first (chat order)
       const orderedMessages = messagesWithSender.reverse();
 
+      // Filter out messages this user has deleted for themselves
+      const visibleMessages = orderedMessages.filter(
+        m => !fetchedDeletedIds.has(m.id)
+      );
+
       if (append) {
-        setMessages(prev => [...orderedMessages, ...prev]);
+        setMessages(prev => [...visibleMessages, ...prev]);
       } else {
-        setMessages(orderedMessages);
+        setMessages(visibleMessages);
       }
 
       setHasMore(messagesData.length === PAGE_SIZE);
@@ -233,11 +256,23 @@ export function useConversationMessages(conversationId: string | null): UseConve
     }
   }, [user]);
 
-  // Delete for me: removes from local view only.
-  // The message remains in the database and visible to other participants.
-  // A full per-user delete requires a deleted_message_users DB table.
+  // Persistent delete-for-me: calls RPC to record in DB, then removes from local view
   const deleteMessageForMe = useCallback(async (messageId: string): Promise<void> => {
-    setMessages(prev => prev.filter(m => m.id !== messageId));
+    try {
+      // Uses 'as any' because the RPC exists in production but types.ts is read-only
+      const { error } = await (supabase.rpc as any)('delete_message_for_me', {
+        p_message_id: messageId,
+      });
+      if (error) throw error;
+
+      // Optimistic: remove from local view immediately
+      setMessages(prev => prev.filter(m => m.id !== messageId));
+      // Track so it stays hidden after next refresh
+      setDeletedForMeIds(prev => new Set([...prev, messageId]));
+    } catch (err: unknown) {
+      AppLog.error('[useConversationMessages]', 'deleteMessageForMe error:', err);
+      throw err;
+    }
   }, []);
 
   // Fetch on mount and when conversationId changes
@@ -261,6 +296,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
           filter: `conversation_id=eq.${conversationId}`,
         },
         () => {
+          // refreshMessages will re-fetch deleted-for-me IDs and filter accordingly
           refreshMessages();
         }
       )
@@ -274,6 +310,8 @@ export function useConversationMessages(conversationId: string | null): UseConve
         },
         (payload) => {
           const updated = payload.new as Record<string, unknown>;
+          // Skip messages this user has deleted for themselves
+          if (deletedForMeIdsRef.current.has(updated.id as string)) return;
           if (updated.deleted_at) {
             setMessages(prev => prev.filter(m => m.id !== updated.id));
           } else {

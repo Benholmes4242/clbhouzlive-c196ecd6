@@ -82,7 +82,7 @@ export function DeleteMessageSheet({
             </div>
             <div>
               <p style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', margin: 0 }}>Delete for me</p>
-              <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>Removed from your view only</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>Only removed from your view — others can still see it</p>
             </div>
           </button>
 
@@ -110,7 +110,7 @@ export function DeleteMessageSheet({
                 <p style={{ fontSize: 14, fontWeight: 600, color: '#ef4444', margin: 0 }}>Delete for everyone</p>
                 <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
                   {canDeleteForEveryone
-                    ? 'Removed for all participants'
+                    ? 'Permanently removed for all participants'
                     : 'Only available within 1 hour of sending'
                   }
                 </p>

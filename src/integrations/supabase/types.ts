@@ -3340,6 +3340,35 @@ export type Database = {
         }
         Relationships: []
       }
+      deleted_message_users: {
+        Row: {
+          deleted_at: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          deleted_at?: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          deleted_at?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deleted_message_users_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       division_config: {
         Row: {
           created_at: string | null
@@ -14654,6 +14683,10 @@ export type Database = {
         Returns: boolean
       }
       delete_group: { Args: { p_conversation_id: string }; Returns: boolean }
+      delete_message_for_me: {
+        Args: { p_message_id: string }
+        Returns: undefined
+      }
       disablelongtransactions: { Args: never; Returns: string }
       dismiss_golfer_candidate: {
         Args: { p_reason?: string; p_user_id: string }
@@ -15485,6 +15518,10 @@ export type Database = {
         }[]
       }
       get_current_username: { Args: { _user_id: string }; Returns: string }
+      get_deleted_message_ids_for_me: {
+        Args: { p_conversation_id: string }
+        Returns: string[]
+      }
       get_division_config: {
         Args: never
         Returns: {
