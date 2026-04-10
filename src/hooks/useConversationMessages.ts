@@ -13,6 +13,7 @@ interface UseConversationMessagesReturn {
   sendMessage: (content: string, replyToId?: string | null, mediaUrl?: string, mediaType?: string, mediaMetadata?: Record<string, unknown> | null) => Promise<string | null>;
   editMessage: (messageId: string, newContent: string) => Promise<boolean>;
   deleteMessage: (messageId: string) => Promise<boolean>;
+  deleteMessageForMe: (messageId: string) => Promise<void>;
   refreshMessages: () => Promise<void>;
 }
 
@@ -232,6 +233,13 @@ export function useConversationMessages(conversationId: string | null): UseConve
     }
   }, [user]);
 
+  // Delete for me: removes from local view only.
+  // The message remains in the database and visible to other participants.
+  // A full per-user delete requires a deleted_message_users DB table.
+  const deleteMessageForMe = useCallback(async (messageId: string): Promise<void> => {
+    setMessages(prev => prev.filter(m => m.id !== messageId));
+  }, []);
+
   // Fetch on mount and when conversationId changes
   useEffect(() => {
     offsetRef.current = 0;
@@ -293,6 +301,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
     sendMessage,
     editMessage,
     deleteMessage,
+    deleteMessageForMe,
     refreshMessages,
   };
 }

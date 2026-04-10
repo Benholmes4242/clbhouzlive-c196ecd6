@@ -118,6 +118,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     sendMessage,
     editMessage,
     deleteMessage,
+    deleteMessageForMe,
   } = useConversationMessages(conversationId);
 
   const { typingUsers, setTyping, clearTyping } = useTypingIndicator(conversationId);
@@ -372,14 +373,14 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
 
   const handleDeleteForMe = async () => {
     if (deletingMessage) {
-      await deleteMessage(deletingMessage.id);
+      await deleteMessageForMe(deletingMessage.id);
       setDeletingMessage(null);
     }
   };
 
   const handleDeleteForEveryone = async () => {
     if (deletingMessage) {
-      await deleteMessage(deletingMessage.id);
+      await deleteMessage(deletingMessage.id);  // sets deleted_at for all participants
       setDeletingMessage(null);
     }
   };

@@ -75,11 +75,8 @@ export function useTypingIndicator(conversationId: string | null) {
 
     // Fetch initial typing users
     const fetchTypingUsers = async () => {
-      // TODO: typing_indicators table is not in the generated Supabase types.
-      // Run `supabase gen types` after confirming the table exists in the schema.
-      // Keep the as any cast until types are regenerated.
       const { data, error } = await supabase
-        .from('typing_indicators' as any)
+        .from('typing_indicators')
         .select('user_id, started_at')
         .eq('conversation_id', conversationId)
         .neq('user_id', user.id);
