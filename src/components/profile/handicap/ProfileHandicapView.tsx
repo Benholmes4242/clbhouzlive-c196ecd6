@@ -120,7 +120,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
           {/* Meta line */}
           {lastUpdatedAt && (
             <p className="text-[13px] text-muted-foreground">
-              Last edited {formatDate(lastUpdatedAt)} · By you
+              Last edited {formatDate(lastUpdatedAt)}{isOwnProfile ? ' · By you' : ''}
             </p>
           )}
 
