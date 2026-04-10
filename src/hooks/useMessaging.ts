@@ -117,8 +117,8 @@ export function useMessaging(): UseMessagingReturn {
 
       // Step 4: Fetch profiles for all participants
       const { data: profilesData, error: profilesError } = await supabase
-        .from('public_profiles')
-        .select('id, username, display_name, profile_photo_url')
+        .from('user_profiles')
+        .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
         .in('id', Array.from(allUserIds));
 
       if (profilesError) throw profilesError;
@@ -132,6 +132,8 @@ export function useMessaging(): UseMessagingReturn {
             username: profile.username,
             display_name: profile.display_name,
             profile_photo_url: profile.profile_photo_url,
+            eg_handicap_index: profile.eg_handicap_index ?? null,
+            home_club: profile.home_club ?? null,
           });
         }
       });

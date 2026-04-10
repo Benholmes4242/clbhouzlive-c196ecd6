@@ -9,7 +9,7 @@ import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft, Loader2, ChevronDown, MoreVertical, Users } from 'lucide-react';
+import { ChevronLeft, Loader2, ChevronDown, MoreVertical, Users, MapPin } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
@@ -178,8 +178,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             .filter((id): id is string => id !== null);
 
           const { data: profiles } = await supabase
-            .from('public_profiles')
-            .select('id, username, display_name, profile_photo_url')
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
             .in('id', participantIds);
 
           const profilesMap = new Map<string, ParticipantProfile>();
@@ -190,6 +190,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 username: profile.username,
                 display_name: profile.display_name,
                 profile_photo_url: profile.profile_photo_url,
+                eg_handicap_index: profile.eg_handicap_index ?? null,
+                home_club: profile.home_club ?? null,
               });
             }
           });
@@ -506,7 +508,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               </span>
             </div>
             {/* Row 2: Status */}
-            <div className="flex items-center" style={{ gap: 6 }}>
+            <div className="flex items-center" style={{ gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '11.5px', fontWeight: 500 }}>
                 {isTyping ? (
                   <span style={{ color: '#F7931E' }}>typing...</span>
@@ -525,6 +527,25 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                   <span style={{ color: '#94a3b8' }}>offline</span>
                 )}
               </span>
+              {!isGroupChat && otherUser?.profile?.eg_handicap_index != null && (
+                <span style={{
+                  fontSize: '10.5px', fontWeight: 600, color: '#F7931E',
+                  background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                  borderRadius: 99, padding: '1px 7px',
+                }}>
+                  HCP {otherUser.profile.eg_handicap_index}
+                </span>
+              )}
+              {!isGroupChat && otherUser?.profile?.home_club && (
+                <span className="flex items-center" style={{
+                  gap: 3, fontSize: '10.5px', fontWeight: 600, color: '#006747',
+                  background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
+                  borderRadius: 99, padding: '1px 7px',
+                }}>
+                  <MapPin size={9} />
+                  {otherUser.profile.home_club}
+                </span>
+              )}
             </div>
           </div>
         </button>

@@ -307,11 +307,31 @@ export function MessageBubble({
       {!isOwnMessage && !showSenderInfo && <div style={{ width: 28, flexShrink: 0 }} />}
 
       <div className="flex flex-col" style={{ maxWidth: '72%', alignItems: isOwnMessage ? 'flex-end' : 'flex-start' }}>
-        {/* Sender name for groups */}
+        {/* Sender name + chips for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155', marginBottom: 3, paddingLeft: 1 }}>
-            {senderName}
-          </span>
+          <div className="flex items-center" style={{ gap: 5, marginBottom: 3, paddingLeft: 1, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155' }}>
+              {senderName}
+            </span>
+            {message.sender?.eg_handicap_index != null && (
+              <span style={{
+                fontSize: '9.5px', fontWeight: 600, color: '#F7931E',
+                background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                borderRadius: 99, padding: '0px 5px',
+              }}>
+                HCP {message.sender.eg_handicap_index}
+              </span>
+            )}
+            {message.sender?.home_club && (
+              <span style={{
+                fontSize: '9.5px', fontWeight: 600, color: '#006747',
+                background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
+                borderRadius: 99, padding: '0px 5px',
+              }}>
+                ⛳ {message.sender.home_club}
+              </span>
+            )}
+          </div>
         )}
 
         {/* Reply quote */}
@@ -379,17 +399,17 @@ export function MessageBubble({
               {message.content}
             </p>
           )}
+        </div>
 
-          {/* Timestamp + Read receipt */}
-          <div className="flex items-center" style={{
-            gap: 3, marginTop: 3,
-            justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
-            fontSize: 10, color: '#94a3b8',
-          }}>
-            {message.is_edited && <span style={{ fontStyle: 'italic' }}>edited</span>}
-            <span>{formatMessageTime(message.created_at)}</span>
-            {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
-          </div>
+        {/* Timestamp + Read receipt — OUTSIDE the bubble */}
+        <div className="flex items-center" style={{
+          gap: 3, marginTop: 3,
+          justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
+          fontSize: 10, color: '#94a3b8',
+        }}>
+          {message.is_edited && <span style={{ fontStyle: 'italic' }}>edited</span>}
+          <span>{formatMessageTime(message.created_at)}</span>
+          {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
         </div>
 
         {/* Reactions */}

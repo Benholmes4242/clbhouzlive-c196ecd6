@@ -79,8 +79,8 @@ export const useArchivedConversations = () => {
 
       // Fetch all profiles in one query
       const { data: profilesData } = await supabase
-        .from('public_profiles')
-        .select('id, username, display_name, profile_photo_url')
+        .from('user_profiles')
+        .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
         .in('id', Array.from(allUserIds));
 
       // Create profile lookup map
@@ -92,6 +92,8 @@ export const useArchivedConversations = () => {
             username: profile.username,
             display_name: profile.display_name,
             profile_photo_url: profile.profile_photo_url,
+            eg_handicap_index: profile.eg_handicap_index ?? null,
+            home_club: profile.home_club ?? null,
           });
         }
       });

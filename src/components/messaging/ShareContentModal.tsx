@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { AppLog } from '@/lib/logger';
 import { Search, MapPin, Calendar, ImagePlus, X, Plus, Loader2, ChevronRight } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -123,7 +124,7 @@ export function ShareContentModal({
       );
       handleClose();
     } catch (error) {
-      console.error('Error uploading media:', error);
+      AppLog.error('[ShareContentModal]', 'Error uploading media:', error);
       toast.error('Failed to upload media');
     } finally {
       setIsUploading(false);
@@ -252,7 +253,7 @@ export function ShareContentModal({
                         <ChevronRight size={14} style={{ color: '#d1d5db', flexShrink: 0 }} />
                       </button>
                       {index < courses.length - 1 && (
-                        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
+                        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 20px' }} />
                       )}
                     </div>
                   ))}

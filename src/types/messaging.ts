@@ -130,6 +130,8 @@ export interface ParticipantProfile {
   username: string | null;
   display_name: string | null;
   profile_photo_url: string | null;
+  eg_handicap_index: number | null;
+  home_club: string | null;
 }
 
 /**

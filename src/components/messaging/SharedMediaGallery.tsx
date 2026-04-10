@@ -265,7 +265,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           {/* Links tab */}
           {activeTab === 'links' && (
             links.length === 0 ? (
-              <EmptyState icon={Link} iconColor="#6366f1" iconBg="rgba(99,102,241,0.08)" title="No links shared yet" subtitle="Links will appear here" />
+              <EmptyState icon={Link} iconColor="#6366f1" iconBg="rgba(99,102,241,0.10)" title="No links shared yet" subtitle="Links will appear here" />
             ) : (
               <div className="flex flex-col" style={{ gap: 10, padding: 16 }}>
                 {links.map(link => (

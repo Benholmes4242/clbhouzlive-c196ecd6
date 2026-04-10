@@ -67,8 +67,8 @@ export function useConversationMessages(conversationId: string | null): UseConve
 
       // Fetch sender profiles
       const { data: profilesData, error: profilesError } = await supabase
-        .from('public_profiles')
-        .select('id, username, display_name, profile_photo_url')
+        .from('user_profiles')
+        .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
         .in('id', Array.from(senderIds));
 
       if (profilesError) throw profilesError;
@@ -82,6 +82,8 @@ export function useConversationMessages(conversationId: string | null): UseConve
             username: p.username,
             display_name: p.display_name,
             profile_photo_url: p.profile_photo_url,
+            eg_handicap_index: p.eg_handicap_index ?? null,
+            home_club: p.home_club ?? null,
           });
         }
       });
