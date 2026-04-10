@@ -110,8 +110,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
           <img
             src={imageUrl}
             alt={tournament.venue_name || tournament.name}
-            className="absolute inset-0 w-full h-full object-cover object-center sm:!object-center"
-            style={{ objectPosition: 'center calc(50% + 24px)' }}
+            className="absolute inset-0 w-full h-full object-cover hero-course-image"
             loading="eager"
             fetchPriority="high"
             onError={() => setImgError(true)}
