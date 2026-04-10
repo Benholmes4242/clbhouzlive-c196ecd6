@@ -954,18 +954,20 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   {isExpanded ? (
                     <AnimatePresence mode="wait">
                       {selectedPlayer ? (
-                        <PlayerScorecardCard
-                          key="scorecard"
-                          player={selectedPlayer}
-                          tournamentId={tournament.id}
-                          tournamentName={tournament.name}
-                          courseName={tournament.venueName || ''}
-                          onBack={handleBackToLeaderboard}
-                          onClose={() => {
-                            setSelectedPlayer(null);
-                            onToggleExpand();
-                          }}
-                        />
+                        <div style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + var(--live-hero-offset, 0px))', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+                          <PlayerScorecardCard
+                            key="scorecard"
+                            player={selectedPlayer}
+                            tournamentId={tournament.id}
+                            tournamentName={tournament.name}
+                            courseName={tournament.venueName || ''}
+                            onBack={handleBackToLeaderboard}
+                            onClose={() => {
+                              setSelectedPlayer(null);
+                              onToggleExpand();
+                            }}
+                          />
+                        </div>
                       ) : (
                         <motion.div
                           key="leaderboard"
