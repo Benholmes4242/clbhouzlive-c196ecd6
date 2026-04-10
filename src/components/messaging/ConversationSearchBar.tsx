@@ -24,33 +24,48 @@ export function ConversationSearchBar({
   }, [onChange]);
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      {/* Search Input - warm glass pill */}
-      <div className="relative flex-1">
-        <div className={cn(
-          "flex items-center gap-3 h-[40px] rounded-xl px-1 transition-all bg-transparent",
-          isFocused && "ring-1 ring-ring"
-        )}>
-          <Search className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search conversations…"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            className="flex-1 bg-transparent outline-none text-[13px] font-normal text-foreground placeholder:font-normal placeholder:text-muted-foreground"
-          />
-          {value && (
-            <button
-              onClick={handleClear}
-              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-muted-foreground"
-            >
-              <X className="w-3 h-3 text-background" />
-            </button>
-          )}
-        </div>
-      </div>
+    <div
+      className={cn("relative", className)}
+      style={{
+        height: 38, borderRadius: 12,
+        background: '#fff',
+        border: '1px solid rgba(0,0,0,0.07)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        display: 'flex', alignItems: 'center',
+        padding: '0 12px 0 36px',
+      }}
+    >
+      {/* Search icon */}
+      <Search
+        className="absolute"
+        style={{ left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}
+        size={14}
+      />
+
+      <input
+        type="text"
+        placeholder="Search conversations…"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className="flex-1 bg-transparent outline-none"
+        style={{
+          fontSize: '13.5px', color: '#1e293b',
+          border: 'none',
+        }}
+      />
+
+      {/* Clear button */}
+      {value && (
+        <button
+          onClick={handleClear}
+          className="absolute flex items-center justify-center"
+          style={{ right: 12, top: '50%', transform: 'translateY(-50%)' }}
+        >
+          <X style={{ color: '#94a3b8' }} size={13} />
+        </button>
+      )}
     </div>
   );
 }

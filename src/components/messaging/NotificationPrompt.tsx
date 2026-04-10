@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Bell, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface NotificationPromptProps {
@@ -30,47 +29,66 @@ export function NotificationPrompt({
 
   return (
     <div 
-      className={cn(
-        "flex items-center gap-3 px-4 py-3 bg-[hsl(38,92%,50%)]/10 border-b border-[hsl(38,92%,50%)]/20",
-        className
-      )}
+      className={cn("flex items-center", className)}
+      style={{
+        borderRadius: 16,
+        padding: '10px 14px',
+        background: 'rgba(247,147,30,0.07)',
+        border: '1px solid rgba(247,147,30,0.20)',
+        gap: 12,
+      }}
     >
-      <div className="flex-shrink-0">
-        <Bell className="h-5 w-5 text-[hsl(38,92%,50%)]" />
+      {/* Icon box */}
+      <div
+        className="flex items-center justify-center flex-shrink-0"
+        style={{
+          width: 36, height: 36, borderRadius: '50%',
+          background: 'rgba(247,147,30,0.15)',
+        }}
+      >
+        <Bell style={{ color: '#F7931E' }} className="w-4 h-4" />
       </div>
       
+      {/* Text column */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-foreground">
-          Enable notifications to get alerted when you receive messages
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', margin: 0 }}>
+          Enable notifications
+        </p>
+        <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>
+          Don't miss a message
         </p>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Button
-          variant="ghost"
-          size="sm"
+      {/* Action buttons */}
+      <div className="flex items-center flex-shrink-0" style={{ gap: 8 }}>
+        {/* Dismiss */}
+        <button
           onClick={onDismiss}
-          className="text-muted-foreground hover:text-foreground"
+          className="flex items-center justify-center"
+          style={{
+            width: 28, height: 28, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.06)', border: 'none',
+            cursor: 'pointer',
+          }}
+          aria-label="Dismiss"
         >
-          Maybe Later
-        </Button>
-        <Button
-          size="sm"
+          <X style={{ color: '#64748b' }} className="w-3.5 h-3.5" />
+        </button>
+
+        {/* Enable */}
+        <button
           onClick={handleEnable}
           disabled={isEnabling}
-          className="bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
+          style={{
+            padding: '5px 12px', borderRadius: 99,
+            background: '#F7931E', color: '#fff',
+            fontSize: 12, fontWeight: 600,
+            border: 'none', cursor: 'pointer',
+          }}
         >
-          {isEnabling ? 'Enabling...' : 'Enable'}
-        </Button>
+          {isEnabling ? 'Enabling…' : 'Enable'}
+        </button>
       </div>
-
-      <button
-        onClick={onDismiss}
-        className="p-1 rounded-full hover:bg-muted transition-colors"
-        aria-label="Dismiss notification prompt"
-      >
-        <X className="h-4 w-4 text-muted-foreground" />
-      </button>
     </div>
   );
 }

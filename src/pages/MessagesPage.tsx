@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { MessageCircle, Plus, ChevronLeft, PenSquare } from 'lucide-react';
+import { MessageCircle, ChevronLeft, PenSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessagingContext } from '@/contexts/MessagingContext';
@@ -22,20 +22,27 @@ function FilterChips({ totalUnread, conversationFilter, onFilterChange }: {
 }) {
   const chips = [
     { key: 'all' as const, label: 'All' },
-    { key: 'unread' as const, label: totalUnread > 0 ? `Unread (${totalUnread})` : 'Unread' },
+    { key: 'unread' as const, label: totalUnread > 0 ? `Unread · ${totalUnread}` : 'Unread' },
     { key: 'groups' as const, label: 'Groups' },
   ];
   return (
-    <div className="flex items-center gap-2 px-4 pt-1.5 pb-1">
+    <div style={{ display: 'flex', gap: 6, padding: '6px 16px' }}>
       {chips.map(chip => (
         <button
           key={chip.key}
           onClick={() => onFilterChange(chip.key)}
-          className="px-3.5 py-1 rounded-full text-[12.5px] font-semibold transition-colors duration-150 active:scale-[0.97]"
           style={{
+            padding: '5px 13px',
+            borderRadius: 99,
+            fontSize: '12.5px',
+            fontWeight: 600,
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.12s',
             background: conversationFilter === chip.key ? '#0f172a' : 'rgba(0,0,0,0.05)',
             color: conversationFilter === chip.key ? '#fff' : '#64748b',
           }}
+          className="active:scale-[0.97]"
         >
           {chip.label}
         </button>
@@ -63,7 +70,7 @@ function MessagesPageInner() {
   const [newConversationTab, setNewConversationTab] = useState<'direct' | 'group'>('direct');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [conversationFilter, setConversationFilter] = useState<'all' | 'unread' | 'groups'>('all');
+  const [conversationFilter, setConversationFilter] = useState<ConversationFilterType>('all');
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -140,15 +147,16 @@ function MessagesPageInner() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative bg-background">
-        <div className="text-center relative z-10">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted">
-            <MessageCircle className="h-8 w-8 text-muted-foreground" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8FAFC' }}>
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(0,0,0,0.05)' }}>
+            <MessageCircle className="h-8 w-8" style={{ color: '#94a3b8' }} />
           </div>
-          <p className="text-muted-foreground">Please log in to view messages.</p>
+          <p style={{ color: '#64748b' }}>Please log in to view messages.</p>
           <Button 
             onClick={() => navigate('/auth')} 
-            className="mt-4 rounded-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
+            className="mt-4 rounded-full border-0"
+            style={{ background: '#F7931E', color: '#fff' }}
           >
             Log in
           </Button>
@@ -159,7 +167,7 @@ function MessagesPageInner() {
 
   if (isMobile && selectedConversationId) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-background">
+      <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#F8FAFC' }}>
         <div className="relative z-10 flex flex-col h-full">
           <OfflineBanner />
           <ChatView 
@@ -176,194 +184,117 @@ function MessagesPageInner() {
     const totalUnread = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) ?? 0;
     
     return (
-      <div className="min-h-screen flex flex-col relative bg-[#F8FAFC]">
-        <div className="relative z-10 flex flex-col min-h-screen bg-[#F8FAFC]">
-          <OfflineBanner />
-          {/* Header */}
-          <header 
-            className="flex-none px-4 flex items-center justify-between"
-            style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-              paddingBottom: '10px',
-              background: '#F8FAFC',
-              borderBottom: '1px solid rgba(0,0,0,0.06)',
-            }}
-          >
-            <button
-              onClick={() => navigate(-1)}
-              className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-              style={{ background: 'rgba(0,0,0,0.05)' }}
-              aria-label="Back"
-            >
-              <ChevronLeft className="w-5 h-5" style={{ color: '#475569' }} strokeWidth={2.5} />
-            </button>
-
-            <div className="flex items-center gap-2">
-              <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
-              {totalUnread > 0 && (
-                <span
-                  className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-                  style={{ background: 'hsl(38,92%,50%)' }}
-                >
-                  {totalUnread > 99 ? '99+' : totalUnread}
-                </span>
-              )}
-            </div>
-
-            <button 
-              onClick={handleNewConversation}
-              className="w-9 h-9 -mr-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-              style={{
-                background: 'hsl(38,92%,50%)',
-                boxShadow: '0 2px 8px rgba(245,166,35,0.35)',
-              }}
-              aria-label="New conversation"
-            >
-              <PenSquare className="w-[17px] h-[17px] text-white" strokeWidth={2.2} />
-            </button>
-          </header>
-          
-          {/* Search bar */}
-          <div className="px-4 pt-2 pb-1">
-            <div
-              className="flex items-center gap-2.5 px-3 rounded-xl"
-              style={{
-                background: '#fff',
-                border: '1px solid rgba(0,0,0,0.07)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                height: 40,
-              }}
-            >
-              <ConversationSearchBar
-                value={searchInput}
-                onChange={handleSearchChange}
-                onNewConversation={handleNewConversation}
-                hideNewButton
-              />
-            </div>
-          </div>
-
-          {/* Filter chips */}
-          <FilterChips
-            totalUnread={totalUnread}
-            conversationFilter={conversationFilter}
-            onFilterChange={setConversationFilter}
-          />
-          
-          {showNotificationPrompt && (
-            <div className="px-4 pb-3">
-              <NotificationPrompt
-                onEnable={handleEnablePush}
-                onDismiss={handleDismissNotificationPrompt}
-              />
-            </div>
-          )}
-          
-          <div className="flex-1 overflow-y-auto px-4 pb-24">
-            <ConversationList
-              onSelectConversation={handleSelectConversation}
-              selectedConversationId={selectedConversationId || undefined}
-              searchQuery={searchQuery}
-              onNewConversation={handleNewConversation}
-              filterType={conversationFilter}
-            />
-          </div>
-          
-          <NewConversationModal
-            open={showNewConversation}
-            onOpenChange={setShowNewConversation}
-            onConversationCreated={handleConversationCreated}
-            initialTab={newConversationTab}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop: Side-by-side layout
-  return (
-    <div className="min-h-screen relative bg-background">
-      <div className="relative z-10 h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
+      <div className="min-h-screen flex flex-col" style={{ background: '#F8FAFC' }}>
+        <OfflineBanner />
+        
+        {/* Header */}
         <header 
-          className="flex-none px-4 flex items-center justify-between mb-4 rounded-2xl"
+          className="flex-none flex items-center justify-between"
           style={{
-            height: '56px',
-            background: 'hsl(var(--background) / 0.9)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid hsl(var(--border))',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            paddingBottom: 10,
+            paddingLeft: 16,
+            paddingRight: 16,
+            background: '#F8FAFC',
+            borderBottom: '1px solid rgba(0,0,0,0.06)',
           }}
         >
+          {/* Back */}
           <button
             onClick={() => navigate(-1)}
-            className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+            className="flex items-center justify-center active:scale-[0.97] transition-transform"
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.05)', border: 'none',
+            }}
             aria-label="Back"
           >
-            <ChevronLeft className="w-5 h-5 text-foreground/60" />
+            <ChevronLeft style={{ color: '#475569' }} strokeWidth={2.5} className="w-5 h-5" />
           </button>
 
-          <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
+          {/* Title + badge */}
+          <div className="flex items-center" style={{ gap: 6 }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em' }}>
+              Messages
+            </span>
+            {totalUnread > 0 && (
+              <span
+                className="flex items-center justify-center"
+                style={{
+                  minWidth: 20, height: 20, borderRadius: 99,
+                  background: '#F7931E', color: '#fff',
+                  fontSize: 10, fontWeight: 700,
+                  padding: '0 5px',
+                }}
+              >
+                {totalUnread > 99 ? '99+' : totalUnread}
+              </span>
+            )}
+          </div>
 
+          {/* Compose — ghost amber */}
           <button 
             onClick={handleNewConversation}
-            className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+            className="flex items-center justify-center active:scale-[0.97] transition-transform"
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(247,147,30,0.10)',
+              border: '1px solid rgba(247,147,30,0.28)',
+            }}
             aria-label="New conversation"
           >
-            <Plus className="w-5 h-5 text-foreground/60" />
+            <PenSquare style={{ color: '#F7931E' }} strokeWidth={2.2} className="w-[17px] h-[17px]" />
           </button>
         </header>
         
-        {showNotificationPrompt && (
-          <NotificationPrompt
-            onEnable={handleEnablePush}
-            onDismiss={handleDismissNotificationPrompt}
-            className="mb-4 rounded-[18px]"
+        {/* Search bar */}
+        <div style={{ margin: '8px 16px 4px', position: 'relative' }}>
+          <ConversationSearchBar
+            value={searchInput}
+            onChange={handleSearchChange}
+            onNewConversation={handleNewConversation}
+            hideNewButton
           />
+        </div>
+
+        {/* Filter chips */}
+        <FilterChips
+          totalUnread={totalUnread}
+          conversationFilter={conversationFilter}
+          onFilterChange={setConversationFilter}
+        />
+        
+        {/* Notification prompt */}
+        {showNotificationPrompt && (
+          <div style={{ margin: '8px 16px' }}>
+            <NotificationPrompt
+              onEnable={handleEnablePush}
+              onDismiss={handleDismissNotificationPrompt}
+            />
+          </div>
+        )}
+
+        {/* Section label */}
+        {!searchInput && conversationFilter === 'all' && conversations.length > 0 && (
+          <div style={{
+            padding: '8px 16px 4px',
+            fontSize: '10.5px', fontWeight: 700,
+            letterSpacing: '0.08em', textTransform: 'uppercase' as const,
+            color: '#c0c8d0',
+          }}>
+            Recent
+          </div>
         )}
         
-        <div className="flex flex-1 rounded-[20px] overflow-hidden border border-border" style={{ background: 'hsl(var(--background) / 0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-          <div className="w-80 flex-shrink-0 flex flex-col border-r border-border">
-            <div className="p-4 border-b border-border">
-              <ConversationSearchBar
-                value={searchInput}
-                onChange={handleSearchChange}
-                onNewConversation={handleNewConversation}
-                hideNewButton
-              />
-            </div>
-            
-            <div className="flex-1 overflow-y-auto">
-              <ConversationList
-                onSelectConversation={handleSelectConversation}
-                selectedConversationId={selectedConversationId || undefined}
-                searchQuery={searchQuery}
-                onNewConversation={handleNewConversation}
-              />
-            </div>
-          </div>
-
-          <div className="flex-1 flex flex-col">
-            {selectedConversationId ? (
-              <ChatView 
-                conversationId={selectedConversationId} 
-                onBack={handleBack} 
-              />
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted/50">
-                    <MessageCircle className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h2 className="font-semibold text-lg mb-1 text-foreground font-dm-sans">
-                    Select a conversation
-                  </h2>
-                  <p className="text-sm max-w-[240px] mx-auto text-muted-foreground">
-                    Choose a conversation from the list to start chatting
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Conversation list */}
+        <div className="flex-1 overflow-y-auto pb-28">
+          <ConversationList
+            onSelectConversation={handleSelectConversation}
+            selectedConversationId={selectedConversationId || undefined}
+            searchQuery={searchQuery}
+            onNewConversation={handleNewConversation}
+            filterType={conversationFilter}
+          />
         </div>
         
         <NewConversationModal
@@ -373,6 +304,177 @@ function MessagesPageInner() {
           initialTab={newConversationTab}
         />
       </div>
+    );
+  }
+
+  // Desktop: Side-by-side layout
+  const totalUnread = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) ?? 0;
+  
+  return (
+    <div style={{ background: '#F0F2F5', minHeight: '100vh' }}>
+      {/* Desktop header */}
+      <div style={{ maxWidth: 1060, margin: '0 auto', padding: '12px 16px 0' }}>
+        <header
+          className="flex items-center justify-between"
+          style={{
+            height: 56,
+            borderRadius: 16,
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(0,0,0,0.07)',
+            boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+            padding: '0 18px',
+            marginBottom: 12,
+          }}
+        >
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center active:scale-[0.97] transition-transform"
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.05)', border: 'none',
+            }}
+            aria-label="Back"
+          >
+            <ChevronLeft style={{ color: '#475569' }} strokeWidth={2.5} className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center" style={{ gap: 6 }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>Messages</span>
+            {totalUnread > 0 && (
+              <span
+                className="flex items-center justify-center"
+                style={{
+                  minWidth: 20, height: 20, borderRadius: 99,
+                  background: '#F7931E', color: '#fff',
+                  fontSize: 10, fontWeight: 700, padding: '0 5px',
+                }}
+              >
+                {totalUnread > 99 ? '99+' : totalUnread}
+              </span>
+            )}
+          </div>
+
+          <button 
+            onClick={handleNewConversation}
+            className="flex items-center justify-center active:scale-[0.97] transition-transform"
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(247,147,30,0.10)',
+              border: '1px solid rgba(247,147,30,0.28)',
+            }}
+            aria-label="New conversation"
+          >
+            <PenSquare style={{ color: '#F7931E' }} strokeWidth={2.2} className="w-[17px] h-[17px]" />
+          </button>
+        </header>
+      </div>
+
+      {/* Two-pane container */}
+      <div
+        className="flex"
+        style={{
+          maxWidth: 1060, margin: '0 auto',
+          borderRadius: 20, overflow: 'hidden',
+          background: '#fff',
+          boxShadow: '0 2px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(0,0,0,0.06)',
+          height: 'calc(100vh - 100px)',
+        }}
+      >
+        {/* Left sidebar */}
+        <div
+          className="flex flex-col"
+          style={{
+            width: 300, flexShrink: 0,
+            background: '#F8FAFC',
+            borderRight: '1px solid rgba(0,0,0,0.06)',
+          }}
+        >
+          {/* Sidebar search */}
+          <div style={{ padding: '12px 12px 4px' }}>
+            <ConversationSearchBar
+              value={searchInput}
+              onChange={handleSearchChange}
+              onNewConversation={handleNewConversation}
+              hideNewButton
+            />
+          </div>
+
+          <FilterChips
+            totalUnread={totalUnread}
+            conversationFilter={conversationFilter}
+            onFilterChange={setConversationFilter}
+          />
+
+          {showNotificationPrompt && (
+            <div style={{ padding: '0 12px' }}>
+              <NotificationPrompt
+                onEnable={handleEnablePush}
+                onDismiss={handleDismissNotificationPrompt}
+              />
+            </div>
+          )}
+
+          <div className="flex-1 overflow-y-auto">
+            <ConversationList
+              onSelectConversation={handleSelectConversation}
+              selectedConversationId={selectedConversationId || undefined}
+              searchQuery={searchQuery}
+              onNewConversation={handleNewConversation}
+              filterType={conversationFilter}
+            />
+          </div>
+        </div>
+
+        {/* Right pane */}
+        <div className="flex-1 flex flex-col">
+          {selectedConversationId ? (
+            <ChatView 
+              conversationId={selectedConversationId} 
+              onBack={handleBack} 
+            />
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center" style={{ padding: 32 }}>
+              {/* Concentric amber rings */}
+              <div className="relative flex items-center justify-center" style={{ width: 80, height: 80, marginBottom: 20 }}>
+                <div className="absolute rounded-full" style={{ width: 80, height: 80, background: 'rgba(247,147,30,0.06)' }} />
+                <div className="absolute rounded-full" style={{ width: 56, height: 56, background: 'rgba(247,147,30,0.10)' }} />
+                <div className="absolute rounded-full" style={{ width: 36, height: 36, background: 'rgba(247,147,30,0.15)' }} />
+                <MessageCircle style={{ color: '#F7931E' }} className="w-5 h-5 relative z-10" />
+              </div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
+                Select a conversation
+              </h2>
+              <p style={{ fontSize: 14, color: '#94a3b8', maxWidth: 240, marginBottom: 20 }}>
+                Choose a conversation from the list or start a new one
+              </p>
+              <button
+                onClick={handleNewConversation}
+                className="flex items-center justify-center active:scale-[0.97] transition-transform"
+                style={{
+                  padding: '8px 20px', borderRadius: 99,
+                  background: 'rgba(247,147,30,0.10)',
+                  border: '1px solid rgba(247,147,30,0.25)',
+                  color: '#F7931E', fontSize: 13, fontWeight: 600,
+                  gap: 6,
+                }}
+              >
+                <PenSquare className="w-4 h-4" />
+                New Message
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <NewConversationModal
+        open={showNewConversation}
+        onOpenChange={setShowNewConversation}
+        onConversationCreated={handleConversationCreated}
+        initialTab={newConversationTab}
+      />
     </div>
   );
 }
