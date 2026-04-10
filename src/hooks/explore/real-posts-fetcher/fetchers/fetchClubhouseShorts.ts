@@ -4,7 +4,7 @@ import type { RawPostData, ClubhouseFetchOptions } from '../types';
 import { buildHydrationContext } from '../utils/postHydration';
 import { formatPost } from '../utils/postFormatter';
 import { passesVerticalFilter } from '../utils/verticalFilter';
-import { categorizePosts, curateFeed, fetchUserRelationships } from '../utils/curationAlgorithm';
+import { categorizePosts, curateFeed } from '../utils/curationAlgorithm';
 import { CLUBHOUSE_FETCH_MULTIPLIER, MAX_FETCH_ITERATIONS, CLUBHOUSE_PAGE_SIZE } from '../constants';
 
 /**
@@ -19,15 +19,10 @@ export async function fetchClubhouseExploreShorts(
     const { data: { user: currentUser } } = await supabase.auth.getUser();
     const currentUserId = currentUser?.id;
 
-    // Fetch user relationships
-    let friendIds = new Set<string>();
-    let followedIds = new Set<string>();
-
-    if (currentUserId) {
-      const relationships = await fetchUserRelationships(supabase, currentUserId);
-      friendIds = relationships.friendIds;
-      followedIds = relationships.followedIds;
-    }
+    // Suggested feed = pure global discovery. No relationship prioritisation.
+    // Friends tab (fetchFriendsPosts) handles followed content.
+    const friendIds = new Set<string>();
+    const followedIds = new Set<string>();
 
     // Fetch posts with pagination
     const TARGET_COUNT = limit;
@@ -148,12 +143,9 @@ export async function fetchClubhouseExploreShorts(
 
     // Format posts with relationship flags
     const formattedPosts = curatedPosts.map(post => {
-      const isFriend = friendIds.has(post.user_id);
-      const isFollowedUser = followedIds.has(post.user_id);
-      
       return formatPost(post, context, {
-        isFollowing: isFollowedUser || isFriend,
-        isFriend,
+        isFollowing: false,
+        isFriend: false,
         includeAudioTrack: true,
       });
     }).filter((item): item is ExploreContentItem => item !== null);

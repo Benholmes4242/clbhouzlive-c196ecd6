@@ -118,15 +118,16 @@ function orbitScore(post: FeedPost): number {
   // Layer 1: engagement gravity
   const engagement = likes * 3 + comments * 5 + shares * 4;
 
-  // Layer 2: relationship amplifier
-  const relation = post.creatorRelation ?? 'none';
+  // Layer 2+3: recency amplifier + time decay (global discovery — no relationship boost)
+  const postAgeMs = Date.now() - new Date(post.createdAt).getTime();
+  const ageHours = postAgeMs / (1000 * 60 * 60);
   const relationMultiplier =
-    relation === 'friend' ? 2.5 :
-    relation === 'following' ? 1.8 : 1.0;
+    ageHours < 24 ? 2.2 :   // last 24h — strong freshness boost
+    ageHours < 48 ? 1.5 :   // 24-48h — moderate boost
+    ageHours < 168 ? 1.1 :  // last week — slight boost
+    1.0;                     // older — compete on engagement alone
 
-  // Layer 3: time decay — exponential, half-life ~9 days
-  const ageMs = Date.now() - new Date(post.createdAt).getTime();
-  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  const ageDays = postAgeMs / (1000 * 60 * 60 * 24);
   const decayMultiplier = Math.exp(-DECAY_LAMBDA * ageDays);
 
   // Layer 4: golf-native review bonus
@@ -315,23 +316,24 @@ export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
 function ensureEditorialCard(
   feedPosts: FeedPost[],
   card: FeedPost | null,
-  postType: string
+  postType: string,
+  fallbackPosition: number
 ): FeedPost[] {
   if (!card) return feedPosts;
   const alreadyPresent = feedPosts.some(p => (p as any).postType === postType);
   if (alreadyPresent) return feedPosts;
-  const insertAt = Math.min(4, feedPosts.length);
+  const insertAt = Math.min(fallbackPosition, feedPosts.length);
   const result = [...feedPosts];
   result.splice(insertAt, 0, card);
   return result;
 }
 
 export function injectPGACard(feedPosts: FeedPost[], pgaCard: FeedPost | null): FeedPost[] {
-  return ensureEditorialCard(feedPosts, pgaCard, 'pga_card');
+  return ensureEditorialCard(feedPosts, pgaCard, 'pga_card', 1); // position 2
 }
 
 export function injectCourseOfWeekCard(feedPosts: FeedPost[], card: FeedPost | null): FeedPost[] {
-  return ensureEditorialCard(feedPosts, card, 'course_of_week_card');
+  return ensureEditorialCard(feedPosts, card, 'course_of_week_card', 6); // position 7
 }
 
 // ── Combined Orbit pipeline — posts + editorial cards scored together ──────
