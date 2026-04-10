@@ -232,12 +232,12 @@ function LeaderHeroStrip({
     : 'rgba(255,255,255,0.55)';
 
   return (
-    <div style={{ padding: '0 16px', flexShrink: 0 }}>
+    <div style={{ <div style={{ padding: '14px 16px 0', flexShrink: 0 }}> }}>
       {/* ── Leader card ── */}
       <div style={{
         background: 'rgba(255,255,255,0.07)',
         border: '1px solid rgba(255,255,255,0.11)',
-        borderRadius: 14, padding: '12px 14px', marginBottom: 10,
+        borderRadius: 14, padding: '16px 14px', marginBottom: 10,
       }}>
         {/* Identity row — left/right split */}
         <div style={{
@@ -852,7 +852,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 }}>
                   <div style={{
                     display: 'flex', alignItems: 'center',
-                    gap: 10, padding: '0 16px 0 56px', height: 52,
+                    gap: 10, padding: '0 16px 0 56px', height: 58,
                   }}>
 
                     {/* R1 + LIVE stacked badge — left side */}
@@ -874,13 +874,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     {/* Title block */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
-                        fontSize: 17, fontWeight: 800, color: '#fff',
+                        fontSize: 19, fontWeight: 800, color: '#fff',
                         letterSpacing: -0.3, lineHeight: 1,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {tournament.name}
                       </div>
-                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
+                      <div style={{ <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 3 }}> }}>
                         {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </div>
                     </div>
