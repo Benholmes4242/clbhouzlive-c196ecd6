@@ -17,7 +17,7 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
   ].filter(r => r.roundNum <= currentRound);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, width: 'fit-content' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4, width: 'fit-content' }}>
       {rounds.map(r => {
         const isLive = r.roundNum === currentRound;
         const isDone = r.score !== null && !isLive;
