@@ -71,7 +71,9 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
   const range = max - min || 1;
   const W = 300, H = 28;
   const pts = running.map((v, i) => {
-    const x = (i / (running.length - 1)) * W;
+    const x = i === running.length - 1
+      ? W - 4
+      : (i / (running.length - 1)) * (W - 4);
     const y = H - ((v - min) / range) * (H - 4) - 2;
     return `${x},${y}`;
   }).join(' ');
@@ -79,7 +81,7 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
   const lastY = H - ((lastV - min) / range) * (H - 4) - 2;
   return (
     <div style={{ padding: '0 16px 6px' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: 'block' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
         <defs>
           <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={lastV <= 0 ? '#F7931E' : '#EF4444'} stopOpacity={0.18} />
@@ -89,7 +91,7 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
         <polyline points={pts} fill="none" stroke={lastV <= 0 ? '#F7931E' : '#EF4444'} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
         <polygon points={`0,${H} ${pts} ${W},${H}`} fill="url(#sparkFill)" />
         <line x1={0} y1={H - ((0 - min) / range) * (H - 4) - 2} x2={W} y2={H - ((0 - min) / range) * (H - 4) - 2} stroke="rgba(255,255,255,0.10)" strokeWidth={0.5} strokeDasharray="3,3" />
-        <circle cx={W} cy={lastY} r={2.5} fill={lastV <= 0 ? '#F7931E' : '#EF4444'} opacity={0.9} />
+        <circle cx={W - 4} cy={lastY} r={3} fill={lastV <= 0 ? '#F7931E' : '#EF4444'} opacity={0.9} />
       </svg>
     </div>
   );
@@ -495,8 +497,8 @@ export function PlayerScorecardCard({
             )}
           </div>
           <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', display: 'block', marginTop: 2 }}>
-            {player.thru === 'F' ? 'Finished' : player.thru ? `Thru ${player.thru}` : 'Starting soon'}
-            {` · Round ${currentRound}`}
+            {`Round ${currentRound}`}
+            {player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
           </span>
         </div>
 
