@@ -301,18 +301,18 @@ function LeaderHeroStrip({
                 <span style={{ fontSize: 13, fontWeight: 800, color: todayColor, fontVariantNumeric: 'tabular-nums' }}>{todayDisplay}</span>
               </div>
             )}
-          </div>
-        </div>
 
-        {/* Round pills — left-aligned with avatar */}
-        <div style={{ marginTop: -2, marginBottom: holeScores.length > 0 ? 12 : 0 }}>
-          <RoundHistoryPills
-            round1={leaderEntry.round_1}
-            round2={leaderEntry.round_2}
-            round3={leaderEntry.round_3}
-            round4={leaderEntry.round_4}
-            currentRound={derivedRound}
-          />
+            {/* Round pills — right-aligned under today badge */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <RoundHistoryPills
+                round1={leaderEntry.round_1}
+                round2={leaderEntry.round_2}
+                round3={leaderEntry.round_3}
+                round4={leaderEntry.round_4}
+                currentRound={derivedRound}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Hole dots + sparkline — inside the card */}
