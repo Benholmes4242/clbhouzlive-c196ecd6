@@ -193,14 +193,17 @@ function LeaderHeroStrip({
     : Math.min(lastCompletedRound + 1, 4);  // advance to next round
 
   const playerId = leaderEntry?.player_id ?? leaderEntry?.player?.id ?? null;
+  // Primary — always fetch derivedRound (active round)
   const { data: holeScores = [] } = useLeaderHoleScores(tournamentId, playerId, derivedRound);
-  // Fallback: if no data for active round yet, show last completed round
+  // Fallback — always fetch lastCompletedRound when it exists (no conditional)
   const { data: fallbackHoleScores = [] } = useLeaderHoleScores(
     tournamentId,
     playerId,
-    holeScores.length === 0 && lastCompletedRound > 0 ? lastCompletedRound : null
+    lastCompletedRound > 0 ? lastCompletedRound : null
   );
+  // Display: prefer active round if it has data, otherwise show last completed
   const displayHoleScores = holeScores.length > 0 ? holeScores : fallbackHoleScores;
+  const displayRound = holeScores.length > 0 ? derivedRound : lastCompletedRound;
 
   const p = leaderEntry.player;
   if (!p) return null;
