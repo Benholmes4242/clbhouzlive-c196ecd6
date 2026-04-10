@@ -729,11 +729,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         style={{
           background: (isLive || isUpcoming)
             ? `linear-gradient(180deg,
-                rgba(0,0,0,0.25) 0%,
-                rgba(0,0,0,0.10) 22%,
-                rgba(0,0,0,0.65) 48%,
-                rgba(0,0,0,0.95) 68%,
-                rgba(0,0,0,1.00) 82%)`
+                rgba(0,0,0,0.55) 0%,
+                rgba(0,0,0,0.35) 18%,
+                rgba(0,0,0,0.75) 45%,
+                rgba(0,0,0,0.96) 65%,
+                rgba(0,0,0,1.00) 78%)`
             : `linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
                linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)`,
         }}
@@ -902,35 +902,40 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
                   }}>
                     <div style={{ padding: '0 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
-                            <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                              Upcoming · {getTourDisplayName(tournament.tourSlug)}
-                            </span>
-                          </div>
-                          <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                            <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -0.6, lineHeight: 1.0, margin: 0 }}>
-                              {tournament.name}
-                            </h2>
-                          </Link>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
-                            className="active:opacity-70 transition-opacity cursor-pointer"
-                            style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
-                          >
-                            {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
-                          </button>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                            Upcoming · {getTourDisplayName(tournament.tourSlug)}
+                          </span>
                         </div>
                         {tournament.startDate && tournament.endDate && (
-                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 14, flexShrink: 0 }}>
+                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.40)', flexShrink: 0 }}>
                             {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             {' – '}
                             {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </span>
                         )}
                       </div>
+                      <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                        <h2 style={{
+                          fontSize: 30, fontWeight: 900, color: '#fff',
+                          letterSpacing: -0.6, lineHeight: 1.05, margin: 0,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical' as const,
+                          overflow: 'hidden',
+                        }}>
+                          {tournament.name}
+                        </h2>
+                      </Link>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                        className="active:opacity-70 transition-opacity cursor-pointer"
+                        style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                      >
+                        {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
+                      </button>
                     </div>
                   </div>
                 </>
@@ -1329,10 +1334,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden' }}
+                  style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const }}
                 >
+                  {/* Main content — grows to fill */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end', padding: '0 18px' }}>
                   {/* ── COURSE FACT CHIPS ── */}
-                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10, padding: '0 18px' }}>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10 }}>
                     {[
                       tournament.purse      && { value: formatPurse(tournament.purse),                          label: 'Purse'  },
                       tournament.venuePar   && { value: `Par ${tournament.venuePar}`,                           label: 'Course' },
@@ -1356,7 +1363,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   </div>
 
                   {/* ── LIVE COUNTDOWN ── */}
-                  <div style={{ padding: '0 18px' }}>
+                  <div>
                     <UpcomingCountdown startDate={tournament.startDate} />
                   </div>
 
@@ -1373,7 +1380,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         borderRadius: 12,
                         padding: '10px 12px',
                         marginTop: 8, marginBottom: 10,
-                        marginLeft: 18, marginRight: 18,
                       }}
                     >
                       {/* Avatar */}
@@ -1394,7 +1400,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   )}
 
                   {/* Echo — tour hub contextual */}
-                  <div style={{ padding: '0 18px 10px' }}>
+                  <div style={{ paddingBottom: 10 }}>
                     <EchoContextualButton
                       prompt={
                         isLive
@@ -1417,8 +1423,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     />
                   </div>
 
+                  </div>
                   {/* ── FOOTER — View Tournament pill only, right-aligned ── */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8, padding: '8px 18px 0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 18px 16px' }}>
                     <Link
                       to={`/tourhub/tournament/${tournament.id}`}
                       style={{
