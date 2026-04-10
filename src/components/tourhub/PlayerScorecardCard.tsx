@@ -430,18 +430,20 @@ export function PlayerScorecardCard({
             Leaderboard
           </span>
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <div style={{
-            width: 6, height: 6, borderRadius: '50%', background: '#22C55E',
-            boxShadow: '0 0 5px 2px rgba(34,197,94,0.4)',
-          }} />
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1.4px', color: '#22C55E' }}>
-            LIVE
-          </span>
-          <span style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.38)', marginLeft: 2 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+          <span style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.38)' }}>
             {tournamentName && tournamentName.length < 20 ? tournamentName : 'PGA TOUR'}
             {player.currentRound ? ` · R${player.currentRound}` : ''}
           </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{
+              width: 5, height: 5, borderRadius: '50%', background: '#22C55E',
+              boxShadow: '0 0 5px 2px rgba(34,197,94,0.4)',
+            }} />
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1.4px', color: '#22C55E' }}>
+              LIVE
+            </span>
+          </div>
         </div>
       </div>
 
