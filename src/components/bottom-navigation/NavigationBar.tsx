@@ -63,8 +63,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
           style={{ transition: 'all var(--motion-fast) var(--ease-standard)' }}
           aria-label="Tour menu"
         >
-          <span style={{ fontSize: 22, lineHeight: 1 }}>☰</span>
-          <span className="text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap text-slate-500">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn(isClubhouseTheme ? "text-[hsl(var(--clubhouse-text-muted))]" : "text-slate-500")}>
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="18" x2="20" y2="18" />
+          </svg>
+          <span className={cn(
+            "text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap",
+            isClubhouseTheme ? "text-[hsl(var(--clubhouse-text-muted))]" : "text-slate-500"
+          )}>
             Menu
           </span>
         </button>
