@@ -120,15 +120,14 @@ function HoleCell({ hole }: { hole: HoleScore }) {
         gap: 0,
       }}>
         <span style={{
-          fontSize: isPar ? 10 : 13,
-          fontWeight: isPar ? 600 : 800,
-          color: isPar ? 'rgba(255,255,255,0.45)' : c.text,
+          fontSize: 11, fontWeight: 800,
+          color: c.text,
           lineHeight: 1,
         }}>
-          {isPar ? '—' : hole.strokes}
+          {hole.strokes}
         </span>
         {!isPar && (
-          <span style={{ fontSize: 7, fontWeight: 700, color: c.text, opacity: 0.7, lineHeight: 1 }}>
+          <span style={{ fontSize: 7, fontWeight: 700, color: c.text, opacity: 0.75, lineHeight: 1, marginTop: 1 }}>
             {hole.scoreToPar < 0 ? `${hole.scoreToPar}` : `+${hole.scoreToPar}`}
           </span>
         )}
@@ -215,14 +214,14 @@ function RoundTabs({
   onSelect: (round: number) => void;
   roundScores: { round: number; strokes: number; toPar: number; holesCompleted: number }[];
 }) {
-  const maxRound = Math.max(currentRound, 4);
-  const tabs = Array.from({ length: maxRound }, (_, i) => i + 1);
+  const tabs = [1, 2, 3, 4];
 
   return (
     <div style={{ display: 'flex', gap: 5, padding: '4px 16px 10px', width: 'fit-content' }}>
       {tabs.map((roundNum) => {
+        const hasScorecard = rounds.some(r => r.roundNumber === roundNum);
         const rs = roundScores.find(r => r.round === roundNum);
-        const hasData = rs && rs.holesCompleted > 0;
+        const hasData = hasScorecard || (rs && rs.holesCompleted > 0);
         const isActive = roundNum === activeRound;
         const toPar = rs?.toPar ?? null;
         const fmtScore = toPar === null ? null
@@ -240,13 +239,10 @@ function RoundTabs({
             onClick={() => hasData && onSelect(roundNum)}
             disabled={!hasData}
             style={{
-              minWidth: 44,
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-              padding: '6px 4px',
+              padding: '6px 14px',
               borderRadius: 9,
-              background: isActive
-                ? 'rgba(247,147,30,0.10)'
-                : 'rgba(255,255,255,0.04)',
+              background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
               border: isActive
                 ? '1.5px solid rgba(247,147,30,0.35)'
                 : '1px solid rgba(255,255,255,0.07)',
@@ -254,10 +250,18 @@ function RoundTabs({
               transition: 'all 0.15s ease',
             }}
           >
-            <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <span style={{
+              fontSize: 8, fontWeight: 700,
+              color: isActive ? '#F7931E' : 'rgba(255,255,255,0.35)',
+              textTransform: 'uppercase', letterSpacing: '0.5px',
+            }}>
               R{roundNum}
             </span>
-            <span style={{ fontSize: 14, fontWeight: 800, color: hasData ? scoreColor : 'rgba(255,255,255,0.18)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+            <span style={{
+              fontSize: 14, fontWeight: 800,
+              color: hasData ? scoreColor : 'rgba(255,255,255,0.18)',
+              fontVariantNumeric: 'tabular-nums',
+            }}>
               {fmtScore ?? '—'}
             </span>
           </button>
@@ -489,8 +493,8 @@ export function PlayerScorecardCard({
                 {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()]}
               </span>
             )}
-            {player.thru === 'F' ? 'Finished' : player.thru ? `Thru ${player.thru}` : 'Round 1'}
-            {player.currentRound ? ` · Round ${player.currentRound}` : ''}
+            {player.thru === 'F' ? 'Finished' : player.thru ? `Thru ${player.thru}` : 'Starting soon'}
+            {` · Round ${currentRound}`}
           </span>
         </div>
 
@@ -511,8 +515,6 @@ export function PlayerScorecardCard({
         <ScorecardSparkline holes={activeRoundData.holes} />
       )}
 
-      {/* Separator */}
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px 6px', flexShrink: 0 }} />
 
       {/* ── SCORECARD CONTENT — scrollable ── */}
       {isLoading ? (
