@@ -118,19 +118,16 @@ function orbitScore(post: FeedPost): number {
   // Layer 1: engagement gravity
   const engagement = likes * 3 + comments * 5 + shares * 4;
 
-  // Layer 2: recency amplifier (replaces relationship boost for global discovery)
-  // Posts from the last 48h get a freshness boost to surface new creators
-  const ageMs = Date.now() - new Date(post.createdAt).getTime();
-  const ageHours = ageMs / (1000 * 60 * 60);
+  // Layer 2+3: recency amplifier + time decay (global discovery — no relationship boost)
+  const postAgeMs = Date.now() - new Date(post.createdAt).getTime();
+  const ageHours = postAgeMs / (1000 * 60 * 60);
   const relationMultiplier =
     ageHours < 24 ? 2.2 :   // last 24h — strong freshness boost
     ageHours < 48 ? 1.5 :   // 24-48h — moderate boost
     ageHours < 168 ? 1.1 :  // last week — slight boost
     1.0;                     // older — compete on engagement alone
 
-  // Layer 3: time decay — exponential, half-life ~9 days
-  const ageMs = Date.now() - new Date(post.createdAt).getTime();
-  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  const ageDays = postAgeMs / (1000 * 60 * 60 * 24);
   const decayMultiplier = Math.exp(-DECAY_LAMBDA * ageDays);
 
   // Layer 4: golf-native review bonus
