@@ -1464,9 +1464,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 interface HeroCarouselProps {
   /** If true, hero bleeds behind header; if false (default), only bleeds behind safe area */
   hasHeader?: boolean;
+  onScorecardChange?: (open: boolean) => void;
 }
 
-export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
+export function HeroCarousel({ hasHeader = false, onScorecardChange }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1652,10 +1653,12 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
               isScorecardOpenRef.current = true;
               setIsPaused(true);
               if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+              onScorecardChange?.(true);
             }}
             onScorecardClose={() => {
               isScorecardOpenRef.current = false;
               scheduleResume();
+              onScorecardChange?.(false);
             }}
             onCardTouchStart={handleTouchStart}
             onCardTouchMove={handleTouchMove}
