@@ -1380,7 +1380,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         borderRadius: 12,
                         padding: '10px 12px',
                         marginTop: 8, marginBottom: 10,
-                        marginLeft: 18, marginRight: 18,
                       }}
                     >
                       {/* Avatar */}
