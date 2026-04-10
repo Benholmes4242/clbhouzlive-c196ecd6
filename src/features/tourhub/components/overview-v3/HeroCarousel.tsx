@@ -701,7 +701,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             className="absolute inset-0 w-full h-full"
             style={{
               background: isLive
-                ? `radial-gradient(ellipse 120% 55% at 50% calc(25% + 57px), #2d5a1e 0%, #1a3a0e 45%, #0a1a05 100%)`
+                ? `radial-gradient(ellipse 120% 55% at 50% calc(25% + 65px), #2d5a1e 0%, #1a3a0e 45%, #0a1a05 100%)`
                 : undefined,
             }}
           >
@@ -872,7 +872,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 /* ── Compact topbar — tournament name left, round + LIVE right ── */
                 <div style={{
                   flexShrink: 0,
-                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
+                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                 }}>
                   <div style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -914,7 +914,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 <>
                   <div style={{
                     flexShrink: 0,
-                    paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
+                    paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                   }}>
                     <div style={{ padding: '0 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
