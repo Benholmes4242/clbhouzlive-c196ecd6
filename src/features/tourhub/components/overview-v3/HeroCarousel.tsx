@@ -242,7 +242,7 @@ function LeaderHeroStrip({
         {/* Identity row — left/right split */}
         <div style={{
           display: 'flex', alignItems: 'flex-start', gap: 12,
-          marginBottom: holeScores.length > 0 ? 12 : 0,
+          marginBottom: 0,
         }}>
           {/* Left — avatar + name + thru */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, minWidth: 0 }}>
@@ -279,7 +279,7 @@ function LeaderHeroStrip({
             </div>
           </div>
 
-          {/* Right — big total score + today pill + round pills */}
+          {/* Right — big total score + today pill */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
             <span style={{
               fontSize: 44, fontWeight: 800, lineHeight: 1,
@@ -301,17 +301,18 @@ function LeaderHeroStrip({
                 <span style={{ fontSize: 13, fontWeight: 800, color: todayColor, fontVariantNumeric: 'tabular-nums' }}>{todayDisplay}</span>
               </div>
             )}
-
-            <div style={{ alignSelf: 'stretch' }}>
-              <RoundHistoryPills
-                round1={leaderEntry.round_1}
-                round2={leaderEntry.round_2}
-                round3={leaderEntry.round_3}
-                round4={leaderEntry.round_4}
-                currentRound={derivedRound}
-              />
-            </div>
           </div>
+        </div>
+
+        {/* Round pills — left-aligned with avatar */}
+        <div style={{ marginTop: 8, marginBottom: holeScores.length > 0 ? 12 : 0 }}>
+          <RoundHistoryPills
+            round1={leaderEntry.round_1}
+            round2={leaderEntry.round_2}
+            round3={leaderEntry.round_3}
+            round4={leaderEntry.round_4}
+            currentRound={derivedRound}
+          />
         </div>
 
         {/* Hole dots + sparkline — inside the card */}
