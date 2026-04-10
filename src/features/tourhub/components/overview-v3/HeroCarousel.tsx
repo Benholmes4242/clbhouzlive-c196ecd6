@@ -851,7 +851,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 }}>
                   <div style={{
                     display: 'flex', alignItems: 'center',
-                    gap: 10, padding: '0 16px', height: 52,
+                    gap: 10, padding: '0 16px 0 62px', height: 52,
                   }}>
 
                     {/* Title block */}
