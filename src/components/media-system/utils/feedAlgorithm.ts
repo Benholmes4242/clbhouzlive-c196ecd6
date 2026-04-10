@@ -10,13 +10,20 @@ const SUGGESTED_MIN_VIDEO_DURATION = 4;
 const SUGGESTED_MAX_ASPECT_RATIO = 1.0;
 const MAX_POSTS_PER_CREATOR = 4;
 const MAX_REVIEWS_PER_CREATOR = 4;
-const DECAY_LAMBDA = 0.035;          // half-life ~20 days matching RPC curve
-const ENTROPY_FLOOR = 0.82;          // minimum score multiplier from jitter
-const ENTROPY_RANGE = 0.32;          // jitter range on top of floor (max 1.14x)
-const EDITORIAL_BASE_SCORE = 180;    // editorial cards compete as if ~40 likes + 15 comments
-const REVIEW_POST_BONUS = 1.4;       // golf-native boost for course reviews
-const MIN_EDITORIAL_GAP = 5;         // minimum posts between any two editorial cards
+const DECAY_LAMBDA = 0.035;
+const ENTROPY_FLOOR = 0.82;
+const ENTROPY_RANGE = 0.32;
+const EDITORIAL_BASE_SCORE = 180;
+const REVIEW_POST_BONUS = 1.6;       // increased — reviews are high-value content
+const MIN_EDITORIAL_GAP = 5;
 const VIDEO_TARGET_RATIO = 0.80;
+
+// Freshness scoring constants
+const FRESHNESS_BASE = 100;          // brand new post starts at 100 — beats any stale content
+const FRESHNESS_HALF_LIFE_HOURS = 36; // score halves every 36 hours
+const ENGAGEMENT_BONUS_PER_LIKE = 4;  // each like adds 4 points on top of freshness
+const ENGAGEMENT_BONUS_PER_COMMENT = 7; // each comment adds 7 points
+const NEW_REVIEW_BONUS = 2.0;        // new reviews get extra boost — discovery of ratings is core to the app
 
 // ── Session seed ─────────────────────────────────────────────────────────────
 let _sessionSeed = 0;
@@ -113,33 +120,26 @@ function orbitScore(post: FeedPost): number {
 
   const likes = post.likeCount ?? 0;
   const comments = post.commentCount ?? 0;
-  const shares = post.shareCount ?? 0;
 
-  // Layer 1: engagement gravity
-  const engagement = likes * 3 + comments * 5 + shares * 4;
+  // Layer 1: Freshness is the primary score
+  // New posts start at FRESHNESS_BASE and decay with a half-life of 36 hours.
+  // This means a brand new post always outscores any stale content regardless of likes.
+  const ageMs = Date.now() - new Date(post.createdAt).getTime();
+  const ageHours = ageMs / (1000 * 60 * 60);
+  const freshnessScore = FRESHNESS_BASE * Math.pow(0.5, ageHours / FRESHNESS_HALF_LIFE_HOURS);
 
-  // Layer 2+3: recency amplifier + time decay (global discovery — no relationship boost)
-  const postAgeMs = Date.now() - new Date(post.createdAt).getTime();
-  const ageHours = postAgeMs / (1000 * 60 * 60);
-  const relationMultiplier =
-    ageHours < 24 ? 2.2 :   // last 24h — strong freshness boost
-    ageHours < 48 ? 1.5 :   // 24-48h — moderate boost
-    ageHours < 168 ? 1.1 :  // last week — slight boost
-    1.0;                     // older — compete on engagement alone
+  // Layer 2: Engagement is additive — it extends a post's lifespan but doesn't override freshness
+  // A post with 10 likes + 2 comments gets +54 points on top of its freshness score.
+  // This lets viral posts stay visible longer, but never buries new content.
+  const engagementBonus = (likes * ENGAGEMENT_BONUS_PER_LIKE) + (comments * ENGAGEMENT_BONUS_PER_COMMENT);
 
-  const ageDays = postAgeMs / (1000 * 60 * 60 * 24);
-  const decayMultiplier = Math.exp(-DECAY_LAMBDA * ageDays);
+  // Layer 3: Review bonus — course reviews are core to Clbhouz, boost them significantly
+  const reviewMultiplier = isReviewPost(post) ? NEW_REVIEW_BONUS : 1.0;
 
-  // Layer 4: golf-native review bonus
-  const reviewMultiplier = isReviewPost(post) ? REVIEW_POST_BONUS : 1.0;
-
-  // Base score — minimum of 1 so brand new posts with zero engagement still appear
-  const baseScore = Math.max(1, engagement * relationMultiplier * decayMultiplier * reviewMultiplier);
-
-  // Layer 5: session entropy — ±16% jitter, deterministic within session hour
+  // Layer 4: Session entropy — ±16% jitter keeps feed feeling fresh each session
   const jitter = ENTROPY_FLOOR + seededRandom(post.id) * ENTROPY_RANGE;
 
-  return baseScore * jitter;
+  return (freshnessScore + engagementBonus) * reviewMultiplier * jitter;
 }
 
 // ── Diversity Pass ────────────────────────────────────────────────────────────
