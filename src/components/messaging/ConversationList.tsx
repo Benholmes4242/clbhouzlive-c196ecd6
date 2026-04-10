@@ -6,7 +6,7 @@ import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, BellOff } from 'lucide-react';
+import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, BellOff, Building2, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -70,10 +70,8 @@ function getConversationDisplay(
   };
 }
 
-// Component to show typing indicator or message preview
-// Only subscribes to typing indicators when isActive to avoid N simultaneous realtime channels
+// Typing indicator or message preview
 function ConversationTypingOrPreview({ conversationId, preview, isActive }: { conversationId: string; preview: string | null; isActive: boolean }) {
-  // Only subscribe to typing indicators for the active conversation
   const { typingUsers } = useTypingIndicator(isActive ? conversationId : '');
   
   if (isActive && typingUsers.length > 0) {
@@ -82,12 +80,12 @@ function ConversationTypingOrPreview({ conversationId, preview, isActive }: { co
       : `${typingUsers.length} people typing...`;
     
     return (
-      <span className="text-[hsl(35,80%,43%)] italic flex items-center gap-1">
+      <span style={{ color: '#F7931E', fontStyle: 'italic' }} className="flex items-center gap-1">
         {text}
         <span className="inline-flex gap-0.5">
-          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: '#F7931E', animationDelay: '0ms' }} />
+          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: '#F7931E', animationDelay: '150ms' }} />
+          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: '#F7931E', animationDelay: '300ms' }} />
         </span>
       </span>
     );
@@ -99,7 +97,7 @@ function ConversationTypingOrPreview({ conversationId, preview, isActive }: { co
 function ConversationSkeleton() {
   return (
     <div className="flex items-center gap-3 py-3 px-4">
-      <Skeleton className="h-14 w-14 rounded-full flex-shrink-0" />
+      <Skeleton className="h-[52px] w-[52px] rounded-full flex-shrink-0" />
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center justify-between">
           <Skeleton className="h-4 w-28" />
@@ -114,17 +112,26 @@ function ConversationSkeleton() {
 function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-4">
-        <MessageCircle className="h-8 w-8 text-[hsl(38,92%,50%)]/50" />
+      <div
+        className="flex items-center justify-center mb-4"
+        style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(247,147,30,0.10)' }}
+      >
+        <MessageCircle style={{ color: '#F7931E' }} className="h-6 w-6" />
       </div>
-      <h3 className="font-semibold text-foreground text-lg mb-1">No messages yet</h3>
-      <p className="text-sm text-muted-foreground mb-6 max-w-[240px]">
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>No messages yet</h3>
+      <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20, maxWidth: 240 }}>
         Start a conversation with your golf buddies
       </p>
       {onNewConversation && (
         <button 
           onClick={onNewConversation}
-          className="flex items-center gap-2 px-6 py-3 bg-[hsl(38,92%,50%)] text-white rounded-full font-semibold active:scale-[0.97] transition-transform"
+          className="flex items-center active:scale-[0.97] transition-transform"
+          style={{
+            gap: 6, padding: '8px 20px', borderRadius: 99,
+            background: 'rgba(247,147,30,0.10)',
+            border: '1px solid rgba(247,147,30,0.25)',
+            color: '#F7931E', fontSize: 13, fontWeight: 600,
+          }}
         >
           <Plus className="h-4 w-4" />
           Start a Chat
@@ -137,13 +144,47 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
 function NoResults({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-3">
-        <MessageCircle className="h-6 w-6 text-[hsl(38,92%,50%)]/50" />
+      <div
+        className="flex items-center justify-center mb-3"
+        style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(247,147,30,0.10)' }}
+      >
+        <Search style={{ color: '#F7931E' }} className="h-5 w-5" />
       </div>
-      <h3 className="font-medium text-foreground mb-1">No results found</h3>
-      <p className="text-sm text-muted-foreground">
-        No conversations match "{query}"
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>No one found</h3>
+      <p style={{ fontSize: 13, color: '#94a3b8' }}>
+        Try a different name or username
       </p>
+    </div>
+  );
+}
+
+/** White card container for conversation sections */
+function ConversationCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        margin: '4px 16px',
+        borderRadius: 16,
+        background: '#fff',
+        border: '1px solid rgba(0,0,0,0.07)',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        overflow: 'hidden',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionLabel({ text }: { text: string }) {
+  return (
+    <div style={{
+      padding: '10px 16px 4px',
+      fontSize: '10px', fontWeight: 700,
+      letterSpacing: '0.08em', textTransform: 'uppercase' as const,
+      color: '#c0c8d0',
+    }}>
+      {text}
     </div>
   );
 }
@@ -163,15 +204,13 @@ export function ConversationList({
     try { return !localStorage.getItem('swipeHintDismissed'); }
     catch { return true; }
   });
-  
 
-  // Dismiss hint after 10 seconds
   useEffect(() => {
     if (showSwipeHint && conversations.length > 0) {
       const timer = setTimeout(() => {
         setShowSwipeHint(false);
         try { localStorage.setItem('swipeHintDismissed', 'true'); }
-        catch { /* silent fail in WebView */ }
+        catch { /* silent fail */ }
       }, 10000);
       return () => clearTimeout(timer);
     }
@@ -183,9 +222,7 @@ export function ConversationList({
         p_conversation_id: conversationId,
         p_archive: true,
       });
-      
       if (error) throw error;
-      
       await fetchConversations();
       await refetchArchived();
       toast.success('Chat archived');
@@ -216,9 +253,7 @@ export function ConversationList({
         .delete()
         .eq('conversation_id', deletingConversationId)
         .eq('user_id', user?.id);
-        
       if (error) throw error;
-      
       await fetchConversations();
       toast.success('Conversation deleted');
     } catch {
@@ -230,7 +265,6 @@ export function ConversationList({
 
   // Filter conversations
   const filteredConversations = conversations.filter(conversation => {
-    // Apply filter type
     if (filterType === 'unread' && conversation.unread_count <= 0) return false;
     if (filterType === 'groups' && conversation.type !== 'group') return false;
     
@@ -245,7 +279,7 @@ export function ConversationList({
 
   if (loading) {
     return (
-      <div className="overflow-hidden">
+      <div>
         {[1, 2, 3, 4, 5].map(i => (
           <ConversationSkeleton key={i} />
         ))}
@@ -261,7 +295,11 @@ export function ConversationList({
     return <NoResults query={searchQuery} />;
   }
 
-  const renderConversationItem = (conversation: ConversationWithDetails, isArchived: boolean = false, index: number = 0, total: number = 0) => {
+  // Split into people (direct) and groups
+  const directConversations = filteredConversations.filter(c => c.type === 'direct');
+  const groupConversations = filteredConversations.filter(c => c.type === 'group');
+
+  const renderConversationRow = (conversation: ConversationWithDetails, isArchived: boolean = false, index: number = 0, total: number = 0) => {
     const { name, avatarUrl, initials } = getConversationDisplay(conversation, user?.id);
     const isSelected = selectedConversationId === conversation.id;
     const hasUnread = conversation.unread_count > 0;
@@ -282,74 +320,102 @@ export function ConversationList({
         <div className="relative">
           <button
             onClick={() => {
-              if (isArchived) {
-                handleUnarchiveConversation(conversation.id);
-              }
+              if (isArchived) handleUnarchiveConversation(conversation.id);
               onSelectConversation(conversation.id);
             }}
-            className={cn(
-              "w-full px-4 py-2.5 flex items-center gap-3 text-left transition-colors duration-100",
-              "active:bg-black/[0.03]",
-              isSelected && "bg-[hsl(38,92%,50%)]/5",
-              isArchived && "opacity-70"
-            )}
+            style={{
+              width: '100%',
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '10px 16px',
+              textAlign: 'left' as const, border: 'none', cursor: 'pointer',
+              background: isSelected ? 'rgba(247,147,30,0.06)' : '#fff',
+              borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+              transition: 'background 0.1s',
+              opacity: isArchived ? 0.7 : 1,
+            }}
+            className="active:!bg-[rgba(0,0,0,0.03)]"
           >
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               {isGroup && !avatarUrl ? (
-                <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: 52, height: 52, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #F7931E, #e07a0d)',
+                  }}
+                >
                   <Users className="w-5 h-5 text-white" />
                 </div>
               ) : (
                 <SquircleAvatar
                   src={avatarUrl}
                   alt={name}
-                  size={50}
+                  size={52}
                   fallback={initials}
                   hideRing
                 />
               )}
-              {/* Amber unread badge on avatar */}
+              
+              {/* Unread count badge on avatar */}
               {hasUnread && (
                 <span
-                  className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-[#F8FAFC]"
-                  style={{ background: '#F5A623' }}
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    top: -2, right: -2,
+                    minWidth: 17, height: 17, borderRadius: 99,
+                    background: '#F7931E', color: '#fff',
+                    fontSize: 9, fontWeight: 700,
+                    border: '2px solid #F8FAFC',
+                    padding: '0 3px',
+                  }}
                 >
                   {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                 </span>
               )}
             </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2 mb-0.5">
-                <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                  <span className={cn(
-                    "text-[14.5px] truncate",
-                    hasUnread ? "font-bold text-foreground" : "font-semibold text-foreground"
-                  )}>
+            {/* Text column */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Top row */}
+              <div className="flex items-center justify-between" style={{ gap: 4, marginBottom: 2 }}>
+                <div className="flex items-center flex-1 min-w-0" style={{ gap: 6 }}>
+                  <span
+                    className="truncate"
+                    style={{
+                      fontSize: '14.5px',
+                      fontWeight: hasUnread ? 700 : 600,
+                      color: hasUnread ? '#0f172a' : '#1e293b',
+                    }}
+                  >
                     {name}
                   </span>
                   {isMuted && (
-                    <BellOff className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
+                    <BellOff size={11} style={{ color: '#94a3b8', flexShrink: 0 }} />
                   )}
                 </div>
                 <span
-                  className={cn(
-                    "text-[11.5px] font-medium shrink-0",
-                    !hasUnread && "text-muted-foreground"
-                  )}
-                  style={{ color: hasUnread ? '#F5A623' : undefined }}
+                  className="flex-shrink-0"
+                  style={{
+                    fontSize: '11.5px', fontWeight: 500,
+                    color: hasUnread ? '#F7931E' : '#94a3b8',
+                  }}
                 >
                   {formatRelativeTime(conversation.last_message_at)}
                 </span>
               </div>
               
-              <div className="flex items-center justify-between">
-                <p className={cn(
-                  "text-[13px] truncate flex-1",
-                  hasUnread ? "text-foreground/70 font-medium" : "text-muted-foreground font-normal"
-                )}>
+              {/* Bottom row — preview */}
+              <div className="flex items-center">
+                <p
+                  className="truncate flex-1"
+                  style={{
+                    fontSize: 13, margin: 0,
+                    color: hasUnread ? '#334155' : '#94a3b8',
+                    fontWeight: hasUnread ? 500 : 400,
+                    whiteSpace: 'nowrap' as const,
+                  }}
+                >
                   <ConversationTypingOrPreview 
                     conversationId={conversation.id}
                     preview={conversation.last_message_preview}
@@ -358,22 +424,52 @@ export function ConversationList({
                 </p>
               </div>
             </div>
+
+            {/* Unread accent bar */}
+            {hasUnread && (
+              <div
+                className="flex-shrink-0"
+                style={{
+                  width: 3, height: 36, borderRadius: 99,
+                  background: '#F7931E',
+                }}
+              />
+            )}
           </button>
           
           {/* Hairline divider */}
           {showDivider && (
-            <div className="h-px bg-black/[0.05] mx-4" />
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
           )}
         </div>
       </SwipeableConversationItem>
     );
   };
 
+  const renderConversationList = (convos: ConversationWithDetails[], isArchived = false) => (
+    <>
+      {convos.map((conversation, index) => 
+        renderConversationRow(conversation, isArchived, index, convos.length)
+      )}
+    </>
+  );
+
+  // When filtering by unread or groups, or searching, render flat list
+  const showSections = filterType === 'all' && !searchQuery.trim();
+
   return (
     <div>
       {/* Swipe hint */}
       {showSwipeHint && filteredConversations.length > 0 && (
-        <div className="px-4 py-2 rounded-xl mb-3 text-center text-[13px] flex items-center justify-center gap-2 bg-[hsl(38,92%,50%)]/5 border border-border text-muted-foreground">
+        <div
+          className="flex items-center justify-center text-center"
+          style={{
+            margin: '4px 16px', padding: '8px 12px', borderRadius: 12,
+            background: 'rgba(247,147,30,0.05)',
+            border: '1px solid rgba(0,0,0,0.06)',
+            fontSize: 13, color: '#94a3b8', gap: 8,
+          }}
+        >
           <span>← Swipe left to delete</span>
           <span>•</span>
           <span>Swipe right to archive →</span>
@@ -381,42 +477,71 @@ export function ConversationList({
             onClick={() => {
               setShowSwipeHint(false);
               try { localStorage.setItem('swipeHintDismissed', 'true'); }
-              catch { /* silent fail in WebView */ }
+              catch { /* silent */ }
             }}
-            className="ml-2 font-medium text-[hsl(35,80%,43%)]"
+            style={{ marginLeft: 8, fontWeight: 600, color: '#F7931E' }}
           >
             Got it
           </button>
         </div>
       )}
 
-      {/* Conversations card — warm glass container */}
-      <div className="overflow-hidden rounded-2xl">
-        {filteredConversations.map((conversation, index) => 
-          renderConversationItem(conversation, false, index, filteredConversations.length)
-        )}
-      </div>
+      {showSections ? (
+        <>
+          {/* People section */}
+          {directConversations.length > 0 && (
+            <>
+              <SectionLabel text="People" />
+              <ConversationCard>
+                {renderConversationList(directConversations)}
+              </ConversationCard>
+            </>
+          )}
+
+          {/* Groups & Clubs section */}
+          {groupConversations.length > 0 && (
+            <>
+              <SectionLabel text="Groups & Clubs" />
+              <ConversationCard>
+                {renderConversationList(groupConversations)}
+              </ConversationCard>
+            </>
+          )}
+        </>
+      ) : (
+        <ConversationCard>
+          {renderConversationList(filteredConversations)}
+        </ConversationCard>
+      )}
 
       {/* Archived section */}
       {hasArchived && (
-        <div className="mt-4">
+        <div style={{ margin: '12px 16px 0' }}>
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-[hsl(38,92%,50%)]/5 rounded-xl text-muted-foreground"
+            className="flex items-center justify-between w-full"
+            style={{
+              padding: '10px 14px', borderRadius: 12,
+              background: 'rgba(0,0,0,0.04)', border: 'none',
+              cursor: 'pointer',
+            }}
           >
-            <div className="flex items-center gap-2">
-              <Archive size={18} />
-              <span className="font-medium">Archived</span>
-              <span className="text-sm text-muted-foreground">({archivedConversations.length})</span>
+            <div className="flex items-center" style={{ gap: 8 }}>
+              <Archive size={16} style={{ color: '#64748b' }} />
+              <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#64748b' }}>Archived</span>
+              <span style={{ fontSize: 12, color: '#94a3b8' }}>({archivedConversations.length})</span>
             </div>
-            {showArchived ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            {showArchived 
+              ? <ChevronDown size={16} style={{ color: '#94a3b8' }} /> 
+              : <ChevronRight size={16} style={{ color: '#94a3b8' }} />
+            }
           </button>
           
           {showArchived && (
-            <div className="mt-2 overflow-hidden">
-              {archivedConversations.map((conversation, index) => 
-                renderConversationItem(conversation, true, index, archivedConversations.length)
-              )}
+            <div style={{ marginTop: 8 }}>
+              <ConversationCard>
+                {renderConversationList(archivedConversations, true)}
+              </ConversationCard>
             </div>
           )}
         </div>
