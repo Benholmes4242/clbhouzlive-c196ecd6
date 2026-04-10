@@ -30,7 +30,6 @@ import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
-import { openTourNav } from '../../contexts/TourNavContext';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 export function OverviewPageV3() {
