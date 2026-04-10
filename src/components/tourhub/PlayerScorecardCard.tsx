@@ -438,7 +438,7 @@ export function PlayerScorecardCard({
         </button>
         <span style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.38)' }}>
           {tournamentName && tournamentName.length < 20 ? tournamentName : 'PGA TOUR'}
-          {player.currentRound ? ` · R${player.currentRound}` : ''}
+          {` · R${currentRound}`}
         </span>
       </div>
 
