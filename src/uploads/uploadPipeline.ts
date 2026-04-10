@@ -55,6 +55,50 @@ async function getImageDimensions(file: File): Promise<{ width: number; height: 
 }
 
 /**
+ * Measure video dimensions and duration client-side using an HTML video element.
+ * Returns null values if extraction fails — non-blocking with a 5s timeout.
+ */
+async function measureVideoDimensions(file: File): Promise<{
+  width: number | null;
+  height: number | null;
+  duration: number | null;
+  aspectRatio: number | null;
+}> {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+
+    const objectUrl = URL.createObjectURL(file);
+    const cleanup = () => URL.revokeObjectURL(objectUrl);
+
+    video.onloadedmetadata = () => {
+      const w = video.videoWidth || null;
+      const h = video.videoHeight || null;
+      const dur = video.duration && isFinite(video.duration)
+        ? Math.round(video.duration)
+        : null;
+      const ar = w && h ? parseFloat((w / h).toFixed(4)) : null;
+      cleanup();
+      resolve({ width: w, height: h, duration: dur, aspectRatio: ar });
+    };
+
+    video.onerror = () => {
+      cleanup();
+      resolve({ width: null, height: null, duration: null, aspectRatio: null });
+    };
+
+    // Timeout fallback — don't block upload indefinitely
+    setTimeout(() => {
+      cleanup();
+      resolve({ width: null, height: null, duration: null, aspectRatio: null });
+    }, 5000);
+
+    video.src = objectUrl;
+  });
+}
+
+/**
  * Enqueue and immediately start processing a post upload.
  * Returns the jobId synchronously - processing happens in background.
  * 
@@ -474,6 +518,18 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 
         // Upload based on file type
         if (file.type.startsWith('video/') || (!file.type && /\.(mov|mp4|m4v)$/i.test(file.name))) {
+          // Measure video dimensions client-side before upload
+          const videoDims = await measureVideoDimensions(file);
+          if (videoDims.width) width = videoDims.width;
+          if (videoDims.height) height = videoDims.height;
+          if (videoDims.duration) {
+            // Store duration for later insertion into post_media
+            (mediaItem as any).__clientDuration = videoDims.duration;
+          }
+          if (videoDims.aspectRatio) aspectRatio = videoDims.aspectRatio;
+          if (width && height) {
+            orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
+          }
           // === TUS RESUMABLE VIDEO UPLOAD ===
           
           console.log(`[uploadPipeline] Using TUS for video: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
@@ -647,6 +703,10 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
               height,
               aspect_ratio: aspectRatio,
               orientation,
+            }),
+            // Include client-measured duration for videos
+            ...((mediaItem as any)?.__clientDuration && {
+              duration_seconds: (mediaItem as any).__clientDuration,
             }),
           })
           .select('id')

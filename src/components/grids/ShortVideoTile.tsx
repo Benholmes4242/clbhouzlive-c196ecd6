@@ -13,7 +13,7 @@
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Heart, Camera } from 'lucide-react';
+import { Heart, Camera, Loader2 } from 'lucide-react';
 import { GridPost } from './types';
 import { DurationBadge } from './DurationBadge';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
@@ -64,6 +64,7 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
   const courseName = (post as any).golf_courses?.name || (post as any).course?.name || null;
   const likeCount = post.like_count || 0;
   const durationSeconds = media?.duration_seconds;
+  const isProcessing = !durationSeconds && !media?.aspect_ratio;
   
   // CRITICAL: Extract stream UID for cache consistency
   const streamId = useMemo(() => uidFromNode({ src: hlsUrl }) || post.id, [hlsUrl, post.id]);
@@ -205,6 +206,14 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
           seconds={durationSeconds} 
           className="absolute bottom-2 right-2 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 text-[10px] font-medium text-white z-10"
         />
+      )}
+
+      {/* Processing overlay — shown when metadata not yet available */}
+      {isProcessing && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
+          <Loader2 className="h-6 w-6 text-white animate-spin" />
+          <span className="text-white text-xs mt-2 font-medium">Processing…</span>
+        </div>
       )}
 
       {/* Course name - bottom left (Watch tab standard) */}
