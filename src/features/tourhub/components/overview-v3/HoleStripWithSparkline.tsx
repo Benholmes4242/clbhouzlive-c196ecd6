@@ -163,7 +163,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             const label = (() => {
               if (!isPlayed || score === null) return null;
               if (isHIO)       return 'HIO';
-              if (score === 0) return null;      // par — no label, dashed circle is enough
+              if (score === 0) return '—';
               return score < 0 ? `${score}` : `+${score}`;
             })();
 
@@ -174,7 +174,12 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
                 </span>
                 <div style={{ width: 13, height: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', ...dotStyle }}>
                   {label && (
-                    <span style={{ fontSize: isHIO ? 4.5 : 6, fontWeight: 800, color: textColor, lineHeight: 1 }}>
+                    <span style={{
+                      fontSize: score === 0 ? 7 : isHIO ? 4.5 : 6,
+                      fontWeight: score === 0 ? 600 : 800,
+                      color: score === 0 ? 'rgba(255,255,255,0.45)' : textColor,
+                      lineHeight: 1,
+                    }}>
                       {label}
                     </span>
                   )}
