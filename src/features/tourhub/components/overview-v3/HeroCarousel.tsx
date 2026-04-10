@@ -898,7 +898,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               ) : isUpcoming ? (
                 <>
                   {/* Safe area spacer — upcoming fills full card like live */}
-                  <div style={{ height: 'max(env(safe-area-inset-top,0px),44px)', flexShrink: 0 }} />
+                  <div style={{ height: 57, flexShrink: 0 }} />
 
                   <div style={{ padding: '0 18px' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
