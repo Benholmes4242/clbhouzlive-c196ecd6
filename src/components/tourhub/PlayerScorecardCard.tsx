@@ -97,7 +97,7 @@ function HoleCell({ hole }: { hole: HoleScore }) {
         {hole.par}
       </span>
       <div style={{
-        width: 30, height: 30,
+        width: 32, height: 32,
         borderRadius: isCircle ? '50%' : isSquare ? 5 : '50%',
         border: isPar ? '1.5px dashed rgba(255,255,255,0.18)' : `1.5px solid ${c.ring}`,
         background: isPar ? 'transparent' : c.bg,
@@ -105,7 +105,7 @@ function HoleCell({ hole }: { hole: HoleScore }) {
         gap: 0,
       }}>
         <span style={{
-          fontSize: isPar ? 10 : 12,
+          fontSize: isPar ? 10 : 13,
           fontWeight: isPar ? 600 : 800,
           color: isPar ? 'rgba(255,255,255,0.45)' : c.text,
           lineHeight: 1,
@@ -132,7 +132,7 @@ function EmptyHoleCell({ holeNumber, par }: { holeNumber: number; par: number })
         {par}
       </span>
       <div style={{
-        width: 30, height: 30,
+        width: 32, height: 32,
         borderRadius: '50%',
         border: '1.5px dashed rgba(255,255,255,0.10)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -494,52 +494,6 @@ export function PlayerScorecardCard({
         </span>
       </div>
 
-      {/* ── ROUND SCORE CHIPS — all 4 rounds ── */}
-      {roundScores.length > 0 && (
-        <div style={{
-          display: 'flex', gap: 5,
-          padding: '0 16px 8px',
-          flexShrink: 0,
-        }}>
-          {Array.from({ length: Math.max(currentRound, 4) }, (_, i) => {
-            const roundNum = i + 1;
-            const rs = roundScores.find(r => r.round === roundNum);
-            const isActive = roundNum === activeRound;
-            const hasData = rs && rs.holesCompleted > 0;
-            return (
-              <button
-                key={roundNum}
-                onClick={() => hasData && setActiveRound(roundNum)}
-                disabled={!hasData}
-                style={{
-                  flex: 1,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  padding: '5px 4px',
-                  borderRadius: 8,
-                  background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${isActive ? 'rgba(247,147,30,0.35)' : 'rgba(255,255,255,0.07)'}`,
-                  cursor: hasData ? 'pointer' : 'default',
-                }}
-              >
-                <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  R{roundNum}
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: hasData ? '#fff' : 'rgba(255,255,255,0.2)' }}>
-                  {hasData ? rs.strokes : '—'}
-                </span>
-                {hasData && (
-                  <span style={{
-                    fontSize: 9, fontWeight: 600,
-                    color: rs.toPar < 0 ? '#F7931E' : rs.toPar === 0 ? 'rgba(255,255,255,0.5)' : '#EF4444',
-                  }}>
-                    {formatScoreToPar(rs.toPar)}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
 
       {/* Separator */}
       <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px 6px', flexShrink: 0 }} />
