@@ -932,7 +932,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     </div>
                   </div>
                 </>
-              )
+              ) : null
             )}
 
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
