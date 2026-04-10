@@ -638,23 +638,43 @@ const BusinessProfilePage: React.FC = () => {
           <CreatorSection userId={user.id} isOwnProfile={isOwner || false} />
         )}
 
-        {/* Segmented control tabs */}
-        <section className="px-4 py-2 pointer-events-auto">
-          <div className="flex items-center justify-center gap-1 w-full">
+        {/* Segmented control tabs — matches PersonalProfile underline style */}
+        <section className="px-4 bg-background pointer-events-auto">
+          <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20, justifyContent: 'center' }}>
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as BusinessTab)}
-                  className={cn(
-                    "relative flex-1 min-h-[44px] transition-all duration-200 whitespace-nowrap active:scale-[0.98]",
-                    isActive 
-                      ? "bg-[#f59e0b] text-white rounded-lg px-4 py-1.5 text-sm font-semibold shadow-sm" 
-                      : "text-muted-foreground px-4 py-1.5 text-sm font-medium hover:text-foreground"
-                  )}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '11px 2px 9px',
+                    fontSize: 16,
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                    letterSpacing: isActive ? '-0.025em' : '0',
+                    position: 'relative',
+                    minHeight: 44,
+                    display: 'flex',
+                    alignItems: 'center',
+                    transition: 'color 0.18s',
+                  }}
                 >
                   {tab.label}
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: 2.5,
+                      borderRadius: 2,
+                      background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                    }} />
+                  )}
                 </button>
               );
             })}
