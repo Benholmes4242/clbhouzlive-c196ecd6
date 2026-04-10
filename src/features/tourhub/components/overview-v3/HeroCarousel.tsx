@@ -215,7 +215,7 @@ function LeaderHeroStrip({
   const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, p.headshot_override);
   const score = leaderEntry.score ?? 0;
   const scoreDisplay = score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`;
-  const scoreColor = score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : 'rgba(255,255,255,0.55)';
+  const scoreColor = score < 0 ? '#ffffff' : score > 0 ? '#EF4444' : 'rgba(255,255,255,0.55)';
 
   const thruRaw = leaderEntry.thru;
   const thruDisplay = leaderEntry.status === 'cut' ? 'CUT'
@@ -240,105 +240,107 @@ function LeaderHeroStrip({
     : todayScore > 0 ? `+${todayScore}`
     : `${todayScore}`;
   const todayColor = todayScore === null ? 'rgba(255,255,255,0.55)'
-    : todayScore < 0 ? '#F7931E'
+    : todayScore < 0 ? '#4ade80'
     : todayScore > 0 ? '#EF4444'
     : 'rgba(255,255,255,0.55)';
 
   return (
     <div style={{ padding: '14px 16px 0', flexShrink: 0 }}>
-      {/* ── Leader card ── */}
+      {/* Leader identity — floating directly on photo */}
       <div style={{
-        background: 'rgba(255,255,255,0.07)',
-        border: '1px solid rgba(255,255,255,0.11)',
-        borderRadius: 14, padding: '16px 14px', marginBottom: 10,
+        display: 'flex', alignItems: 'flex-end',
+        justifyContent: 'space-between', marginBottom: 16,
       }}>
-        {/* Identity row — left/right split */}
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: 12,
-          marginBottom: 0,
-        }}>
-          {/* Left — avatar + name + thru */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, minWidth: 0 }}>
-            <div style={{
-              width: 38, height: 40, borderRadius: '34%',
-              border: '1.5px solid rgba(255,255,255,0.20)',
-              background: 'rgba(255,255,255,0.07)',
-              overflow: 'hidden', flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              {photoUrl && !imgErr ? (
-                <img src={photoUrl} alt="" onError={() => setImgErr(true)}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-              ) : (
-                <PlayerSilhouette size={24} />
-              )}
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 2 }}>
-                🥇 Leader{flagEmoji ? ` · ${flagEmoji}` : ''}
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {fullName}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
-                {thruDisplay !== '-' && thruDisplay !== 'F' && (
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-                )}
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>
-                  {thruDisplay === '-' ? 'Starting soon' : thruDisplay === 'F' ? `Round ${derivedRound}` : `Thru ${thruDisplay} · Round ${derivedRound}`}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right — big total score + today pill */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
-            <span style={{
-              fontSize: 44, fontWeight: 800, lineHeight: 1,
-              color: scoreColor,
-              textShadow: score < 0 ? '0 0 16px rgba(247,147,30,0.35)' : score > 0 ? '0 0 16px rgba(239,68,68,0.35)' : 'none',
-              fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px',
-            }}>
-              {scoreDisplay}
-            </span>
-
-            {todayDisplay !== null && (
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                background: todayScore! < 0 ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${todayScore! < 0 ? 'rgba(247,147,30,0.20)' : 'rgba(255,255,255,0.08)'}`,
-                borderRadius: 20, padding: '2px 9px',
-              }}>
-                <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.5px' }}>TODAY</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: todayColor, fontVariantNumeric: 'tabular-nums' }}>{todayDisplay}</span>
-              </div>
+        {/* Left — avatar + name block */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+          {/* Avatar — slightly larger */}
+          <div style={{
+            width: 60, height: 62, borderRadius: '30%',
+            border: '2px solid rgba(255,255,255,0.25)',
+            background: 'rgba(0,0,0,0.3)',
+            overflow: 'hidden', flexShrink: 0,
+          }}>
+            {photoUrl && !imgErr ? (
+              <img src={photoUrl} alt="" onError={() => setImgErr(true)}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+            ) : (
+              <PlayerSilhouette size={28} />
             )}
-
-            {/* Round pills — right-aligned under today badge */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: displayHoleScores.length > 0 ? 8 : 0 }}>
-              <RoundHistoryPills
-                round1={leaderEntry.round_1}
-                round2={leaderEntry.round_2}
-                round3={leaderEntry.round_3}
-                round4={leaderEntry.round_4}
-                currentRound={derivedRound}
-              />
+          </div>
+          {/* Name + meta */}
+          <div style={{ paddingBottom: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+              <span style={{ fontSize: 12 }}>🥇</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>Leader</span>
+              {flagEmoji && <span style={{ fontSize: 13 }}>{flagEmoji}</span>}
+            </div>
+            <div style={{
+              fontSize: 22, fontWeight: 700, color: '#fff',
+              letterSpacing: '-0.4px', lineHeight: 1.1,
+              textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {fullName}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5 }}>
+              {thruDisplay !== '-' && thruDisplay !== 'F' && (
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
+              )}
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>
+                {thruDisplay === '-' ? 'Starting soon' : thruDisplay === 'F' ? `Round ${derivedRound}` : `Thru ${thruDisplay} · Round ${derivedRound}`}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Hole dots + sparkline — inside the card */}
-        {displayHoleScores.length > 0 && (
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 10 }}>
-            <HoleStripWithSparkline
-              holes={displayHoleScores}
-              totalHoles={18}
-              label={`R${displayRound} · Hole by hole`}
+        {/* Right — score + today + round pills */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+          <span style={{
+            fontSize: 58, fontWeight: 800, lineHeight: 1,
+            color: '#ffffff',
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
+            textShadow: '0 2px 20px rgba(0,0,0,0.4)',
+          }}>
+            {scoreDisplay}
+          </span>
+
+          {todayDisplay !== null && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              background: 'rgba(74,222,128,0.12)',
+              border: '1px solid rgba(74,222,128,0.25)',
+              borderRadius: 20, padding: '3px 10px',
+            }}>
+              <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.5px' }}>TODAY</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: todayColor, fontVariantNumeric: 'tabular-nums' }}>{todayDisplay}</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <RoundHistoryPills
+              round1={leaderEntry.round_1}
+              round2={leaderEntry.round_2}
+              round3={leaderEntry.round_3}
+              round4={leaderEntry.round_4}
+              currentRound={derivedRound}
             />
           </div>
-        )}
+        </div>
       </div>
 
+      {/* Divider line above hole strip */}
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.10)', marginBottom: 14 }} />
+
+      {/* Hole dots + sparkline */}
+      {displayHoleScores.length > 0 && (
+        <div style={{ paddingTop: 0 }}>
+          <HoleStripWithSparkline
+            holes={displayHoleScores}
+            totalHoles={18}
+            label={`R${displayRound} · Hole by hole`}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -802,12 +804,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         style={{
           background: isLive
             ? `linear-gradient(180deg,
-                rgba(0,0,0,0.55) 0%,
-                rgba(0,0,0,0.25) 15%,
-                rgba(0,0,0,0.10) 30%,
-                rgba(0,0,0,0.35) 55%,
-                rgba(0,0,0,0.50) 72%,
-                rgba(0,0,0,0.55) 82%)`
+                rgba(0,0,0,0.45) 0%,
+                rgba(0,0,0,0.05) 20%,
+                rgba(0,0,0,0.30) 48%,
+                rgba(0,0,0,0.82) 68%,
+                rgba(0,0,0,0.96) 82%,
+                rgba(0,0,0,1.00) 100%)`
             : isUpcoming
             ? `linear-gradient(180deg,
                 rgba(0,0,0,0.55) 0%,
