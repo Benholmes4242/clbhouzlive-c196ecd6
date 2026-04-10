@@ -27,11 +27,11 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
         return (
           <div key={r.label} style={{
             display: 'inline-flex',
-            flexDirection: isLive ? 'column' : 'row',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: isLive ? 0 : 6,
-            padding: isLive ? '6px 4px' : '3px 8px',
+            gap: 0,
+            padding: '6px 4px',
             borderRadius: 7,
             background: isLive ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.06)',
             border: isLive ? '1px solid rgba(34,197,94,0.20)' : '1px solid rgba(255,255,255,0.07)',
