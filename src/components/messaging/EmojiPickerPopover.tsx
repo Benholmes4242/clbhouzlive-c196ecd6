@@ -84,31 +84,36 @@ export function EmojiPickerPopover({ onEmojiSelect, className }: EmojiPickerPopo
         <button
           type="button"
           className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:bg-amber-50/50",
+            "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
             className
           )}
+          style={{ background: 'transparent' }}
         >
-          <Smile className="w-5 h-5 text-[#8E8E93]" />
+          <Smile className="w-5 h-5" style={{ color: '#8E8E93' }} />
         </button>
       </PopoverTrigger>
       <PopoverContent
         side="top"
         align="start"
-        className="w-72 p-0 rounded-2xl shadow-lg border border-amber-200/20"
+        className="w-72 p-0 rounded-2xl shadow-lg"
+        style={{ border: '1px solid rgba(247,147,30,0.20)' }}
         sideOffset={8}
       >
         {/* Category tabs */}
-        <div className="flex items-center gap-1 p-2 border-b border-amber-200/20 bg-amber-50/50 rounded-t-2xl overflow-x-auto">
+        <div
+          className="flex items-center gap-1 p-2 rounded-t-2xl overflow-x-auto"
+          style={{ borderBottom: '1px solid rgba(247,147,30,0.20)', background: 'rgba(247,147,30,0.04)' }}
+        >
           {Object.entries(EMOJI_CATEGORIES).map(([key, { icon }]) => (
             <button
               key={key}
               onClick={() => setActiveCategory(key as keyof typeof EMOJI_CATEGORIES)}
-              className={cn(
-                "w-8 h-8 flex items-center justify-center text-lg rounded-lg flex-shrink-0 transition-colors",
+              className="w-8 h-8 flex items-center justify-center text-lg rounded-lg flex-shrink-0 transition-colors"
+              style={
                 activeCategory === key
-                  ? "bg-amber-500 text-white"
-                  : "hover:bg-amber-100/50"
-              )}
+                  ? { background: '#F7931E', color: '#fff' }
+                  : { background: 'transparent' }
+              }
             >
               {icon}
             </button>
@@ -118,7 +123,7 @@ export function EmojiPickerPopover({ onEmojiSelect, className }: EmojiPickerPopo
         {/* Emoji grid */}
         <div className="p-2 max-h-48 overflow-y-auto">
           {activeCategory === 'recent' && recentEmojis.length === 0 ? (
-            <p className="text-center text-sm text-[#8E8E93] py-6">
+            <p className="text-center text-sm py-6" style={{ color: '#8E8E93' }}>
               No recent emojis
             </p>
           ) : (
@@ -127,7 +132,10 @@ export function EmojiPickerPopover({ onEmojiSelect, className }: EmojiPickerPopo
                 <button
                   key={`${emoji}-${index}`}
                   onClick={() => handleSelect(emoji)}
-                  className="w-8 h-8 flex items-center justify-center text-xl hover:bg-amber-100/50 rounded-lg active:scale-90 transition-transform"
+                  className="w-8 h-8 flex items-center justify-center text-xl rounded-lg active:scale-90 transition-transform"
+                  style={{ background: 'transparent' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,147,30,0.08)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 >
                   {emoji}
                 </button>

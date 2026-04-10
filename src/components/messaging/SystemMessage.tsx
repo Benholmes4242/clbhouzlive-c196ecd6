@@ -38,17 +38,17 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
     
     switch (metadata.event_type) {
       case 'user_added':
-        return <UserPlus className={cn(iconClass, "text-primary/70")} />;
+        return <UserPlus className={iconClass} style={{ color: 'rgba(15,23,42,0.70)' }} />;
       case 'user_left':
         return <LogOut className={cn(iconClass, "text-muted-foreground")} />;
       case 'user_ejected':
         return <UserMinus className={cn(iconClass, "text-destructive")} />;
       case 'admin_promoted':
-        return <Shield className={cn(iconClass, "text-primary/80")} />;
+        return <Shield className={iconClass} style={{ color: '#64748b' }} />;
       case 'admin_demoted':
         return <ShieldOff className={cn(iconClass, "text-muted-foreground")} />;
       case 'group_created':
-        return <Users className={cn(iconClass, "text-primary/80")} />;
+        return <Users className={iconClass} style={{ color: '#64748b' }} />;
       case 'name_changed':
         return <Edit className={cn(iconClass, "text-muted-foreground")} />;
       case 'photo_changed':

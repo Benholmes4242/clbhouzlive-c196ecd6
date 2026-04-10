@@ -99,7 +99,7 @@ export function ChatHeaderMenu({
   const handleToggleMute = async () => {
     haptic('light');
     try {
-      const { error } = await (supabase.rpc as Function)('toggle_conversation_mute', {
+      const { error } = await supabase.rpc('toggle_conversation_mute', {
         p_conversation_id: conversation.id,
         p_mute: !isMuted,
       });
@@ -139,7 +139,7 @@ export function ChatHeaderMenu({
   const handleLeaveGroupConfirmed = async () => {
     haptic('medium');
     try {
-      const { error } = await (supabase.rpc as Function)('leave_group_conversation', {
+      const { error } = await supabase.rpc('leave_group_conversation', {
         p_conversation_id: conversation.id,
       });
       if (error) throw error;
