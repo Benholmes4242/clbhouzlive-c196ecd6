@@ -303,7 +303,7 @@ function LeaderHeroStrip({
             )}
 
             {/* Round pills — right-aligned under today badge */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: holeScores.length > 0 ? 8 : 0 }}>
               <RoundHistoryPills
                 round1={leaderEntry.round_1}
                 round2={leaderEntry.round_2}
