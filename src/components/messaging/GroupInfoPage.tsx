@@ -539,6 +539,29 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                         </span>
                       )}
                     </div>
+                    {/* HCP + home club chips */}
+                    {(participant.profile?.eg_handicap_index != null || participant.profile?.home_club) && (
+                      <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
+                        {participant.profile?.eg_handicap_index != null && (
+                          <span style={{
+                            fontSize: '9.5px', fontWeight: 600, color: '#F7931E',
+                            background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                            borderRadius: 99, padding: '0px 5px',
+                          }}>
+                            HCP {participant.profile.eg_handicap_index}
+                          </span>
+                        )}
+                        {participant.profile?.home_club && (
+                          <span style={{
+                            fontSize: '9.5px', fontWeight: 600, color: '#006747',
+                            background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
+                            borderRadius: 99, padding: '0px 5px',
+                          }}>
+                            ⛳ {participant.profile.home_club}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Member action button */}

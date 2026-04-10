@@ -97,13 +97,13 @@ function ConversationTypingOrPreview({ conversationId, preview, isActive }: { co
 function ConversationSkeleton() {
   return (
     <div className="flex items-center gap-3 py-3 px-4">
-      <Skeleton className="h-[52px] w-[52px] rounded-full flex-shrink-0" />
+      <Skeleton className="h-[52px] w-[52px] rounded-full flex-shrink-0 bg-[#e2e8f0]" />
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-3 w-10" />
+          <Skeleton className="h-4 w-28 bg-[#e2e8f0]" />
+          <Skeleton className="h-3 w-10 bg-[#e2e8f0]" />
         </div>
-        <Skeleton className="h-3 w-40" />
+        <Skeleton className="h-3 w-40 bg-[#e2e8f0]" />
       </div>
     </div>
   );
@@ -112,11 +112,18 @@ function ConversationSkeleton() {
 function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div
-        className="flex items-center justify-center mb-4"
-        style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(247,147,30,0.10)' }}
-      >
-        <MessageCircle style={{ color: '#F7931E' }} className="h-6 w-6" />
+      <div className="relative flex items-center justify-center mb-4" style={{ width: 80, height: 80 }}>
+        {/* Outer ring */}
+        <div className="absolute" style={{ inset: 0, borderRadius: '50%', border: '1.5px solid rgba(247,147,30,0.12)' }} />
+        {/* Mid ring */}
+        <div className="absolute" style={{ inset: 10, borderRadius: '50%', border: '1.5px solid rgba(247,147,30,0.20)' }} />
+        {/* Inner filled circle */}
+        <div
+          className="flex items-center justify-center"
+          style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(247,147,30,0.10)' }}
+        >
+          <MessageCircle style={{ color: '#F7931E' }} className="h-5 w-5" />
+        </div>
       </div>
       <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>No messages yet</h3>
       <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20, maxWidth: 240 }}>
@@ -163,7 +170,7 @@ function ConversationCard({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        margin: '4px 16px',
+        margin: '0 16px',
         borderRadius: 16,
         background: '#fff',
         border: '1px solid rgba(0,0,0,0.07)',
@@ -337,7 +344,17 @@ export function ConversationList({
           >
             {/* Avatar */}
             <div className="relative flex-shrink-0">
-              {isGroup && !avatarUrl ? (
+              {(conversation.type === 'club' || conversation.type === 'travel_company') && !avatarUrl ? (
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: 52, height: 52, borderRadius: 12,
+                    background: 'linear-gradient(135deg, #006747, #004d33)',
+                  }}
+                >
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+              ) : isGroup && !avatarUrl ? (
                 <div
                   className="flex items-center justify-center"
                   style={{
