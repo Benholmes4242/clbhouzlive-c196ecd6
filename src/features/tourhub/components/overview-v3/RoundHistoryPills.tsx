@@ -17,7 +17,7 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
   ].filter(r => r.roundNum <= currentRound);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, width: 'fit-content' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
       {rounds.map(r => {
         const isLive = r.roundNum === currentRound;
         const isDone = r.score !== null && !isLive;
@@ -26,30 +26,23 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
 
         return (
           <div key={r.label} style={{
-            display: 'inline-flex',
-            flexDirection: isLive ? 'column' : 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: isLive ? 0 : 6,
-            padding: isLive ? '5px 7px' : '3px 8px',
-            borderRadius: 7,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 8, padding: '3px 9px', borderRadius: 8,
             background: isLive ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.06)',
             border: isLive ? '1px solid rgba(34,197,94,0.20)' : '1px solid rgba(255,255,255,0.07)',
-            width: 'fit-content',
-            alignSelf: 'flex-start',
+            minWidth: 72,
           }}>
             <span style={{
-              fontSize: 8, fontWeight: 700, textTransform: 'uppercase',
-              letterSpacing: 0.6,
+              fontSize: 8, fontWeight: 600, textTransform: 'uppercase',
+              letterSpacing: 0.5,
               color: isLive ? '#22C55E' : 'rgba(255,255,255,0.28)',
-              lineHeight: 1.3,
             }}>
               {r.label}
             </span>
             {isLive ? (
-              <span style={{ fontSize: 8, fontWeight: 800, color: '#22C55E', lineHeight: 1.3, letterSpacing: 0.6 }}>LIVE</span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#22C55E' }}>Live</span>
             ) : isDone && colors ? (
-              <span style={{ fontSize: 11, fontWeight: 800, color: colors.text, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: colors.text, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
             ) : null}
           </div>
         );
