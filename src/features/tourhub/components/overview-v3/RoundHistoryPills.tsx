@@ -31,12 +31,11 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
             alignItems: 'center',
             justifyContent: 'center',
             gap: 0,
-            padding: '6px 4px',
+            padding: '4px 6px',
             borderRadius: 7,
             background: isLive ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.06)',
             border: isLive ? '1px solid rgba(34,197,94,0.20)' : '1px solid rgba(255,255,255,0.07)',
-            width: 'fit-content',
-            alignSelf: 'flex-start',
+            minWidth: 32,
           }}>
             <span style={{
               fontSize: 8, fontWeight: 700, textTransform: 'uppercase',
@@ -49,7 +48,7 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
             {isLive ? (
               <span style={{ fontSize: 8, fontWeight: 800, color: '#22C55E', lineHeight: 1.3, letterSpacing: 0.6 }}>LIVE</span>
             ) : isDone && colors ? (
-              <span style={{ fontSize: 11, fontWeight: 800, color: colors.text, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
+              <span style={{ fontSize: 8, fontWeight: 800, color: colors.text, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
             ) : null}
           </div>
         );
