@@ -774,7 +774,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             className="absolute inset-0 w-full h-full"
             style={{
               background: isLive
-                ? `radial-gradient(ellipse 120% 80% at 50% calc(25% + 65px), #2d5a1e 0%, #1a3a0e 50%, #142e0a 100%)`
+                ? `radial-gradient(ellipse 140% 100% at 50% calc(25% + 65px), #2d5a1e 0%, #1a3a0e 40%, #1a3a0e 100%)`
                 : undefined,
             }}
           >
