@@ -691,7 +691,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             className="absolute inset-0 w-full h-full"
             style={{
               background: isLive
-                ? `radial-gradient(ellipse 120% 55% at 50% calc(25% + 57px), #2d5a1e 0%, #1a3a0e 45%, #0a1a05 100%)`
+                ? `radial-gradient(ellipse 120% 55% at 50% calc(25% + var(--live-hero-offset, 0px)), #2d5a1e 0%, #1a3a0e 45%, #0a1a05 100%)`
                 : undefined,
             }}
           >
@@ -705,7 +705,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       {/* Sky tint overlay for live */}
       {isLive && (
         <div style={{
-          position: 'absolute', top: 57, left: 0, right: 0, height: '38%',
+          position: 'absolute', top: 'var(--live-hero-offset, 0px)' as any, left: 0, right: 0, height: '38%',
           background: 'linear-gradient(180deg, #4a7ab5 0%, #2a5a8e 35%, transparent 100%)',
           opacity: 0.55,
           pointerEvents: 'none',
@@ -847,11 +847,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 /* ── Compact topbar — burger + title + tour badge ── */
                 <div style={{
                   flexShrink: 0,
-                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
+                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + var(--live-hero-offset, 0px))',
                 }}>
                   <div style={{
                     display: 'flex', alignItems: 'center',
-                    gap: 10, padding: '0 16px 0 56px', height: 52,
+                    gap: 10, padding: '0 16px', height: 52,
                   }}>
 
                     {/* Title block */}
@@ -954,18 +954,20 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   {isExpanded ? (
                     <AnimatePresence mode="wait">
                       {selectedPlayer ? (
-                        <PlayerScorecardCard
-                          key="scorecard"
-                          player={selectedPlayer}
-                          tournamentId={tournament.id}
-                          tournamentName={tournament.name}
-                          courseName={tournament.venueName || ''}
-                          onBack={handleBackToLeaderboard}
-                          onClose={() => {
-                            setSelectedPlayer(null);
-                            onToggleExpand();
-                          }}
-                        />
+                        <div style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + var(--live-hero-offset, 0px))', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+                          <PlayerScorecardCard
+                            key="scorecard"
+                            player={selectedPlayer}
+                            tournamentId={tournament.id}
+                            tournamentName={tournament.name}
+                            courseName={tournament.venueName || ''}
+                            onBack={handleBackToLeaderboard}
+                            onClose={() => {
+                              setSelectedPlayer(null);
+                              onToggleExpand();
+                            }}
+                          />
+                        </div>
                       ) : (
                         <motion.div
                           key="leaderboard"

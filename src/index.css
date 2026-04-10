@@ -3649,6 +3649,16 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
+/* Live hero mobile offset — pushes content/gradient down on mobile only */
+:root {
+  --live-hero-offset: 0px;
+}
+@media (max-width: 768px) {
+  :root {
+    --live-hero-offset: 57px;
+  }
+}
+
 /* Tour hero course images — shift down on mobile to compensate for notch bleed */
 .hero-course-image {
   object-position: center center;
