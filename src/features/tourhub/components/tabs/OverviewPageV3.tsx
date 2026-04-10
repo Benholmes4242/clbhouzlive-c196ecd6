@@ -13,7 +13,7 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
@@ -35,6 +35,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
+  const [isScorecardOpen, setIsScorecardOpen] = useState(false);
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
@@ -80,30 +81,32 @@ export function OverviewPageV3() {
           className="relative w-full z-0"
           style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
         >
-          <HeroCarousel hasHeader={false} />
-          {/* Burger menu — glass pill */}
-          <button
-            className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
-            style={{
-              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)',
-              left: '16px',
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: 'rgba(0,0,0,0.28)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.15)',
-            }}
-            onClick={() => openTourNav()}
-            aria-label="Open tour menu"
-          >
-            <Menu
-              className="w-[18px] h-[18px]"
-              strokeWidth={2}
-              style={{ color: '#FFFFFF' }}
-            />
-          </button>
+          <HeroCarousel hasHeader={false} onScorecardStateChange={setIsScorecardOpen} />
+          {/* Burger menu — glass pill — hidden when scorecard is open */}
+          {!isScorecardOpen && (
+            <button
+              className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
+              style={{
+                top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)',
+                left: '16px',
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: 'rgba(0,0,0,0.28)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}
+              onClick={() => openTourNav()}
+              aria-label="Open tour menu"
+            >
+              <Menu
+                className="w-[18px] h-[18px]"
+                strokeWidth={2}
+                style={{ color: '#FFFFFF' }}
+              />
+            </button>
+          )}
         </motion.div>
 
         {/* Content sections */}
