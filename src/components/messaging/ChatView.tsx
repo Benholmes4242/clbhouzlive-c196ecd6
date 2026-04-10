@@ -619,6 +619,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                   return (
                     <div
                       key={message.id}
+                      ref={(el) => { if (el) messageRefs.current.set(message.id, el); }}
                       className={isConsecutiveSameSender ? 'mt-1' : 'mt-3'}
                     >
                       <MessageBubble
@@ -633,6 +634,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                         onDelete={() => handleDelete(message)}
                         onToggleReaction={handleToggleReaction(message.id)}
                         onForward={() => handleForward(message)}
+                        isHighlighted={highlightedMessageId === message.id}
                       />
                     </div>
                   );

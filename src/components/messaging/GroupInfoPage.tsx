@@ -160,6 +160,21 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
+  const handleRemoveAdmin = async (userId: string) => {
+    try {
+      const { error } = await supabase.rpc('update_member_role', {
+        p_conversation_id: conversation.id,
+        p_user_id: userId,
+        p_new_role: 'member',
+      });
+      if (error) throw error;
+      toast.success('Admin rights removed');
+      onUpdate();
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
+    }
+  };
+
   const handleLeaveConfirmed = async () => {
     try {
       const { error } = await supabase.rpc('leave_group', {
@@ -587,7 +602,21 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                           padding: 0, overflow: 'hidden',
                         }}
                       >
-                        {participant.role !== 'admin' && (
+                        {participant.role === 'admin' && participant.user_id !== conversation.created_by ? (
+                          <DropdownMenuItem
+                            onClick={() => participant.user_id && handleRemoveAdmin(participant.user_id)}
+                            className="flex items-center"
+                            style={{ gap: 10, padding: '11px 14px' }}
+                          >
+                            <div
+                              className="flex items-center justify-center flex-shrink-0"
+                              style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(245,158,11,0.10)' }}
+                            >
+                              <Shield size={14} style={{ color: '#d97706' }} />
+                            </div>
+                            <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Dismiss as admin</span>
+                          </DropdownMenuItem>
+                        ) : participant.role !== 'admin' ? (
                           <DropdownMenuItem
                             onClick={() => participant.user_id && handleMakeAdmin(participant.user_id)}
                             className="flex items-center"
@@ -601,10 +630,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                             </div>
                             <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Make group admin</span>
                           </DropdownMenuItem>
-                        )}
-                        {participant.role !== 'admin' && (
-                          <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
-                        )}
+                        ) : null}
+                        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
                         <DropdownMenuItem
                           onClick={() => participant.user_id && handleRemoveMember(participant.user_id)}
                           className="flex items-center"

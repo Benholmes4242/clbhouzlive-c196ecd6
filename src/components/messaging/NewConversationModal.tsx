@@ -13,8 +13,8 @@ interface UserProfile {
   username: string | null;
   display_name: string | null;
   profile_photo_url: string | null;
-  handicap_index?: number | null;
-  home_club_name?: string | null;
+  eg_handicap_index?: number | null;
+  home_club?: string | null;
 }
 
 interface NewConversationModalProps {
@@ -76,7 +76,7 @@ export function NewConversationModal({
       try {
         const { data, error } = await supabase
           .from('public_profiles')
-          .select('id, username, display_name, profile_photo_url')
+          .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
           .or(`username.ilike.%${dmSearch}%,display_name.ilike.%${dmSearch}%`)
           .neq('id', user.id)
           .limit(20);
@@ -103,7 +103,7 @@ export function NewConversationModal({
         const excludeIds = [user.id, ...selectedIds];
         const { data, error } = await supabase
           .from('public_profiles')
-          .select('id, username, display_name, profile_photo_url')
+          .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
           .or(`username.ilike.%${groupSearch}%,display_name.ilike.%${groupSearch}%`)
           .not('id', 'in', `(${excludeIds.join(',')})`)
           .limit(20);
@@ -264,7 +264,7 @@ export function NewConversationModal({
               {userProfile.username && (
                 <span style={{ fontSize: 12, color: '#94a3b8' }}>@{userProfile.username}</span>
               )}
-              {userProfile.handicap_index != null && (
+              {userProfile.eg_handicap_index != null && (
                 <span
                   style={{
                     fontSize: '10.5px', fontWeight: 600, color: '#F7931E',
@@ -273,10 +273,10 @@ export function NewConversationModal({
                     borderRadius: 99, padding: '0 6px',
                   }}
                 >
-                  HCP {userProfile.handicap_index}
+                  HCP {userProfile.eg_handicap_index}
                 </span>
               )}
-              {userProfile.home_club_name && (
+              {userProfile.home_club && (
                 <span
                   className="flex items-center truncate"
                   style={{
@@ -288,7 +288,7 @@ export function NewConversationModal({
                   }}
                 >
                   <MapPin size={10} />
-                  {userProfile.home_club_name}
+                  {userProfile.home_club}
                 </span>
               )}
             </div>

@@ -45,9 +45,10 @@ export function MessageReactions({
           className={cn(
             "flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs transition-colors",
             hasUserReacted 
-              ? "bg-[hsl(38,92%,50%)]/20 border border-[hsl(38,92%,50%)]/30" 
+              ? "border" 
               : "bg-muted hover:bg-muted/80 border border-transparent"
           )}
+          style={hasUserReacted ? { background: 'rgba(247,147,30,0.20)', borderColor: 'rgba(247,147,30,0.30)' } : undefined}
         >
           <span>{emoji}</span>
           {count > 1 && <span className="text-muted-foreground">{count}</span>}

@@ -1,6 +1,6 @@
  /**
-  * BlockUserDialog - Confirmation dialog for blocking a user
-  */
+   * BlockUserDialog - Confirmation dialog for blocking a user
+   */
  
  import { useState } from 'react';
  import { Ban, Loader2 } from 'lucide-react';
@@ -17,6 +17,7 @@
  import { supabase } from '@/integrations/supabase/client';
  import { toast } from 'sonner';
  import { haptic } from '@/utils/haptics';
+ import { AppLog } from '@/lib/logger';
  
  interface BlockUserDialogProps {
    open: boolean;
@@ -53,7 +54,7 @@
        onBlocked();
        onOpenChange(false);
      } catch (error) {
-       console.error('Error blocking user:', error);
+       AppLog.error('[BlockUserDialog]', 'Error blocking user:', error);
        toast.error("Couldn't block user");
      } finally {
        setBlocking(false);

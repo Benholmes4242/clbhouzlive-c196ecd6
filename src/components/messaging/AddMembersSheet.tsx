@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
+import { AppLog } from '@/lib/logger';
 
 interface AddMembersSheetProps {
   isOpen: boolean;
@@ -60,7 +61,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
       if (error) throw error;
       setSearchResults(data || []);
     } catch (error) {
-      console.error('Search error:', error);
+      AppLog.error('[AddMembersSheet]', 'Search error:', error);
     } finally {
       setIsSearching(false);
     }
@@ -112,6 +113,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
       onClose={onClose}
     >
       <div className="p-4 space-y-4">
+        {/* Drag handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#e2e8f0', margin: '0 auto 8px' }} />
         <h2 className="text-lg font-semibold text-foreground mb-4">Add Members</h2>
         {/* Search Input */}
         <div className="relative">
@@ -130,12 +133,13 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
             {selectedUsers.map(user => (
               <div
                 key={user.id}
-                className="flex items-center gap-2 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] px-3 py-1 rounded-full text-sm"
+                className="flex items-center gap-2 px-3 py-1 rounded-full text-sm"
+                style={{ background: 'rgba(247,147,30,0.10)', color: '#c2770f' }}
               >
                 <span>{user.display_name || user.username}</span>
                 <button 
                   onClick={() => toggleUser(user)}
-                  className="hover:text-[hsl(35,80%,43%)]/80"
+                  className="hover:opacity-80"
                 >
                   ×
                 </button>
@@ -156,8 +160,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                   key={user.id}
                   onClick={() => toggleUser(user)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-lg transition-colors",
-                    isSelected ? "bg-[hsl(38,92%,50%)]/5" : "hover:bg-muted"
+                    "w-full flex items-center gap-3 p-3 rounded-lg transition-colors active:scale-[0.97]",
+                    isSelected ? "bg-[rgba(247,147,30,0.05)]" : "hover:bg-muted"
                   )}
                 >
                   <Avatar className="w-10 h-10">
@@ -171,7 +175,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                     )}
                   </div>
                   {isSelected && (
-                    <div className="w-6 h-6 bg-[hsl(38,92%,50%)] rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#F7931E' }}>
                       <Check size={14} className="text-white" />
                     </div>
                   )}
