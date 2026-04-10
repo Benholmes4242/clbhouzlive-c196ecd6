@@ -800,7 +800,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       <div 
         className="absolute inset-0 pointer-events-none z-5"
         style={{
-          background: (isLive || isUpcoming)
+          background: isLive
+            ? `linear-gradient(180deg,
+                rgba(0,0,0,0.55) 0%,
+                rgba(0,0,0,0.25) 15%,
+                rgba(0,0,0,0.10) 30%,
+                rgba(0,0,0,0.35) 55%,
+                rgba(0,0,0,0.50) 72%,
+                rgba(0,0,0,0.55) 82%)`
+            : isUpcoming
             ? `linear-gradient(180deg,
                 rgba(0,0,0,0.55) 0%,
                 rgba(0,0,0,0.25) 15%,
