@@ -3649,6 +3649,16 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
+/* Tour hero course images — shift down on mobile to compensate for notch bleed */
+.hero-course-image {
+  object-position: center center;
+}
+@media (max-width: 768px) {
+  .hero-course-image {
+    object-position: center calc(50% + 47px) !important;
+  }
+}
+
 /* Full-bleed utility class for edge-to-edge layouts */
 .fullbleed {
   width: 100vw;
