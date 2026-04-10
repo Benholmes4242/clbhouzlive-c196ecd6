@@ -79,6 +79,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       {navigationTabs.map((tab) => {
         const isActive = activeTab === tab.id;
         const isLive = liveTabs.has(tab.id);
+        const Icon = tab.icon;
         
         return (
           <button
@@ -102,7 +103,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               "relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
               "active:scale-95",
               "focus:outline-none",
-              // Hover states
               isLightTheme && !isActive && "hover:bg-slate-50",
               isClubhouseTheme && !isActive && "hover:bg-[hsl(var(--clubhouse-hover-bg))]"
             )}
@@ -111,18 +111,26 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             }}
             aria-label={tab.label}
           >
-            {/* Emoji Icon */}
             <div className="relative">
-              <span style={{
-                fontSize: 20,
-                lineHeight: 1,
-                filter: (!isActive && !isLive) ? 'opacity(0.5)' : 'none',
-                transition: 'all var(--motion-fast) var(--ease-pop)',
-                transform: isActive ? 'scale(1.12)' : 'scale(1)',
-                display: 'inline-block',
-              }}>
-                {tab.emoji}
-              </span>
+              <Icon
+                className={cn(
+                  "h-[24px] w-[24px] [stroke-width:1.5]",
+                  isLive
+                    ? "text-green-500 opacity-100"
+                    : isLightTheme
+                      ? isActive
+                        ? useAmberActive ? "text-amber-700 opacity-100" : "text-slate-800 opacity-100"
+                        : "text-slate-500 opacity-90"
+                      : isDimmed
+                        ? "text-[hsl(var(--clubhouse-text-dimmed))]"
+                        : "text-[hsl(var(--clubhouse-text-muted))]"
+                )}
+                style={{
+                  transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                  transition: 'all var(--motion-fast) var(--ease-pop)',
+                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
+                }}
+              />
 
               {/* Tab badge */}
               {(tabBadges[tab.id] ?? 0) > 0 && (
