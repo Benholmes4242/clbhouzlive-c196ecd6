@@ -480,19 +480,21 @@ export function PlayerScorecardCard({
 
         {/* Name + status */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <span style={{
-            fontSize: 16, fontWeight: 800, color: '#fff',
-            display: 'block', lineHeight: 1.2,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {player.name}
-          </span>
-          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', display: 'block', marginTop: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{
+              fontSize: 16, fontWeight: 800, color: '#fff',
+              lineHeight: 1.2,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {player.name}
+            </span>
             {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()] && (
-              <span style={{ marginRight: 4 }}>
+              <span style={{ fontSize: 14, flexShrink: 0 }}>
                 {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()]}
               </span>
             )}
+          </div>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', display: 'block', marginTop: 2 }}>
             {player.thru === 'F' ? 'Finished' : player.thru ? `Thru ${player.thru}` : 'Starting soon'}
             {` · Round ${currentRound}`}
           </span>
