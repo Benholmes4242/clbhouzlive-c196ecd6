@@ -175,7 +175,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
                 <div style={{ width: 13, height: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', ...dotStyle }}>
                   {label && (
                     <span style={{
-                      fontSize: score === 0 ? 7 : isHIO ? 4.5 : 6,
+                      fontSize: score === 0 ? 5 : isHIO ? 4.5 : 6,
                       fontWeight: score === 0 ? 600 : 800,
                       color: score === 0 ? 'rgba(255,255,255,0.45)' : textColor,
                       lineHeight: 1,
