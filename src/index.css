@@ -2856,7 +2856,17 @@ html[data-immersive="true"] .app-shell--topSpacer {
   .focus-visible {
     outline: 2px solid var(--discover-orange);
     outline-offset: 2px;
+}
+
+/* Scorecard top bar — shift down on mobile to match live content offset */
+.scorecard-top-bar {
+  padding-top: 12px;
+}
+@media (max-width: 768px) {
+  .scorecard-top-bar {
+    padding-top: 57px !important;
   }
+}
 
 
   /* Achievement badge size token */

@@ -844,7 +844,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   </div>
                 </>
               ) : isLive ? (
-                /* ── Compact topbar — burger + title + tour badge ── */
+                /* ── Compact topbar — R1 stacked on LIVE left, title right ── */
                 <div style={{
                   flexShrink: 0,
                   paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
@@ -854,14 +854,24 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     gap: 10, padding: '0 16px 0 56px', height: 52,
                   }}>
 
-                    {/* Title block */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 1 }}>
-                        <span className="live-dot" style={{ width: 7, height: 7 }} />
+                    {/* R1 + LIVE stacked badge — left side */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      <span style={{
+                        fontSize: 9, fontWeight: 800, letterSpacing: '0.8px',
+                        color: 'rgba(255,255,255,0.55)',
+                      }}>
+                        {getCurrentRoundLabel(leaders, tournament.startDate)}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span className="live-dot" style={{ width: 6, height: 6 }} />
                         <span style={{ fontSize: 10, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
-                          LIVE · {getCurrentRoundLabel(leaders, tournament.startDate)}
+                          LIVE
                         </span>
                       </div>
+                    </div>
+
+                    {/* Title block */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
                         fontSize: 17, fontWeight: 800, color: '#fff',
                         letterSpacing: -0.3, lineHeight: 1,
@@ -872,19 +882,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
                         {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </div>
-                    </div>
-
-                    {/* Tour badge */}
-                    <div style={{
-                      flexShrink: 0,
-                      background: 'rgba(0,0,0,0.30)',
-                      backdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255,255,255,0.09)',
-                      borderRadius: 16, padding: '4px 10px',
-                    }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.80)' }}>
-                        {getTourDisplayName(tournament.tourSlug)}
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -1462,9 +1459,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 interface HeroCarouselProps {
   /** If true, hero bleeds behind header; if false (default), only bleeds behind safe area */
   hasHeader?: boolean;
+  /** Called when scorecard open/close state changes */
+  onScorecardStateChange?: (isOpen: boolean) => void;
 }
 
-export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
+export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1650,10 +1649,12 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
               isScorecardOpenRef.current = true;
               setIsPaused(true);
               if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+              onScorecardStateChange?.(true);
             }}
             onScorecardClose={() => {
               isScorecardOpenRef.current = false;
               scheduleResume();
+              onScorecardStateChange?.(false);
             }}
             onCardTouchStart={handleTouchStart}
             onCardTouchMove={handleTouchMove}
