@@ -740,7 +740,21 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         }}
       />
 
-      {/* Backdrop overlay when expanded — tap to collapse */}
+      {/* Extra top scrim for upcoming — darkens header area independently */}
+      {isUpcoming && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            zIndex: 6,
+            background: `linear-gradient(180deg,
+              rgba(0,0,0,0.70) 0%,
+              rgba(0,0,0,0.50) 12%,
+              rgba(0,0,0,0.20) 28%,
+              transparent 42%)`,
+          }}
+        />
+      )}
+
       {isExpanded && !isLive && (
         <motion.div
           initial={{ opacity: 0 }}
