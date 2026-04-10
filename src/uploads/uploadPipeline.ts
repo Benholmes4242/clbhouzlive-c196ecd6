@@ -55,6 +55,49 @@ async function getImageDimensions(file: File): Promise<{ width: number; height: 
 }
 
 /**
+ * Measure video dimensions and duration client-side using an HTML video element.
+ * Returns null values if extraction fails — non-blocking with a 5s timeout.
+ */
+async function measureVideoDimensions(file: File): Promise<{
+  width: number | null;
+  height: number | null;
+  duration: number | null;
+  aspectRatio: number | null;
+}> {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+
+    const objectUrl = URL.createObjectURL(file);
+    const cleanup = () => URL.revokeObjectURL(objectUrl);
+
+    video.onloadedmetadata = () => {
+      const w = video.videoWidth || null;
+      const h = video.videoHeight || null;
+      const dur = video.duration && isFinite(video.duration)
+        ? Math.round(video.duration)
+        : null;
+      const ar = w && h ? parseFloat((w / h).toFixed(4)) : null;
+      cleanup();
+      resolve({ width: w, height: h, duration: dur, aspectRatio: ar });
+    };
+
+    video.onerror = () => {
+      cleanup();
+      resolve({ width: null, height: null, duration: null, aspectRatio: null });
+    };
+
+    // Timeout fallback — don't block upload indefinitely
+    setTimeout(() => {
+      cleanup();
+      resolve({ width: null, height: null, duration: null, aspectRatio: null });
+    }, 5000);
+
+    video.src = objectUrl;
+  });
+
+/**
  * Enqueue and immediately start processing a post upload.
  * Returns the jobId synchronously - processing happens in background.
  * 
