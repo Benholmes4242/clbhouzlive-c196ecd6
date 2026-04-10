@@ -194,6 +194,13 @@ function LeaderHeroStrip({
 
   const playerId = leaderEntry?.player_id ?? leaderEntry?.player?.id ?? null;
   const { data: holeScores = [] } = useLeaderHoleScores(tournamentId, playerId, derivedRound);
+  // Fallback: if no data for active round yet, show last completed round
+  const { data: fallbackHoleScores = [] } = useLeaderHoleScores(
+    tournamentId,
+    playerId,
+    holeScores.length === 0 && lastCompletedRound > 0 ? lastCompletedRound : null
+  );
+  const displayHoleScores = holeScores.length > 0 ? holeScores : fallbackHoleScores;
 
   const p = leaderEntry.player;
   if (!p) return null;
@@ -303,7 +310,7 @@ function LeaderHeroStrip({
             )}
 
             {/* Round pills — right-aligned under today badge */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: holeScores.length > 0 ? 8 : 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: displayHoleScores.length > 0 ? 8 : 0 }}>
               <RoundHistoryPills
                 round1={leaderEntry.round_1}
                 round2={leaderEntry.round_2}
@@ -316,12 +323,12 @@ function LeaderHeroStrip({
         </div>
 
         {/* Hole dots + sparkline — inside the card */}
-        {holeScores.length > 0 && (
+        {displayHoleScores.length > 0 && (
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 10 }}>
             <HoleStripWithSparkline
-              holes={holeScores}
+              holes={displayHoleScores}
               totalHoles={18}
-              label={`R${derivedRound} · Hole by hole`}
+              label={`R${holeScores.length > 0 ? derivedRound : lastCompletedRound} · Hole by hole`}
             />
           </div>
         )}
