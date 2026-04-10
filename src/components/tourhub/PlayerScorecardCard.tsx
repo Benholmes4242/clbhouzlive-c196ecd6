@@ -303,7 +303,7 @@ export function PlayerScorecardCard({
       {/* ── TOP BAR — back + condensed live badge ── */}
       <div className="scorecard-top-bar" style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '12px 16px 8px',
+        paddingLeft: 16, paddingRight: 16, paddingBottom: 8,
         flexShrink: 0,
       }}>
         <button
