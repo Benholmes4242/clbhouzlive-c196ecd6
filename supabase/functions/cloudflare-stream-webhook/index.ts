@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
     if (!row.height && height) updateData.height = height;
     if (!row.duration_seconds && durationSeconds)
       updateData.duration_seconds = durationSeconds;
-    if (width && height) updateData.aspect_ratio = aspectRatio;
+    if (!row.aspect_ratio && width && height) updateData.aspect_ratio = aspectRatio;
 
     const ids = mediaRows.map((r: { id: string }) => r.id);
     const { error: updateError } = await supabase
