@@ -5,7 +5,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import type { MessageType, SharedCourse } from '@/types/messaging';
 
@@ -45,40 +44,29 @@ export function ShareContentModal({
   const [activeTab, setActiveTab] = useState<TabType>('courses');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Moments state (native picker)
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const mediaInputRef = useRef<HTMLInputElement>(null);
 
-  // Search courses with react-query
   const { data: courses = [], isLoading: coursesLoading } = useQuery({
     queryKey: ['share-courses', searchQuery],
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
-        .select(`
-          id, name, country, region, thumbnail_image, global_rank, regional_rank, usa_rank,
-          course_rating_aggregates(avg_overall_score)
-        `)
+        .select(`id, name, country, region, thumbnail_image, global_rank, regional_rank, usa_rank, course_rating_aggregates(avg_overall_score)`)
         .order('name')
         .limit(20);
-
-      if (searchQuery.trim()) {
-        query = query.ilike('name', `%${searchQuery.trim()}%`);
-      }
-
+      if (searchQuery.trim()) query = query.ilike('name', `%${searchQuery.trim()}%`);
       const { data } = await query;
       return (data || []) as CourseResult[];
     },
     enabled: activeTab === 'courses' && open,
   });
 
-  // Handle course share
   const handleShareCourse = (course: CourseResult) => {
     const locationParts = [course.region, course.country].filter(Boolean);
     const avgRating = course.course_rating_aggregates?.[0]?.avg_overall_score;
-    
     const metadata: SharedCourse = {
       course_id: course.id,
       course_name: course.name,
@@ -89,42 +77,24 @@ export function ShareContentModal({
       country_rank: course.regional_rank || course.usa_rank || undefined,
       country_code: course.country || undefined,
     };
-
-    onShare(
-      `Check out ${course.name}! ⛳`, 
-      'course_share', 
-      metadata as unknown as Record<string, unknown>
-    );
+    onShare(`Check out ${course.name}! ⛳`, 'course_share', metadata as unknown as Record<string, unknown>);
     handleClose();
   };
 
-  // Media selection handlers
   const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const totalFiles = selectedMedia.length + files.length;
-    
-    if (totalFiles > MAX_MEDIA) {
+    if (selectedMedia.length + files.length > MAX_MEDIA) {
       toast.error(`Maximum ${MAX_MEDIA} items allowed`);
       return;
     }
-    
-    const validFiles = files.filter(file => 
-      file.type.startsWith('image/') || file.type.startsWith('video/')
-    );
-    
+    const validFiles = files.filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
     validFiles.forEach(file => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setMediaPreviews(prev => [...prev, reader.result as string]);
-      };
+      reader.onloadend = () => setMediaPreviews(prev => [...prev, reader.result as string]);
       reader.readAsDataURL(file);
     });
-    
     setSelectedMedia(prev => [...prev, ...validFiles]);
-    
-    if (mediaInputRef.current) {
-      mediaInputRef.current.value = '';
-    }
+    if (mediaInputRef.current) mediaInputRef.current.value = '';
   }, [selectedMedia.length]);
 
   const removeMedia = (index: number) => {
@@ -134,39 +104,23 @@ export function ShareContentModal({
 
   const handleShareMedia = async () => {
     if (selectedMedia.length === 0 || !user) return;
-    
     setIsUploading(true);
     try {
       const uploadedUrls: string[] = [];
-      
       for (const file of selectedMedia) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
         const filePath = `${user.id}/shared-moments/${fileName}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('message-media')
-          .upload(filePath, file);
-          
+        const { error: uploadError } = await supabase.storage.from('message-media').upload(filePath, file);
         if (uploadError) throw uploadError;
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('message-media')
-          .getPublicUrl(filePath);
-          
+        const { data: { publicUrl } } = supabase.storage.from('message-media').getPublicUrl(filePath);
         uploadedUrls.push(publicUrl);
       }
-      
       onShare(
         `Shared ${uploadedUrls.length} photo${uploadedUrls.length > 1 ? 's' : ''} 📸`,
         'moment_share',
-        {
-          media_urls: uploadedUrls,
-          media_count: uploadedUrls.length,
-          thumbnail_url: uploadedUrls[0],
-        }
+        { media_urls: uploadedUrls, media_count: uploadedUrls.length, thumbnail_url: uploadedUrls[0] }
       );
-      
       handleClose();
     } catch (error) {
       console.error('Error uploading media:', error);
@@ -185,262 +139,240 @@ export function ShareContentModal({
 
   const isVideo = (file: File) => file.type.startsWith('video/');
 
+  const tabs: { key: TabType; label: string }[] = [
+    { key: 'courses', label: 'Courses' },
+    { key: 'teetimes', label: 'Tee Times' },
+    { key: 'moments', label: 'Moments' },
+  ];
+
   return (
     <BottomSheet
       open={open}
       onClose={handleClose}
       zIndexBase={1500}
-      className="!bg-[#F8FAFC] !rounded-t-[22px]"
+      className="!rounded-t-[24px]"
+      style={{ background: '#fff' }}
     >
-      <div className="px-4" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto', paddingBottom: '24px' }}>
-        {/* Title */}
-        <h2 className="text-[18px] font-bold mb-4" style={{ color: '#0f172a', letterSpacing: '-0.2px' }}>Share Golf Content</h2>
-        
-        {/* Tab switcher */}
-        <div
-          className="flex p-[3px] mb-4"
-          style={{ background: 'rgba(0,0,0,0.05)', borderRadius: 12 }}
-        >
-          <button
-            onClick={() => setActiveTab('courses')}
-            className={cn(
-              "flex-1 py-2 rounded-[10px] text-sm transition-all",
-              activeTab === 'courses' 
-                ? "bg-white text-[#0f172a] font-bold shadow-[0_1px_4px_rgba(0,0,0,0.10)]" 
-                : "text-[#64748b] font-medium"
-            )}
-          >
-            Courses
-          </button>
-          <button
-            onClick={() => setActiveTab('teetimes')}
-            className={cn(
-              "flex-1 py-2 rounded-[10px] text-sm transition-all",
-              activeTab === 'teetimes' 
-                ? "bg-white text-[#0f172a] font-bold shadow-[0_1px_4px_rgba(0,0,0,0.10)]" 
-                : "text-[#64748b] font-medium"
-            )}
-          >
-            Tee Times
-          </button>
-          <button
-            onClick={() => setActiveTab('moments')}
-            className={cn(
-              "flex-1 py-2 rounded-[10px] text-sm transition-all",
-              activeTab === 'moments' 
-                ? "bg-white text-[#0f172a] font-bold shadow-[0_1px_4px_rgba(0,0,0,0.10)]" 
-                : "text-[#64748b] font-medium"
-            )}
-          >
-            Moments
-          </button>
+      <div style={{ height: '72vh', display: 'flex', flexDirection: 'column' }}>
+        {/* Header */}
+        <div style={{ padding: '12px 20px 0', flexShrink: 0 }}>
+          {/* Drag handle */}
+          <div style={{ width: 36, height: 4, background: '#e2e8f0', borderRadius: 99, margin: '0 auto 14px' }} />
+          <h2 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 14 }}>Share Golf Content</h2>
+          
+          {/* Tab row */}
+          <div className="flex" style={{ gap: 8, marginBottom: 14 }}>
+            {tabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                style={{
+                  padding: '7px 14px', borderRadius: 99,
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  ...(activeTab === tab.key
+                    ? { border: '1.5px solid #0f172a', background: '#0f172a', color: '#fff' }
+                    : { border: '1.5px solid #e2e8f0', background: 'transparent', color: '#64748b' }
+                  ),
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Courses Tab */}
-        {activeTab === 'courses' && (
-          <div className="space-y-3">
-            {/* White card search bar */}
-            <div
-              className="flex items-center gap-2 px-3 h-[44px]"
-              style={{
-                background: '#ffffff',
-                borderRadius: 12,
-                border: '1px solid rgba(0,0,0,0.07)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-              }}
-            >
-              <Search size={17} style={{ color: '#94a3b8', flexShrink: 0 }} />
-              <input
-                placeholder="Search courses…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent border-none outline-none text-[15px] text-[#0f172a] placeholder:text-[#94a3b8]"
-              />
-            </div>
-
-            {/* Eyebrow label */}
-            <p
-              className="text-[11px] font-bold uppercase px-1 pt-1"
-              style={{ color: '#64748b', letterSpacing: '0.1em' }}
-            >
-              Recently Played
-            </p>
-
-            {/* Course list — no ScrollArea wrapper */}
-            {coursesLoading ? (
-              <div className="space-y-2">
-                {[1, 2, 3].map(i => (
-                  <Skeleton key={i} className="h-16 w-full rounded-lg" />
-                ))}
+        {/* Tab content */}
+        <div className="flex-1 overflow-y-auto" style={{ padding: '0 20px 24px' }}>
+          {/* Courses Tab */}
+          {activeTab === 'courses' && (
+            <div>
+              {/* Search bar */}
+              <div className="relative" style={{ marginBottom: 10 }}>
+                <Search className="absolute" style={{ left: 10, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={14} />
+                <input
+                  placeholder="Search courses…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full outline-none"
+                  style={{
+                    height: 36, borderRadius: 10,
+                    background: '#f8fafc',
+                    border: '1px solid rgba(0,0,0,0.08)',
+                    paddingLeft: 32, fontSize: 13, color: '#1e293b',
+                  }}
+                />
               </div>
-            ) : courses.length === 0 ? (
-              <div className="text-center py-8" style={{ color: '#64748b' }}>
-                No courses found
+
+              {/* Section label */}
+              <div style={{
+                padding: '6px 0 4px',
+                fontSize: 10, fontWeight: 700,
+                letterSpacing: '0.08em', color: '#c0c8d0',
+                textTransform: 'uppercase' as const,
+              }}>
+                Recently Played
               </div>
-            ) : (
-              <div>
-                {courses.map((course, index) => {
-                  const isLast = index === courses.length - 1;
-                  return (
+
+              {coursesLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
+                </div>
+              ) : courses.length === 0 ? (
+                <div className="text-center py-8" style={{ color: '#64748b' }}>No courses found</div>
+              ) : (
+                <div>
+                  {courses.map((course, index) => (
                     <div key={course.id}>
                       <button
                         onClick={() => handleShareCourse(course)}
-                        className="w-full flex items-center gap-3 py-[10px] text-left min-h-[44px]"
+                        className="w-full flex items-center text-left active:bg-[rgba(247,147,30,0.04)]"
+                        style={{ gap: 12, padding: '10px 0', border: 'none', background: 'transparent', cursor: 'pointer' }}
                       >
-                        <div className="h-12 w-12 overflow-hidden bg-[#f1f5f9] flex-shrink-0" style={{ borderRadius: '34%' }}>
+                        <div
+                          className="flex-shrink-0 overflow-hidden"
+                          style={{ width: 48, height: 48, borderRadius: 12, background: '#f1f5f9' }}
+                        >
                           {course.thumbnail_image ? (
-                            <img 
-                              src={course.thumbnail_image} 
-                              alt={course.name}
-                              className="h-full w-full object-cover"
-                            />
+                            <img src={course.thumbnail_image} alt={course.name} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="h-full w-full flex items-center justify-center text-xl">
-                              ⛳
-                            </div>
+                            <div className="w-full h-full flex items-center justify-center text-xl">⛳</div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate" style={{ color: '#0f172a' }}>{course.name}</p>
-                          <div className="flex items-center gap-2 text-xs" style={{ color: '#64748b' }}>
-                            {(course.region || course.country) && (
-                              <span className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
+                          <p className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>{course.name}</p>
+                          {(course.region || course.country) && (
+                            <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
+                              <MapPin size={11} style={{ color: '#94a3b8' }} />
+                              <span style={{ fontSize: 12, color: '#94a3b8' }}>
                                 {[course.region, course.country].filter(Boolean).join(', ')}
                               </span>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
                         <ChevronRight size={14} style={{ color: '#d1d5db', flexShrink: 0 }} />
                       </button>
-                      {!isLast && (
-                        <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
+                      {index < courses.length - 1 && (
+                        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
                       )}
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Tee Times Tab */}
-        {activeTab === 'teetimes' && (
-          <div className="flex flex-col items-center justify-center py-12">
-            <div
-              className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center mb-3"
-              style={{ background: 'rgba(245,166,35,0.10)' }}
-            >
-              <Calendar size={24} style={{ color: '#F5A623' }} />
-            </div>
-            <p className="text-[15px] font-semibold text-center" style={{ color: '#0f172a' }}>
-              Tee time sharing coming soon
-            </p>
-            <p className="text-xs text-center mt-1" style={{ color: '#64748b' }}>
-              You'll be able to share upcoming games directly in chat.
-            </p>
-          </div>
-        )}
-
-        {/* Moments Tab - Native Media Picker */}
-        {activeTab === 'moments' && (
-          <div className="space-y-4">
-            {/* Selected media preview grid */}
-            {mediaPreviews.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
-                {mediaPreviews.map((preview, index) => (
-                  <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-[#f1f5f9]">
-                    {isVideo(selectedMedia[index]) ? (
-                      <video 
-                        src={preview} 
-                        className="w-full h-full object-cover" 
-                      />
-                    ) : (
-                      <img 
-                        src={preview} 
-                        alt="" 
-                        className="w-full h-full object-cover" 
-                      />
-                    )}
-                    <button
-                      onClick={() => removeMedia(index)}
-                      className="absolute top-1.5 right-1.5 p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
-                    {isVideo(selectedMedia[index]) && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
-                          <div className="w-0 h-0 border-l-[12px] border-l-white border-y-[8px] border-y-transparent ml-1" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                
-                {/* Add more button */}
-                {selectedMedia.length < MAX_MEDIA && (
-                  <button
-                    onClick={() => mediaInputRef.current?.click()}
-                    className="aspect-square rounded-[12px] border-2 border-dashed border-[rgba(245,166,35,0.35)] bg-[rgba(245,166,35,0.08)] flex flex-col items-center justify-center gap-1 text-[#F5A623] transition-colors"
-                  >
-                    <Plus size={24} />
-                    <span className="text-xs mt-1">Add</span>
-                  </button>
-                )}
-              </div>
-            )}
-            
-            {/* Empty state - amber-tinted dashed zone */}
-            {mediaPreviews.length === 0 && (
-              <button
-                onClick={() => mediaInputRef.current?.click()}
-                className="w-full min-h-[160px] rounded-[16px] border-2 border-dashed border-[rgba(245,166,35,0.30)] bg-[rgba(245,166,35,0.08)] flex flex-col items-center justify-center gap-[10px] transition-colors"
-              >
-                <div
-                  className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center"
-                  style={{ background: 'rgba(245,166,35,0.12)' }}
-                >
-                  <ImagePlus size={24} style={{ color: '#F5A623' }} />
+                  ))}
                 </div>
-                <span className="font-semibold text-[15px]" style={{ color: '#0f172a' }}>Select Photos & Videos</span>
-                <span className="text-xs" style={{ color: '#64748b' }}>Up to {MAX_MEDIA} items</span>
-              </button>
-            )}
-            
-            {/* Hidden file input */}
-            <input
-              ref={mediaInputRef}
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              onChange={handleMediaSelect}
-              className="hidden"
-            />
-            
-            {/* Share CTA button */}
-            {selectedMedia.length > 0 && (
-              <button
-                onClick={handleShareMedia}
-                disabled={isUploading}
-                className="w-full h-[52px] rounded-[14px] text-[16px] font-bold text-white flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-60"
-                style={{
-                  background: '#F5A623',
-                  boxShadow: '0 4px 14px rgba(245,166,35,0.35)',
-                }}
+              )}
+            </div>
+          )}
+
+          {/* Tee Times Tab */}
+          {activeTab === 'teetimes' && (
+            <div className="flex flex-col items-center justify-center text-center" style={{ padding: '40px 24px' }}>
+              <div
+                className="flex items-center justify-center"
+                style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(247,147,30,0.10)', marginBottom: 12 }}
               >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Uploading…
-                  </>
-                ) : (
-                  <>Share {selectedMedia.length} item{selectedMedia.length > 1 ? 's' : ''}</>
-                )}
-              </button>
-            )}
-          </div>
-        )}
+                <Calendar size={24} style={{ color: '#F7931E' }} />
+              </div>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
+                Tee time sharing coming soon
+              </p>
+              <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.5 }}>
+                You'll be able to share upcoming games directly in chat.
+              </p>
+            </div>
+          )}
+
+          {/* Moments Tab */}
+          {activeTab === 'moments' && (
+            <div style={{ padding: '16px 0' }}>
+              {mediaPreviews.length > 0 && (
+                <div className="grid grid-cols-3 gap-2" style={{ marginBottom: 16 }}>
+                  {mediaPreviews.map((preview, index) => (
+                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden" style={{ background: '#f1f5f9' }}>
+                      {isVideo(selectedMedia[index]) ? (
+                        <video src={preview} className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={preview} alt="" className="w-full h-full object-cover" />
+                      )}
+                      <button
+                        onClick={() => removeMedia(index)}
+                        className="absolute flex items-center justify-center"
+                        style={{ top: 6, right: 6, padding: 4, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none' }}
+                      >
+                        <X size={14} style={{ color: '#fff' }} />
+                      </button>
+                    </div>
+                  ))}
+                  {selectedMedia.length < MAX_MEDIA && (
+                    <button
+                      onClick={() => mediaInputRef.current?.click()}
+                      className="aspect-square flex flex-col items-center justify-center"
+                      style={{
+                        borderRadius: 12,
+                        border: '2px dashed rgba(247,147,30,0.35)',
+                        background: 'rgba(247,147,30,0.08)',
+                        color: '#F7931E',
+                      }}
+                    >
+                      <Plus size={24} />
+                      <span style={{ fontSize: 12, marginTop: 4 }}>Add</span>
+                    </button>
+                  )}
+                </div>
+              )}
+              
+              {mediaPreviews.length === 0 && (
+                <button
+                  onClick={() => mediaInputRef.current?.click()}
+                  className="w-full flex flex-col items-center justify-center"
+                  style={{
+                    padding: '28px 20px', borderRadius: 18,
+                    border: '2px dashed rgba(247,147,30,0.35)',
+                    background: 'rgba(247,147,30,0.04)',
+                    gap: 10, cursor: 'pointer',
+                  }}
+                >
+                  <div
+                    className="flex items-center justify-center"
+                    style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(247,147,30,0.10)' }}
+                  >
+                    <ImagePlus size={22} style={{ color: '#F7931E' }} />
+                  </div>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>Select Photos & Videos</span>
+                  <span style={{ fontSize: '12.5px', color: '#94a3b8' }}>Up to {MAX_MEDIA} items</span>
+                </button>
+              )}
+              
+              <input
+                ref={mediaInputRef}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                onChange={handleMediaSelect}
+                className="hidden"
+              />
+              
+              {selectedMedia.length > 0 && (
+                <button
+                  onClick={handleShareMedia}
+                  disabled={isUploading}
+                  className="w-full flex items-center justify-center active:scale-[0.98] transition-transform disabled:opacity-60"
+                  style={{
+                    height: 48, borderRadius: 14,
+                    fontSize: '14.5px', fontWeight: 700,
+                    background: 'rgba(247,147,30,0.10)',
+                    border: '1px solid rgba(247,147,30,0.28)',
+                    color: '#F7931E',
+                    marginTop: 16, gap: 8,
+                  }}
+                >
+                  {isUploading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
+                  ) : (
+                    <>Share {selectedMedia.length} item{selectedMedia.length > 1 ? 's' : ''}</>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </BottomSheet>
   );
