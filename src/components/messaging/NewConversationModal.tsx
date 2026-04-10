@@ -75,13 +75,13 @@ export function NewConversationModal({
       setDmLoading(true);
       try {
         const { data, error } = await supabase
-          .from('public_profiles')
+          .from('user_profiles')
           .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
           .or(`username.ilike.%${dmSearch}%,display_name.ilike.%${dmSearch}%`)
           .neq('id', user.id)
           .limit(20);
         if (error) throw error;
-        setDmResults((data || []) as UserProfile[]);
+        setDmResults((data || []) as unknown as UserProfile[]);
       } catch {
         setDmResults([]);
       } finally {
@@ -102,13 +102,13 @@ export function NewConversationModal({
         const selectedIds = selectedUsers.map(u => u.id);
         const excludeIds = [user.id, ...selectedIds];
         const { data, error } = await supabase
-          .from('public_profiles')
+          .from('user_profiles')
           .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
           .or(`username.ilike.%${groupSearch}%,display_name.ilike.%${groupSearch}%`)
           .not('id', 'in', `(${excludeIds.join(',')})`)
           .limit(20);
         if (error) throw error;
-        setGroupResults((data || []) as UserProfile[]);
+        setGroupResults((data || []) as unknown as UserProfile[]);
       } catch {
         setGroupResults([]);
       } finally {
