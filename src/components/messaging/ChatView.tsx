@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { toast } from 'sonner';
 import { AppLog } from '@/lib/logger';
 import type { ConversationParticipant, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
@@ -372,15 +373,23 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   };
 
   const handleDeleteForMe = async () => {
-    if (deletingMessage) {
+    if (!deletingMessage) return;
+    try {
       await deleteMessageForMe(deletingMessage.id);
+    } catch {
+      toast.error("Couldn't delete message");
+    } finally {
       setDeletingMessage(null);
     }
   };
 
   const handleDeleteForEveryone = async () => {
-    if (deletingMessage) {
-      await deleteMessage(deletingMessage.id);  // sets deleted_at for all participants
+    if (!deletingMessage) return;
+    try {
+      await deleteMessage(deletingMessage.id);
+    } catch {
+      toast.error("Couldn't delete message");
+    } finally {
       setDeletingMessage(null);
     }
   };
