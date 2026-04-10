@@ -1,17 +1,9 @@
 
-import { IoCompassOutline } from 'react-icons/io5';
-import { 
-  HomeIcon,
-  CameraIcon, 
-  MapPinIcon, 
-  TrophyIcon,
-} from '@heroicons/react/24/outline';
-
-// Navigation tabs (5 tabs: Home, Discover, Moment, Tours, Courses)
+// Navigation tabs (5 tabs: Home, Discover, Share, Live, Courses)
 export const navigationTabs = [
-  { id: 'clubhouse', label: 'Home',     icon: HomeIcon,        path: '/clubhouse' },
-  { id: 'discover',  label: 'Discover', icon: IoCompassOutline, path: '/discover' },
-  { id: 'post',      label: 'Share',    icon: CameraIcon,      path: null, isAction: true },
-  { id: 'tourhub',   label: 'Tours',    icon: TrophyIcon,      path: '/tourhub' },
-  { id: 'courses',   label: 'Courses',  icon: MapPinIcon,      path: '/courses' },
+  { id: 'clubhouse', label: 'Home',     emoji: '🏠', path: '/clubhouse' },
+  { id: 'discover',  label: 'Discover', emoji: '🧭', path: '/discover' },
+  { id: 'post',      label: 'Share',    emoji: '📷', path: null, isAction: true },
+  { id: 'tourhub',   label: 'Live',     emoji: '🏆', path: '/tourhub' },
+  { id: 'courses',   label: 'Courses',  emoji: '📍', path: '/courses' },
 ];
