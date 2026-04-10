@@ -40,19 +40,19 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
       case 'user_added':
         return <UserPlus className={iconClass} style={{ color: 'rgba(15,23,42,0.70)' }} />;
       case 'user_left':
-        return <LogOut className={cn(iconClass, "text-muted-foreground")} />;
+        return <LogOut className={iconClass} style={{ color: '#94a3b8' }} />;
       case 'user_ejected':
         return <UserMinus className={cn(iconClass, "text-destructive")} />;
       case 'admin_promoted':
         return <Shield className={iconClass} style={{ color: '#64748b' }} />;
       case 'admin_demoted':
-        return <ShieldOff className={cn(iconClass, "text-muted-foreground")} />;
+        return <ShieldOff className={iconClass} style={{ color: '#94a3b8' }} />;
       case 'group_created':
         return <Users className={iconClass} style={{ color: '#64748b' }} />;
       case 'name_changed':
-        return <Edit className={cn(iconClass, "text-muted-foreground")} />;
+        return <Edit className={iconClass} style={{ color: '#94a3b8' }} />;
       case 'photo_changed':
-        return <Camera className={cn(iconClass, "text-muted-foreground")} />;
+        return <Camera className={iconClass} style={{ color: '#94a3b8' }} />;
       default:
         return null;
     }
@@ -65,15 +65,13 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
 
   return (
     <div className="flex justify-center my-3">
-      <div className={cn(
-        "flex items-center gap-1.5 px-4 py-1.5 rounded-full",
-        "bg-muted/60 text-muted-foreground text-[12px]"
-      )}
-      style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.06)' }}
+      <div
+        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px]"
+        style={{ background: 'rgba(0,0,0,0.05)', color: '#94a3b8', boxShadow: '0 1px 2px rgba(0,0,0,0.06)' }}
       >
         {getIcon()}
         <span>{content}</span>
-        <span className="text-muted-foreground/60 ml-1">
+        <span className="ml-1" style={{ color: 'rgba(148,163,184,0.60)' }}>
           {formatTime(timestamp)}
         </span>
       </div>

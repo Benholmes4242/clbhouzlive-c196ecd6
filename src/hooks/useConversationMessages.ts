@@ -59,8 +59,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       if (messagesError) throw messagesError;
 
       // Fetch IDs this user has deleted for themselves
-      // Uses 'as any' because the RPC exists in production but types.ts is read-only
-      const { data: deletedIds } = await (supabase.rpc as any)(
+      const { data: deletedIds } = await supabase.rpc(
         'get_deleted_message_ids_for_me',
         { p_conversation_id: conversationId }
       );
@@ -259,8 +258,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
   // Persistent delete-for-me: calls RPC to record in DB, then removes from local view
   const deleteMessageForMe = useCallback(async (messageId: string): Promise<void> => {
     try {
-      // Uses 'as any' because the RPC exists in production but types.ts is read-only
-      const { error } = await (supabase.rpc as any)('delete_message_for_me', {
+      const { error } = await supabase.rpc('delete_message_for_me', {
         p_message_id: messageId,
       });
       if (error) throw error;

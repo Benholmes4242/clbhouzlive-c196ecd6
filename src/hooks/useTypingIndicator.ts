@@ -151,7 +151,7 @@ export function useTypingIndicator(conversationId: string | null) {
           try {
             await supabase.rpc('clear_typing_indicator', { 
               p_conversation_id: conversationId 
-            } as any);
+            });
           } catch {
             // Ignore errors on unmount
           }
