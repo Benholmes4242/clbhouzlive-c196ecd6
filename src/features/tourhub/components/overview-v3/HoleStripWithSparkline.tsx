@@ -31,6 +31,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
   ];
 
   const svgWidth = totalHoles * 20;
+  const INSET = 6;
 
   return (
     <div style={{ width: '100%' }}>
@@ -65,11 +66,11 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
           {/* Area fill */}
           {running.length > 1 && (() => {
             const pts = running.map((v, i) => {
-              const x = (i / (totalHoles - 1)) * svgWidth;
+              const x = (i / (totalHoles - 1)) * (svgWidth - INSET);
               const y = SPARK_H - ((v - min) / range) * (SPARK_H - 6) - 3;
               return `${x},${y}`;
             }).join(' ');
-            const lastX = ((running.length - 1) / (totalHoles - 1)) * svgWidth;
+            const lastX = ((running.length - 1) / (totalHoles - 1)) * (svgWidth - INSET);
             const baseY = SPARK_H - ((-min) / range) * (SPARK_H - 6) - 3;
             return (
               <polygon points={`${pts} ${lastX},${baseY} 0,${baseY}`} fill="url(#sparkGrad)" />
@@ -79,7 +80,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
           {/* Line */}
           {running.length > 1 && (() => {
             const pts = running.map((v, i) => {
-              const x = (i / (totalHoles - 1)) * svgWidth;
+              const x = (i / (totalHoles - 1)) * (svgWidth - INSET);
               const y = SPARK_H - ((v - min) / range) * (SPARK_H - 6) - 3;
               return `${x},${y}`;
             }).join(' ');
@@ -91,7 +92,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
           {/* Live dot */}
           {running.length > 0 && (() => {
             const lastIdx = running.length - 1;
-            const x = (lastIdx / (totalHoles - 1)) * svgWidth;
+            const x = (lastIdx / (totalHoles - 1)) * (svgWidth - INSET);
             const y = SPARK_H - ((running[lastIdx] - min) / range) * (SPARK_H - 6) - 3;
             return <circle cx={x} cy={y} r={3} fill="#F7931E" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
           })()}
