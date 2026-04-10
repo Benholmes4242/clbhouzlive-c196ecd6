@@ -785,7 +785,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       {/* Sky tint overlay for live */}
       {isLive && (
         <div style={{
-          position: 'absolute', top: 65, left: 0, right: 0, height: '38%',
+          position: 'absolute', top: 55, left: 0, right: 0, height: '38%',
           background: 'linear-gradient(180deg, #4a7ab5 0%, #2a5a8e 35%, transparent 100%)',
           opacity: 0.55,
           pointerEvents: 'none',
