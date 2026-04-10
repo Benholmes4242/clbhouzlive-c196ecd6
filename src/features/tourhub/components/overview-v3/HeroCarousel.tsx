@@ -685,6 +685,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             src={backgroundImage}
             alt={tournament.venueName || tournament.name}
             className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: 'center calc(50% + env(safe-area-inset-top, 0px) * 0.5)' }}
           />
         ) : (
           <div
