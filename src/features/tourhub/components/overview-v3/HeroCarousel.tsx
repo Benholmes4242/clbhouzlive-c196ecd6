@@ -845,17 +845,31 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   </div>
                 </>
               ) : isLive ? (
-                /* ── Compact topbar — R1 stacked on LIVE left, title right ── */
+                /* ── Compact topbar — tournament name left, round + LIVE right ── */
                 <div style={{
                   flexShrink: 0,
                   paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
                 }}>
                   <div style={{
-                    display: 'flex', alignItems: 'center',
-                    gap: 10, padding: '0 16px 0 56px', height: 58,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    gap: 10, padding: '0 16px', height: 58,
                   }}>
 
-                    {/* R1 + LIVE stacked badge — left side */}
+                    {/* Left — tournament name + venue, full width */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 19, fontWeight: 800, color: '#fff',
+                        letterSpacing: -0.3, lineHeight: 1,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {tournament.name}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 3 }}>
+                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
+                      </div>
+                    </div>
+
+                    {/* Right — round label stacked above LIVE pill */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}>
                       <span style={{
                         fontSize: 9, fontWeight: 800, letterSpacing: '0.8px',
@@ -868,20 +882,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         <span style={{ fontSize: 10, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
                           LIVE
                         </span>
-                      </div>
-                    </div>
-
-                    {/* Title block */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 19, fontWeight: 800, color: '#fff',
-                        letterSpacing: -0.3, lineHeight: 1,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
-                        {tournament.name}
-                      </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 3 }}>
-                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </div>
                     </div>
                   </div>
