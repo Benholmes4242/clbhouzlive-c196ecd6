@@ -37,6 +37,21 @@ interface PlayerScorecardCardProps {
 
 // Score color helpers now imported from @/features/tourhub/utils/scoreColors
 
+const COUNTRY_TO_FLAG: Record<string, string> = {
+  'UNITED STATES': '🇺🇸', 'ENGLAND': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'NORTHERN IRELAND': '🇮🇪', 'SCOTLAND': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'WALES': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'IRELAND': '🇮🇪',
+  'AUSTRALIA': '🇦🇺', 'CANADA': '🇨🇦', 'JAPAN': '🇯🇵',
+  'SOUTH AFRICA': '🇿🇦', 'SPAIN': '🇪🇸', 'GERMANY': '🇩🇪',
+  'FRANCE': '🇫🇷', 'SWEDEN': '🇸🇪', 'NORWAY': '🇳🇴',
+  'DENMARK': '🇩🇰', 'SOUTH KOREA': '🇰🇷', 'CHINA': '🇨🇳',
+  'NEW ZEALAND': '🇳🇿', 'ARGENTINA': '🇦🇷', 'COLOMBIA': '🇨🇴',
+  'ITALY': '🇮🇹', 'BELGIUM': '🇧🇪', 'NETHERLANDS': '🇳🇱',
+  'ZIMBABWE': '🇿🇼', 'INDIA': '🇮🇳', 'FINLAND': '🇫🇮',
+  'CHINESE TAIPEI': '🇹🇼', 'MEXICO': '🇲🇽', 'BRAZIL': '🇧🇷',
+  'FIJI': '🇫🇯', 'THAILAND': '🇹🇭', 'PHILIPPINES': '🇵🇭',
+};
+
 function formatScoreToPar(score: number): string {
   if (score === 0) return 'E';
   if (score > 0) return `+${score}`;
@@ -204,7 +219,7 @@ function RoundTabs({
   const tabs = Array.from({ length: maxRound }, (_, i) => i + 1);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '4px 16px 8px' }}>
+    <div style={{ display: 'flex', gap: 5, padding: '4px 16px 10px', width: 'fit-content' }}>
       {tabs.map((roundNum) => {
         const rs = roundScores.find(r => r.round === roundNum);
         const hasData = rs && rs.holesCompleted > 0;
@@ -225,7 +240,7 @@ function RoundTabs({
             onClick={() => hasData && onSelect(roundNum)}
             disabled={!hasData}
             style={{
-              flex: 1,
+              minWidth: 44,
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
               padding: '6px 4px',
               borderRadius: 9,
@@ -242,7 +257,7 @@ function RoundTabs({
             <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               R{roundNum}
             </span>
-            <span style={{ fontSize: 12, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: hasData ? scoreColor : 'rgba(255,255,255,0.18)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
               {fmtScore ?? '—'}
             </span>
           </button>
@@ -478,6 +493,11 @@ export function PlayerScorecardCard({
             {player.name}
           </span>
           <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', display: 'block', marginTop: 2 }}>
+            {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()] && (
+              <span style={{ marginRight: 4 }}>
+                {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()]}
+              </span>
+            )}
             {player.thru === 'F' ? 'Finished' : player.thru ? `Thru ${player.thru}` : 'Round 1'}
             {player.currentRound ? ` · Round ${player.currentRound}` : ''}
           </span>
@@ -494,6 +514,11 @@ export function PlayerScorecardCard({
         </span>
       </div>
 
+
+      {/* Sparkline — above separator */}
+      {activeRoundData && activeRoundData.holesCompleted > 0 && (
+        <ScorecardSparkline holes={activeRoundData.holes} />
+      )}
 
       {/* Separator */}
       <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px 6px', flexShrink: 0 }} />
@@ -537,10 +562,6 @@ export function PlayerScorecardCard({
             </div>
           )}
 
-          {/* Sparkline — Change 10 */}
-          {activeRoundData && activeRoundData.holesCompleted > 0 && (
-            <ScorecardSparkline holes={activeRoundData.holes} />
-          )}
 
           {/* Front 9 */}
           <div style={{ marginTop: 4 }}>
@@ -564,29 +585,27 @@ export function PlayerScorecardCard({
             />
           </div>
 
-          {/* Total row — Change 8: canonical colours */}
+          {/* Total row */}
           {activeRoundData && activeRoundData.holesCompleted > 0 && (
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '8px 16px 4px',
+              padding: '10px 16px',
               marginTop: 6,
               borderTop: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Total
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Total · {activeRoundData.holesCompleted} holes
               </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>
-                  {activeRoundData.holesCompleted} holes
-                </span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.70)' }}>
                   {activeRoundData.totalStrokes}
                 </span>
                 <span style={{
-                  fontSize: 13, fontWeight: 700,
+                  fontSize: 20, fontWeight: 800,
                   color: activeRoundData.totalToPar < 0 ? '#F7931E'
-                    : activeRoundData.totalToPar > 0 ? '#EF4444'
-                    : 'rgba(255,255,255,0.55)',
+                       : activeRoundData.totalToPar > 0 ? '#EF4444'
+                       : 'rgba(255,255,255,0.55)',
+                  fontVariantNumeric: 'tabular-nums',
                 }}>
                   {formatScoreToPar(activeRoundData.totalToPar)}
                 </span>
