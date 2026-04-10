@@ -515,6 +515,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
         let height: number | null = null;
         let aspectRatio: number | null = null;
         let orientation: string | null = null;
+        let clientDuration: number | null = null;
 
         // Upload based on file type
         if (file.type.startsWith('video/') || (!file.type && /\.(mov|mp4|m4v)$/i.test(file.name))) {
@@ -522,10 +523,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
           const videoDims = await measureVideoDimensions(file);
           if (videoDims.width) width = videoDims.width;
           if (videoDims.height) height = videoDims.height;
-          if (videoDims.duration) {
-            // Store duration for later insertion into post_media
-            (mediaItem as any).__clientDuration = videoDims.duration;
-          }
+          if (videoDims.duration) clientDuration = videoDims.duration;
           if (videoDims.aspectRatio) aspectRatio = videoDims.aspectRatio;
           if (width && height) {
             orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
@@ -705,8 +703,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
               orientation,
             }),
             // Include client-measured duration for videos
-            ...((mediaItem as any)?.__clientDuration && {
-              duration_seconds: (mediaItem as any).__clientDuration,
+            ...(clientDuration && {
+              duration_seconds: clientDuration,
             }),
           })
           .select('id')
