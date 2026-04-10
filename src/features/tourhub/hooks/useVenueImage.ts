@@ -17,6 +17,7 @@ import brokenSoundClub from '@/assets/courses/broken-sound-club.jpg';
 import princeOfWalesCC from '@/assets/courses/prince-of-wales-cc.jpg';
 import missionHillsHaikou from '@/assets/courses/mission-hills-haikou.jpg';
 import theLandingsClub from '@/assets/courses/the-landings-club.jpg';
+import harbourTownGL from '@/assets/harbour-town-upcoming.webp';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -31,6 +32,7 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'Mission Hills Resort Haikou': missionHillsHaikou,
   'The Landings Club': theLandingsClub,
   'TPC San Antonio': '/images/venues/tpc-san-antonio.webp',
+  'Harbour Town Golf Links': harbourTownGL,
 };
 
 interface VenueImageResult {
