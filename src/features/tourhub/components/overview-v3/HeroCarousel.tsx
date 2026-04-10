@@ -331,7 +331,7 @@ function LeaderHeroStrip({
             <HoleStripWithSparkline
               holes={displayHoleScores}
               totalHoles={18}
-              label={`R${holeScores.length > 0 ? derivedRound : lastCompletedRound} · Hole by hole`}
+              label={`R${displayRound} · Hole by hole`}
             />
           </div>
         )}
