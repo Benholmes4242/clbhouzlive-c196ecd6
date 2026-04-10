@@ -14,7 +14,7 @@ export { MediaMessage } from './MediaMessage';
 export { NotificationPrompt } from './NotificationPrompt';
 export { SharedContentCard } from './SharedContentCard';
 export { ShareContentModal } from './ShareContentModal';
-export { ScrollToBottomFab } from './ScrollToBottomFab';
+
 export { ChatSearchBar } from './ChatSearchBar';
 export { SharedMediaGallery } from './SharedMediaGallery';
 export { EditMessageModal } from './EditMessageModal';

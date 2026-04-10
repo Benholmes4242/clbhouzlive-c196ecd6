@@ -41,7 +41,7 @@
      setBlocking(true);
  
      try {
-       const { error } = await supabase.rpc('block_user' as any, {
+       const { error } = await supabase.rpc('block_user', {
          p_blocked_id: userId,
        });
  

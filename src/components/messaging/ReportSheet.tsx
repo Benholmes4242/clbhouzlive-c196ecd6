@@ -52,7 +52,7 @@ export function ReportSheet({
     setSubmitting(true);
 
     try {
-      const { error } = await supabase.rpc('submit_report' as any, {
+      const { error } = await supabase.rpc('submit_report', {
         p_reported_user_id: reportedUserId || null,
         p_reported_conversation_id: reportedConversationId || null,
         p_reason: selectedReason,

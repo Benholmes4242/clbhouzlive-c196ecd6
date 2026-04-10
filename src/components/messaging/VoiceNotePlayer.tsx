@@ -73,7 +73,6 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Calculate position from mouse/touch event
   const getPositionFromEvent = (clientX: number): number => {
     if (!progressRef.current) return 0;
     const rect = progressRef.current.getBoundingClientRect();
@@ -81,7 +80,6 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
     return Math.max(0, Math.min(1, position));
   };
 
-  // Seek to position
   const seekTo = (position: number) => {
     const audio = audioRef.current;
     if (!audio || !duration) return;
@@ -90,13 +88,11 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
     setCurrentTime(newTime);
   };
 
-  // Handle click on progress bar
   const handleProgressClick = (e: React.MouseEvent) => {
     const position = getPositionFromEvent(e.clientX);
     seekTo(position);
   };
 
-  // Handle drag start
   const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -106,7 +102,6 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
     seekTo(position);
   };
 
-  // Handle drag move
   useEffect(() => {
     if (!isDragging) return;
 
@@ -145,12 +140,11 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
       {/* Play/Pause button */}
       <button
         onClick={togglePlayPause}
-        className={cn(
-          "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-          isOwn 
-            ? "bg-background/20 hover:bg-background/30 text-primary" 
-            : "bg-primary/10 hover:bg-primary/20 text-primary"
-        )}
+        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+        style={{
+          background: isOwn ? 'rgba(255,255,255,0.20)' : 'rgba(247,147,30,0.10)',
+          color: '#F7931E',
+        }}
         aria-label={isPlaying ? 'Pause' : 'Play'}
       >
         {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-0.5" />}
@@ -158,7 +152,6 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
       
       {/* Waveform with scrubber */}
       <div className="flex-1 flex flex-col gap-1.5">
-        {/* Clickable/draggable waveform area */}
         <div 
           ref={progressRef}
           className="relative flex items-center gap-[2px] h-8 cursor-pointer group"
@@ -166,18 +159,19 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
           onMouseDown={handleDragStart}
           onTouchStart={handleDragStart}
         >
-          {/* Waveform bars */}
           {waveformBars.map((height, index) => (
             <div
               key={index}
               className={cn(
                 "w-[3px] rounded-full transition-all duration-75",
-                index < activeBarIndex
-                  ? "bg-primary"
-                  : isOwn ? "bg-primary/40" : "bg-primary/30",
                 "group-hover:scale-y-110"
               )}
-              style={{ height: `${height * 100}%` }}
+              style={{
+                height: `${height * 100}%`,
+                background: index < activeBarIndex
+                  ? '#F7931E'
+                  : isOwn ? 'rgba(247,147,30,0.40)' : 'rgba(247,147,30,0.30)',
+              }}
             />
           ))}
           
@@ -185,18 +179,16 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
           <div 
             className={cn(
               "absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full shadow-md transition-transform",
-              "bg-primary",
               isDragging ? "scale-125" : "scale-100 group-hover:scale-110"
             )}
-            style={{ left: `calc(${progress}% - 6px)` }}
+            style={{ left: `calc(${progress}% - 6px)`, background: '#F7931E' }}
           />
         </div>
         
         {/* Time display */}
-        <div className={cn(
-          "flex justify-between text-[10px]",
-          isOwn ? "text-primary/70" : "text-muted-foreground"
-        )}>
+        <div className="flex justify-between text-[10px]"
+          style={{ color: isOwn ? 'rgba(247,147,30,0.70)' : '#94a3b8' }}
+        >
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>

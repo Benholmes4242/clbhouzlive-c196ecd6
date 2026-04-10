@@ -42,7 +42,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       // Fetch messages for this conversation
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('*')
+        .select('id, conversation_id, sender_id, content, message_type, media_url, media_metadata, reply_to_id, is_edited, edited_at, created_at, deleted_at')
         .eq('conversation_id', conversationId)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
@@ -97,7 +97,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       if (replyToIds.length > 0) {
         const { data: replyData } = await supabase
           .from('messages')
-          .select('*')
+          .select('id, conversation_id, sender_id, content, message_type, media_url, media_metadata, reply_to_id, is_edited, edited_at, created_at, deleted_at')
           .in('id', replyToIds);
         
         replyData?.forEach(r => {
