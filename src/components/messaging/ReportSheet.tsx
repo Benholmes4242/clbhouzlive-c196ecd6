@@ -103,14 +103,15 @@ export function ReportSheet({
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all text-left active:scale-[0.97]",
                   selectedReason === reason.id
-                    ? "border-primary bg-primary/5"
+                    ? "border-border/20 hover:border-border/40"
                     : "border-border/20 hover:border-border/40"
                 )}
+                style={selectedReason === reason.id ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.05)' } : undefined}
               >
                 <span className="text-xl">{reason.icon}</span>
                 <span className="font-medium" style={{ color: '#1D1D1F' }}>{reason.label}</span>
                 {selectedReason === reason.id && (
-                   <div className="ml-auto w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                   <div className="ml-auto w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#F7931E' }}>
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}
