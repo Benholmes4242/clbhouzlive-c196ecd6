@@ -21,7 +21,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
   const max = Math.max(...running, 0);
   const range = max - min || 1;
 
-  const DOT_AREA = 26;
+  const DOT_AREA = 31;
   const SPARK_H = 44;
   const TOTAL_H = DOT_AREA + SPARK_H;
 
@@ -166,12 +166,12 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
 
             return (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flex: 1 }}>
-                <span style={{ fontSize: 7, fontWeight: 600, color: 'rgba(255,255,255,0.25)', lineHeight: 1 }}>
+                <span style={{ fontSize: 8.5, fontWeight: 600, color: 'rgba(255,255,255,0.25)', lineHeight: 1 }}>
                   {i + 1}
                 </span>
-                <div style={{ width: 13, height: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', ...dotStyle }}>
+                <div style={{ width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', ...dotStyle }}>
                   {isPlayed && (
-                    <span style={{ fontSize: 6.5, fontWeight: 800, color: textColor, lineHeight: 1 }}>
+                    <span style={{ fontSize: 8, fontWeight: 800, color: textColor, lineHeight: 1 }}>
                       {isHIO ? '①' : h!.strokes}
                     </span>
                   )}
