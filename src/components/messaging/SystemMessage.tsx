@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserPlus, UserMinus, LogOut, Shield, ShieldOff, Edit, Camera, Users } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export type SystemEventType = 
   | 'user_added'
