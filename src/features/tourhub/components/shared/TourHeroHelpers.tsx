@@ -94,45 +94,40 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
   ];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, margin: '8px 0' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, margin: '12px 0' }}>
       {cells.map((cell, i) => (
         <div key={cell.label} style={{ display: 'contents' }}>
           {/* Cell */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 44, padding: '8px 4px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, padding: '8px 0' }}>
             <span style={{
               fontFamily: "'JetBrains Mono','SF Mono',monospace",
-              fontSize: 24, fontWeight: 800,
+              fontSize: 52, fontWeight: 900,
               color: cell.isAccent ? '#4ade80' : '#FFFFFF',
               lineHeight: 1,
+              letterSpacing: -3,
               fontVariantNumeric: 'tabular-nums',
             }}>
               {String(cell.value).padStart(2, '0')}
             </span>
             <span style={{
-              fontSize: 8, fontWeight: 700,
+              fontSize: 9, fontWeight: 700,
               color: 'rgba(255,255,255,0.30)',
               textTransform: 'uppercase',
-              letterSpacing: '0.8px',
-              marginTop: 4,
+              letterSpacing: '1.5px',
+              marginTop: 6,
             }}>
               {cell.label}
             </span>
           </div>
 
-          {/* Pulsing dot separator — between cells only */}
+          {/* Colon separator — between cells only */}
           {i < cells.length - 1 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '0 2px' }}>
-              <div style={{
-                width: 3, height: 3, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.25)',
-                animation: 'tickPulse 1s ease-in-out infinite',
-              }} />
-              <div style={{
-                width: 3, height: 3, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.25)',
-                animation: 'tickPulse 1s ease-in-out infinite',
-              }} />
-            </div>
+            <span style={{
+              fontSize: 40, fontWeight: 300,
+              color: 'rgba(255,255,255,0.20)',
+              lineHeight: 1,
+              marginBottom: 16,
+            }}>:</span>
           )}
         </div>
       ))}
