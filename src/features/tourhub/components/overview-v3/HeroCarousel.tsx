@@ -305,7 +305,7 @@ function LeaderHeroStrip({
         </div>
 
         {/* Round pills — left-aligned with avatar */}
-        <div style={{ marginTop: 2, marginBottom: holeScores.length > 0 ? 12 : 0 }}>
+        <div style={{ marginTop: -2, marginBottom: holeScores.length > 0 ? 12 : 0 }}>
           <RoundHistoryPills
             round1={leaderEntry.round_1}
             round2={leaderEntry.round_2}
