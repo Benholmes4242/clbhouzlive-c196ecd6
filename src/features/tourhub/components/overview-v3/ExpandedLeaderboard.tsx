@@ -175,8 +175,9 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   const thruDisplay = formatThru(entry);
   const isCut = entry.status === 'cut' || entry.status === 'wd' || entry.status === 'dq';
 
-  // Derive current round from round columns
-  const currentRound = entry.round_4 != null ? 4 : entry.round_3 != null ? 3 : entry.round_2 != null ? 2 : 1;
+  // Derive current active round (one ahead of last completed)
+  const lastCompletedRound = entry.round_4 != null ? 4 : entry.round_3 != null ? 3 : entry.round_2 != null ? 2 : entry.round_1 != null ? 1 : 0;
+  const currentRound = Math.min(lastCompletedRound + 1, 4);
 
   const handleTap = onPlayerTap
     ? () => {
@@ -272,11 +273,17 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
 
       {/* Today (current round score-to-par) */}
       {(() => {
-        const isActivelyPlaying = entry.thru != null && entry.thru >= 1 && entry.thru < 18;
+        const isActivelyPlaying = entry.thru != null && entry.thru >= 1 && entry.thru < 18
+          && entry.status !== 'wd' && entry.status !== 'dq' && entry.status !== 'cut';
         const todayToPar = (() => {
-          if (!isActivelyPlaying) return null;           // finished or not started — show —
-          if (currentRound === 1) return entry.score ?? null;  // R1: total = today
-          return (entry[`round_${currentRound}`] as number | null) ?? null; // R2+: use stored round score
+          if (!isActivelyPlaying) return null;
+          const completedTotal = [1, 2, 3, 4]
+            .filter(r => r < currentRound)
+            .reduce((sum, r) => {
+              const s = entry[`round_${r}` as keyof typeof entry] as number | null;
+              return s != null ? sum + s : sum;
+            }, 0);
+          return entry.score != null ? entry.score - completedTotal : null;
         })();
         return (
           <span style={{

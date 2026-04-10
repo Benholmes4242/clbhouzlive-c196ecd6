@@ -226,12 +226,15 @@ function LeaderHeroStrip({
 
   // Today's score — only show when actively playing (thru 1–17)
   const isActivelyPlaying = thruRaw != null && thruRaw >= 1 && thruRaw < 18;
-  const todayRoundScore = leaderEntry[`round_${derivedRound}`] as number | null;
-  const todayScore = isActivelyPlaying ? (
-    derivedRound === 1
-      ? score                    // R1: total = today
-      : todayRoundScore          // R2+: use the stored round score
-  ) : null;                      // Finished or between rounds — hide pill
+  const completedTotal = [1, 2, 3, 4]
+    .filter(r => r < derivedRound)
+    .reduce((sum, r) => {
+      const s = leaderEntry[`round_${r}`] as number | null;
+      return s != null ? sum + s : sum;
+    }, 0);
+  const todayScore = isActivelyPlaying
+    ? (score != null ? score - completedTotal : null)
+    : null;
   const todayDisplay = todayScore === null ? null
     : todayScore === 0 ? 'E'
     : todayScore > 0 ? `+${todayScore}`
