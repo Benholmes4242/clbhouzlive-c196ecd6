@@ -109,7 +109,7 @@ export function ChatSearchBar({
       {/* Close button */}
       <button
         onClick={onClose}
-        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted/50 active:bg-muted"
+        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted/50 active:bg-muted active:scale-[0.97] transition-transform"
       >
         <X className="w-4 h-4 text-muted-foreground" />
       </button>

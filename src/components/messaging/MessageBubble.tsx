@@ -33,6 +33,7 @@ interface MessageBubbleProps {
   onDelete: () => void;
   onToggleReaction?: (emoji: string) => void;
   onForward?: () => void;
+  isHighlighted?: boolean;
 }
 
 function formatMessageTime(dateString: string): string {
@@ -78,6 +79,7 @@ export function MessageBubble({
   onDelete,
   onToggleReaction,
   onForward,
+  isHighlighted,
 }: MessageBubbleProps) {
   const navigate = useNavigate();
   const [isPressed, setIsPressed] = useState(false);
@@ -280,8 +282,12 @@ export function MessageBubble({
   const handleCopy = () => {
     haptic('light');
     if (message.content) {
-      navigator.clipboard.writeText(message.content);
-      toast.success('Copied to clipboard');
+      try {
+        navigator.clipboard.writeText(message.content);
+        toast.success('Copied to clipboard');
+      } catch {
+        toast.error('Could not copy to clipboard');
+      }
     }
   };
 
@@ -426,6 +432,7 @@ export function MessageBubble({
   );
 
   return (
+    <div style={{ borderRadius: 16, transition: 'background 0.3s', background: isHighlighted ? 'rgba(247,147,30,0.12)' : 'transparent' }}>
     <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
       <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
       <ContextMenuContent
@@ -508,5 +515,6 @@ export function MessageBubble({
         )}
       </ContextMenuContent>
     </ContextMenu>
+    </div>
   );
 }

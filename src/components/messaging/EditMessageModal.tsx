@@ -57,6 +57,8 @@ export function EditMessageModal({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
+        {/* Drag handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#e2e8f0', margin: '12px auto' }} />
         <SheetHeader className="pb-4">
           <SheetTitle className="text-center text-[17px] font-semibold">
             Edit Message
@@ -68,7 +70,7 @@ export function EditMessageModal({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Edit your message..."
-            className="min-h-[100px] resize-none rounded-2xl border-border focus:border-[hsl(38,92%,50%)]/40 focus:ring-[hsl(38,92%,50%)]/20"
+            className="min-h-[100px] resize-none rounded-2xl border-border focus:border-[#F7931E]/40 focus:ring-[#F7931E]/20"
             autoFocus
           />
 
@@ -84,7 +86,8 @@ export function EditMessageModal({
             <Button
               onClick={handleSave}
               disabled={!content.trim() || content === originalContent || saving}
-              className="flex-1 h-12 rounded-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
+              className="flex-1 h-12 rounded-full text-white border-0 active:scale-[0.97] transition-transform"
+              style={{ background: '#F7931E' }}
             >
               <Check className="w-4 h-4 mr-2" />
               {saving ? 'Saving...' : 'Save'}

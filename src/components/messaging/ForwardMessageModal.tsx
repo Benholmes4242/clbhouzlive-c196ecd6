@@ -102,11 +102,13 @@ export function ForwardMessageModal({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-<SheetContent
-          side="bottom"
-          className="rounded-t-3xl px-0 pb-8"
-          style={{ height: 'min(70vh, calc(100dvh - 120px))' }}
-        >
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl px-0 pb-8"
+        style={{ height: 'min(70vh, calc(100dvh - 120px))' }}
+      >
+        {/* Drag handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#e2e8f0', margin: '12px auto' }} />
         <SheetHeader className="px-4 pb-4">
           <SheetTitle className="text-center text-[17px] font-semibold">
             Forward Message
@@ -121,7 +123,7 @@ export function ForwardMessageModal({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="pl-10 h-10 rounded-full bg-[hsl(38,92%,50%)]/5 border border-border"
+              className="pl-10 h-10 rounded-full bg-[rgba(247,147,30,0.05)] border border-border"
             />
           </div>
         </div>
@@ -144,13 +146,13 @@ export function ForwardMessageModal({
                   onClick={() => handleForward(conv.id)}
                   disabled={forwarding !== null}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 transition-colors",
-                    "hover:bg-[hsl(38,92%,50%)]/5 active:bg-[hsl(38,92%,50%)]/10",
+                    "w-full flex items-center gap-3 px-4 py-3 transition-colors active:scale-[0.97]",
+                    "hover:bg-[rgba(247,147,30,0.05)] active:bg-[rgba(247,147,30,0.10)]",
                     forwarding !== null && forwarding !== conv.id && "opacity-50"
                   )}
                 >
                   {display.isGroup ? (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[hsl(38,92%,50%)] to-[hsl(36,84%,46%)] flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #F7931E, #e07a0d)' }}>
                       <Users className="w-5 h-5 text-white" />
                     </div>
                   ) : (
@@ -166,7 +168,7 @@ export function ForwardMessageModal({
                     {display.name}
                   </span>
                   {isForwarding && (
-                    <Loader2 className="w-5 h-5 text-[hsl(38,92%,50%)] animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: '#F7931E' }} />
                   )}
                 </button>
               );

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
+import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
 interface ReportSheetProps {
@@ -68,7 +69,7 @@ export function ReportSheet({
       setSelectedReason(null);
       setDetails('');
     } catch (error) {
-      console.error('Error submitting report:', error);
+      AppLog.error('[ReportSheet]', 'Error submitting report:', error);
       toast.error('Failed to submit report');
     } finally {
       setSubmitting(false);
@@ -95,19 +96,19 @@ export function ReportSheet({
             {REPORT_REASONS.map((reason) => (
               <button
                 key={reason.id}
-                onClick={() => {
+              onClick={() => {
                   haptic('light');
                   setSelectedReason(reason.id);
                 }}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all text-left",
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all text-left active:scale-[0.97]",
                   selectedReason === reason.id
                     ? "border-primary bg-primary/5"
                     : "border-border/20 hover:border-border/40"
                 )}
               >
                 <span className="text-xl">{reason.icon}</span>
-                <span className="font-medium text-[#1D1D1F]">{reason.label}</span>
+                <span className="font-medium" style={{ color: '#1D1D1F' }}>{reason.label}</span>
                 {selectedReason === reason.id && (
                    <div className="ml-auto w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                     <span className="text-white text-xs">✓</span>

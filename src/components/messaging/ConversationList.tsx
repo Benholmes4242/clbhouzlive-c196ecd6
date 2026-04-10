@@ -304,15 +304,16 @@ export function ConversationList({
 
   // Split into people (direct) and groups
   const directConversations = filteredConversations.filter(c => c.type === 'direct');
-  const groupConversations = filteredConversations.filter(c => c.type === 'group');
+  const groupConversations = filteredConversations.filter(c => c.type !== 'direct');
 
   const renderConversationRow = (conversation: ConversationWithDetails, isArchived: boolean = false, index: number = 0, total: number = 0) => {
     const { name, avatarUrl, initials } = getConversationDisplay(conversation, user?.id);
     const isSelected = selectedConversationId === conversation.id;
     const hasUnread = conversation.unread_count > 0;
     const showDivider = index < total - 1;
-    const isGroup = conversation.type === 'group';
+    const isGroup = conversation.type !== 'direct';
     const isMuted = conversation.participants.find(p => p.user_id === user?.id)?.is_muted;
+    // TODO: COACH badge requires is_coach field on public_profiles — not yet implemented
 
     return (
       <SwipeableConversationItem
