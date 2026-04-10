@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { getScoreColorSet } from '../../utils/scoreColors';
 import type { LeaderHoleScore } from '../../hooks/useLeaderHoleScores';
 
 interface HoleStripWithSparklineProps {
@@ -105,32 +104,78 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
           height: DOT_AREA,
         }}>
           {allHoles.map((h, i) => {
-            const isPlayed = h !== null;
-            const score = h?.scoreToPar ?? 0;
-            const colors = isPlayed ? getScoreColorSet(score) : null;
-            const isCircle = isPlayed && score <= -1;
-            const isSquare = isPlayed && score >= 1;
+            const isPlayed = h !== null && h.strokes > 0;
+            const score    = isPlayed ? h.scoreToPar : null;
+            const isHIO    = isPlayed && h.strokes === 1;
+
+            const dotStyle = (() => {
+              if (!isPlayed) return {
+                background: 'transparent',
+                border: '1px dashed rgba(255,255,255,0.22)',
+                borderRadius: '50%',
+              };
+              if (isHIO) return {
+                background: 'rgba(255,215,0,0.22)',
+                border: '1.5px solid #FFD700',
+                borderRadius: '50%',
+                boxShadow: '0 0 7px rgba(255,215,0,0.55)',
+              };
+              if (score! <= -2) return {       // Eagle or better — green
+                background: 'rgba(34,197,94,0.20)',
+                border: '1.5px solid #22C55E',
+                borderRadius: '50%',
+                boxShadow: '0 0 6px rgba(34,197,94,0.40)',
+              };
+              if (score === -1) return {       // Birdie — amber
+                background: 'rgba(247,147,30,0.18)',
+                border: '1.5px solid #F7931E',
+                borderRadius: '50%',
+                boxShadow: '0 0 5px rgba(247,147,30,0.35)',
+              };
+              if (score === 0) return {        // Par — dashed outline only, no fill
+                background: 'transparent',
+                border: '1px dashed rgba(255,255,255,0.35)',
+                borderRadius: '50%',
+              };
+              if (score === 1) return {        // Bogey — red square
+                background: 'rgba(239,68,68,0.15)',
+                border: '1.5px solid #EF4444',
+                borderRadius: 3,
+                boxShadow: '0 0 5px rgba(239,68,68,0.30)',
+              };
+              return {                         // Double bogey or worse — dark red square
+                background: 'rgba(153,27,27,0.20)',
+                border: '1.5px solid #991B1B',
+                borderRadius: 3,
+              };
+            })();
+
+            const textColor = (() => {
+              if (!isPlayed || score === null) return 'rgba(255,255,255,0.5)';
+              if (isHIO)        return '#FFD700';
+              if (score <= -2)  return '#22C55E';
+              if (score === -1) return '#F7931E';
+              if (score === 1)  return '#EF4444';
+              if (score >= 2)   return '#991B1B';
+              return 'rgba(255,255,255,0.5)';
+            })();
+
+            const label = (() => {
+              if (!isPlayed || score === null) return null;
+              if (isHIO)       return 'HIO';
+              if (score === 0) return null;      // par — no label, dashed circle is enough
+              return score < 0 ? `${score}` : `+${score}`;
+            })();
 
             return (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flex: 1 }}>
                 <span style={{ fontSize: 7, fontWeight: 600, color: 'rgba(255,255,255,0.25)', lineHeight: 1 }}>
                   {i + 1}
                 </span>
-                <div style={{
-                  width: 13, height: 13,
-                  borderRadius: isCircle ? '50%' : isSquare ? 3 : '50%',
-                  background: isPlayed
-                    ? (score === 0 ? 'rgba(255,255,255,0.12)' : colors!.bg)
-                    : 'rgba(255,255,255,0.06)',
-                  border: isPlayed && score !== 0
-                    ? `1px solid ${colors!.ring}`
-                    : '1px solid rgba(255,255,255,0.08)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: isPlayed && score !== 0 ? `0 0 6px ${colors!.ring}` : 'none',
-                }}>
-                  {isPlayed && score !== 0 && (
-                    <span style={{ fontSize: 6, fontWeight: 800, color: colors!.text, lineHeight: 1 }}>
-                      {score <= -2 ? '−2' : score === -1 ? '−1' : `+${score}`}
+                <div style={{ width: 13, height: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', ...dotStyle }}>
+                  {label && (
+                    <span style={{ fontSize: isHIO ? 4.5 : 6, fontWeight: 800, color: textColor, lineHeight: 1 }}>
+                      {label}
                     </span>
                   )}
                 </div>

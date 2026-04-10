@@ -47,11 +47,11 @@ export const SCORE_COLORS = {
   },
   // Double bogey or worse
   doublePlus: {
-    text: '#FF9500',           // orange
-    bg: 'rgba(255, 149, 0, 0.15)',
-    ring: 'rgba(255, 149, 0, 0.30)',
-    tailwindText: 'text-orange-400',
-    tailwindBg: 'bg-orange-400/15 ring-1 ring-orange-400/30',
+    text: '#991B1B',           // dark red — worse than bogey
+    bg: 'rgba(153, 27, 27, 0.20)',
+    ring: 'rgba(153, 27, 27, 0.35)',
+    tailwindText: 'text-red-800',
+    tailwindBg: 'bg-red-800/20 ring-1 ring-red-800/35',
   },
 } as const;
 

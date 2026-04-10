@@ -272,8 +272,12 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
 
       {/* Today (current round score-to-par) */}
       {(() => {
-        // round_N stores raw strokes, not to-par — only show today for R1 where total === today
-        const todayToPar = currentRound === 1 ? (entry.score ?? null) : null;
+        const isActivelyPlaying = entry.thru != null && entry.thru >= 1 && entry.thru < 18;
+        const todayToPar = (() => {
+          if (!isActivelyPlaying) return null;           // finished or not started — show —
+          if (currentRound === 1) return entry.score ?? null;  // R1: total = today
+          return (entry[`round_${currentRound}`] as number | null) ?? null; // R2+: use stored round score
+        })();
         return (
           <span style={{
             width: 46,

@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface LeaderHoleScore {
   holeNumber: number;
   scoreToPar: number;
+  strokes: number;
 }
 
 export function useLeaderHoleScores(
@@ -33,6 +34,7 @@ export function useLeaderHoleScores(
         .map(r => ({
           holeNumber: r.hole_number,
           scoreToPar: r.score_to_par ?? 0,
+          strokes: r.strokes ?? 0,
         }));
     },
     enabled: !!tournamentId && !!playerId && !!currentRound,

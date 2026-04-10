@@ -73,7 +73,7 @@ function getStartLabel(date: string): string {
 }
 
 const COUNTRY_TO_FLAG: Record<string, string> = {
-  'UNITED STATES': '🇺🇸', 'ENGLAND': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'NORTHERN IRELAND': '🇬🇧',
+  'UNITED STATES': '🇺🇸', 'ENGLAND': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'NORTHERN IRELAND': '🇮🇪',
   'SCOTLAND': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'WALES': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'IRELAND': '🇮🇪',
   'AUSTRALIA': '🇦🇺', 'CANADA': '🇨🇦', 'JAPAN': '🇯🇵', 'SOUTH AFRICA': '🇿🇦',
   'SPAIN': '🇪🇸', 'GERMANY': '🇩🇪', 'FRANCE': '🇫🇷', 'SWEDEN': '🇸🇪',
@@ -184,9 +184,13 @@ function LeaderHeroStrip({
   currentRound: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
-  const derivedRound = [4,3,2,1].find(n =>
+  // derivedRound = current active round (last completed + 1, capped at 4)
+  const lastCompletedRound = [4,3,2,1].find(n =>
     leaderEntry[`round_${n}`] !== null
-  ) ?? currentRound;
+  ) ?? 0;
+  const derivedRound = lastCompletedRound === 0
+    ? currentRound          // no rounds complete yet — use server-provided round
+    : Math.min(lastCompletedRound + 1, 4);  // advance to next round
 
   const playerId = leaderEntry?.player_id ?? leaderEntry?.player?.id ?? null;
   const { data: holeScores = [] } = useLeaderHoleScores(tournamentId, playerId, derivedRound);
@@ -210,18 +214,14 @@ function LeaderHeroStrip({
     : thruRaw === 0 || thruRaw == null ? '-'
     : `${thruRaw}`;
 
-  // Calculate today's score-to-par (round_N stores raw strokes, not to-par)
-  const prevRoundsScore = [1,2,3,4]
-    .filter(n => n < derivedRound)
-    .reduce((sum, n) => sum + ((leaderEntry[`round_${n}`] as number | null) ?? 0), 0);
-  // For R1, total score IS today's score; for R2+, subtract previous rounds' contribution
-  // But since round_N is strokes and score is to-par, we need par info
-  // Simpler: if only R1 played, today = score. If R2+, we can't derive today from strokes alone
-  // without par. Use score directly for R1, and for R2+ check if score changes are trackable.
-  // Actually: score = total_to_par. If we knew per-round par we could calc. 
-  // Best approach: today = score (total to par) when R1, otherwise null (hide pill) unless we get per-round to-par data.
-  // For now, show today only for R1 where today === total score.
-  const todayScore = derivedRound === 1 ? score : null;
+  // Today's score — only show when actively playing (thru 1–17)
+  const isActivelyPlaying = thruRaw != null && thruRaw >= 1 && thruRaw < 18;
+  const todayRoundScore = leaderEntry[`round_${derivedRound}`] as number | null;
+  const todayScore = isActivelyPlaying ? (
+    derivedRound === 1
+      ? score                    // R1: total = today
+      : todayRoundScore          // R2+: use the stored round score
+  ) : null;                      // Finished or between rounds — hide pill
   const todayDisplay = todayScore === null ? null
     : todayScore === 0 ? 'E'
     : todayScore > 0 ? `+${todayScore}`

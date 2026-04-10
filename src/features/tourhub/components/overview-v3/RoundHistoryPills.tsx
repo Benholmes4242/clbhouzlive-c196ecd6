@@ -19,8 +19,8 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4, width: 'fit-content' }}>
       {rounds.map(r => {
-        const isLive = r.roundNum === currentRound;
-        const isDone = r.score !== null && !isLive;
+        const isLive = r.roundNum === currentRound && r.score === null;
+        const isDone = r.score !== null;
         const colors = isDone ? getScoreColorSet(r.score!) : null;
         const fmtScore = r.score === null ? null : r.score === 0 ? 'E' : r.score > 0 ? `+${r.score}` : `${r.score}`;
 

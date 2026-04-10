@@ -42,16 +42,11 @@ export function getCurrentRoundLabel(
   thru?: number | null
 ): string {
   if (roundScores) {
-    // Helper: player is mid-round if thru is 1–17 (started but not finished)
-    const midRound = thru != null && thru >= 1 && thru < 18;
-
+    // When round_N is stored, that round is complete — current round is N+1
     if (roundScores.round_4 != null) return 'Final Round';
-    // R3 complete → Final Round in progress
-    if (roundScores.round_3 != null) return midRound ? 'Final Round' : 'Round 3 of 4';
-    // R2 complete → R3 in progress (suspended mid-round counts as in-progress)
-    if (roundScores.round_2 != null) return midRound ? 'Round 3 of 4' : 'Round 2 of 4';
-    // R1 complete → R2 in progress
-    if (roundScores.round_1 != null) return midRound ? 'Round 2 of 4' : 'Round 1 of 4';
+    if (roundScores.round_3 != null) return 'Final Round';
+    if (roundScores.round_2 != null) return 'Round 3 of 4';
+    if (roundScores.round_1 != null) return 'Round 2 of 4';
   }
   const dayIndex = Math.max(0, Math.floor(
     (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
