@@ -178,7 +178,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             .filter((id): id is string => id !== null);
 
           const { data: profiles } = await supabase
-            .from('public_profiles')
+            .from('user_profiles')
             .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
             .in('id', participantIds);
 
