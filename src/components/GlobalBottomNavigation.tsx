@@ -17,6 +17,7 @@ import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
+import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -91,6 +92,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix));
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
+  const isTourHubRoute = location.pathname.startsWith('/tourhub');
   
   const showNavigation = isVisible && !shouldHideForRoute;
 
@@ -192,6 +194,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 showBorder={false}
                 tabBadges={{ courses: unseenFriendReviews }}
                 liveTabs={liveTabs}
+                showBurger={isTourHubRoute}
+                onBurgerClick={() => openTourNav()}
               />
             </div>
           </motion.div>

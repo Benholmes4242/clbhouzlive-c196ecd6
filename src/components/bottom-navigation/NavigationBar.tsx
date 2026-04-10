@@ -20,6 +20,10 @@ interface NavigationBarProps {
   tabBadges?: Record<string, number>;
   /** Set of tab IDs that have live content right now */
   liveTabs?: Set<string>;
+  /** Show a burger/menu button as the first item */
+  showBurger?: boolean;
+  /** Called when the burger button is clicked */
+  onBurgerClick?: () => void;
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -32,6 +36,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   showBorder = true,
   tabBadges = {},
   liveTabs = new Set(),
+  showBurger = false,
+  onBurgerClick,
 }) => {
   const isLightTheme = variant === 'default';
   const isClubhouseTheme = variant === 'clubhouse';
@@ -50,8 +56,20 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         className="w-full h-[55px] flex items-center justify-around"
         style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
       >
+      {showBurger && (
+        <button
+          onClick={onBurgerClick}
+          className="relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl focus:outline-none active:scale-95"
+          style={{ transition: 'all var(--motion-fast) var(--ease-standard)' }}
+          aria-label="Tour menu"
+        >
+          <span style={{ fontSize: 22, lineHeight: 1 }}>☰</span>
+          <span className="text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap text-slate-500">
+            Menu
+          </span>
+        </button>
+      )}
       {navigationTabs.map((tab) => {
-        const Icon = tab.icon;
         const isActive = activeTab === tab.id;
         const isLive = liveTabs.has(tab.id);
         
@@ -77,7 +95,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               "relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
               "active:scale-95",
               "focus:outline-none",
-              // Active background highlight removed — clean flat style everywhere
               // Hover states
               isLightTheme && !isActive && "hover:bg-slate-50",
               isClubhouseTheme && !isActive && "hover:bg-[hsl(var(--clubhouse-hover-bg))]"
@@ -87,26 +104,18 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             }}
             aria-label={tab.label}
           >
-            {/* Icon */}
+            {/* Emoji Icon */}
             <div className="relative">
-              <Icon 
-                className={cn(
-                  "h-[24px] w-[24px] [stroke-width:1.5]",
-                  isLightTheme
-                    ? isActive 
-                      ? useAmberActive ? "text-amber-700 opacity-100" : "text-slate-800 opacity-100"
-                      : "text-slate-500 opacity-90"
-                    : isDimmed 
-                      ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
-                      : "text-[hsl(var(--clubhouse-text-muted))]"
-                )}
-                style={{
-                  transform: isActive ? 'scale(1.1)' : 'scale(1)',
-                  transition: 'all var(--motion-fast) var(--ease-pop)',
-                  // Active Clubhouse icons: amber for warm routes, white for everything else
-                  ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
-                }}
-              />
+              <span style={{
+                fontSize: 22,
+                lineHeight: 1,
+                filter: (!isActive && !isLive) ? 'opacity(0.5)' : 'none',
+                transition: 'all var(--motion-fast) var(--ease-pop)',
+                transform: isActive ? 'scale(1.12)' : 'scale(1)',
+                display: 'inline-block',
+              }}>
+                {tab.emoji}
+              </span>
 
               {/* Tab badge */}
               {(tabBadges[tab.id] ?? 0) > 0 && (
