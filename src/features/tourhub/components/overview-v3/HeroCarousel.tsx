@@ -340,6 +340,76 @@ function LeaderHeroStrip({
   );
 }
 
+/** Rotates through co-leaders (position === 1 ties) every 5 seconds */
+function RotatingLeaderStrip({
+  leaderEntries,
+  tourSlug,
+  leaderStats,
+  tournamentId,
+  currentRound,
+}: {
+  leaderEntries: any[];
+  tourSlug: string;
+  leaderStats: LeaderStats | null | undefined;
+  tournamentId: string;
+  currentRound: number;
+}) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  useEffect(() => {
+    if (leaderEntries.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % leaderEntries.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [leaderEntries.length]);
+  useEffect(() => {
+    setActiveIdx(0);
+  }, [leaderEntries.length]);
+  const activeEntry = leaderEntries[activeIdx] ?? leaderEntries[0];
+  if (!activeEntry) return null;
+  return (
+    <div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeEntry.player_id ?? activeEntry.player?.id ?? activeIdx}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <LeaderHeroStrip
+            leaderEntry={activeEntry}
+            tourSlug={tourSlug}
+            leaderStats={activeIdx === 0 ? leaderStats : null}
+            tournamentId={tournamentId}
+            currentRound={currentRound}
+          />
+        </motion.div>
+      </AnimatePresence>
+      {leaderEntries.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, padding: '2px 0 6px' }}>
+          {leaderEntries.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveIdx(i)}
+              style={{
+                width: i === activeIdx ? 16 : 6,
+                height: 6,
+                borderRadius: 3,
+                background: i === activeIdx ? '#F7931E' : 'rgba(255,255,255,0.20)',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'all 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 interface LeaderboardRowProps {
   leader: LeaderEntry;
@@ -1004,14 +1074,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             <ExpandedLeaderboardEmpty />
                           ) : (
                             <>
-                              {/* Leader hero strip — sticky above scrollable list */}
+                              {/* Leader hero strip — rotates through co-leaders every 5s */}
                               {(() => {
-                                const leaderEntry = (fullLeaderboard as any[]).find(e => e.position === 1);
-                                if (!leaderEntry) return null;
-                                const currentRound = [4,3,2,1].find(n => leaderEntry[`round_${n}`] !== null) ?? 1;
+                                const leaderEntries = (fullLeaderboard as any[]).filter(e => e.position === 1);
+                                if (leaderEntries.length === 0) return null;
+                                const firstEntry = leaderEntries[0];
+                                const currentRound = [4,3,2,1].find(n => firstEntry[`round_${n}`] !== null) ?? 1;
                                 return (
-                                  <LeaderHeroStrip
-                                    leaderEntry={leaderEntry}
+                                  <RotatingLeaderStrip
+                                    leaderEntries={leaderEntries}
                                     tourSlug={tournament.tourSlug}
                                     leaderStats={leaderStats}
                                     tournamentId={tournament.id}
