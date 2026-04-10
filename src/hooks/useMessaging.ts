@@ -198,7 +198,7 @@ export function useMessaging(): UseMessagingReturn {
           last_message_at: conv.last_message_at,
           last_message_preview: conv.last_message_preview,
           participants,
-          unread_count: hasUnread ? 1 : 0, // Simplified; can use get_unread_count RPC for exact count
+          unread_count: hasUnread ? 1 : 0, // TODO: Replace with get_unread_count RPC batch call for exact counts
         };
       });
 
@@ -388,7 +388,11 @@ export function useMessaging(): UseMessagingReturn {
   useEffect(() => {
     if (!user) return;
 
-    // Subscribe to new messages — only refetch if message belongs to a known conversation
+    // NOTE: This subscription receives all message INSERT events globally,
+    // then filters client-side to known conversations. This is a known limitation
+    // of Supabase realtime's lack of array-based IN filters. On high-traffic
+    // deployments this should be replaced with a user-scoped message notification
+    // pattern (e.g. a dedicated notification table filtered by user_id).
     const messagesChannel = supabase
       .channel(`conversation-list-messages-${user.id}`)
       .on(

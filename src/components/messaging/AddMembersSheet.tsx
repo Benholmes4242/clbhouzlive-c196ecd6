@@ -95,8 +95,9 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
       setSearchQuery('');
       onMembersAdded();
       onClose();
-    } catch (error: any) {
-      toast.error("Couldn't add members", { description: error.message });
+    } catch (err: unknown) {
+      AppLog.error('[AddMembersSheet]', 'Add members error:', err);
+      toast.error("Couldn't add members");
     } finally {
       setIsAdding(false);
     }
