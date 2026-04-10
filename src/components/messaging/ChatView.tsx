@@ -9,18 +9,17 @@ import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
- import { ChevronLeft, Loader2, ChevronDown } from 'lucide-react';
+import { ChevronLeft, Loader2, ChevronDown, MoreVertical, Users } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
-import { OnlineIndicator } from './OnlineIndicator';
 import { GroupInfoPage } from './GroupInfoPage';
- import { ChatHeaderMenu } from './ChatHeaderMenu';
- import { ChatSearchBar } from './ChatSearchBar';
- import { SharedMediaGallery } from './SharedMediaGallery';
- import { EditMessageModal } from './EditMessageModal';
- import { DeleteMessageSheet } from './DeleteMessageSheet';
- import { ForwardMessageModal } from './ForwardMessageModal';
+import { ChatHeaderMenu } from './ChatHeaderMenu';
+import { ChatSearchBar } from './ChatSearchBar';
+import { SharedMediaGallery } from './SharedMediaGallery';
+import { EditMessageModal } from './EditMessageModal';
+import { DeleteMessageSheet } from './DeleteMessageSheet';
+import { ForwardMessageModal } from './ForwardMessageModal';
 import type { MessageWithSender, ConversationWithDetails, MessageType } from '@/types/messaging';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -35,23 +34,19 @@ function formatDateHeader(dateString: string): string {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  if (date.toDateString() === today.toDateString()) {
-    return 'Today';
-  }
-  if (date.toDateString() === yesterday.toDateString()) {
-    return 'Yesterday';
-  }
+  if (date.toDateString() === today.toDateString()) return 'TODAY';
+  if (date.toDateString() === yesterday.toDateString()) return 'YESTERDAY';
   
   const diffDays = Math.floor((today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays < 7) {
-    return date.toLocaleDateString('en-GB', { weekday: 'long' });
+    return date.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
   }
   
   return date.toLocaleDateString('en-GB', { 
     day: 'numeric', 
     month: 'long',
     year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-  });
+  }).toUpperCase();
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -67,14 +62,12 @@ function formatRelativeTime(dateString: string): string {
 
 function groupMessagesByDate(messages: MessageWithSender[]): Map<string, MessageWithSender[]> {
   const groups = new Map<string, MessageWithSender[]>();
-  
   messages.forEach(message => {
     const dateKey = new Date(message.created_at).toDateString();
     const existing = groups.get(dateKey) || [];
     existing.push(message);
     groups.set(dateKey, existing);
   });
-  
   return groups;
 }
 
@@ -95,10 +88,18 @@ function ChatSkeleton() {
 
 function DateSeparator({ date }: { date: string }) {
   return (
-    <div className="flex justify-center my-3">
+    <div className="flex justify-center" style={{ padding: '8px 0 4px' }}>
       <span
-        className="text-[11px] font-semibold uppercase tracking-[0.04em] px-3.5 py-1 rounded-full"
-        style={{ background: 'rgba(0,0,0,0.06)', color: '#64748b' }}
+        style={{
+          fontSize: '10.5px',
+          fontWeight: 700,
+          letterSpacing: '0.06em',
+          color: '#94a3b8',
+          background: 'rgba(0,0,0,0.05)',
+          borderRadius: 99,
+          padding: '3px 12px',
+          textTransform: 'uppercase',
+        }}
       >
         {formatDateHeader(date)}
       </span>
@@ -119,13 +120,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     deleteMessage,
   } = useConversationMessages(conversationId);
 
-  // Typing indicator
   const { typingUsers, setTyping, clearTyping } = useTypingIndicator(conversationId);
-  
-  // Message reactions
   const { reactions, toggleReaction } = useMessageReactions(conversationId);
-  
-  // Presence
   const { presenceMap, subscribeToPresence } = usePresence();
 
   const [replyingTo, setReplyingTo] = useState<MessageWithSender | null>(null);
@@ -136,21 +132,17 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
-   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
-   const [unreadBelowCount, setUnreadBelowCount] = useState(0);
-   const [showSearchBar, setShowSearchBar] = useState(false);
-   const [showSharedMedia, setShowSharedMedia] = useState(false);
-   const [editingMessage, setEditingMessage] = useState<MessageWithSender | null>(null);
-   const [deletingMessage, setDeletingMessage] = useState<MessageWithSender | null>(null);
-   const [forwardingMessage, setForwardingMessage] = useState<MessageWithSender | null>(null);
-   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
-   // TODO: messageRefs is declared but never populated — MessageBubble components
-   // need to register themselves via a callback ref for navigate-to-message to work.
-   // handleNavigateToMessage will silently fail to scroll until this is implemented.
-   const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-   const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [unreadBelowCount, setUnreadBelowCount] = useState(0);
+  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [showSharedMedia, setShowSharedMedia] = useState(false);
+  const [editingMessage, setEditingMessage] = useState<MessageWithSender | null>(null);
+  const [deletingMessage, setDeletingMessage] = useState<MessageWithSender | null>(null);
+  const [forwardingMessage, setForwardingMessage] = useState<MessageWithSender | null>(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Find current conversation from context
   const contextConversation = useMemo(() => 
     conversations.find(c => c.id === conversationId),
     [conversations, conversationId]
@@ -162,7 +154,6 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       const fetchDirectConversation = async () => {
         setLoadingDirect(true);
         try {
-          // Fetch conversation with participants
           const { data: convData, error: convError } = await supabase
             .from('conversations')
             .select(`
@@ -181,19 +172,16 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             return;
           }
 
-          // Get all participant user IDs
           const rawParticipants = convData.conversation_participants as ConversationParticipant[] | null;
           const participantIds = (rawParticipants || [])
             .map(p => p.user_id)
             .filter((id): id is string => id !== null);
 
-          // Fetch profiles for participants
           const { data: profiles } = await supabase
             .from('public_profiles')
             .select('id, username, display_name, profile_photo_url')
             .in('id', participantIds);
 
-          // Build profile map
           const profilesMap = new Map<string, ParticipantProfile>();
           profiles?.forEach(profile => {
             if (profile.id) {
@@ -206,7 +194,6 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             }
           });
 
-          // Build participants with profiles
           const participants: ParticipantWithProfile[] = (rawParticipants || []).map(p => ({
             id: p.id,
             conversation_id: p.conversation_id,
@@ -243,26 +230,21 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     }
   }, [contextConversation, conversationId, user, loadingDirect, directConversation]);
 
-  // Use context conversation or directly fetched conversation
   const conversation = contextConversation || directConversation;
 
-  // Get other user for DM (for presence)
   const otherUser = useMemo(() => {
     if (!conversation || !user || conversation.type !== 'direct') return null;
     return conversation.participants.find(p => p.user_id !== user.id);
   }, [conversation, user]);
 
-  // Subscribe to other user's presence for DMs
   useEffect(() => {
     if (otherUser?.user_id) {
       subscribeToPresence([otherUser.user_id]);
     }
   }, [otherUser?.user_id, subscribeToPresence]);
 
-  // Get presence status for other user
   const otherUserPresence = otherUser?.user_id ? presenceMap.get(otherUser.user_id) : null;
 
-  // Get display info for conversation header
   const headerInfo = useMemo(() => {
     if (!conversation || !user) {
       return { name: 'Loading...', avatarUrl: null, initials: '...' };
@@ -289,57 +271,43 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     };
   }, [conversation, user]);
 
-   // Is this a group conversation (show sender info)?
-   const isGroupChat = conversation?.type !== 'direct';
- 
-   // Get other user name for DM header menu
-   const otherUserName = useMemo(() => {
-     if (conversation?.type === 'direct') {
-       const other = conversation.participants.find(p => p.user_id !== user?.id);
-       return other?.profile?.display_name || other?.profile?.username || 'User';
-     }
-     return 'User';
-   }, [conversation, user?.id]);
+  const isGroupChat = conversation?.type !== 'direct';
 
-  // Create a map for quick reply-to lookup
+  const otherUserName = useMemo(() => {
+    if (conversation?.type === 'direct') {
+      const other = conversation.participants.find(p => p.user_id !== user?.id);
+      return other?.profile?.display_name || other?.profile?.username || 'User';
+    }
+    return 'User';
+  }, [conversation, user?.id]);
+
   const messagesMap = useMemo(() => {
     const map = new Map<string, MessageWithSender>();
     messages.forEach(m => map.set(m.id, m));
     return map;
   }, [messages]);
 
-  // Handle scroll to show/hide scroll-to-bottom FAB
   const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-    
     const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
     setShowScrollToBottom(!isNearBottom);
-    
-    if (isNearBottom) {
-      setUnreadBelowCount(0);
-    }
+    if (isNearBottom) setUnreadBelowCount(0);
   }, []);
 
-  // Scroll to bottom function
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     setUnreadBelowCount(0);
   }, []);
 
-  // Cleanup highlight timer on unmount
   useEffect(() => {
     return () => clearTimeout(highlightTimerRef.current);
   }, []);
 
-  // Mark as read when viewing
   useEffect(() => {
-    if (conversationId) {
-      markAsRead(conversationId);
-    }
+    if (conversationId) markAsRead(conversationId);
   }, [conversationId, markAsRead]);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current) {
       requestAnimationFrame(() => {
@@ -366,192 +334,202 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     clearTyping();
     const finalMessageType = messageType || mediaType || 'text';
     await sendMessage(content, replyToId, mediaUrl, finalMessageType, metadata);
-
-    // Track message sent
     import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
-      analyticsEvents.track('message_sent', {
-        is_voice_note: finalMessageType === 'voice',
-      });
+      analyticsEvents.track('message_sent', { is_voice_note: finalMessageType === 'voice' });
     });
   }, [sendMessage, clearTyping]);
 
   const handleSendVoiceNote = useCallback(async (audioBlob: Blob, duration: number) => {
     if (!user) return;
-    
     try {
       const fileName = `voice-${Date.now()}-${Math.random().toString(36).slice(2)}.webm`;
       const filePath = `${user.id}/voice-notes/${fileName}`;
-      
       const { error: uploadError } = await supabase.storage
         .from('message-media')
-        .upload(filePath, audioBlob, {
-          contentType: 'audio/webm',
-        });
-        
+        .upload(filePath, audioBlob, { contentType: 'audio/webm' });
       if (uploadError) throw uploadError;
-      
       const { data: { publicUrl } } = supabase.storage
         .from('message-media')
         .getPublicUrl(filePath);
-      
-      await sendMessage(
-        '🎤 Voice message', 
-        null, 
-        publicUrl, 
-        'voice',
-        { duration }
-      );
+      await sendMessage('🎤 Voice message', null, publicUrl, 'voice', { duration });
     } catch (error) {
       AppLog.error('[ChatView]', 'Error sending voice note:', error);
     }
   }, [user, sendMessage]);
 
-  const handleReply = (message: MessageWithSender) => {
-    setReplyingTo(message);
-  };
-
-   const handleEdit = (message: MessageWithSender) => {
-     setEditingMessage(message);
-  };
-
-   const handleDelete = (message: MessageWithSender) => {
-     setDeletingMessage(message);
-  };
+  const handleReply = (message: MessageWithSender) => setReplyingTo(message);
+  const handleEdit = (message: MessageWithSender) => setEditingMessage(message);
+  const handleDelete = (message: MessageWithSender) => setDeletingMessage(message);
 
   const handleSaveEdit = async (newContent: string) => {
-     if (editingMessage) {
-       await editMessage(editingMessage.id, newContent);
-       setEditingMessage(null);
-     }
-   };
- 
+    if (editingMessage) {
+      await editMessage(editingMessage.id, newContent);
+      setEditingMessage(null);
+    }
+  };
+
   const handleDeleteForMe = async () => {
-     if (deletingMessage) {
-       await deleteMessage(deletingMessage.id);
-       setDeletingMessage(null);
-     }
-   };
- 
+    if (deletingMessage) {
+      await deleteMessage(deletingMessage.id);
+      setDeletingMessage(null);
+    }
+  };
+
   const handleDeleteForEveryone = async () => {
-     if (deletingMessage) {
-       // Same as delete for me for now - could add different logic
-       await deleteMessage(deletingMessage.id);
-       setDeletingMessage(null);
-     }
-   };
- 
-  const handleForward = (message: MessageWithSender) => {
-     setForwardingMessage(message);
-   };
- 
+    if (deletingMessage) {
+      await deleteMessage(deletingMessage.id);
+      setDeletingMessage(null);
+    }
+  };
+
+  const handleForward = (message: MessageWithSender) => setForwardingMessage(message);
+
   const handleNavigateToMessage = useCallback((messageId: string) => {
-     const element = messageRefs.current.get(messageId);
-     if (!element) {
-       AppLog.warn('[ChatView]', 'Navigate-to-message: element not found for', messageId);
-       return;
-     }
-     element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-     setHighlightedMessageId(messageId);
-     clearTimeout(highlightTimerRef.current);
-     highlightTimerRef.current = setTimeout(() => setHighlightedMessageId(null), 2000);
-   }, []);
- 
-  // Check if message can be deleted for everyone (within 1 hour)
+    const element = messageRefs.current.get(messageId);
+    if (!element) {
+      AppLog.warn('[ChatView]', 'Navigate-to-message: element not found for', messageId);
+      return;
+    }
+    element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setHighlightedMessageId(messageId);
+    clearTimeout(highlightTimerRef.current);
+    highlightTimerRef.current = setTimeout(() => setHighlightedMessageId(null), 2000);
+  }, []);
+
   const canDeleteForEveryone = useCallback((message: MessageWithSender) => {
-     const messageTime = new Date(message.created_at).getTime();
-     const now = Date.now();
-     const oneHour = 60 * 60 * 1000;
-     return now - messageTime < oneHour;
-   }, []);
- 
+    const messageTime = new Date(message.created_at).getTime();
+    return Date.now() - messageTime < 60 * 60 * 1000;
+  }, []);
+
   const handleToggleReaction = useCallback((messageId: string) => (emoji: string) => {
     toggleReaction(messageId, emoji);
   }, [toggleReaction]);
 
-  // Group messages by date
-  const groupedMessages = useMemo(() => 
-    groupMessagesByDate(messages),
-    [messages]
-  );
+  const groupedMessages = useMemo(() => groupMessagesByDate(messages), [messages]);
 
-  // Determine which messages should show sender info
   const shouldShowSenderInfo = (message: MessageWithSender, index: number): boolean => {
     if (!isGroupChat) return false;
     if (index === 0) return true;
-    
     const prevMessage = messages[index - 1];
     if (!prevMessage) return true;
-    
     if (prevMessage.sender_id !== message.sender_id) return true;
     if (new Date(prevMessage.created_at).toDateString() !== new Date(message.created_at).toDateString()) return true;
-    
     return false;
   };
 
-  // Check if typing
   const isTyping = typingUsers.length > 0;
 
+  // Count online members for group header
+  const onlineCount = useMemo(() => {
+    if (!isGroupChat || !conversation) return 0;
+    return conversation.participants.filter(p => {
+      if (p.user_id === user?.id) return true; // current user is online
+      return p.user_id ? presenceMap.get(p.user_id)?.status === 'online' : false;
+    }).length;
+  }, [isGroupChat, conversation, presenceMap, user?.id]);
+
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[#F8FAFC]">
+    <div className="flex flex-col h-full min-h-0" style={{ background: '#F8FAFC' }}>
       {/* Header */}
       <header 
-        className="flex-shrink-0 px-[18px] flex items-center gap-3"
+        className="flex-shrink-0 flex items-center"
         style={{
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          paddingBottom: '10px',
+          paddingBottom: 10,
+          paddingLeft: 16,
+          paddingRight: 16,
           background: '#F8FAFC',
           borderBottom: '1px solid rgba(0,0,0,0.06)',
+          gap: 10,
         }}
       >
-        {/* Back button */}
+        {/* Back button — 34×34 */}
         <button 
           onClick={onBack}
-          className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-          style={{ background: 'rgba(0,0,0,0.05)' }}
+          className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
+          style={{
+            width: 34, height: 34, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.06)', border: 'none',
+          }}
         >
-          <ChevronLeft className="w-5 h-5" style={{ color: '#475569' }} strokeWidth={2.5} />
+          <ChevronLeft style={{ color: '#475569' }} strokeWidth={2.5} className="w-5 h-5" />
         </button>
         
         {/* Avatar + Info */}
         <button 
           onClick={() => isGroupChat && setShowGroupInfo(true)}
-          className="flex items-center gap-3 flex-1 min-w-0"
+          className="flex items-center flex-1 min-w-0"
+          style={{ gap: 10, background: 'none', border: 'none', textAlign: 'left' as const, cursor: isGroupChat ? 'pointer' : 'default' }}
         >
           <div className="relative flex-shrink-0">
-            <SquircleAvatar
-              src={headerInfo.avatarUrl}
-              alt={headerInfo.name}
-              size={38}
-              fallback={headerInfo.initials}
-              hideRing
-            />
-            {/* Online indicator for DMs */}
+            {isGroupChat && !headerInfo.avatarUrl ? (
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: 38, height: 38, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #F7931E, #e07a0d)',
+                }}
+              >
+                <Users className="w-[18px] h-[18px] text-white" />
+              </div>
+            ) : (
+              <SquircleAvatar
+                src={headerInfo.avatarUrl}
+                alt={headerInfo.name}
+                size={38}
+                fallback={headerInfo.initials}
+                hideRing
+              />
+            )}
+            {/* Online dot for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#F8FAFC]" />
+              <div
+                className="absolute"
+                style={{
+                  bottom: 0, right: 0,
+                  width: 9, height: 9, borderRadius: '50%',
+                  background: '#22c55e',
+                  border: '2.5px solid #F8FAFC',
+                }}
+              />
             )}
           </div>
           
-          <div className="flex-1 min-w-0 text-left">
-           <h2 className="text-[15px] font-bold truncate text-foreground" style={{ letterSpacing: '-0.2px' }}>
-              {headerInfo.name}
-            </h2>
-            <p className="text-[11px] truncate text-muted-foreground">
-              {isTyping ? (
-                <span className="text-[hsl(35,80%,43%)]">typing...</span>
-              ) : 
-               isGroupChat && conversation ? `${conversation.participants.length} members` :
-               otherUserPresence?.status === 'online' ? (
-                <span className="text-emerald-500">online</span>
-              ) : 
-               otherUserPresence?.status === 'away' ? 'away' : 
-               otherUserPresence?.last_seen_at 
-                 ? `last seen ${formatRelativeTime(otherUserPresence.last_seen_at)}`
-                 : 'offline'}
-            </p>
+          <div className="flex-1 min-w-0">
+            {/* Row 1: Name */}
+            <div className="flex items-center" style={{ gap: 6 }}>
+              <span
+                className="truncate"
+                style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em' }}
+              >
+                {headerInfo.name}
+              </span>
+            </div>
+            {/* Row 2: Status */}
+            <div className="flex items-center" style={{ gap: 6 }}>
+              <span style={{ fontSize: '11.5px', fontWeight: 500 }}>
+                {isTyping ? (
+                  <span style={{ color: '#F7931E' }}>typing...</span>
+                ) : isGroupChat && conversation ? (
+                  <>
+                    <span style={{ color: '#22c55e' }}>{onlineCount} online</span>
+                    <span style={{ color: '#94a3b8' }}> · {conversation.participants.length} members</span>
+                  </>
+                ) : otherUserPresence?.status === 'online' ? (
+                  <span style={{ color: '#22c55e' }}>online</span>
+                ) : otherUserPresence?.status === 'away' ? (
+                  <span style={{ color: '#94a3b8' }}>away</span>
+                ) : otherUserPresence?.last_seen_at ? (
+                  <span style={{ color: '#94a3b8' }}>last seen {formatRelativeTime(otherUserPresence.last_seen_at)}</span>
+                ) : (
+                  <span style={{ color: '#94a3b8' }}>offline</span>
+                )}
+              </span>
+            </div>
           </div>
         </button>
         
-        {/* Kebab Menu */}
+        {/* Kebab Menu — 34×34 */}
         {conversation && user && (
           <ChatHeaderMenu
             conversation={conversation}
@@ -559,30 +537,37 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             currentUserId={user.id}
             otherUserId={otherUser?.user_id || undefined}
             onOpenGroupInfo={() => setShowGroupInfo(true)}
-             onSearchInChat={() => setShowSearchBar(true)}
-             onViewSharedMedia={() => setShowSharedMedia(true)}
-             otherUserName={otherUserName}
+            onSearchInChat={() => setShowSearchBar(true)}
+            onViewSharedMedia={() => setShowSharedMedia(true)}
+            otherUserName={otherUserName}
             onBack={onBack}
           />
         )}
       </header>
 
-      {/* Messages - scrollable area */}
+      {/* Messages */}
       {loading ? (
         <ChatSkeleton />
       ) : (
         <div 
           ref={containerRef}
-          className="flex-1 min-h-0 overflow-y-auto px-4 py-4 bg-[#F8FAFC]"
+          className="flex-1 min-h-0 overflow-y-auto"
+          style={{ padding: '8px 14px 12px', background: '#F8FAFC' }}
           onScroll={handleScroll}
         >
-          {/* Load more button */}
+          {/* Load more */}
           {hasMore && (
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center" style={{ marginBottom: 16 }}>
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="mx-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-muted/60 text-muted-foreground text-[12px] font-medium active:bg-muted transition-colors disabled:opacity-50"
+                className="flex items-center justify-center active:scale-[0.97] transition-transform disabled:opacity-50"
+                style={{
+                  padding: '6px 16px', borderRadius: 99,
+                  background: 'rgba(0,0,0,0.05)',
+                  fontSize: 12, color: '#64748b', fontWeight: 500,
+                  border: 'none', cursor: 'pointer',
+                }}
               >
                 {loadingMore ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -607,7 +592,6 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                     ? messagesMap.get(message.reply_to_id) 
                     : null;
                   const messageReactions = reactions[message.id] || [];
-
                   const prevMessage = index > 0 ? dateMessages[index - 1] : null;
                   const isConsecutiveSameSender = prevMessage?.sender_id === message.sender_id;
 
@@ -635,7 +619,6 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               </div>
             ))}
 
-            {/* Typing indicator */}
             {typingUsers.length > 0 && (
               <TypingIndicator typingUsers={typingUsers} />
             )}
@@ -647,12 +630,26 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           {showScrollToBottom && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-28 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-[0.97] transition-transform border border-border"
-              style={{ right: 'calc(max(16px, (100vw - 480px) / 2 + 16px))', background: 'hsl(var(--background) / 0.9)' }}
+              className="fixed flex items-center justify-center z-20 active:scale-[0.97] transition-transform"
+              style={{
+                bottom: 72, right: 16,
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.95)',
+                border: '1px solid rgba(0,0,0,0.10)',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.12)',
+              }}
             >
-              <ChevronDown className="w-[18px] h-[18px] text-foreground/60" />
+              <ChevronDown style={{ color: '#64748b' }} size={14} />
               {unreadBelowCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[hsl(38,92%,50%)] rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                <span
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    top: -4, right: -4,
+                    width: 18, height: 18, borderRadius: '50%',
+                    background: '#F7931E', color: '#fff',
+                    fontSize: 9, fontWeight: 700,
+                  }}
+                >
                   {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
                 </span>
               )}
@@ -661,7 +658,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         </div>
       )}
 
-      {/* Input - WhatsApp style */}
+      {/* Input */}
       <MessageInput
         onSend={handleSend}
         onSendVoiceNote={handleSendVoiceNote}

@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
- import { Send, X, Paperclip, Loader2, MapPin, Camera, Mic } from 'lucide-react';
+import { Send, X, Paperclip, Loader2, MapPin, Camera, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ShareContentModal } from './ShareContentModal';
 import { VoiceRecordButton } from './VoiceRecordButton';
- import { haptic } from '@/utils/haptics';
- import { EmojiPickerPopover } from './EmojiPickerPopover';
+import { haptic } from '@/utils/haptics';
+import { EmojiPickerPopover } from './EmojiPickerPopover';
 import { toast } from 'sonner';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
 
@@ -45,11 +45,10 @@ export function MessageInput({
   const [mediaPreview, setMediaPreview] = useState<MediaPreview | null>(null);
   const [uploading, setUploading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-   const textareaRef = useRef<HTMLTextAreaElement>(null);
-   const fileInputRef = useRef<HTMLInputElement>(null);
-   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-resize textarea
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -58,66 +57,37 @@ export function MessageInput({
     }
   }, [content]);
 
-  // Revoke media preview object URL on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
-      if (mediaPreview?.url) {
-        URL.revokeObjectURL(mediaPreview.url);
-      }
+      if (mediaPreview?.url) URL.revokeObjectURL(mediaPreview.url);
     };
   }, [mediaPreview?.url]);
 
-  // Focus when replying
   useEffect(() => {
-    if (replyingTo) {
-      textareaRef.current?.focus();
-    }
+    if (replyingTo) textareaRef.current?.focus();
   }, [replyingTo]);
 
   const uploadMedia = async (file: File): Promise<string | null> => {
     if (!user) return null;
-
     const fileExt = file.name.split('.').pop();
     const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
-    const { data, error } = await supabase.storage
-      .from('message-media')
-      .upload(fileName, file);
-
-    if (error) {
-      toast.error('Failed to upload media');
-      return null;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('message-media')
-      .getPublicUrl(data.path);
-
+    const { data, error } = await supabase.storage.from('message-media').upload(fileName, file);
+    if (error) { toast.error('Failed to upload media'); return null; }
+    const { data: { publicUrl } } = supabase.storage.from('message-media').getPublicUrl(data.path);
     return publicUrl;
   };
 
   const handleSend = async () => {
     if ((!content.trim() && !mediaPreview) || disabled || uploading) return;
-
-    // Haptic feedback on send
     haptic('light');
-
     let mediaUrl: string | undefined;
     let mediaType: 'image' | 'video' | undefined;
-
     if (mediaPreview) {
       setUploading(true);
       const uploadedUrl = await uploadMedia(mediaPreview.file);
       setUploading(false);
-
-      if (uploadedUrl) {
-        mediaUrl = uploadedUrl;
-        mediaType = mediaPreview.type;
-      } else {
-        return;
-      }
+      if (uploadedUrl) { mediaUrl = uploadedUrl; mediaType = mediaPreview.type; } else return;
     }
-
     onSend(content.trim(), replyingTo?.id, mediaUrl, mediaType);
     setContent('');
     setMediaPreview(null);
@@ -125,10 +95,7 @@ export function MessageInput({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -136,184 +103,159 @@ export function MessageInput({
     onTyping?.();
   };
 
-   const handleEmojiSelect = (emoji: string) => {
-     const textarea = textareaRef.current;
-     if (textarea) {
-       const start = textarea.selectionStart;
-       const end = textarea.selectionEnd;
-       const newContent = content.substring(0, start) + emoji + content.substring(end);
-       setContent(newContent);
-       // Set cursor position after emoji
-       setTimeout(() => {
-         textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-         textarea.focus();
-       }, 0);
-     } else {
-       setContent(prev => prev + emoji);
-     }
-     onTyping?.();
-   };
- 
-   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleEmojiSelect = (emoji: string) => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newContent = content.substring(0, start) + emoji + content.substring(end);
+      setContent(newContent);
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+        textarea.focus();
+      }, 0);
+    } else {
+      setContent(prev => prev + emoji);
+    }
+    onTyping?.();
+  };
+
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
-
-    if (!isImage && !isVideo) {
-      toast.error('Unsupported file type', { description: 'Please select an image or video file.' });
-      return;
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    setMediaPreview({
-      file,
-      url: previewUrl,
-      type: isImage ? 'image' : 'video',
-    });
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (!isImage && !isVideo) { toast.error('Unsupported file type'); return; }
+    setMediaPreview({ file, url: URL.createObjectURL(file), type: isImage ? 'image' : 'video' });
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const clearMediaPreview = () => {
-    if (mediaPreview) {
-      URL.revokeObjectURL(mediaPreview.url);
-      setMediaPreview(null);
-    }
+    if (mediaPreview) { URL.revokeObjectURL(mediaPreview.url); setMediaPreview(null); }
   };
 
-  const handleShareContent = (
-    shareContent: string,
-    messageType: MessageType,
-    metadata: Record<string, unknown>
-  ) => {
+  const handleShareContent = (shareContent: string, messageType: MessageType, metadata: Record<string, unknown>) => {
     onSend(shareContent, replyingTo?.id, undefined, undefined, messageType, metadata);
     onCancelReply();
   };
 
-   const handleCameraCapture = (e: ChangeEvent<HTMLInputElement>) => {
-     const file = e.target.files?.[0];
-     if (!file) return;
- 
-     const previewUrl = URL.createObjectURL(file);
-     setMediaPreview({
-       file,
-       url: previewUrl,
-       type: 'image',
-     });
- 
-     if (cameraInputRef.current) {
-       cameraInputRef.current.value = '';
-     }
-   };
- 
-   const replyToName = replyingTo?.sender?.display_name || replyingTo?.sender?.username || 'Unknown';
+  const handleCameraCapture = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMediaPreview({ file, url: URL.createObjectURL(file), type: 'image' });
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
+
+  const replyToName = replyingTo?.sender?.display_name || replyingTo?.sender?.username || 'Unknown';
   const hasText = content.trim().length > 0;
 
   return (
     <div 
-      className="flex-none px-4 pt-2 border-t"
+      className="flex-none"
       style={{
+        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
         background: '#F8FAFC',
-        borderColor: 'rgba(0,0,0,0.06)',
-        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+        borderTop: '1px solid rgba(0,0,0,0.06)',
       }}
     >
-      {/* Reply preview */}
+      {/* Reply preview strip */}
       {replyingTo && (
-        <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-background rounded-[18px] shadow-sm">
-          <div className="flex-1 min-w-0 pl-2 border-l-2 border-[hsl(38,92%,50%)]">
-            <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]">
+        <div
+          className="flex items-center"
+          style={{
+            margin: '0 12px 6px',
+            padding: '8px 12px', borderRadius: 12,
+            background: '#f8fafc',
+            border: '1px solid rgba(0,0,0,0.07)',
+            gap: 10,
+          }}
+        >
+          {/* Accent bar */}
+          <div style={{ width: 3, height: 32, borderRadius: 99, background: '#F7931E', flexShrink: 0 }} />
+          <div className="flex-1 min-w-0">
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', display: 'block', marginBottom: 2 }}>
               Replying to {replyToName}
             </span>
-            <p className="text-[13px] text-muted-foreground truncate">
+            <p className="truncate" style={{ fontSize: '12.5px', color: '#64748b', margin: 0, whiteSpace: 'nowrap' as const }}>
               {replyingTo.content}
             </p>
           </div>
           <button
             onClick={onCancelReply}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted"
+            className="flex items-center justify-center flex-shrink-0"
+            style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(0,0,0,0.07)', border: 'none' }}
           >
-            <X className="w-4 h-4 text-muted-foreground" />
+            <X size={12} style={{ color: '#64748b' }} />
           </button>
         </div>
       )}
 
       {/* Media preview */}
       {mediaPreview && (
-        <div className="mb-2 p-2 bg-background rounded-[18px] shadow-sm">
+        <div style={{ margin: '0 12px 6px', padding: 8, borderRadius: 12, background: '#fff', border: '1px solid rgba(0,0,0,0.07)' }}>
           <div className="relative inline-block">
             {mediaPreview.type === 'image' ? (
-              <img 
-                src={mediaPreview.url} 
-                alt="Preview" 
-                className="max-h-24 rounded-xl object-cover"
-              />
+              <img src={mediaPreview.url} alt="Preview" className="max-h-24 rounded-xl object-cover" />
             ) : (
-              <video 
-                src={mediaPreview.url} 
-                className="max-h-24 rounded-xl"
-                controls={false}
-              />
+              <video src={mediaPreview.url} className="max-h-24 rounded-xl" controls={false} />
             )}
             <button
               onClick={clearMediaPreview}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-muted-foreground rounded-full flex items-center justify-center"
+              className="absolute flex items-center justify-center"
+              style={{ top: -6, right: -6, width: 22, height: 22, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none' }}
             >
-              <X className="w-3 h-3 text-background" />
+              <X size={12} style={{ color: '#fff' }} />
             </button>
           </div>
         </div>
       )}
 
-      {/* Input area - WhatsApp style */}
-      <div className="flex items-end gap-2">
-        {/* Attachment button */}
-         {/* File input for attachments */}
-         <input
-           ref={fileInputRef}
-           type="file"
-           accept="image/*,video/*"
-           className="hidden"
-           onChange={handleFileSelect}
-         />
-         
-         {/* Camera input */}
-         <input
-           ref={cameraInputRef}
-           type="file"
-           accept="image/*"
-           capture="environment"
-           className="hidden"
-           onChange={handleCameraCapture}
-         />
+      {/* Main input row */}
+      <div className="flex items-end" style={{ gap: 7, padding: '8px 12px' }}>
+        {/* Hidden file inputs */}
+        <input ref={fileInputRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileSelect} />
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleCameraCapture} />
+
+        {/* Attach button */}
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading}
-          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0"
+          className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-transform"
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.05)', border: 'none',
+          }}
         >
-          <Paperclip className="w-5 h-5 text-muted-foreground" />
+          <Paperclip size={15} style={{ color: '#64748b' }} />
         </button>
 
         {/* Golf content share button */}
         <button
           onClick={() => setShowShareModal(true)}
           disabled={disabled || uploading}
+          className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-transform"
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(0,103,71,0.07)',
+            border: '1px solid rgba(0,103,71,0.18)',
+          }}
           title="Share golf content"
-          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0"
         >
-          <MapPin className="w-5 h-5 text-[hsl(38,92%,50%)]" />
+          <MapPin size={13} style={{ color: '#006747' }} />
         </button>
 
-        {/* Input container - pill style */}
-        <div className="flex-1 flex items-end gap-2 rounded-[22px] px-4 py-2" style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-           {/* Emoji picker */}
-           <EmojiPickerPopover onEmojiSelect={handleEmojiSelect} />
+        {/* Text input pill */}
+        <div
+          className="flex-1 flex items-end"
+          style={{
+            background: '#fff', borderRadius: 22,
+            border: '1px solid rgba(0,0,0,0.08)',
+            padding: '8px 12px', gap: 8,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          }}
+        >
+          <EmojiPickerPopover onEmojiSelect={handleEmojiSelect} />
           
-          {/* Textarea */}
           <textarea
             ref={textareaRef}
             value={content}
@@ -322,16 +264,18 @@ export function MessageInput({
             placeholder="Message"
             disabled={disabled || uploading}
             rows={1}
-            className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder:text-muted-foreground resize-none max-h-[120px] py-1"
+            className="flex-1 bg-transparent outline-none resize-none max-h-[120px] py-1"
+            style={{ fontSize: 14, color: '#1e293b' }}
           />
           
-           {/* Camera button (when no text/media) */}
-           {!hasText && !mediaPreview && (
-             <button 
-               onClick={() => cameraInputRef.current?.click()}
-               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:bg-muted"
-             >
-              <Camera className="w-5 h-5 text-muted-foreground" />
+          {/* Camera button when no text */}
+          {!hasText && !mediaPreview && (
+            <button 
+              onClick={() => cameraInputRef.current?.click()}
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: 28, height: 28, borderRadius: '50%', background: 'none', border: 'none' }}
+            >
+              <Camera size={18} style={{ color: '#94a3b8' }} />
             </button>
           )}
         </div>
@@ -341,12 +285,17 @@ export function MessageInput({
           <button 
             onClick={handleSend}
             disabled={(!hasText && !mediaPreview) || disabled || uploading}
-            className="w-10 h-10 rounded-full bg-[hsl(38,92%,50%)] flex items-center justify-center transition-all flex-shrink-0 active:scale-[0.97] disabled:opacity-50"
+            className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all disabled:opacity-50"
+            style={{
+              width: 38, height: 38, borderRadius: '50%',
+              background: 'rgba(247,147,30,0.10)',
+              border: '1px solid rgba(247,147,30,0.30)',
+            }}
           >
             {uploading ? (
-              <Loader2 className="w-5 h-5 text-white animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#F7931E' }} />
             ) : (
-              <Send className="w-5 h-5 text-white" />
+              <Send size={15} style={{ color: '#F7931E' }} />
             )}
           </button>
         ) : onSendVoiceNote ? (
@@ -355,8 +304,14 @@ export function MessageInput({
             disabled={disabled || uploading}
           />
         ) : (
-          <button className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0">
-            <Mic className="w-5 h-5 text-muted-foreground" />
+          <button
+            className="flex items-center justify-center flex-shrink-0"
+            style={{
+              width: 38, height: 38, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.05)', border: 'none',
+            }}
+          >
+            <Mic size={16} style={{ color: '#64748b' }} />
           </button>
         )}
       </div>

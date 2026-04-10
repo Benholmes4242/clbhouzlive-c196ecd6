@@ -1,110 +1,139 @@
- /**
-  * DeleteMessageSheet - Options sheet for deleting a message
-  */
- 
- import { Trash2, User, Users } from 'lucide-react';
- import {
-   Sheet,
-   SheetContent,
-   SheetHeader,
-   SheetTitle,
- } from '@/components/ui/sheet';
- import { haptic } from '@/utils/haptics';
- 
- interface DeleteMessageSheetProps {
-   open: boolean;
-   onOpenChange: (open: boolean) => void;
-   isOwnMessage: boolean;
-   canDeleteForEveryone: boolean; // true if message is within 1 hour
-   onDeleteForMe: () => void;
-   onDeleteForEveryone: () => void;
- }
- 
- export function DeleteMessageSheet({
-   open,
-   onOpenChange,
-   isOwnMessage,
-   canDeleteForEveryone,
-   onDeleteForMe,
-   onDeleteForEveryone,
- }: DeleteMessageSheetProps) {
-   const handleDeleteForMe = () => {
-     haptic('medium');
-     onDeleteForMe();
-     onOpenChange(false);
-   };
- 
-   const handleDeleteForEveryone = () => {
-     haptic('medium');
-     onDeleteForEveryone();
-     onOpenChange(false);
-   };
- 
-   return (
-     <Sheet open={open} onOpenChange={onOpenChange}>
-       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
-         <SheetHeader className="pb-4">
-           <SheetTitle className="text-center text-[17px] font-semibold">
-             Delete Message
-           </SheetTitle>
-         </SheetHeader>
- 
-         <div className="space-y-2">
-           {/* Delete for me */}
-           <button
-             onClick={handleDeleteForMe}
-             className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-[#F5F5F5] active:bg-[#E5E5EA] transition-colors text-left"
-           >
-             <div className="w-10 h-10 rounded-full bg-[#F5F5F5] flex items-center justify-center">
-               <User className="w-5 h-5 text-[#8E8E93]" />
-             </div>
-             <div>
-               <p className="font-medium text-[#1D1D1F]">Delete for me</p>
-               <p className="text-sm text-[#8E8E93]">
-                 This message will be deleted from your view only
-               </p>
-             </div>
-           </button>
- 
-           {/* Delete for everyone (only show if own message and within time limit) */}
-           {isOwnMessage && (
-             <button
-               onClick={handleDeleteForEveryone}
-               disabled={!canDeleteForEveryone}
-               className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-colors text-left ${
-                 canDeleteForEveryone 
-                   ? 'hover:bg-red-50 active:bg-red-100' 
-                   : 'opacity-50 cursor-not-allowed'
-               }`}
-             >
-               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                 canDeleteForEveryone ? 'bg-red-100' : 'bg-[#F5F5F5]'
-               }`}>
-                 <Users className={`w-5 h-5 ${canDeleteForEveryone ? 'text-red-500' : 'text-[#8E8E93]'}`} />
-               </div>
-               <div>
-                 <p className={`font-medium ${canDeleteForEveryone ? 'text-red-500' : 'text-[#8E8E93]'}`}>
-                   Delete for everyone
-                 </p>
-                 <p className="text-sm text-[#8E8E93]">
-                   {canDeleteForEveryone 
-                     ? 'This message will be deleted for all participants' 
-                     : 'Only available within 1 hour of sending'
-                   }
-                 </p>
-               </div>
-             </button>
-           )}
- 
-           {/* Cancel button */}
-            <button
-              onClick={() => onOpenChange(false)}
-              className="w-full py-4 text-center text-[hsl(35,80%,43%)] font-semibold rounded-2xl hover:bg-[hsl(38,92%,50%)]/5 active:bg-[hsl(38,92%,50%)]/10 transition-colors mt-2"
+/**
+ * DeleteMessageSheet - Options sheet for deleting a message
+ */
+
+import { User, Users } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+} from '@/components/ui/sheet';
+import { haptic } from '@/utils/haptics';
+
+interface DeleteMessageSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  isOwnMessage: boolean;
+  canDeleteForEveryone: boolean;
+  onDeleteForMe: () => void;
+  onDeleteForEveryone: () => void;
+}
+
+export function DeleteMessageSheet({
+  open,
+  onOpenChange,
+  isOwnMessage,
+  canDeleteForEveryone,
+  onDeleteForMe,
+  onDeleteForEveryone,
+}: DeleteMessageSheetProps) {
+  const handleDeleteForMe = () => {
+    haptic('medium');
+    onDeleteForMe();
+    onOpenChange(false);
+  };
+
+  const handleDeleteForEveryone = () => {
+    haptic('medium');
+    onDeleteForEveryone();
+    onOpenChange(false);
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="!rounded-t-[24px] !p-0"
+        style={{ background: '#fff', padding: '0 16px 32px' }}
+      >
+        {/* Drag handle */}
+        <div
+          style={{
+            width: 36, height: 4, borderRadius: 99,
+            background: '#e2e8f0',
+            margin: '12px auto 16px',
+          }}
+        />
+
+        {/* Title */}
+        <h2 style={{
+          fontSize: 17, fontWeight: 700, color: '#0f172a',
+          textAlign: 'center', marginBottom: 16,
+          padding: '0 16px',
+        }}>
+          Delete Message
+        </h2>
+
+        <div style={{ padding: '0 16px' }}>
+          {/* Delete for me */}
+          <button
+            onClick={handleDeleteForMe}
+            className="w-full flex items-center text-left active:bg-[rgba(0,0,0,0.03)] transition-colors"
+            style={{
+              gap: 14, padding: '12px 16px', borderRadius: 16,
+              border: 'none', background: 'transparent',
+              cursor: 'pointer', marginBottom: 8,
+            }}
+          >
+            <div
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: 44, height: 44, borderRadius: '50%', background: '#f1f5f9' }}
             >
-             Cancel
-           </button>
-         </div>
-       </SheetContent>
-     </Sheet>
-   );
- }
+              <User size={18} style={{ color: '#64748b' }} />
+            </div>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', margin: 0 }}>Delete for me</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>Removed from your view only</p>
+            </div>
+          </button>
+
+          {/* Delete for everyone */}
+          {isOwnMessage && (
+            <button
+              onClick={canDeleteForEveryone ? handleDeleteForEveryone : undefined}
+              disabled={!canDeleteForEveryone}
+              className="w-full flex items-center text-left transition-colors"
+              style={{
+                gap: 14, padding: '12px 16px', borderRadius: 16,
+                border: 'none', background: 'transparent',
+                cursor: canDeleteForEveryone ? 'pointer' : 'not-allowed',
+                opacity: canDeleteForEveryone ? 1 : 0.45,
+                marginBottom: 8,
+              }}
+            >
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(239,68,68,0.08)' }}
+              >
+                <Users size={18} style={{ color: '#ef4444' }} />
+              </div>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#ef4444', margin: 0 }}>Delete for everyone</p>
+                <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+                  {canDeleteForEveryone
+                    ? 'Removed for all participants'
+                    : 'Only available within 1 hour of sending'
+                  }
+                </p>
+              </div>
+            </button>
+          )}
+
+          {/* Cancel button */}
+          <button
+            onClick={() => onOpenChange(false)}
+            className="w-full active:scale-[0.98] transition-transform"
+            style={{
+              padding: '13px 0', borderRadius: 14,
+              border: '1px solid transparent',
+              background: 'rgba(247,147,30,0.08)',
+              fontSize: '14.5px', fontWeight: 600, color: '#F7931E',
+              cursor: 'pointer', marginTop: 8,
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

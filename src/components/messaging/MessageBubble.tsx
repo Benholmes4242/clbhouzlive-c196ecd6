@@ -5,21 +5,18 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { Reply, Pencil, Trash2, MapPin, ExternalLink, Check, CheckCheck, Copy, Forward, Star } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import CountryFlag from '@/components/ui/country-flag';
 import { cn } from '@/lib/utils';
 import { MessageReactions } from './MessageReactions';
 import { MediaMessage } from './MediaMessage';
 import { SharedContentCard } from './SharedContentCard';
 import { VoiceNotePlayer } from './VoiceNotePlayer';
-import { EmojiPicker } from './EmojiPicker';
 import { SystemMessage, type SystemMessageMetadata } from './SystemMessage';
 import type { MessageWithSender, SharedCourse } from '@/types/messaging';
 import type { Reaction } from '@/hooks/useMessageReactions';
@@ -49,12 +46,24 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5" style={{ color: 'rgba(245,166,35,0.85)' }} />;
+    return <CheckCheck className="w-3 h-3" style={{ color: 'rgba(247,147,30,0.85)' }} />;
   }
   if (status === 'delivered') {
-    return <CheckCheck className="w-3.5 h-3.5 text-muted-foreground" />;
+    return <CheckCheck className="w-3 h-3" style={{ color: '#94a3b8' }} />;
   }
-  return <Check className="w-3.5 h-3.5 text-muted-foreground" />;
+  return <Check className="w-3 h-3" style={{ color: '#94a3b8' }} />;
+}
+
+/** Context menu icon box */
+function CtxIconBox({ bg, children }: { bg: string; children: React.ReactNode }) {
+  return (
+    <div
+      className="flex items-center justify-center flex-shrink-0"
+      style={{ width: 32, height: 32, borderRadius: 9, background: bg }}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function MessageBubble({
@@ -76,15 +85,10 @@ export function MessageBubble({
   const [isSaved, setIsSaved] = useState(false);
   const [hasFetchedSaved, setHasFetchedSaved] = useState(false);
 
-  // Fetch saved state lazily when context menu opens
   const fetchSavedState = async () => {
     if (hasFetchedSaved || !message.id) return;
-    const { data, error } = await supabase.rpc('is_message_saved', {
-      p_message_id: message.id
-    });
-    if (!error && data) {
-      setIsSaved(true);
-    }
+    const { data, error } = await supabase.rpc('is_message_saved', { p_message_id: message.id });
+    if (!error && data) setIsSaved(true);
     setHasFetchedSaved(true);
   };
 
@@ -103,102 +107,113 @@ export function MessageBubble({
 
   const senderName = message.sender?.display_name || message.sender?.username || 'Unknown';
   const senderInitials = senderName.substring(0, 2).toUpperCase();
-
-  // TODO: Read receipts require read_at and delivered_at fields on the messages schema.
-  // Until these are added to the DB and Message type, delivery status is always 'sent'.
   const deliveryStatus = 'sent' as const;
 
-  // Handle course share as standalone card
+  // Course share card
   if (message.message_type === 'course_share' && message.media_metadata) {
     const course = message.media_metadata as unknown as SharedCourse;
     const communityRating = course.rating;
 
     const courseCardContent = (
-      <div className={cn("flex gap-2", isOwnMessage ? "justify-end" : "justify-start")}>
+      <div style={{ display: 'flex', gap: 8, justifyContent: isOwnMessage ? 'flex-end' : 'flex-start', alignItems: 'flex-end' }}>
         {/* Avatar for received */}
         {!isOwnMessage && showSenderInfo && (
-          <SquircleAvatar
-            src={message.sender?.profile_photo_url}
-            alt={senderName}
-            size={32}
-            fallback={senderInitials}
-            hideRing
-            className="flex-shrink-0 mt-1"
-          />
+          <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} fallback={senderInitials} hideRing className="flex-shrink-0" />
         )}
-        {!isOwnMessage && !showSenderInfo && <div className="w-8 flex-shrink-0" />}
+        {!isOwnMessage && !showSenderInfo && <div style={{ width: 28, flexShrink: 0 }} />}
 
-        <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
+        <div className="flex flex-col" style={{ maxWidth: 260, alignItems: isOwnMessage ? 'flex-end' : 'flex-start' }}>
           {!isOwnMessage && showSenderInfo && (
-          <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/80 mb-1 px-1">
+            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155', marginBottom: 3, paddingLeft: 1 }}>
               {senderName}
             </span>
           )}
 
           <button
             onClick={() => navigate(course.course_slug ? `/courses/${course.course_slug}` : `/courses/${course.course_id}`)}
-            className={cn(
-              "w-full max-w-[260px] rounded-[16px] overflow-hidden text-left transition-all backdrop-blur-[16px]",
-              "hover:scale-[1.02] active:scale-[0.98]",
-              "bg-background/80 border border-border shadow-sm"
-            )}
+            className="w-full text-left active:scale-[0.98] transition-transform"
+            style={{
+              maxWidth: 260,
+              borderRadius: isOwnMessage ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+              overflow: 'hidden',
+              border: '1px solid rgba(0,0,0,0.08)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+              background: '#fff',
+            }}
           >
             {/* Course Image */}
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-t-[16px]">
+            <div className="relative" style={{ height: 140, overflow: 'hidden' }}>
               {course.course_image_url ? (
                 <img src={course.course_image_url} alt={course.course_name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-[hsl(38,92%,50%)]/80 flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(247,147,30,0.15)' }}>
                   <span className="text-4xl">⛳</span>
                 </div>
               )}
+              {/* Gradient overlays */}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)' }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 40%)' }} />
               
-              {(course.world_rank || course.country_rank) && (
-                <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
-                  {course.country_rank && course.country_rank <= 100 && (() => {
-                    const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(course.country_code || '');
-                    const isUSA = ['United States', 'USA'].includes(course.country_code || '');
-                    const flagCountry = isGBI ? 'Britain & Ireland' : isUSA ? 'USA' : (course.country_code || 'Britain & Ireland');
-                    
-                    return (
-                      <div className="glass-badge-tight shadow-lg">
-                        <CountryFlag country={flagCountry} size="md" />
-                        <span className="text-white">#{course.country_rank}</span>
-                      </div>
-                    );
-                  })()}
-                </div>
+              {/* Course name on image */}
+              <span className="absolute" style={{ bottom: 10, left: 12, right: 12, fontSize: '13.5px', fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
+                {course.course_name}
+              </span>
+              
+              {/* Rating badge */}
+              {communityRating && communityRating > 0 && (
+                <span
+                  className="absolute flex items-center"
+                  style={{
+                    top: 8, right: 8,
+                    background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)',
+                    borderRadius: 8, padding: '3px 8px',
+                    fontSize: 11, fontWeight: 700, color: '#fff', gap: 3,
+                  }}
+                >
+                  ⭐ {communityRating.toFixed(1)}
+                </span>
               )}
+
+              {/* Country/rank badge */}
+              {(course.world_rank || course.country_rank) && course.country_rank && course.country_rank <= 100 && (() => {
+                const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(course.country_code || '');
+                const isUSA = ['United States', 'USA'].includes(course.country_code || '');
+                const flagCountry = isGBI ? 'Britain & Ireland' : isUSA ? 'USA' : (course.country_code || 'Britain & Ireland');
+                return (
+                  <div className="absolute top-2 left-2 glass-badge-tight shadow-lg">
+                    <CountryFlag country={flagCountry} size="md" />
+                    <span className="text-white">#{course.country_rank}</span>
+                  </div>
+                );
+              })()}
             </div>
 
-            <div className="p-3">
-              <div className="flex items-start justify-between gap-2">
-                <h4 className="font-semibold text-[15px] line-clamp-2 flex-1 text-foreground">
-                  {course.course_name}
-                </h4>
-                
-                {communityRating && communityRating > 0 && (
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <ClubhouseLogo size="xs" />
-                    <span className="text-[14px] font-bold text-foreground/80">{communityRating.toFixed(1)}</span>
-                  </div>
-                )}
-              </div>
-              
+            {/* Info section */}
+            <div style={{ padding: '10px 12px' }}>
               {course.location && (
-                <div className="flex items-center gap-1 mt-1 text-[12px] font-normal text-muted-foreground">
-                  <MapPin size={12} className="text-muted-foreground" />
-                  <span className="truncate">{course.location}</span>
+                <div className="flex items-center" style={{ gap: 4, marginBottom: 8 }}>
+                  <MapPin size={11} style={{ color: '#94a3b8' }} />
+                  <span style={{ fontSize: '11.5px', color: '#64748b' }}>{course.location}</span>
                 </div>
               )}
               
-              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full bg-[hsl(38,92%,50%)]/5 text-[hsl(35,80%,43%)] border border-[hsl(38,92%,50%)]/10">
-                <span>View Course</span>
-                <ExternalLink size={14} />
+              {/* View Course button */}
+              <div
+                className="w-full flex items-center justify-center"
+                style={{
+                  gap: 6, padding: '7px 0', borderRadius: 10,
+                  background: 'rgba(247,147,30,0.08)',
+                  border: '1px solid rgba(247,147,30,0.22)',
+                  fontSize: '12.5px', fontWeight: 600, color: '#F7931E',
+                }}
+              >
+                View Course
+                <ExternalLink size={12} />
               </div>
+              
               {/* Timestamp */}
-              <div className="flex items-center justify-end gap-1 mt-2 text-[11px] font-normal text-muted-foreground">
-                {message.is_edited && <span>edited</span>}
+              <div className="flex items-center justify-end" style={{ gap: 3, marginTop: 6, fontSize: 10, color: '#94a3b8' }}>
+                {message.is_edited && <span style={{ fontStyle: 'italic' }}>edited</span>}
                 <span>{formatMessageTime(message.created_at)}</span>
                 {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
               </div>
@@ -221,17 +236,28 @@ export function MessageBubble({
       <div className="py-1">
         <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
           <ContextMenuTrigger asChild>{courseCardContent}</ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem onClick={onReply} className="gap-2">
-              <Reply className="h-4 w-4" />Reply
+          <ContextMenuContent
+            style={{
+              background: '#fff', borderRadius: 16, width: 220,
+              boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+              border: 'none', padding: 0, overflow: 'hidden',
+            }}
+          >
+            <ContextMenuItem onClick={onReply} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+              <CtxIconBox bg="rgba(0,0,0,0.05)"><Reply size={14} style={{ color: '#475569' }} /></CtxIconBox>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Reply</span>
             </ContextMenuItem>
             {isOwnMessage && (
               <>
-                <ContextMenuItem onClick={onEdit} className="gap-2">
-                  <Pencil className="h-4 w-4" />Edit
+                <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
+                <ContextMenuItem onClick={onEdit} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+                  <CtxIconBox bg="rgba(0,0,0,0.05)"><Pencil size={14} style={{ color: '#475569' }} /></CtxIconBox>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Edit</span>
                 </ContextMenuItem>
-                <ContextMenuItem onClick={onDelete} className="gap-2 text-destructive focus:text-destructive">
-                  <Trash2 className="h-4 w-4" />Delete
+                <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
+                <ContextMenuItem onClick={onDelete} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+                  <CtxIconBox bg="rgba(239,68,68,0.08)"><Trash2 size={14} style={{ color: '#ef4444' }} /></CtxIconBox>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Delete</span>
                 </ContextMenuItem>
               </>
             )}
@@ -241,7 +267,6 @@ export function MessageBubble({
     );
   }
 
-  // Check message types
   const isMediaMessage = message.message_type === 'image' || message.message_type === 'video';
   const isVoiceNote = message.message_type === 'voice';
   const isSharedContent = message.message_type === 'tee_time' || message.message_type === 'moment_share';
@@ -263,11 +288,8 @@ export function MessageBubble({
   const handleStar = async () => {
     haptic('light');
     try {
-      const { data, error } = await supabase.rpc('toggle_saved_message', {
-        p_message_id: message.id
-      });
+      const { data, error } = await supabase.rpc('toggle_saved_message', { p_message_id: message.id });
       if (error) throw error;
-      
       const nowSaved = data === true;
       setIsSaved(nowSaved);
       toast.success(nowSaved ? "Saved to Caddie's Picks ⛳" : "Removed from Caddie's Picks");
@@ -277,59 +299,52 @@ export function MessageBubble({
   };
 
   const bubbleContent = (
-    <div className={cn("flex gap-2", isOwnMessage ? "justify-end" : "justify-start")}>
+    <div style={{ display: 'flex', gap: 8, justifyContent: isOwnMessage ? 'flex-end' : 'flex-start', alignItems: 'flex-end' }}>
       {/* Avatar for received */}
       {!isOwnMessage && showSenderInfo && (
-        <SquircleAvatar
-          src={message.sender?.profile_photo_url}
-          alt={senderName}
-          size={32}
-          fallback={senderInitials}
-          hideRing
-          className="flex-shrink-0 mt-1"
-        />
+        <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} fallback={senderInitials} hideRing className="flex-shrink-0" />
       )}
-      {!isOwnMessage && !showSenderInfo && <div className="w-8 flex-shrink-0" />}
+      {!isOwnMessage && !showSenderInfo && <div style={{ width: 28, flexShrink: 0 }} />}
 
-      <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
+      <div className="flex flex-col" style={{ maxWidth: '72%', alignItems: isOwnMessage ? 'flex-end' : 'flex-start' }}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/80 mb-0.5 px-1">
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155', marginBottom: 3, paddingLeft: 1 }}>
             {senderName}
           </span>
         )}
 
+        {/* Reply quote */}
+        {replyToMessage && (
+          <div
+            style={{
+              padding: '4px 10px',
+              background: 'rgba(0,0,0,0.04)', borderRadius: 10,
+              borderLeft: '2px solid #F7931E',
+              maxWidth: '70%', marginBottom: 4,
+              fontSize: 11, color: '#94a3b8',
+            }}
+          >
+            <span style={{ fontWeight: 600 }}>{replyToMessage.sender?.display_name || 'You'}</span>
+            <p className="truncate" style={{ margin: 0 }}>{replyToMessage.content || 'Media'}</p>
+          </div>
+        )}
+
         {/* Message bubble */}
         <div
-          className={cn(
-            "px-[14px] py-[10px] break-words relative group",
-            isPressed && "opacity-80",
-            isOwnMessage 
-              ? "rounded-[18px_18px_4px_18px]"
-              : "rounded-[18px_18px_18px_4px]"
-          )}
-          style={isOwnMessage ? {
-            background: 'rgba(245,166,35,0.10)',
-            border: '1px solid rgba(245,166,35,0.18)',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-          } : {
-            background: '#ffffff',
-            border: '1px solid rgba(0,0,0,0.07)',
+          style={{
+            padding: '9px 13px',
+            borderRadius: isOwnMessage ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+            ...(isOwnMessage ? {
+              background: 'rgba(247,147,30,0.10)',
+              border: '1px solid rgba(247,147,30,0.25)',
+            } : {
+              background: '#fff',
+              border: '1px solid rgba(0,0,0,0.07)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+            }),
           }}
-          onTouchCancel={() => setIsPressed(false)}
         >
-          {/* Reply preview */}
-          {replyToMessage && (
-            <div className="mb-2 pl-2 border-l-2 border-[hsl(38,92%,50%)]/40 bg-foreground/[0.03] rounded-r-lg py-1.5 pr-2">
-              <p className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/70">
-                {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
-              </p>
-              <p className="text-[13px] text-muted-foreground truncate">
-                {replyToMessage.content || 'Media'}
-              </p>
-            </div>
-          )}
-
           {/* Media content */}
           {isMediaMessage && message.media_url && (
             <MediaMessage 
@@ -358,17 +373,21 @@ export function MessageBubble({
             />
           )}
 
-          {/* Message content */}
+          {/* Message text */}
           {message.content && (
-            <p className="text-[14px] leading-relaxed whitespace-pre-wrap text-foreground">
+            <p style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.45, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {message.content}
             </p>
           )}
 
           {/* Timestamp + Read receipt */}
-          <div className="flex items-center gap-1 mt-1 justify-end">
-            {message.is_edited && <span className="text-[11px] font-normal text-muted-foreground/70">edited</span>}
-            <span className="text-[11px] font-normal text-muted-foreground/70">{formatMessageTime(message.created_at)}</span>
+          <div className="flex items-center" style={{
+            gap: 3, marginTop: 3,
+            justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
+            fontSize: 10, color: '#94a3b8',
+          }}>
+            {message.is_edited && <span style={{ fontStyle: 'italic' }}>edited</span>}
+            <span>{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
         </div>
@@ -389,50 +408,81 @@ export function MessageBubble({
   return (
     <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
       <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-background border border-border shadow-lg rounded-xl z-50">
+      <ContextMenuContent
+        className="z-50"
+        style={{
+          background: '#fff', borderRadius: 16, width: 220,
+          boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+          border: 'none', padding: 0, overflow: 'hidden',
+        }}
+      >
+        {/* Message preview */}
+        <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)', textAlign: 'center' as const }}>
+          <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{formatMessageTime(message.created_at)}</div>
+          {message.content && (
+            <p style={{ fontSize: '13.5px', color: '#1e293b', lineHeight: 1.4, margin: 0 }}>
+              {message.content.length > 60 ? message.content.slice(0, 60) + '…' : message.content}
+            </p>
+          )}
+        </div>
+
         {/* Quick reactions row */}
-        <div className="flex items-center justify-around py-2 px-3 border-b border-border">
+        <div className="flex items-center justify-around" style={{ padding: '8px 12px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
           {['👍', '🔥', '⛳', '😂', '❤️', '🏌️'].map((emoji) => (
             <button
               key={emoji}
-              onClick={() => {
-                handleEmojiSelect(emoji);
-              }}
-              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-[hsl(38,92%,50%)]/5 rounded-full active:scale-[0.97] transition-transform"
+              onClick={() => handleEmojiSelect(emoji)}
+              className="flex items-center justify-center active:scale-[0.97] transition-transform"
+              style={{ width: 32, height: 32, borderRadius: '50%', fontSize: 18 }}
             >
               {emoji}
             </button>
           ))}
         </div>
         
-        <ContextMenuItem onClick={() => { haptic('light'); onReply(); }} className="gap-3 py-2.5 cursor-pointer">
-          <Reply className="h-4 w-4" />Reply
+        {/* Actions */}
+        <ContextMenuItem onClick={() => { haptic('light'); onReply(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+          <CtxIconBox bg="rgba(0,0,0,0.05)"><Reply size={14} style={{ color: '#475569' }} /></CtxIconBox>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Reply</span>
         </ContextMenuItem>
         
-        <ContextMenuItem onClick={handleCopy} className="gap-3 py-2.5 cursor-pointer">
-          <Copy className="h-4 w-4" />Copy
+        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
+        
+        <ContextMenuItem onClick={handleCopy} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+          <CtxIconBox bg="rgba(0,0,0,0.05)"><Copy size={14} style={{ color: '#475569' }} /></CtxIconBox>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Copy</span>
         </ContextMenuItem>
         
         {onForward && (
-          <ContextMenuItem onClick={() => { haptic('light'); onForward(); }} className="gap-3 py-2.5 cursor-pointer">
-            <Forward className="h-4 w-4" />Forward
-          </ContextMenuItem>
+          <>
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
+            <ContextMenuItem onClick={() => { haptic('light'); onForward(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+              <CtxIconBox bg="rgba(0,0,0,0.05)"><Forward size={14} style={{ color: '#475569' }} /></CtxIconBox>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Forward</span>
+            </ContextMenuItem>
+          </>
         )}
         
-        <ContextMenuItem onClick={handleStar} className="gap-3 py-2.5 cursor-pointer">
-          <Star className={cn("h-4 w-4", isSaved && "fill-current text-[hsl(38,92%,50%)]")} />
-          {isSaved ? "Remove from Picks" : "Caddie's Pick ⛳"}
-        </ContextMenuItem>
+        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
         
-        <ContextMenuSeparator />
+        <ContextMenuItem onClick={handleStar} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+          <CtxIconBox bg="rgba(0,0,0,0.05)">
+            <Star size={14} style={{ color: isSaved ? '#F7931E' : '#475569' }} className={isSaved ? 'fill-current' : ''} />
+          </CtxIconBox>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>{isSaved ? "Remove from Picks" : "Save"}</span>
+        </ContextMenuItem>
         
         {isOwnMessage && (
           <>
-            <ContextMenuItem onClick={() => { haptic('light'); onEdit(); }} className="gap-3 py-2.5 cursor-pointer">
-              <Pencil className="h-4 w-4" />Edit
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
+            <ContextMenuItem onClick={() => { haptic('light'); onEdit(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+              <CtxIconBox bg="rgba(0,0,0,0.05)"><Pencil size={14} style={{ color: '#475569' }} /></CtxIconBox>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Edit</span>
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => { haptic('medium'); onDelete(); }} className="gap-3 py-2.5 cursor-pointer text-destructive focus:text-destructive">
-              <Trash2 className="h-4 w-4" />Delete
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
+            <ContextMenuItem onClick={() => { haptic('medium'); onDelete(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
+              <CtxIconBox bg="rgba(239,68,68,0.08)"><Trash2 size={14} style={{ color: '#ef4444' }} /></CtxIconBox>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Delete</span>
             </ContextMenuItem>
           </>
         )}
