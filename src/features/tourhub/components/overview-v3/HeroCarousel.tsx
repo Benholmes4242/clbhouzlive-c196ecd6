@@ -232,7 +232,7 @@ function LeaderHeroStrip({
     : 'rgba(255,255,255,0.55)';
 
   return (
-    <div style={{ <div style={{ padding: '14px 16px 0', flexShrink: 0 }}> }}>
+    <div style={{ padding: '14px 16px 0', flexShrink: 0 }}>
       {/* ── Leader card ── */}
       <div style={{
         background: 'rgba(255,255,255,0.07)',
@@ -880,7 +880,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       }}>
                         {tournament.name}
                       </div>
-                      <div style={{ <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 3 }}> }}>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 3 }}>
                         {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </div>
                     </div>
