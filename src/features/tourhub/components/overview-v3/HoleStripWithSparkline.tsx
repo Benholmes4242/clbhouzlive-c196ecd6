@@ -49,8 +49,8 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
         >
           <defs>
             <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(34,197,94,0.25)" />
-              <stop offset="100%" stopColor="rgba(34,197,94,0)" />
+              <stop offset="0%" stopColor="rgba(247,147,30,0.25)" />
+              <stop offset="100%" stopColor="rgba(247,147,30,0)" />
             </linearGradient>
           </defs>
 
@@ -84,7 +84,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
               return `${x},${y}`;
             }).join(' ');
             return (
-              <polyline points={pts} fill="none" stroke="#22C55E" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+              <polyline points={pts} fill="none" stroke="#F7931E" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
             );
           })()}
 
@@ -93,7 +93,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             const lastIdx = running.length - 1;
             const x = (lastIdx / (totalHoles - 1)) * svgWidth;
             const y = SPARK_H - ((running[lastIdx] - min) / range) * (SPARK_H - 6) - 3;
-            return <circle cx={x} cy={y} r={3} fill="#22C55E" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
+            return <circle cx={x} cy={y} r={3} fill="#F7931E" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
           })()}
         </svg>
 
@@ -104,14 +104,17 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
           height: DOT_AREA,
         }}>
           {allHoles.map((h, i) => {
-            const isPlayed = h !== null && h.strokes > 0;
-            const score    = isPlayed ? h.scoreToPar : null;
-            const isHIO    = isPlayed && h.strokes === 1;
+            const isPlayed  = h !== null && h.strokes > 0;
+            const score     = isPlayed ? h.scoreToPar : null;
+            const isHIO     = isPlayed && h.strokes === 1;
+            const isCircle  = isPlayed && score! <= -1;
+            const isSquare  = isPlayed && score! >= 1;
+            const isPar     = isPlayed && score === 0;
 
             const dotStyle = (() => {
               if (!isPlayed) return {
                 background: 'transparent',
-                border: '1px dashed rgba(255,255,255,0.22)',
+                border: '1px dashed rgba(255,255,255,0.20)',
                 borderRadius: '50%',
               };
               if (isHIO) return {
@@ -120,30 +123,30 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
                 borderRadius: '50%',
                 boxShadow: '0 0 7px rgba(255,215,0,0.55)',
               };
-              if (score! <= -2) return {       // Eagle or better — green
+              if (score! <= -2) return {
                 background: 'rgba(34,197,94,0.20)',
                 border: '1.5px solid #22C55E',
                 borderRadius: '50%',
                 boxShadow: '0 0 6px rgba(34,197,94,0.40)',
               };
-              if (score === -1) return {       // Birdie — amber
+              if (score === -1) return {
                 background: 'rgba(247,147,30,0.18)',
                 border: '1.5px solid #F7931E',
                 borderRadius: '50%',
                 boxShadow: '0 0 5px rgba(247,147,30,0.35)',
               };
-              if (score === 0) return {        // Par — dashed outline only, no fill
+              if (isPar) return {
                 background: 'transparent',
-                border: '1px dashed rgba(255,255,255,0.35)',
+                border: '1px dashed rgba(255,255,255,0.30)',
                 borderRadius: '50%',
               };
-              if (score === 1) return {        // Bogey — red square
+              if (score === 1) return {
                 background: 'rgba(239,68,68,0.15)',
                 border: '1.5px solid #EF4444',
                 borderRadius: 3,
                 boxShadow: '0 0 5px rgba(239,68,68,0.30)',
               };
-              return {                         // Double bogey or worse — dark red square
+              return {
                 background: 'rgba(153,27,27,0.20)',
                 border: '1.5px solid #991B1B',
                 borderRadius: 3,
@@ -151,20 +154,13 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             })();
 
             const textColor = (() => {
-              if (!isPlayed || score === null) return 'rgba(255,255,255,0.5)';
+              if (!isPlayed) return 'transparent';
               if (isHIO)        return '#FFD700';
-              if (score <= -2)  return '#22C55E';
+              if (score! <= -2) return '#22C55E';
               if (score === -1) return '#F7931E';
+              if (isPar)        return 'rgba(255,255,255,0.50)';
               if (score === 1)  return '#EF4444';
-              if (score >= 2)   return '#991B1B';
-              return 'rgba(255,255,255,0.5)';
-            })();
-
-            const label = (() => {
-              if (!isPlayed || score === null) return null;
-              if (isHIO)       return 'HIO';
-              if (score === 0) return '—';
-              return score < 0 ? `${score}` : `+${score}`;
+              return '#991B1B';
             })();
 
             return (
@@ -173,14 +169,9 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
                   {i + 1}
                 </span>
                 <div style={{ width: 13, height: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', ...dotStyle }}>
-                  {label && (
-                    <span style={{
-                      fontSize: score === 0 ? 5 : isHIO ? 4.5 : 6,
-                      fontWeight: score === 0 ? 600 : 800,
-                      color: score === 0 ? 'rgba(255,255,255,0.45)' : textColor,
-                      lineHeight: 1,
-                    }}>
-                      {label}
+                  {isPlayed && (
+                    <span style={{ fontSize: 6.5, fontWeight: 800, color: textColor, lineHeight: 1 }}>
+                      {isHIO ? '①' : h!.strokes}
                     </span>
                   )}
                 </div>
