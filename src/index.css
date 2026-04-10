@@ -2858,19 +2858,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
     outline-offset: 2px;
 }
 
-/* Hero mobile offset — 0 on desktop, 57px on mobile */
-:root {
-  --hero-mobile-offset: 0px;
-}
-@media (max-width: 768px) {
-  :root {
-    --hero-mobile-offset: 57px;
-  }
-}
-
-/* Scorecard top bar — match live hero safe-area + mobile offset */
+/* Scorecard top bar — match live hero safe-area + 57px offset */
 .scorecard-top-bar {
-  padding-top: calc(max(env(safe-area-inset-top, 0px), 44px) + var(--hero-mobile-offset, 0px));
+  padding-top: calc(max(env(safe-area-inset-top, 0px), 44px) + 57px);
 }
 
 
