@@ -28,29 +28,28 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
           <div key={r.label} style={{
             display: 'inline-flex',
             flexDirection: isLive ? 'column' : 'row',
-            alignItems: isLive ? 'flex-start' : 'center',
-            justifyContent: 'flex-start',
-            gap: isLive ? 1 : 8,
-            padding: isLive ? '4px 10px' : '3px 9px',
-            borderRadius: 8,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: isLive ? 0 : 6,
+            padding: isLive ? '5px 7px' : '3px 8px',
+            borderRadius: 7,
             background: isLive ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.06)',
             border: isLive ? '1px solid rgba(34,197,94,0.20)' : '1px solid rgba(255,255,255,0.07)',
             width: 'fit-content',
             alignSelf: 'flex-start',
-            minWidth: isLive ? undefined : 72,
           }}>
             <span style={{
-              fontSize: 8, fontWeight: 600, textTransform: 'uppercase',
-              letterSpacing: 0.5,
+              fontSize: 8, fontWeight: 700, textTransform: 'uppercase',
+              letterSpacing: 0.6,
               color: isLive ? '#22C55E' : 'rgba(255,255,255,0.28)',
-              lineHeight: 1.1,
+              lineHeight: 1.3,
             }}>
               {r.label}
             </span>
             {isLive ? (
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#22C55E', lineHeight: 1.1 }}>LIVE</span>
+              <span style={{ fontSize: 8, fontWeight: 800, color: '#22C55E', lineHeight: 1.3, letterSpacing: 0.6 }}>LIVE</span>
             ) : isDone && colors ? (
-              <span style={{ fontSize: 12, fontWeight: 800, color: colors.text, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: colors.text, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
             ) : null}
           </div>
         );
