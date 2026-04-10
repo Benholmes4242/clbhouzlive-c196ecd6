@@ -727,13 +727,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       <div 
         className="absolute inset-0 pointer-events-none z-5"
         style={{
-          background: isLive
+          background: (isLive || isUpcoming)
             ? `linear-gradient(180deg,
-                rgba(0,0,0,0.55) 0%,
-                rgba(0,0,0,0.30) 20%,
-                rgba(0,0,0,0.70) 45%,
-                rgba(0,0,0,0.92) 65%,
-                rgba(0,0,0,0.97) 100%)`
+                rgba(0,0,0,0.25) 0%,
+                rgba(0,0,0,0.10) 22%,
+                rgba(0,0,0,0.65) 48%,
+                rgba(0,0,0,0.95) 68%,
+                rgba(0,0,0,1.00) 82%)`
             : `linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
                linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)`,
         }}
@@ -766,7 +766,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             onTouchStart={(e) => { onCardTouchStart(e); }}
             onTouchMove={(e) => { onCardTouchMove(e); }}
             onTouchEnd={(e) => { onCardTouchEnd(e); }}
-            style={isLive ? {
+            style={(isLive || isUpcoming) ? {
               position: 'absolute',
               top: 0, left: 0, right: 0, bottom: 0,
               borderRadius: 0,
@@ -895,52 +895,44 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     </div>
                   </div>
                 </div>
-              ) : (
-                /* Upcoming header */
+              ) : isUpcoming ? (
                 <>
-                <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                    <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
-                          Upcoming
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-                        {!tournament.isMajor && (
-                        <div className="tour-badge">
-                          <span>
-                            {getTourDisplayName(tournament.tourSlug)}
+                  {/* Safe area spacer — upcoming fills full card like live */}
+                  <div style={{ height: 'max(env(safe-area-inset-top,0px),44px)', flexShrink: 0 }} />
+
+                  <div style={{ padding: '0 18px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                            Upcoming · {getTourDisplayName(tournament.tourSlug)}
                           </span>
                         </div>
-                        )}
-                          {tournament.startDate && tournament.endDate && (
-                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
-                              {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                              {' – '}
-                              {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            </span>
-                          )}
-                        </div>
+                        <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                          <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -0.6, lineHeight: 1.0, margin: 0 }}>
+                            {tournament.name}
+                          </h2>
+                        </Link>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                          className="active:opacity-70 transition-opacity cursor-pointer"
+                          style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                        >
+                          {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
+                        </button>
                       </div>
+                      {tournament.startDate && tournament.endDate && (
+                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 14, flexShrink: 0 }}>
+                          {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {' – '}
+                          {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      )}
                     </div>
-                    <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                      <h2 className="hero-tournament-name">{tournament.name}</h2>
-                    </Link>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-                      }}
-                      className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                    >
-                      {tournament.venueName}
-                      {tournament.venueCity && ` · ${tournament.venueCity}`}
-                    </button>
                   </div>
                 </>
-              )
+              ) : null
             )}
 
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
@@ -1338,7 +1330,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   style={{ overflow: 'hidden' }}
                 >
                   {/* ── COURSE FACT CHIPS ── */}
-                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10 }}>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10, padding: '0 18px' }}>
                     {[
                       tournament.purse      && { value: formatPurse(tournament.purse),                          label: 'Purse'  },
                       tournament.venuePar   && { value: `Par ${tournament.venuePar}`,                           label: 'Course' },
@@ -1362,7 +1354,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   </div>
 
                   {/* ── LIVE COUNTDOWN ── */}
-                  <UpcomingCountdown startDate={tournament.startDate} />
+                  <div style={{ padding: '0 18px' }}>
+                    <UpcomingCountdown startDate={tournament.startDate} />
+                  </div>
 
                   {/* ── DEFENDING CHAMPION PANEL ── */}
                   {tournament.defendingChampion && (
@@ -1377,6 +1371,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         borderRadius: 12,
                         padding: '10px 12px',
                         marginTop: 8, marginBottom: 10,
+                        marginLeft: 18, marginRight: 18,
                       }}
                     >
                       {/* Avatar */}
@@ -1397,7 +1392,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   )}
 
                   {/* Echo — tour hub contextual */}
-                  <div style={{ padding: '0 0 10px' }}>
+                  <div style={{ padding: '0 18px 10px' }}>
                     <EchoContextualButton
                       prompt={
                         isLive
@@ -1420,29 +1415,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     />
                   </div>
 
-                  {/* ── FOOTER — View Tournament pill ── */}
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    marginTop: 4, paddingTop: 8,
-                    borderTop: '1px solid rgba(255,255,255,0.06)',
-                  }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-                        Tournament info
-                      </span>
-                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)' }}>
-                        {tournament.venueName || 'Stroke play · 72 holes'}
-                      </span>
-                    </div>
+                  {/* ── FOOTER — View Tournament pill only, right-aligned ── */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8, padding: '8px 18px 0' }}>
                     <Link
                       to={`/tourhub/tournament/${tournament.id}`}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 4,
-                        background: 'rgba(255,255,255,0.08)',
-                        border: '1px solid rgba(255,255,255,0.13)',
-                        borderRadius: 20,
-                        padding: '5px 11px',
-                        fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
+                        background: 'rgba(255,255,255,0.09)',
+                        border: '1px solid rgba(255,255,255,0.14)',
+                        borderRadius: 20, padding: '7px 14px',
+                        fontSize: 12, fontWeight: 700, color: '#fff',
                         textDecoration: 'none',
                       }}
                       className="active:opacity-70 transition-opacity"
