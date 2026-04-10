@@ -730,10 +730,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           background: (isLive || isUpcoming)
             ? `linear-gradient(180deg,
                 rgba(0,0,0,0.55) 0%,
-                rgba(0,0,0,0.35) 18%,
-                rgba(0,0,0,0.75) 45%,
-                rgba(0,0,0,0.96) 65%,
-                rgba(0,0,0,1.00) 78%)`
+                rgba(0,0,0,0.25) 15%,
+                rgba(0,0,0,0.10) 30%,
+                rgba(0,0,0,0.60) 55%,
+                rgba(0,0,0,0.93) 72%,
+                rgba(0,0,0,1.00) 82%)`
             : `linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
                linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)`,
         }}
