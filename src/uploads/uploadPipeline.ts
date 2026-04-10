@@ -96,6 +96,7 @@ async function measureVideoDimensions(file: File): Promise<{
 
     video.src = objectUrl;
   });
+}
 
 /**
  * Enqueue and immediately start processing a post upload.
