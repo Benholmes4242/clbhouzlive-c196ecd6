@@ -101,7 +101,7 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, padding: '8px 0' }}>
             <span style={{
               fontFamily: "'JetBrains Mono','SF Mono',monospace",
-              fontSize: 52, fontWeight: 900,
+              fontSize: 'clamp(36px, 13vw, 52px)', fontWeight: 900,
               color: cell.isAccent ? '#4ade80' : '#FFFFFF',
               lineHeight: 1,
               letterSpacing: -3,
@@ -123,7 +123,7 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
           {/* Colon separator — between cells only */}
           {i < cells.length - 1 && (
             <span style={{
-              fontSize: 40, fontWeight: 300,
+              fontSize: 'clamp(28px, 10vw, 40px)', fontWeight: 300,
               color: 'rgba(255,255,255,0.20)',
               lineHeight: 1,
               marginBottom: 16,
