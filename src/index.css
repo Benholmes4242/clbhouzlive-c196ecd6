@@ -2858,9 +2858,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
     outline-offset: 2px;
 }
 
-/* Scorecard top bar — match live hero safe-area + 57px offset */
+/* Scorecard top bar — match live hero safe-area + 65px offset */
 .scorecard-top-bar {
-  padding-top: calc(max(env(safe-area-inset-top, 0px), 44px) + 57px);
+  padding-top: calc(max(env(safe-area-inset-top, 0px), 44px) + 65px);
 }
 
 
