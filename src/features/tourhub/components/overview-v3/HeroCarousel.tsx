@@ -695,7 +695,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             className="absolute inset-0 w-full h-full"
             style={{
               background: isLive
-                ? `radial-gradient(ellipse 120% 55% at 50% calc(25% + 57px), #2d5a1e 0%, #1a3a0e 45%, #0a1a05 100%)`
+                ? `radial-gradient(ellipse 120% 55% at 50% calc(25% + ${mobileOffset}px), #2d5a1e 0%, #1a3a0e 45%, #0a1a05 100%)`
                 : undefined,
             }}
           >
@@ -709,7 +709,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       {/* Sky tint overlay for live */}
       {isLive && (
         <div style={{
-          position: 'absolute', top: 57, left: 0, right: 0, height: '38%',
+          position: 'absolute', top: mobileOffset, left: 0, right: 0, height: '38%',
           background: 'linear-gradient(180deg, #4a7ab5 0%, #2a5a8e 35%, transparent 100%)',
           opacity: 0.55,
           pointerEvents: 'none',
@@ -851,7 +851,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 /* ── Compact topbar — R1 stacked on LIVE left, title right ── */
                 <div style={{
                   flexShrink: 0,
-                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
+                  paddingTop: `calc(max(env(safe-area-inset-top, 0px), 44px) + ${mobileOffset}px)`,
                 }}>
                   <div style={{
                     display: 'flex', alignItems: 'center',
