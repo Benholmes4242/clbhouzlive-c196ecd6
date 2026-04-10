@@ -85,7 +85,7 @@ export function OverviewPageV3() {
           <button
             className="absolute z-20 flex items-center justify-center active:scale-[0.97] transition-transform"
             style={{
-              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px + var(--live-hero-offset, 0px))',
+              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
               left: '16px',
               width: 36,
               height: 36,
