@@ -2,12 +2,9 @@ import React, { useState, useRef } from 'react';
 import { 
   ChevronLeft, Camera, Pencil, UserPlus, LogOut, Archive,
   Shield, ShieldCheck, MoreVertical, Trash2, Image,
-  Bell, BellOff, Flag, ChevronRight
+  Bell, BellOff, Flag, ChevronRight, Users
 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,7 +21,6 @@ import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messagi
 import { AddMembersSheet } from './AddMembersSheet';
 import { ReportSheet } from './ReportSheet';
 import { SharedMediaGallery } from './SharedMediaGallery';
-import { cn } from '@/lib/utils';
 
 interface GroupInfoPageProps {
   conversation: ConversationWithDetails;
@@ -38,18 +28,6 @@ interface GroupInfoPageProps {
   onClose: () => void;
   onUpdate: () => void;
 }
-
-/* ── shared card style ── */
-const warmCard: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid rgba(0,0,0,0.06)',
-  borderRadius: 16,
-  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-};
-const insetDivider: React.CSSProperties = {
-  height: 1,
-  backgroundColor: 'rgba(0,0,0,0.05)',
-};
 
 export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   conversation,
@@ -168,21 +146,6 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
-  const handleRemoveAdmin = async (userId: string) => {
-    try {
-      const { error } = await supabase.rpc('update_member_role', {
-        p_conversation_id: conversation.id,
-        p_user_id: userId,
-        p_new_role: 'member',
-      });
-      if (error) throw error;
-      toast.success('Admin rights removed');
-      onUpdate();
-    } catch (e: unknown) {
-      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
-    }
-  };
-
   const handleRemoveMember = async (userId: string) => {
     try {
       const { error } = await supabase.rpc('remove_group_member', {
@@ -195,10 +158,6 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     } catch (e: unknown) {
       toast.error('Failed to remove', { description: (e as Error).message ?? 'An error occurred' });
     }
-  };
-
-  const handleLeaveGroup = () => {
-    setShowLeaveDialog(true);
   };
 
   const handleLeaveConfirmed = async () => {
@@ -230,10 +189,6 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
-  const handleDeleteGroup = () => {
-    setShowDeleteDialog(true);
-  };
-
   const handleDeleteConfirmed = async () => {
     try {
       const { error } = await supabase.rpc('delete_group', {
@@ -260,58 +215,75 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden"
-      style={{ backgroundColor: '#F8FAFC' }}
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{ background: '#F8FAFC' }}
     >
       {/* ── Header ── */}
       <div
-        className="sticky top-0 z-10 flex items-center px-[18px]"
+        className="sticky top-0 z-10 flex items-center"
         style={{
-          height: 'calc(56px + env(safe-area-inset-top, 0px))',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingBottom: 10,
+          paddingLeft: 16,
+          paddingRight: 16,
           background: '#F8FAFC',
           borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         <button
           onClick={onClose}
-          className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-          style={{ background: 'rgba(0,0,0,0.05)' }}
+          className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
+          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(0,0,0,0.06)', border: 'none' }}
         >
           <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
         <div className="flex-1 text-center">
-          <span className="text-[17px] font-bold" style={{ color: '#0f172a' }}>
-            Group Info
-          </span>
+          <span style={{ fontSize: 17, fontWeight: 700, color: '#0f172a' }}>Group Info</span>
         </div>
-        <div className="w-9" />
+        <div style={{ width: 34 }} />
       </div>
 
       {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-y-auto px-5 pb-safe">
-        {/* ── Profile section ── */}
-        <div className="flex flex-col items-center pt-6 pb-4">
+      <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px 40px' }}>
+        {/* ── Avatar + Name section ── */}
+        <div className="flex flex-col items-center" style={{ padding: '24px 0 16px' }}>
           {/* Avatar */}
           <div className="relative">
-            <div style={{ filter: 'drop-shadow(0 4px 20px rgba(245,166,35,0.20))' }}>
-              <SquircleAvatar
-                size={96}
-                src={conversation.avatar_url || undefined}
-                alt={conversation.name || 'Group'}
-                fallback={getInitials(conversation.name || 'Group')}
-                hideRing
-              />
-            </div>
+            {conversation.avatar_url ? (
+              <div style={{ filter: 'drop-shadow(0 4px 20px rgba(247,147,30,0.28))' }}>
+                <SquircleAvatar
+                  size={88}
+                  src={conversation.avatar_url}
+                  alt={conversation.name || 'Group'}
+                  fallback={getInitials(conversation.name || 'Group')}
+                  hideRing
+                />
+              </div>
+            ) : (
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: 88, height: 88, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #F7931E, #e07a0d)',
+                  filter: 'drop-shadow(0 4px 20px rgba(247,147,30,0.28))',
+                }}
+              >
+                <Users size={36} style={{ color: '#fff' }} />
+              </div>
+            )}
             {isAdmin && (
               <>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.97] transition-transform disabled:opacity-50"
-                  style={{ background: '#f59e0b', border: '2px solid #F8FAFC' }}
+                  className="absolute flex items-center justify-center active:scale-[0.97] transition-transform disabled:opacity-50"
+                  style={{
+                    bottom: 2, right: 2,
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: '#F7931E', border: '2px solid #F8FAFC',
+                  }}
                 >
-                  <Camera size={16} className="text-white" />
+                  <Camera size={13} style={{ color: '#fff' }} />
                 </button>
                 <input
                   ref={fileInputRef}
@@ -325,110 +297,179 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           </div>
 
           {/* Group name */}
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center" style={{ gap: 8 }}>
             {isEditingName ? (
-              <div className="flex items-center gap-2">
-                <Input
+              <div className="flex items-center" style={{ gap: 8 }}>
+                <input
                   value={groupName}
                   onChange={(e) => setGroupName(e.target.value)}
-                  className="text-center text-xl font-semibold"
                   autoFocus
+                  className="text-center"
+                  style={{
+                    fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px',
+                    background: 'transparent', border: '1px solid rgba(0,0,0,0.1)',
+                    borderRadius: 10, padding: '4px 12px', outline: 'none',
+                  }}
                 />
-                <Button size="sm" onClick={handleUpdateGroupName}>Save</Button>
-                <Button size="sm" variant="ghost" onClick={() => setIsEditingName(false)}>Cancel</Button>
+                <button
+                  onClick={handleUpdateGroupName}
+                  style={{
+                    padding: '5px 14px', borderRadius: 10,
+                    background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                    fontSize: 13, fontWeight: 600, color: '#F7931E', cursor: 'pointer',
+                  }}
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setIsEditingName(false)}
+                  style={{
+                    padding: '5px 14px', borderRadius: 10,
+                    background: 'rgba(0,0,0,0.05)', border: 'none',
+                    fontSize: 13, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
             ) : (
               <>
-                <h2 className="text-[22px] font-extrabold" style={{ color: '#0f172a', letterSpacing: '-0.3px' }}>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px', margin: 0 }}>
                   {conversation.name}
                 </h2>
                 {isAdmin && (
                   <button
                     onClick={() => setIsEditingName(true)}
-                    className="p-1 rounded active:scale-[0.95] transition-transform"
+                    className="active:scale-[0.95] transition-transform"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}
                   >
-                    <Pencil size={18} className="text-muted-foreground" />
+                    <Pencil size={14} style={{ color: '#F7931E' }} />
                   </button>
                 )}
               </>
             )}
           </div>
 
-          <p className="text-[13px] font-medium mt-1" style={{ color: '#64748b' }}>
+          {/* Member count */}
+          <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
             {conversation.participants.length} members
           </p>
 
           {/* Description */}
-          <div className="mt-3 w-full">
-            {isEditingDescription ? (
-              <div className="space-y-2">
-                <Textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Add group description..."
-                  className="resize-none text-[13px]"
-                  rows={3}
-                />
-                <div className="flex justify-end gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setIsEditingDescription(false)}>Cancel</Button>
-                  <Button size="sm" onClick={handleUpdateDescription}>Save</Button>
-                </div>
+          {isEditingDescription ? (
+            <div className="w-full mt-3" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Add group description..."
+                rows={3}
+                style={{
+                  fontSize: 13, color: '#1e293b', resize: 'none',
+                  border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                  padding: '8px 12px', outline: 'none', background: '#fff',
+                }}
+              />
+              <div className="flex justify-end" style={{ gap: 8 }}>
+                <button
+                  onClick={() => setIsEditingDescription(false)}
+                  style={{
+                    padding: '5px 14px', borderRadius: 10,
+                    background: 'rgba(0,0,0,0.05)', border: 'none',
+                    fontSize: 13, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateDescription}
+                  style={{
+                    padding: '5px 14px', borderRadius: 10,
+                    background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                    fontSize: 13, fontWeight: 600, color: '#F7931E', cursor: 'pointer',
+                  }}
+                >
+                  Save
+                </button>
               </div>
-            ) : (
-              <button
-                onClick={() => isAdmin && setIsEditingDescription(true)}
-                className={cn(
-                  "w-full text-center text-[13px] font-normal rounded-lg p-2",
-                  isAdmin && "active:scale-[0.99] transition-transform"
-                )}
-                style={{ color: description ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground) / 0.6)' }}
-              >
-                {description || (isAdmin ? 'Add group description' : 'No description')}
-              </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => isAdmin && setIsEditingDescription(true)}
+              className="w-full text-center active:opacity-70 transition-opacity"
+              style={{
+                fontSize: 13, color: description ? '#94a3b8' : '#F7931E',
+                marginTop: 2, background: 'none', border: 'none', cursor: isAdmin ? 'pointer' : 'default',
+                padding: 4,
+              }}
+            >
+              {description || (isAdmin ? 'Add group description' : 'No description')}
+            </button>
+          )}
         </div>
 
-        {/* ── Media + Notifications card ── */}
-        <div className="mt-4 overflow-hidden" style={warmCard}>
+        {/* ── Settings card (Shared Media + Notifications) ── */}
+        <div
+          className="overflow-hidden"
+          style={{
+            background: '#fff', borderRadius: 16,
+            border: '1px solid rgba(0,0,0,0.07)',
+            marginBottom: 14,
+          }}
+        >
+          {/* Shared Media row */}
           <button
             onClick={() => setShowSharedMedia(true)}
-            className="w-full flex items-center justify-between px-4 py-[14px] active:opacity-80 transition-opacity"
+            className="w-full flex items-center justify-between active:opacity-80 transition-opacity"
+            style={{ padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+            <div className="flex items-center" style={{ gap: 10 }}>
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(0,0,0,0.04)' }}
+              >
                 <Image size={17} style={{ color: '#64748b' }} />
               </div>
-              <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Shared Media</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Shared Media</span>
             </div>
             <ChevronRight size={14} style={{ color: '#d1d5db' }} />
           </button>
 
-          <div style={insetDivider} />
+          {/* Hairline */}
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
 
-          <div className="flex items-center justify-between px-4 py-[14px]">
-            <div className="flex items-center gap-3">
-              <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
-                {isMuted ? (
-                  <BellOff size={17} style={{ color: '#64748b' }} />
-                ) : (
-                  <Bell size={17} style={{ color: '#64748b' }} />
-                )}
+          {/* Notifications row */}
+          <div
+            className="flex items-center justify-between"
+            style={{ padding: '13px 16px' }}
+          >
+            <div className="flex items-center" style={{ gap: 10 }}>
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(0,0,0,0.04)' }}
+              >
+                {isMuted ? <BellOff size={17} style={{ color: '#64748b' }} /> : <Bell size={17} style={{ color: '#64748b' }} />}
               </div>
-              <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Notifications</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Notifications</span>
             </div>
-            {/* Warm toggle */}
+            {/* Custom toggle */}
             <button
               onClick={handleToggleMute}
-              className="relative w-[50px] h-[28px] rounded-full transition-colors duration-200"
+              className="relative"
               style={{
-                background: isMuted ? 'hsl(var(--muted))' : '#f59e0b',
+                width: 46, height: 26, borderRadius: 99,
+                background: !isMuted ? '#F7931E' : '#e2e8f0',
+                border: 'none', cursor: 'pointer',
+                transition: 'background 0.2s',
               }}
             >
               <div
-                className="absolute top-[2px] w-6 h-6 bg-background rounded-full shadow-sm transition-transform duration-200"
                 style={{
-                  transform: isMuted ? 'translateX(2px)' : 'translateX(22px)',
+                  position: 'absolute', top: 3,
+                  width: 20, height: 20, borderRadius: '50%',
+                  background: '#fff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                  transition: 'transform 0.2s',
+                  transform: !isMuted ? 'translateX(22px)' : 'translateX(3px)',
                 }}
               />
             </button>
@@ -436,98 +477,123 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         </div>
 
         {/* ── Members section ── */}
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-2 px-1">
-            <span
-              className="text-[11px] font-bold uppercase"
-              style={{ color: '#64748b', letterSpacing: '0.1em' }}
-            >
+        <div style={{ marginBottom: 14 }}>
+          {/* Header row */}
+          <div className="flex items-center justify-between" style={{ padding: '0 4px', marginBottom: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: '#94a3b8', textTransform: 'uppercase' as const }}>
               {conversation.participants.length} Members
             </span>
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}
-                className="flex items-center gap-1.5 text-[13px] font-semibold active:opacity-70 transition-opacity"
-                style={{ color: '#F5A623' }}
+                className="flex items-center active:opacity-70 transition-opacity"
+                style={{ gap: 4, fontSize: 13, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
               >
-                <UserPlus size={14} style={{ color: '#F5A623' }} />
+                <UserPlus size={14} style={{ color: '#F7931E' }} />
                 Add
               </button>
             )}
           </div>
 
-          <div className="overflow-hidden" style={warmCard}>
+          {/* Members container */}
+          <div
+            className="overflow-hidden"
+            style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(0,0,0,0.07)' }}
+          >
             {conversation.participants.map((participant, idx) => (
               <React.Fragment key={participant.id}>
-                {idx > 0 && <div style={insetDivider} />}
-                <div className="flex items-center justify-between px-4 py-3">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <SquircleAvatar
-                      size={42}
-                      src={participant.profile?.profile_photo_url || undefined}
-                      alt={participant.profile?.display_name || participant.profile?.username || '?'}
-                      fallback={getInitials(participant.profile?.display_name || participant.profile?.username || '?')}
-                      hideRing
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[14px] font-semibold truncate" style={{ color: 'hsl(var(--foreground))' }}>
-                          {participant.profile?.display_name || participant.profile?.username}
-                        </span>
-                        {participant.user_id === currentUserId && (
-                          <span className="text-[11px] font-medium flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                            You
-                          </span>
-                        )}
-                      </div>
+                {idx > 0 && <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />}
+                <div className="flex items-center" style={{ gap: 12, padding: '10px 16px' }}>
+                  {/* Avatar */}
+                  <SquircleAvatar
+                    size={44}
+                    src={participant.profile?.profile_photo_url || undefined}
+                    alt={participant.profile?.display_name || participant.profile?.username || '?'}
+                    fallback={getInitials(participant.profile?.display_name || participant.profile?.username || '?')}
+                    hideRing
+                  />
+
+                  {/* Info column */}
+                  <div className="flex-1 min-w-0">
+                    {/* Row 1: Name + You + Role badge */}
+                    <div className="flex items-center" style={{ gap: 6 }}>
+                      <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>
+                        {participant.profile?.display_name || participant.profile?.username}
+                      </span>
+                      {participant.user_id === currentUserId && (
+                        <span style={{ fontSize: 11, color: '#94a3b8' }}>You</span>
+                      )}
                       {getMemberRole(participant) && (
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <span
-                            className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-[1px] rounded-lg"
-                            style={{
-                              color: '#d97706',
-                              background: 'rgba(245, 158, 11, 0.08)',
-                              border: '1px solid rgba(245,166,35,0.18)',
-                            }}
-                          >
-                            {participant.user_id === conversation.created_by ? (
-                              <ShieldCheck size={11} />
-                            ) : (
-                              <Shield size={11} />
-                            )}
-                            {getMemberRole(participant)}
-                          </span>
-                        </div>
+                        <span
+                          className="flex items-center flex-shrink-0"
+                          style={{
+                            gap: 3, fontSize: 10, fontWeight: 700,
+                            color: '#d97706',
+                            background: 'rgba(245,158,11,0.08)',
+                            border: '1px solid rgba(245,166,35,0.18)',
+                            borderRadius: 99, padding: '1px 6px',
+                          }}
+                        >
+                          {participant.user_id === conversation.created_by ? <ShieldCheck size={11} /> : <Shield size={11} />}
+                          {getMemberRole(participant)}
+                        </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Member actions */}
+                  {/* Member action button */}
                   {isAdmin && participant.user_id !== currentUserId && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="p-2 rounded-full active:opacity-70 transition-opacity">
-                          <MoreVertical size={18} style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }} />
+                        <button
+                          className="flex items-center justify-center flex-shrink-0"
+                          style={{
+                            width: 30, height: 30, borderRadius: '50%',
+                            background: 'transparent', border: 'none', cursor: 'pointer',
+                          }}
+                        >
+                          <MoreVertical size={18} style={{ color: '#94a3b8' }} />
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {participant.role === 'admin' && participant.user_id !== conversation.created_by ? (
-                          <DropdownMenuItem onClick={() => participant.user_id && handleRemoveAdmin(participant.user_id)}>
-                            <Shield size={16} className="mr-2" />
-                            Dismiss as admin
+                      <DropdownMenuContent
+                        align="end"
+                        style={{
+                          background: '#fff', borderRadius: 14, width: 210,
+                          boxShadow: '0 8px 24px rgba(0,0,0,0.13)',
+                          border: '1px solid rgba(0,0,0,0.07)',
+                          padding: 0, overflow: 'hidden',
+                        }}
+                      >
+                        {participant.role !== 'admin' && (
+                          <DropdownMenuItem
+                            onClick={() => participant.user_id && handleMakeAdmin(participant.user_id)}
+                            className="flex items-center"
+                            style={{ gap: 10, padding: '11px 14px' }}
+                          >
+                            <div
+                              className="flex items-center justify-center flex-shrink-0"
+                              style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(245,158,11,0.10)' }}
+                            >
+                              <ShieldCheck size={14} style={{ color: '#F7931E' }} />
+                            </div>
+                            <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Make group admin</span>
                           </DropdownMenuItem>
-                        ) : participant.role !== 'admin' && (
-                          <DropdownMenuItem onClick={() => participant.user_id && handleMakeAdmin(participant.user_id)}>
-                            <ShieldCheck size={16} className="mr-2" />
-                            Make group admin
-                          </DropdownMenuItem>
+                        )}
+                        {participant.role !== 'admin' && (
+                          <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
                         )}
                         <DropdownMenuItem
                           onClick={() => participant.user_id && handleRemoveMember(participant.user_id)}
-                          className="text-destructive"
+                          className="flex items-center"
+                          style={{ gap: 10, padding: '11px 14px' }}
                         >
-                          <Trash2 size={16} className="mr-2" />
-                          Remove from group
+                          <div
+                            className="flex items-center justify-center flex-shrink-0"
+                            style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(239,68,68,0.08)' }}
+                          >
+                            <Trash2 size={14} style={{ color: '#ef4444' }} />
+                          </div>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444' }}>Remove from group</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -539,54 +605,77 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         </div>
 
         {/* ── Actions card ── */}
-        <div className="mt-4 mb-8 overflow-hidden" style={warmCard}>
+        <div
+          className="overflow-hidden"
+          style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(0,0,0,0.07)' }}
+        >
+          {/* Archive Chat */}
           <button
             onClick={handleArchive}
-            className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
+            className="w-full flex items-center active:opacity-70 transition-opacity"
+            style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
-            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+            <div
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(0,0,0,0.04)' }}
+            >
               <Archive size={17} style={{ color: '#64748b' }} />
             </div>
-            <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Archive Chat</span>
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Archive Chat</span>
           </button>
 
+          {/* Exit Group (not if creator) */}
           {!isCreator && (
             <>
-              <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
               <button
-                onClick={handleLeaveGroup}
-                className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
+                onClick={() => setShowLeaveDialog(true)}
+                className="w-full flex items-center active:opacity-70 transition-opacity"
+                style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
               >
-                <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
-                  <LogOut size={17} style={{ color: '#64748b' }} />
+                <div
+                  className="flex items-center justify-center flex-shrink-0"
+                  style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}
+                >
+                  <LogOut size={17} style={{ color: '#ef4444' }} />
                 </div>
-                <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Exit Group</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Exit Group</span>
               </button>
             </>
           )}
 
-           <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
+          {/* Report Group */}
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
           <button
             onClick={() => setIsReportOpen(true)}
-            className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
+            className="w-full flex items-center active:opacity-70 transition-opacity"
+            style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
-            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
-              <Flag size={17} style={{ color: '#64748b' }} />
+            <div
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}
+            >
+              <Flag size={17} style={{ color: '#ef4444' }} />
             </div>
-            <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Report Group</span>
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Report Group</span>
           </button>
 
+          {/* Delete Group for Everyone (admin only) */}
           {isAdmin && (
             <>
-              <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
               <button
-                onClick={handleDeleteGroup}
-                className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
+                onClick={() => setShowDeleteDialog(true)}
+                className="w-full flex items-center active:opacity-70 transition-opacity"
+                style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
               >
-                <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(239,68,68,0.08)' }}>
+                <div
+                  className="flex items-center justify-center flex-shrink-0"
+                  style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}
+                >
                   <Trash2 size={17} style={{ color: '#ef4444' }} />
                 </div>
-                <span className="text-[14px] font-medium" style={{ color: '#ef4444' }}>Delete Group for Everyone</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Delete Group for Everyone</span>
               </button>
             </>
           )}
@@ -618,43 +707,85 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
       {/* Leave group confirmation */}
       <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Leave group?</AlertDialogTitle>
-            <AlertDialogDescription>
+        <AlertDialogContent
+          style={{
+            background: '#fff', borderRadius: 20, border: 'none',
+            boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+            padding: '20px 20px 16px', maxWidth: 320,
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '0 0 8px' }}>Leave group?</h3>
+            <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
               You'll need to be re-added by a member to rejoin.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            </p>
+          </div>
+          <div className="flex" style={{ gap: 8, marginTop: 16 }}>
+            <button
+              onClick={() => setShowLeaveDialog(false)}
+              className="flex-1"
+              style={{
+                height: 42, borderRadius: 12,
+                border: '1px solid rgba(0,0,0,0.10)', background: '#fff',
+                fontSize: 14, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+            <button
               onClick={handleLeaveConfirmed}
-              className="bg-destructive text-destructive-foreground"
+              className="flex-1"
+              style={{
+                height: 42, borderRadius: 12,
+                border: '1px solid rgba(239,68,68,0.28)', background: 'rgba(239,68,68,0.08)',
+                fontSize: 14, fontWeight: 600, color: '#ef4444', cursor: 'pointer',
+              }}
             >
               Leave
-            </AlertDialogAction>
-          </AlertDialogFooter>
+            </button>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Delete group confirmation */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete group for everyone?</AlertDialogTitle>
-            <AlertDialogDescription>
+        <AlertDialogContent
+          style={{
+            background: '#fff', borderRadius: 20, border: 'none',
+            boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+            padding: '20px 20px 16px', maxWidth: 320,
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '0 0 8px' }}>Delete group for everyone?</h3>
+            <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
               This cannot be undone. All messages and media will be permanently deleted.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            </p>
+          </div>
+          <div className="flex" style={{ gap: 8, marginTop: 16 }}>
+            <button
+              onClick={() => setShowDeleteDialog(false)}
+              className="flex-1"
+              style={{
+                height: 42, borderRadius: 12,
+                border: '1px solid rgba(0,0,0,0.10)', background: '#fff',
+                fontSize: 14, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+            <button
               onClick={handleDeleteConfirmed}
-              className="bg-destructive text-destructive-foreground"
+              className="flex-1"
+              style={{
+                height: 42, borderRadius: 12,
+                border: '1px solid rgba(239,68,68,0.28)', background: 'rgba(239,68,68,0.08)',
+                fontSize: 14, fontWeight: 600, color: '#ef4444', cursor: 'pointer',
+              }}
             >
               Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
+            </button>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>

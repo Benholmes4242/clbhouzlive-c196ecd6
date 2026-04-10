@@ -1,12 +1,12 @@
 /**
  * SharedMediaGallery - Display shared media, courses, and links
+ * Phase 3 redesign
  */
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface SharedMediaGalleryProps {
   conversationId: string;
@@ -22,6 +22,16 @@ interface MediaItem {
   createdAt: string;
 }
 
+interface CourseItem {
+  id: string;
+  url: string;
+  title: string;
+  thumbnail?: string;
+  location?: string;
+  rating?: number;
+  createdAt: string;
+}
+
 interface LinkItem {
   id: string;
   url: string;
@@ -29,20 +39,21 @@ interface LinkItem {
   createdAt: string;
 }
 
+type TabKey = 'media' | 'courses' | 'links';
+
 export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalleryProps) {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [media, setMedia] = useState<MediaItem[]>([]);
-  const [courses, setCourses] = useState<MediaItem[]>([]);
+  const [courses, setCourses] = useState<CourseItem[]>([]);
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabKey>('media');
 
   useEffect(() => {
     const fetchSharedContent = async () => {
       setLoading(true);
-
       try {
-        // NOTE: Media gallery only scans the most recent 1000 messages.
-        // For very long conversations, older shared media will not appear.
         const { data: messages } = await supabase
           .from('messages')
           .select('id, content, message_type, media_url, media_metadata, created_at')
@@ -53,7 +64,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           .limit(1000);
 
         const mediaItems: MediaItem[] = [];
-        const courseItems: MediaItem[] = [];
+        const courseItems: CourseItem[] = [];
         const linkItems: LinkItem[] = [];
 
         messages?.forEach(msg => {
@@ -64,9 +75,12 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           } else if (msg.message_type === 'course_share' && msg.media_metadata) {
             const meta = msg.media_metadata as Record<string, unknown>;
             courseItems.push({
-              id: msg.id, type: 'course',
+              id: msg.id,
               url: `/courses/${(meta.course_slug as string) || (meta.course_id as string)}`,
-              title: meta.course_name as string, thumbnail: meta.course_image_url as string,
+              title: (meta.course_name as string) || 'Golf Course',
+              thumbnail: meta.course_image_url as string | undefined,
+              location: meta.location as string | undefined,
+              rating: meta.rating as number | undefined,
               createdAt: msg.created_at,
             });
           }
@@ -83,7 +97,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
         setCourses(courseItems);
         setLinks(linkItems);
       } catch {
-        // Silent fail — gallery is non-critical
+        // Silent fail
       } finally {
         setLoading(false);
       }
@@ -92,212 +106,222 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
     fetchSharedContent();
   }, [conversationId]);
 
-  const tabTriggerClass = "flex-1 flex flex-col items-center gap-0 pt-[10px] pb-[10px] rounded-none bg-transparent shadow-none text-[14px] font-medium text-[#94a3b8] relative data-[state=active]:font-bold data-[state=active]:text-[#0f172a] data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=inactive]:text-[#94a3b8] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-t-[2px] after:bg-transparent data-[state=active]:after:bg-[#F5A623]";
+  const tabs: { key: TabKey; label: string; count: number; icon: typeof Image; activeColor: string }[] = [
+    { key: 'media', label: 'Media', count: media.length, icon: Image, activeColor: '#0f172a' },
+    { key: 'courses', label: 'Courses', count: courses.length, icon: MapPin, activeColor: '#006747' },
+    { key: 'links', label: 'Links', count: links.length, icon: Link, activeColor: '#6366f1' },
+  ];
 
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-        background: '#F8FAFC',
-      }}
+      style={{ background: '#F8FAFC' }}
     >
       {/* Header */}
       <header
-        className="flex-none flex items-center px-4 justify-between"
+        className="flex-shrink-0 flex items-center"
         style={{
-          paddingTop: '8px',
-          paddingBottom: '10px',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingBottom: 10,
+          paddingLeft: 16, paddingRight: 16,
+          background: '#F8FAFC',
           borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         <button
           onClick={onClose}
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 active:scale-[0.97]"
-          style={{ background: 'rgba(0,0,0,0.05)' }}
+          className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
+          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(0,0,0,0.06)', border: 'none' }}
         >
-          <ChevronLeft size={20} style={{ color: '#0f172a' }} />
+          <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
-        <h1
-          className="flex-1 text-center font-bold text-[#0f172a]"
-          style={{ fontSize: 17, letterSpacing: '-0.3px' }}
-        >
+        <h1 className="flex-1 text-center" style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.3px' }}>
           Shared Media
         </h1>
-        <div className="w-9" />
+        <div style={{ width: 34 }} />
       </header>
 
-      {/* Tabs */}
-      <Tabs defaultValue="media" className="flex-1 flex flex-col min-h-0">
-        <TabsList
-          className="w-full grid grid-cols-3 h-auto rounded-none bg-transparent p-0 shadow-none"
-          style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
-        >
-          <TabsTrigger value="media" className={tabTriggerClass}>
-            <span className="data-[state=active]:text-[#F5A623] data-[state=inactive]:text-[#94a3b8]">
-              <Image className="w-4 h-4" />
-            </span>
-            Media ({media.length})
-          </TabsTrigger>
-          <TabsTrigger value="courses" className={tabTriggerClass}>
-            <span className="data-[state=active]:text-[#F5A623] data-[state=inactive]:text-[#94a3b8]">
-              <MapPin className="w-4 h-4" />
-            </span>
-            Courses ({courses.length})
-          </TabsTrigger>
-          <TabsTrigger value="links" className={tabTriggerClass}>
-            <span className="data-[state=active]:text-[#F5A623] data-[state=inactive]:text-[#94a3b8]">
-              <Link className="w-4 h-4" />
-            </span>
-            Links ({links.length})
-          </TabsTrigger>
-        </TabsList>
+      {/* Tab bar */}
+      <div
+        className="flex flex-shrink-0"
+        style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.07)' }}
+      >
+        {tabs.map(tab => {
+          const isActive = activeTab === tab.key;
+          const IconComponent = tab.icon;
+          const iconColor = isActive ? tab.activeColor : '#94a3b8';
+          const textColor = isActive ? '#0f172a' : '#94a3b8';
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className="flex-1 flex flex-col items-center relative"
+              style={{
+                gap: 3, padding: '12px 8px 10px',
+                background: 'transparent', border: 'none', cursor: 'pointer',
+              }}
+            >
+              <IconComponent size={15} style={{ color: iconColor }} />
+              <span style={{ fontSize: '12.5px', fontWeight: isActive ? 700 : 500, color: textColor }}>
+                {tab.label} ({tab.count})
+              </span>
+              {/* Underline */}
+              <div
+                style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  height: 2, borderRadius: '2px 2px 0 0',
+                  background: isActive ? '#F7931E' : 'transparent',
+                }}
+              />
+            </button>
+          );
+        })}
+      </div>
 
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#F5A623' }} />
-          </div>
-        ) : (
-          <>
-            <TabsContent value="media" className="flex-1 overflow-y-auto p-0 pb-8">
-              {media.length === 0 ? (
-                <div className="text-center py-12">
-                  <div
-                    className="w-14 h-14 rounded-[14px] mx-auto mb-3 flex items-center justify-center"
-                    style={{ background: 'rgba(245,166,35,0.08)' }}
+      {/* Content */}
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#F7931E' }} />
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto">
+          {/* Media tab */}
+          {activeTab === 'media' && (
+            media.length === 0 ? (
+              <EmptyState icon={Image} iconColor="#F7931E" iconBg="rgba(247,147,30,0.10)" title="No media shared yet" subtitle="Photos and videos will appear here" />
+            ) : (
+              <div className="grid grid-cols-3" style={{ gap: 3, padding: 16 }}>
+                {media.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => setSelectedImage(item.url)}
+                    className="overflow-hidden"
+                    style={{ aspectRatio: '1', borderRadius: 8, background: 'rgba(0,0,0,0.04)', border: 'none', cursor: 'pointer', padding: 0 }}
                   >
-                    <Image size={24} style={{ color: '#F5A623' }} />
-                  </div>
-                  <p className="text-[14px] font-semibold text-[#0f172a]">No media shared yet</p>
-                  <p className="text-[13px] text-[#94a3b8] mt-1">Photos and videos will appear here</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-3 gap-[2px]">
-                  {media.map(item => (
-                    <button
-                      key={item.id}
-                      onClick={() => setSelectedImage(item.url)}
-                      className="aspect-square overflow-hidden bg-muted/30"
-                    >
-                      {item.type === 'image' ? (
-                        <img src={item.url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <video src={item.url} className="w-full h-full object-cover" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
+                    {item.type === 'image' ? (
+                      <img src={item.url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <video src={item.url} className="w-full h-full object-cover" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )
+          )}
 
-            <TabsContent value="courses" className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-[10px]">
-              {courses.length === 0 ? (
-                <div className="text-center py-12">
-                  <div
-                    className="w-14 h-14 rounded-[14px] mx-auto mb-3 flex items-center justify-center"
-                    style={{ background: 'rgba(34,197,94,0.08)' }}
+          {/* Courses tab */}
+          {activeTab === 'courses' && (
+            courses.length === 0 ? (
+              <EmptyState icon={MapPin} iconColor="#006747" iconBg="rgba(0,103,71,0.07)" title="No courses shared yet" subtitle="Course shares will appear here" />
+            ) : (
+              <div className="flex flex-col" style={{ gap: 10, padding: 16 }}>
+                {courses.map(course => (
+                  <button
+                    key={course.id}
+                    onClick={() => navigate(course.url)}
+                    className="w-full flex items-center text-left active:opacity-80 transition-opacity"
+                    style={{
+                      gap: 12, padding: '10px 14px', borderRadius: 14,
+                      background: '#fff', border: '1px solid rgba(0,0,0,0.07)',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <MapPin size={24} style={{ color: '#22c55e' }} />
-                  </div>
-                  <p className="text-[14px] font-semibold text-[#0f172a]">No courses shared yet</p>
-                  <p className="text-[13px] text-[#94a3b8] mt-1">Course shares will appear here</p>
-                </div>
-              ) : (
-                courses.map(course => {
-                  const date = new Date(course.createdAt).toLocaleDateString();
-                  return (
-                    <a
-                      key={course.id}
-                      href={course.url}
-                      className="flex items-center gap-3 px-4 py-3 bg-white rounded-[14px] border border-[rgba(0,0,0,0.07)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-                    >
-                      {/* Squircle thumbnail */}
-                      {course.thumbnail ? (
-                        <img
-                          src={course.thumbnail}
-                          alt={course.title}
-                          className="w-11 h-11 object-cover shrink-0"
-                          style={{ borderRadius: '34%' }}
-                        />
-                      ) : (
-                        <div
-                          className="w-11 h-11 shrink-0 flex items-center justify-center"
-                          style={{ borderRadius: '34%', background: 'rgba(34,197,94,0.08)' }}
-                        >
-                          <span className="text-lg">⛳</span>
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="flex-shrink-0 object-cover"
+                        style={{ width: 48, height: 48, borderRadius: 10 }}
+                      />
+                    ) : (
+                      <div
+                        className="flex items-center justify-center flex-shrink-0"
+                        style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(0,103,71,0.07)' }}
+                      >
+                        <span className="text-lg">⛳</span>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>
+                        {course.title}
+                      </p>
+                      {course.location && (
+                        <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
+                          <MapPin size={11} style={{ color: '#94a3b8' }} />
+                          <span style={{ fontSize: 12, color: '#94a3b8' }}>{course.location}</span>
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold text-[#0f172a] truncate">
-                          {course.title || 'Golf Course'}
-                        </p>
-                        <p className="text-[12px] text-[#94a3b8] mt-[2px]">{date}</p>
-                      </div>
-                      <ChevronRight size={16} className="text-[#94a3b8] shrink-0" />
-                    </a>
-                  );
-                })
-              )}
-            </TabsContent>
+                    </div>
+                    {course.rating && course.rating > 0 && (
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>⭐ {course.rating.toFixed(1)}</span>
+                    )}
+                    <ChevronRight size={14} style={{ color: '#d1d5db', flexShrink: 0 }} />
+                  </button>
+                ))}
+              </div>
+            )
+          )}
 
-            <TabsContent value="links" className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-[10px]">
-              {links.length === 0 ? (
-                <div className="text-center py-12">
-                  <div
-                    className="w-14 h-14 rounded-[14px] mx-auto mb-3 flex items-center justify-center"
-                    style={{ background: 'rgba(99,102,241,0.08)' }}
+          {/* Links tab */}
+          {activeTab === 'links' && (
+            links.length === 0 ? (
+              <EmptyState icon={Link} iconColor="#6366f1" iconBg="rgba(99,102,241,0.08)" title="No links shared yet" subtitle="Links will appear here" />
+            ) : (
+              <div className="flex flex-col" style={{ gap: 10, padding: 16 }}>
+                {links.map(link => (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                    style={{
+                      gap: 12, padding: '10px 14px', borderRadius: 14,
+                      background: '#fff', border: '1px solid rgba(0,0,0,0.07)',
+                      textDecoration: 'none',
+                    }}
                   >
-                    <Link size={24} style={{ color: '#6366F1' }} />
-                  </div>
-                  <p className="text-[14px] font-semibold text-[#0f172a]">No links shared yet</p>
-                  <p className="text-[13px] text-[#94a3b8] mt-1">Links will appear here</p>
-                </div>
-              ) : (
-                links.map(link => {
-                  const date = new Date(link.createdAt).toLocaleDateString();
-                  return (
-                    <a
-                      key={link.id}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-4 py-3 bg-white rounded-[14px] border border-[rgba(0,0,0,0.07)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                    <div
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{
+                        width: 36, height: 36, borderRadius: 10,
+                        background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)',
+                      }}
                     >
-                      <div
-                        className="w-9 h-9 rounded-[10px] shrink-0 flex items-center justify-center"
-                        style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', color: '#6366F1' }}
-                      >
-                        <Link size={16} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold text-[#0f172a] truncate">
-                          {link.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0]}
-                        </p>
-                        <p className="text-[12px] text-[#64748b] truncate mt-[2px]">{link.url}</p>
-                        <p className="text-[11px] text-[#94a3b8] mt-[2px]">{date}</p>
-                      </div>
-                      <ExternalLink size={14} className="text-[#94a3b8] shrink-0" />
-                    </a>
-                  );
-                })
-              )}
-            </TabsContent>
-          </>
-        )}
-      </Tabs>
+                      <Link size={16} style={{ color: '#6366f1' }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate" style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', margin: 0 }}>
+                        {link.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0]}
+                      </p>
+                      <p className="truncate" style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>{link.url}</p>
+                    </div>
+                    <ExternalLink size={14} style={{ color: '#94a3b8', flexShrink: 0 }} />
+                  </a>
+                ))}
+              </div>
+            )
+          )}
+        </div>
+      )}
 
       {/* Fullscreen image viewer */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/90 z-60 flex items-center justify-center"
+          className="fixed inset-0 z-60 flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.95)' }}
           onClick={() => setSelectedImage(null)}
         >
           <button
             onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
-            style={{ marginTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+            className="absolute flex items-center justify-center"
+            style={{
+              top: 'max(env(safe-area-inset-top, 0px), 16px)', right: 16,
+              width: 40, height: 40, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)', border: 'none', cursor: 'pointer',
+            }}
           >
-            <ChevronLeft className="w-6 h-6 text-white rotate-180" />
+            <X size={20} style={{ color: '#fff' }} />
           </button>
           <img
             src={selectedImage}
@@ -306,6 +330,34 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           />
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Empty state helper ── */
+function EmptyState({
+  icon: Icon,
+  iconColor,
+  iconBg,
+  title,
+  subtitle,
+}: {
+  icon: typeof Image;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center" style={{ padding: '60px 24px' }}>
+      <div
+        className="flex items-center justify-center"
+        style={{ width: 56, height: 56, borderRadius: 16, background: iconBg, marginBottom: 12 }}
+      >
+        <Icon size={24} style={{ color: iconColor }} />
+      </div>
+      <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>{title}</p>
+      <p style={{ fontSize: 13, color: '#94a3b8', margin: '4px 0 0' }}>{subtitle}</p>
     </div>
   );
 }
