@@ -897,38 +897,40 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 </div>
               ) : isUpcoming ? (
                 <>
-                  {/* Safe area spacer — upcoming fills full card like live */}
-                  <div style={{ height: 57, flexShrink: 0 }} />
-
-                  <div style={{ padding: '0 18px' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
-                          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                            Upcoming · {getTourDisplayName(tournament.tourSlug)}
-                          </span>
+                  <div style={{
+                    flexShrink: 0,
+                    paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 57px)',
+                  }}>
+                    <div style={{ padding: '0 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                            <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                              Upcoming · {getTourDisplayName(tournament.tourSlug)}
+                            </span>
+                          </div>
+                          <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                            <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -0.6, lineHeight: 1.0, margin: 0 }}>
+                              {tournament.name}
+                            </h2>
+                          </Link>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                            className="active:opacity-70 transition-opacity cursor-pointer"
+                            style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                          >
+                            {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
+                          </button>
                         </div>
-                        <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                          <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -0.6, lineHeight: 1.0, margin: 0 }}>
-                            {tournament.name}
-                          </h2>
-                        </Link>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
-                          className="active:opacity-70 transition-opacity cursor-pointer"
-                          style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
-                        >
-                          {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
-                        </button>
+                        {tournament.startDate && tournament.endDate && (
+                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 14, flexShrink: 0 }}>
+                            {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {' – '}
+                            {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        )}
                       </div>
-                      {tournament.startDate && tournament.endDate && (
-                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 14, flexShrink: 0 }}>
-                          {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          {' – '}
-                          {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </span>
-                      )}
                     </div>
                   </div>
                 </>
