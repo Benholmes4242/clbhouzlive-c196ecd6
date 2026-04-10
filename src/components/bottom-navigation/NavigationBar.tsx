@@ -107,7 +107,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             {/* Emoji Icon */}
             <div className="relative">
               <span style={{
-                fontSize: 22,
+                fontSize: 20,
                 lineHeight: 1,
                 filter: (!isActive && !isLive) ? 'opacity(0.5)' : 'none',
                 transition: 'all var(--motion-fast) var(--ease-pop)',
