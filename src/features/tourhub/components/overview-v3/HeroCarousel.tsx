@@ -12,7 +12,6 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
@@ -27,8 +26,6 @@ import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOvervi
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
-import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
-import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import livUpcomingHero from '@/assets/liv-upcoming-hero.webp';
