@@ -630,8 +630,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         {/* Course location (collapsed) — separate line */}
         {!isExpanded && courseDisplayLabel && (
           <div className="flex items-center gap-1 mt-1.5">
-            <FiMapPin size={14} className="text-white/50 flex-shrink-0" />
-            <span className="text-[11px] text-white/50 truncate">
+            <FiMapPin size={14} className="flex-shrink-0" style={{ color: '#F7931E' }} />
+            <span className="text-[11px] truncate" style={{ color: '#F7931E' }}>
               {courseDisplayLabel}
             </span>
             {golfCourse?.globalRank && (
