@@ -16004,7 +16004,6 @@ export type Database = {
       get_suggested_feed: {
         Args: {
           p_cursor?: string
-          p_mode?: string
           p_page_size?: number
           p_seen_post_ids?: string[]
           p_user_id: string
