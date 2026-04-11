@@ -84,14 +84,14 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
         <defs>
           <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={lastV <= 0 ? '#F7931E' : '#EF4444'} stopOpacity={0.18} />
-            <stop offset="100%" stopColor={lastV <= 0 ? '#F7931E' : '#EF4444'} stopOpacity={0} />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <polyline points={pts} fill="none" stroke={lastV <= 0 ? '#F7931E' : '#EF4444'} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
+        <polyline points={pts} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
         <polygon points={`0,${H} ${pts} ${W},${H}`} fill="url(#sparkFill)" />
         <line x1={0} y1={H - ((0 - min) / range) * (H - 4) - 2} x2={W} y2={H - ((0 - min) / range) * (H - 4) - 2} stroke="rgba(255,255,255,0.10)" strokeWidth={0.5} strokeDasharray="3,3" />
-        <circle cx={W - 4} cy={lastY} r={3} fill={lastV <= 0 ? '#F7931E' : '#EF4444'} opacity={0.9} />
+        <circle cx={W - 4} cy={lastY} r={3} fill="#ffffff" opacity={0.9} />
       </svg>
     </div>
   );
@@ -247,8 +247,8 @@ function RoundTabs({
           : toPar > 0 ? `+${toPar}`
           : `${toPar}`;
         const scoreColor = toPar === null ? 'rgba(255,255,255,0.20)'
-          : toPar < 0 ? '#F7931E'
-          : toPar > 0 ? '#EF4444'
+          : toPar < 0 ? '#ffffff'
+          : toPar > 0 ? '#f87171'
           : 'rgba(255,255,255,0.55)';
 
         return (
@@ -260,9 +260,9 @@ function RoundTabs({
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
               padding: '6px 14px',
               borderRadius: 9,
-              background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
+              background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
               border: isActive
-                ? '1.5px solid rgba(247,147,30,0.35)'
+                ? '1.5px solid rgba(255,255,255,0.25)'
                 : '1px solid rgba(255,255,255,0.07)',
               cursor: hasData ? 'pointer' : 'default',
               transition: 'all 0.15s ease',
@@ -270,7 +270,7 @@ function RoundTabs({
           >
             <span style={{
               fontSize: 8, fontWeight: 700,
-              color: isActive ? '#F7931E' : 'rgba(255,255,255,0.35)',
+              color: isActive ? '#ffffff' : 'rgba(255,255,255,0.35)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
               R{roundNum}
