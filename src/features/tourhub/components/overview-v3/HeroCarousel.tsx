@@ -611,23 +611,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     if (playerId) navigate(`/tourhub/player/${playerId}`);
   };
 
-  // Scorecard state — player tapped in expanded leaderboard
-  const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
-  const handleScorecardTap = useCallback((player: PlayerInfo) => {
-    setSelectedPlayer(player);
-    onScorecardOpen?.();
-  }, [onScorecardOpen]);
-  const handleBackToLeaderboard = useCallback(() => {
-    setSelectedPlayer(null);
-    onScorecardClose?.();
-  }, [onScorecardClose]);
-
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
     isLive ? tournament.id : null
   );
 
-  // Full leaderboard — only fetched when expanded
+  // Full leaderboard — fetched for live (passed to parent for bottom sheet)
   const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
     isLive ? tournament.id : ''
   );
@@ -635,37 +624,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   // Realtime updates — always subscribe when live so collapsed hero stays fresh
   useLeaderboardRealtime(isLive ? tournament.id : null);
 
-  // Body scroll lock when expanded
+  // Back button handling when expanded (non-live states only)
   useEffect(() => {
-    if (isExpanded) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isExpanded]);
-
-  // Back button handling when expanded
-  useEffect(() => {
-    if (!isExpanded) return;
+    if (!isExpanded || isLive) return;
     window.history.pushState({ expandedLeaderboard: true }, '');
     const handlePopState = () => {
       onToggleExpand();
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [isExpanded, onToggleExpand]);
-
-  // Clear selected player when glass card collapses
-  useEffect(() => {
-    if (!isExpanded) setSelectedPlayer(null);
-  }, [isExpanded]);
-
-  // Touch isolation for expanded scroll area
-  const handleExpandedTouch = useCallback((e: React.TouchEvent) => {
-    e.stopPropagation();
-    onInteraction();
-  }, [onInteraction]);
+  }, [isExpanded, isLive, onToggleExpand]);
 
   // Phase 3+4: Track previous leaders for score change & movement animations
   const prevLeadersRef = useRef<LeaderEntry[]>([]);
