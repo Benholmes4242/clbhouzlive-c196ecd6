@@ -13,7 +13,7 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
@@ -28,12 +28,18 @@ import { LazySection } from '../overview-v3/LazySection';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { HERO_STYLES } from '../../constants/heroStyles';
+import { HERO_STYLES_FULLBLEED } from '../../constants/heroStyles';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+import { LeaderboardBottomSheet, type LiveLeaderboardData } from '../overview-v3/LeaderboardBottomSheet';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
+  const { hideBottomNav, showBottomNav } = useBottomNavigation();
+  const [isSheetExpanded, setIsSheetExpanded] = useState(false);
+  const [isLiveHeroActive, setIsLiveHeroActive] = useState(false);
+  const [liveLeaderboardData, setLiveLeaderboardData] = useState<LiveLeaderboardData | null>(null);
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
@@ -45,6 +51,18 @@ export function OverviewPageV3() {
 
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
+
+  // Bottom nav hide/show logic
+  useEffect(() => {
+    if (isLiveHeroActive && !isSheetExpanded) {
+      hideBottomNav();
+    } else {
+      showBottomNav();
+    }
+    return () => {
+      showBottomNav(); // always restore on unmount
+    };
+  }, [isLiveHeroActive, isSheetExpanded, hideBottomNav, showBottomNav]);
 
   return (
     <>
@@ -77,9 +95,13 @@ export function OverviewPageV3() {
         {/* 1. Hero Carousel */}
         <motion.div 
           className="relative w-full z-0"
-          style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
+          style={{ ...HERO_STYLES_FULLBLEED.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
         >
-          <HeroCarousel hasHeader={false} />
+          <HeroCarousel
+            hasHeader={false}
+            onLiveStateChange={setIsLiveHeroActive}
+            onLiveLeaderboardData={setLiveLeaderboardData}
+          />
         </motion.div>
 
         {/* Content sections */}
@@ -106,6 +128,15 @@ export function OverviewPageV3() {
         </div>
         <ScrollToTopGlass />
       </motion.div>
+
+      {/* Peek leaderboard sheet — only when live hero is active */}
+      {isLiveHeroActive && liveLeaderboardData && (
+        <LeaderboardBottomSheet
+          {...liveLeaderboardData}
+          isExpanded={isSheetExpanded}
+          onExpandChange={setIsSheetExpanded}
+        />
+      )}
     </>
   );
 }
