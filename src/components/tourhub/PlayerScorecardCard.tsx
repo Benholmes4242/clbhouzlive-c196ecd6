@@ -197,11 +197,11 @@ function NineHoleRow({
   return (
     <div className="px-3">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] font-semibold text-white/40 uppercase tracking-[1.5px]">{label}</span>
+        <span className="text-[12px] font-semibold text-white/45 uppercase tracking-[1.5px]">{label}</span>
         {hasAnyScore && (
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-white/30">Par {outPar}</span>
-            <span className="text-xs font-bold text-white/80">{outScore || '—'}</span>
+            <span className="text-sm font-bold text-white/80">{outScore || '—'}</span>
           </div>
         )}
       </div>
