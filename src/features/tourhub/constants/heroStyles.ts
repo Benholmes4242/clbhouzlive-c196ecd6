@@ -41,13 +41,3 @@ export const HERO_STYLES = {
     paddingTop: 'env(safe-area-inset-top)',
   },
 } as const;
-
-/** Full-bleed variant — hero fills entire viewport (100dvh) */
-export const HERO_STYLES_FULLBLEED = {
-  /** For pages WITHOUT header — full viewport height */
-  containerNoHeader: {
-    marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
-    height: '100dvh',
-    minHeight: '100dvh',
-  },
-} as const;
