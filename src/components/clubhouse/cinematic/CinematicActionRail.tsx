@@ -99,7 +99,8 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
     wasActive.current = isActive;
   }, [isActive, isLikeButton]);
 
-  const handlePress = useCallback(() => {
+  const handlePress = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
     setIsPressed(true);
     // Haptic feedback on mobile
     if ('vibrate' in navigator) {
