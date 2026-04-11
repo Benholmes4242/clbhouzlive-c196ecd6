@@ -254,6 +254,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             onBeforeNavigate?.();
             navigate(`/courses/${golfCourse.slug || golfCourse.id}`);
           }}
+          prefetchedData={
+            golfCourse.latitude || golfCourse.thumbnailImage
+              ? {
+                  thumbnailImage: golfCourse.thumbnailImage ?? null,
+                  latitude: golfCourse.latitude ?? null,
+                  longitude: golfCourse.longitude ?? null,
+                  globalRank: golfCourse.globalRank ?? null,
+                }
+              : null
+          }
         />;
       })()}
 

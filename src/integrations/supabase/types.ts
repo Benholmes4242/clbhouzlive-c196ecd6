@@ -15637,9 +15637,13 @@ export type Database = {
           business_name: string
           comment_count: number
           course_country: string
+          course_global_rank: number
           course_id: string
+          course_latitude: number
+          course_longitude: number
           course_name: string
           course_region: string
+          course_thumbnail_image: string
           creator_avatar_url: string
           creator_display_name: string
           creator_is_verified: boolean
@@ -16010,8 +16014,12 @@ export type Database = {
           business_logo_url: string
           business_name: string
           comment_count: number
+          course_global_rank: number
           course_id: string
+          course_latitude: number
+          course_longitude: number
           course_name: string
+          course_thumbnail_image: string
           creator_avatar_url: string
           creator_display_name: string
           creator_is_verified: boolean

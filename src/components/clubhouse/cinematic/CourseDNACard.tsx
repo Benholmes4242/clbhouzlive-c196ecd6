@@ -10,11 +10,31 @@ interface CourseDNACardProps {
   courseCountry: string;
   mapboxToken: string;
   onNavigate: () => void;
+  prefetchedData?: {
+    thumbnailImage: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    globalRank: number | null;
+  } | null;
 }
 
-export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken, onNavigate }: CourseDNACardProps) {
+export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken, onNavigate, prefetchedData }: CourseDNACardProps) {
   const navigate = useNavigate();
-  const { data: courseData } = useCourseCardData(courseId, true);
+  const { data: fetchedData } = useCourseCardData(courseId, !prefetchedData);
+  const courseData = prefetchedData
+    ? {
+        thumbnailImage: prefetchedData.thumbnailImage,
+        latitude: prefetchedData.latitude,
+        longitude: prefetchedData.longitude,
+        globalRank: prefetchedData.globalRank,
+        hasHostedMajor: null as boolean | null,
+        subCountry: null as string | null,
+        region: null as string | null,
+        courseType: null as string | null,
+        countryRank: null as number | null,
+        majorChampionships: null as string[] | null,
+      }
+    : fetchedData;
   const { status, isLoading: statusLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
