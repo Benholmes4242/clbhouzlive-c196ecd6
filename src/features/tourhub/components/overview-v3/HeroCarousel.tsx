@@ -636,15 +636,20 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   // Realtime updates — always subscribe when live so collapsed hero stays fresh
   useLeaderboardRealtime(isLive ? tournament.id : null);
 
-  // Body scroll lock when expanded
+  // Emit leaderboard data upward for the bottom sheet
   useEffect(() => {
-    if (isExpanded) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isExpanded]);
+    if (!isLive || !fullLeaderboard.length) return;
+    const firstEntry = fullLeaderboard[0] as any;
+    const derivedRound = [4,3,2,1].find(n => firstEntry[`round_${n}`] !== null) ?? 1;
+    onLeaderboardData?.({
+      entries: fullLeaderboard,
+      tourCode: tournament.tourSlug ?? 'pga',
+      tournamentId: tournament.id,
+      tournamentName: tournament.name,
+      courseName: tournament.venueName ?? '',
+      currentRound: derivedRound,
+    });
+  }, [isLive, fullLeaderboard, tournament.id, tournament.name, tournament.venueName, tournament.tourSlug, onLeaderboardData]);
 
   // Back button handling when expanded
   useEffect(() => {
