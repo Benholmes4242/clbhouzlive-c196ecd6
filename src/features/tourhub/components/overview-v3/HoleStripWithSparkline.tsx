@@ -63,7 +63,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             );
           })()}
 
-          {/* Area fill */}
+          {/* Area fill — below the line */}
           {running.length > 1 && (() => {
             const pts = running.map((v, i) => {
               const x = (i / (totalHoles - 1)) * (svgWidth - INSET);
@@ -71,9 +71,9 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
               return `${x},${y}`;
             }).join(' ');
             const lastX = ((running.length - 1) / (totalHoles - 1)) * (svgWidth - INSET);
-            const baseY = SPARK_H - ((-min) / range) * (SPARK_H - 6) - 3;
+            const bottomY = SPARK_H;
             return (
-              <polygon points={`${pts} ${lastX},${baseY} 0,${baseY}`} fill="url(#sparkGrad)" />
+              <polygon points={`${pts} ${lastX},${bottomY} 0,${bottomY}`} fill="url(#sparkGrad)" />
             );
           })()}
 
