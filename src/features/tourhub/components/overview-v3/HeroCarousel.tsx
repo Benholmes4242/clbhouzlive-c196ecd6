@@ -777,7 +777,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             className="absolute inset-0 w-full h-full"
             style={{
               background: isLive
-                ? `radial-gradient(ellipse 140% 100% at 50% calc(25% + 65px), #2d5a1e 0%, #1a3a0e 40%, #1a3a0e 100%)`
+                ? '#141d2e'
                 : undefined,
             }}
           >
@@ -788,29 +788,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         )}
       </motion.div>
 
-      {/* Sky tint overlay for live */}
-      {isLive && (
-        <div style={{
-          position: 'absolute', top: 55, left: 0, right: 0, height: '38%',
-          background: 'linear-gradient(180deg, #4a7ab5 0%, #2a5a8e 35%, transparent 100%)',
-          opacity: 0.55,
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}/>
-      )}
 
       {/* Legibility gradient overlay */}
       <div 
         className="absolute inset-0 pointer-events-none z-5"
         style={{
           background: isLive
-            ? `linear-gradient(180deg,
-                rgba(0,0,0,0.45) 0%,
-                rgba(0,0,0,0.05) 20%,
-                rgba(0,0,0,0.30) 48%,
-                rgba(0,0,0,0.82) 68%,
-                rgba(20,29,46,0.96) 82%,
-                rgba(20,29,46,1.00) 100%)`
+            ? 'none'
             : isUpcoming
             ? `linear-gradient(180deg,
                 rgba(0,0,0,0.55) 0%,
