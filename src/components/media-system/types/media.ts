@@ -63,6 +63,10 @@ export interface FeedPost {
   tags?: FeedPostTag[];
   courseName?: string;
   courseId?: string;
+  courseThumbnailImage?: string | null;
+  courseLatitude?: number | null;
+  courseLongitude?: number | null;
+  courseGlobalRank?: number | null;
   postType?: string;
   engagementScore?: number;
 }
@@ -443,6 +447,10 @@ export interface FeedRpcRow {
   post_tags?: FeedPostTag[] | null;
   course_id?: string | null;
   course_name?: string | null;
+  course_thumbnail_image?: string | null;
+  course_latitude?: number | null;
+  course_longitude?: number | null;
+  course_global_rank?: number | null;
 }
 
 /** Timing constants */

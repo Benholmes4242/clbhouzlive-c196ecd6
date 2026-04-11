@@ -24,6 +24,10 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
         id: activePost.review.courseId,
         name: activePost.review.courseName,
         courseCountry: activePost.review.courseCountry || null,
+        thumbnailImage: activePost.courseThumbnailImage ?? null,
+        latitude: activePost.courseLatitude ?? null,
+        longitude: activePost.courseLongitude ?? null,
+        globalRank: activePost.courseGlobalRank ?? null,
       };
     }
 
@@ -33,6 +37,10 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
         id: activePost.courseId,
         name: activePost.courseName || null,
         courseCountry: null,
+        thumbnailImage: activePost.courseThumbnailImage ?? null,
+        latitude: activePost.courseLatitude ?? null,
+        longitude: activePost.courseLongitude ?? null,
+        globalRank: activePost.courseGlobalRank ?? null,
       };
     }
 
@@ -43,6 +51,10 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
         id: courseTag.entity_id,
         name: courseTag.name,
         courseCountry: null,
+        thumbnailImage: activePost.courseThumbnailImage ?? null,
+        latitude: activePost.courseLatitude ?? null,
+        longitude: activePost.courseLongitude ?? null,
+        globalRank: activePost.courseGlobalRank ?? null,
       };
     }
 

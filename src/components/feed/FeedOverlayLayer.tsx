@@ -129,7 +129,11 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           golfCourse={golfCourse ? { 
             id: golfCourse.id, 
             name: golfCourse.name, 
-            country: (golfCourse as any).courseCountry ?? (golfCourse as any).country ?? null
+            country: (golfCourse as any).courseCountry ?? (golfCourse as any).country ?? null,
+            thumbnailImage: (golfCourse as any).thumbnailImage ?? null,
+            latitude: (golfCourse as any).latitude ?? null,
+            longitude: (golfCourse as any).longitude ?? null,
+            globalRank: (golfCourse as any).globalRank ?? null,
           } : null}
           isFollowing={isFollowed}
           isOwnPost={isOwnPost}
