@@ -121,15 +121,15 @@ function HoleCell({ hole }: { hole: HoleScore }) {
   const borderStyle = isPar ? `1.5px dashed ${c.ring}` : `1.5px solid ${c.ring}`;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-      <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+      <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.5px' }}>
         {hole.holeNumber}
       </span>
       <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)' }}>
         {hole.par}
       </span>
       <div style={{
-        width: 32, height: 32,
+        width: 34, height: 34,
         borderRadius,
         border: borderStyle,
         background: isPar ? 'transparent' : c.bg,
@@ -138,7 +138,7 @@ function HoleCell({ hole }: { hole: HoleScore }) {
         ...outlineStyle,
       } as React.CSSProperties}>
         <span style={{
-          fontSize: 11, fontWeight: 800,
+          fontSize: 13, fontWeight: 800,
           color: c.text,
           lineHeight: 1,
         }}>
