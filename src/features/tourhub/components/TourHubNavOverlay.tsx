@@ -1,6 +1,6 @@
 /**
  * TourHubNavOverlay - Command Centre bottom sheet for Tour Hub navigation
- * Dark editorial design with live ticker, world rankings strip, and clean nav rows
+ * Light editorial design with live ticker, world rankings strip, and clean nav rows
  */
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
@@ -79,28 +79,21 @@ export function TourHubNavOverlay({
   const { data: leaderTeaser } = useLiveLeaderTeaser();
   const { data: topCollege } = useTopCollegeTeaser();
   
-  // Lock body scroll when open
   useEffect(() => {
     if (isOpen) {
       const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
+      return () => { document.body.style.overflow = originalOverflow; };
     }
   }, [isOpen]);
   
-  // Handle ESC key
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
+    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Android back button handler
   useEffect(() => {
     if (!isOpen) return;
     window.history.pushState({ drawer: true }, '');
@@ -109,7 +102,6 @@ export function TourHubNavOverlay({
     return () => { window.removeEventListener('popstate', handlePopState); };
   }, [isOpen, onClose]);
 
-  // Simple focus trap
   useEffect(() => {
     if (!isOpen || !overlayRef.current) return;
     const overlay = overlayRef.current;
@@ -185,8 +177,8 @@ export function TourHubNavOverlay({
     if (item.value === 'overview' && hasLive && !leaderTeaser) {
       return (
         <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ height: 12, width: '75%', borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} className="animate-pulse" />
-          <div style={{ height: 12, width: '50%', borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} className="animate-pulse" />
+          <div style={{ height: 12, width: '75%', borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} className="animate-pulse" />
+          <div style={{ height: 12, width: '50%', borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} className="animate-pulse" />
         </div>
       );
     }
@@ -195,13 +187,13 @@ export function TourHubNavOverlay({
         ? (leaderTeaser.score < 0 ? `${leaderTeaser.score}` : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
         : null;
       return (
-        <p style={{ fontSize: 11, marginTop: 2, color: 'rgba(255,255,255,0.4)' }}>
+        <p style={{ fontSize: 11, marginTop: 2, color: '#64748b' }}>
           {leaderTeaser.isTied ? (
             <span style={{ fontWeight: 500 }}>{leaderTeaser.playerName}</span>
           ) : (
             <button
               type="button"
-              style={{ fontWeight: 500, color: 'rgba(255,255,255,0.7)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              style={{ fontWeight: 500, color: '#0f172a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               className="transition-opacity active:opacity-70 focus:outline-none"
               onClick={(e) => {
                 e.stopPropagation();
@@ -213,14 +205,14 @@ export function TourHubNavOverlay({
           )}
           {leaderTeaser.isTied ? ' at ' : ' leads at '}
           {scoreStr !== null && (
-            <span style={{ color: '#fff' }}>
+            <span style={{ color: leaderTeaser.score !== null && leaderTeaser.score < 0 ? TOUR_COLORS.scoreUnderPar : undefined }}>
               {scoreStr}
             </span>
           )}
           <br />
           <button
             type="button"
-            style={{ color: 'rgba(255,255,255,0.7)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+            style={{ color: '#0f172a', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
             className="truncate transition-opacity active:opacity-70 focus:outline-none"
             onClick={(e) => {
               e.stopPropagation();
@@ -285,8 +277,8 @@ export function TourHubNavOverlay({
             style={{
               width: '100%',
               borderRadius: '20px 20px 0 0',
-              background: '#0d1623',
-              borderTop: '1px solid rgba(255,255,255,0.07)',
+              background: '#F8FAFC',
+              borderTop: '1px solid rgba(0,0,0,0.06)',
               maxHeight: '88vh',
             }}
             role="dialog"
@@ -295,17 +287,17 @@ export function TourHubNavOverlay({
           >
             {/* Handle + close row */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px 0' }}>
-              <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.15)' }} />
+              <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(0,0,0,0.12)' }} />
               <button
                 onClick={onClose}
                 style={{
-                  background: 'rgba(255,255,255,0.07)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(0,0,0,0.05)',
+                  border: '1px solid rgba(0,0,0,0.08)',
                   borderRadius: '50%',
                   width: 28, height: 28,
                   cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'rgba(255,255,255,0.45)',
+                  color: 'rgba(0,0,0,0.4)',
                   fontSize: 13,
                 }}
               >
@@ -318,7 +310,7 @@ export function TourHubNavOverlay({
               className="flex-1 overflow-y-auto min-h-0"
               style={{ overscrollBehavior: 'contain' }}
             >
-              {/* SECTION 2 — Live Ticker */}
+              {/* Live Ticker */}
               {hasLive && leaderTeaser && (
                 <div style={{
                   margin: '14px 18px 0',
@@ -336,14 +328,14 @@ export function TourHubNavOverlay({
                     />
                     <div>
                       <div style={{ fontSize: 9, fontWeight: 700, color: '#22C55E', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Live now</div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{leaderTeaser.tournamentName}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#0f172a' }}>{leaderTeaser.tournamentName}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)' }}>Leader</div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>
+                    <div style={{ fontSize: 9, color: 'rgba(0,0,0,0.35)' }}>Leader</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a' }}>
                       {leaderTeaser.playerName.split(' ').pop()}{' '}
-                      <span style={{ color: '#fff' }}>
+                      <span style={{ color: '#0f172a' }}>
                         {leaderTeaser.score !== null
                           ? leaderTeaser.score < 0 ? `${leaderTeaser.score}` : leaderTeaser.score > 0 ? `+${leaderTeaser.score}` : 'E'
                           : ''}
@@ -353,16 +345,15 @@ export function TourHubNavOverlay({
                 </div>
               )}
 
-              {/* SECTION 3 — World Rankings Strip */}
+              {/* World Rankings Strip */}
               {(rankingsLoading || displayPlayers.length > 0) && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.08 }}
                 >
-                  {/* Section header */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '14px 18px 8px' }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.28)', letterSpacing: '2px', textTransform: 'uppercase' }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '2px', textTransform: 'uppercase' }}>
                       World Rankings
                     </span>
                     <button onClick={handleViewAllRankings} style={{ fontSize: 10, color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>
@@ -370,7 +361,6 @@ export function TourHubNavOverlay({
                     </button>
                   </div>
 
-                  {/* Player cards row */}
                   <div style={{ position: 'relative' }}>
                     <div
                       ref={scrollRef}
@@ -401,15 +391,15 @@ export function TourHubNavOverlay({
                               padding: '8px 10px',
                               borderRadius: 10,
                               minWidth: 130,
-                              background: 'rgba(255,255,255,0.04)',
-                              border: '1px solid rgba(255,255,255,0.07)',
+                              background: 'rgba(255,255,255,0.80)',
+                              border: '1px solid rgba(0,0,0,0.07)',
                             }}
                           >
-                            <div style={{ width: 14, height: 12, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
-                            <div style={{ width: 36, height: 36, borderRadius: 11, background: 'rgba(255,255,255,0.08)' }} />
+                            <div style={{ width: 14, height: 12, borderRadius: 4, background: 'rgba(0,0,0,0.08)' }} />
+                            <div style={{ width: 36, height: 36, borderRadius: 11, background: 'rgba(0,0,0,0.08)' }} />
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-                              <div style={{ height: 12, width: 48, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
-                              <div style={{ height: 10, width: 36, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+                              <div style={{ height: 12, width: 48, borderRadius: 4, background: 'rgba(0,0,0,0.08)' }} />
+                              <div style={{ height: 10, width: 36, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
                             </div>
                           </div>
                         ))
@@ -427,8 +417,8 @@ export function TourHubNavOverlay({
                               onClick={() => handlePlayerClick(player.playerId)}
                               style={{
                                 scrollSnapAlign: 'start',
-                                background: isFirst ? 'rgba(247,147,30,0.08)' : 'rgba(255,255,255,0.04)',
-                                border: isFirst ? '1px solid rgba(247,147,30,0.20)' : '1px solid rgba(255,255,255,0.07)',
+                                background: isFirst ? 'rgba(245,166,35,0.09)' : 'rgba(255,255,255,0.80)',
+                                border: isFirst ? '1.5px solid rgba(245,166,35,0.22)' : '1px solid rgba(0,0,0,0.07)',
                                 borderRadius: 10,
                                 padding: '8px 10px',
                                 minWidth: 130,
@@ -440,7 +430,7 @@ export function TourHubNavOverlay({
                               <span
                                 style={{
                                   fontSize: 13, fontWeight: 800,
-                                  color: isFirst ? '#F7931E' : 'rgba(255,255,255,0.28)',
+                                  color: isFirst ? '#F7931E' : 'rgba(0,0,0,0.3)',
                                   minWidth: 14,
                                   fontVariantNumeric: 'tabular-nums',
                                   flexShrink: 0,
@@ -461,10 +451,10 @@ export function TourHubNavOverlay({
                                 );
                               })()}
                               <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                                <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                                <p style={{ color: '#0f172a', fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                                   {lastName}
                                 </p>
-                                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                                <p style={{ color: '#64748b', fontSize: 9, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                                   {country || 'Unknown'}
                                 </p>
                               </div>
@@ -477,10 +467,10 @@ export function TourHubNavOverlay({
                 </motion.div>
               )}
 
-              {/* SECTION 4 — Divider */}
-              <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '14px 18px' }} />
+              {/* Divider */}
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', margin: '14px 18px' }} />
 
-              {/* SECTION 5 — Nav Items + Link Items */}
+              {/* Nav Items + Link Items */}
               <div style={{ padding: '0 18px' }}>
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
@@ -504,7 +494,7 @@ export function TourHubNavOverlay({
                         padding: '12px 0',
                         background: 'transparent',
                         border: 'none',
-                        borderBottom: index < NAV_ITEMS.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                        borderBottom: index < NAV_ITEMS.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
                         cursor: 'pointer',
                         opacity: 1,
                       }}
@@ -513,22 +503,22 @@ export function TourHubNavOverlay({
                     >
                       <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                          <span style={{ fontSize: 15, fontWeight: 600, color: '#fff', letterSpacing: '-0.3px' }}>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', letterSpacing: '-0.3px' }}>
                             {item.label}
                           </span>
                           {renderBadge(item)}
                         </div>
-                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>
+                        <div style={{ fontSize: 11, color: '#64748b' }}>
                           {dynamicSubtitle}
                         </div>
                         {renderTeaser(item)}
                       </div>
-                      <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.2)', flexShrink: 0, marginLeft: 8 }}>›</span>
+                      <span style={{ fontSize: 16, color: 'rgba(0,0,0,0.2)', flexShrink: 0, marginLeft: 8 }}>›</span>
                     </motion.button>
                   );
                 })}
 
-                <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />
+                <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '4px 0' }} />
 
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
@@ -554,7 +544,7 @@ export function TourHubNavOverlay({
                   >
                     <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 15, fontWeight: 600, color: '#fff', letterSpacing: '-0.3px' }}>
+                        <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', letterSpacing: '-0.3px' }}>
                           {item.label}
                         </span>
                         {item.badge && (
@@ -567,22 +557,21 @@ export function TourHubNavOverlay({
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 2 }}>
+                      <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
                         {item.subtitle}
                       </div>
-                      {/* College teaser */}
                       {item.id === 'college-golf' && !topCollege && (
                         <div className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                          <div style={{ width: 20, height: 20, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }} />
-                          <div style={{ height: 12, width: 96, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
-                          <div style={{ height: 12, width: 64, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+                          <div style={{ width: 20, height: 20, borderRadius: 3, background: 'rgba(0,0,0,0.06)' }} />
+                          <div style={{ height: 12, width: 96, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
+                          <div style={{ height: 12, width: 64, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
                         </div>
                       )}
                       {item.id === 'college-golf' && topCollege && (
-                        <p style={{ fontSize: 11, marginTop: 4, color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', margin: '4px 0 0' }}>
+                        <p style={{ fontSize: 11, marginTop: 4, color: '#64748b', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', margin: '4px 0 0' }}>
                           <button
                             type="button"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'rgba(255,255,255,0.7)' }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#0f172a' }}
                             className="transition-opacity active:opacity-70 focus:outline-none"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -608,14 +597,14 @@ export function TourHubNavOverlay({
                         </p>
                       )}
                     </div>
-                    <ChevronRight style={{ width: 16, height: 16, flexShrink: 0, color: 'rgba(255,255,255,0.2)' }} />
+                    <ChevronRight style={{ width: 16, height: 16, flexShrink: 0, color: 'rgba(0,0,0,0.2)' }} />
                   </motion.button>
                 ))}
               </div>
 
               {/* Bottom safe area */}
               <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }} />
-            </div>{/* close scroll container */}
+            </div>
           </motion.div>
         </>
       )}
@@ -624,7 +613,7 @@ export function TourHubNavOverlay({
   );
 }
 
-/** Avatar with initials fallback — dark theme */
+/** Avatar with initials fallback */
 function AvatarWithInitials({ src, alt, initials, size }: { src: string | null | undefined; alt: string; initials: string; size: number }) {
   const [imgFailed, setImgFailed] = useState(false);
   const radius = `${Math.round(size * 0.306)}px`;
@@ -634,13 +623,13 @@ function AvatarWithInitials({ src, alt, initials, size }: { src: string | null |
       <div 
         style={{
           width: size, height: size, borderRadius: radius,
-          border: '1px solid rgba(255,255,255,0.1)',
-          background: 'rgba(255,255,255,0.08)',
+          border: '1px solid rgba(0,0,0,0.07)',
+          background: 'rgba(0,0,0,0.04)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0, overflow: 'hidden',
         }}
       >
-        <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>{initials}</span>
       </div>
     );
   }
@@ -649,7 +638,7 @@ function AvatarWithInitials({ src, alt, initials, size }: { src: string | null |
     <div 
       style={{
         width: size, height: size, borderRadius: radius,
-        border: '1px solid rgba(255,255,255,0.1)',
+        border: '1px solid rgba(0,0,0,0.07)',
         flexShrink: 0, overflow: 'hidden',
       }}
     >
