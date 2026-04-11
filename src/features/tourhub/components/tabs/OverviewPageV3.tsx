@@ -3,17 +3,11 @@
  * Full-bleed immersive hero that extends behind the iOS status bar
  * NO header on this page - fully immersive experience
  * 
- * MODULE ORDER (Updated):
- * 1. Hero Carousel (Featured/Latest Tournaments)
- * 2. Live Right Now (Conditional - only shows when live action)
- * 3. Tournament Schedule (Moved up for user priority)
- * 4. Tournament Insights (AI Predictions - differentiator)
- * 5. Unified World Rankings (Movers + OWGR Table combined)
- * 6. Season Leaderboards (Statistical category leaders)
- * 7. College Golf Rankings (NEW - preview of college leaderboard)
+ * Live hero fills 100dvh. Upcoming/completed keep 85dvh.
+ * Leaderboard lives in a fixed bottom sheet (peek + expand).
  */
 
-import { useRef } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
@@ -25,12 +19,26 @@ import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { TournamentInsights } from '../tournament-insights';
 import { LazySection } from '../overview-v3/LazySection';
+import { LeaderboardBottomSheet } from '../overview-v3/LeaderboardBottomSheet';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import type { LeaderboardEntryWithPlayer } from '../overview-v3/ExpandedLeaderboard';
+
+interface LiveLeaderboardData {
+  entries: LeaderboardEntryWithPlayer[];
+  tourCode: string;
+  tournamentId: string;
+  tournamentName: string;
+  courseName: string;
+  currentRound: number;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => void;
+}
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
@@ -45,6 +53,16 @@ export function OverviewPageV3() {
 
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
+
+  // Live leaderboard data — passed from HeroCarousel to bottom sheet
+  const [liveLeaderboardData, setLiveLeaderboardData] = useState<LiveLeaderboardData | null>(null);
+
+  const handleLiveLeaderboardData = useCallback((data: LiveLeaderboardData | null) => {
+    setLiveLeaderboardData(data);
+  }, []);
+
+  // Determine if current active slide is live (sheet data present = live)
+  const isLiveSlide = liveLeaderboardData !== null;
 
   return (
     <>
@@ -74,12 +92,19 @@ export function OverviewPageV3() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {/* 1. Hero Carousel */}
+        {/* 1. Hero Carousel — 100dvh for live, 85dvh for others */}
         <motion.div 
           className="relative w-full z-0"
-          style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
+          style={{
+            ...(isLiveSlide ? HERO_STYLES.containerLiveFullBleed : HERO_STYLES.containerNoHeader),
+            opacity: heroOpacity,
+            scale: heroScale,
+          }}
         >
-          <HeroCarousel hasHeader={false} />
+          <HeroCarousel
+            hasHeader={false}
+            onLiveLeaderboardData={handleLiveLeaderboardData}
+          />
         </motion.div>
 
         {/* Content sections */}
@@ -106,6 +131,24 @@ export function OverviewPageV3() {
         </div>
         <ScrollToTopGlass />
       </motion.div>
+
+      {/* ── LEADERBOARD BOTTOM SHEET — fixed, sibling to hero ── */}
+      <AnimatePresence>
+        {liveLeaderboardData && (
+          <LeaderboardBottomSheet
+            entries={liveLeaderboardData.entries}
+            tourCode={liveLeaderboardData.tourCode}
+            tournamentId={liveLeaderboardData.tournamentId}
+            tournamentName={liveLeaderboardData.tournamentName}
+            courseName={liveLeaderboardData.courseName}
+            currentRound={liveLeaderboardData.currentRound}
+            isVisible={true}
+            isLoading={liveLeaderboardData.isLoading}
+            isError={liveLeaderboardData.isError}
+            onRetry={liveLeaderboardData.refetch}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
