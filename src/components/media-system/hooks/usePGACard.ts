@@ -10,9 +10,6 @@ import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
 const PGA_TOUR_ID = 'b52068af-28e4-4e91-bdbb-037591b0ff84';
-// Majors (Masters, US Open, The Open, PGA Championship) are stored under
-// a shared tour ID in Sportradar — must be included alongside PGA Tour
-const MAJORS_TOUR_ID = 'e97bb87a-6347-40d0-8c8c-3d0f54a41043';
 const PGA_TOUR_SLUG = 'pga';
 
 const MAJOR_NAMES = [
@@ -88,7 +85,7 @@ export function usePGACard(userId?: string): {
       const { data: seasons } = await supabase
         .from('sr_seasons')
         .select('id')
-        .in('tour_id', [PGA_TOUR_ID, MAJORS_TOUR_ID]);
+        .eq('tour_id', PGA_TOUR_ID);
       const seasonIds = (seasons ?? []).map(s => s.id);
       if (!seasonIds.length) return null;
 
@@ -120,7 +117,7 @@ export function usePGACard(userId?: string): {
       const { data: seasons } = await supabase
         .from('sr_seasons')
         .select('id')
-        .in('tour_id', [PGA_TOUR_ID, MAJORS_TOUR_ID]);
+        .eq('tour_id', PGA_TOUR_ID);
       const seasonIds = (seasons ?? []).map(s => s.id);
       if (!seasonIds.length) return null;
       const { data } = await supabase
