@@ -1561,6 +1561,8 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
   const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
+  const resetAutoAdvance = () => setAutoAdvanceKey(k => k + 1);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleToggleExpand = useCallback(() => {
@@ -1593,17 +1595,17 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
     };
   }, []);
 
-  // Auto-advance every 8 seconds (spec: 8s idle, 5s resume after touch)
+  // Auto-advance every 12 seconds, resets on user interaction
   useEffect(() => {
     if (safeSlides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
       if (isScorecardOpenRef.current) return;
       setCurrentIndex(prev => (prev + 1) % safeSlides.length);
-    }, 8000);
+    }, 12000);
 
     return () => clearInterval(interval);
-  }, [safeSlides.length, isPaused, isExpanded]);
+  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey]);
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
@@ -1695,10 +1697,12 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
         setCurrentIndex(prev => prev + 1);
         if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
         setIsPaused(false);
+        resetAutoAdvance();
       } else if (deltaX > threshold && currentIndex > 0) {
         setCurrentIndex(prev => prev - 1);
         if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
         setIsPaused(false);
+        resetAutoAdvance();
       }
     }
 
@@ -1730,7 +1734,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
             isActive={index === currentIndex}
             totalSlides={safeSlides.length}
             currentIndex={currentIndex}
-            onDotClick={setCurrentIndex}
+            onDotClick={(i: number) => { setCurrentIndex(i); resetAutoAdvance(); }}
             leadersWinnersMap={leadersWinnersMap}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
