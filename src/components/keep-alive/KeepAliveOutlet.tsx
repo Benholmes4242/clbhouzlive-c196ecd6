@@ -43,7 +43,16 @@ export const useKeepAlive = () => useContext(KeepAliveContext);
 export function KeepAliveOutlet({ keepAliveRoutes, maxCached = 3 }: KeepAliveOutletProps) {
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [cachedPaths, setCachedPaths] = useState<Set<string>>(new Set());
+  const [cachedPaths, setCachedPaths] = useState<Set<string>>(() => {
+    const initial = new Set<string>();
+    const rawInitialPath = window.location.pathname;
+    const initialPath = rawInitialPath === '/clubhouse' ? '/' : rawInitialPath;
+    const isKeepAlive = keepAliveRoutes.some(r => r.path === initialPath);
+    if (isKeepAlive) {
+      initial.add(initialPath);
+    }
+    return initial;
+  });
   const mountedRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Normalise Clubhouse alias — '/clubhouse' and '/' are the same keep-alive slot
