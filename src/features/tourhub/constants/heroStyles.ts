@@ -45,7 +45,7 @@ export const HERO_STYLES = {
 export const HERO_STYLES_FULLBLEED = {
   containerNoHeader: {
     marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
-    height: '100dvh',
-    minHeight: '100dvh',
+    height: 'calc(100dvh - var(--bottom-nav-height, 88px))',
+    minHeight: 'calc(100dvh - var(--bottom-nav-height, 88px))',
   },
 } as const;
