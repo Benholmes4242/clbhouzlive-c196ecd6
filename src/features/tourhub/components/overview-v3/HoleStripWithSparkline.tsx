@@ -49,9 +49,9 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: SPARK_H, overflow: 'visible' }}
         >
           <defs>
-            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.20)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity={0.18} />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
             </linearGradient>
           </defs>
 
@@ -59,7 +59,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
           {(() => {
             const y = SPARK_H - ((-min) / range) * (SPARK_H - 6) - 3;
             return (
-              <line x1="0" y1={y} x2={svgWidth} y2={y} stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="3,3" />
+              <line x1="0" y1={y} x2={svgWidth} y2={y} stroke="rgba(255,255,255,0.10)" strokeWidth="0.5" strokeDasharray="3,3" />
             );
           })()}
 
@@ -73,7 +73,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             const lastX = ((running.length - 1) / (totalHoles - 1)) * (svgWidth - INSET);
             const baseY = SPARK_H - ((-min) / range) * (SPARK_H - 6) - 3;
             return (
-              <polygon points={`${pts} ${lastX},${baseY} 0,${baseY}`} fill="url(#sparkGrad)" />
+              <polygon points={`0,${baseY} ${pts} ${lastX},${baseY}`} fill="url(#sparkFill)" />
             );
           })()}
 
@@ -85,7 +85,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
               return `${x},${y}`;
             }).join(' ');
             return (
-              <polyline points={pts} fill="none" stroke="#ffffff" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+              <polyline points={pts} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
             );
           })()}
 
@@ -94,7 +94,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             const lastIdx = running.length - 1;
             const x = (lastIdx / (totalHoles - 1)) * (svgWidth - INSET);
             const y = SPARK_H - ((running[lastIdx] - min) / range) * (SPARK_H - 6) - 3;
-            return <circle cx={x} cy={y} r={3} fill="#ffffff" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
+            return <circle cx={x} cy={y} r={3} fill="#ffffff" opacity={0.9} />;
           })()}
         </svg>
 
