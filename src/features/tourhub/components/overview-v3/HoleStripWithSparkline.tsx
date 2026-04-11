@@ -123,41 +123,50 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
                 border: '1.5px solid #FFD700',
                 borderRadius: '50%',
               };
+              // Eagle or better — red double-ring circle
               if (score! <= -2) return {
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.7)',
+                background: 'rgba(248,113,113,0.06)',
+                border: '1px solid #f87171',
                 borderRadius: '50%',
-              };
+                outline: '1px solid #f87171',
+                outlineOffset: '1px',
+              } as React.CSSProperties;
+              // Birdie — red square
               if (score === -1) return {
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.6)',
-                borderRadius: '50%',
-              };
-              if (isPar) return {
-                background: 'transparent',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '50%',
-              };
-              if (score === 1) return {
                 background: 'rgba(248,113,113,0.08)',
                 border: '1px solid #f87171',
                 borderRadius: 2,
               };
-              return {
-                background: 'rgba(153,27,27,0.10)',
-                border: '1px solid #991b1b',
+              // Par — white circle (like old birdie)
+              if (isPar) return {
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.6)',
+                borderRadius: '50%',
+              };
+              // Bogey — muted grey square
+              if (score === 1) return {
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.18)',
                 borderRadius: 2,
               };
+              // Double bogey+ — muted grey double-border square
+              return {
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                borderRadius: 2,
+                outline: '1px solid rgba(255,255,255,0.18)',
+                outlineOffset: '1px',
+              } as React.CSSProperties;
             })();
 
             const textColor = (() => {
               if (!isPlayed) return 'transparent';
               if (isHIO)        return '#FFD700';
-              if (score! <= -2) return '#ffffff';
-              if (score === -1) return '#ffffff';
-              if (isPar)        return 'rgba(255,255,255,0.35)';
-              if (score === 1)  return '#f87171';
-              return '#991b1b';
+              if (score! <= -2) return '#f87171';
+              if (score === -1) return '#f87171';
+              if (isPar)        return '#ffffff';
+              if (score === 1)  return 'rgba(255,255,255,0.35)';
+              return 'rgba(255,255,255,0.35)';
             })();
 
             return (
