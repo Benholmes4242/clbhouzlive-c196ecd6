@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { Database } from '@/integrations/supabase/types';
