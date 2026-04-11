@@ -370,7 +370,7 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
           overscrollBehavior: 'contain',
           touchAction: 'pan-y',
           paddingTop: 4,
-          paddingBottom: 'calc(60px + max(env(safe-area-inset-bottom, 0px), 20px))',
+          paddingBottom: 'calc(56px + max(env(safe-area-inset-bottom, 0px), 20px))',
         }}
         onScroll={handleScroll}
         onTouchStart={onTouchStart}
