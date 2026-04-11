@@ -62,6 +62,11 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
     set((s) => {
       const next = new Map(s.carouselPositions);
       next.set(feedIdx, mediaIdx);
+      // Trim to 20 entries — evict oldest keys beyond the window
+      if (next.size > 20) {
+        const firstKey = next.keys().next().value;
+        if (firstKey !== undefined) next.delete(firstKey);
+      }
       return { carouselPositions: next };
     }),
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
