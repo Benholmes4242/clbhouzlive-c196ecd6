@@ -36,6 +36,14 @@ export const HERO_STYLES = {
     height: `calc(${HERO_HEIGHT} + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
+  /** Hero container - LIVE full-bleed (fills entire viewport to bottom nav) */
+  containerLiveFullBleed: {
+    marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
+    height: '100dvh',
+    minHeight: '100dvh',
+    position: 'relative' as const,
+    overflow: 'hidden' as const,
+  },
   /** Content inside hero should use this to stay below notch */
   content: {
     paddingTop: 'env(safe-area-inset-top)',
