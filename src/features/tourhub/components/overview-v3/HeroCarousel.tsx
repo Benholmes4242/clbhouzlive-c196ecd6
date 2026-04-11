@@ -1554,9 +1554,13 @@ interface HeroCarouselProps {
   hasHeader?: boolean;
   /** Called when scorecard open/close state changes */
   onScorecardStateChange?: (isOpen: boolean) => void;
+  /** Called when the active slide is/isn't a live tournament */
+  onLiveStateChange?: (isLive: boolean) => void;
+  /** Called with leaderboard data when a live slide is active */
+  onLiveLeaderboardData?: (data: import('./LeaderboardBottomSheet').LiveLeaderboardData | null) => void;
 }
 
-export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: HeroCarouselProps) {
+export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLiveStateChange, onLiveLeaderboardData }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
