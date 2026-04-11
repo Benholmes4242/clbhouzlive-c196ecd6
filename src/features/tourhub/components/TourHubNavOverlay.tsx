@@ -380,7 +380,6 @@ export function TourHubNavOverlay({
                         gap: 8,
                         overflowX: 'auto',
                         paddingBottom: 4,
-                        paddingLeft: 18,
                         paddingRight: 18,
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -388,6 +387,8 @@ export function TourHubNavOverlay({
                         WebkitOverflowScrolling: 'touch',
                       }}
                     >
+                      {/* Left spacer to match 18px inset — paddingLeft on scroll containers can be unreliable */}
+                      <div style={{ minWidth: 18, flexShrink: 0 }} aria-hidden="true" />
                       {rankingsLoading ? (
                         Array.from({ length: 5 }).map((_, i) => (
                           <div
