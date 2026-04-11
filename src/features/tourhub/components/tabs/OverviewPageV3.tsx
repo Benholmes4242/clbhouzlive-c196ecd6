@@ -35,30 +35,9 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
-  const { hideBottomNav, showBottomNav } = useBottomNavigation();
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
-
-  // Hide nav on mount, show when user scrolls past the hero
-  useEffect(() => {
-    hideBottomNav();
-
-    const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) {
-        showBottomNav();
-      } else {
-        hideBottomNav();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      showBottomNav();
-    };
-  }, [hideBottomNav, showBottomNav]);
 
   // Parallax scale + fade on hero as user scrolls past
   const { scrollY } = useScroll();
