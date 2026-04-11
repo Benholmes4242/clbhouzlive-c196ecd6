@@ -1610,6 +1610,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLive
             onCardTouchStart={handleTouchStart}
             onCardTouchMove={handleTouchMove}
             onCardTouchEnd={handleTouchEnd}
+            onLiveLeaderboardData={onLiveLeaderboardData}
           />
         ))}
       </AnimatePresence>
