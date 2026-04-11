@@ -18,10 +18,17 @@ export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
 }
 
 function getScoreColor(toPar: number | null): string {
-  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.55)';
-  if (toPar < 0) return '#F7931E';   // amber — under par
-  if (toPar === 0) return 'rgba(255,255,255,0.55)'; // grey — even
-  return '#EF4444';                   // red — over par
+  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.45)';
+  if (toPar < 0) return '#ffffff';
+  if (toPar === 0) return 'rgba(255,255,255,0.45)';
+  return '#f87171';
+}
+
+function getTodayScoreColor(toPar: number | null): string {
+  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.45)';
+  if (toPar < 0) return '#4ade80';
+  if (toPar === 0) return 'rgba(255,255,255,0.45)';
+  return '#f87171';
 }
 
 function formatScore(toPar: number | null): string {
@@ -292,7 +299,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
             flexShrink: 0,
             fontSize: 13,
             fontWeight: 600,
-            color: getScoreColor(todayToPar),
+            color: getTodayScoreColor(todayToPar),
             fontVariantNumeric: 'tabular-nums',
           }}>
             {formatScore(todayToPar)}
@@ -344,11 +351,11 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         marginBottom: 2,
       }}>
-        <span style={{ width: 22, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}></span>
-        <span style={{ flex: 1, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, paddingLeft: 44 }}>PLAYER</span>
-        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'right' }}>TOTAL</span>
-        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'right' }}>TODAY</span>
-        <span style={{ width: 40, fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'right' }}>THRU</span>
+        <span style={{ width: 22, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2 }}></span>
+        <span style={{ flex: 1, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, paddingLeft: 44 }}>PLAYER</span>
+        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>TOTAL</span>
+        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>TODAY</span>
+        <span style={{ width: 40, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>THRU</span>
       </div>
       <div
         role="list"

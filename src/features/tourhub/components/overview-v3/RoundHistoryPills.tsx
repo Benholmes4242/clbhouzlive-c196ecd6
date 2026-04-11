@@ -1,4 +1,4 @@
-import { getScoreColorSet } from '../../utils/scoreColors';
+
 
 interface RoundHistoryPillsProps {
   round1: number | null;
@@ -21,7 +21,6 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
       {rounds.map(r => {
         const isLive = r.roundNum === currentRound && r.score === null;
         const isDone = r.score !== null;
-        const colors = isDone ? getScoreColorSet(r.score!) : null;
         const fmtScore = r.score === null ? null : r.score === 0 ? 'E' : r.score > 0 ? `+${r.score}` : `${r.score}`;
 
         return (
@@ -33,8 +32,8 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
             gap: 0,
             padding: '4px 6px',
             borderRadius: 7,
-            background: isLive ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.06)',
-            border: isLive ? '1px solid rgba(34,197,94,0.20)' : '1px solid rgba(255,255,255,0.07)',
+            background: isLive ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.05)',
+            border: isLive ? '1px solid rgba(34,197,94,0.20)' : '1px solid rgba(255,255,255,0.08)',
             minWidth: 32,
           }}>
             <span style={{
@@ -47,8 +46,8 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
             </span>
             {isLive ? (
               <span style={{ fontSize: 8, fontWeight: 800, color: '#22C55E', lineHeight: 1.3, letterSpacing: 0.6 }}>LIVE</span>
-            ) : isDone && colors ? (
-              <span style={{ fontSize: 8, fontWeight: 800, color: colors.text, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
+            ) : isDone ? (
+              <span style={{ fontSize: 8, fontWeight: 800, color: r.score! < 0 ? '#ffffff' : r.score! > 0 ? '#f87171' : 'rgba(255,255,255,0.5)', lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
             ) : null}
           </div>
         );
