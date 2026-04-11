@@ -288,69 +288,41 @@ export function TourHubNavOverlay({
             aria-hidden="true"
           />
           
-          {/* Full-width overlay panel */}
+          {/* Bottom sheet panel */}
           <motion.div
             ref={overlayRef}
-            initial={{ x: '100%', opacity: 0.5 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '100%', opacity: 0.5 }}
-            transition={{ 
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{
               type: 'spring',
-              damping: 28,
+              damping: 25,
               stiffness: 300,
             }}
-            className="fixed inset-y-0 right-0 z-[10000] flex flex-col overflow-hidden"
+            className="fixed inset-x-0 bottom-0 z-[10000] w-full rounded-t-[24px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
             style={{
-              width: '100vw',
-              maxWidth: '480px',
-              marginLeft: 'auto',
-              background: '#F8FAFC',
+              maxHeight: '92dvh',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
             role="dialog"
             aria-modal="true"
             aria-label="Tour Hub navigation menu"
           >
-            {/* Clbhouz Logo Mark Watermark */}
-            <div
-              className="fixed pointer-events-none"
-              style={{
-                right: '-100px',
-                bottom: '-80px',
-                width: 'min(380px, 100vw)',
-                height: 'min(380px, 100vw)',
-                zIndex: 0,
-              }}
-            >
-              <motion.img
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 0.04, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-                src="/assets/logomark-orange.png"
-                alt=""
-                loading="lazy"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            
-            {/* Grab bar — top of sheet, no close button needed */}
+            {/* Grab bar */}
             <div style={{
               display: 'flex',
               justifyContent: 'center',
               paddingTop: 10,
-              paddingBottom: 6,
+              paddingBottom: 4,
               flexShrink: 0,
             }}>
               <div style={{
-                width: 32,
-                height: 3,
+                width: 36,
+                height: 4,
                 borderRadius: 2,
                 background: 'rgba(0,0,0,0.12)',
               }} />
             </div>
-
-            {/* Header spacer for safe area */}
-            <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 20px)' }} />
             
             {/* Scrollable content — rankings + nav items together */}
             <div
