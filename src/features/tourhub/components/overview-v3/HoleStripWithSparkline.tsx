@@ -50,8 +50,8 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
         >
           <defs>
             <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(247,147,30,0.25)" />
-              <stop offset="100%" stopColor="rgba(247,147,30,0)" />
+              <stop offset="0%" stopColor="rgba(255,255,255,0.20)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
             </linearGradient>
           </defs>
 
@@ -85,7 +85,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
               return `${x},${y}`;
             }).join(' ');
             return (
-              <polyline points={pts} fill="none" stroke="#F7931E" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+              <polyline points={pts} fill="none" stroke="#ffffff" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
             );
           })()}
 
@@ -94,7 +94,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             const lastIdx = running.length - 1;
             const x = (lastIdx / (totalHoles - 1)) * (svgWidth - INSET);
             const y = SPARK_H - ((running[lastIdx] - min) / range) * (SPARK_H - 6) - 3;
-            return <circle cx={x} cy={y} r={3} fill="#F7931E" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
+            return <circle cx={x} cy={y} r={3} fill="#ffffff" stroke="rgba(0,0,0,0.4)" strokeWidth="1" />;
           })()}
         </svg>
 
@@ -115,53 +115,49 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
             const dotStyle = (() => {
               if (!isPlayed) return {
                 background: 'transparent',
-                border: '1px dashed rgba(255,255,255,0.20)',
+                border: '1px dashed rgba(255,255,255,0.10)',
                 borderRadius: '50%',
               };
               if (isHIO) return {
                 background: 'rgba(255,215,0,0.22)',
                 border: '1.5px solid #FFD700',
                 borderRadius: '50%',
-                boxShadow: '0 0 7px rgba(255,215,0,0.55)',
               };
               if (score! <= -2) return {
-                background: 'rgba(34,197,94,0.20)',
-                border: '1.5px solid #22C55E',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.7)',
                 borderRadius: '50%',
-                boxShadow: '0 0 6px rgba(34,197,94,0.40)',
               };
               if (score === -1) return {
-                background: 'rgba(247,147,30,0.18)',
-                border: '1.5px solid #F7931E',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.6)',
                 borderRadius: '50%',
-                boxShadow: '0 0 5px rgba(247,147,30,0.35)',
               };
               if (isPar) return {
                 background: 'transparent',
-                border: '1px dashed rgba(255,255,255,0.30)',
+                border: '1px solid rgba(255,255,255,0.15)',
                 borderRadius: '50%',
               };
               if (score === 1) return {
-                background: 'rgba(239,68,68,0.15)',
-                border: '1.5px solid #EF4444',
-                borderRadius: 3,
-                boxShadow: '0 0 5px rgba(239,68,68,0.30)',
+                background: 'rgba(248,113,113,0.08)',
+                border: '1px solid #f87171',
+                borderRadius: 2,
               };
               return {
-                background: 'rgba(153,27,27,0.20)',
-                border: '1.5px solid #991B1B',
-                borderRadius: 3,
+                background: 'rgba(153,27,27,0.10)',
+                border: '1px solid #991b1b',
+                borderRadius: 2,
               };
             })();
 
             const textColor = (() => {
               if (!isPlayed) return 'transparent';
               if (isHIO)        return '#FFD700';
-              if (score! <= -2) return '#22C55E';
-              if (score === -1) return '#F7931E';
-              if (isPar)        return 'rgba(255,255,255,0.50)';
-              if (score === 1)  return '#EF4444';
-              return '#991B1B';
+              if (score! <= -2) return '#ffffff';
+              if (score === -1) return '#ffffff';
+              if (isPar)        return 'rgba(255,255,255,0.35)';
+              if (score === 1)  return '#f87171';
+              return '#991b1b';
             })();
 
             return (

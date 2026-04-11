@@ -216,6 +216,7 @@ function LeaderHeroStrip({
   const score = leaderEntry.score ?? 0;
   const scoreDisplay = score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`;
   const scoreColor = score < 0 ? '#ffffff' : score > 0 ? '#EF4444' : 'rgba(255,255,255,0.55)';
+  const scoreTextShadow = 'none';
 
   const thruRaw = leaderEntry.thru;
   const thruDisplay = leaderEntry.status === 'cut' ? 'CUT'
@@ -299,7 +300,7 @@ function LeaderHeroStrip({
             fontSize: 58, fontWeight: 800, lineHeight: 1,
             color: '#ffffff',
             fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
-            textShadow: '0 2px 20px rgba(0,0,0,0.4)',
+            textShadow: 'none',
           }}>
             {scoreDisplay}
           </span>
@@ -307,8 +308,8 @@ function LeaderHeroStrip({
           {todayDisplay !== null && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 4,
-              background: 'rgba(74,222,128,0.12)',
-              border: '1px solid rgba(74,222,128,0.25)',
+              background: todayScore! < 0 ? 'rgba(74,222,128,0.10)' : 'rgba(255,255,255,0.06)',
+              border: `1px solid ${todayScore! < 0 ? 'rgba(74,222,128,0.22)' : 'rgba(255,255,255,0.08)'}`,
               borderRadius: 20, padding: '3px 10px',
             }}>
               <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.5px' }}>TODAY</span>
@@ -808,8 +809,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 rgba(0,0,0,0.05) 20%,
                 rgba(0,0,0,0.30) 48%,
                 rgba(0,0,0,0.82) 68%,
-                rgba(0,0,0,0.96) 82%,
-                rgba(0,0,0,1.00) 100%)`
+                rgba(20,29,46,0.96) 82%,
+                rgba(20,29,46,1.00) 100%)`
             : isUpcoming
             ? `linear-gradient(180deg,
                 rgba(0,0,0,0.55) 0%,
@@ -817,7 +818,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 rgba(0,0,0,0.10) 30%,
                 rgba(0,0,0,0.60) 55%,
                 rgba(0,0,0,0.93) 72%,
-                rgba(0,0,0,1.00) 82%)`
+                rgba(20,29,46,1.00) 82%)`
             : `linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
                linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)`,
         }}
@@ -965,13 +966,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     {/* Left — tournament name + venue, full width */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
-                        fontSize: 19, fontWeight: 800, color: '#fff',
+                        fontSize: 22, fontWeight: 700, color: '#fff',
                         letterSpacing: -0.3, lineHeight: 1,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {tournament.name}
                       </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 3 }}>
+                      <div style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>
                         {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </div>
                     </div>
@@ -979,14 +980,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     {/* Right — round label stacked above LIVE pill */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}>
                       <span style={{
-                        fontSize: 9, fontWeight: 800, letterSpacing: '0.8px',
-                        color: 'rgba(255,255,255,0.55)',
+                        fontSize: 12, fontWeight: 500, letterSpacing: '0.8px',
+                        color: 'rgba(255,255,255,0.5)',
                       }}>
                         {getCurrentRoundLabel(leaders, tournament.startDate)}
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <span className="live-dot" style={{ width: 6, height: 6 }} />
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
                           LIVE
                         </span>
                       </div>
