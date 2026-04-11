@@ -2,56 +2,51 @@
  * Unified score color palette for all golf scoring surfaces.
  * 
  * Convention:
- * - Gold/Yellow: Eagle or better (prestige)
- * - Green: Birdie (golf convention — under par is green)
- * - White/Muted: Par (neutral)
- * - Orange: Bogey (warning)
- * - Red: Double bogey or worse (danger)
- * 
- * Used by: PlayerScorecardCard, WinnerStatsPanel, StatChip, 
- * RoundSummary, and any future scoring UI.
+ * - White: Eagle or better / Birdie (under par is white)
+ * - Muted grey: Par (neutral)
+ * - Red: Bogey / Double bogey+ (over par is red)
  */
 
 export const SCORE_COLORS = {
-  // Eagle or better (includes hole-in-one on par 3+, albatross, condor)
+  // Eagle or better
   eagle: {
-    text: '#F7931E',           // amber — same as birdie
-    bg: 'rgba(247, 147, 30, 0.20)',
-    ring: 'rgba(247, 147, 30, 0.35)',
-    tailwindText: 'text-[#F7931E]',
-    tailwindBg: 'bg-[#F7931E]/20 ring-1 ring-[#F7931E]/35',
+    text: '#ffffff',
+    bg: 'rgba(255, 255, 255, 0.08)',
+    ring: 'rgba(255, 255, 255, 0.6)',
+    tailwindText: 'text-white',
+    tailwindBg: 'bg-white/8 ring-1 ring-white/60',
   },
   // Birdie
   birdie: {
-    text: '#F7931E',           // amber
-    bg: 'rgba(247, 147, 30, 0.15)',
-    ring: 'rgba(247, 147, 30, 0.30)',
-    tailwindText: 'text-[#F7931E]',
-    tailwindBg: 'bg-[#F7931E]/15 ring-1 ring-[#F7931E]/30',
+    text: '#ffffff',
+    bg: 'rgba(255, 255, 255, 0.08)',
+    ring: 'rgba(255, 255, 255, 0.6)',
+    tailwindText: 'text-white',
+    tailwindBg: 'bg-white/8 ring-1 ring-white/60',
   },
   // Par
   par: {
-    text: 'rgba(255, 255, 255, 0.7)',
-    bg: 'rgba(255, 255, 255, 0.05)',
-    ring: 'transparent',
-    tailwindText: 'text-white/70',
-    tailwindBg: 'bg-white/5',
+    text: 'rgba(255, 255, 255, 0.35)',
+    bg: 'rgba(255, 255, 255, 0.04)',
+    ring: 'rgba(255, 255, 255, 0.18)',
+    tailwindText: 'text-white/35',
+    tailwindBg: 'bg-white/4 ring-1 ring-white/18',
   },
   // Bogey
   bogey: {
-    text: '#EF4444',           // red
-    bg: 'rgba(239, 68, 68, 0.15)',
-    ring: 'rgba(239, 68, 68, 0.30)',
-    tailwindText: 'text-red-500',
-    tailwindBg: 'bg-red-500/15 ring-1 ring-red-500/30',
+    text: '#f87171',
+    bg: 'rgba(248, 113, 113, 0.08)',
+    ring: '#f87171',
+    tailwindText: 'text-red-400',
+    tailwindBg: 'bg-red-400/8 ring-1 ring-red-400',
   },
   // Double bogey or worse
   doublePlus: {
-    text: '#991B1B',           // dark red — worse than bogey
-    bg: 'rgba(153, 27, 27, 0.20)',
-    ring: 'rgba(153, 27, 27, 0.35)',
-    tailwindText: 'text-red-800',
-    tailwindBg: 'bg-red-800/20 ring-1 ring-red-800/35',
+    text: '#f87171',
+    bg: 'rgba(248, 113, 113, 0.08)',
+    ring: '#f87171',
+    tailwindText: 'text-red-400',
+    tailwindBg: 'bg-red-400/8 ring-1 ring-red-400',
   },
 } as const;
 

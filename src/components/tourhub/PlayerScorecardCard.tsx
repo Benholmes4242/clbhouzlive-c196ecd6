@@ -84,14 +84,14 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
         <defs>
           <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={lastV <= 0 ? '#F7931E' : '#EF4444'} stopOpacity={0.18} />
-            <stop offset="100%" stopColor={lastV <= 0 ? '#F7931E' : '#EF4444'} stopOpacity={0} />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <polyline points={pts} fill="none" stroke={lastV <= 0 ? '#F7931E' : '#EF4444'} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
+        <polyline points={pts} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
         <polygon points={`0,${H} ${pts} ${W},${H}`} fill="url(#sparkFill)" />
         <line x1={0} y1={H - ((0 - min) / range) * (H - 4) - 2} x2={W} y2={H - ((0 - min) / range) * (H - 4) - 2} stroke="rgba(255,255,255,0.10)" strokeWidth={0.5} strokeDasharray="3,3" />
-        <circle cx={W - 4} cy={lastY} r={3} fill={lastV <= 0 ? '#F7931E' : '#EF4444'} opacity={0.9} />
+        <circle cx={W - 4} cy={lastY} r={3} fill="#ffffff" opacity={0.9} />
       </svg>
     </div>
   );
@@ -101,9 +101,24 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
 
 function HoleCell({ hole }: { hole: HoleScore }) {
   const c = getScoreColorSet(hole.scoreToPar);
-  const isCircle = hole.scoreToPar <= -1;
-  const isSquare = hole.scoreToPar >= 1;
+  const isEagleOrBetter = hole.scoreToPar <= -2;
+  const isBirdie = hole.scoreToPar === -1;
   const isPar = hole.scoreToPar === 0;
+  const isBogey = hole.scoreToPar === 1;
+  const isDoublePlus = hole.scoreToPar >= 2;
+
+  // Shape: birdie/eagle = circle, par/bogey/double = square
+  const isCircle = hole.scoreToPar <= -1;
+  const borderRadius = isCircle ? '50%' : 5;
+
+  // Double outline for eagle and double bogey+
+  const outlineStyle = (isEagleOrBetter || isDoublePlus) ? {
+    outline: `1px solid ${c.ring}`,
+    outlineOffset: '1px',
+  } : {};
+
+  // Par uses dashed border
+  const borderStyle = isPar ? `1.5px dashed ${c.ring}` : `1.5px solid ${c.ring}`;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
@@ -115,12 +130,13 @@ function HoleCell({ hole }: { hole: HoleScore }) {
       </span>
       <div style={{
         width: 32, height: 32,
-        borderRadius: isCircle ? '50%' : isSquare ? 5 : '50%',
-        border: isPar ? '1.5px dashed rgba(255,255,255,0.18)' : `1.5px solid ${c.ring}`,
+        borderRadius,
+        border: borderStyle,
         background: isPar ? 'transparent' : c.bg,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         gap: 0,
-      }}>
+        ...outlineStyle,
+      } as React.CSSProperties}>
         <span style={{
           fontSize: 11, fontWeight: 800,
           color: c.text,
@@ -231,8 +247,8 @@ function RoundTabs({
           : toPar > 0 ? `+${toPar}`
           : `${toPar}`;
         const scoreColor = toPar === null ? 'rgba(255,255,255,0.20)'
-          : toPar < 0 ? '#F7931E'
-          : toPar > 0 ? '#EF4444'
+          : toPar < 0 ? '#ffffff'
+          : toPar > 0 ? '#f87171'
           : 'rgba(255,255,255,0.55)';
 
         return (
@@ -244,9 +260,9 @@ function RoundTabs({
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
               padding: '6px 14px',
               borderRadius: 9,
-              background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
+              background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
               border: isActive
-                ? '1.5px solid rgba(247,147,30,0.35)'
+                ? '1.5px solid rgba(255,255,255,0.25)'
                 : '1px solid rgba(255,255,255,0.07)',
               cursor: hasData ? 'pointer' : 'default',
               transition: 'all 0.15s ease',
@@ -254,7 +270,7 @@ function RoundTabs({
           >
             <span style={{
               fontSize: 8, fontWeight: 700,
-              color: isActive ? '#F7931E' : 'rgba(255,255,255,0.35)',
+              color: isActive ? '#ffffff' : 'rgba(255,255,255,0.35)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
               R{roundNum}
@@ -505,7 +521,7 @@ export function PlayerScorecardCard({
         {/* Total score — Change 7: canonical amber/red */}
         <span style={{
           fontSize: 28, fontWeight: 900,
-          color: player.totalScore < 0 ? '#F7931E' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#EF4444',
+          color: player.totalScore < 0 ? '#ffffff' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
           fontFamily: "'JetBrains Mono','SF Mono',monospace",
           letterSpacing: -1, flexShrink: 0,
         }}>
@@ -539,11 +555,11 @@ export function PlayerScorecardCard({
           {activeRoundData && activeRoundData.holesCompleted > 0 && (
             <div style={{ display: 'flex', gap: 4, padding: '0 16px 8px' }}>
               {[
-                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#22C55E', bg: 'rgba(34,197,94,0.08)' },
-                { v: activeRoundData.birdies,      label: 'Birdies', color: '#F7931E', bg: 'rgba(247,147,30,0.08)' },
-                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.55)', bg: 'rgba(255,255,255,0.04)' },
-                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
-                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#991B1B', bg: 'rgba(153,27,27,0.08)' },
+                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
+                { v: activeRoundData.birdies,      label: 'Birdies', color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
+                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.04)' },
+                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
+                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
               ].map(stat => (
                 <div key={stat.label} style={{
                   flex: 1, textAlign: 'center',
@@ -599,8 +615,8 @@ export function PlayerScorecardCard({
                 </span>
                 <span style={{
                   fontSize: 20, fontWeight: 800,
-                  color: activeRoundData.totalToPar < 0 ? '#F7931E'
-                       : activeRoundData.totalToPar > 0 ? '#EF4444'
+                  color: activeRoundData.totalToPar < 0 ? '#ffffff'
+                       : activeRoundData.totalToPar > 0 ? '#f87171'
                        : 'rgba(255,255,255,0.55)',
                   fontVariantNumeric: 'tabular-nums',
                 }}>
