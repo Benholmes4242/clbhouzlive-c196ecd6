@@ -521,7 +521,7 @@ export function PlayerScorecardCard({
         {/* Total score — Change 7: canonical amber/red */}
         <span style={{
           fontSize: 28, fontWeight: 900,
-          color: player.totalScore < 0 ? '#F7931E' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#EF4444',
+          color: player.totalScore < 0 ? '#ffffff' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
           fontFamily: "'JetBrains Mono','SF Mono',monospace",
           letterSpacing: -1, flexShrink: 0,
         }}>
@@ -555,11 +555,11 @@ export function PlayerScorecardCard({
           {activeRoundData && activeRoundData.holesCompleted > 0 && (
             <div style={{ display: 'flex', gap: 4, padding: '0 16px 8px' }}>
               {[
-                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#22C55E', bg: 'rgba(34,197,94,0.08)' },
-                { v: activeRoundData.birdies,      label: 'Birdies', color: '#F7931E', bg: 'rgba(247,147,30,0.08)' },
-                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.55)', bg: 'rgba(255,255,255,0.04)' },
-                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
-                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#991B1B', bg: 'rgba(153,27,27,0.08)' },
+                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
+                { v: activeRoundData.birdies,      label: 'Birdies', color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
+                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.04)' },
+                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
+                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
               ].map(stat => (
                 <div key={stat.label} style={{
                   flex: 1, textAlign: 'center',
@@ -615,8 +615,8 @@ export function PlayerScorecardCard({
                 </span>
                 <span style={{
                   fontSize: 20, fontWeight: 800,
-                  color: activeRoundData.totalToPar < 0 ? '#F7931E'
-                       : activeRoundData.totalToPar > 0 ? '#EF4444'
+                  color: activeRoundData.totalToPar < 0 ? '#ffffff'
+                       : activeRoundData.totalToPar > 0 ? '#f87171'
                        : 'rgba(255,255,255,0.55)',
                   fontVariantNumeric: 'tabular-nums',
                 }}>
