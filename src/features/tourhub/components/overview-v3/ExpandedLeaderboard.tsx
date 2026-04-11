@@ -390,7 +390,7 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
       {/* Explore below hint with bouncing arrow */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, paddingTop: 12, paddingBottom: 6, opacity: 0.45 }}>
         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-          Explore below
+          Tour Overview
         </span>
         <ChevronDown
           style={{
