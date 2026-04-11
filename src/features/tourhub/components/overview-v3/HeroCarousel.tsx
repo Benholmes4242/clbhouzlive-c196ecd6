@@ -1616,6 +1616,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLive
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
+            onLeaderboardData={index === currentIndex && slide.type === 'live' ? (data) => onLiveLeaderboardData?.(data) : undefined}
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
               setIsPaused(true);
