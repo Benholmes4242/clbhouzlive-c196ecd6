@@ -382,6 +382,8 @@ export function TourHubNavOverlay({
                         paddingBottom: 4,
                         paddingLeft: 50,
                         paddingRight: 18,
+                        scrollPaddingLeft: 50,
+                        scrollPaddingRight: 18,
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
                         scrollSnapType: 'x mandatory',
