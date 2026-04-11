@@ -56,7 +56,8 @@ const EngagementButton = ({
 }) => {
   const [isPressed, setIsPressed] = useState(false);
 
-  const handlePress = () => {
+  const handlePress = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 200);
     onClick();
