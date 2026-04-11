@@ -678,9 +678,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         style={{
           bottom: bottomOffset 
             ? bottomOffset 
-            : (isReview 
-                ? '97px'
-                : '97px'),
+            : '117px',
         }}
       >
         {/* Carousel dots — positioned 8px above capsule */}
