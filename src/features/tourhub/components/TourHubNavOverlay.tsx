@@ -73,6 +73,7 @@ export function TourHubNavOverlay({
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [tickerIndex, setTickerIndex] = useState(0);
 
   const { data: topPlayers, isLoading: rankingsLoading } = useTopWorldRanked(5);
   const { data: liveCount } = useLiveTournamentCount();
@@ -151,13 +152,24 @@ export function TourHubNavOverlay({
     navigate(`/tourhub/player/${playerId}`);
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [onClose, navigate]);
-  
+
+
+  // Cycle ticker index when multiple live tournaments
+  const hasLive = (liveCount ?? 0) > 0;
+  useEffect(() => {
+    if (!hasLive || (liveCount ?? 0) <= 1) return;
+    const interval = setInterval(() => {
+      setTickerIndex(i => (i + 1) % (liveCount ?? 1));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [hasLive, liveCount]);
+  // TODO: extend useLiveLeaderTeaser to return array for multi-tournament cycling
+
   if (typeof document === 'undefined') return null;
   
   const portalRoot = document.getElementById('portal-root') || document.body;
 
   const displayPlayers = topPlayers?.slice(0, 5) || [];
-  const hasLive = (liveCount ?? 0) > 0;
 
   const scheduleSubtitle = hasLive
     ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
@@ -285,24 +297,9 @@ export function TourHubNavOverlay({
             aria-modal="true"
             aria-label="Tour Hub navigation menu"
           >
-            {/* Handle + close row */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px 0' }}>
-              <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(0,0,0,0.12)' }} />
-              <button
-                onClick={onClose}
-                style={{
-                  background: 'rgba(0,0,0,0.05)',
-                  border: '1px solid rgba(0,0,0,0.08)',
-                  borderRadius: '50%',
-                  width: 28, height: 28,
-                  cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'rgba(0,0,0,0.4)',
-                  fontSize: 13,
-                }}
-              >
-                ✕
-              </button>
+            {/* Grab bar */}
+            <div style={{ padding: '14px 0 0', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ width: 48, height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.12)' }} />
             </div>
 
             {/* Scrollable content */}
@@ -341,6 +338,19 @@ export function TourHubNavOverlay({
                           : ''}
                       </span>
                     </div>
+                    {(liveCount ?? 0) > 1 && (
+                      <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end', marginTop: 6 }}>
+                        {Array.from({ length: liveCount ?? 0 }).map((_, i) => (
+                          <div key={i} style={{
+                            width: i === tickerIndex ? 14 : 5,
+                            height: 5,
+                            borderRadius: 3,
+                            background: i === tickerIndex ? '#16a34a' : 'rgba(0,103,71,0.2)',
+                            transition: 'width 0.3s ease',
+                          }} />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -421,6 +431,8 @@ export function TourHubNavOverlay({
                                 border: isFirst ? '1.5px solid rgba(245,166,35,0.22)' : '1px solid rgba(0,0,0,0.07)',
                                 borderRadius: 10,
                                 padding: '8px 10px',
+                                paddingLeft: index === 0 ? 22 : 10,
+                                marginLeft: index === 0 ? -12 : 0,
                                 minWidth: 130,
                                 display: 'flex', alignItems: 'center', gap: 8,
                                 cursor: 'pointer',
