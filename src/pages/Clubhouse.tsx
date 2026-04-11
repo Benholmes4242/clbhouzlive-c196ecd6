@@ -164,12 +164,6 @@ const ClubhouseContent = () => {
     return () => { setBottomNavVisible(true); };
   }, [setBottomNavVisible]);
 
-  // Effect 2: Once feed is ready, gate on tournament card state
-  useEffect(() => {
-    if (!skeletonVisible) {
-      setBottomNavVisible(!isTournamentCardActive);
-    }
-  }, [skeletonVisible, isTournamentCardActive, setBottomNavVisible]);
 
   // ── Feed hooks ──
   const suggestedFeed = useSuggestedFeed(user?.id);
