@@ -131,7 +131,7 @@ export function usePGACard(userId?: string): {
         .maybeSingle();
       return data ?? null;
     },
-    staleTime: 30 * 60_000,
+    staleTime: 2 * 60_000,
     enabled: !topLive && !recentResult,
   });
 
@@ -151,7 +151,7 @@ export function usePGACard(userId?: string): {
         .maybeSingle();
       return data ?? null;
     },
-    staleTime: 30 * 60_000,
+    staleTime: 2 * 60_000,
     enabled: !topLive && !recentResult,
   });
 

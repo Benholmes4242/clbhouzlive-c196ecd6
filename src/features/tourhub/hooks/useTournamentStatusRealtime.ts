@@ -32,6 +32,8 @@ export function useTournamentStatusRealtime() {
             queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
             queryClient.invalidateQueries({ queryKey: ['live-tournaments'] });
             queryClient.invalidateQueries({ queryKey: ['overview-live-tournaments'] });
+            queryClient.invalidateQueries({ queryKey: ['pga-card-upcoming'] });
+            queryClient.invalidateQueries({ queryKey: ['pga-card-next-major'] });
           }
         }
       )
