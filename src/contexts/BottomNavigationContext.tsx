@@ -54,11 +54,6 @@ export const BottomNavigationProvider: React.FC<BottomNavigationProviderProps> =
       const h = entries[0]?.contentRect?.height ?? 0;
       setHeight(h);
       document.documentElement.style.setProperty('--bottom-nav-height', `${h}px`);
-      // Also store the "natural" height so hero sections can always reserve space
-      // even when the nav is temporarily hidden
-      if (h > 0) {
-        document.documentElement.style.setProperty('--bottom-nav-natural-height', `${h}px`);
-      }
     });
     
     ro.observe(navEl);
