@@ -284,7 +284,7 @@ export function TourHubNavOverlay({
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
-            transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ type: 'spring', damping: 32, stiffness: 280 }}
             className="fixed inset-x-0 bottom-0 z-[10000] flex flex-col overflow-hidden"
             style={{
               width: '100%',
@@ -360,7 +360,7 @@ export function TourHubNavOverlay({
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.08, type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                  transition={{ delay: 0.08 }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '14px 18px 8px' }}>
                     <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '2px', textTransform: 'uppercase' }}>
@@ -380,6 +380,7 @@ export function TourHubNavOverlay({
                         gap: 8,
                         overflowX: 'auto',
                         paddingBottom: 4,
+                        paddingLeft: 18,
                         paddingRight: 18,
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -387,8 +388,6 @@ export function TourHubNavOverlay({
                         WebkitOverflowScrolling: 'touch',
                       }}
                     >
-                      {/* Left spacer to match 18px inset — paddingLeft on scroll containers can be unreliable */}
-                      <div style={{ minWidth: 18, flexShrink: 0 }} aria-hidden="true" />
                       {rankingsLoading ? (
                         Array.from({ length: 5 }).map((_, i) => (
                           <div
@@ -432,6 +431,8 @@ export function TourHubNavOverlay({
                                 border: isFirst ? '1.5px solid rgba(245,166,35,0.22)' : '1px solid rgba(0,0,0,0.07)',
                                 borderRadius: 10,
                                 padding: '8px 10px',
+                                paddingLeft: index === 0 ? 22 : 10,
+                                marginLeft: index === 0 ? -12 : 0,
                                 minWidth: 130,
                                 display: 'flex', alignItems: 'center', gap: 8,
                                 cursor: 'pointer',
