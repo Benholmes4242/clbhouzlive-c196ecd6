@@ -123,31 +123,40 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
                 border: '1.5px solid #FFD700',
                 borderRadius: '50%',
               };
+              // Eagle or better — white double-ring circle
               if (score! <= -2) return {
                 background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.7)',
+                border: '1px solid rgba(255,255,255,0.6)',
                 borderRadius: '50%',
-              };
+                outline: '1px solid rgba(255,255,255,0.6)',
+                outlineOffset: '1px',
+              } as React.CSSProperties;
+              // Birdie — white circle
               if (score === -1) return {
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.6)',
                 borderRadius: '50%',
               };
+              // Par — muted grey square
               if (isPar) return {
-                background: 'transparent',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                borderRadius: 2,
               };
+              // Bogey — red square
               if (score === 1) return {
                 background: 'rgba(248,113,113,0.08)',
                 border: '1px solid #f87171',
                 borderRadius: 2,
               };
+              // Double bogey+ — red double-outline square
               return {
-                background: 'rgba(153,27,27,0.10)',
-                border: '1px solid #991b1b',
+                background: 'rgba(248,113,113,0.08)',
+                border: '1px solid #f87171',
                 borderRadius: 2,
-              };
+                outline: '1px solid #f87171',
+                outlineOffset: '1px',
+              } as React.CSSProperties;
             })();
 
             const textColor = (() => {
@@ -157,7 +166,7 @@ export const HoleStripWithSparkline = memo(function HoleStripWithSparkline({
               if (score === -1) return '#ffffff';
               if (isPar)        return 'rgba(255,255,255,0.35)';
               if (score === 1)  return '#f87171';
-              return '#991b1b';
+              return '#f87171';
             })();
 
             return (
