@@ -13,7 +13,6 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
@@ -28,8 +27,7 @@ import { LazySection } from '../overview-v3/LazySection';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { HERO_STYLES, HERO_STYLES_FULLBLEED } from '../../constants/heroStyles';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+import { HERO_STYLES_FULLBLEED } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
