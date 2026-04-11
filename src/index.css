@@ -938,6 +938,7 @@ html, body, #root {
   
   /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 88px;
+  --bottom-nav-natural-height: 88px;
   
   /* Top 100 Region Colors - Premium identity per list */
   --region-global: 180 140 70;      /* soft gold / champagne - prestige, pinnacle */
