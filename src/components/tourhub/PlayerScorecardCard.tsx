@@ -575,8 +575,8 @@ export function PlayerScorecardCard({
                   background: stat.bg,
                   border: '1px solid rgba(255,255,255,0.06)',
                 }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-                  <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.4px', marginTop: 2 }}>{stat.label}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
+                  <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.32)', textTransform: 'uppercase', letterSpacing: '0.4px', marginTop: 2 }}>{stat.label}</div>
                 </div>
               ))}
             </div>
