@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
@@ -26,6 +27,8 @@ import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOvervi
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
+import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
+import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import livUpcomingHero from '@/assets/liv-upcoming-hero.webp';
@@ -543,7 +546,6 @@ interface HeroSlideProps {
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
-  onLiveLeaderboardData?: HeroCarouselProps['onLiveLeaderboardData'];
 }
 
 function getDefendingChampionSubtext(tournament: {
@@ -574,7 +576,7 @@ function getDefendingChampionSubtext(tournament: {
   return tourFallbacks[tourSlug] ?? 'The defending champion';
 }
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd, onLiveLeaderboardData }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -609,12 +611,23 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     if (playerId) navigate(`/tourhub/player/${playerId}`);
   };
 
+  // Scorecard state — player tapped in expanded leaderboard
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
+  const handleScorecardTap = useCallback((player: PlayerInfo) => {
+    setSelectedPlayer(player);
+    onScorecardOpen?.();
+  }, [onScorecardOpen]);
+  const handleBackToLeaderboard = useCallback(() => {
+    setSelectedPlayer(null);
+    onScorecardClose?.();
+  }, [onScorecardClose]);
+
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
     isLive ? tournament.id : null
   );
 
-  // Full leaderboard — fetched for live (passed to parent for bottom sheet)
+  // Full leaderboard — only fetched when expanded
   const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
     isLive ? tournament.id : ''
   );
@@ -622,41 +635,39 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   // Realtime updates — always subscribe when live so collapsed hero stays fresh
   useLeaderboardRealtime(isLive ? tournament.id : null);
 
-  // Back button handling when expanded (non-live states only)
+  // Body scroll lock when expanded
   useEffect(() => {
-    if (!isExpanded || isLive) return;
+    if (isExpanded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isExpanded]);
+
+  // Back button handling when expanded
+  useEffect(() => {
+    if (!isExpanded) return;
     window.history.pushState({ expandedLeaderboard: true }, '');
     const handlePopState = () => {
       onToggleExpand();
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [isExpanded, isLive, onToggleExpand]);
+  }, [isExpanded, onToggleExpand]);
 
-  // Bubble live leaderboard data to parent for bottom sheet
+  // Clear selected player when glass card collapses
   useEffect(() => {
-    if (!isLive || !isActive) {
-      if (!isLive && isActive) onLiveLeaderboardData?.(null);
-      return;
-    }
-    const firstEntry = fullLeaderboard[0] as any;
-    const currentRound = firstEntry
-      ? ([4,3,2,1].find(n => firstEntry[`round_${n}`] !== null) ?? 1)
-      : 1;
-    onLiveLeaderboardData?.({
-      entries: fullLeaderboard,
-      tourCode: tournament.tourSlug,
-      tournamentId: tournament.id,
-      tournamentName: tournament.name,
-      courseName: tournament.venueName || '',
-      currentRound,
-      isLoading: isLoadingFull,
-      isError: isFullError,
-      refetch: refetchFull,
-    });
-  }, [isLive, isActive, fullLeaderboard, isLoadingFull, isFullError, tournament.id, tournament.tourSlug, tournament.name, tournament.venueName, onLiveLeaderboardData, refetchFull]);
+    if (!isExpanded) setSelectedPlayer(null);
+  }, [isExpanded]);
 
+  // Touch isolation for expanded scroll area
+  const handleExpandedTouch = useCallback((e: React.TouchEvent) => {
+    e.stopPropagation();
+    onInteraction();
+  }, [onInteraction]);
 
+  // Phase 3+4: Track previous leaders for score change & movement animations
   const prevLeadersRef = useRef<LeaderEntry[]>([]);
   const [scoreFlashes, setScoreFlashes] = useState<Record<string, 'birdie' | 'bogey'>>({});
   const [positionDeltas, setPositionDeltas] = useState<Record<string, number>>({});
@@ -888,8 +899,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             exit={{ opacity: 0, y: 20 }}
           >
 
-            {/* ─── Tournament header ─── */}
-            {(
+            {/* ─── Tournament header — hidden when scorecard is open ─── */}
+            {!selectedPlayer && (
               isCompleted ? (
                 <>
                   <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
@@ -1017,7 +1028,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
             <AnimatePresence mode="popLayout">
 
-              {/* LIVE LAYOUT — hero strip only, leaderboard moved to bottom sheet */}
+              {/* LIVE LAYOUT */}
               {isLive && (
                 <motion.div
                   key="live-content"
@@ -1025,29 +1036,175 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end', paddingBottom: 100 }}
+                  style={{ overflow: isExpanded ? 'visible' : 'hidden', flex: isExpanded ? 1 : undefined, minHeight: isExpanded ? 0 : undefined, display: isExpanded ? 'flex' : undefined, flexDirection: isExpanded ? 'column' as const : undefined }}
                 >
-                  {/* Leader hero strip — rotates through co-leaders */}
-                  {fullLeaderboard.length > 0 ? (() => {
-                    const leaderEntries = (fullLeaderboard as any[]).filter(e => e.position === 1);
-                    if (leaderEntries.length === 0) return null;
-                    const firstEntry = leaderEntries[0];
-                    const currentRound = [4,3,2,1].find(n => firstEntry[`round_${n}`] !== null) ?? 1;
-                    return (
-                      <RotatingLeaderStrip
-                        leaderEntries={leaderEntries}
-                        tourSlug={tournament.tourSlug}
-                        leaderStats={leaderStats}
-                        tournamentId={tournament.id}
-                        currentRound={currentRound}
-                      />
-                    );
-                  })() : leadersLoading ? (
-                    <LeaderboardSkeleton />
+
+                  {/* Expanded: Full Leaderboard or Scorecard */}
+                  {isExpanded ? (
+                    <AnimatePresence mode="wait">
+                      {selectedPlayer ? (
+                        <motion.div
+                          key="scorecard"
+                          initial={{ opacity: 0, x: 60 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 60 }}
+                          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                          style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                        >
+                          <PlayerScorecardCard
+                            player={selectedPlayer}
+                            tournamentId={tournament.id}
+                            tournamentName={tournament.name}
+                            courseName={tournament.venueName || ''}
+                            onBack={handleBackToLeaderboard}
+                            onClose={() => {
+                              setSelectedPlayer(null);
+                              onToggleExpand();
+                            }}
+                          />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="leaderboard"
+                          initial={{ opacity: 1 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0, x: -40 }}
+                          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                          style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                        >
+                          {isLoadingFull ? (
+                            <ExpandedLeaderboardSkeleton />
+                          ) : isFullError ? (
+                            <ExpandedLeaderboardError onRetry={() => refetchFull()} />
+                          ) : fullLeaderboard.length === 0 ? (
+                            <ExpandedLeaderboardEmpty />
+                          ) : (
+                            <>
+                              {/* Leader hero strip — rotates through co-leaders every 5s */}
+                              {(() => {
+                                const leaderEntries = (fullLeaderboard as any[]).filter(e => e.position === 1);
+                                if (leaderEntries.length === 0) return null;
+                                const firstEntry = leaderEntries[0];
+                                const currentRound = [4,3,2,1].find(n => firstEntry[`round_${n}`] !== null) ?? 1;
+                                return (
+                                  <RotatingLeaderStrip
+                                    leaderEntries={leaderEntries}
+                                    tourSlug={tournament.tourSlug}
+                                    leaderStats={leaderStats}
+                                    tournamentId={tournament.id}
+                                    currentRound={currentRound}
+                                  />
+                                );
+                              })()}
+                              <ExpandedLeaderboardList
+                                entries={fullLeaderboard}
+                                tourCode={tournament.tourSlug}
+                                onTouchStart={handleExpandedTouch}
+                                onTouchMove={handleExpandedTouch}
+                                onTouchEnd={handleExpandedTouch}
+                                onPlayerTap={handleScorecardTap}
+                              />
+                            </>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   ) : (
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', padding: '0 16px' }}>
-                      Starting Soon
-                    </span>
+                    <>
+                      {/* Mini Leaderboard */}
+                      <AnimatePresence mode="wait">
+                        {leadersLoading ? (
+                          <motion.div
+                            key="skeleton"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                          >
+                            <LeaderboardSkeleton />
+                          </motion.div>
+                        ) : leaders.length > 0 ? (
+                          <motion.div
+                            key="leaders"
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                            className="leaderboard-container"
+                          >
+                            {(() => {
+                              const rows = buildLiveLeaderboardRows(leaders, 4);
+                              let rowIndex = 0;
+                              return rows.map((row, rIdx) => {
+                                const isFirst = rIdx === 0;
+
+                                // Tied at #1 — show each individually with leader highlight
+                                if (row.isTied && isFirst) {
+                                  return row.players.slice(0, 2).map((player, i) => {
+                                    const idx = rowIndex++;
+                                    return (
+                                      <MiniLeaderboardRow
+                                        key={`row-${player.position}-${player.player.id}`}
+                                        leader={player}
+                                        isFirst={idx === 0}
+                                        index={idx}
+                                        isActive={isActive}
+                                        isLeader={true}
+                                        scoreFlash={scoreFlashes[player.player.id] || null}
+                                        positionDelta={positionDeltas[player.player.id] || 0}
+                                        tournamentTourSlug={tournament.tourSlug}
+                                      />
+                                    );
+                                  });
+                                }
+
+                                // Tied chasers — condensed row
+                                if (row.isTied && !isFirst) {
+                                  const idx = rowIndex++;
+                                  return <CondensedTieRow key={`tie-${row.position}`} row={row} index={idx} isActive={isActive} tournamentTourSlug={tournament.tourSlug} />;
+                                }
+
+                                // Single player row
+                                const idx = rowIndex++;
+                                return (
+                                  <MiniLeaderboardRow
+                                    key={`row-${row.players[0].position}-${row.players[0].player.id}`}
+                                    leader={row.players[0]}
+                                    isFirst={idx === 0}
+                                    index={idx}
+                                    isActive={isActive}
+                                    isLeader={row.players[0].position === 1}
+                                    scoreFlash={scoreFlashes[row.players[0].player.id] || null}
+                                    positionDelta={positionDeltas[row.players[0].player.id] || 0}
+                                    tournamentTourSlug={tournament.tourSlug}
+                                  />
+                                );
+                              });
+                            })()}
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="starting-soon"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            style={{ marginBottom: '4px' }}
+                          >
+                            <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                              Starting Soon
+                            </span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {!isExpanded && (
+                        <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
+                          <span>See All</span>
+                          <ChevronRight className="w-4 h-4 cta-chevron" />
+                        </Link>
+                      )}
+                    </>
                   )}
                 </motion.div>
               )}
@@ -1397,21 +1554,9 @@ interface HeroCarouselProps {
   hasHeader?: boolean;
   /** Called when scorecard open/close state changes */
   onScorecardStateChange?: (isOpen: boolean) => void;
-  /** Exposes live leaderboard data for bottom sheet */
-  onLiveLeaderboardData?: (data: {
-    entries: import('./ExpandedLeaderboard').LeaderboardEntryWithPlayer[];
-    tourCode: string;
-    tournamentId: string;
-    tournamentName: string;
-    courseName: string;
-    currentRound: number;
-    isLoading: boolean;
-    isError: boolean;
-    refetch: () => void;
-  } | null) => void;
 }
 
-export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLiveLeaderboardData }: HeroCarouselProps) {
+export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1587,7 +1732,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLive
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
-            isExpanded={index === currentIndex && slide.type !== 'live' && isExpanded}
+            isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
               setIsPaused(true);
@@ -1607,7 +1752,6 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLive
             onCardTouchStart={handleTouchStart}
             onCardTouchMove={handleTouchMove}
             onCardTouchEnd={handleTouchEnd}
-            onLiveLeaderboardData={onLiveLeaderboardData}
           />
         ))}
       </AnimatePresence>
