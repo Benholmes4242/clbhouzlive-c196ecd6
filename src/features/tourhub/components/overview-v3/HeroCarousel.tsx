@@ -636,7 +636,30 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     return () => window.removeEventListener('popstate', handlePopState);
   }, [isExpanded, isLive, onToggleExpand]);
 
-  // Phase 3+4: Track previous leaders for score change & movement animations
+  // Bubble live leaderboard data to parent for bottom sheet
+  useEffect(() => {
+    if (!isLive || !isActive) {
+      if (!isLive && isActive) onLiveLeaderboardData?.(null);
+      return;
+    }
+    const firstEntry = fullLeaderboard[0] as any;
+    const currentRound = firstEntry
+      ? ([4,3,2,1].find(n => firstEntry[`round_${n}`] !== null) ?? 1)
+      : 1;
+    onLiveLeaderboardData?.({
+      entries: fullLeaderboard,
+      tourCode: tournament.tourSlug,
+      tournamentId: tournament.id,
+      tournamentName: tournament.name,
+      courseName: tournament.venueName || '',
+      currentRound,
+      isLoading: isLoadingFull,
+      isError: isFullError,
+      refetch: refetchFull,
+    });
+  }, [isLive, isActive, fullLeaderboard, isLoadingFull, isFullError, tournament.id, tournament.tourSlug, tournament.name, tournament.venueName, onLiveLeaderboardData, refetchFull]);
+
+
   const prevLeadersRef = useRef<LeaderEntry[]>([]);
   const [scoreFlashes, setScoreFlashes] = useState<Record<string, 'birdie' | 'bogey'>>({});
   const [positionDeltas, setPositionDeltas] = useState<Record<string, number>>({});
