@@ -546,6 +546,7 @@ interface HeroSlideProps {
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
+  onLiveLeaderboardData?: HeroCarouselProps['onLiveLeaderboardData'];
 }
 
 function getDefendingChampionSubtext(tournament: {
