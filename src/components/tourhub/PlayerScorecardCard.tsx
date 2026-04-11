@@ -613,15 +613,15 @@ export function PlayerScorecardCard({
               marginTop: 6,
               borderTop: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 Total · {activeRoundData.holesCompleted} holes
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.70)' }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.70)' }}>
                   {activeRoundData.totalStrokes}
                 </span>
                 <span style={{
-                  fontSize: 20, fontWeight: 800,
+                  fontSize: 24, fontWeight: 800,
                   color: activeRoundData.totalToPar < 0 ? '#ffffff'
                        : activeRoundData.totalToPar > 0 ? '#f87171'
                        : 'rgba(255,255,255,0.55)',
