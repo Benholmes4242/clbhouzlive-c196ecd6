@@ -802,7 +802,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 rgba(0,0,0,0.10) 30%,
                 rgba(0,0,0,0.60) 55%,
                 rgba(0,0,0,0.93) 72%,
-                rgba(20,29,46,1.00) 82%)`
+                rgba(0,0,0,0.95) 82%)`
             : `linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%),
                linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)`,
         }}
