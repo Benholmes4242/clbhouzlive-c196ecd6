@@ -51,7 +51,9 @@ export const BottomNavigationProvider: React.FC<BottomNavigationProviderProps> =
     if (!navEl) return;
     
     const ro = new ResizeObserver((entries) => {
-      const h = entries[0]?.contentRect?.height ?? 0;
+      const h = entries[0]?.target instanceof HTMLElement
+        ? entries[0].target.getBoundingClientRect().height
+        : (entries[0]?.contentRect?.height ?? 0);
       setHeight(h);
       document.documentElement.style.setProperty('--bottom-nav-height', `${h}px`);
     });
