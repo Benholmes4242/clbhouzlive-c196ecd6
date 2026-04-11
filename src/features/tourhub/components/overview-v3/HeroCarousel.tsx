@@ -1561,6 +1561,8 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
   const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
+  const resetAutoAdvance = () => setAutoAdvanceKey(k => k + 1);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleToggleExpand = useCallback(() => {
