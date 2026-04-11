@@ -204,7 +204,14 @@ const ClubhouseContent = () => {
     signalFirstFrameReady,
     resetSkeleton,
   } = useClubhouseSkeletonTiming(!isLoading && posts.length > 0);
-  
+
+  // Effect 2: Once feed is ready, gate on tournament card state
+  useEffect(() => {
+    if (!skeletonVisible) {
+      setBottomNavVisible(!isTournamentCardActive);
+    }
+  }, [skeletonVisible, isTournamentCardActive, setBottomNavVisible]);
+
   // ── Lifecycle ──
   useClubhouseLifecycle();
   
