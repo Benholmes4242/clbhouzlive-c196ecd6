@@ -984,46 +984,41 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     flexShrink: 0,
                     paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                   }}>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      gap: 10, padding: '0 16px', height: 58,
-                    }}>
-                      {/* Left — tournament name + venue */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                          <div style={{
-                            fontSize: 22, fontWeight: 700, color: '#fff',
-                            letterSpacing: -0.3, lineHeight: 1,
-                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          }}>
-                            {tournament.name}
-                          </div>
-                        </Link>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
-                          className="active:opacity-70 transition-opacity cursor-pointer"
-                          style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)', marginTop: 3, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
-                        >
-                          {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
-                        </button>
-                      </div>
-
-                      {/* Right — dates + Upcoming pill */}
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                    <div style={{ padding: '0 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                            Upcoming · {getTourDisplayName(tournament.tourSlug)}
+                          </span>
+                        </div>
                         {tournament.startDate && tournament.endDate && (
-                          <span style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.8px', color: 'rgba(255,255,255,0.5)' }}>
+                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.40)', flexShrink: 0 }}>
                             {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             {' – '}
                             {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </span>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
-                          <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: 1 }}>
-                            UPCOMING
-                          </span>
-                        </div>
                       </div>
+                      <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                        <h2 style={{
+                          fontSize: 30, fontWeight: 900, color: '#fff',
+                          letterSpacing: -0.6, lineHeight: 1.05, margin: 0,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical' as const,
+                          overflow: 'hidden',
+                        }}>
+                          {tournament.name}
+                        </h2>
+                      </Link>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                        className="active:opacity-70 transition-opacity cursor-pointer"
+                        style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                      >
+                        {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
+                      </button>
                     </div>
                   </div>
                 </>
