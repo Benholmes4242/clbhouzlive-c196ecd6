@@ -868,7 +868,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           >
 
             {/* ─── Tournament header ─── */}
-            {(isLive || !false) && (
+            {(
               isCompleted ? (
                 <>
                   <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
@@ -1376,9 +1376,21 @@ interface HeroCarouselProps {
   hasHeader?: boolean;
   /** Called when scorecard open/close state changes */
   onScorecardStateChange?: (isOpen: boolean) => void;
+  /** Exposes live leaderboard data for bottom sheet */
+  onLiveLeaderboardData?: (data: {
+    entries: import('./ExpandedLeaderboard').LeaderboardEntryWithPlayer[];
+    tourCode: string;
+    tournamentId: string;
+    tournamentName: string;
+    courseName: string;
+    currentRound: number;
+    isLoading: boolean;
+    isError: boolean;
+    refetch: () => void;
+  } | null) => void;
 }
 
-export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: HeroCarouselProps) {
+export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLiveLeaderboardData }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1554,7 +1566,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
-            isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
+            isExpanded={index === currentIndex && slide.type !== 'live' && isExpanded}
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
               setIsPaused(true);
