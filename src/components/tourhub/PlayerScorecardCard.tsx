@@ -448,11 +448,11 @@ export function PlayerScorecardCard({
           }}
         >
           <ChevronLeft style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.55)' }} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>
+          <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)' }}>
             Leaderboard
           </span>
         </button>
-        <span style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.38)' }}>
+        <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)' }}>
           {tournamentName && tournamentName.length < 20 ? tournamentName : 'PGA TOUR'}
           {` · R${currentRound}`}
         </span>
