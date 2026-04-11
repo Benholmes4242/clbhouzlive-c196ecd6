@@ -13,6 +13,7 @@ const NEAR_END_THRESHOLD = 3;
 const ACTIVE_SLIDE_RATIO = 0.5;
 const INTERSECTION_THRESHOLDS = [0.5];
 const PTR_DISTANCE = 80;
+const VIRTUAL_WINDOW = 3; // render activeIndex ± 3 slides
 
 interface SnapFeedProps {
   posts: FeedPost[];
@@ -136,12 +137,15 @@ export function SnapFeed({
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
             if (pendingIndexRef.current !== null) {
+              // Guard against end-card setting index beyond posts array
+              const safeIdx = Math.min(pendingIndexRef.current, postsLengthRef.current - 1);
+              if (safeIdx < 0) return;
               if (onActiveIndexChangeRef.current) {
-                onActiveIndexChangeRef.current(pendingIndexRef.current);
+                onActiveIndexChangeRef.current(safeIdx);
               } else {
-                setActiveIndex(pendingIndexRef.current);
+                setActiveIndex(safeIdx);
               }
-              if (hasNextPageRef.current && pendingIndexRef.current >= postsLengthRef.current - NEAR_END_THRESHOLD) {
+              if (hasNextPageRef.current && safeIdx >= postsLengthRef.current - NEAR_END_THRESHOLD) {
                 onNearEndRef.current();
               }
               pendingIndexRef.current = null;
@@ -222,10 +226,12 @@ export function SnapFeed({
       const slideHeight = el.clientHeight;
       if (slideHeight === 0) return;
       const idx = Math.round(el.scrollTop / slideHeight);
+      const safeIdx = Math.min(idx, postsLengthRef.current - 1);
+      if (safeIdx < 0) return;
       if (onActiveIndexChangeRef.current) {
-        onActiveIndexChangeRef.current(idx);
+        onActiveIndexChangeRef.current(safeIdx);
       } else {
-        setActiveIndex(idx);
+        setActiveIndex(safeIdx);
       }
     };
 
@@ -235,14 +241,14 @@ export function SnapFeed({
 
   // ── Prefetch next 2 HLS manifests ──
   useEffect(() => {
-    const next = posts.slice(activeIndex + 1, activeIndex + 3);
+    const next = postsRef.current.slice(activeIndex + 1, activeIndex + 3);
     next.forEach(post => {
       const url = post.mediaItems?.[0]?.hlsUrl;
       if (url) {
         preloadHlsManifest(url).catch(() => {});
       }
     });
-  }, [activeIndex, posts]);
+  }, [activeIndex]);
 
   // ── PGA card sentinel observer ──
   const setIsTournamentCardActive = useClubhouseStore(s => s.setIsTournamentCardActive);
@@ -273,7 +279,7 @@ export function SnapFeed({
 
     sentinels.forEach(sentinel => observer.observe(sentinel));
     return () => observer.disconnect();
-  }, [setIsTournamentCardActive, posts]);
+  }, [setIsTournamentCardActive]);
 
   return (
     <div
@@ -290,29 +296,51 @@ export function SnapFeed({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <style>{`::-webkit-scrollbar { display: none; }`}</style>
-      {posts.map((post, idx) => (
-        <FeedSlide
-          key={post.id}
-          post={post}
-          index={idx}
-          setRef={(el) => setSlideRef(idx, el)}
-          activeTab={activeTab}
-          followOverrides={followOverrides}
-          onFollowChange={onFollowChange}
-          onFirstFrameReady={idx === 0 ? handleFirstFrame : undefined}
-          onLike={onLike}
-          onComment={onComment}
-          onShare={onShare}
-          getLikeState={getLikeState}
-          getCommentCount={getCommentCount}
-           onZoomChange={handleZoomChange}
-           activeIndexOverride={activeIndexOverride}
-         />
-      ))}
+      {posts.map((post, idx) => {
+        const distance = Math.abs(idx - activeIndex);
+        const isInWindow = distance <= VIRTUAL_WINDOW;
+
+        if (!isInWindow) {
+          return (
+            <div
+              key={post.id}
+              ref={(el) => setSlideRef(idx, el)}
+              data-index={idx}
+              className="relative w-full flex-shrink-0"
+              style={{
+                height: '100dvh',
+                scrollSnapAlign: 'start',
+                scrollSnapStop: 'always',
+                background: '#000',
+              }}
+            />
+          );
+        }
+
+        return (
+          <FeedSlide
+            key={post.id}
+            post={post}
+            index={idx}
+            setRef={(el) => setSlideRef(idx, el)}
+            activeTab={activeTab}
+            followOverrides={followOverrides}
+            onFollowChange={onFollowChange}
+            onFirstFrameReady={idx === 0 ? handleFirstFrame : undefined}
+            onLike={onLike}
+            onComment={onComment}
+            onShare={onShare}
+            getLikeState={getLikeState}
+            getCommentCount={getCommentCount}
+            onZoomChange={handleZoomChange}
+            activeIndexOverride={activeIndexOverride}
+          />
+        );
+      })}
 
       {!hasNextPage && posts.length > 0 && (
         <div
+          data-index={posts.length}
           className="w-full flex-shrink-0 flex flex-col items-center justify-center bg-background"
           style={{
             height: '100dvh',
