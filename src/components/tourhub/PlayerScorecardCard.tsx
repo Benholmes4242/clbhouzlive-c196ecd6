@@ -101,9 +101,24 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
 
 function HoleCell({ hole }: { hole: HoleScore }) {
   const c = getScoreColorSet(hole.scoreToPar);
-  const isCircle = hole.scoreToPar <= -1;
-  const isSquare = hole.scoreToPar >= 1;
+  const isEagleOrBetter = hole.scoreToPar <= -2;
+  const isBirdie = hole.scoreToPar === -1;
   const isPar = hole.scoreToPar === 0;
+  const isBogey = hole.scoreToPar === 1;
+  const isDoublePlus = hole.scoreToPar >= 2;
+
+  // Shape: birdie/eagle = circle, par/bogey/double = square
+  const isCircle = hole.scoreToPar <= -1;
+  const borderRadius = isCircle ? '50%' : 5;
+
+  // Double outline for eagle and double bogey+
+  const outlineStyle = (isEagleOrBetter || isDoublePlus) ? {
+    outline: `1px solid ${c.ring}`,
+    outlineOffset: '1px',
+  } : {};
+
+  // Par uses dashed border
+  const borderStyle = isPar ? `1.5px dashed ${c.ring}` : `1.5px solid ${c.ring}`;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
@@ -115,12 +130,13 @@ function HoleCell({ hole }: { hole: HoleScore }) {
       </span>
       <div style={{
         width: 32, height: 32,
-        borderRadius: isCircle ? '50%' : isSquare ? 5 : '50%',
-        border: isPar ? '1.5px dashed rgba(255,255,255,0.18)' : `1.5px solid ${c.ring}`,
+        borderRadius,
+        border: borderStyle,
         background: isPar ? 'transparent' : c.bg,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         gap: 0,
-      }}>
+        ...outlineStyle,
+      } as React.CSSProperties}>
         <span style={{
           fontSize: 11, fontWeight: 800,
           color: c.text,
