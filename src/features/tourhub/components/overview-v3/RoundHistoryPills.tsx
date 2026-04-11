@@ -1,4 +1,4 @@
-import { getScoreColorSet } from '../../utils/scoreColors';
+
 
 interface RoundHistoryPillsProps {
   round1: number | null;
