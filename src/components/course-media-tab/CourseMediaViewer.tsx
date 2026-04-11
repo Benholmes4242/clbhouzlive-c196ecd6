@@ -185,7 +185,7 @@ export function CourseMediaViewer() {
               <div
                 style={{
                   position: 'fixed',
-                  bottom: '85px',
+                  bottom: 'var(--bottom-nav-height, 88px)',
                   left: 0,
                   right: 0,
                   pointerEvents: 'auto',
