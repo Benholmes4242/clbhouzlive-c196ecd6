@@ -357,8 +357,8 @@ export function useLiveArena() {
     queryKey: ['live-arena', 'v2'],
     queryFn: fetchLiveArenaData,
     staleTime: 30_000,             // 30s — matches sync interval
-    refetchInterval: false,        // No polling — Realtime pushes updates
-    refetchOnWindowFocus: false,   // Realtime handles updates; focus refetch triggers unnecessary feed rebuilds
+    refetchInterval: 2 * 60_000,  // 2-min polling fallback if Realtime misses inprogress status update
+    refetchOnWindowFocus: true,    // Tab-switch recovery for missed Realtime events
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 }
