@@ -152,15 +152,10 @@ export function TourHubNavOverlay({
     navigate(`/tourhub/player/${playerId}`);
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [onClose, navigate]);
-  
-  if (typeof document === 'undefined') return null;
-  
-  const portalRoot = document.getElementById('portal-root') || document.body;
 
-  const displayPlayers = topPlayers?.slice(0, 5) || [];
-  const hasLive = (liveCount ?? 0) > 0;
 
   // Cycle ticker index when multiple live tournaments
+  const hasLive = (liveCount ?? 0) > 0;
   useEffect(() => {
     if (!hasLive || (liveCount ?? 0) <= 1) return;
     const interval = setInterval(() => {
@@ -169,6 +164,12 @@ export function TourHubNavOverlay({
     return () => clearInterval(interval);
   }, [hasLive, liveCount]);
   // TODO: extend useLiveLeaderTeaser to return array for multi-tournament cycling
+
+  if (typeof document === 'undefined') return null;
+  
+  const portalRoot = document.getElementById('portal-root') || document.body;
+
+  const displayPlayers = topPlayers?.slice(0, 5) || [];
 
   const scheduleSubtitle = hasLive
     ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
