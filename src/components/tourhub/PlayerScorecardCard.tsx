@@ -269,14 +269,14 @@ function RoundTabs({
             }}
           >
             <span style={{
-              fontSize: 8, fontWeight: 700,
+              fontSize: 9, fontWeight: 700,
               color: isActive ? '#ffffff' : 'rgba(255,255,255,0.35)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
               R{roundNum}
             </span>
             <span style={{
-              fontSize: 14, fontWeight: 800,
+              fontSize: 17, fontWeight: 800,
               color: hasData ? scoreColor : 'rgba(255,255,255,0.18)',
               fontVariantNumeric: 'tabular-nums',
             }}>
