@@ -13,6 +13,7 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
+import { useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
@@ -27,7 +28,7 @@ import { LazySection } from '../overview-v3/LazySection';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { HERO_STYLES_FULLBLEED } from '../../constants/heroStyles';
+import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
@@ -76,28 +77,9 @@ export function OverviewPageV3() {
         {/* 1. Hero Carousel */}
         <motion.div 
           className="relative w-full z-0"
-          style={{ ...HERO_STYLES_FULLBLEED.containerNoHeader, opacity: heroOpacity, scale: heroScale, position: 'relative' }}
+          style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
         >
           <HeroCarousel hasHeader={false} />
-
-          {/* Scroll hint arrow */}
-          <div style={{
-            position: 'absolute', bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 20px) + 10px)',
-            left: 0, right: 0,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-            pointerEvents: 'none', zIndex: 30,
-          }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', letterSpacing: '1px', textTransform: 'uppercase' }}>
-              More below
-            </span>
-            <svg
-              width="20" height="12" viewBox="0 0 20 12"
-              fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-              style={{ animation: 'heroArrowBounce 2s ease-in-out infinite' }}
-            >
-              <path d="M2 2 L10 10 L18 2" />
-            </svg>
-          </div>
         </motion.div>
 
         {/* Content sections */}
