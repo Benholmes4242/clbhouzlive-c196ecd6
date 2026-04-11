@@ -380,7 +380,7 @@ export function TourHubNavOverlay({
                         gap: 8,
                         overflowX: 'auto',
                         paddingBottom: 4,
-                        paddingLeft: 18,
+                        paddingLeft: 50,
                         paddingRight: 18,
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
