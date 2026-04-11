@@ -1567,6 +1567,17 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLive
   const [isPaused, setIsPaused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Detect current live slide and emit upward
+  const currentSlide = safeSlides[currentIndex];
+  const isCurrentLive = currentSlide?.type === 'live';
+
+  useEffect(() => {
+    onLiveStateChange?.(isCurrentLive);
+    if (!isCurrentLive) {
+      onLiveLeaderboardData?.(null);
+    }
+  }, [isCurrentLive, currentIndex, onLiveStateChange, onLiveLeaderboardData]);
+
   const handleToggleExpand = useCallback(() => {
     setIsExpanded(prev => !prev);
   }, []);
