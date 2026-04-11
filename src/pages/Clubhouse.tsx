@@ -157,11 +157,19 @@ const ClubhouseContent = () => {
 
 
   // ── Hide chrome when PGA card is active ──
-  const { setVisible: setBottomNavVisible } = useBottomNavigation();
+   const { setVisible: setBottomNavVisible } = useBottomNavigation();
+  // Effect 1: Hide nav on mount, show only when skeleton resolves
   useEffect(() => {
-    setBottomNavVisible(!isTournamentCardActive);
+    setBottomNavVisible(false);
     return () => { setBottomNavVisible(true); };
-  }, [isTournamentCardActive, setBottomNavVisible]);
+  }, [setBottomNavVisible]);
+
+  // Effect 2: Once feed is ready, gate on tournament card state
+  useEffect(() => {
+    if (!skeletonVisible) {
+      setBottomNavVisible(!isTournamentCardActive);
+    }
+  }, [skeletonVisible, isTournamentCardActive, setBottomNavVisible]);
 
   // ── Feed hooks ──
   const suggestedFeed = useSuggestedFeed(user?.id);
