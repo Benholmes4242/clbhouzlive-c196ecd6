@@ -333,8 +333,24 @@ export function TourHubNavOverlay({
               />
             </div>
             
+            {/* Grab bar — top of sheet, no close button needed */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              paddingTop: 10,
+              paddingBottom: 6,
+              flexShrink: 0,
+            }}>
+              <div style={{
+                width: 32,
+                height: 3,
+                borderRadius: 2,
+                background: 'rgba(0,0,0,0.12)',
+              }} />
+            </div>
+
             {/* Header spacer for safe area */}
-            <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }} />
+            <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 20px)' }} />
             
             {/* Scrollable content — rankings + nav items together */}
             <div

@@ -57,24 +57,40 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
       >
       {showBurger && (
-        <button
-          onClick={onBurgerClick}
-          className="relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl focus:outline-none active:scale-95"
-          style={{ transition: 'all var(--motion-fast) var(--ease-standard)' }}
-          aria-label="Tour menu"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn(isClubhouseTheme ? "text-[hsl(var(--clubhouse-text-muted))]" : "text-slate-500")}>
-            <line x1="4" y1="6" x2="20" y2="6" />
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <line x1="4" y1="18" x2="20" y2="18" />
-          </svg>
-          <span className={cn(
-            "text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap",
-            isClubhouseTheme ? "text-[hsl(var(--clubhouse-text-muted))]" : "text-slate-500"
-          )}>
-            Menu
-          </span>
-        </button>
+        <>
+          <button
+            onClick={onBurgerClick}
+            className="relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl focus:outline-none active:scale-95"
+            style={{ transition: 'all var(--motion-fast) var(--ease-standard)' }}
+            aria-label="Tour sections menu"
+          >
+            {/* 2×2 grid icon */}
+            <div style={{
+              width: 24,
+              height: 24,
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 3,
+              padding: 4,
+              background: 'rgba(15,23,42,0.07)',
+              borderRadius: 7,
+            }}>
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} style={{ background: '#475569', borderRadius: 2 }} />
+              ))}
+            </div>
+            <span className="text-[9px] min-[375px]:text-[10px] leading-none font-semibold whitespace-nowrap text-slate-500">
+              Sections
+            </span>
+          </button>
+          {/* Vertical divider — separates Sections from main nav tabs */}
+          <div style={{
+            width: 1,
+            height: 28,
+            background: 'rgba(0,0,0,0.08)',
+            flexShrink: 0,
+          }} />
+        </>
       )}
       {navigationTabs.map((tab) => {
         const isActive = activeTab === tab.id;
@@ -115,7 +131,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               <Icon
                 className={cn(
                   "h-[24px] w-[24px] [stroke-width:1.5]",
-                  isLive
+                  isLive && tab.id === 'tourhub'
+                    ? "opacity-100"
+                    : isLive
                     ? "text-green-500 opacity-100"
                     : isLightTheme
                       ? isActive
@@ -128,7 +146,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 style={{
                   transform: isActive ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all var(--motion-fast) var(--ease-pop)',
-                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
+                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' }),
+                  ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
                 }}
               />
 
@@ -149,13 +168,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 </span>
               )}
 
-              {/* Live indicator — green pulse dot, shown when tab has live content */}
-              {isLive && (tabBadges[tab.id] ?? 0) === 0 && (
-                <span
-                  className="absolute -top-1 -right-1.5 h-[8px] w-[8px] rounded-full bg-green-500"
-                  style={{ animation: 'navLivePulse 2s ease-in-out infinite' }}
-                />
-              )}
             </div>
             
             {/* Label */}
@@ -175,7 +187,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 )}
                 style={{
                   transition: 'color var(--motion-fast) var(--ease-standard)',
-                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
+                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' }),
+                  ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
                 }}
               >
                 {isLive ? 'LIVE' : tab.label}
