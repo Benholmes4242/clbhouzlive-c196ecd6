@@ -27,6 +27,9 @@ img[src*="Silhouette"] {
   background-color: #F8FAFC;
 }
 
+/* SnapFeed — hide scrollbar via CSS instead of per-render inline <style> */
+[data-snap-feed]::-webkit-scrollbar { display: none; }
+
 /* 
  * ============================================================================
  * CRITICAL: PREVENT PULL-TO-REFRESH AND OVERSCROLL - DO NOT MODIFY OR REMOVE
