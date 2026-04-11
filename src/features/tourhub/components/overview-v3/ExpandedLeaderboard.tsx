@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { Database } from '@/integrations/supabase/types';
@@ -386,18 +387,18 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
         ))}
       </div>
 
-      {/* Tap hint — discoverability for scorecard */}
-      {onPlayerTap && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 16px 6px', opacity: 0.45 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-            <polyline points="10 17 15 12 10 7" />
-          </svg>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-            Tap any player to see their scorecard
-          </span>
-        </div>
-      )}
+      {/* Explore below hint with bouncing arrow */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, paddingTop: 12, paddingBottom: 6, opacity: 0.45 }}>
+        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
+          Explore below
+        </span>
+        <ChevronDown
+          style={{
+            width: 18, height: 18, color: 'rgba(255,255,255,0.5)',
+            animation: 'heroChevronBounce 1.8s ease-in-out infinite',
+          }}
+        />
+      </div>
     </>
   );
 }

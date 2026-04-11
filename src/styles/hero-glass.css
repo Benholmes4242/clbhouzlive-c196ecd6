@@ -680,3 +680,9 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
 }
+
+/* ── Bouncing chevron for "Explore below" hint ── */
+@keyframes heroChevronBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
