@@ -1043,26 +1043,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   {isExpanded ? (
                     <AnimatePresence mode="wait">
                       {selectedPlayer ? (
-                        <motion.div
+                        <PlayerScorecardCard
                           key="scorecard"
-                          initial={{ opacity: 0, x: 60 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 60 }}
-                          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                          style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-                        >
-                          <PlayerScorecardCard
-                            player={selectedPlayer}
-                            tournamentId={tournament.id}
-                            tournamentName={tournament.name}
-                            courseName={tournament.venueName || ''}
-                            onBack={handleBackToLeaderboard}
-                            onClose={() => {
-                              setSelectedPlayer(null);
-                              onToggleExpand();
-                            }}
-                          />
-                        </motion.div>
+                          player={selectedPlayer}
+                          tournamentId={tournament.id}
+                          tournamentName={tournament.name}
+                          courseName={tournament.venueName || ''}
+                          onBack={handleBackToLeaderboard}
+                          onClose={() => {
+                            setSelectedPlayer(null);
+                            onToggleExpand();
+                          }}
+                        />
                       ) : (
                         <motion.div
                           key="leaderboard"

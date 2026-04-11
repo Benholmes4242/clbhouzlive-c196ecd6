@@ -84,14 +84,14 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
         <defs>
           <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity={0.18} />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
+            <stop offset="0%" stopColor={lastV <= 0 ? '#F7931E' : '#EF4444'} stopOpacity={0.18} />
+            <stop offset="100%" stopColor={lastV <= 0 ? '#F7931E' : '#EF4444'} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <polyline points={pts} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
+        <polyline points={pts} fill="none" stroke={lastV <= 0 ? '#F7931E' : '#EF4444'} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
         <polygon points={`0,${H} ${pts} ${W},${H}`} fill="url(#sparkFill)" />
         <line x1={0} y1={H - ((0 - min) / range) * (H - 4) - 2} x2={W} y2={H - ((0 - min) / range) * (H - 4) - 2} stroke="rgba(255,255,255,0.10)" strokeWidth={0.5} strokeDasharray="3,3" />
-        <circle cx={W - 4} cy={lastY} r={3} fill="#ffffff" opacity={0.9} />
+        <circle cx={W - 4} cy={lastY} r={3} fill={lastV <= 0 ? '#F7931E' : '#EF4444'} opacity={0.9} />
       </svg>
     </div>
   );
@@ -101,44 +101,28 @@ function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
 
 function HoleCell({ hole }: { hole: HoleScore }) {
   const c = getScoreColorSet(hole.scoreToPar);
-  const isEagleOrBetter = hole.scoreToPar <= -2;
-  const isBirdie = hole.scoreToPar === -1;
-  const isPar = hole.scoreToPar === 0;
-  const isBogey = hole.scoreToPar === 1;
-  const isDoublePlus = hole.scoreToPar >= 2;
-
-  // Shape: birdie/eagle = circle, par/bogey/double = square
   const isCircle = hole.scoreToPar <= -1;
-  const borderRadius = isCircle ? '50%' : 5;
-
-  // Double outline for eagle and double bogey+
-  const outlineStyle = (isEagleOrBetter || isDoublePlus) ? {
-    outline: `1px solid ${c.ring}`,
-    outlineOffset: '1px',
-  } : {};
-
-  // Par uses dashed border
-  const borderStyle = isPar ? `1.5px dashed ${c.ring}` : `1.5px solid ${c.ring}`;
+  const isSquare = hole.scoreToPar >= 1;
+  const isPar = hole.scoreToPar === 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-      <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
         {hole.holeNumber}
       </span>
       <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)' }}>
         {hole.par}
       </span>
       <div style={{
-        width: 34, height: 34,
-        borderRadius,
-        border: borderStyle,
+        width: 32, height: 32,
+        borderRadius: isCircle ? '50%' : isSquare ? 5 : '50%',
+        border: isPar ? '1.5px dashed rgba(255,255,255,0.18)' : `1.5px solid ${c.ring}`,
         background: isPar ? 'transparent' : c.bg,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         gap: 0,
-        ...outlineStyle,
-      } as React.CSSProperties}>
+      }}>
         <span style={{
-          fontSize: 13, fontWeight: 800,
+          fontSize: 11, fontWeight: 800,
           color: c.text,
           lineHeight: 1,
         }}>
@@ -197,11 +181,11 @@ function NineHoleRow({
   return (
     <div className="px-3">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[12px] font-semibold text-white/45 uppercase tracking-[1.5px]">{label}</span>
+        <span className="text-[11px] font-semibold text-white/40 uppercase tracking-[1.5px]">{label}</span>
         {hasAnyScore && (
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-white/30">Par {outPar}</span>
-            <span className="text-sm font-bold text-white/80">{outScore || '—'}</span>
+            <span className="text-xs font-bold text-white/80">{outScore || '—'}</span>
           </div>
         )}
       </div>
@@ -247,8 +231,8 @@ function RoundTabs({
           : toPar > 0 ? `+${toPar}`
           : `${toPar}`;
         const scoreColor = toPar === null ? 'rgba(255,255,255,0.20)'
-          : toPar < 0 ? '#ffffff'
-          : toPar > 0 ? '#f87171'
+          : toPar < 0 ? '#F7931E'
+          : toPar > 0 ? '#EF4444'
           : 'rgba(255,255,255,0.55)';
 
         return (
@@ -260,23 +244,23 @@ function RoundTabs({
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
               padding: '6px 14px',
               borderRadius: 9,
-              background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+              background: isActive ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.04)',
               border: isActive
-                ? '1.5px solid rgba(255,255,255,0.25)'
+                ? '1.5px solid rgba(247,147,30,0.35)'
                 : '1px solid rgba(255,255,255,0.07)',
               cursor: hasData ? 'pointer' : 'default',
               transition: 'all 0.15s ease',
             }}
           >
             <span style={{
-              fontSize: 9, fontWeight: 700,
-              color: isActive ? '#ffffff' : 'rgba(255,255,255,0.35)',
+              fontSize: 8, fontWeight: 700,
+              color: isActive ? '#F7931E' : 'rgba(255,255,255,0.35)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
               R{roundNum}
             </span>
             <span style={{
-              fontSize: 17, fontWeight: 800,
+              fontSize: 14, fontWeight: 800,
               color: hasData ? scoreColor : 'rgba(255,255,255,0.18)',
               fontVariantNumeric: 'tabular-nums',
             }}>
@@ -430,8 +414,8 @@ export function PlayerScorecardCard({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 60 }}
       transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-      className="flex flex-col"
-      style={{ overflow: 'hidden', flex: 1, minHeight: 0 }}
+      className="flex flex-col h-full"
+      style={{ overflow: 'hidden' }}
     >
 
       {/* ── TOP BAR — back + condensed live badge ── */}
@@ -458,79 +442,72 @@ export function PlayerScorecardCard({
         </span>
       </div>
 
-      {/* ── PLAYER HERO — horizontal layout (matched to live state sizing) ── */}
+      {/* ── PLAYER HERO — horizontal layout ── */}
       <div style={{
-        display: 'flex', alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        padding: '0 16px 12px',
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '0 16px 10px',
         flexShrink: 0,
       }}>
-        {/* Left — avatar + name block */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-          {/* Avatar — matched to live state 60x62 */}
-          <button
-            onClick={() => navigate(`/tourhub/player/${player.id}`)}
-            style={{ flexShrink: 0, position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-            className="active:scale-95 transition-transform"
-          >
-            <div style={{
-              width: 60, height: 62, borderRadius: '30%',
-              border: '2px solid rgba(255,255,255,0.25)',
-              background: 'rgba(255,255,255,0.08)',
-              overflow: 'hidden',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              {player.photoUrl ? (
-                <img src={player.photoUrl} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-              ) : (
-                <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>
-                  {player.firstName?.[0]}{player.lastName?.[0]}
-                </span>
-              )}
-            </div>
-            <div style={{
-              position: 'absolute', bottom: -2, right: -2,
-              background: 'white', borderRadius: '50%',
-              width: 18, height: 18,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 9, fontWeight: 800, color: 'black',
-            }}>
-              {player.position}
-            </div>
-          </button>
-
-          {/* Name + status — matched to live 22px */}
-          <div style={{ paddingBottom: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{
-                fontSize: 22, fontWeight: 700, color: '#fff',
-                letterSpacing: '-0.4px', lineHeight: 1.1,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
-                {player.name}
+        {/* Avatar */}
+        <button
+          onClick={() => navigate(`/tourhub/player/${player.id}`)}
+          style={{ flexShrink: 0, position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          className="active:scale-95 transition-transform"
+        >
+          <div style={{
+            width: 52, height: 55, borderRadius: '34%',
+            border: '2px solid rgba(255,255,255,0.22)',
+            background: 'rgba(255,255,255,0.08)',
+            overflow: 'hidden',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {player.photoUrl ? (
+              <img src={player.photoUrl} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+            ) : (
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>
+                {player.firstName?.[0]}{player.lastName?.[0]}
               </span>
-              {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()] && (
-                <span style={{ fontSize: 15, flexShrink: 0 }}>
-                  {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()]}
-                </span>
-              )}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5 }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
-                {`Round ${currentRound}`}
-                {player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
-              </span>
-            </div>
+            )}
           </div>
+          <div style={{
+            position: 'absolute', bottom: -2, right: -2,
+            background: 'white', borderRadius: '50%',
+            width: 16, height: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 8, fontWeight: 800, color: 'black',
+          }}>
+            {player.position}
+          </div>
+        </button>
+
+        {/* Name + status */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{
+              fontSize: 16, fontWeight: 800, color: '#fff',
+              lineHeight: 1.2,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {player.name}
+            </span>
+            {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()] && (
+              <span style={{ fontSize: 14, flexShrink: 0 }}>
+                {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()]}
+              </span>
+            )}
+          </div>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', display: 'block', marginTop: 2 }}>
+            {`Round ${currentRound}`}
+            {player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
+          </span>
         </div>
 
-        {/* Total score — matched to live state prominent sizing */}
+        {/* Total score — Change 7: canonical amber/red */}
         <span style={{
-          fontSize: 48, fontWeight: 800, lineHeight: 1,
-          color: player.totalScore < 0 ? '#ffffff' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
-          fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
-          flexShrink: 0,
+          fontSize: 28, fontWeight: 900,
+          color: player.totalScore < 0 ? '#F7931E' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#EF4444',
+          fontFamily: "'JetBrains Mono','SF Mono',monospace",
+          letterSpacing: -1, flexShrink: 0,
         }}>
           {formatScoreToPar(player.totalScore)}
         </span>
@@ -562,11 +539,11 @@ export function PlayerScorecardCard({
           {activeRoundData && activeRoundData.holesCompleted > 0 && (
             <div style={{ display: 'flex', gap: 4, padding: '0 16px 8px' }}>
               {[
-                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
-                { v: activeRoundData.birdies,      label: 'Birdies', color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
-                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.04)' },
-                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
-                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
+                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#22C55E', bg: 'rgba(34,197,94,0.08)' },
+                { v: activeRoundData.birdies,      label: 'Birdies', color: '#F7931E', bg: 'rgba(247,147,30,0.08)' },
+                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.55)', bg: 'rgba(255,255,255,0.04)' },
+                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
+                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#991B1B', bg: 'rgba(153,27,27,0.08)' },
               ].map(stat => (
                 <div key={stat.label} style={{
                   flex: 1, textAlign: 'center',
@@ -575,8 +552,8 @@ export function PlayerScorecardCard({
                   background: stat.bg,
                   border: '1px solid rgba(255,255,255,0.06)',
                 }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-                  <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.32)', textTransform: 'uppercase', letterSpacing: '0.4px', marginTop: 2 }}>{stat.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
+                  <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.4px', marginTop: 2 }}>{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -613,17 +590,17 @@ export function PlayerScorecardCard({
               marginTop: 6,
               borderTop: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 Total · {activeRoundData.holesCompleted} holes
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.70)' }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.70)' }}>
                   {activeRoundData.totalStrokes}
                 </span>
                 <span style={{
-                  fontSize: 24, fontWeight: 800,
-                  color: activeRoundData.totalToPar < 0 ? '#ffffff'
-                       : activeRoundData.totalToPar > 0 ? '#f87171'
+                  fontSize: 20, fontWeight: 800,
+                  color: activeRoundData.totalToPar < 0 ? '#F7931E'
+                       : activeRoundData.totalToPar > 0 ? '#EF4444'
                        : 'rgba(255,255,255,0.55)',
                   fontVariantNumeric: 'tabular-nums',
                 }}>
