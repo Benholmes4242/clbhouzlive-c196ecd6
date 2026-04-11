@@ -14,7 +14,7 @@
 export const HEADER_HEIGHT = 55;
 
 /** Base hero height values */
-export const HERO_HEIGHT = 'calc(100dvh - var(--bottom-nav-height, 88px))';
+export const HERO_HEIGHT = '85dvh';
 export const HERO_MIN_HEIGHT = 0;
 
 /** For pages WITH a header (hero bleeds behind header + safe area) */
