@@ -1,6 +1,6 @@
 /**
- * TourHubNavOverlay - Premium overlay menu for Tour Hub navigation
- * Card-style nav items with live data teasers and cinematic animations
+ * TourHubNavOverlay - Command Centre bottom sheet for Tour Hub navigation
+ * Dark editorial design with live ticker, world rankings strip, and clean nav rows
  */
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
@@ -38,9 +38,6 @@ interface LinkItem {
   badge?: string;
 }
 
-// Clbhouz brand orange
-const CLBHOUZ_ORANGE = '#F59E0B';
-
 const NAV_ITEMS: NavItem[] = [
   { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <span className="text-xl">🌍</span> },
   { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening - past, present, and upcoming.', icon: <span className="text-xl">📅</span> },
@@ -58,7 +55,6 @@ const LINK_ITEMS: LinkItem[] = [
   },
 ];
 
-// Animation config
 const ITEM_EASE: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
 interface TourHubNavOverlayProps {
@@ -78,7 +74,6 @@ export function TourHubNavOverlay({
   const scrollRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Only fetch data when overlay is open (lazy-mount)
   const { data: topPlayers, isLoading: rankingsLoading } = useTopWorldRanked(5);
   const { data: liveCount } = useLiveTournamentCount();
   const { data: leaderTeaser } = useLiveLeaderTeaser();
@@ -105,7 +100,7 @@ export function TourHubNavOverlay({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // TM-10: Android back button handler
+  // Android back button handler
   useEffect(() => {
     if (!isOpen) return;
     window.history.pushState({ drawer: true }, '');
@@ -172,12 +167,10 @@ export function TourHubNavOverlay({
   const displayPlayers = topPlayers?.slice(0, 5) || [];
   const hasLive = (liveCount ?? 0) > 0;
 
-  // Generate dynamic subtitle for Schedule
   const scheduleSubtitle = hasLive
     ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
     : "What's happening - past, present, and upcoming.";
 
-  // TM-08: aria-labels for each card
   const getAriaLabel = (item: NavItem) => {
     switch (item.value) {
       case 'overview': return 'Overview — The global golf season at a glance';
@@ -188,14 +181,12 @@ export function TourHubNavOverlay({
     }
   };
 
-  // Helper: render card teaser text — TM-04: player + tournament names tappable
   const renderTeaser = (item: NavItem) => {
-    // Show skeleton while leader data is loading
     if (item.value === 'overview' && hasLive && !leaderTeaser) {
       return (
-        <div className="mt-1 flex flex-col gap-1.5 animate-pulse">
-          <div className="h-3 w-3/4 rounded bg-slate-100" />
-          <div className="h-3 w-1/2 rounded bg-slate-100" />
+        <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ height: 12, width: '75%', borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} className="animate-pulse" />
+          <div style={{ height: 12, width: '50%', borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} className="animate-pulse" />
         </div>
       );
     }
@@ -204,13 +195,14 @@ export function TourHubNavOverlay({
         ? (leaderTeaser.score < 0 ? `${leaderTeaser.score}` : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
         : null;
       return (
-        <p className="text-[13px] mt-1 text-muted-foreground">
+        <p style={{ fontSize: 11, marginTop: 2, color: 'rgba(255,255,255,0.4)' }}>
           {leaderTeaser.isTied ? (
-            <span className="font-medium">{leaderTeaser.playerName}</span>
+            <span style={{ fontWeight: 500 }}>{leaderTeaser.playerName}</span>
           ) : (
             <button
               type="button"
-              className="font-medium transition-opacity active:opacity-70 focus:outline-none"
+              style={{ fontWeight: 500, color: 'rgba(255,255,255,0.7)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              className="transition-opacity active:opacity-70 focus:outline-none"
               onClick={(e) => {
                 e.stopPropagation();
                 if (leaderTeaser.playerId) handlePlayerClick(leaderTeaser.playerId);
@@ -221,14 +213,15 @@ export function TourHubNavOverlay({
           )}
           {leaderTeaser.isTied ? ' at ' : ' leads at '}
           {scoreStr !== null && (
-            <span style={{ color: leaderTeaser.score !== null && leaderTeaser.score < 0 ? TOUR_COLORS.scoreUnderPar : undefined }}>
+            <span style={{ color: '#fff' }}>
               {scoreStr}
             </span>
           )}
           <br />
           <button
             type="button"
-            className="truncate transition-opacity active:opacity-70 focus:outline-none text-left"
+            style={{ color: 'rgba(255,255,255,0.7)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+            className="truncate transition-opacity active:opacity-70 focus:outline-none"
             onClick={(e) => {
               e.stopPropagation();
               if (leaderTeaser.tournamentId) {
@@ -247,21 +240,16 @@ export function TourHubNavOverlay({
     return null;
   };
 
-  // Helper: render right-side badge for nav items
   const renderBadge = (item: NavItem) => {
     if (item.value === 'schedule' && hasLive) {
       return (
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <motion.span
-            className="w-2 h-2 rounded-full"
-            style={{ background: TOUR_COLORS.liveGreen }}
+            style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', display: 'inline-block' }}
             animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           />
-          <span 
-            className="text-[11px] font-bold uppercase tracking-wide"
-            style={{ color: TOUR_COLORS.liveGreen }}
-          >
+          <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22C55E' }}>
             {liveCount} LIVE
           </span>
         </div>
@@ -274,16 +262,14 @@ export function TourHubNavOverlay({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop - tap to close */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
             className="fixed inset-0 z-[9998]"
-            style={{
-              background: 'rgba(0, 0, 0, 0.35)',
-            }}
+            style={{ background: 'rgba(0, 0, 0, 0.35)' }}
             onClick={onClose}
             aria-hidden="true"
           />
@@ -291,181 +277,211 @@ export function TourHubNavOverlay({
           {/* Bottom sheet panel */}
           <motion.div
             ref={overlayRef}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{
-              type: 'spring',
-              damping: 25,
-              stiffness: 300,
-            }}
-            className="fixed inset-x-0 bottom-0 z-[10000] w-full rounded-t-[24px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 32, stiffness: 280 }}
+            className="fixed inset-x-0 bottom-0 z-[10000] flex flex-col overflow-hidden"
             style={{
-              maxHeight: '92dvh',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+              width: '100%',
+              borderRadius: '20px 20px 0 0',
+              background: '#0d1623',
+              borderTop: '1px solid rgba(255,255,255,0.07)',
+              maxHeight: '88vh',
             }}
             role="dialog"
             aria-modal="true"
             aria-label="Tour Hub navigation menu"
           >
-            {/* Grab bar */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              paddingTop: 10,
-              paddingBottom: 4,
-              flexShrink: 0,
-            }}>
-              <div style={{
-                width: 36,
-                height: 4,
-                borderRadius: 2,
-                background: 'rgba(0,0,0,0.12)',
-              }} />
+            {/* Handle + close row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px 0' }}>
+              <div style={{ width: 32, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.15)' }} />
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '50%',
+                  width: 28, height: 28,
+                  cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'rgba(255,255,255,0.45)',
+                  fontSize: 13,
+                }}
+              >
+                ✕
+              </button>
             </div>
-            
-            {/* Scrollable content — rankings + nav items together */}
+
+            {/* Scrollable content */}
             <div
               className="flex-1 overflow-y-auto min-h-0"
-              style={{
-                overscrollBehavior: 'contain',
-                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
-              }}
+              style={{ overscrollBehavior: 'contain' }}
             >
-            
-            {/* World Rankings Strip */}
-            {(rankingsLoading || displayPlayers.length > 0) && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08 }}
-                className="px-5 pb-4 pt-4"
-              >
-                {/* Section header */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🏆</span>
-                    <span className="text-[11px] font-bold uppercase" style={{ letterSpacing: "0.1em", color: "#94a3b8" }}>
+              {/* SECTION 2 — Live Ticker */}
+              {hasLive && leaderTeaser && (
+                <div style={{
+                  margin: '14px 18px 0',
+                  background: 'linear-gradient(90deg, rgba(34,197,94,0.08) 0%, rgba(34,197,94,0.03) 100%)',
+                  border: '1px solid rgba(34,197,94,0.15)',
+                  borderRadius: 10,
+                  padding: '10px 14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <motion.span
+                      style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }}
+                      animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    />
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: '#22C55E', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Live now</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{leaderTeaser.tournamentName}</div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)' }}>Leader</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>
+                      {leaderTeaser.playerName.split(' ').pop()}{' '}
+                      <span style={{ color: '#fff' }}>
+                        {leaderTeaser.score !== null
+                          ? leaderTeaser.score < 0 ? `${leaderTeaser.score}` : leaderTeaser.score > 0 ? `+${leaderTeaser.score}` : 'E'
+                          : ''}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 3 — World Rankings Strip */}
+              {(rankingsLoading || displayPlayers.length > 0) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08 }}
+                >
+                  {/* Section header */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '14px 18px 8px' }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.28)', letterSpacing: '2px', textTransform: 'uppercase' }}>
                       World Rankings
                     </span>
+                    <button onClick={handleViewAllRankings} style={{ fontSize: 10, color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>
+                      View all ›
+                    </button>
                   </div>
-                  
-                  <motion.button
-                    onClick={handleViewAllRankings}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-0.5 text-[13px] font-semibold transition-opacity active:opacity-70 outline-none focus:outline-none focus-visible:outline-none"
-                    style={{ color: "#F5A623" }}
-                  >
-                    View all
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </motion.button>
-                </div>
-                
-                {/* Glass Cards Row — with right-side fade overlay */}
-                <div className="relative">
-                  <div
-                    ref={scrollRef}
-                    className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide"
-                    style={{
-                      scrollbarWidth: 'none',
-                      msOverflowStyle: 'none',
-                      scrollSnapType: 'x mandatory',
-                      WebkitOverflowScrolling: 'touch',
-                    }}
-                  >
-                    {rankingsLoading ? (
-                      Array.from({ length: 5 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl animate-pulse"
-                          style={{
-                            minWidth: '155px',
-                            background: 'rgba(255,255,255,0.80)',
-                            border: '1px solid rgba(0,0,0,0.07)',
-                          }}
-                        >
-                          <div className="w-5 h-3 rounded-full bg-slate-200 flex-shrink-0" />
-                          <div className="w-9 h-9 rounded-[11px] bg-slate-200 flex-shrink-0" />
-                          <div className="flex flex-col gap-1.5 flex-1">
-                            <div className="h-3 w-16 rounded bg-slate-200" />
-                            <div className="h-2.5 w-12 rounded bg-slate-200" />
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      displayPlayers.map((player, index) => {
-                        const isFirst = index === 0;
-                        const lastName = player.playerName.split(' ').slice(-1)[0];
-                        const country = toTitleCase(player.country);
-                        
-                        return (
-                          <motion.button
-                            key={player.playerId}
-                            initial={false}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => handlePlayerClick(player.playerId)}
-                            className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl transition-all"
+
+                  {/* Player cards row */}
+                  <div style={{ position: 'relative' }}>
+                    <div
+                      ref={scrollRef}
+                      className="scrollbar-hide"
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                        overflowX: 'auto',
+                        paddingBottom: 4,
+                        paddingLeft: 18,
+                        paddingRight: 18,
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        scrollSnapType: 'x mandatory',
+                        WebkitOverflowScrolling: 'touch',
+                      }}
+                    >
+                      {rankingsLoading ? (
+                        Array.from({ length: 5 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className="animate-pulse"
                             style={{
-                              scrollSnapAlign: 'start',
-                              background: isFirst 
-                                ? 'rgba(245,166,35,0.09)'
-                                : 'rgba(255,255,255,0.80)',
-                              border: isFirst 
-                                ? '1.5px solid rgba(245,166,35,0.22)'
-                                : '1px solid rgba(0,0,0,0.07)',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                              minWidth: '155px',
+                              flexShrink: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 8,
+                              padding: '8px 10px',
+                              borderRadius: 10,
+                              minWidth: 130,
+                              background: 'rgba(255,255,255,0.04)',
+                              border: '1px solid rgba(255,255,255,0.07)',
                             }}
                           >
-                            <span
-                              className="flex-shrink-0 text-center"
+                            <div style={{ width: 14, height: 12, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
+                            <div style={{ width: 36, height: 36, borderRadius: 11, background: 'rgba(255,255,255,0.08)' }} />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                              <div style={{ height: 12, width: 48, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
+                              <div style={{ height: 10, width: 36, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        displayPlayers.map((player, index) => {
+                          const isFirst = index === 0;
+                          const lastName = player.playerName.split(' ').slice(-1)[0];
+                          const country = toTitleCase(player.country);
+                          
+                          return (
+                            <motion.button
+                              key={player.playerId}
+                              initial={false}
+                              whileTap={{ scale: 0.97 }}
+                              onClick={() => handlePlayerClick(player.playerId)}
                               style={{
-                                width: '20px',
-                                fontSize: '13px',
-                                fontWeight: 700,
-                                fontVariantNumeric: 'tabular-nums',
-                                color: index === 0
-                                  ? 'hsl(var(--accent-amber))'
-                                  : 'hsl(var(--muted-foreground))',
+                                scrollSnapAlign: 'start',
+                                background: isFirst ? 'rgba(247,147,30,0.08)' : 'rgba(255,255,255,0.04)',
+                                border: isFirst ? '1px solid rgba(247,147,30,0.20)' : '1px solid rgba(255,255,255,0.07)',
+                                borderRadius: 10,
+                                padding: '8px 10px',
+                                minWidth: 130,
+                                display: 'flex', alignItems: 'center', gap: 8,
+                                cursor: 'pointer',
+                                flexShrink: 0,
                               }}
                             >
-                              {player.worldRank}
-                            </span>
-                            {(() => {
-                              const headshot = getPlayerHeadshotUrl(player.playerName, (player as any).tourCode ?? 'pga');
-                              const initials = getInitials(player.playerName);
-                              return (
-                                <AvatarWithInitials
-                                  src={headshot}
-                                  alt={player.playerName}
-                                  initials={initials}
-                                  size={36}
-                                />
-                              );
-                            })()}
-                            <div className="flex-1 min-w-0 text-left">
-                              <p className="text-sm font-semibold text-foreground truncate">
-                                {lastName}
-                              </p>
-                              <p className="text-[11px] text-muted-foreground truncate">
-                                {country || 'Unknown'}
-                              </p>
-                            </div>
-                          </motion.button>
-                        );
-                      })
-                    )}
+                              <span
+                                style={{
+                                  fontSize: 13, fontWeight: 800,
+                                  color: isFirst ? '#F7931E' : 'rgba(255,255,255,0.28)',
+                                  minWidth: 14,
+                                  fontVariantNumeric: 'tabular-nums',
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {player.worldRank}
+                              </span>
+                              {(() => {
+                                const headshot = getPlayerHeadshotUrl(player.playerName, (player as any).tourCode ?? 'pga');
+                                const initials = getInitials(player.playerName);
+                                return (
+                                  <AvatarWithInitials
+                                    src={headshot}
+                                    alt={player.playerName}
+                                    initials={initials}
+                                    size={36}
+                                  />
+                                );
+                              })()}
+                              <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                                <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                                  {lastName}
+                                </p>
+                                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                                  {country || 'Unknown'}
+                                </p>
+                              </div>
+                            </motion.button>
+                          );
+                        })
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-            
-            {/* Divider */}
-            <div className="h-px mx-5" style={{ background: 'rgba(0,0,0,0.07)' }} />
-            
-            {/* Nav + Link items */}
-            <div className="px-5 py-5">
-              <div className="space-y-2">
+                </motion.div>
+              )}
+
+              {/* SECTION 4 — Divider */}
+              <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '14px 18px' }} />
+
+              {/* SECTION 5 — Nav Items + Link Items */}
+              <div style={{ padding: '0 18px' }}>
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
                   const dynamicSubtitle = item.value === 'schedule' ? scheduleSubtitle : item.subtitle;
@@ -482,51 +498,38 @@ export function TourHubNavOverlay({
                       }}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => handleItemClick(item.value)}
-                      className="w-full flex items-center gap-3.5 p-4 rounded-[18px] text-left relative overflow-hidden"
                       style={{
-                        background: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)',
-                        border: isActive ? '1.5px solid rgba(245,166,35,0.22)' : '1px solid rgba(0,0,0,0.06)',
-                        boxShadow: isActive ? '0 2px 12px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.04)',
+                        width: '100%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '12px 0',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: index < NAV_ITEMS.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                        cursor: 'pointer',
+                        opacity: 1,
                       }}
                       aria-current={isActive ? 'page' : undefined}
                       aria-label={getAriaLabel(item)}
                     >
-                      {/* Icon in circle */}
-                      <div 
-                        className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
-                        style={{
-                          background: isActive ? 'rgba(245,166,35,0.14)' : 'rgba(0,0,0,0.04)',
-                          color: isActive ? '#d97706' : '#64748b',
-                        }}
-                      >
-                        {item.icon}
-                      </div>
-                      
-                      {/* Text content */}
-                      <div className="flex-1 min-w-0">
-                        {/* Title row — badge inline on the right */}
-                        <div className="flex items-center justify-between gap-2">
-                          <div 
-                          className="text-[15px] font-bold"
-                          style={{ 
-                            color: '#0f172a',
-                            letterSpacing: '-0.2px',
-                          }}
-                          >
+                      <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: '#fff', letterSpacing: '-0.3px' }}>
                             {item.label}
-                          </div>
+                          </span>
                           {renderBadge(item)}
                         </div>
-                        <div className="text-[13px] mt-1 leading-relaxed text-muted-foreground">
+                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>
                           {dynamicSubtitle}
                         </div>
                         {renderTeaser(item)}
                       </div>
+                      <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.2)', flexShrink: 0, marginLeft: 8 }}>›</span>
                     </motion.button>
                   );
                 })}
 
-              {/* Link Items (College Golf, etc.) — unified list continues */}
+                <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />
+
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
                     key={item.id}
@@ -539,56 +542,48 @@ export function TourHubNavOverlay({
                     }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => handleLinkClick(item.path)}
-                    className="w-full flex items-center gap-3.5 p-4 rounded-[18px] text-left"
                     style={{
-                      background: 'rgba(255,255,255,0.60)',
-                      border: '1px solid rgba(0,0,0,0.05)',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                      width: '100%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '12px 0',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
                     }}
                     aria-label={`${item.label} — ${item.subtitle}`}
                   >
-                    {/* Icon in circle */}
-                    <div 
-                      className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(0,0,0,0.04)', color: '#64748b' }}
-                    >
-                      {item.icon}
-                    </div>
-                    
-                    {/* Text content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span 
-                          className="text-[15px] font-bold"
-                          style={{ color: '#0f172a' }}
-                        >
+                    <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 15, fontWeight: 600, color: '#fff', letterSpacing: '-0.3px' }}>
                           {item.label}
                         </span>
                         {item.badge && (
-                          <span 
-                            className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide text-white"
-                            style={{ background: CLBHOUZ_ORANGE }}
-                          >
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 99,
+                            textTransform: 'uppercase', letterSpacing: '0.5px',
+                            color: '#fff', background: '#F7931E',
+                          }}>
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      <div className="text-[13px] mt-1 leading-relaxed text-muted-foreground">
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 2 }}>
                         {item.subtitle}
                       </div>
-                      {/* TM-06: College #1 teaser — school name tappable */}
+                      {/* College teaser */}
                       {item.id === 'college-golf' && !topCollege && (
-                        <div className="flex items-center gap-2 mt-1 animate-pulse">
-                          <div className="w-5 h-5 rounded-sm bg-slate-100 flex-shrink-0" />
-                          <div className="h-3 w-24 rounded bg-slate-100" />
-                          <div className="h-3 w-16 rounded bg-slate-100" />
+                        <div className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                          <div style={{ width: 20, height: 20, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }} />
+                          <div style={{ height: 12, width: 96, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+                          <div style={{ height: 12, width: 64, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
                         </div>
                       )}
                       {item.id === 'college-golf' && topCollege && (
-                        <p className="text-[13px] mt-1 text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                        <p style={{ fontSize: 11, marginTop: 4, color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', margin: '4px 0 0' }}>
                           <button
                             type="button"
-                            className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 focus:outline-none"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'rgba(255,255,255,0.7)' }}
+                            className="transition-opacity active:opacity-70 focus:outline-none"
                             onClick={(e) => {
                               e.stopPropagation();
                               haptic('light');
@@ -601,28 +596,25 @@ export function TourHubNavOverlay({
                               <img 
                                 src={topCollege.logoUrl} 
                                 alt="" 
-                                className="w-5 h-5 rounded-sm object-contain flex-shrink-0" 
+                                style={{ width: 20, height: 20, borderRadius: 3, objectFit: 'contain', flexShrink: 0 }}
                               />
                             )}
-                            <span className="font-medium">{topCollege.name}</span>
+                            <span style={{ fontWeight: 500 }}>{topCollege.name}</span>
                           </button>
-                          <span className="truncate">
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {' leads • '}
                             {formatCurrency(topCollege.earnings)} earned
                           </span>
                         </p>
                       )}
                     </div>
-                    
-                    {/* Chevron */}
-                    <ChevronRight 
-                      className="w-4.5 h-4.5 flex-shrink-0 text-muted-foreground/50"
-                    />
+                    <ChevronRight style={{ width: 16, height: 16, flexShrink: 0, color: 'rgba(255,255,255,0.2)' }} />
                   </motion.button>
                 ))}
+              </div>
 
-              </div>{/* close space-y-2 */}
-            </div>{/* close px-5 py-5 wrapper */}
+              {/* Bottom safe area */}
+              <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }} />
             </div>{/* close scroll container */}
           </motion.div>
         </>
@@ -632,31 +624,39 @@ export function TourHubNavOverlay({
   );
 }
 
-/** TM-11: Avatar with initials fallback */
+/** Avatar with initials fallback — dark theme */
 function AvatarWithInitials({ src, alt, initials, size }: { src: string | null | undefined; alt: string; initials: string; size: number }) {
   const [imgFailed, setImgFailed] = useState(false);
-  const radius = `${Math.round(size * 0.306)}px`; // 34% squircle
+  const radius = `${Math.round(size * 0.306)}px`;
 
   if (!src || imgFailed) {
     return (
       <div 
-        className="flex-shrink-0 overflow-hidden border border-border/50 bg-muted flex items-center justify-center"
-        style={{ width: size, height: size, borderRadius: radius }}
+        style={{
+          width: size, height: size, borderRadius: radius,
+          border: '1px solid rgba(255,255,255,0.1)',
+          background: 'rgba(255,255,255,0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0, overflow: 'hidden',
+        }}
       >
-        <span className="text-[11px] font-semibold text-muted-foreground">{initials}</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
       </div>
     );
   }
 
   return (
     <div 
-      className="flex-shrink-0 overflow-hidden border border-border/50"
-      style={{ width: size, height: size, borderRadius: radius }}
+      style={{
+        width: size, height: size, borderRadius: radius,
+        border: '1px solid rgba(255,255,255,0.1)',
+        flexShrink: 0, overflow: 'hidden',
+      }}
     >
       <img 
         src={src}
         alt={alt}
-        className="w-full h-full object-cover"
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         loading="lazy"
         onError={() => setImgFailed(true)}
       />
