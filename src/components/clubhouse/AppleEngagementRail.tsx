@@ -54,7 +54,7 @@ interface RailButtonProps {
 const RailButton = ({ children, count, onClick, ariaLabel }: RailButtonProps) => (
   <button
     type="button"
-    onClick={onClick}
+    onClick={(e) => { e.stopPropagation(); onClick(); }}
     aria-label={ariaLabel}
     className="flex flex-col items-center gap-1"
   >
@@ -115,6 +115,7 @@ const AppleEngagementRailBase = ({
         !isActive && 'pointer-events-none',
         className
       )}
+      style={bottom ? { bottom } : undefined}
       data-active={isActive ? 'true' : 'false'}
     >
       {/* Mute Button (video only) */}
