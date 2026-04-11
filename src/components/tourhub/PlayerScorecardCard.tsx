@@ -430,8 +430,8 @@ export function PlayerScorecardCard({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 60 }}
       transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-      className="flex flex-col h-full"
-      style={{ overflow: 'hidden' }}
+      className="flex flex-col"
+      style={{ overflow: 'hidden', flex: 1, minHeight: 0 }}
     >
 
       {/* ── TOP BAR — back + condensed live badge ── */}
