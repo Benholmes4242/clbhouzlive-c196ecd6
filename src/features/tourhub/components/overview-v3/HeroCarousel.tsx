@@ -1760,18 +1760,6 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, onLive
         ))}
       </AnimatePresence>
 
-  // Detect current live slide and emit upward
-  const currentSlide = safeSlides[currentIndex];
-  const isCurrentLive = currentSlide?.type === 'live';
-
-  useEffect(() => {
-    onLiveStateChange?.(isCurrentLive);
-    if (!isCurrentLive) {
-      onLiveLeaderboardData?.(null);
-    }
-  }, [isCurrentLive, currentIndex, onLiveStateChange, onLiveLeaderboardData]);
-
-
 
 
     </div>
