@@ -56,42 +56,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         className="w-full h-[55px] flex items-center justify-around"
         style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
       >
-      {showBurger && (
-        <>
-          <button
-            onClick={onBurgerClick}
-            className="relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl focus:outline-none active:scale-95"
-            style={{ transition: 'all var(--motion-fast) var(--ease-standard)' }}
-            aria-label="Tour sections menu"
-          >
-            {/* 2×2 grid icon */}
-            <div style={{
-              width: 24,
-              height: 24,
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 3,
-              padding: 4,
-              background: 'rgba(15,23,42,0.07)',
-              borderRadius: 7,
-            }}>
-              {[0, 1, 2, 3].map(i => (
-                <div key={i} style={{ background: '#475569', borderRadius: 2 }} />
-              ))}
-            </div>
-            <span className="text-[9px] min-[375px]:text-[10px] leading-none font-semibold whitespace-nowrap text-slate-500">
-              Sections
-            </span>
-          </button>
-          {/* Vertical divider — separates Sections from main nav tabs */}
-          <div style={{
-            width: 1,
-            height: 28,
-            background: 'rgba(0,0,0,0.08)',
-            flexShrink: 0,
-          }} />
-        </>
-      )}
       {navigationTabs.map((tab) => {
         const isActive = activeTab === tab.id;
         const isLive = liveTabs.has(tab.id);
@@ -197,6 +161,42 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
           </button>
         );
       })}
+      {showBurger && (
+        <>
+          {/* Vertical divider — sits between Tour tab and Sections button */}
+          <div style={{
+            width: 1,
+            height: 28,
+            background: 'rgba(0,0,0,0.08)',
+            flexShrink: 0,
+          }} />
+          <button
+            onClick={onBurgerClick}
+            className="relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl focus:outline-none active:scale-95"
+            style={{ transition: 'all var(--motion-fast) var(--ease-standard)' }}
+            aria-label="Tour sections menu"
+          >
+            {/* 2×2 grid icon */}
+            <div style={{
+              width: 24,
+              height: 24,
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 3,
+              padding: 4,
+              background: 'rgba(15,23,42,0.07)',
+              borderRadius: 7,
+            }}>
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} style={{ background: '#475569', borderRadius: 2 }} />
+              ))}
+            </div>
+            <span className="text-[9px] min-[375px]:text-[10px] leading-none font-semibold whitespace-nowrap text-slate-500">
+              Sections
+            </span>
+          </button>
+        </>
+      )}
       </nav>
     </>
   );
