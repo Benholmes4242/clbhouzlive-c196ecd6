@@ -360,7 +360,7 @@ export function TourHubNavOverlay({
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.08 }}
+                  transition={{ delay: 0.08, type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '14px 18px 8px' }}>
                     <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '2px', textTransform: 'uppercase' }}>
