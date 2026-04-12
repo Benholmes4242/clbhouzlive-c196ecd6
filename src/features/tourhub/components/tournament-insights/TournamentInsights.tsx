@@ -599,7 +599,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
               <span style={{ fontSize: 10 }}>⚡</span>
               <span style={{ fontSize: 9, fontWeight: 900, color: '#451A03', letterSpacing: '0.1em' }}>AI PREDICTIONS</span>
             </div>
-            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, fontFamily: 'Georgia, serif', lineHeight: 1.1 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
               Tournament Intelligence
             </h2>
             <p style={{ fontSize: 11, color: '#94A3B8', marginTop: 5, marginBottom: 0, lineHeight: 1.5 }}>
