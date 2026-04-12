@@ -249,7 +249,7 @@ async function updateCourse(
 ): Promise<void> {
   const { error } = await supabase
     .from('golf_courses')
-    .update(updates)
+    .update(updates as any)
     .eq('id', id);
   if (error) throw error;
 }
