@@ -328,13 +328,15 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
 interface ExpandedLeaderboardListProps {
   entries: LeaderboardEntryWithPlayer[];
   tourCode: string;
+  tournamentId?: string;
+  defendingChampion?: string | null;
   onTouchStart: (e: React.TouchEvent) => void;
   onTouchMove: (e: React.TouchEvent) => void;
   onTouchEnd: (e: React.TouchEvent) => void;
   onPlayerTap?: (player: PlayerInfo) => void;
 }
 
-export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTouchMove, onTouchEnd, onPlayerTap }: ExpandedLeaderboardListProps) {
+export function ExpandedLeaderboardList({ entries, tourCode, tournamentId, defendingChampion, onTouchStart, onTouchMove, onTouchEnd, onPlayerTap }: ExpandedLeaderboardListProps) {
   const [visibleCount, setVisibleCount] = useState(30);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
