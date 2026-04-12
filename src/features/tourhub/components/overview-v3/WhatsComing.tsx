@@ -97,9 +97,14 @@ function MajorCard({ tournament, index }: { tournament: SeasonTournament; index:
       aria-label={`${tournament.name}, Major Championship`}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', color: TOUR_COLORS.intelligenceGold }}>
-          MAJOR CHAMPIONSHIP
+        <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: TOUR_COLORS.intelligenceGold, textTransform: 'uppercase' as const }}>
+          ★ Major Championship
         </span>
+        {tournament.purse && (
+          <span style={{ fontSize: '10px', fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+            ${(tournament.purse / 1_000_000).toFixed(1)}M
+          </span>
+        )}
       </div>
       <div style={{ fontSize: '16px', fontWeight: 700, color: 'hsl(var(--foreground))', lineHeight: 1.25, marginBottom: '4px' }}>
         {tournament.name}
