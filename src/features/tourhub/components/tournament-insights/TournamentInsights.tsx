@@ -76,33 +76,13 @@ function PickRecordRail() {
     <>
       <div style={{ padding: '16px 0 8px' }}>
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 16px 10px' }}>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Our pick record</div>
-            <div style={{ fontSize: 11, fontWeight: 500, color: 'hsl(var(--muted-foreground))', marginTop: 2 }}>Season 2024–25</div>
-          </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {wins > 0 && (
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                padding: '3px 8px', borderRadius: 8,
-                background: 'rgba(245,158,11,0.1)',
-                border: '1px solid rgba(245,158,11,0.35)',
-              }}>
-                <span style={{ fontSize: 10 }}>🏆</span>
-                <span style={{ fontSize: 11, fontWeight: 800, color: 'hsl(var(--accent-amber))' }}>{wins} win{wins !== 1 ? 's' : ''}</span>
-              </div>
-            )}
-            {top5 > 0 && (
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                padding: '3px 8px', borderRadius: 8,
-                background: 'rgba(22,163,74,0.08)',
-                border: '1px solid rgba(22,163,74,0.25)',
-              }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A' }}>{top5} top 5</span>
-              </div>
-            )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 0 }}>
+          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Our Pick Record</span>
+          <span style={{ fontSize: 9, color: '#CBD5E1', marginLeft: 4 }}>Season 2024–25</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+            {wins > 0 && <span style={{ fontSize: 10, fontWeight: 800, color: '#F7931E' }}>🏆 {wins}</span>}
+            {top5 > 0 && <><span style={{ fontSize: 10, color: '#CBD5E1' }}>·</span><span style={{ fontSize: 10, fontWeight: 800, color: '#16A34A' }}>{top5} top-5</span></>}
           </div>
         </div>
 
@@ -323,31 +303,16 @@ function PickRecordBadge() {
   const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
       {wins > 0 && (
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 5,
-          padding: '5px 10px', borderRadius: 8,
-          background: '#F59E0B',
-          transform: 'rotate(-2deg)',
-        }}>
-          <span style={{ fontSize: 12 }}>🏆</span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#451A03', letterSpacing: '0.02em' }}>
-            {wins} win{wins !== 1 ? 's' : ''}
-          </span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 9px', borderRadius: 7, background: 'rgba(247,147,30,0.1)', border: '1px solid rgba(247,147,30,0.3)' }}>
+          <span style={{ fontSize: 11 }}>🏆</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E' }}>{wins} wins</span>
         </div>
       )}
       {top5 > 0 && (
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 5,
-          padding: '5px 10px', borderRadius: 8,
-          background: '#16A34A',
-          transform: 'rotate(-2deg)',
-        }}>
-          <span style={{ fontSize: 12 }}>✓</span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#F0FDF4', letterSpacing: '0.02em' }}>
-            {top5} top‑5{top5 !== 1 ? 's' : ''}
-          </span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 9px', borderRadius: 7, background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.25)' }}>
+          <span style={{ fontSize: 11, fontWeight: 800, color: '#16A34A' }}>✓ {top5} top‑5s</span>
         </div>
       )}
     </div>
@@ -533,30 +498,22 @@ export const TournamentInsights = memo(function TournamentInsights() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '14px 16px',
-                  margin: '12px 0',
-                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  margin: '4px 0',
+                  background: '#F8FAFC',
+                  borderTop: '0.5px solid rgba(15,23,42,0.07)',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
                   cursor: 'pointer',
                 }}
-                className="active:scale-[0.98] transition-transform bg-muted/50 border border-border/40"
+                className="active:scale-[0.98] transition-transform"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '14px' }}>🧬</span>
-                  <span className="text-foreground/70" style={{ fontSize: '13.5px', fontWeight: 600 }}>
-                    {showCourseDNA ? 'Hide Course DNA' : 'View Course DNA'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1 }} />
+                  <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                    {showCourseDNA ? 'Hide Course DNA' : 'Course DNA'}
                   </span>
                 </div>
-                <span
-                  className="text-muted-foreground"
-                  style={{
-                    fontSize: '16px',
-                    transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease',
-                    display: 'inline-block',
-                  }}
-                >
-                  ›
-                </span>
+                <span style={{ fontSize: 14, color: '#94A3B8', transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', display: 'inline-block' }}>›</span>
               </div>
 
               <AnimatePresence>
@@ -628,39 +585,33 @@ export const TournamentInsights = memo(function TournamentInsights() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         viewport={{ once: true }}
-        style={{ marginBottom: '24px' }}
+        style={{ marginBottom: '20px' }}
       >
-        {/* Top row: identity + social proof */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        {/* Top row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
           <div>
-            {/* AI eyebrow pill — stamp style */}
+            {/* AI pill */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '5px 10px', borderRadius: 8, marginBottom: 6,
-              background: '#F59E0B',
-              transform: 'rotate(-2deg)',
+              padding: '3px 9px', borderRadius: 6, marginBottom: 8,
+              background: '#F7931E',
             }}>
-              <span style={{ fontSize: 12 }}>⚡</span>
-              <span style={{
-                fontSize: 11, fontWeight: 800,
-                color: '#451A03',
-                letterSpacing: '0.02em',
-              }}>AI Predictions</span>
+              <span style={{ fontSize: 10 }}>⚡</span>
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#451A03', letterSpacing: '0.08em' }}>AI PREDICTIONS</span>
             </div>
-            <h2 className="text-foreground" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>
-              Tournament Intelligence
+            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', margin: 0, fontFamily: 'Georgia, serif', lineHeight: 1.05 }}>
+              Tournament<br />Intelligence
             </h2>
-            <p className="text-muted-foreground/60" style={{ fontSize: 13, fontWeight: 500, marginTop: 2 }}>
-              Predicts winners using course DNA, form &amp; field strength
+            <p style={{ fontSize: 11, color: '#94A3B8', marginTop: 5, marginBottom: 0, lineHeight: 1.5 }}>
+              Course DNA · Form analysis · Field strength
             </p>
           </div>
-          {/* Social proof badge */}
           <PickRecordBadge />
         </div>
 
         {/* Tab bar — only when multiple tabs */}
         {tabs.length > 1 && (
-          <div style={{ display: 'flex', gap: 4, paddingTop: 14 }}>
+          <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid rgba(15,23,42,0.08)', marginBottom: '0' }}>
             {tabs.map(tab => {
               const isActive = tab.id === activeMainTab;
               return (
@@ -671,17 +622,19 @@ export const TournamentInsights = memo(function TournamentInsights() {
                     flex: 1,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                     padding: '10px 12px',
-                    borderRadius: 10,
-                    fontSize: 13, fontWeight: 600,
-                    color: isActive ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
-                    background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                    border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                    borderRadius: 0,
+                    fontSize: 12, fontWeight: 700,
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
+                    letterSpacing: '0.02em',
                   }}
                 >
                   {tab.hasLiveDot && (
-                    <span style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: 'var(--th-accent-live)', animation: 'ti-pulse 2s infinite', flexShrink: 0 }} />
+                    <span style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#22C55E', flexShrink: 0 }} />
                   )}
                   {tab.label}
                 </button>
@@ -689,29 +642,24 @@ export const TournamentInsights = memo(function TournamentInsights() {
             })}
           </div>
         )}
-
-        <style>{`
-          @keyframes ti-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.35; }
-          }
-        `}</style>
       </motion.div>
 
-      {/* Hero Card — full bleed */}
+      {/* Hero Card — full bleed with section rule */}
       {heroData && (
-        <div className="-mx-4 relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`hero-${activeMainTab}-${heroData?.id ?? 'none'}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={heroIsCompleted} />
-            </motion.div>
-          </AnimatePresence>
+        <div style={{ borderBottom: '3px solid #0F172A', marginBottom: 0 }}>
+          <div className="-mx-4 relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`hero-${activeMainTab}-${heroData?.id ?? 'none'}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={heroIsCompleted} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       )}
 
@@ -725,6 +673,14 @@ export const TournamentInsights = memo(function TournamentInsights() {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="mt-0 pt-6"
         >
+          {/* Section rule */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 14 }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              {activeMainTab === 'results' ? 'Tournament Winner' : activeMainTab === 'live' ? 'Active Pick' : 'Primary Selection'}
+            </span>
+          </div>
+
           {activeMainTab === 'live' && !isWaitingForPlay && data.winners.length > 0 && (
             <NextUpPickCard
               featured={data.winners[0]}
@@ -770,8 +726,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-background"
-          style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
+          style={{ background: '#F8FAFC', borderTop: '1px solid rgba(15,23,42,0.06)' }}
         >
           {renderSecondaryContent()}
         </motion.div>

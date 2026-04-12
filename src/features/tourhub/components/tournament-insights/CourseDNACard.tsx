@@ -1,6 +1,6 @@
 /**
  * CourseDNACard - What wins here
- * Theme-aware, premium skill importance bars
+ * Dispatch-style flat ruled rows
  */
 
 import { memo } from 'react';
@@ -76,12 +76,16 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
   if (items.length === 0) return null;
 
   return (
-    <div className="px-4 py-5">
-      <h3 className="mb-4 text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
-        What Matters{courseName ? ` at ${courseName}` : ''}
-      </h3>
+    <div style={{ background: '#F8FAFC' }}>
+      {/* Section rule */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 0 }}>
+        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          What Matters{courseName ? ` at ${courseName}` : ''}
+        </span>
+      </div>
 
-      <div className="flex flex-col gap-3">
+      <div style={{ padding: '8px 16px 14px', display: 'flex', flexDirection: 'column', gap: 0 }}>
         {items.map((item, i) => {
           const IconComponent = resolveIcon(item.icon, item.label);
           const hexColor = tierToHexColor[item.tier];
@@ -98,12 +102,26 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
                 ease: [0.16, 1, 0.3, 1]
               }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 p-4 rounded-xl bg-muted/50"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '10px 0',
+                borderBottom: i < items.length - 1 ? '0.5px solid rgba(15,23,42,0.06)' : 'none',
+              }}
             >
               {/* Skill icon — 32x32 */}
               <div 
-                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: getIconBg(item.tier) }}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  background: getIconBg(item.tier),
+                }}
               >
                 <IconComponent 
                   className="w-4 h-4" 
@@ -113,21 +131,20 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
               </div>
 
               {/* Name, tag, and bar */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>
                     {item.label}
                   </span>
                    <span 
-                    className="uppercase"
-                    style={{ fontSize: '10px', fontWeight: 700, color: hexColor, letterSpacing: '0.08em' }}
+                    style={{ fontSize: 10, fontWeight: 700, color: hexColor, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}
                   >
                     {tierToLabel[item.tier]}
                   </span>
                 </div>
                 
                 {/* Progress bar — 6px height, rounded-full */}
-                <div className="h-1.5 w-full rounded-full bg-muted">
+                <div style={{ height: 6, width: '100%', borderRadius: 9999, background: 'rgba(15,23,42,0.06)' }}>
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${fillPercent}%` }}
@@ -137,8 +154,9 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
                       ease: [0.16, 1, 0.3, 1] 
                     }}
                     viewport={{ once: true }}
-                    className="h-full rounded-full"
-                    style={{ 
+                    style={{
+                      height: '100%',
+                      borderRadius: 9999,
                       background: hexColor,
                       boxShadow: `0 0 8px ${hexColor}33`,
                     }}
