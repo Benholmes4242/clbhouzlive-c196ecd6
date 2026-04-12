@@ -1099,6 +1099,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                               <ExpandedLeaderboardList
                                 entries={fullLeaderboard}
                                 tourCode={tournament.tourSlug}
+                                tournamentId={tournament.id}
+                                defendingChampion={tournament.defendingChampion}
                                 onTouchStart={handleExpandedTouch}
                                 onTouchMove={handleExpandedTouch}
                                 onTouchEnd={handleExpandedTouch}
