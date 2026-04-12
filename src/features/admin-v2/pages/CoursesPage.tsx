@@ -444,25 +444,98 @@ function CourseDrawer({
           {/* Location */}
           <div className="space-y-3">
             <AdminSectionHeader title="Location" />
-            <div className="grid grid-cols-1 gap-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[12.5px] text-muted-foreground">Country</span>
-                <span className="text-[13px] text-foreground">{course.country}</span>
-              </div>
-              {course.sub_country && (
-                <div className="flex items-center justify-between">
-                  <span className="text-[12.5px] text-muted-foreground">Region</span>
-                  <span className="text-[13px] text-foreground">{course.sub_country}</span>
+            {([
+              { label: 'Country',      key: 'country',      value: course.country,      type: 'text' as const },
+              { label: 'Region',       key: 'sub_country',  value: course.sub_country,  type: 'text' as const },
+              { label: 'State/County', key: 'region',       value: course.region,       type: 'text' as const },
+              { label: 'Country Code', key: 'country_code', value: course.country_code, type: 'text' as const },
+              { label: 'Top 100 URL',  key: 'top100_url',   value: course.top100_url,   type: 'url' as const },
+            ] as const).map(({ label, key, value, type }) => (
+              <div key={key} className="flex items-center justify-between gap-4">
+                <span className="text-[12.5px] text-muted-foreground flex-shrink-0">{label}</span>
+                <div className="flex-1 text-right">
+                  <InlineEditField
+                    value={value}
+                    type={type}
+                    onSave={(v) => onUpdate(course.id, { [key]: v || null })}
+                  />
                 </div>
-              )}
-              <div className="flex items-center justify-between">
-                <span className="text-[12.5px] text-muted-foreground">Coordinates</span>
-                <span className="text-[12.5px] font-mono text-muted-foreground">
-                  {course.latitude != null
-                    ? `${course.latitude.toFixed(4)}, ${course.longitude?.toFixed(4)}`
-                    : 'Not geocoded'
-                  }
-                </span>
+              </div>
+            ))}
+
+            {/* Coordinates — two side-by-side inputs */}
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-[12.5px] text-muted-foreground flex-shrink-0">Latitude</span>
+              <div className="flex-1 text-right">
+                <InlineEditField
+                  value={course.latitude}
+                  type="number"
+                  placeholder="e.g. 51.5074"
+                  onSave={(v) => onUpdate(course.id, { latitude: v ? Number(v) : null })}
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-[12.5px] text-muted-foreground flex-shrink-0">Longitude</span>
+              <div className="flex-1 text-right">
+                <InlineEditField
+                  value={course.longitude}
+                  type="number"
+                  placeholder="e.g. -0.1278"
+                  onSave={(v) => onUpdate(course.id, { longitude: v ? Number(v) : null })}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Course attributes */}
+          <div className="space-y-3">
+            <AdminSectionHeader title="Attributes" />
+
+            {/* Course type select */}
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-[12.5px] text-muted-foreground flex-shrink-0">Course Type</span>
+              <select
+                value={course.course_type ?? ''}
+                onChange={(e) => onUpdate(course.id, { course_type: e.target.value || null })}
+                style={{ border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 13, padding: '4px 8px', background: 'hsl(var(--background))', color: 'hsl(var(--foreground))' }}
+              >
+                <option value="">Not set</option>
+                <option value="links">Links</option>
+                <option value="parkland">Parkland</option>
+                <option value="heathland">Heathland</option>
+                <option value="desert">Desert</option>
+                <option value="mountain">Mountain</option>
+                <option value="resort">Resort</option>
+              </select>
+            </div>
+
+            {/* Has hosted major toggle */}
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-[12.5px] text-muted-foreground flex-shrink-0">Hosted Major</span>
+              <button
+                onClick={() => onUpdate(course.id, { has_hosted_major: !course.has_hosted_major })}
+                className={cn(
+                  'px-3 py-1 rounded-lg text-[12px] font-semibold transition-colors',
+                  course.has_hosted_major
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-muted text-muted-foreground'
+                )}
+              >
+                {course.has_hosted_major ? '✓ Yes' : 'No'}
+              </button>
+            </div>
+
+            {/* Country rank */}
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-[12.5px] text-muted-foreground flex-shrink-0">Country Rank</span>
+              <div className="flex-1 text-right">
+                <InlineEditField
+                  value={course.country_rank}
+                  type="number"
+                  placeholder="Not ranked"
+                  onSave={(v) => onUpdate(course.id, { country_rank: v ? Number(v) : null })}
+                />
               </div>
             </div>
           </div>

@@ -25,6 +25,13 @@ export interface AdminCourseRow {
   created_at:     string;
   avg_rating:     number | null;
   review_count:   number | null;
+  country_code:        string | null;
+  country_rank:        number | null;
+  course_type:         string | null;
+  has_hosted_major:    boolean | null;
+  major_championships: string[] | null;
+  region_key:          string | null;
+  top100_url:          string | null;
 }
 
 export type CourseFilterList = 'all' | 'global' | 'gbi' | 'usa' | 'europe' | 'unranked';
@@ -39,9 +46,11 @@ interface CourseRatingAggregateRow {
 
 const COURSE_COLUMNS = `
   id, name, country, sub_country, region, continent,
-  global_rank, regional_rank, usa_rank,
+  global_rank, regional_rank, usa_rank, country_rank,
   thumbnail_image, latitude, longitude,
-  website_url, description, created_at
+  website_url, description, created_at,
+  country_code, course_type, has_hosted_major,
+  major_championships, region_key, top100_url
 `;
 
 function applySearch(query: any, search: string) {
@@ -96,6 +105,13 @@ function mapCourseRow(
     created_at:     c.created_at,
     avg_rating:     ratingsMap.get(c.id)?.avg_overall_score ?? null,
     review_count:   ratingsMap.get(c.id)?.review_count ?? null,
+    country_code:        c.country_code,
+    country_rank:        c.country_rank,
+    course_type:         c.course_type,
+    has_hosted_major:    c.has_hosted_major,
+    major_championships: c.major_championships,
+    region_key:          c.region_key,
+    top100_url:          c.top100_url,
   };
 }
 
@@ -224,13 +240,16 @@ async function fetchSingleCourse(id: string): Promise<AdminCourseRow | null> {
 async function updateCourse(
   id: string,
   updates: Partial<Pick<AdminCourseRow,
-    'name' | 'global_rank' | 'regional_rank' | 'usa_rank' |
-    'website_url' | 'description'
+    'name' | 'global_rank' | 'regional_rank' | 'usa_rank' | 'country_rank' |
+    'website_url' | 'description' | 'top100_url' |
+    'country' | 'sub_country' | 'region' |
+    'latitude' | 'longitude' | 'country_code' |
+    'course_type' | 'has_hosted_major'
   >>
 ): Promise<void> {
   const { error } = await supabase
     .from('golf_courses')
-    .update(updates)
+    .update(updates as any)
     .eq('id', id);
   if (error) throw error;
 }
