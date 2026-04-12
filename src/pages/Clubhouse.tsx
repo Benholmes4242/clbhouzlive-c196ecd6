@@ -434,7 +434,9 @@ const ClubhouseContent = () => {
             isActiveReview={isActiveReview}
           />
         </>
-      ) : null}
+      ) : (
+        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
+      )}
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {activePost && posts.length > 0 && (
