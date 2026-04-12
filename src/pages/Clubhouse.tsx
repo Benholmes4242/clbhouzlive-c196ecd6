@@ -138,7 +138,7 @@ const ClubhouseContent = () => {
   const isBusinessActor = tabContext?.isBusinessActor ?? false;
   
   // Auth + actor context
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   
   // ── Network status ──
