@@ -6,25 +6,25 @@
 
 import type { CategoryId } from './StatCategoryIcons';
 
-const AMBER_ACCENT = {
-  primary: '#f59e0b',
-  shadow: 'rgba(245, 158, 11, 0.25)',
-  border: 'rgba(245, 158, 11, 0.2)',
-  bgLight: 'rgba(245, 158, 11, 0.04)',
-  bgMedium: 'rgba(245, 158, 11, 0.08)',
-  textMuted: 'rgba(245, 158, 11, 0.5)',
+const SLATE_ACCENT = {
+  primary: '#0F172A',
+  shadow: 'rgba(15, 23, 42, 0.2)',
+  border: 'rgba(15, 23, 42, 0.15)',
+  bgLight: 'rgba(15, 23, 42, 0.03)',
+  bgMedium: 'rgba(15, 23, 42, 0.06)',
+  textMuted: 'rgba(15, 23, 42, 0.4)',
 };
 
-export const CATEGORY_ACCENT_COLORS: Record<CategoryId, typeof AMBER_ACCENT> = {
-  sg_total: AMBER_ACCENT,
-  scoring_avg: AMBER_ACCENT,
-  earnings: AMBER_ACCENT,
-  distance: AMBER_ACCENT,
-  accuracy: AMBER_ACCENT,
-  gir_pct: AMBER_ACCENT,
-  putting: AMBER_ACCENT,
-  scrambling: AMBER_ACCENT,
-  sand_saves: AMBER_ACCENT,
+export const CATEGORY_ACCENT_COLORS: Record<CategoryId, typeof SLATE_ACCENT> = {
+  sg_total: SLATE_ACCENT,
+  scoring_avg: SLATE_ACCENT,
+  earnings: SLATE_ACCENT,
+  distance: SLATE_ACCENT,
+  accuracy: SLATE_ACCENT,
+  gir_pct: SLATE_ACCENT,
+  putting: SLATE_ACCENT,
+  scrambling: SLATE_ACCENT,
+  sand_saves: SLATE_ACCENT,
 };
 
 /** Pill order: power → money → efficiency → short game */

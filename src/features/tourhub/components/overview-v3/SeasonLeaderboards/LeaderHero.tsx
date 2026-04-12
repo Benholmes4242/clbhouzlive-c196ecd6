@@ -35,15 +35,16 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
       <div
         style={{
           background: 'hsl(var(--card))',
-          borderRadius: 16,
-          border: '1px solid hsl(var(--border) / 0.5)',
+          borderRadius: 18,
+          border: '1px solid rgba(15,23,42,0.08)',
           overflow: 'hidden',
-          display: 'flex',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          boxShadow: '0 2px 12px rgba(15,23,42,0.07)',
         }}
       >
-        {/* Amber left accent bar */}
-        <div style={{ width: 5, flexShrink: 0, background: accent.primary }} />
+        {/* Slate top accent bar */}
+        <div style={{ height: 3, background: '#0F172A', flexShrink: 0 }} />
+
+        <div style={{ display: 'flex' }}>
 
         {/* Avatar block */}
         <div
@@ -92,7 +93,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
               fontWeight: 700,
               letterSpacing: '1.5px',
               textTransform: 'uppercase',
-              color: accent.primary,
+              color: '#F7931E',
               marginBottom: 2,
             }}
           >
@@ -151,6 +152,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
               {player.statUnit}
             </div>
           )}
+        </div>
         </div>
       </div>
     </button>

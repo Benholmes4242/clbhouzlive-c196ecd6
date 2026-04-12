@@ -6,11 +6,10 @@
  */
 
 import { useState, memo, useEffect } from 'react';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaderboards, CATEGORY_CONFIG as CATEGORY_DATA_CONFIG } from '@/features/tourhub/hooks/useSeasonLeaderboards';
-import { CategoryTabs } from './CategoryTabs';
 import { LeaderHero } from './LeaderHero';
 import { ChasingPack } from './ChasingPack';
 import { SeasonToggle } from './SeasonToggle';
@@ -82,7 +81,7 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
             fontWeight: 700,
             letterSpacing: '0.8px',
             textTransform: 'uppercase',
-            color: 'hsl(var(--accent-amber))',
+            color: '#F7931E',
             marginBottom: '6px',
           }}
         >
@@ -143,34 +142,31 @@ export function SeasonLeaderboards() {
   const leader = activeCategoryData?.players[0];
   const chasers = activeCategoryData?.players.slice(1, 6) || [];
   const categoryConfig = CATEGORY_DATA_CONFIG[activeCategory];
-  const accent = CATEGORY_ACCENT_COLORS[activeCategory];
   const contextLine = DISCIPLINE_CONTEXT[activeCategory];
 
   return (
     <section>
       {/* ═══ SECTION HEADER ═══ */}
       <motion.div
-        className="flex items-end justify-between px-4"
+        className="px-4"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        style={{ marginBottom: '16px' }}
+        style={{ marginBottom: '14px' }}
       >
-        <div>
-          <div className="flex items-center gap-2">
-            <p
-              className="m-0 flex items-center gap-1.5"
-              style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                letterSpacing: '0.8px',
-                textTransform: 'uppercase',
-                color: 'hsl(var(--accent-amber))',
-              }}
-            >
-              <Trophy className="w-3.5 h-3.5" />
-              {displayYear} Season
-            </p>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+              <Trophy style={{ width: 14, height: 14, color: '#F7931E' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#F7931E', letterSpacing: '0.05em' }}>
+                {displayYear} Season
+              </span>
+            </div>
+            <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05 }}>
+              Performance Rankings
+            </h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
             {data?.availableSeasons && (
               <SeasonToggle
                 availableSeasons={data.availableSeasons}
@@ -178,38 +174,62 @@ export function SeasonLeaderboards() {
                 onYearChange={setSelectedYear}
               />
             )}
+            <button
+              onClick={() => {
+                const leaderCategory = CATEGORY_TO_URL_SLUG[activeCategory] || 'strokes_gained_total';
+                navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
+              }}
+              style={{ fontSize: '12px', fontWeight: 500, color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            >
+              View All ›
+            </button>
           </div>
-          <h2 className="m-0 mt-1 text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-            Performance Rankings
-          </h2>
         </div>
-        <button
-          onClick={() => {
-            const leaderCategory = CATEGORY_TO_URL_SLUG[activeCategory] || 'strokes_gained_total';
-            navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
-          }}
-          className="flex items-center gap-0.5 transition-all duration-300 bg-transparent border-none cursor-pointer group text-muted-foreground"
-          style={{ fontSize: '13px', fontWeight: 500, minHeight: '44px' }}
-        >
-          View All
-          <ChevronRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
-        </button>
+
+        {/* ═══ 2-ROW PILL GRID ═══ */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+          {[CATEGORY_CONFIG.slice(0, 5), CATEGORY_CONFIG.slice(5)].map((row, rowIndex) => (
+            <div
+              key={rowIndex}
+              style={{
+                display: 'flex',
+                gap: '6px',
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+                WebkitOverflowScrolling: 'touch',
+              }}
+            >
+              {row.map((category) => {
+                const isActive = category.id === activeCategory;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => handleCategoryChange(category.id as CategoryId)}
+                    style={{
+                      flexShrink: 0,
+                      padding: '6px 11px',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      fontWeight: isActive ? 700 : 500,
+                      background: isActive ? '#0F172A' : '#ffffff',
+                      color: isActive ? '#ffffff' : '#64748B',
+                      border: isActive ? 'none' : '1px solid rgba(15,23,42,0.09)',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      boxShadow: isActive ? 'none' : '0 1px 3px rgba(15,23,42,0.05)',
+                      transition: 'all 0.18s ease',
+                    }}
+                  >
+                    {category.name}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </motion.div>
 
-      {/* ═══ CATEGORY TABS (Scene Selectors) ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <CategoryTabs
-          categories={CATEGORY_CONFIG}
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
-        />
-      </motion.div>
-
-      {/* ═══ NO DATA FOR SELECTED YEAR ═══ */}
+      {/* ═══ NO DATA STATE ═══ */}
       {hasNoCategories ? (
         <motion.div
           className="mx-4 mt-4 p-8 text-center rounded-2xl bg-muted/30 border border-border/50"
@@ -226,7 +246,6 @@ export function SeasonLeaderboards() {
           </div>
         </motion.div>
       ) : (
-        /* ═══ CINEMATIC CONTENT (no card wrapper) ═══ */
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory}
@@ -235,21 +254,17 @@ export function SeasonLeaderboards() {
             animate={{ opacity: isTransitioning ? 0.6 : 1, y: isTransitioning ? -4 : 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            style={{ marginTop: '16px' }}
           >
-            {/* Stat context line — no icon badge */}
-            <p className="m-0 text-muted-foreground/60 mb-4" style={{ fontSize: '13px', fontWeight: 500 }}>
+            <p style={{ fontSize: '13px', fontWeight: 500, color: '#94A3B8', margin: '0 0 14px' }}>
               {contextLine}
             </p>
 
-            {/* ═══ CHAMPION SPOTLIGHT ═══ */}
             {leader && (
               <div style={{ marginBottom: '12px' }}>
                 <LeaderHero player={leader} accentColor={activeCategory} />
               </div>
             )}
 
-            {/* ═══ THE CHASERS (#2 & #3) ═══ */}
             {chasers.length > 0 && leader && (
               <ChasingPack
                 players={chasers}
@@ -260,7 +275,6 @@ export function SeasonLeaderboards() {
               />
             )}
 
-            {/* ═══ VIEW FULL RANKINGS — navigates to Leaders page ═══ */}
             <button
               onClick={() => {
                 const leaderCategory = CATEGORY_TO_URL_SLUG[activeCategory] || 'strokes_gained_total';
