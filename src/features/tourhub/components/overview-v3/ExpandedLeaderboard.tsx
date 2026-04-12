@@ -390,8 +390,74 @@ export function ExpandedLeaderboardList({ entries, tourCode, tournamentId, defen
         ))}
       </div>
 
+      {/* Event info footer — defending champion left, View Tournament right */}
+      {tournamentId && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 16px 2px',
+          borderTop: '0.5px solid rgba(255,255,255,0.07)',
+          marginTop: 4,
+        }}>
+          {/* Defending champion pill */}
+          {defendingChampion ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(255,255,255,0.06)',
+              borderRadius: '12px',
+              padding: '7px 11px',
+              border: '0.5px solid rgba(255,255,255,0.08)',
+            }}>
+              <span style={{ fontSize: 13 }}>🏆</span>
+              <div>
+                <div style={{
+                  fontSize: '9px',
+                  color: 'rgba(255,255,255,0.3)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase' as const,
+                  marginBottom: '1px',
+                }}>
+                  Defending
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.85)',
+                }}>
+                  {defendingChampion}
+                </div>
+              </div>
+            </div>
+          ) : <div />}
+
+          {/* View Tournament pill */}
+          <Link
+            to={`/tourhub/tournament/${tournamentId}`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              background: 'rgba(255,255,255,0.10)',
+              borderRadius: '10px',
+              padding: '8px 14px',
+              border: '0.5px solid rgba(255,255,255,0.15)',
+              textDecoration: 'none',
+            }}
+            className="active:opacity-70 transition-opacity"
+          >
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff' }}>
+              View Tournament
+            </span>
+            <ChevronRight style={{ width: 13, height: 13, color: 'rgba(255,255,255,0.5)' }} />
+          </Link>
+        </div>
+      )}
+
       {/* Explore below hint with bouncing arrow */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, paddingTop: 12, paddingBottom: 6, opacity: 0.45 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, paddingTop: 12, paddingBottom: 6, opacity: 0.65 }}>
         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
           Tour Overview
         </span>
