@@ -402,7 +402,7 @@ function RotatingLeaderStrip({
                 width: i === activeIdx ? 16 : 6,
                 height: 6,
                 borderRadius: 3,
-                background: i === activeIdx ? '#F7931E' : 'rgba(255,255,255,0.20)',
+                background: i === activeIdx ? '#ffffff' : 'rgba(255,255,255,0.20)',
                 border: 'none',
                 cursor: 'pointer',
                 padding: 0,
