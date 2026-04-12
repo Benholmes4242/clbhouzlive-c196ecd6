@@ -614,12 +614,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
         {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
-          <div className="text-[11px] text-white/60 line-clamp-1 mt-0.5" style={{ ['--mention-color' as any]: 'rgba(255,255,255,0.75)' }}>
+          <div className="text-[11px] text-white line-clamp-1 mt-0.5" style={{ ['--mention-color' as any]: 'rgba(255,255,255,0.75)' }}>
             {tags.length > 0 ? (
               <PostContentWithTags
                 content={truncatedCaption}
                 tags={tags}
-                className="text-[11px] text-white/60 line-clamp-1"
+                className="text-[11px] text-white line-clamp-1"
               />
             ) : (
               truncatedCaption
@@ -630,12 +630,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         {/* Course location (collapsed) — separate line */}
         {!isExpanded && courseDisplayLabel && (
           <div className="flex items-center gap-1 mt-1.5">
-            <FiMapPin size={14} className="flex-shrink-0" style={{ color: '#F7931E' }} />
-            <span className="text-[11px] truncate" style={{ color: '#F7931E' }}>
+            <FiMapPin size={14} className="flex-shrink-0" style={{ color: '#ffffff' }} />
+            <span className="text-[11px] truncate" style={{ color: '#ffffff' }}>
               {courseDisplayLabel}
             </span>
             {golfCourse?.globalRank && (
-              <span className="text-[10px] font-bold flex-shrink-0" style={{ color: '#F59E0B' }}>
+              <span className="text-[10px] font-bold flex-shrink-0" style={{ color: '#ffffff' }}>
                 · #{golfCourse.globalRank} World
               </span>
             )}
