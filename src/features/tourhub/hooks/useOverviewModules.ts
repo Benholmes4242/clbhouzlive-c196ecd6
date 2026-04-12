@@ -184,9 +184,9 @@ export function useLiveRightNow() {
         const midRound = thru != null && thru > 0 && thru < 18;
         let currentRound = 1;
         if (r4 != null) currentRound = 4;
-        else if (r3 != null) currentRound = midRound ? 4 : 3;
-        else if (r2 != null) currentRound = midRound ? 3 : 2;
-        else if (r1 != null) currentRound = midRound ? 2 : 1;
+        else if (r3 != null) currentRound = 4; // R3 complete → R4 is current (final round)
+        else if (r2 != null) currentRound = 3;
+        else if (r1 != null) currentRound = 2;
 
         return {
           id: t.id,

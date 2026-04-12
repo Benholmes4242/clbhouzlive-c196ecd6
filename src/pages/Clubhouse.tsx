@@ -138,7 +138,7 @@ const ClubhouseContent = () => {
   const isBusinessActor = tabContext?.isBusinessActor ?? false;
   
   // Auth + actor context
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   
   // ── Network status ──
@@ -289,6 +289,11 @@ const ClubhouseContent = () => {
 
   const showRehydrationSkeleton = isRehydrating;
 
+  // Guard: wait for auth to resolve before evaluating feed state
+  if (authLoading) {
+    return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />;
+  }
+
   return (
     <PageRoot 
       ref={clubhouseRootRef} 
@@ -429,7 +434,9 @@ const ClubhouseContent = () => {
             isActiveReview={isActiveReview}
           />
         </>
-      ) : null}
+      ) : (
+        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
+      )}
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {activePost && posts.length > 0 && (
