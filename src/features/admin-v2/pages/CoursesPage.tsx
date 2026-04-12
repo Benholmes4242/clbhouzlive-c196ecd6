@@ -261,6 +261,77 @@ function InlineEditField({
   );
 }
 
+// ─── Description field ────────────────────────────────────────────────────────
+
+function DescriptionField({
+  value,
+  onSave,
+}: {
+  value: string | null;
+  onSave: (val: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value ?? '');
+
+  const commit = () => {
+    setEditing(false);
+    if (draft !== (value ?? '')) onSave(draft);
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[12.5px] text-muted-foreground">Description</span>
+        {!editing && (
+          <button
+            onClick={() => { setDraft(value ?? ''); setEditing(true); }}
+            className="text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-0.5 rounded hover:bg-muted"
+          >
+            {value ? 'Edit' : '+ Add'}
+          </button>
+        )}
+        {editing && (
+          <div className="flex gap-2">
+            <button
+              onClick={commit}
+              className="text-[11px] font-semibold text-amber-600 hover:text-amber-700 px-2 py-0.5 rounded hover:bg-amber-50 transition-colors"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              className="text-[11px] text-muted-foreground/60 hover:text-foreground px-2 py-0.5 rounded hover:bg-muted transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+      {editing ? (
+        <textarea
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          rows={10}
+          className="w-full text-[13px] px-3 py-2 rounded-lg border border-border bg-background outline-none focus:ring-2 focus:ring-border/40 resize-y leading-relaxed"
+          placeholder="Write a description… Use blank lines to separate paragraphs."
+        />
+      ) : value ? (
+        <div className="text-[13px] text-foreground leading-relaxed whitespace-pre-wrap bg-muted/30 rounded-lg px-3 py-2.5 max-h-[200px] overflow-y-auto">
+          {value}
+        </div>
+      ) : (
+        <button
+          onClick={() => { setDraft(''); setEditing(true); }}
+          className="text-[13px] text-muted-foreground/40 italic w-full text-left px-1 py-0.5 hover:text-muted-foreground transition-colors"
+        >
+          Click to add description…
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ─── Course detail drawer ─────────────────────────────────────────────────────
 
 function CourseDrawer({
@@ -428,16 +499,10 @@ function CourseDrawer({
               </div>
             ))}
 
-            <div className="flex items-start justify-between gap-4">
-              <span className="text-[12.5px] text-muted-foreground flex-shrink-0 pt-1">Description</span>
-              <div className="flex-1 text-right">
-                <InlineEditField
-                  value={course.description}
-                  placeholder="Add description…"
-                  onSave={(v) => onUpdate(course.id, { description: v || null })}
-                />
-              </div>
-            </div>
+            <DescriptionField
+              value={course.description}
+              onSave={(v) => onUpdate(course.id, { description: v || null })}
+            />
           </div>
 
 
