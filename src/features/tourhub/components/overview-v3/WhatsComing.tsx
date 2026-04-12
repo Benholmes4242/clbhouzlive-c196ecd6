@@ -100,11 +100,32 @@ function MajorCard({ tournament, index }: { tournament: SeasonTournament; index:
         <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: TOUR_COLORS.intelligenceGold, textTransform: 'uppercase' as const }}>
           ★ Major Championship
         </span>
-        {tournament.purse && (
-          <span style={{ fontSize: '10px', fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
-            ${(tournament.purse / 1_000_000).toFixed(1)}M
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {tournament.purse && (
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
+              ${(tournament.purse / 1_000_000).toFixed(1)}M
+            </span>
+          )}
+          <div style={{
+            fontSize: '9px',
+            fontWeight: 800,
+            color: '#fff',
+            background: '#0F172A',
+            borderRadius: '5px',
+            padding: '2px 7px',
+            letterSpacing: '0.05em',
+            whiteSpace: 'nowrap',
+          }}>
+            {tournament.tourName
+              ?.replace('PGA Tour', 'PGA TOUR')
+              ?.replace('LPGA Tour', 'LPGA')
+              ?.replace('LIV Golf', 'LIV GOLF')
+              ?.replace('Champions Tour', 'CHAMPIONS')
+              ?.replace('Korn Ferry Tour', 'KORN FERRY')
+              ?.replace('DP World Tour', 'DP WORLD')
+              ?.toUpperCase() ?? ''}
+          </div>
+        </div>
       </div>
       <div style={{ fontSize: '16px', fontWeight: 700, color: 'hsl(var(--foreground))', lineHeight: 1.25, marginBottom: '4px' }}>
         {tournament.name}
