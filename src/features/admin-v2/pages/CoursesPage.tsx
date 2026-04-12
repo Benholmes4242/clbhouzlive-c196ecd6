@@ -313,7 +313,7 @@ function DescriptionField({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={10}
-          className="w-full text-[13px] px-3 py-2 rounded-lg border border-border bg-background outline-none focus:ring-2 focus:ring-border/40 resize-y leading-relaxed"
+          className="w-full text-[13px] px-3 py-2 rounded-lg border border-border bg-background text-foreground outline-none focus:ring-2 focus:ring-border/40 resize-y leading-relaxed"
           placeholder="Write a description… Use blank lines to separate paragraphs."
         />
       ) : value ? (
