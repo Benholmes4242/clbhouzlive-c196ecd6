@@ -123,8 +123,8 @@ const ChaserCard = memo(function ChaserCard({
         style={{
           fontSize: 15,
           fontWeight: 900,
-          color: accent.primary,
-          letterSpacing: '-0.5px',
+        color: '#0F172A',
+        letterSpacing: '-0.5px',
         }}
       >
         {player.statDisplayValue}
