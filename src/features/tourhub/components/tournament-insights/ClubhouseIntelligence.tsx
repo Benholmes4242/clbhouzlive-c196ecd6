@@ -1,6 +1,6 @@
 /**
  * ClubhouseIntelligence - Course breakdown
- * Theme-aware, animated chevron
+ * Dispatch-style section rule header
  */
 
 import { memo, useState } from 'react';
@@ -28,13 +28,15 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
       viewport={{ once: true }}
-      className="px-4 pb-5 pt-0"
+      style={{ background: '#F8FAFC' }}
     >
-      <h3 className="mb-3 text-foreground" style={{ fontSize: '18px', fontWeight: 700 }}>
-        Course Breakdown
-      </h3>
+      {/* Section rule */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 12 }}>
+        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Course Breakdown</span>
+      </div>
 
-      <p className="text-sm leading-relaxed m-0 text-muted-foreground">
+      <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, padding: '0 16px', color: '#475569' }}>
         {insight.primaryText}
         {isExpanded && insight.expandedText && (
           <>
@@ -47,15 +49,28 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       {hasExpandedContent && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold bg-transparent border-none cursor-pointer p-0 transition-opacity duration-200 text-foreground hover:opacity-70 active:opacity-70"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            marginTop: 12,
+            padding: '0 16px 16px',
+            fontSize: 13,
+            fontWeight: 600,
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#0F172A',
+            transition: 'opacity 0.2s',
+          }}
         >
           {isExpanded ? 'Show less' : 'Show more'}
           <motion.span
             animate={{ rotate: isExpanded ? 180 : 0 }}
             transition={{ duration: 0.2 }}
-            className="inline-flex"
+            style={{ display: 'inline-flex' }}
           >
-            <ChevronDown className="w-3.5 h-3.5 text-foreground" />
+            <ChevronDown style={{ width: 14, height: 14, color: '#0F172A' }} />
           </motion.span>
         </button>
       )}
