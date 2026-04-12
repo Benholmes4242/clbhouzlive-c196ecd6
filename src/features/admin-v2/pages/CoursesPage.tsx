@@ -382,6 +382,13 @@ function CourseDrawer({
             )}
             <div className="flex-1" />
             <AdminButton
+              variant="outline"
+              icon={CheckCircle}
+              onClick={() => toast.success('All changes saved')}
+            >
+              Save Changes
+            </AdminButton>
+            <AdminButton
               variant="danger"
               icon={Trash2}
               onClick={() => {
