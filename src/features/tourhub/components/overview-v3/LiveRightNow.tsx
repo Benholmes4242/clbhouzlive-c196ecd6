@@ -108,7 +108,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
             </span>
             <span style={{ fontSize: '8.5px', color: '#94A3B8' }}>·</span>
             <span style={{ fontSize: '8.5px', color: '#94A3B8', letterSpacing: '0.04em' }}>
-              Round {tournament.currentRound}
+              {tournament.currentRound === 4 ? 'Final Round' : `Round ${tournament.currentRound}`}
             </span>
           </div>
 
