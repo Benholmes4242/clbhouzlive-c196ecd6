@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import {
-  MapPin, Upload, Star, Globe,
+  MapPin, Upload, Star, Globe, Plus,
   MoreHorizontal, ExternalLink, Copy, CheckCircle,
   XCircle, RefreshCw, Image, Trash2,
 } from 'lucide-react';
@@ -589,6 +589,190 @@ function CourseDrawer({
   );
 }
 
+// ─── Add course modal ─────────────────────────────────────────────────────────
+
+const VALID_CONTINENTS = [
+  'Africa', 'Antarctica', 'Asia', 'Europe',
+  'North America', 'Oceania', 'South America',
+] as const;
+
+function AddCourseModal({ open, onClose, onCreated }: {
+  open: boolean;
+  onClose: () => void;
+  onCreated: (id: string) => void;
+}) {
+  const qc = useQueryClient();
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    country: '',
+    continent: '' as string,
+    sub_country: '',
+    region: '',
+    website_url: '',
+    description: '',
+    latitude: '',
+    longitude: '',
+    course_type: '',
+    has_hosted_major: false,
+  });
+
+  const set = (key: string, val: any) => setForm(f => ({ ...f, [key]: val }));
+
+  const handleSave = async () => {
+    if (!form.name.trim() || !form.country.trim() || !form.continent) {
+      toast.error('Name, Country and Continent are required');
+      return;
+    }
+    setSaving(true);
+    const { data, error } = await supabase
+      .from('golf_courses')
+      .insert({
+        name: form.name.trim(),
+        country: form.country.trim(),
+        continent: form.continent as any,
+        sub_country: form.sub_country || null,
+        region: form.region || null,
+        website_url: form.website_url || null,
+        description: form.description || null,
+        latitude: form.latitude ? parseFloat(form.latitude) : null,
+        longitude: form.longitude ? parseFloat(form.longitude) : null,
+        course_type: (form.course_type || null) as any,
+        has_hosted_major: form.has_hosted_major,
+      })
+      .select('id')
+      .single();
+    setSaving(false);
+
+    if (error) {
+      toast.error('Failed to create course');
+      return;
+    }
+    toast.success(`"${form.name}" created`);
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+    onCreated(data.id);
+    onClose();
+  };
+
+  if (!open) return null;
+
+  const Field = ({ label, value, onChange, type = 'text', placeholder, required }: {
+    label: string; value: string; onChange: (v: string) => void;
+    type?: string; placeholder?: string; required?: boolean;
+  }) => (
+    <div className="space-y-1">
+      <label className="text-[12px] font-medium text-muted-foreground">
+        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full text-[13px] px-3 py-2 rounded-lg border border-border bg-background outline-none focus:ring-2 focus:ring-border/40"
+      />
+    </div>
+  );
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div
+          className="relative w-full max-w-lg bg-background rounded-2xl shadow-2xl border border-border pointer-events-auto overflow-y-auto"
+          style={{ maxHeight: '90vh' }}
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <div>
+              <h2 className="text-[15px] font-semibold text-foreground">Add Course</h2>
+              <p className="text-[12px] text-muted-foreground mt-0.5">Create a new golf course record</p>
+            </div>
+            <button onClick={onClose} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-muted-foreground">✕</button>
+          </div>
+
+          {/* Form */}
+          <div className="px-6 py-5 space-y-4">
+            <Field label="Course Name" value={form.name} onChange={v => set('name', v)} placeholder="e.g. Augusta National" required />
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Country" value={form.country} onChange={v => set('country', v)} placeholder="e.g. USA" required />
+              <div className="space-y-1">
+                <label className="text-[12px] font-medium text-muted-foreground">
+                  Continent<span className="text-destructive ml-0.5">*</span>
+                </label>
+                <select
+                  value={form.continent}
+                  onChange={e => set('continent', e.target.value)}
+                  className="w-full text-[13px] px-3 py-2 rounded-lg border border-border bg-background outline-none focus:ring-2 focus:ring-border/40"
+                >
+                  <option value="">Select…</option>
+                  {VALID_CONTINENTS.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="State / County" value={form.sub_country} onChange={v => set('sub_country', v)} placeholder="e.g. Georgia" />
+              <Field label="Region" value={form.region} onChange={v => set('region', v)} placeholder="e.g. South East" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Latitude" value={form.latitude} onChange={v => set('latitude', v)} type="number" placeholder="e.g. 33.5021" />
+              <Field label="Longitude" value={form.longitude} onChange={v => set('longitude', v)} type="number" placeholder="e.g. -82.0232" />
+            </div>
+            <Field label="Website URL" value={form.website_url} onChange={v => set('website_url', v)} type="url" placeholder="https://…" />
+            <div className="space-y-1">
+              <label className="text-[12px] font-medium text-muted-foreground">Course Type</label>
+              <select
+                value={form.course_type}
+                onChange={e => set('course_type', e.target.value)}
+                className="w-full text-[13px] px-3 py-2 rounded-lg border border-border bg-background outline-none focus:ring-2 focus:ring-border/40"
+              >
+                <option value="">Not set</option>
+                {['Links', 'Parkland', 'Heathland', 'Desert', 'Mountain', 'Resort'].map(t => (
+                  <option key={t} value={t.toLowerCase()}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[12px] font-medium text-muted-foreground">Description</label>
+              <textarea
+                value={form.description}
+                onChange={e => set('description', e.target.value)}
+                placeholder="Optional course description…"
+                rows={3}
+                className="w-full text-[13px] px-3 py-2 rounded-lg border border-border bg-background outline-none focus:ring-2 focus:ring-border/40 resize-none"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => set('has_hosted_major', !form.has_hosted_major)}
+                className={cn(
+                  'h-5 w-9 rounded-full transition-colors relative flex-shrink-0',
+                  form.has_hosted_major ? 'bg-amber-500' : 'bg-muted-foreground/30'
+                )}
+              >
+                <span className={cn(
+                  'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform',
+                  form.has_hosted_major ? 'left-4' : 'left-0.5'
+                )} />
+              </button>
+              <span className="text-[13px] text-foreground">Has hosted a major championship</span>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border">
+            <AdminButton variant="ghost" onClick={onClose}>Cancel</AdminButton>
+            <AdminButton variant="primary" onClick={handleSave} disabled={saving}>
+              {saving ? 'Creating…' : 'Create Course'}
+            </AdminButton>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function CoursesPage() {
@@ -608,6 +792,7 @@ export default function CoursesPage() {
 
   const queryClient = useQueryClient();
   const [countryFilter, setCountryFilter] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Fetch top100 list IDs for membership sync
   const { data: top100Lists } = useQuery({
@@ -832,20 +1017,9 @@ export default function CoursesPage() {
         description="Manage course records, rankings, and geocoding"
         action={
           <div className="flex items-center gap-2">
-            <AdminButton
-              variant="ghost"
-              icon={RefreshCw}
-              onClick={() => refetch()}
-            >
-              Refresh
-            </AdminButton>
-            <AdminButton
-              variant="primary"
-              icon={Upload}
-              onClick={() => navigate('/admin-v2/courses/import')}
-            >
-              Import Courses
-            </AdminButton>
+            <AdminButton variant="ghost" icon={RefreshCw} onClick={() => refetch()}>Refresh</AdminButton>
+            <AdminButton variant="outline" icon={Plus} onClick={() => setShowAddModal(true)}>Add Course</AdminButton>
+            <AdminButton variant="primary" icon={Upload} onClick={() => navigate('/admin-v2/courses/import')}>Import Courses</AdminButton>
           </div>
         }
       />
@@ -940,6 +1114,12 @@ export default function CoursesPage() {
         isUploadingPhoto={isUploadingPhoto}
         onDelete={deleteCourse}
         isDeleting={isDeleting}
+      />
+
+      <AddCourseModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onCreated={(id) => { setShowAddModal(false); setDrawerCourseId(id); }}
       />
 
     </div>
