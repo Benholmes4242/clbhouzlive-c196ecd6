@@ -1,11 +1,5 @@
 /**
- * UnifiedWorldRankings v5 — Broadcast-Quality OWGR Leaderboard
- * 
- * FIX 06: Momentum/faller chips navigate to player profiles
- * FIX 07: All hardcoded colors replaced with theme tokens
- * FIX 11: Avatar initials rendered in fallback state
- * FIX 13: aria-labels on interactive elements
- * FIX 18: OWGR subtitle shows actual date if available
+ * UnifiedWorldRankings v6 — Rankings Report Redesign (Dispatch aesthetic)
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
@@ -23,9 +17,6 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 
 const PLAYERS_PER_PAGE = 10;
-
-// No.1 rank crown accent — amber-orange, distinct from live green
-const CROWN_COLOR = '#EA580C';
 
 const RANKING_TOUR_OPTIONS = [
   { code: 'pga',  label: 'PGA Tour',       description: 'Official World Golf Ranking' },
@@ -69,7 +60,7 @@ function SkeletonRow() {
 }
 
 // ============================================================================
-// MOMENTUM PILL — FIX 06: Navigate to player profile on tap
+// MOMENTUM PILL — kept for import safety, no longer rendered
 // ============================================================================
 
 interface MomentumPillProps {
@@ -91,62 +82,15 @@ interface MomentumPillProps {
 
 function MomentumPill({ entry, index, direction }: MomentumPillProps) {
   const navigate = useNavigate();
-  const initials = `${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase();
-  const photoUrl = getPlayerHeadshotUrl(`${entry.firstName} ${entry.lastName}`, entry.tourCode ?? 'pga');
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false);
-
-  const showPhoto = photoUrl && !imgError;
-  const showInitials = !showPhoto || !imgLoaded;
-
   const isUp = direction === 'up';
   const absChange = Math.abs(entry.rankChange);
-
   return (
-    <motion.button
+    <button
       onClick={() => navigate(`/tourhub/player/${entry.playerId}`)}
-      className="flex-shrink-0 rounded-xl border border-border/60 active:scale-[0.97] transition-transform bg-muted/40"
-      style={{
-        padding: '6px 10px',
-        scrollSnapAlign: 'start',
-      }}
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       aria-label={`${entry.firstName} ${entry.lastName}, rank ${entry.rank}, ${isUp ? 'up' : 'down'} ${absChange}`}
     >
-        <div className="flex items-center gap-1.5">
-          {/* Avatar — FIX 11: Show initials in fallback */}
-          <div className="w-6 h-6 overflow-hidden flex-shrink-0 border border-border/40" style={{ borderRadius: '34%' }}>
-            {showPhoto && (
-              <img
-                src={photoUrl}
-                alt={entry.lastName}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onLoad={() => setImgLoaded(true)}
-                onError={() => setImgError(true)}
-                style={{ display: imgLoaded ? 'block' : 'none' }}
-              />
-            )}
-            {showInitials && (
-              <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-[8px] font-semibold">
-                {initials}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col">
-            <span className="whitespace-nowrap text-[0.8125rem] font-medium text-foreground/80">{entry.lastName}</span>
-            <div className="flex items-center gap-1">
-              <span className="text-[0.625rem] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>#{entry.rank}</span>
-               <span className="whitespace-nowrap text-[0.625rem] font-medium" style={{ color: isUp ? TOUR_COLORS.movementUp : TOUR_COLORS.movementDown }}>
-                <span style={{ fontSize: '10px' }}>{isUp ? '▲' : '▼'}</span>{isUp ? '+' : '−'}{absChange}
-              </span>
-            </div>
-        </div>
-      </div>
-    </motion.button>
+      {entry.lastName}
+    </button>
   );
 }
 
@@ -219,6 +163,8 @@ export function UnifiedWorldRankings() {
   };
   const dotRange = getVisibleDotRange();
 
+  const hasMovers = upwardMovers.length > 0 || downwardMovers.length > 0;
+
   // ── Loading ──
   if (isLoading) {
     return (
@@ -244,7 +190,7 @@ export function UnifiedWorldRankings() {
     );
   }
 
-  // FIX 08: Error state
+  // Error state
   if (hasError) {
     return (
       <section aria-label="Official World Golf Ranking">
@@ -252,10 +198,6 @@ export function UnifiedWorldRankings() {
       </section>
     );
   }
-
-  const isEmpty = !rankings?.length && !isLoading;
-
-  const hasMovers = upwardMovers.length > 0;
 
   return (
     <motion.section
@@ -265,61 +207,52 @@ export function UnifiedWorldRankings() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* ═══ 1. Section Header ═══ */}
-      <div className="flex items-start justify-between mb-0.5">
-        <h2 className="tracking-tight leading-snug text-foreground text-[1.375rem] font-bold" style={{ letterSpacing: '-0.3px' }}>
-          World Rankings
-        </h2>
-        <button
-          onClick={() => navigate('/tourhub?tab=players')}
-          className="flex items-center gap-0.5 active:scale-95 transition-transform mt-1 text-muted-foreground text-[0.8125rem] font-medium"
-          style={{ minHeight: '44px' }}
-          aria-label="View all world rankings"
-        >
-          View All
-          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-        </button>
-      </div>
-      {/* Tour selector trigger */}
-      <div className="flex items-center gap-2.5 mt-1 mb-2.5">
-        <button
-          onClick={() => setSheetOpen(true)}
-          className="flex items-center gap-2 active:scale-[0.98] transition-transform"
-          style={{
-            background: 'hsl(var(--card))',
-            border: '1px solid hsl(var(--border) / 0.5)',
-            borderRadius: 10,
-            padding: '7px 12px',
-            minHeight: 36,
-          }}
-        >
-          <img
-            src={getTourLogo(activeTour)}
-            alt={RANKING_TOUR_OPTIONS.find(t => t.code === activeTour)?.label}
-            style={{ width: 28, height: 20, objectFit: 'contain', flexShrink: 0 }}
-          />
-          <span className="text-[0.8125rem] font-semibold text-foreground">
-            {RANKING_TOUR_OPTIONS.find(t => t.code === activeTour)?.label}
-          </span>
-          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-        </button>
-
-        <span className="text-muted-foreground/60 leading-tight" style={{ fontSize: '12px', fontWeight: 500 }}>
-          {(() => {
-            const rankingDate = (rankings as any)?.[0]?.ranking_date;
-            if (!rankingDate) return 'Updated weekly';
-            const diffDays = Math.floor(
-              (new Date().getTime() - new Date(rankingDate + 'T00:00:00').getTime()) / 86400000
-            );
-            if (diffDays === 0) return 'Updated today';
-            if (diffDays === 1) return 'Updated yesterday';
-            if (diffDays <= 7) return `Updated ${diffDays} days ago`;
-            return `Updated ${rankingDate}`;
-          })()}
-        </span>
+      {/* ═══ MASTHEAD ═══ */}
+      <div style={{ borderBottom: '2px solid #0F172A', paddingBottom: 10, marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>
+              ⚡ Weekly Rankings Report
+            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>
+              World Golf Rankings
+            </h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+            {/* Tour selector trigger */}
+            <button
+              onClick={() => setSheetOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                background: '#ffffff',
+                border: '1px solid rgba(15,23,42,0.09)',
+                borderRadius: 10, padding: '6px 11px',
+                boxShadow: '0 1px 4px rgba(15,23,42,0.05)',
+              }}
+              className="active:scale-[0.98] transition-transform"
+            >
+              <img src={getTourLogo(activeTour)} alt="" style={{ width: 24, height: 18, objectFit: 'contain' }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>
+                {RANKING_TOUR_OPTIONS.find(t => t.code === activeTour)?.label}
+              </span>
+              <ChevronDown style={{ width: 12, height: 12, color: '#94A3B8' }} />
+            </button>
+            <span style={{ fontSize: 9, color: '#94A3B8' }}>
+              {(() => {
+                const rankingDate = (rankings as any)?.[0]?.ranking_date;
+                if (!rankingDate) return 'Updated weekly';
+                const diffDays = Math.floor((new Date().getTime() - new Date(rankingDate + 'T00:00:00').getTime()) / 86400000);
+                if (diffDays === 0) return 'Updated today';
+                if (diffDays === 1) return 'Updated yesterday';
+                if (diffDays <= 7) return `Updated ${diffDays} days ago`;
+                return `Updated ${rankingDate}`;
+              })()}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Bottom sheet */}
+      {/* Bottom sheet — kept exactly as is */}
       <BottomSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
@@ -363,16 +296,10 @@ export function UnifiedWorldRankings() {
                     style={{ width: 32, height: 22, objectFit: 'contain', flexShrink: 0 }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div
-                      className="text-[0.875rem] font-semibold"
-                      style={{ color: 'hsl(var(--foreground))' }}
-                    >
+                    <div className="text-[0.875rem] font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
                       {tour.label}
                     </div>
-                    <div
-                      className="text-[0.75rem]"
-                      style={{ color: 'hsl(var(--muted-foreground))' }}
-                    >
+                    <div className="text-[0.75rem]" style={{ color: 'hsl(var(--muted-foreground))' }}>
                       {tour.description}
                     </div>
                   </div>
@@ -388,66 +315,137 @@ export function UnifiedWorldRankings() {
         </div>
       </BottomSheet>
 
-      <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.3)' }} />
+      {/* ═══ NO.1 COVER STORY ═══ */}
+      {currentPagePlayers.length > 0 && currentPage === 0 && (() => {
+        const top = rankings?.[0];
+        if (!top) return null;
+        const topName = `${top.player.first_name} ${top.player.last_name}`;
+        return (
+          <div style={{
+            display: 'flex', alignItems: 'flex-start', gap: 0,
+            marginBottom: 16, paddingBottom: 16,
+            borderBottom: '1px solid rgba(15,23,42,0.08)',
+          }}>
+            {/* Left — rank number */}
+            <div style={{
+              width: 64, flexShrink: 0,
+              paddingRight: 14, marginRight: 14,
+              borderRight: '1px solid rgba(15,23,42,0.08)',
+            }}>
+              <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', marginBottom: 4 }}>NO.1</div>
+              <div style={{ fontSize: 48, fontWeight: 900, color: '#F7931E', lineHeight: 1, letterSpacing: '-0.05em' }}>1</div>
+            </div>
+            {/* Right — player info */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.05, marginBottom: 3 }}>
+                {topName}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+                <CountryFlag country={top.player.country ?? ''} size="sm" />
+                <span style={{ fontSize: 10, color: '#94A3B8' }}>{toTitleCase(top.player.country ?? '')}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                  {top.avg_points?.toFixed(2) ?? '—'}
+                </span>
+                <span style={{ fontSize: 8.5, color: '#94A3B8', letterSpacing: '0.06em' }}>AVG PTS</span>
+                <span style={{ fontSize: 11, color: '#E2E8F0', margin: '0 2px' }}>·</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#475569', fontVariantNumeric: 'tabular-nums' }}>
+                  {top.total_points?.toLocaleString(undefined, { maximumFractionDigits: 1 }) ?? '—'}
+                </span>
+                <span style={{ fontSize: 8.5, color: '#94A3B8', letterSpacing: '0.06em' }}>TOTAL</span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
-
-      {/* ═══ 3. Risers & Fallers ═══ */}
+      {/* ═══ MOVERS REPORT ═══ */}
       {hasMovers && (
-        <div className="mb-5 flex flex-col" style={{ gap: '8px' }}>
-          {/* Row 1 — Risers */}
-          {upwardMovers.length > 0 && (
-            <div>
-              <span style={{ color: TOUR_COLORS.movementUp, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▲ Risers</span>
-              <div
-                className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
-                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
-                role="list"
-                aria-label="Players with biggest ranking gains this week"
-              >
-                {upwardMovers.map((entry, idx) => (
-                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="up" />
+        <div style={{
+          background: '#ffffff',
+          borderRadius: 14,
+          border: '1px solid rgba(15,23,42,0.08)',
+          padding: '12px 14px',
+          marginBottom: 16,
+          boxShadow: '0 1px 4px rgba(15,23,42,0.04)',
+        }}>
+          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.14em', marginBottom: 10 }}>
+            WEEK'S MOVERS
+          </div>
+          <div style={{ display: 'flex', gap: 16 }}>
+            {/* Risers column */}
+            {upwardMovers.length > 0 && (
+              <div style={{ flex: 1, borderRight: downwardMovers.length > 0 ? '0.5px solid rgba(15,23,42,0.08)' : 'none', paddingRight: downwardMovers.length > 0 ? 14 : 0 }}>
+                <div style={{ fontSize: 8.5, fontWeight: 900, color: '#16A34A', letterSpacing: '0.12em', marginBottom: 8 }}>
+                  ▲ RISERS
+                </div>
+                {upwardMovers.slice(0, 4).map((entry, i) => (
+                  <button
+                    key={entry.playerId}
+                    onClick={() => navigate(`/tourhub/player/${entry.playerId}`)}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      width: '100%', padding: '5px 0',
+                      background: 'none', border: 'none',
+                      borderBottom: i < Math.min(upwardMovers.length, 4) - 1 ? '0.5px solid rgba(15,23,42,0.05)' : 'none',
+                      cursor: 'pointer', textAlign: 'left' as const,
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{entry.lastName}</div>
+                      <div style={{ fontSize: 9, color: '#94A3B8' }}>#{entry.rank}</div>
+                    </div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#16A34A' }}>+{Math.abs(entry.rankChange)}</div>
+                  </button>
                 ))}
               </div>
-            </div>
-          )}
-          {/* Row 2 — Fallers */}
-          {downwardMovers.length > 0 && (
-            <div>
-              <span style={{ color: TOUR_COLORS.movementDown, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▼ Fallers</span>
-              <div
-                className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
-                style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
-                role="list"
-                aria-label="Players with biggest ranking drops this week"
-              >
-                {downwardMovers.map((entry, idx) => (
-                  <MomentumPill key={entry.playerId} entry={entry} index={idx} direction="down" />
+            )}
+            {/* Fallers column */}
+            {downwardMovers.length > 0 && (
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 8.5, fontWeight: 900, color: '#DC2626', letterSpacing: '0.12em', marginBottom: 8 }}>
+                  ▼ FALLERS
+                </div>
+                {downwardMovers.slice(0, 4).map((entry, i) => (
+                  <button
+                    key={entry.playerId}
+                    onClick={() => navigate(`/tourhub/player/${entry.playerId}`)}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      width: '100%', padding: '5px 0',
+                      background: 'none', border: 'none',
+                      borderBottom: i < Math.min(downwardMovers.length, 4) - 1 ? '0.5px solid rgba(15,23,42,0.05)' : 'none',
+                      cursor: 'pointer', textAlign: 'left' as const,
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{entry.lastName}</div>
+                      <div style={{ fontSize: 9, color: '#94A3B8' }}>#{entry.rank}</div>
+                    </div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626' }}>{entry.rankChange}</div>
+                  </button>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
-      {/* ═══ 4. Leaderboard ═══ */}
+      {/* ═══ LEADERBOARD ═══ */}
       <div>
-        {/* Two-column stat headers */}
-        <div className="flex items-center pb-2" style={{ borderBottom: '1px solid hsl(var(--border) / 0.3)' }}>
-          <div className="w-10 flex-shrink-0 text-center uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-            #
+        {/* Column headers */}
+        <div style={{ display: 'flex', padding: '8px 0', borderBottom: '1px solid rgba(15,23,42,0.1)', marginBottom: 0 }}>
+          <div style={{ width: 48, flexShrink: 0, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em' }}>RNK</div>
+          <div style={{ flex: 1, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em' }}>PLAYER</div>
+          <div style={{ width: 36, textAlign: 'right' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>WK</div>
+          <div style={{ width: 52, textAlign: 'right' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>
+            {activeTour === 'pga' ? 'AVG' : 'PTS'}
           </div>
-          <div className="flex-1 min-w-0 uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-            Player
-          </div>
-           <div className="w-16 flex-shrink-0 text-right uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-             {activeTour === 'pga' ? 'Avg Pts' : 'Points'}
-          </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-            Total
-          </div>
+          <div style={{ width: 52, textAlign: 'right' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>TOTAL</div>
         </div>
 
-        {/* ═══ 5–8. Player Rows ═══ */}
+        {/* Player Rows */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
@@ -474,20 +472,8 @@ export function UnifiedWorldRankings() {
             ) : currentPagePlayers.map((entry, index) => {
               const fullName = `${entry.player.first_name} ${entry.player.last_name}`;
               const isHighlighted = highlightedPlayerId === entry.player.id;
-              const isMover = moverPlayerIds.has(entry.player.id);
-
-              // Tier logic
               const isCrown = entry.rank === 1;
-
-              // Row background — subtle tier differentiation
-              let rowBg = 'transparent';
-              if (isCrown) rowBg = 'hsl(45 93% 47% / 0.04)';
-              if (isHighlighted) rowBg = 'hsl(var(--primary) / 0.04)';
-
-              // Velocity arrow
               const rankChange = entry.rank_change;
-
-              // Avatar
               const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase();
               const photoUrl = getPlayerHeadshotUrl(fullName, entry.player.tour_codes?.[0] ?? 'pga');
 
@@ -495,70 +481,72 @@ export function UnifiedWorldRankings() {
                 <motion.div
                   key={entry.player.id}
                   ref={(el) => setRowRef(entry.player.id, el)}
-                  className="flex items-center cursor-pointer active:scale-[0.98] transition-transform"
+                  className="cursor-pointer active:scale-[0.98] transition-transform"
                   onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: Math.min(index, 10) * 0.03, ease: [0.16, 1, 0.3, 1] }}
                   style={{
-                    padding: '12px 0',
-                    minHeight: '64px',
-                    borderBottom: '1px solid hsl(var(--border) / 0.15)',
-                    borderLeft: isMover ? `3px solid ${TOUR_COLORS.movementUp}` : '3px solid transparent',
-                    background: rowBg,
+                    display: 'flex', alignItems: 'center',
+                    padding: '11px 0',
+                    borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+                    background: isHighlighted ? 'rgba(247,147,30,0.03)' : 'transparent',
                   }}
                   aria-label={`${fullName}, rank ${entry.rank}, average ${entry.avg_points?.toFixed(2) ?? 'N/A'} points`}
                 >
-                  {/* ── Rank + velocity arrow ── */}
-                  <div className="w-10 flex-shrink-0 flex flex-col items-center gap-0.5">
-                    <span className="text-[0.875rem] font-semibold text-foreground" style={{
+                  {/* Large grey rank number */}
+                  <div style={{ width: 48, flexShrink: 0 }}>
+                    <span style={{
+                      fontSize: 18, fontWeight: 900,
+                      color: isCrown ? '#F7931E' : 'rgba(15,23,42,0.12)',
+                      letterSpacing: '-0.02em',
                       fontVariantNumeric: 'tabular-nums',
-                      color: isCrown ? CROWN_COLOR : undefined,
                     }}>
                       {entry.rank}
                     </span>
-                    {rankChange > 0 ? (
-                      <span style={{ color: TOUR_COLORS.movementUp, fontSize: '10px', fontWeight: 600 }}>▲{Math.abs(rankChange)}</span>
-                    ) : rankChange < 0 ? (
-                      <span style={{ color: TOUR_COLORS.movementDown, fontSize: '10px', fontWeight: 600 }}>▼{Math.abs(rankChange)}</span>
-                    ) : null}
                   </div>
 
-                  {/* ── Avatar + name ── */}
-                  <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  {/* Avatar + name */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                     <PlayerAvatar photoUrl={photoUrl} initials={initials} fullName={fullName} />
-
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate leading-tight text-[0.875rem] font-semibold text-foreground">
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, lineHeight: 1.2 }}>
                         {fullName}
                       </div>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <CountryFlag country={entry.player.country} size="sm" />
-                        <span className="truncate leading-none text-[0.6875rem] text-muted-foreground">
-                          {toTitleCase(entry.player.country)}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                        <CountryFlag country={entry.player.country ?? ''} size="sm" />
+                        <span style={{ fontSize: 10, color: '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                          {toTitleCase(entry.player.country ?? '')}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* ── Two-column stats ── */}
-                  <div className="flex items-start gap-0 flex-shrink-0">
-                    <div className="w-16 text-right">
-                      <div className="text-[0.8125rem] font-medium text-foreground/80" style={{
-                        fontVariantNumeric: 'tabular-nums',
-                        color: isCrown ? CROWN_COLOR : undefined,
-                      }}>
-                        {entry.avg_points?.toFixed(2) ?? '—'}
-                      </div>
-                    </div>
+                  {/* Weekly change */}
+                  <div style={{ width: 36, textAlign: 'right' as const, flexShrink: 0 }}>
+                    {rankChange > 0 ? (
+                      <span style={{ fontSize: 9, fontWeight: 800, color: '#16A34A' }}>▲{Math.abs(rankChange)}</span>
+                    ) : rankChange < 0 ? (
+                      <span style={{ fontSize: 9, fontWeight: 800, color: '#DC2626' }}>▼{Math.abs(rankChange)}</span>
+                    ) : (
+                      <span style={{ fontSize: 9, color: '#E2E8F0' }}>—</span>
+                    )}
+                  </div>
 
-                    <div className="w-16 text-right">
-                      <div className="text-[0.8125rem] font-medium text-foreground/80" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {entry.total_points
-                          ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                          : '—'}
-                      </div>
-                    </div>
+                  {/* Avg points */}
+                  <div style={{ width: 52, textAlign: 'right' as const, flexShrink: 0 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: isCrown ? '#F7931E' : '#334155', fontVariantNumeric: 'tabular-nums' }}>
+                      {entry.avg_points?.toFixed(2) ?? '—'}
+                    </span>
+                  </div>
+
+                  {/* Total */}
+                  <div style={{ width: 52, textAlign: 'right' as const, flexShrink: 0 }}>
+                    <span style={{ fontSize: 11, color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
+                      {entry.total_points
+                        ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                        : '—'}
+                    </span>
                   </div>
                 </motion.div>
               );
@@ -567,7 +555,7 @@ export function UnifiedWorldRankings() {
         </AnimatePresence>
       </div>
 
-      {/* ═══ 9. Pagination ═══ */}
+      {/* ═══ PAGINATION ═══ */}
       {totalPages > 1 && (
         <div className="pt-3">
           <div className="flex items-center justify-center gap-3">
@@ -590,12 +578,10 @@ export function UnifiedWorldRankings() {
                     onClick={() => setCurrentPage(dotIndex)}
                     className="transition-all duration-300"
                     style={{
-                      height: '6px',
-                      width: isActive ? '20px' : '6px',
-                      borderRadius: '3px',
-                      background: isActive
-                        ? 'hsl(var(--foreground))'
-                        : 'hsl(var(--border))',
+                      height: '4px',
+                      width: isActive ? '20px' : '4px',
+                      borderRadius: '2px',
+                      background: isActive ? '#0F172A' : 'rgba(15,23,42,0.12)',
                     }}
                     aria-label={`Page ${dotIndex + 1} of ${totalPages}`}
                   />
@@ -613,7 +599,7 @@ export function UnifiedWorldRankings() {
             </button>
           </div>
 
-          <p className="text-center text-[10px] font-medium text-muted-foreground/50 mt-1.5" style={{ fontVariantNumeric: 'normal' }}>
+          <p className="text-center text-muted-foreground/50 mt-1.5" style={{ fontSize: 10, fontWeight: 500, fontVariantNumeric: 'normal' }}>
             {startIndex + 1}–{endIndex} of {totalPlayers}
           </p>
         </div>
@@ -623,7 +609,7 @@ export function UnifiedWorldRankings() {
 }
 
 // ============================================================================
-// PlayerAvatar — FIX 11: Show initials in fallback, not empty div
+// PlayerAvatar
 // ============================================================================
 
 function PlayerAvatar({ photoUrl, initials, fullName }: { photoUrl: string | null; initials: string; fullName: string }) {
