@@ -153,6 +153,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
             </div>
           )}
         </div>
+        </div>
       </div>
     </button>
   );
