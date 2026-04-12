@@ -77,7 +77,6 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
             style={{
               fontSize: 40,
               fontWeight: 900,
-              fontFamily: 'Georgia, serif',
               letterSpacing: '-0.05em',
               lineHeight: 1,
               color: '#141d2e',
@@ -120,7 +119,6 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
               color: '#141d2e',
               lineHeight: 1.2,
               marginBottom: 4,
-              fontFamily: 'Georgia, serif',
               letterSpacing: '-0.025em',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
