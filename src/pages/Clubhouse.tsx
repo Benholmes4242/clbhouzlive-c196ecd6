@@ -289,6 +289,11 @@ const ClubhouseContent = () => {
 
   const showRehydrationSkeleton = isRehydrating;
 
+  // Guard: wait for auth to resolve before evaluating feed state
+  if (authLoading) {
+    return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />;
+  }
+
   return (
     <PageRoot 
       ref={clubhouseRootRef} 
