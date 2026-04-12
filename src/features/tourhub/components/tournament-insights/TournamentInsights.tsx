@@ -74,7 +74,7 @@ function PickRecordRail() {
 
   return (
     <>
-      <div style={{ padding: '16px 0 8px' }}>
+      <div style={{ padding: '8px 0 8px' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 0 }}>
           <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
@@ -107,7 +107,7 @@ function PickRecordRail() {
                   border: entry.isWinner
                     ? '1.5px solid rgba(245,158,11,0.4)'
                     : '1px solid hsl(var(--border))',
-                  boxShadow: entry.isWinner ? '0 0 12px rgba(245,158,11,0.1)' : 'none',
+                  boxShadow: entry.isWinner ? '0 0 12px rgba(245,158,11,0.1)' : '0 1px 4px rgba(15,23,42,0.06)',
                 }}
               >
                 {/* Tournament short name */}
@@ -305,13 +305,13 @@ function PickRecordBadge() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
       {wins > 0 && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 9px', borderRadius: 7, background: 'rgba(247,147,30,0.1)', border: '1px solid rgba(247,147,30,0.3)' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 7, background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.3)' }}>
           <span style={{ fontSize: 11 }}>🏆</span>
           <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E' }}>{wins} wins</span>
         </div>
       )}
       {top5 > 0 && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 9px', borderRadius: 7, background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.25)' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 7, background: 'rgba(22,163,74,0.07)', border: '1px solid rgba(22,163,74,0.25)' }}>
           <span style={{ fontSize: 11, fontWeight: 800, color: '#16A34A' }}>✓ {top5} top‑5s</span>
         </div>
       )}
@@ -508,7 +508,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 className="active:scale-[0.98] transition-transform"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1 }} />
+                  <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
                   <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                     {showCourseDNA ? 'Hide Course DNA' : 'Course DNA'}
                   </span>
@@ -593,14 +593,14 @@ export const TournamentInsights = memo(function TournamentInsights() {
             {/* AI pill */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '3px 9px', borderRadius: 6, marginBottom: 8,
+              padding: '3px 9px', borderRadius: 5, marginBottom: 10,
               background: '#F7931E',
             }}>
               <span style={{ fontSize: 10 }}>⚡</span>
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#451A03', letterSpacing: '0.08em' }}>AI PREDICTIONS</span>
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#451A03', letterSpacing: '0.1em' }}>AI PREDICTIONS</span>
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', margin: 0, fontFamily: 'Georgia, serif', lineHeight: 1.05 }}>
-              Tournament<br />Intelligence
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, fontFamily: 'Georgia, serif', lineHeight: 1.1 }}>
+              Tournament Intelligence
             </h2>
             <p style={{ fontSize: 11, color: '#94A3B8', marginTop: 5, marginBottom: 0, lineHeight: 1.5 }}>
               Course DNA · Form analysis · Field strength
@@ -726,7 +726,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          style={{ background: '#F8FAFC', borderTop: '1px solid rgba(15,23,42,0.06)' }}
+          style={{ background: '#F8FAFC', paddingTop: 0 }}
         >
           {renderSecondaryContent()}
         </motion.div>

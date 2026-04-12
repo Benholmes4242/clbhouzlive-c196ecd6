@@ -45,15 +45,14 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       {/* Live-only header */}
       {!isCompleted && (
         <div className="px-1 flex items-center justify-between" style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              Tournament Picks · Live Positions
+            </span>
+          </div>
           <span
-            className="text-muted-foreground uppercase"
-            style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em' }}
-          >
-            TOURNAMENT PICKS · LIVE POSITIONS
-          </span>
-          <span
-            className="text-muted-foreground uppercase"
-            style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}
+            style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}
           >
             POS / OFF LEAD
           </span>
