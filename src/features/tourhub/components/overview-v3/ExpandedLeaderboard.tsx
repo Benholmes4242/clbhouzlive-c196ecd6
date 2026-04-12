@@ -390,53 +390,48 @@ export function ExpandedLeaderboardList({ entries, tourCode, tournamentId, defen
         ))}
       </div>
 
-      {/* Event info footer — centered, both pills side by side */}
+      {/* Event info footer — defending champion left, View Tournament right */}
       {tournamentId && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: '10px',
+          justifyContent: 'space-between',
           padding: '10px 16px 2px',
           borderTop: '0.5px solid rgba(255,255,255,0.07)',
           marginTop: 4,
         }}>
           {/* Defending champion pill */}
-          {defendingChampion && (
+          {defendingChampion ? (
             <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              background: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              borderRadius: '14px',
-              padding: '8px 14px',
-              border: '0.5px solid rgba(255,255,255,0.10)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+              background: 'rgba(255,255,255,0.06)',
+              borderRadius: '12px',
+              padding: '7px 11px',
+              border: '0.5px solid rgba(255,255,255,0.08)',
             }}>
-              <span style={{ fontSize: 16 }}>🏆</span>
+              <span style={{ fontSize: 13 }}>🏆</span>
               <div>
                 <div style={{
                   fontSize: '9px',
                   color: 'rgba(255,255,255,0.3)',
-                  letterSpacing: '0.09em',
+                  letterSpacing: '0.08em',
                   textTransform: 'uppercase' as const,
-                  marginBottom: '2px',
-                  fontWeight: 700,
+                  marginBottom: '1px',
                 }}>
                   Defending
                 </div>
                 <div style={{
-                  fontSize: '13px',
+                  fontSize: '12px',
                   fontWeight: 700,
-                  color: 'rgba(255,255,255,0.92)',
+                  color: 'rgba(255,255,255,0.85)',
                 }}>
                   {defendingChampion}
                 </div>
               </div>
             </div>
-          )}
+          ) : <div />}
 
           {/* View Tournament pill */}
           <Link
@@ -445,21 +440,18 @@ export function ExpandedLeaderboardList({ entries, tourCode, tournamentId, defen
               display: 'flex',
               alignItems: 'center',
               gap: '5px',
-              background: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              borderRadius: '14px',
-              padding: '8px 16px',
-              border: '0.5px solid rgba(255,255,255,0.10)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+              background: 'rgba(255,255,255,0.10)',
+              borderRadius: '10px',
+              padding: '8px 14px',
+              border: '0.5px solid rgba(255,255,255,0.15)',
               textDecoration: 'none',
             }}
             className="active:opacity-70 transition-opacity"
           >
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff' }}>
               View Tournament
             </span>
-            <ChevronRight style={{ width: 13, height: 13, color: 'rgba(255,255,255,0.45)' }} />
+            <ChevronRight style={{ width: 13, height: 13, color: 'rgba(255,255,255,0.5)' }} />
           </Link>
         </div>
       )}
