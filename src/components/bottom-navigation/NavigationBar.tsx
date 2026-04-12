@@ -191,8 +191,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 <div key={i} style={{ background: '#475569', borderRadius: 2 }} />
               ))}
             </div>
-            <span className="text-[9px] min-[375px]:text-[10px] leading-none font-semibold whitespace-nowrap text-slate-500">
-              Sections
+            <span className="text-[9px] min-[375px]:text-[10px] leading-[1.1] font-semibold text-center text-slate-500" style={{ whiteSpace: 'normal', maxWidth: 48 }}>
+              Tour Menu
             </span>
           </button>
         </>
