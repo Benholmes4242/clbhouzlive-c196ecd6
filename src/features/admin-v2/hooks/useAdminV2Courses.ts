@@ -242,7 +242,7 @@ async function updateCourse(
   updates: Partial<Pick<AdminCourseRow,
     'name' | 'global_rank' | 'regional_rank' | 'usa_rank' | 'country_rank' |
     'website_url' | 'description' | 'top100_url' |
-    'country' | 'sub_country' | 'region' | 'continent' |
+    'country' | 'sub_country' | 'region' |
     'latitude' | 'longitude' | 'country_code' |
     'course_type' | 'has_hosted_major'
   >>
