@@ -27,11 +27,12 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
   const tourLabel = (() => {
     switch (tournament.tourSlug?.toLowerCase()) {
       case 'pga': return 'PGA TOUR';
-      case 'euro': return 'DP WORLD';
+      case 'euro': return 'PGA TOUR';
       case 'lpga': return 'LPGA';
       case 'liv': return 'LIV';
       case 'champ': return 'CHAMPIONS';
       case 'pgad': return 'KORN FERRY';
+      case 'masters': return 'PGA TOUR';
       default: return tournament.tourSlug?.toUpperCase() ?? '';
     }
   })();
@@ -43,7 +44,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className="flex-shrink-0 text-left active:scale-[0.97] transition-transform"
       style={{
-        width: 260,
+        width: 286,
         background: '#ffffff',
         borderRadius: 14,
         border: '1px solid rgba(15,23,42,0.09)',
@@ -55,14 +56,14 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       aria-label={`${tournament.name} — live now`}
     >
       {/* Top accent bar */}
-      <div style={{ height: 3, background: '#0F172A', flexShrink: 0 }} />
+      <div style={{ height: 3, background: '#141d2e', flexShrink: 0 }} />
 
       {/* Card body */}
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         {/* Score column */}
         <div
           style={{
-            width: 72,
+            width: 79,
             flexShrink: 0,
             padding: '14px 12px 14px 14px',
             borderRight: '1px solid rgba(15,23,42,0.06)',
@@ -79,7 +80,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
               fontFamily: 'Georgia, serif',
               letterSpacing: '-0.05em',
               lineHeight: 1,
-              color: '#0F172A',
+              color: '#141d2e',
             }}
           >
             {tournament.leader?.scoreDisplay ?? '—'}
@@ -102,7 +103,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
         <div style={{ flex: 1, padding: '12px 0 12px 14px', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {/* Tour + Round */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#141d2e', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
               {tourLabel}
             </span>
             <span style={{ fontSize: '8.5px', color: '#94A3B8' }}>·</span>
@@ -116,7 +117,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
             style={{
               fontSize: 13,
               fontWeight: 800,
-              color: '#0F172A',
+              color: '#141d2e',
               lineHeight: 1.2,
               marginBottom: 4,
               fontFamily: 'Georgia, serif',
@@ -210,10 +211,10 @@ export function LiveRightNow() {
           </span>
         </div>
         <div style={{ display: 'flex', gap: 10, overflowX: 'auto' }}>
-          {[0, 1, 2].map((i) => (
+           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              style={{ width: 260, height: 90, borderRadius: 14, background: 'rgba(15,23,42,0.4)', flexShrink: 0 }}
+              style={{ width: 286, height: 99, borderRadius: 14, background: 'rgba(15,23,42,0.4)', flexShrink: 0 }}
             />
           ))}
         </div>
