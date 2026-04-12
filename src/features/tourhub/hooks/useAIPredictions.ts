@@ -154,16 +154,20 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
   const pgaSeasonId = await getPgaSeasonId();
   if (!pgaSeasonId) return { predictions: null, tournamentPhase: 'pre-tournament' };
 
-  // Priority 1: In-progress tournament
-  const { data: activeTournament } = await supabase
+  // Priority 1: In-progress tournament (search ALL seasons — majors like the Masters
+  // may be stored under a different tour/season e.g. EURO)
+  const { data: allActiveTournaments } = await supabase
     .from('sr_tournaments')
     .select('*')
-    .eq('season_id', pgaSeasonId)
     .eq('status', 'inprogress')
-    .order('start_date', { ascending: true })
     .order('purse', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .order('start_date', { ascending: true })
+    .limit(5);
+
+  // Prefer PGA-season tournament, fall back to highest-purse from any tour
+  const activeTournament = (allActiveTournaments || []).find(t => t.season_id === pgaSeasonId)
+    ?? (allActiveTournaments || [])[0]
+    ?? null;
 
   if (activeTournament) {
     const predictions = await fetchPredictionsForTournament(activeTournament);
@@ -173,18 +177,21 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
     };
   }
 
-  // Check for recently completed tournament (within 24h)
+  // Check for recently completed tournament (within 72h, any tour — covers majors)
   const threeDaysAgo = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
-  const { data: completedTournament } = await supabase
+  const { data: allCompletedTournaments } = await supabase
     .from('sr_tournaments')
     .select('*')
-    .eq('season_id', pgaSeasonId)
     .in('status', ['closed', 'complete'])
     .gte('end_date', threeDaysAgo)
-    .order('end_date', { ascending: false })
     .order('purse', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .order('end_date', { ascending: false })
+    .limit(5);
+
+  // Prefer PGA-season, fall back to highest-purse
+  const completedTournament = (allCompletedTournaments || []).find(t => t.season_id === pgaSeasonId)
+    ?? (allCompletedTournaments || [])[0]
+    ?? null;
 
   if (completedTournament) {
     const predictions = await fetchPredictionsForTournament(completedTournament);
