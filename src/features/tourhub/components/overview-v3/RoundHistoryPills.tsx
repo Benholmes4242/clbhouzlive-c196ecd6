@@ -40,14 +40,14 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
             gap: 0,
             padding: '4px 6px',
             borderRadius: 7,
-            background: isLive ? 'rgba(34,197,94,0.08)' : isFinalHighlight ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.05)',
-            border: isLive ? '1px solid rgba(34,197,94,0.20)' : isFinalHighlight ? '1px solid rgba(247,147,30,0.35)' : '1px solid rgba(255,255,255,0.08)',
+            background: isLive ? 'rgba(34,197,94,0.08)' : isFinalHighlight ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
+            border: isLive ? '1px solid rgba(34,197,94,0.20)' : isFinalHighlight ? '1px solid rgba(255,255,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
             minWidth: 32,
           }}>
             <span style={{
               fontSize: 8, fontWeight: 700, textTransform: 'uppercase',
               letterSpacing: 0.6,
-              color: isLive ? '#22C55E' : isFinalHighlight ? '#F7931E' : 'rgba(255,255,255,0.28)',
+              color: isLive ? '#22C55E' : isFinalHighlight ? '#ffffff' : 'rgba(255,255,255,0.28)',
               lineHeight: 1.3,
             }}>
               {r.label}
@@ -55,7 +55,7 @@ export function RoundHistoryPills({ round1, round2, round3, round4, currentRound
             {isLive ? (
               <span style={{ fontSize: 8, fontWeight: 800, color: '#22C55E', lineHeight: 1.3, letterSpacing: 0.6 }}>LIVE</span>
             ) : isDone ? (
-              <span style={{ fontSize: 8, fontWeight: 800, color: isFinalHighlight ? '#F7931E' : r.score! < 0 ? '#ffffff' : r.score! > 0 ? '#f87171' : 'rgba(255,255,255,0.5)', lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
+              <span style={{ fontSize: 8, fontWeight: 800, color: isFinalHighlight ? '#ffffff' : r.score! < 0 ? '#ffffff' : r.score! > 0 ? '#f87171' : 'rgba(255,255,255,0.5)', lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>{fmtScore}</span>
             ) : null}
           </div>
         );
