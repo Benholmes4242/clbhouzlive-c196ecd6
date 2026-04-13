@@ -276,10 +276,11 @@ function LeaderHeroStrip({
               {flagEmoji && <span style={{ fontSize: 13 }}>{flagEmoji}</span>}
             </div>
             <div style={{
-              fontSize: 22, fontWeight: 700, color: '#fff',
+              fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 700, color: '#fff',
               letterSpacing: '-0.4px', lineHeight: 1.1,
               textShadow: '0 2px 12px rgba(0,0,0,0.5)',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              maxWidth: 'clamp(140px, 50vw, 220px)',
             }}>
               {fullName}
             </div>
@@ -297,7 +298,7 @@ function LeaderHeroStrip({
         {/* Right — score + today + round pills */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
           <span style={{
-            fontSize: 58, fontWeight: 800, lineHeight: 1,
+            fontSize: 'clamp(40px, 14vw, 58px)', fontWeight: 800, lineHeight: 1,
             color: '#ffffff',
             fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
             textShadow: 'none',
@@ -927,7 +928,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
                         <div style={{
-                          fontSize: 22, fontWeight: 800, color: '#fff',
+                          fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff',
                           letterSpacing: '-0.02em', lineHeight: 1,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                         }}>
@@ -966,7 +967,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     {/* Left — tournament name + venue, full width */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
-                        fontSize: 22, fontWeight: 700, color: '#fff',
+                        fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 700, color: '#fff',
                         letterSpacing: -0.3, lineHeight: 1,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
@@ -1300,7 +1301,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 </button>
                                 <div style={{ paddingBottom: 2, minWidth: 0 }}>
                                   <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ display: 'block', textAlign: 'left' as const }}>
-                                    <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                                    <div style={{ fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                                       {podiumWinner.fullName || podiumWinner.displayName}
                                     </div>
                                   </button>
@@ -1309,7 +1310,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                   </div>
                                 </div>
                               </div>
-                              <span style={{ fontSize: 52, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                              <span style={{ fontSize: 'clamp(38px, 13vw, 52px)', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
                                 {podiumWinner.displayScore}
                               </span>
                             </div>
@@ -1353,7 +1354,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                               <div style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>{winnerInfo.winnerName}</div>
                             </div>
                             {winnerInfo.winnerScore && (
-                              <span style={{ fontSize: 52, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                              <span style={{ fontSize: 'clamp(38px, 13vw, 52px)', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                                 {winnerInfo.winnerScore}
                               </span>
                             )}
@@ -1427,7 +1428,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2, delay: 0.08 }}
-                          style={{ display: 'flex', gap: 4, marginBottom: 14 }}
+                          style={{ display: 'flex', gap: 'clamp(2px, 1vw, 4px)', marginBottom: 14 }}
                         >
                           {[
                             { v: winnerStats.eagles, label: 'Eagles', color: '#F7931E' },
@@ -1438,13 +1439,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           ].map((stat: any) => (
                             <div key={stat.label} style={{
                               flex: 1, textAlign: 'center' as const,
-                              padding: '9px 4px',
+                              padding: 'clamp(6px, 2vw, 9px) clamp(2px, 1vw, 4px)',
                               borderRadius: 10,
                               background: 'rgba(255,255,255,0.04)',
                               border: '1px solid rgba(255,255,255,0.07)',
+                              minWidth: 0,
                             }}>
-                              <div style={{ fontSize: 18, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-                              <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginTop: 3 }}>{stat.label}</div>
+                              <div style={{ fontSize: 'clamp(14px, 4.5vw, 18px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
+                              <div style={{ fontSize: 'clamp(7px, 2vw, 8px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginTop: 3 }}>{stat.label}</div>
                             </div>
                           ))}
                         </motion.div>
