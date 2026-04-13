@@ -1269,7 +1269,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             {/* Champion eyebrow with country flag */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10 }}>
                               <span style={{ fontSize: 12 }}>🏆</span>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Champion</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Champion</span>
                               {podiumWinner.country && COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()] && (
                                 <span style={{ fontSize: 14 }}>{COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()]}</span>
                               )}
@@ -1339,7 +1339,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           >
                             <PlayerAvatar displayName={winnerInfo.winnerName} photoUrl={winnerInfo.winnerPhotoUrl} tourCode={winnerInfo.tourSlug || 'pga'} size={56} frosted />
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: 4 }}>🏆 Champion</div>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: 4 }}>🏆 Champion</div>
                               <div style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>{winnerInfo.winnerName}</div>
                             </div>
                             {winnerInfo.winnerScore && (
@@ -1393,13 +1393,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: H, display: 'block' }}>
                                   <defs>
                                     <linearGradient id="completed-sparkline-fill" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="0%" stopColor="#F7931E" stopOpacity={0.15} />
-                                      <stop offset="100%" stopColor="#F7931E" stopOpacity={0} />
+                                      <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
+                                      <stop offset="100%" stopColor="rgba(255,255,255,0)" />
                                     </linearGradient>
                                   </defs>
                                   <path d={areaD} fill="url(#completed-sparkline-fill)" />
-                                  <path d={pathD} fill="none" stroke="#F7931E" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                                  <circle cx={last.x} cy={last.y} r={3.5} fill="#F7931E" />
+                                  <path d={pathD} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                                  <circle cx={last.x} cy={last.y} r={3.5} fill="#ffffff" stroke="rgba(0,0,0,0.4)" strokeWidth={1} />
                                 </svg>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                                   {rounds.map((_, i) => (
@@ -1423,7 +1423,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           {[
                             { v: winnerStats.eagles, label: 'Eagles', color: '#F7931E' },
                             { v: winnerStats.birdies, label: 'Birdies', color: '#22c55e' },
-                            { v: winnerStats.pars, label: 'Pars', color: 'rgba(255,255,255,0.45)' },
+                            { v: winnerStats.pars, label: 'Pars', color: '#ffffff' },
                             { v: winnerStats.bogeys, label: 'Bogeys', color: '#ef4444' },
                             { v: winnerStats.doubleBogeys, label: 'Doubles', color: '#dc2626' },
                           ].map((stat: any) => (
@@ -1504,7 +1504,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                       )}
                                       <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{p.displayName}</span>
                                     </div>
-                                    <span style={{ width: 48, textAlign: 'right' as const, fontSize: 15, fontWeight: 800, color: '#F7931E', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                                    <span style={{ width: 48, textAlign: 'right' as const, fontSize: 15, fontWeight: 800, color: '#ffffff', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
                                       {p.displayScore}
                                     </span>
                                     <span style={{ width: 36, textAlign: 'right' as const, fontSize: 13, fontWeight: 600, color: r4Color, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
