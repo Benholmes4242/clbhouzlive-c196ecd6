@@ -269,13 +269,13 @@ export function LeadersTab() {
 
       {/* Sticky header — back link + category pill + group tabs + category chips */}
       <div
-        className="sticky z-20"
+        className="sticky top-0 z-20"
         style={{
-          top: 'max(env(safe-area-inset-top, 0px), 0px)',
           background: 'rgba(248,250,252,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         }}
       >
         {/* Back link + category pill */}
