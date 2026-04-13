@@ -1,11 +1,10 @@
 /**
- * AlumniDepthChart - Squad-style depth chart with tier-colored left borders
+ * AlumniDepthChart - Dispatch-style depth chart with tier-colored left borders
  */
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Trophy, TrendingUp, Rocket, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -25,9 +24,9 @@ interface AlumniRowProps {
 }
 
 const tierBorderColor: Record<TierAccent, string> = {
-  amber: 'hsl(var(--accent-amber))',
-  blue: '#60A5FA',
-  green: '#22C55E',
+  amber: '#F7931E',
+  blue: '#3B82F6',
+  green: '#16A34A',
 };
 
 function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
@@ -44,77 +43,67 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
     .join('')
     .toUpperCase();
 
-  // Build two lines: OWGR on top, earnings/wins below
-  const rankLine = hasWorldRank ? `#${alumnus.world_ranking} OWGR` : null;
-  const detailParts: string[] = [];
-  if (hasEarnings) detailParts.push(formatCurrency(alumnus.earnings || 0));
-  if (hasWins) detailParts.push(`${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}`);
-
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: index * 0.03 }}
+      transition={{ duration: 0.2, delay: index * 0.02 }}
     >
       <Link
         to={`/tourhub/player/${alumnus.id}`}
-        aria-label={`${fullName}, rank ${alumnus.world_ranking || 'N/A'}, ${formatCurrency(alumnus.earnings || 0)}${hasWins ? `, ${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}` : ''}`}
-        className={cn(
-          "flex overflow-hidden",
-          "bg-card rounded-2xl border border-border/50",
-          "active:scale-[0.98] transition-all"
-        )}
+        aria-label={`${fullName}, rank ${alumnus.world_ranking ?? 'N/A'}, ${formatCurrency(alumnus.earnings ?? 0)}${hasWins ? `, ${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}` : ''}`}
         style={{
-          height: '120px',
-          minHeight: '120px',
-          borderLeftWidth: '3px',
-          borderLeftStyle: 'solid',
-          borderLeftColor: tierBorderColor[tierAccent],
-          
+          display: 'flex', alignItems: 'center',
+          padding: '10px 20px',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderLeft: `3px solid ${tierBorderColor[tierAccent]}`,
+          textDecoration: 'none',
         }}
+        className="active:bg-black/[0.02] transition-colors"
       >
-        {/* Photo section — 140px left */}
-        <div className="relative shrink-0 bg-muted overflow-hidden" style={{ width: '140px', borderRadius: '16px 0 0 16px' }}>
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={fullName}
-              className="w-full h-full object-cover object-top"
-              loading="lazy"
-              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-              <span className="text-2xl font-bold text-muted-foreground/40">{initials}</span>
+        {/* 34px squircle avatar */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
+          <div style={{ width: '34px', height: '34px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt={fullName}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
+                loading="lazy"
+                onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              />
+            ) : (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#94A3B8' }}>{initials}</span>
+              </div>
+            )}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
+              {fullName}
             </div>
-          )}
+            {hasWorldRank && (
+              <div style={{ fontSize: '9.5px', color: '#94A3B8', marginTop: '1px' }}>
+                #{alumnus.world_ranking} OWGR
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Info section */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ padding: '12px 12px 12px 14px' }}>
-          <h3 className="text-foreground truncate leading-tight" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
-            {fullName}
-          </h3>
+        {/* OWGR number */}
+        <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '10px', color: '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+          {hasWorldRank ? `#${alumnus.world_ranking}` : '—'}
+        </span>
 
-          {/* OWGR line */}
-          {rankLine && (
-            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-              {rankLine}
-            </p>
-          )}
+        {/* Earnings */}
+        <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 700, color: '#F7931E', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+          {hasEarnings ? formatCurrency(alumnus.earnings ?? 0) : '—'}
+        </span>
 
-          {/* Earnings / wins line */}
-          {detailParts.length > 0 && (
-            <p className="text-muted-foreground/60" style={{ fontSize: '13px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-              {detailParts.join(' · ')}
-            </p>
-          )}
-        </div>
-
-        {/* Chevron */}
-        <div className="flex items-center pr-3 shrink-0">
-          <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-        </div>
+        {/* Wins */}
+        <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+          {alumnus.wins ?? 0}
+        </span>
       </Link>
     </motion.div>
   );
@@ -123,14 +112,12 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
 interface SectionProps {
   title: string;
   subtitle: string;
-  icon: React.ElementType;
-  iconColor: string;
   alumni: CollegeAlumnus[];
   defaultExpanded?: boolean;
   tierAccent: TierAccent;
 }
 
-function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpanded = true, tierAccent }: SectionProps) {
+function Section({ title, subtitle, alumni, defaultExpanded = true, tierAccent }: SectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const COLLAPSED_COUNT = 3;
   
@@ -140,64 +127,45 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
   const hasMore = alumni.length > COLLAPSED_COUNT;
   
   return (
-    <div style={{ marginBottom: '20px' }}>
+    <div style={{ marginBottom: 0 }}>
+      {/* Dispatch rule header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between w-full group min-h-[44px]"
-        style={{ marginBottom: '10px' }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' as const, borderTop: '0.5px solid rgba(15,23,42,0.07)' }}
       >
-        <div className="flex items-center gap-2">
-          <Icon className={cn('w-5 h-5', iconColor)} />
-          <div className="text-left">
-            <h3 className="text-foreground" style={{ fontSize: '16px', fontWeight: 600 }}>{title}</h3>
-            <p className="text-muted-foreground" style={{ fontSize: '12px', fontWeight: 400 }}>{subtitle}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground/60" style={{ fontSize: '13px', fontWeight: 500 }}>
-            {alumni.length}
-          </span>
-          {hasMore && (
-            <motion.div
-              animate={{ rotate: isExpanded ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-muted-foreground/40"
-            >
-              <ChevronDown className="w-4 h-4" />
-            </motion.div>
-          )}
-        </div>
+        <div style={{ width: 3, height: 14, background: tierBorderColor[tierAccent], borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: '9px', fontWeight: 900, color: tierBorderColor[tierAccent], letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+          {title} · {subtitle}
+        </span>
+        <span style={{ fontSize: '9.5px', color: '#94A3B8' }}>{alumni.length}</span>
+        <span style={{ fontSize: '10px', color: '#CBD5E1', marginLeft: '4px' }}>
+          {isExpanded ? '▾' : '▸'}
+        </span>
       </button>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {displayedAlumni.map((alumnus, index) => (
-          <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
-        ))}
-      </div>
-      
-      {hasMore && (
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={cn(
-            "w-full rounded-lg transition-colors",
-            "hover:bg-muted/50",
-            "flex items-center justify-center gap-1",
-            "min-h-[44px] text-muted-foreground/50"
+
+      {isExpanded && (
+        <>
+          {/* Column headers */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '4px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
+            <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>OWGR</span>
+            <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
+            <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>W</span>
+          </div>
+
+          {displayedAlumni.map((alumnus, index) => (
+            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
+          ))}
+
+          {hasMore && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              style={{ width: '100%', padding: '10px 0', fontSize: '11px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
+            >
+              {isExpanded ? `View all ${alumni.length} ▾` : 'Show less ▴'}
+            </button>
           )}
-          style={{ marginTop: '8px', fontSize: '14px', fontWeight: 600 }}
-        >
-          {isExpanded ? (
-            <>
-              <ChevronUp className="w-4 h-4" />
-              Show less
-            </>
-          ) : (
-            <>
-              View all {alumni.length}
-              <ChevronDown className="w-4 h-4" />
-            </>
-          )}
-        </button>
+        </>
       )}
     </div>
   );
@@ -222,7 +190,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
       } else if ((a.cuts_made || 0) >= 3 || (a.earnings || 0) >= 75_000) {
         engineRoom.push(a);
       } else {
-        pipeline.push(a); // always show — they're on tour
+        pipeline.push(a);
       }
     });
     
@@ -231,9 +199,13 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
   
   if (isLoading) {
     return (
-      <div className={cn('space-y-3', className)}>
+      <div className={cn('', className)}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="bg-card/50 border border-border/30 rounded-2xl animate-pulse" style={{ height: '120px' }} />
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div style={{ width: '34px', height: '34px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+            <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+            <div style={{ width: '56px', height: '12px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+          </div>
         ))}
       </div>
     );
@@ -248,10 +220,10 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
   }
   
   return (
-    <div className={className}>
-      <Section title="Stars" subtitle="Top ranked & winners" icon={Trophy} iconColor="text-amber-400" alumni={headliners} defaultExpanded={true} tierAccent="amber" />
-      <Section title="Regulars" subtitle="Consistent performers on tour" icon={TrendingUp} iconColor="text-blue-400" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} tierAccent="blue" />
-      <Section title="Rising" subtitle="Building their tour career" icon={Rocket} iconColor="text-emerald-500" alumni={pipeline} defaultExpanded={false} tierAccent="green" />
+    <div className={cn('', className)}>
+      <Section title="Stars" subtitle="Top ranked & winners" alumni={headliners} defaultExpanded={true} tierAccent="amber" />
+      <Section title="Regulars" subtitle="Consistent performers on tour" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} tierAccent="blue" />
+      <Section title="Rising" subtitle="Building their tour career" alumni={pipeline} defaultExpanded={false} tierAccent="green" />
     </div>
   );
 }
