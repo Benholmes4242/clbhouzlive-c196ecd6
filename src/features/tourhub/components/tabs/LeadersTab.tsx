@@ -1,8 +1,6 @@
 /**
- * LeadersTab — Immersive hero-driven leaderboard.
- * Full-bleed #1 hero matching PlayersHero, opaque runner cards,
- * pill tabs matching PlayersTourFilter, OWGR leaderboard style.
- * URL-persisted category via ?category= param.
+ * LeadersTab — Dispatch editorial layout for Performance Rankings.
+ * Slate masthead, underline group tabs, category chips, white surface table.
  */
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
@@ -11,16 +9,13 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, ChevronLeft, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { cn } from '@/lib/utils';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
-import { LeadersHero } from '../leaders/LeadersHero';
-import { LeadersRunnersStrip } from '../leaders/LeadersRunnersStrip';
+import { LeadersMasthead } from '../leaders/LeadersMasthead';
 import { LeaderRow } from '../leaders/LeaderRow';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
-import { LeadersStatContext } from '../leaders/LeadersStatContext';
 
 interface RankedItem {
   player: {
@@ -36,6 +31,13 @@ interface RankedItem {
   value: number;
   rank: number;
 }
+
+// Group keys for tabs and chips
+const GROUP_KEYS: Record<string, string[]> = {
+  'General': ['world_rank', 'events_played', 'cuts_made', 'top_10', 'earnings', 'strokes_gained_total', 'scoring_avg'],
+  'Ball Striking': ['drive_avg', 'drive_acc', 'gir_pct'],
+  'Short Game': ['putt_avg', 'sand_saves_pct', 'scrambling_pct'],
+};
 
 export function LeadersTab() {
   const navigate = useNavigate();
@@ -198,25 +200,29 @@ export function LeadersTab() {
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
-      <div className="space-y-4 -mx-5">
-        <Skeleton className="w-full" style={{ height: '35dvh' }} />
-        {/* Runner card skeletons — overlapping hero */}
-        <div className="flex gap-2 px-5" style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
-          <Skeleton className="flex-1 h-[60px] rounded-2xl" />
-          <Skeleton className="flex-1 h-[60px] rounded-2xl" />
+      <div style={{ background: '#F8FAFC' }}>
+        {/* Masthead skeleton */}
+        <div style={{ background: '#0F172A', padding: '16px 16px 14px' }}>
+          <Skeleton className="h-3 w-48 mb-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <Skeleton className="h-6 w-40 mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <Skeleton className="h-24 w-full rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+            {[1, 2].map(i => <Skeleton key={i} className="h-10 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />)}
+          </div>
         </div>
-        {/* Sticky header skeleton: back link + category pill */}
-        <div className="flex items-center gap-2 px-5 pt-2">
-          <Skeleton className="h-4 w-24" />
-          <div className="flex-1" />
-          <Skeleton className="h-[34px] w-40 rounded-[10px]" />
+        {/* Sticky header skeleton */}
+        <div style={{ padding: '12px 16px' }}>
+          <Skeleton className="h-8 w-full rounded-lg" />
         </div>
-        {/* Stat context skeleton */}
-        <Skeleton className="mx-5 h-[48px] rounded-xl" />
-        {/* Leader rows */}
-        <div className="rounded-2xl border border-border/30 overflow-hidden mx-5">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-[60px] rounded-none border-b border-border/20" />
+        {/* Row skeletons */}
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+              <Skeleton className="h-5 w-8" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-4 w-12" />
+            </div>
           ))}
         </div>
       </div>
@@ -227,6 +233,11 @@ export function LeadersTab() {
   const leader = rankedPlayers[0] ?? null;
   const runners = rankedPlayers.slice(1, 3);
   const listPlayers = rankedPlayers;
+
+  // Active group detection
+  const activeGroup = Object.entries(GROUP_KEYS).find(([, keys]) => keys.includes(categoryKey))?.[0] ?? 'General';
+  const activeGroupKeys = GROUP_KEYS[activeGroup] ?? [];
+  const activeGroupCats = LEADER_CATEGORIES.filter(c => activeGroupKeys.includes(c.key));
 
   return (
     <div
@@ -245,126 +256,133 @@ export function LeadersTab() {
         </motion.div>
       </div>
 
-      {/* Immersive hero for #1 */}
-      <div className="relative">
-        <AnimatePresence mode="wait">
-          {leader && (
-            <LeadersHero
-              key={`${category.key}-${leader.playerId}`}
-              leader={leader}
-              category={category}
-              formatOverride={worldFormatOverride}
-              unitOverride={worldUnitOverride}
-            />
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Unified editorial masthead */}
+      <LeadersMasthead
+        leader={leader}
+        runners={runners}
+        category={category}
+        formatOverride={worldFormatOverride}
+        unitOverride={worldUnitOverride}
+        leaderValue={leaderValue}
+        onChangeCategoryTap={() => setCategorySheetOpen(true)}
+      />
 
-      {/* Opaque runner cards for #2–#3, overlapping hero */}
-      {runners.length > 0 && (
-        <LeadersRunnersStrip
-          runners={runners}
-          category={category}
-          formatOverride={worldFormatOverride}
-          unitOverride={worldUnitOverride}
-        />
-      )}
-
-      {/* ══════════════════════════════════════════════
-          STICKY HEADER — back link · category pill · stat context
-          ══════════════════════════════════════════════ */}
+      {/* Sticky header — back link + category pill + group tabs + category chips */}
       <div
         className="sticky z-20"
         style={{
           top: 'max(env(safe-area-inset-top, 0px), 0px)',
-          background: 'hsl(var(--background) / 0.96)',
+          background: 'rgba(248,250,252,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid hsl(var(--border) / 0.10)',
-          paddingTop: 10,
-          paddingBottom: 0,
-          marginTop: 8,
+          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
         }}
       >
-        {/* Control row: ← Tour Overview | [spacer] | category pill */}
-        <div className="flex items-center gap-2 px-5 pt-2.5">
-          {/* Back link */}
+        {/* Back link + category pill */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: '6px' }}>
           <Link
             to="/tourhub?tab=overview"
             replace
-            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
-            style={{ color: 'hsl(var(--muted-foreground) / 0.70)' }}
+            className="flex items-center gap-0.5 active:opacity-50 transition-opacity shrink-0"
+            style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', textDecoration: 'none', marginLeft: '-4px' }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
           </Link>
-
-          <div className="flex-1" />
-
-          {/* Category selector pill — opens LeadersCategorySheet */}
+          <div style={{ flex: 1 }} />
           <button
             onClick={() => setCategorySheetOpen(true)}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] shrink-0',
-              'bg-card border border-border/50 shadow-sm',
-              'transition-all duration-150 active:scale-[0.97]'
-            )}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '5px',
+              padding: '5px 9px', borderRadius: '8px',
+              background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)',
+              boxShadow: '0 1px 3px rgba(15,23,42,0.05)',
+              cursor: 'pointer', flexShrink: 0,
+            }}
+            className="active:scale-[0.97] transition-transform"
           >
-            <span className="text-[13px] leading-none shrink-0">{category.emoji}</span>
-            <span className="text-[12px] font-bold text-foreground">
-              {category.shortLabel}
-            </span>
-            <span
-              className="text-[10px] font-bold uppercase tracking-[0.06em]"
-              style={{ color: 'hsl(var(--muted-foreground))' }}
-            >
-              Leaderboard
-            </span>
-            {leaderValue && (
-              <span
-                className="text-[10px] font-bold"
-                style={{ color: 'hsl(var(--muted-foreground) / 0.40)' }}
-              >
-                · {leaderValue}
-              </span>
-            )}
-            <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
+            <span style={{ fontSize: '13px' }}>{(category as any).emoji}</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>{category.shortLabel}</span>
+            <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
           </button>
         </div>
 
-        {/* Stat context — tight 2-line block, always visible in header */}
-        <div className="px-5 pt-2 pb-3">
+        {/* Group underline tabs */}
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
+          {Object.keys(GROUP_KEYS).map((groupLabel) => {
+            const isActive = groupLabel === activeGroup;
+            const firstKey = GROUP_KEYS[groupLabel]?.[0];
+            return (
+              <button
+                key={groupLabel}
+                onClick={() => { if (firstKey) setCategory(firstKey); }}
+                className="flex-shrink-0 active:scale-[0.97] transition-transform"
+                style={{
+                  flex: 1, padding: '7px 14px',
+                  fontSize: '11px',
+                  fontWeight: isActive ? 800 : 500,
+                  color: isActive ? '#0F172A' : '#94A3B8',
+                  background: 'transparent', border: 'none',
+                  borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                  cursor: 'pointer', whiteSpace: 'nowrap' as const,
+                  transition: 'all 0.15s',
+                }}
+              >
+                {groupLabel}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Category chips — within the active group */}
+        <div style={{ display: 'flex', gap: '6px', padding: '8px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+          {activeGroupCats.map(cat => {
+            const on = cat.key === categoryKey;
+            return (
+              <button
+                key={cat.key}
+                onClick={() => setCategory(cat.key)}
+                className="flex-shrink-0 active:scale-[0.97] transition-transform"
+                style={{
+                  padding: '4px 10px', borderRadius: '6px',
+                  fontSize: '10px', fontWeight: on ? 800 : 600,
+                  color: on ? '#ffffff' : '#94A3B8',
+                  background: on ? '#0F172A' : 'transparent',
+                  border: on ? 'none' : '0.5px solid rgba(15,23,42,0.12)',
+                  cursor: 'pointer', whiteSpace: 'nowrap' as const,
+                  transition: 'all 0.15s',
+                }}
+              >
+                {(cat as any).emoji} {cat.shortLabel}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Content area */}
+      <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+        {/* Rankings list — white surface */}
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+          {/* Column headers */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <span style={{ width: '44px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>RK</span>
+            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
+            <span style={{ width: '72px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0, paddingRight: '14px' }}>
+              {category.shortLabel.toUpperCase()}
+            </span>
+          </div>
+
           <AnimatePresence mode="wait">
             <motion.div
-              key={`ctx-${category.key}`}
+              key={category.key}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <LeadersStatContext
-                category={category}
-                leaderValue={leaderValue}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Content area */}
-      <div className="px-5" style={{ paddingTop: 0, paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-        {/* Rankings list (#4–50) */}
-        <div style={{ marginTop: 16 }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={category.key}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-            >
-              {listPlayers.length > 0 && (
-                <div>
+              {listPlayers.length > 0 ? (
+                <>
                   {listPlayers.map((item, idx) => (
                     <LeaderRow
                       key={item.playerId}
@@ -387,32 +405,22 @@ export function LeadersTab() {
                       index={idx}
                     />
                   ))}
-                </div>
+                  {/* Footer */}
+                  <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                      SEASON LEADERS · AVAILABLE TOURNAMENT DATA
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <LeadersEmptyState />
               )}
-
-              {/* Empty state */}
-              {rankedPlayers.length === 0 && <LeadersEmptyState />}
             </motion.div>
           </AnimatePresence>
         </div>
-
-        {/* Footer */}
-        <div className="text-center" style={{ marginTop: 20 }}>
-          <p
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase',
-            }}
-            className="text-muted-foreground/30"
-          >
-            Season leaders · available tournament data
-          </p>
-        </div>
       </div>
 
-      {/* Category sheet — driven by categorySheetOpen state */}
+      {/* Category sheet */}
       <LeadersCategorySheet
         categories={LEADER_CATEGORIES}
         activeKey={category.key}
