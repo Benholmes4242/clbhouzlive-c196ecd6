@@ -1287,7 +1287,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             {/* Winner identity — avatar + name left, giant score right */}
                             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 8 }}>
                               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0, flex: 1 }}>
-                                <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
+                                <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
                                   <PlayerAvatar
                                     displayName={podiumWinner.displayName}
                                     fullName={podiumWinner.fullName}
