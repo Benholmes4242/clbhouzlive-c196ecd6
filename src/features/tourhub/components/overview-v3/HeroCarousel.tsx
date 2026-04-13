@@ -1254,7 +1254,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <div style={{ padding: '0 16px', flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-start' }}>
 
                       {/* ── HEADER DIVIDER ── */}
-                      <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginBottom: 16 }} />
+                      <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginBottom: 12 }} />
 
                       {/* ── WINNER HERO STRIP ── */}
                       <AnimatePresence mode="wait">
@@ -1305,7 +1305,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             </div>
 
                             {/* Round history pills + winning margin chip */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                               <RoundHistoryPills
                                 round1={podiumWinner.round1}
                                 round2={podiumWinner.round2}
