@@ -1356,10 +1356,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             const range = maxY - minY || 1;
                             const W = 300;
                             const H = 48;
-                            const pad = 4;
                             const points = cumulative.map((v, i) => ({
-                              x: pad + (i / (cumulative.length - 1)) * (W - 2 * pad),
-                              y: pad + ((maxY - v) / range) * (H - 2 * pad),
+                              x: (i / (cumulative.length - 1)) * W,
+                              y: 4 + ((maxY - v) / range) * (H - 8),
                             }));
                             const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
                             const areaD = `${pathD} L ${points[points.length - 1].x} ${H} L ${points[0].x} ${H} Z`;
