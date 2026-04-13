@@ -36,12 +36,13 @@ export const SeasonToggle = memo(function SeasonToggle({
             
             className={`flex-shrink-0 active:scale-[0.97] transition-all min-h-[36px] px-4 text-xs sm:text-sm font-semibold ${
               isSelected
-                ? 'bg-foreground text-white shadow-none border-0'
+                ? 'text-white shadow-none border-0'
                 : 'bg-transparent text-muted-foreground border-[1.5px] border-border'
             }`}
             style={{
               borderRadius: 8,
               cursor: 'pointer',
+              background: isSelected ? '#0F172A' : 'transparent',
             }}
           >
             {season.year}
