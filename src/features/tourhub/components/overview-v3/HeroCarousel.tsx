@@ -1369,7 +1369,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2, delay: 0.08 }}
-                          style={{ display: 'flex', gap: 4, marginBottom: 14 }}
+                          style={{ display: 'flex', gap: 4, marginBottom: 10 }}
                         >
                           {[
                             { v: winnerStats.eagles, label: 'Eagles', color: '#F7931E' },
