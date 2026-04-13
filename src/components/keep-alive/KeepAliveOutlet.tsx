@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, ReactNode, createContext, useContext } from 'react';
+import { useRef, useEffect, useLayoutEffect, useState, ReactNode, createContext, useContext } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 
@@ -112,6 +112,20 @@ export function KeepAliveOutlet({ keepAliveRoutes, maxCached = 3 }: KeepAliveOut
       }
     });
   }, [currentPath, cachedPaths]);
+
+  // Cold-load fix: mount points can be created before containerRef is attached.
+  // Append any existing portal roots in a layout effect so the initial Clubhouse
+  // render is attached before first paint instead of living in a detached node.
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    mountedRef.current.forEach((mountPoint) => {
+      if (!container.contains(mountPoint)) {
+        container.appendChild(mountPoint);
+      }
+    });
+  }, [cachedPaths, currentPath]);
 
   return (
     <>
