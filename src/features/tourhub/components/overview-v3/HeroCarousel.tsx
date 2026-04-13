@@ -1428,7 +1428,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2, delay: 0.08 }}
-                          style={{ display: 'flex', gap: 4, marginBottom: 14 }}
+                          style={{ display: 'flex', gap: 'clamp(2px, 1vw, 4px)', marginBottom: 14 }}
                         >
                           {[
                             { v: winnerStats.eagles, label: 'Eagles', color: '#F7931E' },
@@ -1439,13 +1439,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           ].map((stat: any) => (
                             <div key={stat.label} style={{
                               flex: 1, textAlign: 'center' as const,
-                              padding: '9px 4px',
+                              padding: 'clamp(6px, 2vw, 9px) clamp(2px, 1vw, 4px)',
                               borderRadius: 10,
                               background: 'rgba(255,255,255,0.04)',
                               border: '1px solid rgba(255,255,255,0.07)',
+                              minWidth: 0,
                             }}>
-                              <div style={{ fontSize: 18, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-                              <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginTop: 3 }}>{stat.label}</div>
+                              <div style={{ fontSize: 'clamp(14px, 4.5vw, 18px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
+                              <div style={{ fontSize: 'clamp(7px, 2vw, 8px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginTop: 3 }}>{stat.label}</div>
                             </div>
                           ))}
                         </motion.div>
