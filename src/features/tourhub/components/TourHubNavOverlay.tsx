@@ -91,28 +91,7 @@ export function TourHubNavOverlay({
     return () => { window.removeEventListener('popstate', handlePopState); };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (!isOpen || !overlayRef.current) return;
-    const overlay = overlayRef.current;
-    const focusableEls = overlay.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusableEls.length === 0) return;
-    const firstEl = focusableEls[0];
-    const lastEl = focusableEls[focusableEls.length - 1];
-    firstEl.focus();
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-      if (e.shiftKey) {
-        if (document.activeElement === firstEl) { e.preventDefault(); lastEl.focus(); }
-      } else {
-        if (document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); }
-      }
-    };
-    document.addEventListener('keydown', handleTab);
-    return () => document.removeEventListener('keydown', handleTab);
-  }, [isOpen]);
-  
+  // Focus trap not needed — BottomSheet handles dialog role
   const handleItemClick = useCallback((tab: TourHubTab) => {
     haptic('light');
     onNavigate(tab);
