@@ -456,8 +456,7 @@ export function PlayerScorecardCard({
         </button>
         <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)' }}>
           {tournamentName && tournamentName.length < 20 ? tournamentName : 'PGA TOUR'}
-          {` · R${currentRound}`}
-          {isCompleted && currentRound === 4 ? ' · Final' : ''}
+          {isCompleted ? ' · Final' : ` · R${currentRound}`}
         </span>
       </div>
 
@@ -521,8 +520,8 @@ export function PlayerScorecardCard({
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5 }}>
               <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
-                {`Round ${currentRound}`}
-                {isCompleted && currentRound === 4 ? ' · Final' : player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
+                {isCompleted ? 'Final' : `Round ${currentRound}`}
+                {!isCompleted && player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
               </span>
             </div>
           </div>
