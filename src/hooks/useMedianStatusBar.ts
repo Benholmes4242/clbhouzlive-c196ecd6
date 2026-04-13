@@ -91,8 +91,9 @@ export function useMedianStatusBar(
       applyMedianStatusBar(c.style, c.hexColor, c.overlay, c.blur);
 
       // 3. Belt + suspenders: paint html/body to match (iOS WebView compositing)
-      document.documentElement.style.backgroundColor = color;
-      document.body.style.backgroundColor = color;
+      const paintColor = color === 'transparent' ? '#000000' : color;
+      document.documentElement.style.backgroundColor = paintColor;
+      document.body.style.backgroundColor = paintColor;
 
       // 4. Update theme-color meta for iOS
       const meta = document.querySelector('meta[name="theme-color"]');
