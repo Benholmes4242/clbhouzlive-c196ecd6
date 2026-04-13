@@ -622,6 +622,20 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     onScorecardClose?.();
   }, [onScorecardClose]);
 
+  // Convert a TournamentFinisher to PlayerInfo for scorecard
+  const finisherToPlayerInfo = useCallback((f: TournamentFinisher): PlayerInfo => ({
+    id: f.playerId || '',
+    srId: f.pgaTourId || '',
+    name: f.fullName || f.displayName,
+    firstName: f.firstName,
+    lastName: f.lastName,
+    countryCode: f.country || undefined,
+    position: f.position,
+    totalScore: f.score ?? 0,
+    thru: 'F',
+    currentRound: 4,
+  }), []);
+
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
     isLive ? tournament.id : null
