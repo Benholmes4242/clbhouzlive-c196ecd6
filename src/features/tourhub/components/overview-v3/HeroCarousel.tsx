@@ -788,23 +788,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         )}
       </motion.div>
 
-      {/* Venue photo accent — right side fade for completed slides */}
-      {isCompleted && backgroundImage && (
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
-          <img
-            src={backgroundImage}
-            alt=""
-            className="absolute top-0 right-0 h-full object-cover"
-            style={{ width: '45%' }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to right, #141d2e 0%, rgba(20,29,46,0.7) 50%, transparent 100%)',
-            }}
-          />
-        </div>
-      )}
 
       {/* Legibility gradient overlay */}
       <div 
