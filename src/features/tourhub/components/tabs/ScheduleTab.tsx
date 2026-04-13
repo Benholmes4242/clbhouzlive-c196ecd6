@@ -480,7 +480,7 @@ export function ScheduleTab() {
                 <div
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
-                  className={groupIndex > 0 ? 'mt-7' : ''}
+                  className=""
                 >
                   {/* B44 FIX 3: suppress month header on live tab */}
                   {filter !== 'live' && (
@@ -504,7 +504,11 @@ export function ScheduleTab() {
                         </div>
                       </InViewCard>
                     ))}
-                  </div>
+                   </div>
+                    {/* Heavier rule between date groups */}
+                    {groupIndex < monthGroups.length - 1 && (
+                      <div style={{ height: '1px', background: 'rgba(15,23,42,0.1)' }} />
+                    )}
                 </div>
               ))}
             </motion.div>
