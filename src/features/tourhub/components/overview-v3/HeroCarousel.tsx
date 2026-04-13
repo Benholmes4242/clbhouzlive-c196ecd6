@@ -838,10 +838,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           style={{
             zIndex: 6,
             background: `linear-gradient(180deg,
-              rgba(0,0,0,0.70) 0%,
-              rgba(0,0,0,0.50) 12%,
-              rgba(0,0,0,0.20) 28%,
-              transparent 42%)`,
+              rgba(0,0,0,0.75) 0%,
+              rgba(0,0,0,0.50) 15%,
+              rgba(0,0,0,0.20) 35%,
+              transparent 50%)`,
           }}
         />
       )}
@@ -1010,25 +1010,35 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                   }}>
                     <div style={{ padding: '0 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
-                          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                            Upcoming · {getTourDisplayName(tournament.tourSlug)}
+                      {/* ZONE A — Tour + Dates row */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.18)', marginBottom: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ background: '#fff', borderRadius: 4, padding: '2px 7px', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+                            {getTourDisplayName(tournament.tourSlug)}
+                          </span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
+                            Upcoming
                           </span>
                         </div>
                         {tournament.startDate && tournament.endDate && (
-                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.40)', flexShrink: 0 }}>
-                            {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            {' – '}
-                            {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </span>
+                          <div style={{ textAlign: 'right' as const }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                              {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {' – '}
+                              {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </div>
+                            <div style={{ fontSize: 10, fontWeight: 600, color: '#F7931E', marginTop: 1 }}>
+                              {getStartLabel(tournament.startDate)}
+                            </div>
+                          </div>
                         )}
                       </div>
+
+                      {/* ZONE B — Tournament name + venue */}
                       <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
                         <h2 style={{
-                          fontSize: 30, fontWeight: 900, color: '#fff',
-                          letterSpacing: -0.6, lineHeight: 1.05, margin: 0,
+                          fontSize: 40, fontWeight: 900, color: '#fff',
+                          letterSpacing: '-0.03em', lineHeight: 0.95, margin: 0, marginBottom: 10,
                           display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical' as const,
@@ -1040,9 +1050,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
                         className="active:opacity-70 transition-opacity cursor-pointer"
-                        style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                        style={{ fontSize: 15, fontWeight: 600, color: '#fff', background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
                       >
-                        {tournament.venueName}
+                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </button>
                     </div>
                   </div>
