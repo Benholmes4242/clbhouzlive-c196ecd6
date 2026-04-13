@@ -25,10 +25,18 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   
   if (isLoading) {
     return (
-      <div className={cn("animate-pulse", className)}>
-        <div style={{ padding: '14px 20px' }}>
-          <div className="h-3 w-16 bg-muted rounded mb-3" />
-          <div className="h-16 bg-muted/30 rounded-lg" />
+      <div className={cn("", className)} style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '14px 20px 14px' }}>
+        <div className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ height: '8px', width: '80px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '8px' }} />
+            <div style={{ height: '20px', width: '150px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '6px' }} />
+            <div style={{ height: '10px', width: '100px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          </div>
+          <div style={{ width: '48px', height: '48px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ width: '52px' }}>
+            <div style={{ height: '28px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '4px' }} />
+            <div style={{ height: '8px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          </div>
         </div>
       </div>
     );

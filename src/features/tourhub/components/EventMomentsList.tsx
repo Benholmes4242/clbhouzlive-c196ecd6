@@ -18,13 +18,19 @@ export function EventMomentsList({ tournamentId, className, limit }: EventMoment
   
   if (isLoading) {
     return (
-      <div className={cn("animate-pulse", className)}>
-        <div style={{ padding: '14px 20px' }}>
-          <div className="h-3 w-24 bg-muted rounded mb-3" />
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-12 bg-muted/30 rounded mb-2" />
-          ))}
+      <div className={cn("", className)} style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        <div className="animate-pulse" style={{ padding: '14px 20px 0' }}>
+          <div style={{ height: '9px', width: '100px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '10px' }} />
         </div>
+        {[1, 2, 3].map(i => (
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '11px 20px', borderBottom: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ height: '12px', width: '120px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '5px' }} />
+              <div style={{ height: '10px', width: '180px', background: 'rgba(15,23,42,0.05)', borderRadius: '4px' }} />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

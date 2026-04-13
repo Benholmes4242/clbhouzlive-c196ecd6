@@ -22,9 +22,33 @@ interface SummaryTabProps {
 
 function SummarySkeleton() {
   return (
-    <div className="space-y-4 animate-pulse">
-      <div className="h-40 bg-muted rounded-2xl" />
-      <div className="h-32 bg-muted rounded-2xl" />
+    <div>
+      {/* Champion block skeleton */}
+      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '14px 20px 14px' }}>
+        <div className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ height: '8px', width: '100px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '8px' }} />
+            <div style={{ height: '22px', width: '160px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '6px' }} />
+            <div style={{ height: '10px', width: '120px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          </div>
+          <div style={{ width: '52px', height: '52px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ width: '60px' }}>
+            <div style={{ height: '32px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '4px' }} />
+            <div style={{ height: '8px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          </div>
+        </div>
+      </div>
+      {/* Row skeletons */}
+      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none', gap: '12px' }}>
+            <div style={{ width: '36px', height: '14px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div style={{ width: '28px', height: '28px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
+            <div style={{ flex: 1, height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div style={{ width: '44px', height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
