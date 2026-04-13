@@ -1364,8 +1364,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             const areaD = `${pathD} L ${points[points.length - 1].x} ${H} L ${points[0].x} ${H} Z`;
                             const last = points[points.length - 1];
                             return (
-                              <div style={{ position: 'relative' }}>
-                                <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ width: '100%', height: H, display: 'block' }}>
+                              <div style={{ position: 'relative', overflow: 'visible' }}>
+                                <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" overflow="visible" style={{ width: '100%', height: H, display: 'block', overflow: 'visible' }}>
                                   <defs>
                                     <linearGradient id="completed-sparkline-fill" x1="0" y1="0" x2="0" y2="1">
                                       <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
@@ -1374,7 +1374,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                   </defs>
                                   <path d={areaD} fill="url(#completed-sparkline-fill)" />
                                   <path d={pathD} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                                  <circle cx={last.x} cy={last.y} r={3.5} fill="#ffffff" stroke="rgba(0,0,0,0.4)" strokeWidth={1} />
+                                  <circle cx={last.x} cy={last.y} r={3} fill="#ffffff" stroke="rgba(0,0,0,0.4)" strokeWidth={1} />
                                 </svg>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                                   {rounds.map((_, i) => (
