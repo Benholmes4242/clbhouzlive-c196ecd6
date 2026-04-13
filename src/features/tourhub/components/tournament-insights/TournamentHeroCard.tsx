@@ -20,6 +20,13 @@ interface TournamentHeroCardProps {
   };
   isLive?: boolean;
   isCompleted?: boolean;
+  winner?: {
+    name: string;
+    photoUrl?: string | null;
+    scoreDisplay: string;
+    marginText?: string;
+    country?: string | null;
+  } | null;
 }
 
 /** Canonical HUD glass spec */
