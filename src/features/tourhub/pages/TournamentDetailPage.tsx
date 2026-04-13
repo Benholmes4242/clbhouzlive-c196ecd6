@@ -4,7 +4,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
-import { Skeleton } from '@/components/ui/skeleton';
+
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Trophy, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
