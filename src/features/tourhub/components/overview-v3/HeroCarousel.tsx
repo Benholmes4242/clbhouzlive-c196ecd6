@@ -1254,7 +1254,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <div style={{ padding: '0 16px', flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-start' }}>
 
                       {/* ── HEADER DIVIDER ── */}
-                      <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginBottom: 16 }} />
+                      <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginBottom: 12 }} />
 
                       {/* ── WINNER HERO STRIP ── */}
                       <AnimatePresence mode="wait">
@@ -1305,7 +1305,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             </div>
 
                             {/* Round history pills + winning margin chip */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                               <RoundHistoryPills
                                 round1={podiumWinner.round1}
                                 round2={podiumWinner.round2}
@@ -1360,57 +1360,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         )}
                       </AnimatePresence>
 
-                      {/* ── SCORE PROGRESSION SPARKLINE ── */}
-                      {podiumWinner && [podiumWinner.round1, podiumWinner.round2, podiumWinner.round3, podiumWinner.round4].some(r => r !== null) && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2, delay: 0.04 }}
-                          style={{ marginBottom: 14 }}
-                        >
-                          <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: 8 }}>
-                            Tournament · Score Progression
-                          </div>
-                          {(() => {
-                            const rounds = [podiumWinner.round1, podiumWinner.round2, podiumWinner.round3, podiumWinner.round4].filter((r): r is number => r !== null);
-                            if (rounds.length < 2) return null;
-                            const cumulative = rounds.reduce<number[]>((acc, r, i) => { acc.push((acc[i - 1] ?? 0) + r); return acc; }, []);
-                            const minY = Math.min(...cumulative);
-                            const maxY = Math.max(...cumulative);
-                            const range = maxY - minY || 1;
-                            const W = 300;
-                            const H = 48;
-                            const pad = 4;
-                            const points = cumulative.map((v, i) => ({
-                              x: pad + (i / (cumulative.length - 1)) * (W - 2 * pad),
-                              y: pad + ((maxY - v) / range) * (H - 2 * pad),
-                            }));
-                            const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-                            const areaD = `${pathD} L ${points[points.length - 1].x} ${H} L ${points[0].x} ${H} Z`;
-                            const last = points[points.length - 1];
-                            return (
-                              <div style={{ position: 'relative' }}>
-                                <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: H, display: 'block' }}>
-                                  <defs>
-                                    <linearGradient id="completed-sparkline-fill" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="0%" stopColor="#F7931E" stopOpacity={0.15} />
-                                      <stop offset="100%" stopColor="#F7931E" stopOpacity={0} />
-                                    </linearGradient>
-                                  </defs>
-                                  <path d={areaD} fill="url(#completed-sparkline-fill)" />
-                                  <path d={pathD} fill="none" stroke="#F7931E" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                                  <circle cx={last.x} cy={last.y} r={3.5} fill="#F7931E" />
-                                </svg>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                                  {rounds.map((_, i) => (
-                                    <span key={i} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 600 }}>R{i + 1}</span>
-                                  ))}
-                                </div>
-                              </div>
-                            );
-                          })()}
-                        </motion.div>
-                      )}
+
+
 
                       {/* ── SCORECARD STATS GRID ── */}
                       {winnerStats && (
@@ -1418,7 +1369,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2, delay: 0.08 }}
-                          style={{ display: 'flex', gap: 4, marginBottom: 14 }}
+                          style={{ display: 'flex', gap: 4, marginBottom: 10 }}
                         >
                           {[
                             { v: winnerStats.eagles, label: 'Eagles', color: '#F7931E' },
