@@ -20,6 +20,19 @@ interface ScheduleTournamentCardProps {
   leaderWinner?: TournamentLeaderWinner;
 }
 
+function getPrefixedContextLabel(contextLabel: string, tourName: string | null | undefined): string {
+  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const isSignature = contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES';
+  if (!isMajor && !isSignature) return contextLabel;
+  const prefixMap: Record<string, string> = {
+    'PGA Tour': 'PGA Tour', 'LPGA Tour': 'LPGA Tour', 'Champions Tour': 'Champions Tour',
+    'DP World Tour': 'DP World Tour', 'Korn Ferry Tour': 'Korn Ferry',
+    'LIV Golf': 'LIV Golf', 'LIV Golf League': 'LIV Golf',
+  };
+  const prefix = (tourName && prefixMap[tourName]) || tourName || '';
+  return prefix ? `${prefix} · ${contextLabel}` : contextLabel;
+}
+
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
   return 'startDate' in t;
 }
@@ -141,7 +154,7 @@ export function ScheduleTournamentCard({
             ? TOUR_COLORS.liveGreen
             : '#94A3B8',
         }}>
-          {isLive ? '● LIVE' : (isMajor ? '★ ' : '')}{isLive ? '' : contextLabel}
+          {isLive ? '● LIVE' : (isMajor ? '★ ' : '')}{isLive ? '' : getPrefixedContextLabel(contextLabel, tourName)}
           {isLive && leaderWinner?.round1 !== undefined && (() => {
             const roundInfo = getCurrentRound(
               leaderWinner!.round1, leaderWinner!.round2,
