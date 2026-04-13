@@ -24,7 +24,7 @@ import {
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
 import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
-import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
+import { useTournamentLeadersWinners, type TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
