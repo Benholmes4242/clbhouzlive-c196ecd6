@@ -365,75 +365,13 @@ export function ScheduleTab() {
         className="sticky top-0 z-30 -mx-5 bg-background/95 backdrop-blur-xl border-b border-border/10"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
-        {/* ── ROW 1: Filter pills + Search icon toggle ── */}
-        <div className="flex items-center gap-2 px-5 pt-2.5 pb-0">
-          <div className="flex items-center flex-1 gap-0">
-            {(['all', 'upcoming', 'live', 'completed'] as const).map((f) => {
-              const isActive = filter === f;
-              const isLive = f === 'live';
-              const label = f === 'all' ? 'All' : f === 'upcoming' ? 'Upcoming' : f === 'live' ? 'Live' : 'Completed';
-              const count = filterStats[f];
-              return (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={cn(
-                    'relative flex-1 h-[38px] rounded-[10px] text-[13px] font-semibold transition-all duration-200',
-                    'flex items-center justify-center gap-1.5 active:scale-[0.97]',
-                    isActive
-                      ? isLive
-                        ? 'text-white'
-                        : 'bg-foreground text-background'
-                      : 'bg-transparent text-muted-foreground'
-                  )}
-                  style={isActive && isLive ? { background: '#22C55E' } : undefined}
-                >
-                  {isLive && count > 0 && (
-                    <span className="relative flex h-[6px] w-[6px] shrink-0">
-                      <span
-                        className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-75"
-                        style={{ background: isActive ? 'rgba(255,255,255,0.8)' : '#22C55E' }}
-                      />
-                      <span
-                        className="relative inline-flex h-[6px] w-[6px] rounded-full"
-                        style={{ background: isActive ? 'rgba(255,255,255,0.9)' : '#22C55E' }}
-                      />
-                    </span>
-                  )}
-                  {label}
-                  {isLive && count > 0 && !isActive && (
-                    <span
-                      className="absolute top-[5px] right-[5px] flex items-center justify-center rounded-full text-white font-bold"
-                      style={{ background: '#22C55E', fontSize: 9, width: 14, height: 14, lineHeight: 1 }}
-                    >
-                      {count}
-                    </span>
-                  )}
-                  {isLive && count > 0 && isActive && (
-                    <span
-                      className="flex items-center justify-center rounded-full font-bold text-white"
-                      style={{ background: 'rgba(255,255,255,0.25)', fontSize: 10, padding: '0 4px', height: 16, lineHeight: '16px' }}
-                    >
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <button
-            onClick={() => setSearchExpanded(v => !v)}
-            className={cn(
-              'w-[38px] h-[38px] rounded-[10px] flex items-center justify-center shrink-0 transition-colors duration-150',
-              searchExpanded ? 'bg-amber-50' : 'bg-transparent'
-            )}
-          >
-            <Search
-              className="w-[17px] h-[17px] transition-colors duration-150"
-              style={{ color: searchExpanded ? '#F59E0B' : undefined }}
-              strokeWidth={2.5}
-            />
-          </button>
+        {/* ── ROW 1: Filter underline tabs ── */}
+        <div style={{ padding: '0' }}>
+          <ScheduleFilterPills
+            activeFilter={filter}
+            onFilterChange={setFilter}
+            counts={filterStats}
+          />
         </div>
 
         {/* ── SEARCH BAR — collapsible ── */}

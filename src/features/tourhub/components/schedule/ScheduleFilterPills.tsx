@@ -1,9 +1,7 @@
 /**
- * ScheduleFilterPills - Segmented control matching LiveUpcomingToggle style
- * Transparent track, white active pill with shadow
+ * ScheduleFilterPills - Flat underline tab bar matching dispatch style
  */
 
-import { cn } from '@/lib/utils';
 import { TOUR_COLORS } from '../../constants/colors';
 
 export type ScheduleFilterType = 'all' | 'upcoming' | 'live' | 'completed';
@@ -39,12 +37,13 @@ export function ScheduleFilterPills({
 
   return (
     <div
-      className="flex items-stretch rounded-xl overflow-hidden bg-transparent"
+      style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)' }}
       role="tablist"
       aria-label="Filter tournaments"
     >
       {options.map((option) => {
         const isActive = activeFilter === option.value;
+        const isLive = option.value === 'live';
 
         return (
           <button
@@ -52,25 +51,34 @@ export function ScheduleFilterPills({
             role="tab"
             aria-selected={isActive}
             onClick={() => onFilterChange(option.value)}
-            className={cn(
-              "relative flex-1 py-2.5 text-[14px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center gap-1.5",
-              isActive
-                ? "bg-foreground text-background m-1 rounded-lg"
-                : "text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50 active:bg-muted/70"
-            )}
+            style={{
+              flex: 1,
+              padding: '11px 0',
+              fontSize: '12px',
+              fontWeight: isActive ? 800 : 500,
+              color: isActive ? '#0F172A' : '#94A3B8',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: isActive
+                ? `2px solid ${isLive ? '#22C55E' : '#F7931E'}`
+                : '2px solid transparent',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '5px',
+              transition: 'all 0.15s',
+            }}
+            className="active:scale-[0.97] transition-transform"
           >
             {option.hasLiveIndicator && counts.live > 0 && (
-              <span className="relative flex h-[6px] w-[6px]">
-                <span
-                  className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
-                  style={{ background: TOUR_COLORS.liveGreen }}
-                />
-                <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: TOUR_COLORS.liveGreen }} />
-              </span>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: isActive ? '#22C55E' : '#94A3B8', display: 'inline-block', flexShrink: 0 }} />
             )}
             {option.label}
             {option.hasLiveIndicator && counts.live > 0 && (
-              <span className="text-[11px]">({counts.live})</span>
+              <span style={{ fontSize: '10px', color: isActive ? '#22C55E' : '#94A3B8', fontWeight: 700 }}>
+                {counts.live}
+              </span>
             )}
           </button>
         );

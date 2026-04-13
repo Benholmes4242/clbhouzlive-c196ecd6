@@ -1,15 +1,10 @@
 /**
- * ScheduleTournamentCard - Clean list-row design matching WhatsComing EventRow
- * 
- * Design: Date block + context label + name + venue + leader/winner
- * Dark-mode safe: all colors use semantic tokens
- * Tappable player/venue names with stopPropagation
- * Score color-coded (green/red/neutral)
+ * ScheduleTournamentCard - Flat ruled row design
+ * No border-radius, no card bg. Hairline border handled by parent.
  */
 
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Trophy } from 'lucide-react';
-import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
@@ -18,7 +13,6 @@ import { TOUR_COLORS } from '../../constants/colors';
 import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { formatPurse } from '../shared/TourHeroHelpers';
 
-// B42 FIX 11: removed batchImageUrl prop
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
@@ -41,10 +35,10 @@ function getDayNum(dateStr: string): string {
 }
 
 function getScoreColor(score: number | null): string {
-  if (score === null || score === undefined) return 'hsl(var(--muted-foreground))';
+  if (score === null || score === undefined) return '#94A3B8';
   if (score < 0) return '#F7931E';
   if (score > 0) return '#EF4444';
-  return 'hsl(var(--muted-foreground))';
+  return '#94A3B8';
 }
 
 export function ScheduleTournamentCard({ 
@@ -81,11 +75,8 @@ export function ScheduleTournamentCard({
     ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
 
-  // B45 FIX 4: always use leaderWinner score when available
-  const winnerScore = leaderWinner?.score ?? null;
   const winnerDisplayScore = leaderWinner?.displayScore ?? null;
 
-  // B45 FIX 6: show end date for completed tournaments
   const displayDate = isFinal
     ? (isSeasonTournament(tournament) ? tournament.endDate : (tournament as TourTournament).end_date)
     : startDate;
@@ -101,7 +92,6 @@ export function ScheduleTournamentCard({
     if (venueName) navigate(`/courses?q=${encodeURIComponent(venueName)}`);
   };
 
-  // Build aria-label
   const ariaLabel = [
     tournament.name,
     isLive ? 'live' : isFinal ? 'completed' : 'upcoming',
@@ -111,115 +101,110 @@ export function ScheduleTournamentCard({
   ].filter(Boolean).join(', ');
 
   return (
-    <motion.button
+    <div
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className={`w-full flex items-center gap-3 px-4 py-3 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98] ${className || ''}`}
+      className={`w-full flex items-start gap-0 cursor-pointer active:bg-black/[0.02] transition-colors ${className || ''}`}
       style={{
-        borderLeftWidth: (isLive || isMajor || isSignature || isRolex) ? '3px' : undefined,
-        borderLeftColor: isLive
-          ? TOUR_COLORS.liveGreen
-          : isMajor
-          ? TOUR_COLORS.liveAmber
-          : (isSignature || isRolex)
-          ? 'rgba(16, 185, 129, 0.8)'
-          : undefined,
+        borderLeft: (isLive || isMajor || isSignature || isRolex)
+          ? `3px solid ${isLive ? TOUR_COLORS.liveGreen : isMajor ? TOUR_COLORS.liveAmber : 'rgba(16,185,129,0.8)'}`
+          : '3px solid transparent',
+        background: 'transparent',
       }}
-      whileTap={{ scale: 0.98 }}
+      role="button"
       aria-label={ariaLabel}
     >
-      {/* Date block — B45 FIX 6: use displayDate */}
-      <div className="flex-shrink-0 w-12 text-center">
-        <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
+      {/* Date block */}
+      <div style={{
+        flexShrink: 0,
+        width: '52px',
+        padding: '12px 0 12px 16px',
+        textAlign: 'left' as const,
+      }}>
+        <p style={{ fontSize: '9px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.08em', textTransform: 'uppercase' as const, lineHeight: 1, margin: 0 }}>
           {getMonthAbbr(displayDate)}
         </p>
-        <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '20px', fontWeight: 700 }}>
+        <p style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', lineHeight: 1, marginTop: '2px', letterSpacing: '-0.02em', margin: '2px 0 0' }}>
           {getDayNum(displayDate)}
         </p>
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
+      <div style={{ flex: 1, minWidth: 0, padding: '12px 16px 12px 10px' }}>
         {/* Context label */}
-        <div className="flex items-center gap-1.5">
-          <p
-            className="uppercase leading-none"
-            style={{
-              fontSize: '10px',
-              fontWeight: 600,
-              letterSpacing: '0.05em',
-              color: isMajor ? TOUR_COLORS.liveAmber : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? TOUR_COLORS.liveGreen : 'hsl(var(--muted-foreground) / 0.7)',
-            }}
-          >
-            {isLive ? '● LIVE' : contextLabel}
-          </p>
-          {/* B44 FIX 7: round label on live list card */}
+        <p style={{
+          fontSize: '9px',
+          fontWeight: 800,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase' as const,
+          lineHeight: 1,
+          marginBottom: '4px',
+          margin: '0 0 4px',
+          color: isMajor
+            ? TOUR_COLORS.liveAmber
+            : (isSignature || isRolex)
+            ? 'rgba(16,185,129,0.9)'
+            : isLive
+            ? TOUR_COLORS.liveGreen
+            : '#94A3B8',
+        }}>
+          {isLive ? '● LIVE' : contextLabel}
           {isLive && leaderWinner?.round1 !== undefined && (() => {
             const roundInfo = getCurrentRound(
-              leaderWinner!.round1, leaderWinner!.round2, 
+              leaderWinner!.round1, leaderWinner!.round2,
               leaderWinner!.round3, leaderWinner!.round4
             );
             return roundInfo ? (
-              <span style={{ fontSize: '10px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.03em' }}>
+              <span style={{ fontWeight: 500, color: 'rgba(34,197,94,0.6)', marginLeft: '4px', letterSpacing: '0.04em' }}>
                 R{roundInfo.currentRound}
               </span>
             ) : null;
           })()}
-        </div>
-        
+        </p>
+
         {/* Tournament name */}
-        <p
-          className="mt-1 line-clamp-1 text-foreground"
-          style={{ fontSize: '17px', fontWeight: 700, letterSpacing: '-0.15px' }}
-        >
+        <p style={{
+          fontSize: '15px',
+          fontWeight: 800,
+          color: '#0F172A',
+          letterSpacing: '-0.02em',
+          lineHeight: 1.2,
+          marginBottom: '4px',
+          margin: '0 0 4px',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap' as const,
+        }}>
           {tournament.name}
         </p>
-        
-        {/* Winner/Leader row */}
+
+        {/* Winner / Leader row */}
         {(winnerDisplay || hasLeaderData) && (
-          <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 500 }}>
+          <p style={{ fontSize: '12px', fontWeight: 500, marginBottom: '3px', margin: '0 0 3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             {isFinal && winnerDisplay && (
-              <span className="text-muted-foreground">
-                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: TOUR_COLORS.liveAmber }} />
-                <button
-                  onClick={handlePlayerTap}
-                  className="transition-opacity active:opacity-70 inline font-semibold"
-                >
+              <span style={{ color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Trophy style={{ width: 12, height: 12, color: TOUR_COLORS.liveAmber, flexShrink: 0 }} />
+                <button onClick={handlePlayerTap} className="transition-opacity active:opacity-70" style={{ color: '#0F172A', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                   {winnerDisplay}
                 </button>
-                {/* B45 FIX 4+5: use winnerDisplayScore + semantic color */}
                 {winnerDisplayScore && (
-                  <span className="font-semibold ml-1" style={{ color: TOUR_COLORS.liveAmber }}>
-                    ({winnerDisplayScore})
-                  </span>
+                  <span style={{ color: TOUR_COLORS.liveAmber, fontWeight: 700 }}>({winnerDisplayScore})</span>
                 )}
               </span>
             )}
             {hasLeaderData && !isFinal && (
               <span style={{ color: TOUR_COLORS.liveGreen }}>
                 Leader:{' '}
-                <button
-                  onClick={handlePlayerTap}
-                  className="transition-opacity active:opacity-70 inline"
-                >
-                  {leaderWinner!.displayName}
-                </button>
-                <span className="font-semibold ml-1" style={{ color: getScoreColor(leaderWinner!.score) }}>
-                  {leaderWinner!.displayScore}
-                </span>
+                <button onClick={handlePlayerTap} className="transition-opacity active:opacity-70" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}>{leaderWinner!.displayName}</button>
+                <span style={{ fontWeight: 700, marginLeft: '4px', color: getScoreColor(leaderWinner!.score) }}>{leaderWinner!.displayScore}</span>
               </span>
             )}
           </p>
         )}
 
-        {/* B43 FIX 8: date range + purse secondary line for upcoming */}
+        {/* Date range + purse for upcoming */}
         {!isLive && !isFinal && (() => {
-          const endDate = isSeasonTournament(tournament)
-            ? null
-            : (tournament as TourTournament).end_date;
-          const purse = isSeasonTournament(tournament)
-            ? null
-            : (tournament as TourTournament).purse;
-
+          const endDate = isSeasonTournament(tournament) ? null : (tournament as TourTournament).end_date;
+          const purse = isSeasonTournament(tournament) ? null : (tournament as TourTournament).purse;
           const parts = [
             endDate && (() => {
               const s = new Date(startDate + 'T12:00:00');
@@ -231,27 +216,24 @@ export function ScheduleTournamentCard({
             })(),
             purse && formatPurse(purse),
           ].filter(Boolean);
-
           return parts.length > 0 ? (
-            <p className="mt-0.5 text-muted-foreground/60 line-clamp-1" style={{ fontSize: '12px', fontWeight: 500 }}>
-              {parts.join(' · ')}
-            </p>
+            <p style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '3px', margin: '0 0 3px' }}>{parts.join(' · ')}</p>
           ) : null;
         })()}
-        
-        {/* Venue (tappable) */}
+
+        {/* Venue */}
         {venue && !compact && (
           <button
             onClick={handleVenueTap}
-            className="flex items-center gap-1 mt-0.5 text-muted-foreground transition-opacity active:opacity-70"
-            style={{ fontSize: '13px', fontWeight: 400 }}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            className="transition-opacity active:opacity-70"
           >
-            <MapPin className="w-3 h-3 flex-shrink-0 opacity-60" />
-            <span className="line-clamp-1">{venue}</span>
+            <MapPin style={{ width: 10, height: 10, flexShrink: 0, opacity: 0.6 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{venue}</span>
           </button>
         )}
       </div>
-    </motion.button>
+    </div>
   );
 }
 

@@ -1,9 +1,7 @@
 /**
- * ScheduleMonthHeader - Section header aligned with Tour Overview audit
- * 22px / 700 / tracking -0.3px section headers
+ * ScheduleMonthHeader - Dispatch rule marker style
+ * 9px/900 uppercase with vertical bar accent
  */
-
-import { cn } from '@/lib/utils';
 
 const TOUR_LABELS: Record<string, string> = {
   pga: 'PGA',
@@ -25,7 +23,6 @@ export function ScheduleMonthHeader({
   monthLabel, 
   eventCount,
   tourBreakdown,
-  className 
 }: ScheduleMonthHeaderProps) {
   const breakdownParts = tourBreakdown
     ? Object.entries(tourBreakdown)
@@ -34,31 +31,32 @@ export function ScheduleMonthHeader({
         .map(([code, count]) => `${count} ${TOUR_LABELS[code] || code}`)
     : [];
 
-  // B42 FIX 3: monthLabel arrives in title case from source, use directly
   return (
-    <div className={cn("pt-6 pb-3 px-4", className)}>
-      <div className="flex items-center justify-between">
-        <h3 
-          className="text-foreground"
-          style={{ 
-            fontSize: '22px',
-            fontWeight: 700,
-            letterSpacing: '-0.3px',
-          }}
-        >
+    <div style={{ padding: '20px 20px 0', background: '#F8FAFC' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+        <h3 style={{
+          fontSize: '9px',
+          fontWeight: 900,
+          color: '#0F172A',
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase' as const,
+          margin: 0,
+        }}>
           {monthLabel}
         </h3>
-        
-        <span 
-          className="text-muted-foreground"
-          style={{ fontSize: '13px', fontWeight: 500 }}
-        >
+        <span style={{ marginLeft: 'auto', fontSize: '10px', fontWeight: 700, color: '#F7931E' }}>
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>
-
       {breakdownParts.length > 0 && (
-        <p className="mt-0.5 text-muted-foreground/70" style={{ fontSize: '12px', fontWeight: 400 }}>
+        <p style={{
+          fontSize: '11px',
+          color: '#94A3B8',
+          margin: '0 0 10px',
+          lineHeight: 1.4,
+          paddingLeft: '11px',
+        }}>
           {breakdownParts.join(' · ')}
         </p>
       )}

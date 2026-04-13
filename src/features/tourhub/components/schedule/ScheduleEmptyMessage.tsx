@@ -1,5 +1,5 @@
 /**
- * ScheduleEmptyMessage - Premium empty states aligned with Tour Overview audit
+ * ScheduleEmptyMessage - Premium empty states aligned with dispatch styling
  */
 
 import { Link } from 'react-router-dom';
@@ -34,7 +34,6 @@ export function ScheduleEmptyMessage({
 
   const countdown = nextTournamentDate ? formatCountdown(nextTournamentDate) : null;
 
-  // Premium no-live empty state
   if (variant === 'no-live') {
     return (
       <div
@@ -45,7 +44,6 @@ export function ScheduleEmptyMessage({
         )}
         style={{ paddingTop: '40px', paddingBottom: '40px' }}
       >
-        {/* Icon cluster */}
         <div className="relative">
           <Flag className="w-12 h-12 text-muted-foreground/30" />
           <div className="absolute -bottom-1 -right-2">
@@ -53,41 +51,52 @@ export function ScheduleEmptyMessage({
           </div>
         </div>
 
-        {/* Primary message */}
         <h3 
-          className="text-foreground text-center"
-          style={{ fontSize: '18px', fontWeight: 700, marginTop: '16px' }}
+          className="text-center"
+          style={{ fontSize: '18px', fontWeight: 700, marginTop: '16px', color: '#0F172A' }}
         >
           No Tournaments Live Right Now
         </h3>
 
-        {/* Countdown to next event */}
         {nextTournamentName && countdown && (
           <div className="flex flex-col items-center max-w-[300px]" style={{ marginTop: '24px' }}>
-            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400 }}>
+            <p style={{ fontSize: '13px', fontWeight: 400, color: '#94A3B8' }}>
               Next up
             </p>
-            <p className="text-foreground text-center" style={{ fontSize: '16px', fontWeight: 600, marginTop: '4px' }}>
+            <p className="text-center" style={{ fontSize: '16px', fontWeight: 600, marginTop: '4px', color: '#0F172A' }}>
               {nextTournamentName}
             </p>
-            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '2px' }}>
+            <p style={{ fontSize: '13px', fontWeight: 400, marginTop: '2px', color: '#94A3B8' }}>
               {countdown}
             </p>
           </div>
         )}
 
         {!nextTournamentName && (
-          <p className="text-muted-foreground max-w-[280px]" style={{ fontSize: '13px', fontWeight: 400, marginTop: '12px' }}>
+          <p className="max-w-[280px]" style={{ fontSize: '13px', fontWeight: 400, marginTop: '12px', color: '#94A3B8' }}>
             No tournaments are in progress. Check back soon!
           </p>
         )}
 
-        {/* CTA */}
         {onSwitchFilter && (
           <button
             onClick={() => onSwitchFilter('upcoming')}
-            className="rounded-xl text-foreground border border-border/60 transition-all active:scale-95"
-            style={{ fontSize: '14px', fontWeight: 600, padding: '12px 24px', marginTop: '20px' }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '12px 24px',
+              marginTop: '20px',
+              borderRadius: '12px',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: '#0F172A',
+              background: '#ffffff',
+              border: '1px solid rgba(15,23,42,0.09)',
+              boxShadow: '0 1px 4px rgba(15,23,42,0.05)',
+              cursor: 'pointer',
+            }}
+            className="active:scale-[0.97] transition-transform"
           >
             View Upcoming Schedule →
           </button>
@@ -96,7 +105,6 @@ export function ScheduleEmptyMessage({
     );
   }
 
-  // B42 FIX 9: remove card container from non-live variants — bare centered layout
   return (
     <div 
       className={cn(
@@ -105,19 +113,16 @@ export function ScheduleEmptyMessage({
         className
       )}
     >
-      {/* Icon */}
       {variant === 'no-results' && <Calendar className="w-8 h-8 text-muted-foreground/40" />}
       {variant === 'no-upcoming' && <Calendar className="w-8 h-8 text-muted-foreground/40" />}
       {variant === 'season-complete' && <Trophy className="w-8 h-8 text-muted-foreground/40" />}
 
-      {/* Title */}
       <h4 className="text-lg font-semibold text-foreground">
         {variant === 'no-results' && (tourName ? `No ${tourName} Tournaments` : 'No Matches Found')}
         {variant === 'no-upcoming' && 'No Upcoming Tournaments'}
         {variant === 'season-complete' && 'Season Complete'}
       </h4>
 
-      {/* Subtitle */}
       <p className="text-sm text-muted-foreground text-center max-w-[280px] mx-auto">
         {variant === 'no-results' && (
           tourName 
@@ -138,7 +143,6 @@ export function ScheduleEmptyMessage({
         )}
       </p>
 
-      {/* CTA */}
       {variant === 'no-results' && onResetTour && (
         <button
           onClick={() => onResetTour()}
