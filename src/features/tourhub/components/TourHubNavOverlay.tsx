@@ -1,10 +1,10 @@
 /**
  * TourHubNavOverlay - Command Centre bottom sheet for Tour Hub navigation
  * Light editorial design with live ticker, world rankings strip, and clean nav rows
+ * Uses the shared BottomSheet component for consistent UI across the app.
  */
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
