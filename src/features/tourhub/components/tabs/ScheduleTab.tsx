@@ -504,7 +504,11 @@ export function ScheduleTab() {
                         </div>
                       </InViewCard>
                     ))}
-                  </div>
+                   </div>
+                    {/* Heavier rule between date groups */}
+                    {groupIndex < monthGroups.length - 1 && (
+                      <div style={{ height: '1px', background: 'rgba(15,23,42,0.1)' }} />
+                    )}
                 </div>
               ))}
             </motion.div>
