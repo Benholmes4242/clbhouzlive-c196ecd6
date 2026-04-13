@@ -1,12 +1,9 @@
 /**
- * LeadersCategorySheet — Full-width selector button + BottomSheet
- * for choosing leaderboard categories, organized in grouped grid.
- * Supports external open control via optional externalOpen/onExternalClose props.
+ * LeadersCategorySheet — Dispatch-styled bottom sheet for choosing leaderboard categories.
+ * Flat full-width rows with amber left stripe on active.
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { LeaderCategory } from './constants';
 
@@ -44,7 +41,6 @@ export function LeadersCategorySheet({
 }: LeadersCategorySheetProps) {
   const [internalOpen, setInternalOpen] = useState(false);
 
-  // Sync external open state
   useEffect(() => {
     if (externalOpen !== undefined) {
       setInternalOpen(externalOpen);
@@ -82,31 +78,20 @@ export function LeadersCategorySheet({
       {!hideTrigger && (
         <button
           onClick={() => setInternalOpen(true)}
-          className="w-full flex items-center justify-between active:scale-[0.99] transition-all duration-200"
           style={{
-            background: 'hsl(var(--card))',
-            border: '1px solid hsl(var(--border) / 0.5)',
-            borderRadius: 16,
-            padding: '12px 16px',
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)',
+            borderRadius: '12px', padding: '12px 16px', cursor: 'pointer',
           }}
+          className="active:scale-[0.99] transition-all duration-200"
           aria-haspopup="dialog"
           aria-expanded={open}
         >
-          <div className="flex items-center gap-2.5">
-            <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
-              {activeEmoji}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground">{activeCategory.shortLabel}</span>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' as const }} className="text-muted-foreground">
-              Leaderboard
-            </span>
-            {leaderValue && (
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--muted-foreground) / 0.5)' }}>
-                · {leaderValue}
-              </span>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '16px' }}>{activeEmoji}</span>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>{activeCategory.shortLabel}</span>
           </div>
-          <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
+          <span style={{ fontSize: '10px', color: '#94A3B8' }}>▾</span>
         </button>
       )}
 
@@ -117,115 +102,71 @@ export function LeadersCategorySheet({
         ariaLabelledBy="leaders-category-sheet-title"
       >
         <div
-          className="overflow-y-auto overscroll-contain px-4 pb-2"
-          style={{ maxHeight: 'calc(70vh - 60px)', paddingTop: 8 }}
+          style={{ maxHeight: 'calc(70vh - 60px)', paddingTop: '8px', overflowY: 'auto' }}
+          className="overscroll-contain"
         >
-          {/* Header */}
-          <div style={{ paddingBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
-              Category
+          {/* Dispatch header */}
+          <div style={{ padding: '0 20px 14px' }}>
+            <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
+              LEADERBOARDS
             </div>
-            <div id="leaders-category-sheet-title" style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em' }} className="text-foreground">
-              Performance Category
+            <div id="leaders-category-sheet-title" style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+              Performance Rankings
             </div>
           </div>
 
-          {/* Grouped grid */}
-          <div className="space-y-5">
-            {groups.map((group) => (
-              <div key={group.label}>
-                {/* Section label */}
-                <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.8px',
-                    textTransform: 'uppercase' as const,
-                    marginTop: 20,
-                    marginBottom: 10,
-                  }}
-                  className="text-muted-foreground/70"
-                >
+          {groups.map((group) => (
+            <div key={group.label}>
+              {/* Group rule marker */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '14px 20px 8px' }}>
+                <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+                <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                   {group.label}
-                </p>
-                <div className="grid grid-cols-2" style={{ gap: 8 }} role="group" aria-label={group.label}>
-                  {group.categories.map((cat) => {
-                    const isActive = activeKey === cat.key;
-                    const emoji = (cat as any).emoji;
-                    return (
-                      <button
-                        key={cat.key}
-                        onClick={() => handleSelect(cat.key)}
-                        aria-pressed={isActive}
-                        className={cn(
-                          'flex flex-col text-left transition-all duration-150',
-                        )}
-                        style={{
-                          borderRadius: 12,
-                          padding: '12px 14px',
-                          minWidth: 0,
-                          border: isActive
-                            ? '1.5px solid hsl(var(--accent-amber) / 0.40)'
-                            : '1px solid hsl(var(--border) / 0.5)',
-                          background: isActive ? 'hsl(var(--accent-amber) / 0.10)' : 'hsl(var(--card))',
-                          color: 'hsl(var(--foreground))',
-                          fontWeight: isActive ? 700 : 500,
-                        }}
-                      >
-                        <div className="flex items-center gap-2.5 w-full min-w-0">
-                          <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>
-                            {emoji}
-                          </span>
-                          <span style={{ fontSize: 14 }} className="flex-1 truncate">
-                            {cat.shortLabel}
-                          </span>
-
-
-                        </div>
-                        {(() => {
-                          const leader = categoryLeaderValues?.[cat.key];
-                          const avg = (cat as any).tourAverage;
-                          if (leader) {
-                            return (
-                              <span
-                                style={{
-                                  fontSize: 11,
-                                  color: 'hsl(var(--muted-foreground) / 0.5)',
-                                  display: 'block',
-                                  marginTop: 2,
-                                  lineHeight: 1.3,
-                                }}
-                                className="truncate"
-                              >
-                                {leader.name} · {leader.value}
-                              </span>
-                            );
-                          }
-                          if (avg) {
-                            return (
-                              <span
-                                style={{
-                                  fontSize: 11,
-                                  color: 'hsl(var(--muted-foreground) / 0.5)',
-                                  display: 'block',
-                                  marginTop: 2,
-                                  lineHeight: 1.3,
-                                }}
-                                className="truncate"
-                              >
-                                Tour avg: {avg}
-                              </span>
-                            );
-                          }
-                          return null;
-                        })()}
-                      </button>
-                    );
-                  })}
-                </div>
+                </span>
               </div>
-            ))}
-          </div>
+
+              {/* Category rows — flat, not grid tiles */}
+              {group.categories.map((cat) => {
+                const isActive = activeKey === cat.key;
+                const leaderData = categoryLeaderValues?.[cat.key];
+                const emoji = (cat as any).emoji;
+                return (
+                  <button
+                    key={cat.key}
+                    onClick={() => handleSelect(cat.key)}
+                    aria-pressed={isActive}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
+                      padding: '11px 20px',
+                      background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                      border: 'none',
+                      borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                      cursor: 'pointer', textAlign: 'left' as const,
+                    }}
+                  >
+                    <span style={{ fontSize: '16px', flexShrink: 0 }}>{emoji}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '13px', fontWeight: isActive ? 800 : 600, color: '#0F172A' }}>
+                        {cat.shortLabel}
+                      </div>
+                      {leaderData ? (
+                        <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                          {leaderData.name} · {leaderData.value}
+                        </div>
+                      ) : (cat as any).tourAverage && (cat as any).tourAverage !== '—' ? (
+                        <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '1px' }}>
+                          Tour avg: {(cat as any).tourAverage}
+                        </div>
+                      ) : null}
+                    </div>
+                    {isActive && (
+                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </div>
 
         {/* Safe area bottom padding */}

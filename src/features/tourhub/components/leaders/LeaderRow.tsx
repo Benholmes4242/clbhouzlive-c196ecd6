@@ -1,11 +1,10 @@
 /**
- * LeaderRow — Matches OWGR leaderboard style on overview page.
- * 44×44 avatars, 13px border-radius, JetBrains Mono stat values.
+ * LeaderRow — Flat dispatch row for Performance Rankings.
+ * Large faded rank number, 34px squircle avatar, proportion bar.
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderCategory } from './constants';
@@ -49,6 +48,9 @@ export function LeaderRow({
 
   const ariaLabel = `Rank ${displayRank}, ${player.fullName}, ${formattedStat}${unit ? ` ${unit}` : ''}`;
 
+  const isFirst = displayRank === 1;
+  const barPct = leaderValue > 0 ? Math.min(100, (value / leaderValue) * 100) : 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -12 }}
@@ -57,106 +59,79 @@ export function LeaderRow({
     >
       <Link
         to={`/tourhub/player/${player.id}`}
-        className="flex items-center hover:bg-muted/30 active:scale-[0.98] transition-transform"
         style={{
-          padding: '12px 16px',
-          minHeight: 64,
-          borderBottom: '1px solid hsl(var(--border) / 0.15)',
-          gap: 12,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0,
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderLeft: isFirst ? '3px solid #F7931E' : '3px solid transparent',
+          background: isFirst ? 'rgba(247,147,30,0.025)' : 'transparent',
+          textDecoration: 'none',
         }}
+        className="active:bg-black/[0.02] transition-colors"
         aria-label={ariaLabel}
       >
-        {/* Rank */}
-        <span
-          style={{
-            width: 32,
-            textAlign: 'center',
-            fontSize: 14,
-            fontWeight: 600,
-            fontVariantNumeric: 'tabular-nums',
-            color: 'hsl(var(--muted-foreground) / 0.6)',
-          }}
-        >
-          {displayRank}
-        </span>
+        {/* Large faded rank number */}
+        <div style={{ width: '44px', padding: '13px 0 13px 14px', flexShrink: 0 }}>
+          <span style={{
+            fontSize: '18px', fontWeight: 900,
+            color: isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)',
+            lineHeight: 1, letterSpacing: '-0.03em', display: 'block',
+          }}>
+            {displayRank}
+          </span>
+        </div>
 
-        {/* Avatar — 44×44 */}
-        <div className="shrink-0" style={{ width: 44, height: 44 }}>
+        {/* Avatar — 34px squircle */}
+        <div style={{ width: '34px', height: '34px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', marginRight: '10px' }}>
           {photoUrl ? (
             <img
               src={photoUrl}
               alt={player.fullName}
-              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '34%',
-                objectFit: 'cover',
-                border: '1px solid hsl(var(--border) / 0.5)',
-              }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
+              loading="lazy"
+              onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
             />
           ) : (
-            <div
-              className="flex items-center justify-center bg-muted"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '34%',
-                border: '1px solid hsl(var(--border) / 0.5)',
-              }}
-            >
-              <span className="text-muted-foreground text-xs font-semibold">
-                {player.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,23,42,0.08)' }}>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: '#94A3B8' }}>
+                {player.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
               </span>
             </div>
           )}
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: 1 }}>
-          <p style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }} className="text-foreground truncate leading-tight">
+        {/* Player info */}
+        <div style={{ flex: 1, minWidth: 0, padding: '12px 0' }}>
+          <div style={{
+            fontSize: '14px', fontWeight: isFirst ? 800 : 600, color: '#0F172A',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+          }}>
             {player.fullName}
-          </p>
-          <div className="flex items-center gap-1.5">
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.countryCode || player.country} size="sm" />
             {player.country && (
-              <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.6)' }}>
-                {player.country}
-              </span>
+              <span style={{ fontSize: '10px', color: '#94A3B8' }}>{player.country}</span>
             )}
           </div>
         </div>
 
-        {/* Stat value */}
-        <div className="text-right shrink-0">
-          <span
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-            className="text-foreground"
-          >
+        {/* Stat value + proportion bar */}
+        <div style={{ padding: '12px 14px 12px 0', textAlign: 'right' as const, flexShrink: 0, minWidth: '72px' }}>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
             {formattedStat}
           </span>
           {unit && (
-            <p
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                letterSpacing: '0.5px',
-                textTransform: 'uppercase' as const,
-                marginTop: 2,
-              }}
-              className="text-muted-foreground/60"
-            >
+            <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
               {unit}
-            </p>
+            </span>
           )}
+          {/* Proportion bar — value relative to leader */}
+          <div style={{ marginTop: '4px', width: '60px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.06)', overflow: 'hidden', marginLeft: 'auto' }}>
+            <div style={{ height: '100%', width: `${barPct}%`, background: isFirst ? '#F7931E' : 'rgba(15,23,42,0.2)', borderRadius: '2px', transition: 'width 0.4s ease' }} />
+          </div>
         </div>
-
-        {/* Chevron */}
-        <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: 'hsl(var(--muted-foreground) / 0.5)' }} />
       </Link>
     </motion.div>
   );
