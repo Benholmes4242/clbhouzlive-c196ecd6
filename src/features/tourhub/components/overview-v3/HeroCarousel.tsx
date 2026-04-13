@@ -919,40 +919,45 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             {/* ─── Tournament header — hidden when scorecard is open ─── */}
             {!selectedPlayer && (
               isCompleted ? (
-                <>
-                  <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                    {/* Tournament name + FINAL badge + tour badge — right-aligned column */}
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                          <h2 className="hero-tournament-name" style={{ fontSize: '18px' }}>{tournament.name}</h2>
-                        </Link>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
-                          className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                        >
-                          {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
-                        </button>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-                        <span style={{
-                          fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
-                          color: 'rgba(255,255,255,0.55)',
-                          background: 'rgba(255,255,255,0.10)',
-                          border: '1px solid rgba(255,255,255,0.14)',
-                          borderRadius: 20, padding: '2px 9px',
+                <div style={{
+                  flexShrink: 0,
+                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
+                }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    gap: 10, padding: '0 16px', height: 58,
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                        <div style={{
+                          fontSize: 22, fontWeight: 800, color: '#fff',
+                          letterSpacing: '-0.02em', lineHeight: 1,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                         }}>
+                          {tournament.name}
+                        </div>
+                      </Link>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                        className="active:opacity-70 transition-opacity cursor-pointer"
+                        style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginTop: 3, background: 'none', border: 'none', padding: 0, textAlign: 'left' as const }}
+                      >
+                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
+                      </button>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      <span style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.8px', color: 'rgba(255,255,255,0.4)' }}>
+                        Final Round
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span style={{ fontSize: 14 }}>🏆</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#F7931E', letterSpacing: 1 }}>
                           FINAL
                         </span>
-                        {!tournament.isMajor && (
-                        <div className="tour-badge" style={{ fontSize: 9, padding: '2px 8px' }}>
-                          <span>{getTourDisplayName(tournament.tourSlug)}</span>
-                        </div>
-                        )}
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
               ) : isLive ? (
                 /* ── Compact topbar — tournament name left, round + LIVE right ── */
                 <div style={{
