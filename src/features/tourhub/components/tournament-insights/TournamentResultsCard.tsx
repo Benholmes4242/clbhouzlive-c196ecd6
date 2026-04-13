@@ -251,17 +251,15 @@ export function TournamentResultsCard({
         {/* Leader row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
           {/* Avatar */}
-          <SquircleAvatar
-            size="md"
-            src={winnerPhoto}
-            alt={winnerName}
-            hideRing
-            fallback={winnerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-            style={{
-              background: 'rgba(247,147,30,0.15)',
-              border: '1.5px solid rgba(247,147,30,0.3)',
-            }}
-          />
+          <div style={{ background: 'rgba(247,147,30,0.15)', border: '1.5px solid rgba(247,147,30,0.3)', borderRadius: '34%', overflow: 'hidden', flexShrink: 0 }}>
+            <SquircleAvatar
+              size="md"
+              src={winnerPhoto}
+              alt={winnerName}
+              hideRing
+              fallback={winnerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            />
+          </div>
 
           {/* Name + subtitle */}
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -410,18 +408,15 @@ export function TournamentResultsCard({
                   {row.isTied ? 'T' : ''}{row.position}
                 </span>
                 {/* Avatar */}
-                <SquircleAvatar
-                  size="sm"
-                  src={photo}
-                  alt={row.playerName}
-                  hideRing
-                  fallback={row.playerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                  style={{
-                    background: 'rgba(255,255,255,0.07)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    marginRight: 10,
-                  }}
-                />
+                <div style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, marginRight: 10 }}>
+                  <SquircleAvatar
+                    size="sm"
+                    src={photo}
+                    alt={row.playerName}
+                    hideRing
+                    fallback={row.playerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  />
+                </div>
                 {/* Name */}
                 <span style={{
                   flex: 1, fontSize: 14, fontWeight: 600,
