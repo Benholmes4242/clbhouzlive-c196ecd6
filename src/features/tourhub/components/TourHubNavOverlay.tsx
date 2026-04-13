@@ -73,7 +73,7 @@ export function TourHubNavOverlay({
 }: TourHubNavOverlayProps) {
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
+  
   const [tickerIndex, setTickerIndex] = useState(0);
 
   const { data: topPlayers, isLoading: rankingsLoading } = useTopWorldRanked(5);
