@@ -1,83 +1,13 @@
 /**
- * TournamentHero - Cinematic immersive hero with gradient scrim
+ * TournamentHero - Editorial slate header with contained course thumbnail
  */
 
 import { format, isSameMonth } from 'date-fns';
-import { MapPin, Calendar, DollarSign, Flag, Ruler, Clock, CheckCircle2, Menu, Target } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { openTourNav } from '../../contexts/TourNavContext';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
 interface TournamentHeroProps {
   tournament: TourTournament;
   imageUrl: string | null;
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { 
-    label: string; 
-    icon: React.ReactNode;
-    pulse?: boolean;
-  }> = {
-    inprogress: { 
-      label: 'LIVE', 
-      icon: null,
-      pulse: true,
-    },
-    scheduled: { 
-      label: 'UPCOMING', 
-      icon: <Clock className="w-3.5 h-3.5 text-white" />,
-    },
-    created: { 
-      label: 'SCHEDULED', 
-      icon: <Clock className="w-3.5 h-3.5 text-white" />,
-    },
-    closed: { 
-      label: 'COMPLETED', 
-      icon: <CheckCircle2 className="w-3.5 h-3.5 text-white" />,
-    },
-  };
-
-  const c = config[status] || config.scheduled;
-
-  return (
-    <div
-      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-white"
-      style={{
-        background: 'rgba(0,0,0,0.40)',
-        backdropFilter: 'blur(12px)',
-      }}
-    >
-      {c.pulse && (
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: '#22C55E' }} />
-          <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: '#22C55E' }} />
-        </span>
-      )}
-      {!c.pulse && c.icon}
-      {c.label}
-    </div>
-  );
-}
-
-function HeroPill({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div 
-      className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white active:opacity-70 transition-opacity",
-        className
-      )}
-      style={{ 
-        background: 'rgba(0, 0, 0, 0.35)', 
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
-      }}
-    >
-      {children}
-    </div>
-  );
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
@@ -90,156 +20,81 @@ function formatDateRange(startDate: string, endDate: string): string {
 }
 
 export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
-  const formattedPurse = tournament.purse 
+  const formattedPurse = tournament.purse
     ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
     : null;
 
+  const isLive = tournament.status === 'inprogress';
+  const isUpcoming = tournament.status === 'scheduled' || tournament.status === 'created';
+  const statusLabel = isLive ? 'LIVE' : isUpcoming ? 'UPCOMING' : 'FINAL';
+  const badgeColor = isLive ? '#22C55E' : isUpcoming ? '#F7931E' : '#94A3B8';
+
   return (
-    <div className="relative overflow-hidden">
-      <motion.div 
-        className="relative overflow-hidden"
-        style={{ minHeight: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {/* Background with Ken Burns */}
-        <motion.div
-          className="absolute inset-0"
-          initial={{ scale: 1.06 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 15, ease: 'linear' }}
-        >
-          {/* Always render fallback gradient */}
-          <div 
-            className="w-full h-full absolute inset-0" 
-            style={{
-              background: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(220, 30%, 20%) 50%, hsl(var(--foreground)) 100%)',
-            }}
-          />
-          {/* Layer image on top if available */}
-          {imageUrl && (
-            <img 
-              src={imageUrl}
-              alt={tournament.venue_name || tournament.name}
-              className="w-full h-full object-cover absolute inset-0"
-              loading="eager"
-              fetchPriority="high"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
+    <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+      {/* Amber tour eyebrow */}
+      <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '8px' }}>
+        ⚡ {tournament.tour_full_name?.toUpperCase() ?? 'PGA TOUR'}
+      </div>
+
+      {/* Tournament name + status chip */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px', marginBottom: '8px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0, flex: 1 }}>
+          {tournament.name}
+        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.07)', border: `1px solid ${badgeColor}44`, flexShrink: 0, marginTop: '2px' }}>
+          {isLive && (
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
           )}
-        </motion.div>
-
-        {/* Canonical gradient scrim — lighter */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.05) 60%, transparent 80%)',
-          }}
-        />
-
-        {/* Burger menu — dark glass pill */}
-        <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
-          aria-label="Open tour menu"
-          className="absolute z-30 flex items-center justify-center active:scale-[0.97] transition-transform"
-          style={{
-            width: 36, height: 36,
-            top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
-            left: 16,
-            borderRadius: 10,
-            background: 'rgba(0,0,0,0.28)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-          }}
-        >
-          <Menu className="w-[18px] h-[18px] text-white" strokeWidth={2} />
-        </button>
-
-        {/* Content overlay - bottom aligned */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-          <motion.h1 
-            className="font-bold text-white mb-3"
-            style={{ 
-              fontSize: '28px',
-              fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: '-0.3px',
-              textShadow: '0 4px 24px rgba(0,0,0,0.6)',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {tournament.name}
-          </motion.h1>
-
-          <motion.div 
-            className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <span 
-              className="flex items-center gap-1.5 text-sm font-medium text-white"
-              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
-            >
-              <Calendar className="w-3.5 h-3.5 text-white/70" />
-              {formatDateRange(tournament.start_date, tournament.end_date)}
-            </span>
-            
-            {(tournament.venue_city || tournament.venue_country) && (
-              <span 
-                className="flex items-center gap-1.5 text-sm text-white/80"
-                style={{ textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
-              >
-                <MapPin className="w-3.5 h-3.5 text-white/70" />
-                {[tournament.venue_city, tournament.venue_country].filter(Boolean).join(', ')}
-              </span>
-            )}
-          </motion.div>
-
-          {/* Metadata pills */}
-          <motion.div 
-            className="flex flex-wrap items-center gap-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {formattedPurse && (
-              <HeroPill>
-                <DollarSign className="w-3.5 h-3.5" />
-                <span>{formattedPurse}</span>
-              </HeroPill>
-            )}
-            
-            {tournament.venue_course_name && (
-              <HeroPill>
-                <Flag className="w-3.5 h-3.5" />
-                <span className="max-w-[180px] truncate">{tournament.venue_course_name}</span>
-              </HeroPill>
-            )}
-            
-            {tournament.venue_par && (
-              <HeroPill>
-                <Target className="w-3.5 h-3.5" />
-                <span>Par {tournament.venue_par}</span>
-              </HeroPill>
-            )}
-            
-            {tournament.venue_yardage && (
-              <HeroPill>
-                <Ruler className="w-3.5 h-3.5" />
-                <span>{tournament.venue_yardage.toLocaleString()} yds</span>
-              </HeroPill>
-            )}
-          </motion.div>
+          <span style={{ fontSize: '9px', fontWeight: 900, color: badgeColor, letterSpacing: '0.12em' }}>
+            {statusLabel}
+          </span>
         </div>
-      </motion.div>
+      </div>
+
+      {/* Course image — contained editorial thumbnail */}
+      <div style={{ width: '100%', height: '120px', borderRadius: '10px 10px 0 0', overflow: 'hidden', background: 'rgba(255,255,255,0.05)', position: 'relative', flexShrink: 0 }}>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={tournament.venue_name || tournament.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }}
+            loading="eager"
+            fetchPriority="high"
+            onError={e => { e.currentTarget.style.display = 'none'; }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.07) 100%)' }} />
+        )}
+        {/* Location bottom-left overlay */}
+        {(tournament.venue_city || tournament.venue_country) && (
+          <div style={{ position: 'absolute', bottom: '8px', left: '10px' }}>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>
+              📍 {[tournament.venue_city, tournament.venue_country].filter(Boolean).join(', ')}
+            </span>
+          </div>
+        )}
+        {/* Dates top-right overlay */}
+        <div style={{ position: 'absolute', top: '8px', right: '10px' }}>
+          <span style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>
+            {formatDateRange(tournament.start_date, tournament.end_date)}
+          </span>
+        </div>
+      </div>
+
+      {/* 4-col quick facts grid on slate */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+        {[
+          { label: 'PURSE', value: formattedPurse ?? '—' },
+          { label: 'PAR', value: tournament.venue_par ? `Par ${tournament.venue_par}` : '—' },
+          { label: 'YARDS', value: tournament.venue_yardage ? `${tournament.venue_yardage.toLocaleString()}` : '—' },
+          { label: 'COURSE', value: tournament.venue_course_name ?? tournament.venue_name ?? '—' },
+        ].map((s, i) => (
+          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center', borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+            <div style={{ fontSize: '8px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>{s.label}</div>
+            <div style={{ fontSize: '12px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, padding: '0 4px' }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

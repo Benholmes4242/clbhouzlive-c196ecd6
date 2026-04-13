@@ -1,14 +1,7 @@
 /**
- * EventWinnerCard - Display tournament winner with premium styling
- * 
- * Features:
- * - Glass card treatment
- * - Tap feedback on Link wrapper
- * - Semantic token compliance (no hardcoded slates)
- * - Section entrance animation (whileInView)
+ * EventWinnerCard - Dispatch champion block
  */
 
-import { Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -18,21 +11,6 @@ import { PlayerAvatar } from './PlayerAvatar';
 interface EventWinnerCardProps {
   tournamentId: string;
   className?: string;
-}
-
-function formatScore(score: number | null, toPar: number | null): string {
-  if (score === null) return '—';
-  if (toPar === null) return String(score);
-  const parDisplay = toPar === 0 ? 'E' : toPar < 0 ? String(toPar) : `+${toPar}`;
-  return `${score} (${parDisplay})`;
-}
-
-function formatEarnings(money: number | null | undefined): string {
-  if (!money) return '';
-  if (money >= 1_000_000) {
-    return `$${(money / 1_000_000).toFixed(2)}M`;
-  }
-  return `$${money.toLocaleString()}`;
 }
 
 const sectionEntrance = {
@@ -48,152 +26,96 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   if (isLoading) {
     return (
       <div className={cn("animate-pulse", className)}>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-4 h-4 bg-muted rounded" />
-          <div className="h-3 w-16 bg-muted rounded" />
-        </div>
-        <div className="flex items-center gap-4 p-5 bg-muted/30 rounded-xl">
-          <div className="w-20 h-20 rounded-full bg-muted" />
-          <div className="flex-1 space-y-2">
-            <div className="h-5 w-32 bg-muted rounded" />
-            <div className="h-4 w-24 bg-muted rounded" />
-          </div>
+        <div style={{ padding: '14px 20px' }}>
+          <div className="h-3 w-16 bg-muted rounded mb-3" />
+          <div className="h-16 bg-muted/30 rounded-lg" />
         </div>
       </div>
     );
   }
   
-  // Premium pending state when no winner data yet
   if (!winner) {
     return (
-      <motion.div className={cn("", className)} {...sectionEntrance}>
-        <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
-          <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
-          <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-            Champion
-          </h2>
-        </div>
-        
-        <div className="p-6 bg-gradient-to-br from-foreground/50 to-foreground/30 rounded-xl border border-foreground/20">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-foreground/30 flex items-center justify-center">
-              <Trophy className="w-8 h-8" style={{ color: 'hsl(var(--accent-amber) / 0.6)' }} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-white/80">Champion unlocking soon</h3>
-              <p className="text-sm text-white/50 mt-0.5">
-                Official results will appear once the event concludes
-              </p>
-            </div>
+      <motion.div className={cn('', className)} {...sectionEntrance}>
+        <div style={{ padding: '14px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Champion</span>
           </div>
+        </div>
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '16px 20px' }}>
+          <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>Champion unlocking soon — official results will appear once the event concludes.</p>
         </div>
       </motion.div>
     );
   }
   
-  // Winner exists but no player linked (pending data)
   if (!winner.player) {
     return (
-      <motion.div className={cn("", className)} {...sectionEntrance}>
-        <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
-          <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
-          <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-            Champion
-          </h2>
-        </div>
-        
-        <div className="p-5 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl border border-amber-500/30">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <Trophy className="w-7 h-7" style={{ color: 'hsl(var(--accent-amber))' }} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-foreground">{winner.headline || 'Champion crowned'}</h3>
-              {winner.narrative && (
-                <p className="text-sm text-muted-foreground mt-0.5">{winner.narrative}</p>
-              )}
-            </div>
+      <motion.div className={cn('', className)} {...sectionEntrance}>
+        <div style={{ padding: '14px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Champion</span>
           </div>
+        </div>
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '14px 20px' }}>
+          <p style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: '0 0 4px' }}>{winner.headline || 'Champion crowned'}</p>
+          {winner.narrative && <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>{winner.narrative}</p>}
         </div>
       </motion.div>
     );
   }
   
-  // Full winner display with player linked
   return (
-    <motion.div className={cn("", className)} {...sectionEntrance}>
-      <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
-        <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
-        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Champion
-        </h2>
+    <motion.div className={cn('', className)} {...sectionEntrance}>
+      {/* Section rule marker */}
+      <div style={{ padding: '14px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Champion</span>
+        </div>
       </div>
-      
-      <Link 
-        to={`/tourhub/player/${winner.player.id}`}
-        className="group block active:scale-[0.98] transition-transform"
-      >
-        <div className="relative overflow-hidden p-5 bg-gradient-to-br from-amber-500/15 via-amber-500/10 to-amber-600/5 rounded-xl border-2 border-amber-500/30 transition-all group-hover:border-amber-500/50 group-hover:shadow-lg group-hover:shadow-amber-500/10">
-          {/* Subtle gold shimmer effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-          
-          <div className="relative flex items-center gap-5">
-            {/* Large Avatar with gold ring */}
-            <div className="relative">
-              <PlayerAvatar
-                playerId={winner.player.id}
-                playerName={winner.player.full_name}
-                
-                size="xl"
-                className="ring-4 ring-amber-500/40 ring-offset-2 ring-offset-background"
-              />
-              {/* Trophy badge overlay */}
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-lg">
-                <Trophy className="w-4 h-4 text-white" />
+
+      {/* Winner block */}
+      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+        <Link
+          to={`/tourhub/player/${winner.player.id}`}
+          style={{ display: 'block', textDecoration: 'none' }}
+          className="active:opacity-80 transition-opacity"
+        >
+          <div style={{ padding: '14px 20px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
+                  Tournament Winner
+                </div>
+                <div style={{ fontSize: '22px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                  {winner.player.full_name}
+                </div>
+                {winner.narrative && (
+                  <p style={{ fontSize: '11px', color: '#64748B', margin: 0, lineHeight: 1.5 }}>
+                    {winner.narrative}
+                  </p>
+                )}
               </div>
-            </div>
-            
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-xl text-foreground group-hover:text-amber-600 transition-colors truncate">
-                {winner.player.full_name}
-              </h3>
-              
-              {winner.player.country && (
-                <p className="text-sm text-muted-foreground truncate mt-0.5">
-                  {winner.player.country.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
-                </p>
-              )}
-              
-              {/* Score line */}
-              <div className="flex flex-wrap items-center gap-3 mt-2">
-                <span className="text-lg font-bold text-foreground">
-                  {formatScore(winner.winning_score, winner.score_to_par)}
-                </span>
-                
-                {winner.margin && winner.margin > 0 && (
-                  <span className="text-sm text-muted-foreground">
-                    Won by {winner.margin} {winner.margin === 1 ? 'stroke' : 'strokes'}
-                  </span>
-                )}
-                
-                {winner.is_playoff && (
-                  <span className="px-2 py-0.5 bg-red-500/15 text-red-600 text-xs rounded-full font-semibold">
-                    Playoff
-                  </span>
-                )}
+
+              {/* Contained squircle headshot */}
+              <div style={{ width: '52px', height: '52px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
+                <PlayerAvatar playerId={winner.player.id} playerName={winner.player.full_name} size="md" />
+              </div>
+
+              {/* Score */}
+              <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
+                <div style={{ fontSize: '32px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.05em', lineHeight: 1 }}>
+                  {winner.score_to_par === 0 ? 'E' : winner.score_to_par != null && winner.score_to_par < 0 ? String(winner.score_to_par) : winner.score_to_par != null ? `+${winner.score_to_par}` : '—'}
+                </div>
+                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#94A3B8', letterSpacing: '0.08em' }}>TO PAR</div>
               </div>
             </div>
           </div>
-          
-          {/* Headline / Narrative */}
-          {winner.headline && !winner.headline.includes('Champion crowned') && (
-            <p className="mt-4 pt-4 border-t border-amber-500/20 text-sm text-muted-foreground italic">
-              "{winner.headline}"
-            </p>
-          )}
-        </div>
-      </Link>
+        </Link>
+      </div>
     </motion.div>
   );
 }
@@ -228,7 +150,7 @@ export function CompactWinner({ winner, className }: CompactWinnerProps) {
         className
       )}
     >
-      <Trophy className="w-3.5 h-3.5 shrink-0" style={{ color: 'hsl(var(--accent-amber))' }} />
+      <span style={{ fontSize: '12px', color: '#F7931E' }}>🏆</span>
       <span className="font-medium text-foreground truncate">
         {winner.player.full_name}
       </span>

@@ -1,8 +1,7 @@
 /**
- * TournamentInfoGrid - Clean data grid, no card container
+ * TournamentInfoGrid - Flat ruled key-value grid
  */
 
-import { DollarSign, Trophy, Users, Calendar, Crosshair, Star, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format, isSameMonth } from 'date-fns';
@@ -14,7 +13,6 @@ interface TournamentInfoGridProps {
 }
 
 interface InfoItem {
-  icon: React.ReactNode;
   label: string;
   value: string;
   link?: string;
@@ -34,7 +32,6 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
   
   if (tournament.purse) {
     items.push({
-      icon: <DollarSign className="w-4 h-4" />,
       label: 'Purse',
       value: tournament.purse >= 1_000_000
         ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
@@ -43,83 +40,58 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
   }
   
   if (tournament.defending_champion) {
-    items.push({
-      icon: <Trophy className="w-4 h-4" />,
-      label: 'Defending Champion',
-      value: tournament.defending_champion,
-    });
+    items.push({ label: 'Defending Champion', value: tournament.defending_champion });
   }
   
   if (fieldSize && fieldSize > 0) {
-    items.push({
-      icon: <Users className="w-4 h-4" />,
-      label: 'Field Size',
-      value: `${fieldSize} players`,
-    });
+    items.push({ label: 'Field Size', value: `${fieldSize} players` });
   }
   
-  items.push({
-    icon: <Calendar className="w-4 h-4" />,
-    label: 'Dates',
-    value: formatDateRange(tournament.start_date, tournament.end_date),
-  });
+  items.push({ label: 'Dates', value: formatDateRange(tournament.start_date, tournament.end_date) });
 
   const rawData = (tournament as any).scoring_system;
   if (rawData) {
-    items.push({
-      icon: <Crosshair className="w-4 h-4" />,
-      label: 'Format',
-      value: rawData.charAt(0).toUpperCase() + rawData.slice(1),
-    });
+    items.push({ label: 'Format', value: rawData.charAt(0).toUpperCase() + rawData.slice(1) });
   }
 
   const points = (tournament as any).points;
   const pointsType = (tournament as any).points_type;
   if (points) {
-    items.push({
-      icon: <Star className="w-4 h-4" />,
-      label: 'Points',
-      value: `${points} ${pointsType || 'FedEx Cup'} pts`,
-    });
+    items.push({ label: 'Points', value: `${points} ${pointsType || 'FedEx Cup'} pts` });
   }
   
   if (items.length === 0) return null;
   
   return (
-    <motion.div 
-      className="py-6"
+    <motion.div
+      style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
     >
-      <h3 className="text-[10px] font-bold uppercase text-muted-foreground/50 mb-4" style={{ letterSpacing: '0.05em' }}>
-        Tournament Details
-      </h3>
-      
-      <div>
-        {items.map((item) => (
-          <div 
-            key={item.label}
-            className="flex items-center gap-3 py-3"
-          >
-            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
-              {item.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-0.5" style={{ letterSpacing: '0.05em' }}>
-                {item.label}
-              </p>
-              <p className="text-sm font-medium text-foreground truncate">
-                {item.value}
-              </p>
-            </div>
-            {item.link && (
-              <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-            )}
-          </div>
-        ))}
+      <div style={{ padding: '14px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Tournament Details
+          </span>
+        </div>
       </div>
+
+      {items.map((item) => (
+        <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
+          {item.link ? (
+            <Link to={item.link} style={{ fontSize: '13px', fontWeight: 600, color: '#F7931E', textDecoration: 'none', flex: 1 }}>
+              {item.value}
+            </Link>
+          ) : (
+            <span style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', flex: 1 }}>{item.value}</span>
+          )}
+        </div>
+      ))}
+      <div style={{ height: '6px' }} />
     </motion.div>
   );
 }

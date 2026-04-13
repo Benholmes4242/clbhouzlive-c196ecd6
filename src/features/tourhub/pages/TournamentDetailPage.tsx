@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Trophy, Clock, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { Trophy, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
@@ -46,10 +46,8 @@ export function TournamentDetailPage() {
   const [activeTab, setActiveTab] = useState<TournamentTab>(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
     if (tabParam && VALID_TABS.includes(tabParam)) return tabParam;
-    return 'overview'; // Will be corrected once tournament data loads
+    return 'overview';
   });
-
-  // Scroll position handled by centralized ScrollRestoration component
 
   // TD-01: Pull-to-refresh
   const [isPulling, setIsPulling] = useState(false);
@@ -124,7 +122,7 @@ export function TournamentDetailPage() {
   const { courseImage: courseMatch } = useSingleCourseImage(venueInput);
   const heroImageUrl = courseMatch?.imageUrl || getCourseImage({ id: tournamentId || '' });
   
-  const headshotMap = undefined; // R2 CDN handles headshots via PlayerAvatar
+  const headshotMap = undefined;
 
   const countdownText = useMemo(() => {
     if (!tournament || !isUpcoming) return undefined;
@@ -137,7 +135,6 @@ export function TournamentDetailPage() {
 
   const leader = useMemo(() => {
     if (!isLive || !leaderboard?.length) return null;
-    // Count how many players share position 1
     const tiedForLead = leaderboard.filter((e: any) => e.position === 1);
     const first = tiedForLead[0] as any;
     const score = first?.score;
@@ -163,14 +160,11 @@ export function TournamentDetailPage() {
 
   if (isLoading) {
     return (
-      <TourHubShell immersive>
+      <TourHubShell>
         <Skeleton
           className="w-full"
-          style={{
-            minHeight: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))',
-          }}
+          style={{ minHeight: '200px' }}
         />
-        {/* Sticky header skeleton: back + tabs */}
         <div className="px-5 pt-3 pb-2">
           <div className="flex items-center gap-2 mb-2">
             <Skeleton className="h-4 w-24" />
@@ -189,10 +183,9 @@ export function TournamentDetailPage() {
     );
   }
   
-  // TD-02: Error state with retry
   if (!tournament) {
     return (
-      <TourHubShell immersive>
+      <TourHubShell>
         <div className="pt-6 px-5">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
@@ -228,9 +221,7 @@ export function TournamentDetailPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Champion section for completed tournaments */}
             {isCompleted && tournamentId && <EventWinnerCard tournamentId={tournamentId} />}
-            
             {isCompleted && tournamentId && <EventMomentsList tournamentId={tournamentId} limit={5} />}
             
             {hasLeaderboard && (
@@ -329,8 +320,8 @@ export function TournamentDetailPage() {
   };
   
   return (
-    <TourHubShell immersive>
-      {/* TD-01: Pull-to-refresh indicator */}
+    <TourHubShell>
+      {/* Pull-to-refresh indicator */}
       <AnimatePresence>
         {(pullDistance > 0 || isRefreshing) && (
           <motion.div
@@ -360,127 +351,31 @@ export function TournamentDetailPage() {
           imageUrl={heroImageUrl}
         />
 
-        {/* ══════════════════════════════════════════════
-            STICKY HEADER — ← Back | status pill | tabs
-            ══════════════════════════════════════════════ */}
+        {/* STICKY HEADER — ← Back | underline tabs */}
         <div
-          className="-mx-5 sticky top-0 z-20"
+          className="sticky top-0 z-20"
           style={{
-            background: 'hsl(var(--background) / 0.96)',
+            background: 'rgba(248,250,252,0.97)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '1px solid hsl(var(--border) / 0.10)',
-            paddingTop: 10,
-            marginTop: 8,
+            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
           }}
         >
-          {/* Row 1: ← Back | [spacer] | status pill */}
-          <div className="flex items-center gap-2 px-5 pt-2">
+          {/* Back link */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '7px 20px 0', gap: '4px' }}>
             <button
-              onClick={() => {
-                if (window.history.length > 1) {
-                  navigate(-1);
-                } else {
-                  navigate('/tourhub?tab=schedule');
-                }
-              }}
-              className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
-              style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              onClick={() => { if (window.history.length > 1) navigate(-1); else navigate('/tourhub?tab=schedule'); }}
+              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
               Back
             </button>
-
-            <div className="flex-1" />
-
-            {/* Status pill — compact, right-aligned */}
-            {isLive && (
-              <div
-                className="flex items-center gap-1.5 shrink-0 max-w-[220px]"
-                style={{
-                  background: 'rgba(34,197,94,0.08)',
-                  border: '1px solid rgba(34,197,94,0.20)',
-                  borderRadius: 99,
-                  padding: '5px 10px',
-                }}
-              >
-                <span className="relative flex h-2 w-2 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: 'rgb(34,197,94)' }} />
-                  <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: 'rgb(34,197,94)' }} />
-                </span>
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'rgb(34,197,94)', flexShrink: 0 }}>
-                  Live
-                </span>
-                {leader && (
-                  <>
-                    <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.35)', flexShrink: 0 }}>·</span>
-                    <span className="text-[12px] font-medium text-foreground truncate">
-                      {leader.name}{leader.score ? ` at ${leader.score}` : ''}
-                    </span>
-                  </>
-                )}
-                {isConnected && (
-                  <span className="text-[11px] text-muted-foreground/50 shrink-0 ml-1">Live</span>
-                )}
-              </div>
-            )}
-
-            {isUpcoming && (
-              <div
-                className="flex items-center gap-1.5 shrink-0"
-                style={{
-                  background: 'hsl(var(--accent-amber) / 0.08)',
-                  border: '1px solid hsl(var(--accent-amber) / 0.20)',
-                  borderRadius: 99,
-                  padding: '5px 10px',
-                }}
-              >
-                <Clock
-                  className="w-[13px] h-[13px] shrink-0"
-                  style={{ color: 'hsl(var(--accent-amber))' }}
-                  strokeWidth={2.5}
-                />
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'hsl(var(--accent-amber))', flexShrink: 0 }}>
-                  Upcoming
-                </span>
-                {countdownText && (
-                  <>
-                    <span style={{ fontSize: 11, color: 'hsl(var(--accent-amber) / 0.35)', flexShrink: 0 }}>·</span>
-                    <span style={{ fontSize: 12, color: 'hsl(var(--accent-amber) / 0.85)' }} className="truncate">
-                      {countdownText}
-                    </span>
-                  </>
-                )}
-              </div>
-            )}
-
-            {isCompleted && (
-              <div
-                className="flex items-center gap-1.5 shrink-0"
-                style={{
-                  background: 'hsl(var(--muted) / 0.5)',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 99,
-                  padding: '5px 10px',
-                }}
-              >
-                <Trophy
-                  className="w-[13px] h-[13px] shrink-0"
-                  style={{ color: 'hsl(var(--accent-amber) / 0.80)' }}
-                  strokeWidth={2.5}
-                />
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'hsl(var(--foreground))', flexShrink: 0 }}>
-                  Final
-                </span>
-                <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.35)', flexShrink: 0 }}>·</span>
-                <span className="text-[12px] text-muted-foreground">Official results</span>
-              </div>
-            )}
           </div>
 
-          {/* Row 2: Tabs */}
+          {/* Underline tab bar */}
           <div
-            className="flex gap-1 overflow-x-auto scrollbar-hide px-5 pt-2 pb-2.5 justify-center"
+            style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', marginTop: '6px' }}
             role="tablist"
             aria-label="Tournament Sections"
           >
@@ -505,20 +400,18 @@ export function TournamentDetailPage() {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => handleTabChange(tab.value)}
-                  className="flex-shrink-0 transition-all duration-200 active:scale-[0.97]"
+                  className="flex-shrink-0 active:scale-[0.97] transition-transform"
                   style={{
-                    height: 34,
-                    padding: '0 12px',
-                    borderRadius: 8,
-                    fontSize: 12,
-                    fontWeight: isActive ? 600 : 500,
-                    whiteSpace: 'nowrap',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                    color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-                    border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                    padding: '8px 14px',
+                    fontSize: '11px',
+                    fontWeight: isActive ? 800 : 500,
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap' as const,
+                    transition: 'all 0.15s',
                   }}
                 >
                   {tab.label}
@@ -528,12 +421,38 @@ export function TournamentDetailPage() {
           </div>
         </div>
 
-        <div className="px-5" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-          {/* Tab Content */}
+        {/* Live leader strip */}
+        {isLive && leader && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            padding: '9px 20px',
+            background: 'rgba(34,197,94,0.05)',
+            borderLeft: '3px solid #22C55E',
+            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+            marginTop: 0,
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
+            <span style={{ fontSize: '11px', fontWeight: 900, color: '#22C55E' }}>LIVE</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>{leader.name}</span>
+            {leader.score && (
+              <span style={{ fontSize: '12px', color: '#F7931E', fontWeight: 800 }}>at {leader.score}</span>
+            )}
+          </div>
+        )}
+
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           <AnimatePresence mode="wait">
-            <div key={activeTab} className="pt-5" role="tabpanel" aria-label={`${activeTab} content`}>
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              role="tabpanel"
+              aria-label={`${activeTab} content`}
+            >
               {renderTabContent()}
-            </div>
+            </motion.div>
           </AnimatePresence>
         </div>
       </div>

@@ -1,9 +1,8 @@
 /**
- * LeaderboardCard - Overview leaderboard preview (no card container)
+ * LeaderboardCard - Dispatch table preview (no card container)
  */
 
 import { Link } from 'react-router-dom';
-import { ChevronRight, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
@@ -34,18 +33,14 @@ interface LeaderboardCardProps {
 }
 
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("text-muted-foreground/70", className)}>—</span>;
+  if (score === null) return <span className={cn("", className)} style={{ color: '#94A3B8' }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
   return (
-    <span 
+    <span
       className={cn("font-bold", className)}
-      style={{ 
+      style={{
         fontVariantNumeric: 'tabular-nums',
-        color: score < 0 
-          ? 'hsl(var(--accent-amber))' 
-          : score > 0 
-            ? '#EF4444' 
-            : 'hsl(var(--muted-foreground))' 
+        color: score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : '#94A3B8',
       }}
     >
       {formatted}
@@ -56,148 +51,120 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
 function ThruDisplay({ thru }: { thru: number | null }) {
   if (thru === null || thru === 0) return null;
   if (thru >= 18) {
-    return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
+    return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
   }
   return (
-    <span className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
+    <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
       Thru {thru}
     </span>
   );
 }
 
-function LeaderboardRow({ 
-  entry, 
-  index,
+export function LeaderboardCard({
+  entries,
   headshotMap,
-}: { 
-  entry: LeaderboardEntry; 
-  index: number;
-  headshotMap?: Map<string, string>;
-}) {
-  const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03, duration: 0.3 }}
-    >
-      <Link
-        to={`/tourhub/player/${entry.player?.id}`}
-        className={cn(
-          "flex items-center gap-3 py-3 transition-transform",
-          "active:scale-[0.99] rounded-lg px-1",
-          isMissedCut && "opacity-50"
-        )}
-      >
-        {/* Plain rank number */}
-        <span
-          style={{
-            width: '28px',
-            fontSize: '13px',
-            fontWeight: 700,
-            fontVariantNumeric: 'tabular-nums',
-            flexShrink: 0,
-            color: isMissedCut || entry.status === 'WD'
-              ? 'hsl(var(--muted-foreground) / 0.5)'
-              : entry.position === 1
-              ? 'hsl(var(--accent-amber))'
-              : 'hsl(var(--muted-foreground))',
-          }}
-        >
-          {isMissedCut ? 'MC'
-            : entry.status === 'WD' ? 'WD'
-            : entry.position_tied ? `T${entry.position}`
-            : String(entry.position)}
-        </span>
-        
-        <BatchPlayerAvatar
-          playerId={entry.player?.id || ''}
-          playerName={entry.player?.full_name || 'Unknown'}
-          size="sm"
-        />
-        
-        <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-semibold truncate text-foreground">
-            {entry.player?.full_name || 'Unknown'}
-          </p>
-        </div>
-        
-        {/* Thru */}
-        <div className="text-right shrink-0 w-10">
-          <ThruDisplay thru={entry.thru} />
-        </div>
-        
-        {/* Score to Par */}
-        <div className="text-right shrink-0 w-14">
-          <ScoreToPar score={entry.score} className="text-[15px]" />
-        </div>
-        
-        <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-      </Link>
-    </motion.div>
-  );
-}
-
-export function LeaderboardCard({ 
-  entries, 
-  headshotMap, 
-  onViewAll, 
+  onViewAll,
   limit = 10,
   showHeader = true,
   title = "Leaderboard",
 }: LeaderboardCardProps) {
   const displayEntries = limit === 0 ? entries : entries.slice(0, limit);
   const hasMore = limit > 0 && entries.length > limit;
-  
+
   return (
-    <motion.div 
-      className="py-6"
+    <motion.div
+      style={{ marginTop: '8px' }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
     >
-      {/* Header */}
+      {/* Section rule marker */}
       {showHeader && (
-        <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
-          <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
-            <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>{title}</h2>
+        <div style={{ padding: '14px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+              {title}
+            </span>
+            {onViewAll && (
+              <button onClick={onViewAll} style={{ fontSize: '9px', fontWeight: 700, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                View all ›
+              </button>
+            )}
           </div>
-          
-          {onViewAll && hasMore && (
-            <button 
-              onClick={onViewAll}
-              className="text-[13px] font-medium text-muted-foreground flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-            >
-              View All
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
       )}
-      
-      {/* Leaderboard rows */}
-      <div className="divide-y divide-border/40">
-        {displayEntries.map((entry, index) => (
-          <LeaderboardRow
-            key={entry.id}
-            entry={entry}
-            index={index}
-            headshotMap={headshotMap}
-          />
-        ))}
+
+      {/* Column headers */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <span style={{ width: '36px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
+        <span style={{ width: '36px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>SCORE</span>
       </div>
-      
-      {/* Footer action */}
+
+      {/* Rows */}
+      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+        {displayEntries.map((entry, index) => {
+          const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
+
+          return (
+            <motion.div
+              key={entry.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.03, duration: 0.3 }}
+            >
+              <Link
+                to={`/tourhub/player/${entry.player?.id}`}
+                style={{
+                  display: 'flex', alignItems: 'center',
+                  padding: '10px 20px',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  borderLeft: entry.position === 1 ? '3px solid #F7931E' : '3px solid transparent',
+                  background: entry.position === 1 ? 'rgba(247,147,30,0.025)' : 'transparent',
+                  textDecoration: 'none',
+                  opacity: isMissedCut ? 0.5 : 1,
+                }}
+                className="active:bg-black/[0.02] transition-colors"
+              >
+                {/* Position */}
+                <span style={{ width: '36px', fontSize: '12px', fontWeight: 900, color: entry.position === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                  {isMissedCut ? 'MC' : entry.status === 'WD' ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
+                </span>
+
+                {/* Avatar + name */}
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                  <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
+                  <p style={{ fontSize: '13px', fontWeight: entry.position === 1 ? 800 : 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    {entry.player?.full_name}
+                  </p>
+                </div>
+
+                {/* Thru */}
+                <div style={{ width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>
+                  <ThruDisplay thru={entry.thru} />
+                </div>
+
+                {/* Score to par */}
+                <div style={{ width: '44px', textAlign: 'right' as const, flexShrink: 0 }}>
+                  <ScoreToPar score={entry.score} className="text-[14px]" />
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* View All button */}
       {onViewAll && hasMore && (
-        <button 
+        <button
           onClick={onViewAll}
-          className="w-full py-3 mt-3 text-[14px] font-semibold text-foreground/60 rounded-xl flex items-center justify-center gap-1 active:scale-[0.97] transition-transform"
+          style={{ width: '100%', padding: '10px 0', fontSize: '11px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
+          className="active:opacity-70 transition-opacity"
         >
-          View Full Leaderboard
-          <ChevronRight className="w-4 h-4" />
+          Full Leaderboard ›
         </button>
       )}
     </motion.div>
