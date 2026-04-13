@@ -39,6 +39,8 @@ export function PlayerProfilePage() {
   const { hideHeader, showHeader } = useHeader();
 
   useMedianStatusBar("dark", "transparent", true, false);
+
+  const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
   const [activeStatTab, setActiveStatTab] = useState<StatTab>('Player Overview');
