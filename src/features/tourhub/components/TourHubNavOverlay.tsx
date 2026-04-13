@@ -81,20 +81,7 @@ export function TourHubNavOverlay({
   const { data: leaderTeaser } = useLiveLeaderTeaser();
   const { data: topCollege } = useTopCollegeTeaser();
   
-  useEffect(() => {
-    if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => { document.body.style.overflow = originalOverflow; };
-    }
-  }, [isOpen]);
-  
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  // BottomSheet handles scroll lock and ESC key
 
   useEffect(() => {
     if (!isOpen) return;
