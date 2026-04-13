@@ -1431,11 +1431,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           style={{ display: 'flex', gap: 'clamp(2px, 1vw, 4px)', marginBottom: 14 }}
                         >
                           {[
-                            { v: winnerStats.eagles, label: 'Eagles', color: '#F7931E' },
-                            { v: winnerStats.birdies, label: 'Birdies', color: '#22c55e' },
-                            { v: winnerStats.pars, label: 'Pars', color: '#ffffff' },
-                            { v: winnerStats.bogeys, label: 'Bogeys', color: '#ef4444' },
-                            { v: winnerStats.doubleBogeys, label: 'Doubles', color: '#dc2626' },
+                            { v: winnerStats.eagles, label: 'Eagles', color: '#ffffff' },
+                            { v: winnerStats.birdies, label: 'Birdies', color: '#ffffff' },
+                            { v: winnerStats.pars, label: 'Pars', color: 'rgba(255,255,255,0.35)' },
+                            { v: winnerStats.bogeys, label: 'Bogeys', color: '#f87171' },
+                            { v: winnerStats.doubleBogeys, label: 'Doubles', color: '#f87171' },
                           ].map((stat: any) => (
                             <div key={stat.label} style={{
                               flex: 1, textAlign: 'center' as const,
