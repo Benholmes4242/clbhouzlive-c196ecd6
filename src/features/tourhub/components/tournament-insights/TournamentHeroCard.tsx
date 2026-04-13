@@ -162,7 +162,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
   }
 
   // ── Default layout (upcoming / completed-without-winner / live) ──
-
+  return (
     <div className="relative overflow-hidden" style={{ height: `${Math.round(306 * 0.8)}px` }}>
       {/* Background Image */}
       <img
