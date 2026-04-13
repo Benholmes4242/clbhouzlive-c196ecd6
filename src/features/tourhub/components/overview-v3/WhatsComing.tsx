@@ -56,6 +56,19 @@ function DateGroupHeader({ label, count }: { label: string; count: number }) {
   );
 }
 
+function getPrefixedContextLabel(contextLabel: string, tourName: string | null | undefined): string {
+  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const isSignature = contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES';
+  if (!isMajor && !isSignature) return contextLabel;
+  const prefixMap: Record<string, string> = {
+    'PGA Tour': 'PGA Tour', 'LPGA Tour': 'LPGA Tour', 'Champions Tour': 'Champions Tour',
+    'DP World Tour': 'DP World Tour', 'Korn Ferry Tour': 'Korn Ferry',
+    'LIV Golf': 'LIV Golf', 'LIV Golf League': 'LIV Golf',
+  };
+  const prefix = (tourName && prefixMap[tourName]) || tourName || '';
+  return prefix ? `${prefix} · ${contextLabel}` : contextLabel;
+}
+
 function EventRow({ tournament, index, isLast }: { tournament: SeasonTournament; index: number; isLast: boolean }) {
   const navigate = useNavigate();
   const contextLabel = getContextLabel(tournament);
