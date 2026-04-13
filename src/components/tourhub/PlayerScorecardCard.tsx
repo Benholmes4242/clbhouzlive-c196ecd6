@@ -122,15 +122,15 @@ function HoleCell({ hole }: { hole: HoleScore }) {
   const borderStyle = isPar ? `1.5px dashed ${c.ring}` : `1.5px solid ${c.ring}`;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-      <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0 }}>
+      <span style={{ fontSize: 'clamp(9px, 2.8vw, 11px)', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.5px' }}>
         {hole.holeNumber}
       </span>
-      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)' }}>
+      <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', color: 'rgba(255,255,255,0.30)' }}>
         {hole.par}
       </span>
       <div style={{
-        width: 34, height: 34,
+        width: 'clamp(28px, 8.5vw, 34px)', height: 'clamp(28px, 8.5vw, 34px)',
         borderRadius,
         border: borderStyle,
         background: isPar ? 'transparent' : c.bg,
@@ -139,14 +139,14 @@ function HoleCell({ hole }: { hole: HoleScore }) {
         ...outlineStyle,
       } as React.CSSProperties}>
         <span style={{
-          fontSize: 13, fontWeight: 800,
+          fontSize: 'clamp(11px, 3.3vw, 13px)', fontWeight: 800,
           color: c.text,
           lineHeight: 1,
         }}>
           {hole.strokes}
         </span>
         {!isPar && (
-          <span style={{ fontSize: 7, fontWeight: 700, color: c.text, opacity: 0.75, lineHeight: 1, marginTop: 1 }}>
+          <span style={{ fontSize: 'clamp(6px, 1.8vw, 7px)', fontWeight: 700, color: c.text, opacity: 0.75, lineHeight: 1, marginTop: 1 }}>
             {hole.scoreToPar < 0 ? `${hole.scoreToPar}` : `+${hole.scoreToPar}`}
           </span>
         )}
@@ -157,20 +157,20 @@ function HoleCell({ hole }: { hole: HoleScore }) {
 
 function EmptyHoleCell({ holeNumber, par }: { holeNumber: number; par: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-      <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0 }}>
+      <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', fontWeight: 500, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
         {holeNumber}
       </span>
-      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)' }}>
+      <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', color: 'rgba(255,255,255,0.30)' }}>
         {par}
       </span>
       <div style={{
-        width: 32, height: 32,
+        width: 'clamp(26px, 8vw, 32px)', height: 'clamp(26px, 8vw, 32px)',
         borderRadius: '50%',
         border: '1.5px dashed rgba(255,255,255,0.10)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.20)' }}>—</span>
+        <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', fontWeight: 600, color: 'rgba(255,255,255,0.20)' }}>—</span>
       </div>
     </div>
   );
@@ -196,7 +196,7 @@ function NineHoleRow({
   const hasAnyScore = nineHoles.some((h) => h !== undefined);
 
   return (
-    <div className="px-3">
+    <div style={{ padding: '0 clamp(8px, 2vw, 12px)' }}>
       <div className="flex items-center justify-between mb-2">
         <span className="text-[12px] font-semibold text-white/45 uppercase tracking-[1.5px]">{label}</span>
         {hasAnyScore && (
@@ -206,7 +206,7 @@ function NineHoleRow({
           </div>
         )}
       </div>
-      <div className="grid grid-cols-9 gap-1">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 'clamp(1px, 0.5vw, 4px)' }}>
         {Array.from({ length: 9 }, (_, i) => {
           const holeNum = startHole + i;
           const hole = completedHoles.get(holeNum);
@@ -236,7 +236,7 @@ function RoundTabs({
   const tabs = [1, 2, 3, 4];
 
   return (
-    <div style={{ display: 'flex', gap: 5, padding: '4px 16px 10px', width: 'fit-content' }}>
+    <div style={{ display: 'flex', gap: 'clamp(3px, 1vw, 5px)', padding: '4px 16px 10px', width: 'fit-content', maxWidth: '100%' }}>
       {tabs.map((roundNum) => {
         const hasScorecard = rounds.some(r => r.roundNumber === roundNum);
         const rs = roundScores.find(r => r.round === roundNum);
@@ -502,10 +502,10 @@ export function PlayerScorecardCard({
           </button>
 
           {/* Name + status — matched to live 22px */}
-          <div style={{ paddingBottom: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ paddingBottom: 2, minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
               <span style={{
-                fontSize: 22, fontWeight: 700, color: '#fff',
+                fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 700, color: '#fff',
                 letterSpacing: '-0.4px', lineHeight: 1.1,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
@@ -529,7 +529,7 @@ export function PlayerScorecardCard({
 
         {/* Total score — matched to live state prominent sizing */}
         <span style={{
-          fontSize: 48, fontWeight: 800, lineHeight: 1,
+          fontSize: 'clamp(36px, 12vw, 48px)', fontWeight: 800, lineHeight: 1,
           color: player.totalScore < 0 ? '#ffffff' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
           fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
           flexShrink: 0,
@@ -562,7 +562,7 @@ export function PlayerScorecardCard({
 
           {/* Stat chips — Change 6: canonical colours */}
           {activeRoundData && activeRoundData.holesCompleted > 0 && (
-            <div style={{ display: 'flex', gap: 4, padding: '0 16px 8px' }}>
+            <div style={{ display: 'flex', gap: 'clamp(2px, 1vw, 4px)', padding: '0 clamp(8px, 3vw, 16px) 8px' }}>
               {[
                 { v: activeRoundData.eagles,       label: 'Eagles',  color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
                 { v: activeRoundData.birdies,      label: 'Birdies', color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
