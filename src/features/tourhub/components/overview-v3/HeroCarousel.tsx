@@ -1298,7 +1298,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                   />
                                 </button>
                                 <div style={{ paddingBottom: 2, minWidth: 0 }}>
-                                  <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ display: 'block', textAlign: 'left' as const }}>
+                                  <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ display: 'block', textAlign: 'left' as const }}>
                                     <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                                       {podiumWinner.fullName || podiumWinner.displayName}
                                     </div>
