@@ -31,6 +31,7 @@ interface PlayerScorecardCardProps {
   tournamentId: string;
   tournamentName: string;
   courseName: string;
+  isCompleted?: boolean;
   onBack: () => void;
   onClose: () => void;
 }
