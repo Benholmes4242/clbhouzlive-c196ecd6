@@ -1496,7 +1496,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                               return (
                                 <button
                                   key={p.playerId || i}
-                                  onClick={handlePlayerTapNav(p.playerId)}
+                                  onClick={() => handleScorecardTap(finisherToPlayerInfo(p))}
                                   className="transition-opacity active:opacity-70"
                                   style={{
                                     display: 'flex', alignItems: 'center',
