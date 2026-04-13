@@ -951,7 +951,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <span style={{ fontSize: 14 }}>🏆</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: '#F7931E', letterSpacing: 1 }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: 1 }}>
                           FINAL
                         </span>
                       </div>
@@ -1243,15 +1243,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
                 >
-                  {/* Scrollable content area — contains within hero like live state */}
-                  <div style={{
-                    flex: 1, display: 'flex', flexDirection: 'column' as const,
-                    overflowY: 'auto', overflowX: 'hidden',
-                    WebkitOverflowScrolling: 'touch',
-                    scrollbarWidth: 'none' as const,
-                    minHeight: 0,
-                  }}>
-                    <div style={{ padding: '0 16px', flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-start' }}>
+                  {/* Fixed content area — winner, sparkline, stats */}
+                  <div style={{ padding: '0 16px', flexShrink: 0 }}>
 
                       {/* ── HEADER DIVIDER ── */}
                       <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginBottom: 16 }} />
@@ -1269,7 +1262,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             {/* Champion eyebrow with country flag */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10 }}>
                               <span style={{ fontSize: 12 }}>🏆</span>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Champion</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Champion</span>
                               {podiumWinner.country && COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()] && (
                                 <span style={{ fontSize: 14 }}>{COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()]}</span>
                               )}
@@ -1339,7 +1332,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           >
                             <PlayerAvatar displayName={winnerInfo.winnerName} photoUrl={winnerInfo.winnerPhotoUrl} tourCode={winnerInfo.tourSlug || 'pga'} size={56} frosted />
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: 4 }}>🏆 Champion</div>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: 4 }}>🏆 Champion</div>
                               <div style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>{winnerInfo.winnerName}</div>
                             </div>
                             {winnerInfo.winnerScore && (
@@ -1393,13 +1386,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: H, display: 'block' }}>
                                   <defs>
                                     <linearGradient id="completed-sparkline-fill" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="0%" stopColor="#F7931E" stopOpacity={0.15} />
-                                      <stop offset="100%" stopColor="#F7931E" stopOpacity={0} />
+                                      <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
+                                      <stop offset="100%" stopColor="rgba(255,255,255,0)" />
                                     </linearGradient>
                                   </defs>
                                   <path d={areaD} fill="url(#completed-sparkline-fill)" />
-                                  <path d={pathD} fill="none" stroke="#F7931E" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                                  <circle cx={last.x} cy={last.y} r={3.5} fill="#F7931E" />
+                                  <path d={pathD} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                                  <circle cx={last.x} cy={last.y} r={3.5} fill="#ffffff" stroke="rgba(0,0,0,0.4)" strokeWidth={1} />
                                 </svg>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                                   {rounds.map((_, i) => (
@@ -1423,7 +1416,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           {[
                             { v: winnerStats.eagles, label: 'Eagles', color: '#F7931E' },
                             { v: winnerStats.birdies, label: 'Birdies', color: '#22c55e' },
-                            { v: winnerStats.pars, label: 'Pars', color: 'rgba(255,255,255,0.45)' },
+                            { v: winnerStats.pars, label: 'Pars', color: '#ffffff' },
                             { v: winnerStats.bogeys, label: 'Bogeys', color: '#ef4444' },
                             { v: winnerStats.doubleBogeys, label: 'Doubles', color: '#dc2626' },
                           ].map((stat: any) => (
@@ -1441,95 +1434,103 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         </motion.div>
                       )}
 
-                      {/* ── LEADERBOARD SECTION — top 10, internally scrollable ── */}
-                      <AnimatePresence mode="wait">
-                        {(() => {
-                          const chasers = allFetchedData
-                            .filter(f => f.position > (winnerRow?.position ?? 1))
-                            .slice(0, 10);
-                          if (chasers.length === 0) return (
-                            <motion.div key="lb-skeleton" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column' as const, gap: 6 }}>
-                              <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-                              <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
-                            </motion.div>
-                          );
-                          const positionCounts = new Map<number, number>();
-                          allFetchedData.forEach(f => positionCounts.set(f.position, (positionCounts.get(f.position) || 0) + 1));
-                          return (
-                            <motion.div
-                              key="leaderboard-rows"
-                              initial={{ opacity: 0, y: 8 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.06 }}
-                            >
-                              {/* Column headers */}
-                              <div style={{ display: 'flex', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: 0 }}>
-                                <span style={{ width: 28, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}></span>
-                                <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Player</span>
-                                <span style={{ width: 48, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Total</span>
-                                <span style={{ width: 36, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>R4</span>
-                                <span style={{ width: 28, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Thru</span>
-                              </div>
-                              {chasers.map((p, i) => {
-                                const isTied = (positionCounts.get(p.position) || 1) > 1;
-                                const r4 = p.round4;
-                                const r4Display = r4 == null ? '—' : r4 === 0 ? 'E' : r4 > 0 ? `+${r4}` : `${r4}`;
-                                const r4Color = r4 == null ? 'rgba(255,255,255,0.3)' : r4 < 0 ? '#4ade80' : r4 > 0 ? '#ef4444' : 'rgba(255,255,255,0.35)';
-                                const countryFlag = p.country ? COUNTRY_TO_FLAG[p.country.toUpperCase()] : null;
-                                return (
-                                  <button
-                                    key={p.playerId || i}
-                                    onClick={handlePlayerTapNav(p.playerId)}
-                                    className="transition-opacity active:opacity-70"
-                                    style={{
-                                      display: 'flex', alignItems: 'center',
-                                      padding: '11px 0',
-                                      width: '100%',
-                                      background: 'none',
-                                      border: 'none',
-                                      borderBottom: i < chasers.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                                      cursor: 'pointer',
-                                      textAlign: 'left' as const,
-                                    }}
-                                  >
-                                    <span style={{ width: 28, fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>
-                                      {isTied ? `T${p.position}` : p.position}
-                                    </span>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-                                      {countryFlag ? (
-                                        <span style={{ fontSize: 18, flexShrink: 0 }}>{countryFlag}</span>
-                                      ) : (
-                                        <PlayerAvatar displayName={p.displayName} fullName={p.fullName} headshotOverride={p.headshotOverride} tourCode={tournament.tourSlug} size={24} frosted />
-                                      )}
-                                      <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{p.displayName}</span>
-                                    </div>
-                                    <span style={{ width: 48, textAlign: 'right' as const, fontSize: 15, fontWeight: 800, color: '#F7931E', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-                                      {p.displayScore}
-                                    </span>
-                                    <span style={{ width: 36, textAlign: 'right' as const, fontSize: 13, fontWeight: 600, color: r4Color, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-                                      {r4Display}
-                                    </span>
-                                    <span style={{ width: 28, textAlign: 'right' as const, fontSize: 12, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
-                                      F
-                                    </span>
-                                  </button>
-                                );
-                              })}
-                            </motion.div>
-                          );
-                        })()}
-                      </AnimatePresence>
-
-                      {/* Echo */}
-                      <div style={{ paddingTop: 8, paddingBottom: 10 }}>
-                        <EchoContextualButton
-                          prompt={`Search for the ${new Date().getFullYear()} ${tournament.name} result${tournament.venueName ? ` at ${tournament.venueName}` : ''}${podiumWinner ? `. The winner was ${podiumWinner.fullName || podiumWinner.displayName}${podiumWinner.displayScore ? ` with a score of ${podiumWinner.displayScore}` : ''}` : tournament.winnerName ? `. The winner was ${tournament.winnerName}` : ''}. Tell me what happened, how the winner played, what the key moments were, and what this result means for their season.`}
-                          label="Ask Echo about the result"
-                          sublabel="Winner story · key moments"
-                          source="tour_hub_completed"
-                        />
+                      {/* ── LEADERBOARD COLUMN HEADERS (fixed) ── */}
+                      <div style={{ display: 'flex', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: 0 }}>
+                        <span style={{ width: 28, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}></span>
+                        <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Player</span>
+                        <span style={{ width: 48, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Total</span>
+                        <span style={{ width: 36, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>R4</span>
+                        <span style={{ width: 28, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Thru</span>
                       </div>
+                  </div>
+
+                  {/* ── SCROLLABLE LEADERBOARD ROWS ── */}
+                  <div style={{
+                    flex: 1, minHeight: 0,
+                    overflowY: 'auto', overflowX: 'hidden',
+                    WebkitOverflowScrolling: 'touch',
+                    scrollbarWidth: 'none' as const,
+                    padding: '0 16px',
+                  }}>
+                    <AnimatePresence mode="wait">
+                      {(() => {
+                        const chasers = allFetchedData
+                          .filter(f => f.position > (winnerRow?.position ?? 1))
+                          .slice(0, 10);
+                        if (chasers.length === 0) return (
+                          <motion.div key="lb-skeleton" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column' as const, gap: 6 }}>
+                            <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
+                            <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                          </motion.div>
+                        );
+                        const positionCounts = new Map<number, number>();
+                        allFetchedData.forEach(f => positionCounts.set(f.position, (positionCounts.get(f.position) || 0) + 1));
+                        return (
+                          <motion.div
+                            key="leaderboard-rows"
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.06 }}
+                          >
+                            {chasers.map((p, i) => {
+                              const isTied = (positionCounts.get(p.position) || 1) > 1;
+                              const r4 = p.round4;
+                              const r4Display = r4 == null ? '—' : r4 === 0 ? 'E' : r4 > 0 ? `+${r4}` : `${r4}`;
+                              const r4Color = r4 == null ? 'rgba(255,255,255,0.3)' : r4 < 0 ? '#4ade80' : r4 > 0 ? '#ef4444' : 'rgba(255,255,255,0.35)';
+                              const countryFlag = p.country ? COUNTRY_TO_FLAG[p.country.toUpperCase()] : null;
+                              return (
+                                <button
+                                  key={p.playerId || i}
+                                  onClick={handlePlayerTapNav(p.playerId)}
+                                  className="transition-opacity active:opacity-70"
+                                  style={{
+                                    display: 'flex', alignItems: 'center',
+                                    padding: '11px 0',
+                                    width: '100%',
+                                    background: 'none',
+                                    border: 'none',
+                                    borderBottom: i < chasers.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                                    cursor: 'pointer',
+                                    textAlign: 'left' as const,
+                                  }}
+                                >
+                                  <span style={{ width: 28, fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>
+                                    {isTied ? `T${p.position}` : p.position}
+                                  </span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                                    {countryFlag ? (
+                                      <span style={{ fontSize: 18, flexShrink: 0 }}>{countryFlag}</span>
+                                    ) : (
+                                      <PlayerAvatar displayName={p.displayName} fullName={p.fullName} headshotOverride={p.headshotOverride} tourCode={tournament.tourSlug} size={24} frosted />
+                                    )}
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{p.displayName}</span>
+                                  </div>
+                                  <span style={{ width: 48, textAlign: 'right' as const, fontSize: 15, fontWeight: 800, color: '#ffffff', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                                    {p.displayScore}
+                                  </span>
+                                  <span style={{ width: 36, textAlign: 'right' as const, fontSize: 13, fontWeight: 600, color: r4Color, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                                    {r4Display}
+                                  </span>
+                                  <span style={{ width: 28, textAlign: 'right' as const, fontSize: 12, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+                                    F
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </motion.div>
+                        );
+                      })()}
+                    </AnimatePresence>
+
+                    {/* Echo */}
+                    <div style={{ paddingTop: 8, paddingBottom: 10 }}>
+                      <EchoContextualButton
+                        prompt={`Search for the ${new Date().getFullYear()} ${tournament.name} result${tournament.venueName ? ` at ${tournament.venueName}` : ''}${podiumWinner ? `. The winner was ${podiumWinner.fullName || podiumWinner.displayName}${podiumWinner.displayScore ? ` with a score of ${podiumWinner.displayScore}` : ''}` : tournament.winnerName ? `. The winner was ${tournament.winnerName}` : ''}. Tell me what happened, how the winner played, what the key moments were, and what this result means for their season.`}
+                        label="Ask Echo about the result"
+                        sublabel="Winner story · key moments"
+                        source="tour_hub_completed"
+                      />
                     </div>
                   </div>
 
