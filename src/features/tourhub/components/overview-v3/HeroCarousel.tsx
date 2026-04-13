@@ -1243,15 +1243,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
                 >
-                  {/* Scrollable content area — contains within hero like live state */}
-                  <div style={{
-                    flex: 1, display: 'flex', flexDirection: 'column' as const,
-                    overflowY: 'auto', overflowX: 'hidden',
-                    WebkitOverflowScrolling: 'touch',
-                    scrollbarWidth: 'none' as const,
-                    minHeight: 0,
-                  }}>
-                    <div style={{ padding: '0 16px', flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-start' }}>
+                  {/* Fixed content area — winner, sparkline, stats */}
+                  <div style={{ padding: '0 16px', flexShrink: 0 }}>
 
                       {/* ── HEADER DIVIDER ── */}
                       <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginBottom: 16 }} />
