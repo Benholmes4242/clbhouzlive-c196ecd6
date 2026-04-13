@@ -1422,7 +1422,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Player</span>
                         <span style={{ width: 48, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Total</span>
                         <span style={{ width: 36, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>R4</span>
-                        <span style={{ width: 28, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Thru</span>
                       </div>
                   </div>
 
@@ -1493,9 +1492,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                   </span>
                                   <span style={{ width: 36, textAlign: 'right' as const, fontSize: 13, fontWeight: 600, color: r4Color, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
                                     {r4Display}
-                                  </span>
-                                  <span style={{ width: 28, textAlign: 'right' as const, fontSize: 12, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
-                                    F
                                   </span>
                                 </button>
                               );
