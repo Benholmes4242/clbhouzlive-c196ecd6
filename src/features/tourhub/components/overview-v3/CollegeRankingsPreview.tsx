@@ -150,7 +150,7 @@ function PodiumCard({
           <img
             src={logoUrl}
             alt={displayName}
-            style={{ width: '44px', height: '44px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
+            style={{ width: '44px', height: '44px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))', display: 'block', margin: '0 auto' }}
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         )}
