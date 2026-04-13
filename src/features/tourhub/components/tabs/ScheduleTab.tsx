@@ -451,7 +451,7 @@ export function ScheduleTab() {
         </div>
       </div>
 
-      <div className="bg-background">
+      <div style={{ background: '#ffffff', marginTop: '8px' }}>
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
@@ -492,14 +492,16 @@ export function ScheduleTab() {
                     />
                   )}
 
-                  {/* Tournament list — 12px gap from header, 12px between cards */}
-                  <div className="flex flex-col gap-3 px-5 mt-3">
-                    {group.tournaments.map((tournament) => (
+                  {/* Tournament list — flat rows with hairline dividers */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    {group.tournaments.map((tournament, idx) => (
                       <InViewCard key={tournament.id}>
-                        <ScheduleTournamentCard 
-                          tournament={tournament}
-                          leaderWinner={leadersWinnersMap?.get(tournament.id)}
-                        />
+                        <div style={{ borderBottom: idx < group.tournaments.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+                          <ScheduleTournamentCard 
+                            tournament={tournament}
+                            leaderWinner={leadersWinnersMap?.get(tournament.id)}
+                          />
+                        </div>
                       </InViewCard>
                     ))}
                   </div>
