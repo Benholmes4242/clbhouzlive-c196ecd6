@@ -84,6 +84,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
             full_name,
             headshot_override,
             photo_url,
+            country,
             pga_tour_id,
             tour_codes
           )
