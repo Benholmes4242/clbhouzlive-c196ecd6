@@ -108,22 +108,17 @@ export function ScheduleTournamentCard({
         borderLeft: (isLive || isMajor || isSignature || isRolex)
           ? `3px solid ${isLive ? TOUR_COLORS.liveGreen : isMajor ? TOUR_COLORS.liveAmber : 'rgba(16,185,129,0.8)'}`
           : '3px solid transparent',
-        background: 'transparent',
+        background: isMajor ? 'rgba(247,147,30,0.03)' : 'transparent',
       }}
       role="button"
       aria-label={ariaLabel}
     >
       {/* Date block */}
-      <div style={{
-        flexShrink: 0,
-        width: '52px',
-        padding: '12px 0 12px 16px',
-        textAlign: 'left' as const,
-      }}>
-        <p style={{ fontSize: '9px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.08em', textTransform: 'uppercase' as const, lineHeight: 1, margin: 0 }}>
+      <div style={{ flexShrink: 0, width: '52px', padding: '13px 0 13px 14px' }}>
+        <p style={{ fontSize: '8.5px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.08em', textTransform: 'uppercase' as const, lineHeight: 1, margin: 0 }}>
           {getMonthAbbr(displayDate)}
         </p>
-        <p style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', lineHeight: 1, marginTop: '2px', letterSpacing: '-0.02em', margin: '2px 0 0' }}>
+        <p style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', lineHeight: 1, letterSpacing: '-0.03em', margin: '2px 0 0' }}>
           {getDayNum(displayDate)}
         </p>
       </div>
@@ -132,12 +127,11 @@ export function ScheduleTournamentCard({
       <div style={{ flex: 1, minWidth: 0, padding: '12px 16px 12px 10px' }}>
         {/* Context label */}
         <p style={{
-          fontSize: '9px',
+          fontSize: '8.5px',
           fontWeight: 800,
           letterSpacing: '0.1em',
           textTransform: 'uppercase' as const,
           lineHeight: 1,
-          marginBottom: '4px',
           margin: '0 0 4px',
           color: isMajor
             ? TOUR_COLORS.liveAmber
@@ -147,7 +141,7 @@ export function ScheduleTournamentCard({
             ? TOUR_COLORS.liveGreen
             : '#94A3B8',
         }}>
-          {isLive ? '● LIVE' : contextLabel}
+          {isLive ? '● LIVE' : (isMajor ? '★ ' : '')}{isLive ? '' : contextLabel}
           {isLive && leaderWinner?.round1 !== undefined && (() => {
             const roundInfo = getCurrentRound(
               leaderWinner!.round1, leaderWinner!.round2,
@@ -161,25 +155,21 @@ export function ScheduleTournamentCard({
           })()}
         </p>
 
-        {/* Tournament name */}
+        {/* Tournament name — full width, wraps naturally */}
         <p style={{
           fontSize: '15px',
           fontWeight: 800,
           color: '#0F172A',
           letterSpacing: '-0.02em',
-          lineHeight: 1.2,
-          marginBottom: '4px',
+          lineHeight: 1.25,
           margin: '0 0 4px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap' as const,
         }}>
           {tournament.name}
         </p>
 
         {/* Winner / Leader row */}
         {(winnerDisplay || hasLeaderData) && (
-          <p style={{ fontSize: '12px', fontWeight: 500, marginBottom: '3px', margin: '0 0 3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <p style={{ fontSize: '12px', fontWeight: 500, margin: '0 0 3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             {isFinal && winnerDisplay && (
               <span style={{ color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Trophy style={{ width: 12, height: 12, color: TOUR_COLORS.liveAmber, flexShrink: 0 }} />
@@ -217,7 +207,7 @@ export function ScheduleTournamentCard({
             purse && formatPurse(purse),
           ].filter(Boolean);
           return parts.length > 0 ? (
-            <p style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '3px', margin: '0 0 3px' }}>{parts.join(' · ')}</p>
+            <p style={{ fontSize: '11px', color: '#94A3B8', margin: '0 0 3px' }}>{parts.join(' · ')}</p>
           ) : null;
         })()}
 

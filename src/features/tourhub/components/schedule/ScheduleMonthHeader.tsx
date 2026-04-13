@@ -32,9 +32,15 @@ export function ScheduleMonthHeader({
     : [];
 
   return (
-    <div style={{ padding: '20px 20px 0', background: '#F8FAFC' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
-        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+    <div
+      style={{
+        padding: '12px 16px 8px',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        background: 'rgba(15,23,42,0.02)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
         <h3 style={{
           fontSize: '9px',
           fontWeight: 900,
@@ -53,7 +59,7 @@ export function ScheduleMonthHeader({
         <p style={{
           fontSize: '11px',
           color: '#94A3B8',
-          margin: '0 0 10px',
+          margin: '4px 0 0',
           lineHeight: 1.4,
           paddingLeft: '11px',
         }}>

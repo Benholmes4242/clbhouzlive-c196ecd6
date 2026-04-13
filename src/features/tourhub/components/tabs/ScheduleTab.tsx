@@ -480,7 +480,7 @@ export function ScheduleTab() {
                 <div
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
-                  className={groupIndex > 0 ? 'mt-7' : ''}
+                  className=""
                 >
                   {/* B44 FIX 3: suppress month header on live tab */}
                   {filter !== 'live' && (
