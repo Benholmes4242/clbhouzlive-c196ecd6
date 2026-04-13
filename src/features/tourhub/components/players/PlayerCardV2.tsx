@@ -1,12 +1,9 @@
 /**
- * PlayerCardV2 - Redesigned player card with photo filling the left side.
- * Aligned with Tour Overview audit specs.
+ * PlayerCardV2 - Flat dispatch row style.
  */
 
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
@@ -23,7 +20,6 @@ interface PlayerCardV2Props {
     tourCodes?: string[] | null;
   };
   worldRank?: number | null;
-  /** Actual OWGR rank (separate from worldRank which may hold tour rank) */
   owgr?: number | null;
   eventsPlayed?: number | null;
   earnings?: number | null;
@@ -35,9 +31,7 @@ interface PlayerCardV2Props {
   activeSort?: PlayerSortType;
   activeTour?: string;
   onNavigate?: () => void;
-  /** Skip entry animation (e.g. when inside an already-animating overlay) */
   disableAnimation?: boolean;
-  /** Directory mode — show only name, country, photo, chevron (no stats/rank) */
   directoryMode?: boolean;
 }
 
@@ -64,74 +58,45 @@ export function PlayerCardV2({
   disableAnimation = false,
   directoryMode = false,
 }: PlayerCardV2Props) {
-  // R2 headshot — single source of truth
   const tourCode = activeTour === 'all' ? (player.tourCodes?.[0] ?? 'pga') : activeTour;
   const photoUrl = getPlayerHeadshotUrl(player.fullName, tourCode);
-  
   const countryName = titleCaseCountry(player.country);
-
-  const initials = player.fullName
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
 
   const staggerDelay = Math.min(index, 20) * 0.015;
 
-  // Build meta parts — euro/lpga show tour-specific ranking data
   const isEuro = activeTour === 'EURO';
   const isLPGA = activeTour === 'LPGA';
   const isPGAD = activeTour === 'PGAD';
   const isLIV = activeTour === 'LIV';
   const isTourRanking = isEuro || isLPGA || isPGAD || isLIV;
-  const rankPart = worldRank != null && worldRank > 0
-    ? (activeTour === 'all' ? `#${worldRank} OWGR` : `#${worldRank}`)
-    : null;
-  
-  // Points display for R2D / CME Globe
-  const pointsPart = isTourRanking && points != null && points > 0
-    ? `${points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`
-    : null;
   const winCount = wins ?? 0;
-  const tourWinsPart = isTourRanking && winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
-  const eventsPart = null; // Events display removed — wins shown instead
-
-  const earningsPart = !isTourRanking && earnings != null && earnings > 0 ? formatEarnings(earnings) : null;
-  const winsPart = !isTourRanking && winCount > 0 ? `${winCount} ${winCount === 1 ? 'win' : 'wins'}` : null;
-
-  // Reorder stats based on active sort
-  let metaParts: string[] = [];
-  let primaryIndex = -1;
-
-  if (isTourRanking) {
-    // Tour-ranked: show points, then wins
-    if (pointsPart) metaParts.push(pointsPart);
-    if (tourWinsPart) metaParts.push(tourWinsPart);
-    primaryIndex = 0;
-  } else if (activeSort === 'most-wins') {
-    if (winsPart) metaParts.push(winsPart);
-    primaryIndex = 0;
-    if (rankPart) metaParts.push(rankPart);
-    if (earningsPart) metaParts.push(earningsPart);
-  } else if (activeSort === 'highest-earnings') {
-    if (earningsPart) metaParts.push(earningsPart);
-    primaryIndex = 0;
-    if (rankPart) metaParts.push(rankPart);
-    if (winsPart) metaParts.push(winsPart);
-  } else {
-    if (rankPart) metaParts.push(rankPart);
-    if (earningsPart) metaParts.push(earningsPart);
-    if (winsPart) metaParts.push(winsPart);
-  }
 
   const ariaLabel = [
     player.fullName,
     countryName,
-    rankPart ? `rank ${worldRank}` : null,
-    earningsPart,
+    worldRank != null ? `rank ${worldRank}` : null,
+    earnings != null ? formatEarnings(earnings) : null,
     winCount > 0 ? `${winCount} wins` : null,
   ].filter(Boolean).join(', ');
+
+  // Build the right-side value based on active sort
+  const rightValue = (() => {
+    if (isTourRanking) {
+      if (points != null && points > 0) return { main: points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), label: 'pts' };
+      return null;
+    }
+    if (activeSort === 'highest-earnings') {
+      return earnings != null ? { main: formatEarnings(earnings), label: '' } : null;
+    }
+    if (activeSort === 'most-wins') {
+      return wins != null ? { main: String(wins), label: wins === 1 ? 'win' : 'wins' } : null;
+    }
+    // Default: show earnings as secondary
+    if (earnings != null && earnings > 0) return { main: formatEarnings(earnings), label: '' };
+    return null;
+  })();
+
+  const isFirst = (worldRank === 1 && (activeSort === 'world-rank-desc' || activeTour === 'all'));
 
   return (
     <motion.div
@@ -143,97 +108,80 @@ export function PlayerCardV2({
         to={`/tourhub/player/${player.id}`}
         onClick={onNavigate}
         aria-label={ariaLabel}
-        className={cn(
-          "flex overflow-hidden",
-          "bg-card rounded-2xl border border-border/50",
-          "",
-          "active:scale-[0.98] transition-all"
-        )}
-        style={{ height: '120px', minHeight: '120px' }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0,
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderLeft: isFirst ? '3px solid #F7931E' : '3px solid transparent',
+          background: isFirst ? 'rgba(247,147,30,0.025)' : 'transparent',
+          textDecoration: 'none',
+        }}
+        className="active:bg-black/[0.02] transition-colors"
       >
-        {/* Photo section — left 140px */}
-        <div className="relative shrink-0 bg-muted overflow-hidden" style={{ width: '140px', borderRadius: '16px 0 0 16px' }}>
+        {/* Large faded rank number */}
+        <div style={{ width: '44px', padding: '13px 0 13px 14px', flexShrink: 0 }}>
+          {worldRank != null && worldRank > 0 ? (
+            <span style={{
+              fontSize: '18px', fontWeight: 900,
+              color: isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)',
+              lineHeight: 1, letterSpacing: '-0.03em', display: 'block',
+            }}>
+              {worldRank}
+            </span>
+          ) : (
+            <span style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(15,23,42,0.12)' }}>—</span>
+          )}
+        </div>
+
+        {/* Avatar */}
+        <div style={{ width: '34px', height: '34px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', marginRight: '10px' }}>
           <img
             src={photoUrl}
             alt={player.fullName}
-             className="w-full h-full object-cover"
-             style={{ objectPosition: 'center 5%' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
             loading="lazy"
-            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+            onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
           />
         </div>
 
-        {/* Info section */}
-        <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
-          <h3 
-            className="text-foreground truncate"
-            style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}
-          >
+        {/* Player info */}
+        <div style={{ flex: 1, minWidth: 0, padding: '12px 0' }}>
+          <div style={{
+            fontSize: '14px', fontWeight: isFirst ? 800 : 600, color: '#0F172A',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+          }}>
             {player.fullName}
-          </h3>
-
-          {countryName && (
-            <div className="flex items-center gap-1.5" style={{ marginTop: '2px' }}>
-              <CountryFlag country={player.country} size="sm" />
-              <span style={{ fontSize: '12px', fontWeight: 400 }} className="text-muted-foreground/60 truncate">{countryName}</span>
-            </div>
-          )}
-
-          {/* Stats lines — hidden in directory mode */}
-          {!directoryMode && (
-            <>
-              {/* Combined rank + points line for tour rankings (Euro/LPGA) */}
-              {isTourRanking && (rankPart || pointsPart || tourWinsPart) && (
-                <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-                  {[rankPart, pointsPart, tourWinsPart].filter(Boolean).map((part, i) => (
-                    <span key={i}>
-                      {i > 0 && ' · '}
-                      {(part === rankPart || part === pointsPart) ? (
-                    <span className="font-bold text-foreground">{part}</span>
-                      ) : part}
-                    </span>
-                  ))}
-                </p>
-              )}
-
-              {/* OWGR secondary line for tour-ranked tours (EURO, PGAD, LIV — not LPGA) */}
-              {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
-                <p className="text-muted-foreground truncate" style={{ fontSize: '12px', fontWeight: 400, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-                  #{owgr} OWGR
-                </p>
-              )}
-
-              {/* Rank line for non-tour rankings */}
-              {!isTourRanking && rankPart && (
-                <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
-                  {activeSort === 'world-rank-desc' || activeSort === 'world-rank-asc' ? (
-                    <span className="font-bold text-foreground">{rankPart}</span>
-                  ) : rankPart}
-                </p>
-              )}
-
-              {/* Earnings / Wins line for non-tour rankings */}
-              {!isTourRanking && (earningsPart || winsPart) && (
-                <p className="text-muted-foreground truncate" style={{ fontSize: '13px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-                  {[earningsPart, winsPart].filter(Boolean).map((part, i) => (
-                    <span key={i}>
-                      {i > 0 && ' · '}
-                      {((activeSort === 'highest-earnings' && part === earningsPart) || 
-                        (activeSort === 'most-wins' && part === winsPart)) ? (
-                        <span className="font-semibold text-foreground">{part}</span>
-                      ) : part}
-                    </span>
-                  ))}
-                </p>
-              )}
-            </>
-          )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+            <CountryFlag country={player.country} size="sm" />
+            <span style={{ fontSize: '10px', color: '#94A3B8' }}>{countryName}</span>
+            {/* OWGR secondary for tour-specific pages */}
+            {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
+              <span style={{ fontSize: '10px', color: '#CBD5E1', marginLeft: '4px' }}>· #{owgr} OWGR</span>
+            )}
+            {/* Win count secondary for earnings/OWGR sort */}
+            {!isTourRanking && (winCount > 0) && activeSort !== 'most-wins' && (
+              <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '4px' }}>
+                · {winCount} {winCount === 1 ? 'win' : 'wins'}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Chevron */}
-        <div className="flex items-center pr-3 shrink-0">
-          <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-        </div>
+        {/* Right value */}
+        {rightValue && (
+          <div style={{ padding: '12px 14px 12px 0', textAlign: 'right' as const, flexShrink: 0 }}>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A' }}>
+              {rightValue.main}
+            </span>
+            {rightValue.label && (
+              <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
+                {rightValue.label}
+              </span>
+            )}
+          </div>
+        )}
       </Link>
     </motion.div>
   );
