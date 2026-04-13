@@ -117,7 +117,7 @@ function EventRow({ tournament, index, isLast }: { tournament: SeasonTournament;
           letterSpacing: '0.1em', textTransform: 'uppercase' as const,
           lineHeight: 1, margin: '0 0 4px',
         }}>
-          {isMajor ? '★ ' : ''}{contextLabel}
+          {isMajor ? '★ ' : ''}{getPrefixedContextLabel(contextLabel, tournament.tourName)}
         </p>
 
         {/* Tournament name */}

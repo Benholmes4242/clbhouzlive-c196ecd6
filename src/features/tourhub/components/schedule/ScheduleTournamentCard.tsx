@@ -141,7 +141,7 @@ export function ScheduleTournamentCard({
             ? TOUR_COLORS.liveGreen
             : '#94A3B8',
         }}>
-          {isLive ? '● LIVE' : (isMajor ? '★ ' : '')}{isLive ? '' : contextLabel}
+          {isLive ? '● LIVE' : (isMajor ? '★ ' : '')}{isLive ? '' : getPrefixedContextLabel(contextLabel, tourName)}
           {isLive && leaderWinner?.round1 !== undefined && (() => {
             const roundInfo = getCurrentRound(
               leaderWinner!.round1, leaderWinner!.round2,
