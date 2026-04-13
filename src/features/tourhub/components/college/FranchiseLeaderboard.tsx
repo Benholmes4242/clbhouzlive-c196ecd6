@@ -1,12 +1,10 @@
 /**
- * FranchiseLeaderboard - Premium college leaderboard
- * Simple text tabs with underline active state
+ * FranchiseLeaderboard - Dispatch table wrapper with column headers
  */
 
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useTopMovers } from '../../hooks/useCollegeStatus';
@@ -16,22 +14,13 @@ import { FranchiseMovers } from './FranchiseMovers';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
-const METRIC_TABS: { value: MetricTab; label: string }[] = [
-  { value: 'earnings', label: 'Earnings' },
-  { value: 'wins', label: 'Wins' },
-  { value: 'top10s', label: 'Top 10s' },
-  { value: 'movers', label: 'Movers' },
-];
-
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
 
 interface FranchiseLeaderboardProps {
   limit?: number;
   className?: string;
-  /** When provided, parent controls the active metric — tabs are hidden */
   activeMetric?: MetricTab;
   onMetricChange?: (metric: MetricTab) => void;
-  /** When true, suppress the sticky tab header (parent renders it instead) */
   hideHeader?: boolean;
 }
 
@@ -40,7 +29,6 @@ export function FranchiseLeaderboard({ limit = 25, className, activeMetric: exte
   const sortParam = searchParams.get('sort') || 'earnings';
   const internalMetric: MetricTab = VALID_METRICS.has(sortParam) ? (sortParam as MetricTab) : 'earnings';
 
-  // Use external control if provided, otherwise internal URL state
   const activeMetric = externalMetric ?? internalMetric;
 
   const setActiveMetric = (metric: MetricTab) => {
@@ -84,126 +72,99 @@ export function FranchiseLeaderboard({ limit = 25, className, activeMetric: exte
   const { data: alumniMap } = useBatchCollegeAlumni(collegeSlugs, 3);
 
   return (
-    <div className={cn('', className)}>
-      {/* Tabs — only rendered when parent hasn't taken over (hideHeader = false) */}
-      {!hideHeader && (
-        <div
-          className="sticky top-0 z-20 -mx-4 px-4"
-          style={{
-            background: 'hsl(var(--background) / 0.95)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-            paddingBottom: 8,
-            marginBottom: 16,
-            borderBottom: '1px solid hsl(var(--border) / 0.15)',
-          }}
-        >
-          <div
-            role="tablist"
-            aria-label="Franchise Leaderboard Sort"
-            className="flex rounded-xl"
-            style={{
-              background: 'transparent',
-              padding: 4,
-            }}
-          >
-            {METRIC_TABS.map(({ value, label }) => {
-              const isSelected = activeMetric === value;
-              return (
-                <button
-                  key={value}
-                  role="tab"
-                  aria-selected={isSelected}
-                  onClick={() => setActiveMetric(value)}
-                  className={cn(
-                    'relative flex-1 whitespace-nowrap rounded-lg active:scale-[0.98] transition-all duration-200',
-                    isSelected
-                      ? 'bg-foreground text-background'
-                      : 'text-muted-foreground hover:bg-muted/50'
-                  )}
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 600,
-                    minHeight: 44,
-                    padding: '10px 4px',
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
+    <div className={className}>
+      {activeMetric !== 'movers' && (
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+          {/* Section rule marker */}
+          <div style={{ padding: '14px 16px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                {activeMetric === 'earnings' ? 'Season Earnings Leaderboard'
+                  : activeMetric === 'wins' ? 'Season Wins Leaderboard'
+                  : 'Top 10s Leaderboard'}
+              </span>
+            </div>
           </div>
+
+          {/* Column headers */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <span style={{ width: '32px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
+            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
+            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
+            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>T10</span>
+            <span style={{ width: '72px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
+              {activeMetric === 'wins' ? 'WINS' : activeMetric === 'top10s' ? 'TOP 10s' : 'EARNINGS'}
+            </span>
+          </div>
+
+          {/* Animated list */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeMetric}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {isLoading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', gap: '10px' }}>
+                    <div style={{ width: '32px', height: '14px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} className="animate-pulse" />
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(15,23,42,0.06)' }} className="animate-pulse" />
+                    <div style={{ flex: 1, height: '14px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} className="animate-pulse" />
+                    <div style={{ width: '60px', height: '14px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} className="animate-pulse" />
+                  </div>
+                ))
+              ) : sortedStats.length > 0 ? (
+                <>
+                  {sortedStats.map((collegeStats, index) => {
+                    const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
+                    const momentum = moverData ? {
+                      rankChange: moverData.rankChange,
+                      earningsDelta: moverData.earningsDelta,
+                      isRising: moverData.earningsDelta > 0 || (moverData.rankChange !== null && moverData.rankChange > 0),
+                    } : null;
+                    const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
+                    return (
+                      <FranchiseCard
+                        key={collegeStats.normalized_name}
+                        stats={collegeStats}
+                        college={collegeMap?.get(collegeStats.normalized_name) || null}
+                        rank={index + 1}
+                        maxValue={maxValue}
+                        activeMetric={activeMetric}
+                        momentum={momentum}
+                        alumni={alumni}
+                        animationDelay={index * 0.03}
+                      />
+                    );
+                  })}
+                  {/* Footer */}
+                  <div style={{ padding: '12px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+                    <p style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
+                      COLLEGE FRANCHISE RANKINGS · 2025–26 SEASON
+                    </p>
+                  </div>
+                </>
+              ) : activeMetric === 'wins' ? (
+                <div style={{ padding: '48px 16px', textAlign: 'center' as const }}>
+                  <p style={{ fontSize: '15px', fontWeight: 600, color: '#0F172A', margin: '0 0 4px' }}>No wins yet this season</p>
+                  <p style={{ fontSize: '13px', color: '#94A3B8', margin: 0 }}>Check back as the season progresses.</p>
+                </div>
+              ) : (
+                <div style={{ padding: '48px 16px', textAlign: 'center' as const }}>
+                  <p style={{ fontSize: '15px', fontWeight: 600, color: '#0F172A', margin: '0 0 4px' }}>No data available</p>
+                  <p style={{ fontSize: '13px', color: '#94A3B8', margin: 0 }}>Season stats are being calculated. Check back soon.</p>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       )}
 
-      {/* Content */}
-      {activeMetric === 'movers' ? (
+      {activeMetric === 'movers' && (
         <FranchiseMovers />
-      ) : (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeMetric}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="flex flex-col"
-            style={{ gap: 8 }}
-          >
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="bg-muted/40 animate-pulse" style={{ minHeight: 110, borderRadius: 16 }} />
-              ))
-            ) : error ? (
-              <div className="text-center py-12 text-sm text-muted-foreground">Failed to load leaderboard</div>
-            ) : sortedStats.length > 0 ? (
-              <>
-                {sortedStats.map((collegeStats, index) => {
-                  const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
-                  const momentum = moverData ? {
-                    rankChange: moverData.rankChange,
-                    earningsDelta: moverData.earningsDelta,
-                    isRising: moverData.earningsDelta > 0 || (moverData.rankChange !== null && moverData.rankChange > 0),
-                  } : null;
-                  const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
-
-                  return (
-                    <FranchiseCard
-                      key={collegeStats.normalized_name}
-                      stats={collegeStats}
-                      college={collegeMap?.get(collegeStats.normalized_name) || null}
-                      rank={index + 1}
-                      maxValue={maxValue}
-                      activeMetric={activeMetric}
-                      momentum={momentum}
-                      alumni={alumni}
-                      animationDelay={index * 0.03}
-                    />
-                  );
-                })}
-                {(activeMetric === 'wins' || activeMetric === 'top10s') && (
-                  <p
-                    style={{ fontSize: 12, fontWeight: 500, textAlign: 'center', marginTop: 8 }}
-                    className="text-muted-foreground/50"
-                  >
-                    {sortedStats.length} {sortedStats.length === 1 ? 'franchise' : 'franchises'} with {activeMetric === 'wins' ? 'wins' : 'top 10s'} this season
-                  </p>
-                )}
-              </>
-            ) : activeMetric === 'wins' ? (
-              <div className="flex flex-col items-center py-12 text-center">
-                <p className="text-sm font-medium text-foreground mb-1">No wins yet this season</p>
-                <p className="text-xs text-muted-foreground">Check back as the season progresses.</p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center py-12 text-center">
-                <p className="text-sm font-medium text-foreground mb-1">No data available</p>
-                <p className="text-xs text-muted-foreground">Season stats are being calculated. Check back soon.</p>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
       )}
     </div>
   );
