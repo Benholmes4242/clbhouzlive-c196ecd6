@@ -1,6 +1,4 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
@@ -13,29 +11,17 @@ interface CollegeCompareHeroProps {
   className?: string;
 }
 
-/* ── Section header matching design system ── */
-function SectionHeader({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div
-      className={cn("text-muted-foreground/60", className)}
-      style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}
-    >
-      {children}
-    </div>
-  );
-}
-
 /* ── Metric compare row with visual bar ── */
 interface MetricCompareRowProps {
   label: string;
   value1: number;
   value2: number;
   format?: (v: number) => string;
-  /** true = lower is better (e.g. scoring avg, putting avg) */
   lowerIsBetter?: boolean;
+  isLast?: boolean;
 }
 
-function MetricCompareRow({ label, value1, value2, format = String, lowerIsBetter = false }: MetricCompareRowProps) {
+function MetricCompareRow({ label, value1, value2, format = String, lowerIsBetter = false, isLast = false }: MetricCompareRowProps) {
   const total = value1 + value2;
   const pct1 = total > 0 ? (value1 / total) * 100 : 50;
   const pct2 = total > 0 ? (value2 / total) * 100 : 50;
@@ -51,129 +37,151 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   }
 
   return (
-    <div className="py-3 border-b last:border-0" style={{ borderColor: 'hsl(var(--border) / 0.15)' }}>
-      <div className="flex items-center justify-between mb-1.5">
-        <span
-          className={isLeading1 ? 'text-foreground' : 'text-muted-foreground'}
-          style={{ fontSize: 14, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
-        >
+    <div style={{ padding: '9px 20px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
+        <span style={{ flex: 1, fontSize: '14px', fontWeight: isLeading1 ? 800 : 500, color: isLeading1 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'left' as const }}>
           {format(value1)}
         </span>
-        <span style={{ fontSize: 12, fontWeight: 500 }} className="text-muted-foreground">
+        <span style={{ fontSize: '9px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
           {label}
         </span>
-        <span
-          className={isLeading2 ? 'text-foreground' : 'text-muted-foreground'}
-          style={{ fontSize: 14, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
-        >
+        <span style={{ flex: 1, fontSize: '14px', fontWeight: isLeading2 ? 800 : 500, color: isLeading2 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'right' as const }}>
           {format(value2)}
         </span>
       </div>
-      <div className="flex gap-0.5 rounded-full overflow-hidden" style={{ height: 4 }}>
-        <div
-          className="rounded-l-full"
-          style={{
-            width: `${pct1}%`,
-            backgroundColor: isLeading1 ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--border))',
-          }}
-        />
-        <div
-          className="rounded-r-full"
-          style={{
-            width: `${pct2}%`,
-            backgroundColor: isLeading2 ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--border))',
-          }}
-        />
+      <div style={{ display: 'flex', height: '3px', borderRadius: '2px', overflow: 'hidden' }}>
+        <div style={{ width: `${pct1}%`, background: isLeading1 ? '#F7931E' : 'rgba(15,23,42,0.08)', transition: 'width 0.4s' }} />
+        <div style={{ width: `${pct2}%`, background: isLeading2 ? '#F7931E' : 'rgba(15,23,42,0.08)', transition: 'width 0.4s' }} />
       </div>
     </div>
   );
 }
 
-/* ── Flat stat section (no card wrapper) ── */
-function StatSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <motion.div
-      style={{ marginTop: 24 }}
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.4 }}
-    >
-      <SectionHeader className="mb-3">{title}</SectionHeader>
-      <div className="mt-2">
-        {children}
-      </div>
-    </motion.div>
-  );
-}
-
-/* ── Alumni block with stat values ── */
-function AlumniCompareBlock({ title, alumni1, alumni2, statKey, emptyLabel }: {
+/* ── Alumni compare block ── */
+interface AlumniCompareBlockProps {
   title: string;
   alumni1: CollegeAlumnus[];
   alumni2: CollegeAlumnus[];
   statKey: 'earnings' | 'world_ranking' | 'wins';
+  name1: string;
+  name2: string;
   emptyLabel?: string;
-}) {
-  const formatStat = (a: CollegeAlumnus) => {
+}
+
+function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, emptyLabel }: AlumniCompareBlockProps) {
+  const formatStat = (a: CollegeAlumnus): string => {
     if (statKey === 'earnings') return formatCurrency(a.earnings || 0);
     if (statKey === 'world_ranking') return a.world_ranking ? `#${a.world_ranking}` : '—';
-    if (statKey === 'wins') {
-      const w = a.wins || 0;
-      return `${w} win${w !== 1 ? 's' : ''}`;
-    }
-    return '';
+    const w = a.wins || 0;
+    return `${w} win${w !== 1 ? 's' : ''}`;
   };
 
-  const renderSide = (alumni: CollegeAlumnus[]) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      {alumni.length > 0 ? alumni.map((a, i) => (
-        <Link
-          key={a.id}
-          to={`/tourhub/player/${a.id}`}
-          className="flex items-center gap-2 bg-card rounded-2xl border border-border/50 active:scale-[0.98] transition-transform"
-          style={{ padding: '10px 12px' }}
-        >
-          <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, width: '16px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
-          <div className="w-8 h-8 bg-muted overflow-hidden shrink-0" style={{ borderRadius: '34%' }}>
-            <img
-              src={getPlayerHeadshotUrl(`${a.first_name} ${a.last_name}`, a.tour_codes?.[0] ?? 'pga')}
-              alt={`${a.first_name} ${a.last_name}`}
-              className="w-full h-full object-cover object-top"
-              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <span className="text-foreground block" style={{ fontSize: 13, fontWeight: 600 }}>
-              {a.last_name}
-            </span>
-            <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-              {formatStat(a)}
-            </span>
-          </div>
-        </Link>
-      )) : (
-        <span className="text-muted-foreground py-2" style={{ fontSize: 12, fontWeight: 400 }}>
-          {emptyLabel || 'No data available'}
-        </span>
-      )}
-    </div>
-  );
+  const rowCount = Math.max(alumni1.length, alumni2.length);
+  if (rowCount === 0) return null;
 
   return (
-    <motion.div
-      style={{ marginTop: 24 }}
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.4 }}
-    >
-      <SectionHeader className="mb-3">{title}</SectionHeader>
-      <div className="grid grid-cols-2 gap-4">
-        {renderSide(alumni1)}
-        {renderSide(alumni2)}
+    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      {/* Section rule marker */}
+      <div style={{ padding: '14px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            {title}
+          </span>
+        </div>
       </div>
-    </motion.div>
+
+      {/* Column headers */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '4px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <span style={{ width: '18px', flexShrink: 0 }} />
+        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', paddingRight: '8px' }}>
+          {name1.toUpperCase()}
+        </span>
+        <div style={{ width: '1px', height: '12px', background: 'rgba(15,23,42,0.07)', flexShrink: 0 }} />
+        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', paddingLeft: '8px' }}>
+          {name2.toUpperCase()}
+        </span>
+      </div>
+
+      {/* Side-by-side rows */}
+      {Array.from({ length: rowCount }).map((_, i) => {
+        const a1 = alumni1[i] || null;
+        const a2 = alumni2[i] || null;
+        const isLast = i === rowCount - 1;
+
+        return (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '9px 20px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
+            <span style={{ width: '18px', fontSize: '10px', fontWeight: 700, color: 'rgba(15,23,42,0.18)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {i + 1}
+            </span>
+
+            {/* Left alumnus */}
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, paddingRight: '8px' }}>
+              {a1 ? (
+                <Link
+                  to={`/tourhub/player/${a1.id}`}
+                  style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, textDecoration: 'none', flex: 1 }}
+                  className="active:opacity-70 transition-opacity"
+                >
+                  <div style={{ width: '26px', height: '26px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
+                    <img
+                      src={getPlayerHeadshotUrl(`${a1.first_name} ${a1.last_name}`, a1.tour_codes?.[0] ?? 'pga')}
+                      alt={`${a1.first_name} ${a1.last_name}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
+                      onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                    />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                      {a1.last_name}
+                    </div>
+                    <div style={{ fontSize: '9.5px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatStat(a1)}
+                    </div>
+                  </div>
+                </Link>
+              ) : (
+                <span style={{ fontSize: '11px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
+              )}
+            </div>
+
+            {/* Centre divider */}
+            <div style={{ width: '1px', height: '36px', background: 'rgba(15,23,42,0.07)', flexShrink: 0 }} />
+
+            {/* Right alumnus */}
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, paddingLeft: '8px' }}>
+              {a2 ? (
+                <Link
+                  to={`/tourhub/player/${a2.id}`}
+                  style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, textDecoration: 'none', flex: 1 }}
+                  className="active:opacity-70 transition-opacity"
+                >
+                  <div style={{ width: '26px', height: '26px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
+                    <img
+                      src={getPlayerHeadshotUrl(`${a2.first_name} ${a2.last_name}`, a2.tour_codes?.[0] ?? 'pga')}
+                      alt={`${a2.first_name} ${a2.last_name}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
+                      onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                    />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                      {a2.last_name}
+                    </div>
+                    <div style={{ fontSize: '9.5px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatStat(a2)}
+                    </div>
+                  </div>
+                </Link>
+              ) : (
+                <span style={{ fontSize: '11px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ height: '4px' }} />
+    </div>
   );
 }
 
@@ -228,7 +236,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
     s1?.avg_sand_saves || s2?.avg_sand_saves
   );
 
-  // Count categories led for summary card (only from populated stats)
+  // Count categories led
   const comparisons: [number, number, boolean][] = [
     [s1?.earnings_total || 0, s2?.earnings_total || 0, false],
     [s1?.wins_total || 0, s2?.wins_total || 0, false],
@@ -238,7 +246,6 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
     [s1?.player_count || 0, s2?.player_count || 0, false],
   ];
 
-  // Only include performance stats in category count if they exist
   if (hasPerformanceData) {
     comparisons.push(
       [s1?.avg_scoring || 0, s2?.avg_scoring || 0, true],
@@ -272,123 +279,156 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
   });
 
   return (
-    <div className={cn('', className)}>
-      {/* VS Header */}
-      <motion.div className="mb-6" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        {/* Season label centered above the VS row */}
-        <div className="flex justify-center mb-2">
-          <span className="text-muted-foreground/60" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
-            {seasonYear} Season
-          </span>
+    <div className={className}>
+      {/* ── SEASON VERDICT ── */}
+      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        <div style={{ padding: '14px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              Season Verdict · {seasonYear}
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-start" style={{ gap: 0 }}>
-          <Link
-            to={`/tourhub/college-golf/${s1?.normalized_name}`}
-            className="flex-1 flex flex-col items-center min-w-0"
-          >
-            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2">
+        {/* Three-column verdict */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '12px 20px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          {/* College 1 */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '9px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logo1 ? (
-                <img src={logo1} alt={name1} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                <img src={logo1} alt={name1} style={{ width: '26px', height: '26px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
-                <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
+                <span style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name1.charAt(0)}</span>
               )}
             </div>
-            <span className="text-foreground text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
-              {name1}
-            </span>
-          </Link>
-
-          {/* VS vertically centered with the 80px logo boxes */}
-          <div className="shrink-0 w-16 flex items-center justify-center" style={{ height: 80 }}>
-            <span className="text-muted-foreground/40" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>{name1}</div>
+            <div style={{ fontSize: '28px', fontWeight: 900, color: c1Wins > c2Wins ? '#F7931E' : '#94A3B8', letterSpacing: '-0.04em', lineHeight: 1 }}>
+              {c1Wins}
+            </div>
+            <div style={{ fontSize: '9px', color: '#94A3B8' }}>categories led</div>
           </div>
 
-          <Link
-            to={`/tourhub/college-golf/${s2?.normalized_name}`}
-            className="flex-1 flex flex-col items-center min-w-0"
-          >
-            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2">
+          {/* Centre — verdict chip */}
+          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 900, color: 'rgba(15,23,42,0.1)' }}>—</div>
+            <div style={{ padding: '4px 10px', borderRadius: '6px', background: c1Wins === c2Wins ? 'rgba(15,23,42,0.05)' : 'rgba(247,147,30,0.08)', border: `1px solid ${c1Wins === c2Wins ? 'rgba(15,23,42,0.08)' : '#F7931E33'}` }}>
+              <span style={{ fontSize: '9px', fontWeight: 900, color: c1Wins === c2Wins ? '#94A3B8' : '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+                {c1Wins === c2Wins ? 'TIED' : c1Wins > c2Wins ? `${name1.split(' ')[0].toUpperCase()} WINS` : `${name2.split(' ')[0].toUpperCase()} WINS`}
+              </span>
+            </div>
+          </div>
+
+          {/* College 2 */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '9px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logo2 ? (
-                <img src={logo2} alt={name2} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                <img src={logo2} alt={name2} style={{ width: '26px', height: '26px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
-                <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
+                <span style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name2.charAt(0)}</span>
               )}
             </div>
-            <span className="text-foreground text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
-              {name2}
-            </span>
-          </Link>
-        </div>
-      </motion.div>
-
-
-      {/* Summary Verdict Card */}
-      <motion.div className="bg-card rounded-2xl border border-border/50 p-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
-        <SectionHeader className="mb-3">Season Summary</SectionHeader>
-        <div className="flex items-center justify-between">
-          <div className="text-center flex-1">
-            <span className="text-foreground block" style={{ fontSize: 28, fontWeight: 700 }}>{c1Wins}</span>
-            <span className="text-muted-foreground block" style={{ fontSize: 11, fontWeight: 500, marginTop: 4 }}>categories led</span>
-          </div>
-          <div className="text-center">
-            <span className="text-muted-foreground/40" style={{ fontSize: 14, fontWeight: 600 }}>—</span>
-          </div>
-          <div className="text-center flex-1">
-            <span className="text-foreground block" style={{ fontSize: 28, fontWeight: 700 }}>{c2Wins}</span>
-            <span className="text-muted-foreground block" style={{ fontSize: 11, fontWeight: 500, marginTop: 4 }}>categories led</span>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>{name2}</div>
+            <div style={{ fontSize: '28px', fontWeight: 900, color: c2Wins > c1Wins ? '#F7931E' : '#94A3B8', letterSpacing: '-0.04em', lineHeight: 1 }}>
+              {c2Wins}
+            </div>
+            <div style={{ fontSize: '9px', color: '#94A3B8' }}>categories led</div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Season Overview — no card wrapper */}
-      <StatSection title="Season Overview">
-        <MetricCompareRow label="Earnings" value1={s1?.earnings_total || 0} value2={s2?.earnings_total || 0} format={formatCurrency} />
-        <MetricCompareRow label="Wins" value1={s1?.wins_total || 0} value2={s2?.wins_total || 0} />
-        <MetricCompareRow label="Top 10s" value1={s1?.top10_total || 0} value2={s2?.top10_total || 0} />
-        <MetricCompareRow label="Top 25s" value1={s1?.top25_total || 0} value2={s2?.top25_total || 0} />
-        <MetricCompareRow label="Events Played" value1={s1?.events_total || 0} value2={s2?.events_total || 0} />
-        <MetricCompareRow label="Players on Tour" value1={s1?.player_count || 0} value2={s2?.player_count || 0} />
-      </StatSection>
+      {/* ── SEASON OVERVIEW ── */}
+      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        {/* Mini logo column headers */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '12px 20px 0' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {logo1 ? <img src={logo1} alt={name1} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
+            </div>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B' }}>{name1}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
+            <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
+          </div>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B' }}>{name2}</span>
+            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {logo2 ? <img src={logo2} alt={name2} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
+            </div>
+          </div>
+        </div>
 
-      {/* Performance Stats — no card wrapper */}
+        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}>
+          <MetricCompareRow label="Earnings" value1={s1?.earnings_total || 0} value2={s2?.earnings_total || 0} format={formatCurrency} />
+          <MetricCompareRow label="Wins" value1={s1?.wins_total || 0} value2={s2?.wins_total || 0} />
+          <MetricCompareRow label="Top 10s" value1={s1?.top10_total || 0} value2={s2?.top10_total || 0} />
+          <MetricCompareRow label="Top 25s" value1={s1?.top25_total || 0} value2={s2?.top25_total || 0} />
+          <MetricCompareRow label="Events Played" value1={s1?.events_total || 0} value2={s2?.events_total || 0} />
+          <MetricCompareRow label="Players on Tour" value1={s1?.player_count || 0} value2={s2?.player_count || 0} isLast />
+        </div>
+      </div>
+
+      {/* ── PERFORMANCE STATS ── */}
       {hasPerformanceData && (
-        <StatSection title="Performance Stats">
-          <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
-          <MetricCompareRow label="Avg SG Total" value1={s1?.avg_sg_total || 0} value2={s2?.avg_sg_total || 0} format={formatSg} />
-          <MetricCompareRow label="Avg Putting" value1={s1?.avg_putting || 0} value2={s2?.avg_putting || 0} format={formatAvg} lowerIsBetter />
-          <MetricCompareRow label="Avg Scrambling" value1={s1?.avg_scrambling || 0} value2={s2?.avg_scrambling || 0} format={formatPct} />
-        </StatSection>
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+          <div style={{ padding: '14px 20px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
+            </div>
+          </div>
+          <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
+            <MetricCompareRow label="Avg SG Total" value1={s1?.avg_sg_total || 0} value2={s2?.avg_sg_total || 0} format={formatSg} />
+            <MetricCompareRow label="Avg Putting" value1={s1?.avg_putting || 0} value2={s2?.avg_putting || 0} format={formatAvg} lowerIsBetter />
+            <MetricCompareRow label="Avg Scrambling" value1={s1?.avg_scrambling || 0} value2={s2?.avg_scrambling || 0} format={formatPct} isLast />
+          </div>
+        </div>
       )}
 
-      {/* Ball Striking — no card wrapper */}
+      {/* ── BALL STRIKING ── */}
       {hasBallStrikingData && (
-        <StatSection title="Ball Striking">
-          <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />
-          <MetricCompareRow label="Driving Accuracy" value1={s1?.avg_driving_accuracy || 0} value2={s2?.avg_driving_accuracy || 0} format={formatPct} />
-          <MetricCompareRow label="GIR" value1={s1?.avg_gir || 0} value2={s2?.avg_gir || 0} format={formatPct} />
-          <MetricCompareRow label="Sand Saves" value1={s1?.avg_sand_saves || 0} value2={s2?.avg_sand_saves || 0} format={formatPct} />
-        </StatSection>
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+          <div style={{ padding: '14px 20px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Ball Striking</span>
+            </div>
+          </div>
+          <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />
+            <MetricCompareRow label="Driving Accuracy" value1={s1?.avg_driving_accuracy || 0} value2={s2?.avg_driving_accuracy || 0} format={formatPct} />
+            <MetricCompareRow label="GIR" value1={s1?.avg_gir || 0} value2={s2?.avg_gir || 0} format={formatPct} />
+            <MetricCompareRow label="Sand Saves" value1={s1?.avg_sand_saves || 0} value2={s2?.avg_sand_saves || 0} format={formatPct} isLast />
+          </div>
+        </div>
       )}
 
-      {/* Alumni Sections */}
+      {/* ── ALUMNI BLOCKS ── */}
       <AlumniCompareBlock
         title="Top Earners"
         alumni1={college1.topEarners}
         alumni2={college2.topEarners}
         statKey="earnings"
+        name1={name1}
+        name2={name2}
       />
       <AlumniCompareBlock
         title="Best World Rankings"
         alumni1={college1.topRanked}
         alumni2={college2.topRanked}
         statKey="world_ranking"
+        name1={name1}
+        name2={name2}
       />
       <AlumniCompareBlock
         title="Top Winners"
         alumni1={college1.topWinners}
         alumni2={college2.topWinners}
         statKey="wins"
+        name1={name1}
+        name2={name2}
         emptyLabel="No winners this season"
       />
     </div>
