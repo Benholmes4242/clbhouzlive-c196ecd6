@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Users } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
@@ -10,44 +8,6 @@ interface CollegeRivalsCarouselProps {
   normalizedName: string;
   className?: string;
   onCompare?: (rivalNormalizedName: string) => void;
-}
-
-interface HeadToHeadChipProps {
-  winsA: number;
-  winsB: number;
-  earningsDiff: number;
-  winner: 'A' | 'B' | 'tie';
-}
-
-function HeadToHeadChip({ winsA, winsB, winner }: HeadToHeadChipProps) {
-  const isWinning = winner === 'A';
-  const isTied = winner === 'tie';
-  
-  return (
-    <div
-      className="rounded-full"
-      style={{
-        fontSize: '11px',
-        fontWeight: 600,
-        padding: '4px 10px',
-        backgroundColor: isWinning
-          ? 'rgba(34,197,94,0.1)'
-          : isTied
-          ? 'hsl(var(--muted))'
-          : 'rgba(239,68,68,0.1)',
-        color: isWinning
-          ? 'rgb(34,197,94)'
-          : isTied
-          ? 'hsl(var(--muted-foreground))'
-          : 'hsl(var(--destructive))',
-      }}
-    >
-      {isTied ? 'Tied' : isWinning
-        ? `Leading ${winsA}–${winsB}`
-        : `Trailing ${winsA}–${winsB}`
-      }
-    </div>
-  );
 }
 
 export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: CollegeRivalsCarouselProps) {
@@ -92,109 +52,142 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
   
   if (isLoading) {
     return (
-      <div className={cn('flex gap-2 overflow-x-auto pb-2 px-4 -mx-4', className)} style={{ touchAction: 'pan-x pan-y' }}>
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="shrink-0 h-44 bg-card border border-border/50 rounded-2xl animate-pulse" style={{ width: '160px' }} />
+      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ padding: '14px 20px 0' }}>
+          <div className="animate-pulse" style={{ width: '60px', height: '9px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', marginBottom: '10px' }} />
+        </div>
+        {[1, 2, 3].map(i => (
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', height: '52px' }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(15,23,42,0.06)' }} />
+            <div style={{ flex: 1, height: '14px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+            <div style={{ width: '72px', height: '20px', borderRadius: '5px', background: 'rgba(15,23,42,0.06)' }} />
+          </div>
         ))}
       </div>
     );
   }
-  
-  if (!enrichedRivalries?.length) {
-    return (
-      <div className={cn('flex items-center justify-center py-8 px-4', className)}>
-        <div className="flex flex-col items-center text-center">
-          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-2">
-            <Users className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <p className="text-sm text-muted-foreground">No rivals defined yet</p>
+
+  if (!enrichedRivalries?.length) return null;
+
+  const sectionTitle = rivalries?.every(r => r.isFallback) ? 'Similar Programs' : 'Rivals';
+
+  return (
+    <div className={className} style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      {/* Section rule marker */}
+      <div style={{ padding: '14px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+            {sectionTitle}
+          </span>
         </div>
       </div>
-    );
-  }
-  
-  return (
-    <div className={cn('flex overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide', className)} style={{ gap: '8px', touchAction: 'pan-x pan-y' }}>
-      {enrichedRivalries.map((rivalry) => {
+
+      {/* Column headers */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PROGRAM</span>
+        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
+        <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
+        <span style={{ width: '80px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>HEAD-TO-HEAD</span>
+      </div>
+
+      {enrichedRivalries.map((rivalry, i) => {
         const rivalName = rivalry.rivalNormalizedName;
         const college = rivalry.college;
         const displayName = college?.short_name || college?.college_name || rivalName;
         const logoUrl = getCollegeLogoUrl(college?.college_name || rivalName);
-        
-        const cardContent = (
-          <>
-            {/* Logo with circular muted background */}
-            <div className="relative flex items-center justify-center rounded-full bg-muted/20" style={{ width: '72px', height: '72px' }}>
-              {logoUrl ? (
-                <img 
-                  src={logoUrl} 
-                  alt={displayName}
-                  className="object-contain relative z-10"
-                  style={{ width: '56px', height: '56px' }}
-                  loading="lazy"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              ) : (
-                <span className="text-lg font-bold text-muted-foreground relative z-10">
-                  {displayName.charAt(0).toUpperCase()}
-                </span>
-              )}
+        const rivalStats = allStats?.find(s => s.normalized_name === rivalName);
+        const isWinning = rivalry.h2h?.winner === 'A';
+        const isTied = rivalry.h2h?.winner === 'tie';
+        const h2hLabel = rivalry.h2h
+          ? isTied
+            ? 'Tied'
+            : isWinning
+            ? `Leading ${rivalry.h2h.winsA}–${rivalry.h2h.winsB}`
+            : `Trailing ${rivalry.h2h.winsA}–${rivalry.h2h.winsB}`
+          : null;
+        const h2hColor = isTied ? '#94A3B8' : isWinning ? '#16A34A' : '#DC2626';
+        const h2hBg = isTied ? 'rgba(15,23,42,0.05)' : isWinning ? 'rgba(22,163,74,0.08)' : 'rgba(220,38,38,0.08)';
+
+        const rowContent = (
+          <div
+            style={{ display: 'flex', alignItems: 'center', padding: '11px 20px', borderBottom: i < enrichedRivalries.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}
+          >
+            {/* Logo chip + name */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '9px', flex: 1, minWidth: 0 }}>
+              <div style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0, background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt={displayName}
+                    style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+                    loading="lazy"
+                    onError={e => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(15,23,42,0.3)' }}>{displayName.charAt(0)}</span>
+                )}
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                {displayName}
+              </span>
             </div>
-            
-            {/* Name */}
-            <p className="text-foreground truncate w-full text-center" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px', marginTop: '10px' }}>
-              {displayName}
-            </p>
-            
-            {/* Record pill */}
-            {rivalry.h2h && (
-              <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <HeadToHeadChip {...rivalry.h2h} />
-                <span style={{ fontSize: 10, fontWeight: 400, color: 'hsl(var(--muted-foreground))', opacity: 0.6, marginTop: 2 }}>
-                  earnings · wins · top 10s
+
+            {/* Wins */}
+            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {rivalStats?.wins_total ?? '—'}
+            </span>
+
+            {/* Earnings compact */}
+            <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {rivalStats ? `$${(rivalStats.earnings_total / 1_000_000).toFixed(0)}M` : '—'}
+            </span>
+
+            {/* H2H chip */}
+            {h2hLabel && (
+              <div style={{ width: '80px', display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
+                <span style={{ fontSize: '9.5px', fontWeight: 800, color: h2hColor, background: h2hBg, padding: '3px 7px', borderRadius: '5px', whiteSpace: 'nowrap' as const }}>
+                  {h2hLabel}
                 </span>
               </div>
             )}
-            
-            {/* Compare → */}
-            <span className="text-muted-foreground flex items-center gap-0.5" style={{ fontSize: '12px', fontWeight: 500, marginTop: '8px' }}>
-              Compare <ArrowRight className="w-2.5 h-2.5" />
-            </span>
-          </>
+          </div>
         );
-        
-        const cardStyles = cn(
-          'shrink-0 rounded-2xl',
-          'bg-card border border-border/50',
-          'active:scale-[0.98]',
-          'flex flex-col items-center text-center',
-          'transition-all duration-200'
-        );
-        
+
         if (onCompare) {
           return (
             <button
-              key={rivalry.id}
+              key={rivalry.id || rivalName}
               onClick={() => onCompare(rivalName)}
-              className={cardStyles}
-              style={{ width: '160px', padding: '16px' }}
+              style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' as const }}
+              className="active:bg-black/[0.02] transition-colors"
             >
-              {cardContent}
+              {rowContent}
             </button>
           );
         }
-        
+
         return (
           <Link
-            key={rivalry.id}
+            key={rivalry.id || rivalName}
             to={`/tourhub/college-golf/compare?c1=${normalizedName}&c2=${rivalName}`}
-            className={cardStyles}
-            style={{ width: '160px', padding: '16px' }}
+            style={{ display: 'block', textDecoration: 'none' }}
+            className="active:bg-black/[0.02] transition-colors"
           >
-            {cardContent}
+            {rowContent}
           </Link>
         );
       })}
+
+      {/* Compare footer link */}
+      <div style={{ padding: '10px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)', textAlign: 'center' as const }}>
+        <span
+          onClick={onCompare ? () => onCompare(enrichedRivalries[0]?.rivalNormalizedName ?? '') : undefined}
+          style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
+        >
+          Compare franchises ›
+        </span>
+      </div>
     </div>
   );
 }
