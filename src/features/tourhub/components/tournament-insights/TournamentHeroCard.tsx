@@ -69,7 +69,100 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
 
   const badge = getBadgeConfig();
 
-  return (
+  // ── Completed state with winner data: dark cinematic split layout ──
+  if (isCompleted && winner) {
+    return (
+      <div className="relative overflow-hidden" style={{ minHeight: 244, background: '#0d1421' }}>
+        {/* Venue image — right half, fading left */}
+        <div style={{ position: 'absolute', top: 0, right: 0, width: '55%', height: '100%' }}>
+          <img
+            src={imageUrl}
+            alt={tournament.courseName}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            loading="eager"
+          />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to right, #0d1421 0%, rgba(13,20,33,0.6) 50%, transparent 100%)',
+          }} />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, rgba(13,20,33,0.5) 0%, transparent 40%)',
+          }} />
+        </div>
+
+        {/* Left content panel */}
+        <div style={{ position: 'relative', zIndex: 2, padding: '20px 16px 24px', width: '65%' }}>
+          {/* Top badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <span style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
+              color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const,
+            }}>
+              {tournament.dateRangeText}
+            </span>
+            <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 10 }}>·</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
+              FINAL
+            </span>
+          </div>
+
+          {/* Tournament name */}
+          <div style={{
+            fontSize: 13, fontWeight: 600,
+            color: 'rgba(255,255,255,0.45)',
+            marginBottom: 6, lineHeight: 1.2,
+          }}>
+            {tournament.name}
+          </div>
+
+          {/* Champion eyebrow */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+            <span style={{ fontSize: 12 }}>🏆</span>
+            <span style={{
+              fontSize: 10, fontWeight: 700, color: '#F7931E',
+              letterSpacing: '0.12em', textTransform: 'uppercase' as const,
+            }}>Champion</span>
+          </div>
+
+          {/* Winner name */}
+          <div style={{
+            fontSize: 26, fontWeight: 900, color: '#ffffff',
+            letterSpacing: '-0.02em', lineHeight: 1.05, marginBottom: 8,
+          }}>
+            {winner.name}
+          </div>
+
+          {/* Score */}
+          <div style={{
+            fontSize: 48, fontWeight: 900, color: '#F7931E',
+            letterSpacing: '-0.04em', lineHeight: 1, marginBottom: 6,
+          }}>
+            {winner.scoreDisplay}
+          </div>
+
+          {/* Margin text */}
+          {winner.marginText && (
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>
+              {winner.marginText}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom: course name */}
+        <div style={{
+          position: 'absolute', bottom: 14, left: 16, right: 16, zIndex: 2,
+        }}>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+            {tournament.courseName}{tournament.location ? ` · ${tournament.location}` : ''}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Default layout (upcoming / completed-without-winner / live) ──
+
     <div className="relative overflow-hidden" style={{ height: `${Math.round(306 * 0.8)}px` }}>
       {/* Background Image */}
       <img

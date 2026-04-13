@@ -7,6 +7,8 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useEventWinner } from '../../hooks/useEventWinner';
+import { useTop5Leaderboard } from '../../hooks/useTop5Leaderboard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
 import { TournamentHeroCard } from './TournamentHeroCard';
