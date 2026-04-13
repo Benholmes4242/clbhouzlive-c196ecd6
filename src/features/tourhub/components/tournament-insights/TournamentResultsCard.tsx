@@ -1,7 +1,6 @@
 /**
- * TournamentResultsCard — Cinematic results card for Tournament Intelligence.
- * Light-mode adaptation of TournamentResultCard from the Clubhouse feed.
- * Zones: Hero | AI Narrative | Leaderboard (5 rows) | Stats | CTA
+ * TournamentResultsCard — Dark cinematic results card matching live state design language.
+ * Sections: Header | Winner Block | Sparkline | Stats Grid | Leaderboard | AI Narrative | CTA
  */
 
 import React, { useMemo, useEffect } from 'react';
@@ -10,11 +9,13 @@ import { useNavigate } from 'react-router-dom';
 import { useEventWinner } from '../../hooks/useEventWinner';
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
+import { useWinnerRoundScores } from '../../hooks/useWinnerRoundScores';
 import { useTop5Leaderboard } from '../../hooks/useTop5Leaderboard';
 import { useVenueImage } from '../../hooks/useVenueImage';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ClubhouzCalledItSection } from './ClubhouzCalledItSection';
+import CountryFlag from '@/components/ui/country-flag';
 import type { TrackedPrediction } from './types';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -28,6 +29,27 @@ interface TournamentResultsCardProps {
   tourSlug?: string;
 }
 
+// ─── Design tokens ───────────────────────────────────────────────────────────
+
+const C = {
+  bg: '#0d1421',
+  white: '#ffffff',
+  muted: 'rgba(255,255,255,0.45)',
+  mutedLight: 'rgba(255,255,255,0.4)',
+  mutedDim: 'rgba(255,255,255,0.3)',
+  mutedFaint: 'rgba(255,255,255,0.25)',
+  amber: '#F7931E',
+  green: '#22c55e',
+  red: '#ef4444',
+  redDark: '#dc2626',
+  divider: 'rgba(255,255,255,0.06)',
+  chipBg: 'rgba(255,255,255,0.04)',
+  chipBorder: 'rgba(255,255,255,0.07)',
+  rowBorder: 'rgba(255,255,255,0.05)',
+  chipSurfaceBg: 'rgba(255,255,255,0.06)',
+  chipSurfaceBorder: 'rgba(255,255,255,0.08)',
+} as const;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatScoreDisplay(scoreToPar: number | null): string {
@@ -36,8 +58,19 @@ function formatScoreDisplay(scoreToPar: number | null): string {
   return scoreToPar < 0 ? String(scoreToPar) : `+${scoreToPar}`;
 }
 
-// Client-side narrative fallback — mirrors logic in TournamentResultCard.tsx.
-// Used only when event_winners.narrative AND event_winners.headline are both null.
+function roundScoreColor(score: number | null): string {
+  if (score === null) return C.muted;
+  if (score < 0) return C.green;
+  if (score > 0) return C.red;
+  return 'rgba(255,255,255,0.5)';
+}
+
+function formatRoundScore(score: number | null): string {
+  if (score === null) return '—';
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : `${score}`;
+}
+
 function generateFallbackNarrative(
   winnerName: string,
   scoreDisplay: string,
@@ -63,21 +96,6 @@ function generateFallbackNarrative(
   return `${last} wins at ${scoreDisplay}. The conversation starts now.`;
 }
 
-// ─── Keyframes ───────────────────────────────────────────────────────────────
-
-const STYLE_ID = 'tric-keyframes';
-function ensureKeyframes() {
-  if (document.getElementById(STYLE_ID)) return;
-  const s = document.createElement('style');
-  s.id = STYLE_ID;
-  s.textContent = `
-    @keyframes tric-fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes tric-fadeIn { from{opacity:0} to{opacity:1} }
-    @keyframes tric-slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
-  `;
-  document.head.appendChild(s);
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function TournamentResultsCard({
@@ -89,13 +107,11 @@ export function TournamentResultsCard({
   tourSlug,
 }: TournamentResultsCardProps) {
   const navigate = useNavigate();
-  useEffect(() => { ensureKeyframes(); }, []);
 
   // ── Data fetches ──────────────────────────────────────────────────────────
   const { data: winner, isLoading: winnerLoading } = useEventWinner(tournamentId);
   const { data: top5 = [] } = useTop5Leaderboard(tournamentId);
 
-  // If event_winners is empty, synthesise a winner object from sr_leaderboards position 1
   const effectiveWinner = useMemo(() => {
     if (winner) return winner;
     const pos1 = top5[0];
@@ -117,57 +133,70 @@ export function TournamentResultsCard({
     };
   }, [winner, top5]);
 
-  const { data: tStats } = useWinnerScorecardStats(
-    tournamentId, effectiveWinner?.player_id
-  );
+  const { data: tStats } = useWinnerScorecardStats(tournamentId, effectiveWinner?.player_id);
   const { data: sStats } = useWinnerSeasonStats(effectiveWinner?.player_id);
+  const { data: roundScores } = useWinnerRoundScores(tournamentId, effectiveWinner?.player_id);
   const venueQuery = useVenueImage(courseName, null);
-  const venueImageUrl = venueQuery.data?.imageUrl;
 
   // ── Derived values ────────────────────────────────────────────────────────
   const winnerName = effectiveWinner?.player?.full_name ?? '';
+  const winnerCountry = effectiveWinner?.player?.country ?? '';
   const scoreDisplay = (effectiveWinner as any)?._scoreDisplayOverride
     ?? formatScoreDisplay(effectiveWinner?.score_to_par ?? null);
   const marginText = effectiveWinner?.is_playoff
     ? 'Playoff'
-    : effectiveWinner?.margin === 1 ? 'Won by 1 stroke'
-    : effectiveWinner?.margin ? `Won by ${effectiveWinner.margin} strokes`
+    : effectiveWinner?.margin === 1 ? '1 stroke'
+    : effectiveWinner?.margin ? `${effectiveWinner.margin} strokes`
     : '';
 
-  // Player headshot — always use R2 via getPlayerHeadshotUrl, fallback to silhouette
   const winnerPhoto = (winnerName ? getPlayerHeadshotUrl(winnerName, 'pga') : null)
     ?? PLAYER_SILHOUETTE_URL;
 
-  // Hero background: player headshot with venue image as img onError fallback
-  const heroFallback = venueImageUrl ?? PLAYER_SILHOUETTE_URL;
-
-  // AI Narrative — DB narrative first, then DB headline, then generated
   const narrative = useMemo(() => {
     if (effectiveWinner?.narrative) return effectiveWinner.narrative;
     if (effectiveWinner?.headline && !effectiveWinner.headline.includes('Champion crowned'))
       return effectiveWinner.headline;
-    // Client-side fallback from available stats
     return generateFallbackNarrative(
-      winnerName,
-      scoreDisplay,
-      tStats?.birdies,
-      tStats?.bogeys,
-      sStats?.puttingAverage,
-      sStats?.drivingDistance,
+      winnerName, scoreDisplay,
+      tStats?.birdies, tStats?.bogeys,
+      sStats?.puttingAverage, sStats?.drivingDistance,
       marginText,
     );
   }, [effectiveWinner, winnerName, scoreDisplay, tStats, sStats, marginText]);
 
-  // Leaderboard: winner row (from event_winners) + rows 2–5 (from sr_leaderboards)
-  // top5[0] is position 1 (confirmed winner), top5[1..4] are positions 2–5
-  const podiumRows = top5.slice(1, 3); // positions 2–3 max (3 total rows)
+  const podiumRows = top5.slice(1, 5); // positions 2–5
+
+  // Round scores for chips & sparkline
+  const r1 = roundScores?.round_1 ?? null;
+  const r2 = roundScores?.round_2 ?? null;
+  const r3 = roundScores?.round_3 ?? null;
+  const r4 = roundScores?.round_4 ?? null;
+  const hasRoundScores = r1 !== null || r2 !== null || r3 !== null || r4 !== null;
+
+  // Cumulative scores for sparkline
+  const cumulativeScores = useMemo(() => {
+    if (!hasRoundScores) return null;
+    const rounds = [r1, r2, r3, r4];
+    const cumulative: number[] = [];
+    let total = 0;
+    for (const r of rounds) {
+      if (r === null) break;
+      total += r;
+      cumulative.push(total);
+    }
+    return cumulative.length >= 2 ? cumulative : null;
+  }, [r1, r2, r3, r4, hasRoundScores]);
 
   // ── Loading skeleton ──────────────────────────────────────────────────────
   if (winnerLoading && top5.length === 0) {
     return (
-      <div className="rounded-2xl overflow-hidden border border-border bg-card animate-pulse">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-24 bg-muted/40 m-2 rounded-xl" />
+      <div style={{ background: C.bg, borderRadius: 16, overflow: 'hidden' }}>
+        {[200, 140, 80, 60].map((h, i) => (
+          <div key={i} style={{
+            height: h, background: 'rgba(255,255,255,0.04)',
+            margin: '8px 16px', borderRadius: 12,
+            animation: 'pulse 1.5s ease-in-out infinite',
+          }} />
         ))}
       </div>
     );
@@ -175,8 +204,8 @@ export function TournamentResultsCard({
 
   if (!effectiveWinner) {
     return (
-      <div className="rounded-2xl overflow-hidden border border-border bg-card p-6 text-center">
-        <p className="text-sm text-muted-foreground">Results not yet available.</p>
+      <div style={{ background: C.bg, borderRadius: 16, padding: 24, textAlign: 'center' }}>
+        <p style={{ fontSize: 13, color: C.mutedLight }}>Results not yet available.</p>
       </div>
     );
   }
@@ -186,191 +215,313 @@ export function TournamentResultsCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      style={{ paddingBottom: 8, marginTop: -20 }}
+      style={{ background: C.bg, borderRadius: 16, overflow: 'hidden', paddingBottom: 0 }}
     >
-      {/* ── WINNER HERO — split layout ─────────────────────────────── */}
-      <div style={{ position: 'relative', overflow: 'visible', minHeight: 280, zIndex: 1 }}>
-
-        {/* Player portrait — right side, full bleed, behind everything */}
-        <div style={{
-          position: 'absolute', top: 0, right: -16,
-          width: '60%', height: '100%',
-          zIndex: 0,
-        }}>
-          <img
-            src={winnerPhoto}
-            alt={winnerName}
-            onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
-            style={{
-              width: '100%', height: '100%',
-              objectFit: 'cover', objectPosition: '50% 8%',
-              display: 'block',
-            }}
-          />
-        </div>
-
-        {/* Winner info — anchored top left */}
-        <div style={{
-          position: 'absolute', top: 0, left: 0,
-          width: '58%',
-          padding: '28px 12px 0 16px',
-          zIndex: 2,
-        }}>
-
-          {/* Eyebrow — course name in amber */}
-          <div style={{
-            fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
-            textTransform: 'uppercase' as const,
-            color: 'hsl(var(--accent-amber))',
-            marginBottom: 3, lineHeight: 1,
-          }}>
-            {courseName}
-          </div>
-
-          {/* Tournament name */}
-          <div style={{
-            fontSize: 12, fontWeight: 600,
-            color: 'hsl(var(--muted-foreground))',
-            lineHeight: 1.3, marginBottom: 5,
-          }}>
+      {/* ═══ SECTION 1 — TOURNAMENT HEADER ═══ */}
+      <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 20, fontWeight: 800, color: C.white, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: 4 }}>
             {tournamentName}
           </div>
-
-          {/* Winner name */}
-          <div style={{
-            fontSize: 26, fontWeight: 900,
-            color: 'hsl(var(--foreground))',
-            letterSpacing: -0.8, lineHeight: 1.05,
-            marginBottom: 6,
-          }}>
-            {winnerName}
+          <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.3 }}>
+            {courseName}{location ? ` · ${location}` : ''}
           </div>
-
-          {/* Score */}
-          <div style={{
-            fontSize: 40, fontWeight: 900,
-            color: 'hsl(var(--accent-amber))',
-            letterSpacing: -2, lineHeight: 1,
-            marginBottom: 8,
-          }}>
-            {scoreDisplay}
+        </div>
+        <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
+          <div style={{ fontSize: 12, color: C.mutedLight, marginBottom: 4 }}>Final Round</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: C.amber }}>
+            🏆 FINAL
           </div>
-
         </div>
       </div>
 
-      {/* ── STATS GRID ──────────────────────────────────────────────── */}
-      {(tStats || sStats) && (
-        <div style={{
-          padding: '14px 16px 6px',
-          marginTop: -28,
-          position: 'relative',
-          zIndex: 4,
-        }}>
+      {/* Divider */}
+      <div style={{ height: 1, background: C.divider, margin: '14px 20px' }} />
 
-          {/* Row 1 — Scorecard stats */}
-          {tStats && (
-            <div style={{
-              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6,
-              marginBottom: 6,
-            }}>
-              {([
-                { v: tStats.eagles,   label: 'Eagles',  num: '#F59E0B', bg: 'rgba(245,158,11,0.10)'  },
-                { v: tStats.birdies,  label: 'Birdies', num: '#16A34A', bg: 'rgba(22,163,74,0.09)'   },
-                { v: tStats.pars,     label: 'Pars',    num: 'hsl(var(--foreground))', bg: 'rgba(0,0,0,0.04)'  },
-                { v: tStats.bogeys,   label: 'Bogeys',  num: '#DC2626', bg: 'rgba(220,38,38,0.08)'   },
-              ] as const).map(s => (
-                <div key={s.label} style={{
-                  textAlign: 'center' as const,
-                  padding: '9px 4px 7px',
-                  borderRadius: 12,
-                  background: 'rgba(255,255,255,0.55)',
-                  backdropFilter: 'blur(16px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-                  border: '1px solid rgba(255,255,255,0.75)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
+      {/* ═══ SECTION 2 — WINNER BLOCK ═══ */}
+      <div style={{ padding: '0 20px' }}>
+        {/* Eyebrow */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: C.amber, letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
+            🏆 CHAMPION
+          </span>
+          {winnerCountry && <CountryFlag country={winnerCountry} size="sm" />}
+        </div>
+
+        {/* Leader row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+          {/* Avatar */}
+          <div style={{ background: 'rgba(247,147,30,0.15)', border: '1.5px solid rgba(247,147,30,0.3)', borderRadius: '34%', overflow: 'hidden', flexShrink: 0 }}>
+            <SquircleAvatar
+              size="md"
+              src={winnerPhoto}
+              alt={winnerName}
+              hideRing
+              fallback={winnerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            />
+          </div>
+
+          {/* Name + subtitle */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: C.white, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+              {winnerName}
+            </div>
+            <div style={{ fontSize: 12, color: C.mutedLight, marginTop: 3 }}>
+              72 Holes · {courseName}
+            </div>
+          </div>
+
+          {/* Score */}
+          <div style={{ fontSize: 52, fontWeight: 900, color: C.white, letterSpacing: '-0.04em', lineHeight: 1, flexShrink: 0 }}>
+            {scoreDisplay}
+          </div>
+        </div>
+
+        {/* Round chips row */}
+        {hasRoundScores && (
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+            {[
+              { label: 'R1', value: r1 },
+              { label: 'R2', value: r2 },
+              { label: 'R3', value: r3 },
+              { label: 'R4', value: r4, isR4: true },
+            ].map((chip) => (
+              <div
+                key={chip.label}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  background: chip.isR4 ? 'rgba(247,147,30,0.12)' : C.chipSurfaceBg,
+                  border: `1px solid ${chip.isR4 ? 'rgba(247,147,30,0.3)' : C.chipSurfaceBorder}`,
+                  borderRadius: 8, padding: '5px 10px', minWidth: 44,
+                }}
+              >
+                <span style={{ fontSize: 9, color: C.mutedLight, fontWeight: 600, letterSpacing: '0.06em' }}>
+                  {chip.label}
+                </span>
+                <span style={{
+                  fontSize: 13, fontWeight: 800,
+                  color: chip.isR4 ? C.amber : roundScoreColor(chip.value),
                 }}>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: s.num, lineHeight: 1 }}>
-                    {s.v ?? 0}
-                  </div>
-                  <div style={{
-                    fontSize: 9, fontWeight: 700, letterSpacing: 0.8,
-                    textTransform: 'uppercase' as const,
-                    color: 'hsl(var(--muted-foreground))',
-                    marginTop: 3,
-                  }}>
-                    {s.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                  {formatRoundScore(chip.value)}
+                </span>
+              </div>
+            ))}
 
-          {/* Row 2 — Season performance stats */}
-          {sStats && (sStats.drivingDistance || sStats.greensInReg || sStats.puttingAverage) && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(${[sStats.drivingDistance, sStats.greensInReg, sStats.puttingAverage].filter(Boolean).length}, 1fr)`,
-              gap: 6, marginBottom: 8,
-            }}>
-              {sStats.drivingDistance && (
-                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 12, background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
-                    {Math.round(sStats.drivingDistance)}<span style={{ fontSize: 9, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>yds</span>
-                  </div>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))', marginTop: 3 }}>Driver</div>
-                </div>
-              )}
-              {sStats.greensInReg && (
-                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 12, background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
-                    {Math.round(sStats.greensInReg)}<span style={{ fontSize: 9, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>%</span>
-                  </div>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))', marginTop: 3 }}>GIR</div>
-                </div>
-              )}
-              {sStats.puttingAverage && (
-                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 12, background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
-                    {sStats.puttingAverage.toFixed(2)}
-                  </div>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))', marginTop: 3 }}>Putts/hole</div>
-                </div>
-              )}
-            </div>
-          )}
+            {/* Margin chip */}
+            {marginText && (
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: C.chipSurfaceBg,
+                border: `1px solid ${C.chipSurfaceBorder}`,
+                borderRadius: 8, padding: '5px 10px', minWidth: 44,
+              }}>
+                <span style={{ fontSize: 11, color: C.mutedLight }}>
+                  {marginText}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ═══ SECTION 3 — SCORE PROGRESSION SPARKLINE ═══ */}
+      {cumulativeScores && (
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, color: C.mutedDim,
+            letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+            marginBottom: 8,
+          }}>
+            Tournament · Score Progression
+          </div>
+          <SparklineChart scores={cumulativeScores} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+            {['R1', 'R2', 'R3', 'R4'].slice(0, cumulativeScores.length).map(label => (
+              <span key={label} style={{ fontSize: 9, color: C.mutedFaint }}>{label}</span>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* ── AI NARRATIVE ────────────────────────────────────────────── */}
+      {/* ═══ SECTION 4 — SCORECARD STATS GRID ═══ */}
+      {tStats && (
+        <div style={{ padding: '0 20px', marginBottom: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+            {([
+              { v: tStats.eagles,       label: 'Eagles',  color: C.amber },
+              { v: tStats.birdies,      label: 'Birdies', color: C.green },
+              { v: tStats.pars,         label: 'Pars',    color: C.muted },
+              { v: tStats.bogeys,       label: 'Bogeys',  color: C.red },
+              { v: tStats.doubleBogeys, label: 'Doubles', color: C.redDark },
+            ] as const).map(s => (
+              <div key={s.label} style={{
+                background: C.chipBg,
+                border: `1px solid ${C.chipBorder}`,
+                borderRadius: 10, padding: '9px 4px', textAlign: 'center',
+              }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: s.color, lineHeight: 1 }}>
+                  {s.v ?? 0}
+                </div>
+                <div style={{
+                  fontSize: 8, fontWeight: 700, color: C.mutedDim,
+                  letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 4,
+                }}>
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Divider */}
+      <div style={{ height: 1, background: C.divider, margin: '0 20px' }} />
+
+      {/* ═══ SECTION 5 — FINAL LEADERBOARD ═══ */}
+      {podiumRows.length > 0 && (
+        <div style={{ padding: '12px 20px' }}>
+          {/* Column headers */}
+          <div style={{ display: 'flex', alignItems: 'center', paddingBottom: 8, borderBottom: `1px solid ${C.divider}` }}>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: C.mutedFaint, letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+              PLAYER
+            </span>
+            <span style={{ width: 50, textAlign: 'right', fontSize: 10, fontWeight: 700, color: C.mutedFaint, letterSpacing: '0.1em' }}>
+              TOTAL
+            </span>
+            <span style={{ width: 36, textAlign: 'right', fontSize: 10, fontWeight: 700, color: C.mutedFaint, letterSpacing: '0.1em' }}>
+              THRU
+            </span>
+          </div>
+
+          {podiumRows.map((row, i) => {
+            const photo = getPlayerHeadshotUrl(row.playerName, 'pga') ?? PLAYER_SILHOUETTE_URL;
+            return (
+              <div
+                key={row.playerId}
+                style={{
+                  display: 'flex', alignItems: 'center', padding: '11px 0',
+                  borderBottom: i < podiumRows.length - 1 ? `1px solid ${C.rowBorder}` : 'none',
+                }}
+              >
+                {/* Position */}
+                <span style={{ fontSize: 12, fontWeight: 700, color: C.mutedFaint, width: 28, flexShrink: 0 }}>
+                  {row.isTied ? 'T' : ''}{row.position}
+                </span>
+                {/* Avatar */}
+                <div style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, marginRight: 10 }}>
+                  <SquircleAvatar
+                    size="sm"
+                    src={photo}
+                    alt={row.playerName}
+                    hideRing
+                    fallback={row.playerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  />
+                </div>
+                {/* Name */}
+                <span style={{
+                  flex: 1, fontSize: 14, fontWeight: 600,
+                  color: 'rgba(255,255,255,0.85)',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {row.playerName}
+                </span>
+                {/* Total */}
+                <span style={{ width: 50, textAlign: 'right', fontSize: 15, fontWeight: 800, color: C.amber }}>
+                  {row.scoreDisplay}
+                </span>
+                {/* Thru */}
+                <span style={{ width: 36, textAlign: 'right', fontSize: 12, color: C.mutedDim }}>
+                  F
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ═══ SECTION 6 — AI NARRATIVE BLOCK ═══ */}
       {narrative && (
-        <div style={{ padding: '4px 16px 14px', textAlign: 'center' }}>
+        <div style={{
+          background: 'rgba(247,147,30,0.06)',
+          border: '1px solid rgba(247,147,30,0.15)',
+          borderRadius: 12, padding: 14,
+          margin: '12px 20px',
+        }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, color: C.amber,
+            letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+            marginBottom: 8,
+          }}>
+            ⚡ AI Recap
+          </div>
           <p style={{
-            fontSize: 13, lineHeight: 1.6,
-            fontStyle: 'normal',
-            fontWeight: 500,
-            color: 'hsl(var(--foreground))',
-            margin: 0,
+            fontSize: 13, lineHeight: 1.65, color: 'rgba(255,255,255,0.6)',
+            fontStyle: 'italic', margin: 0,
           }}>
             {narrative}
           </p>
         </div>
       )}
 
-      {/* ── DIVIDER ─────────────────────────────────────────────────── */}
-      <div style={{ height: 1, background: 'hsl(var(--border))', margin: '0' }} />
+      {/* ═══ SECTION 7 — CTA ═══ */}
+      <div style={{ padding: '0 20px 16px' }}>
+        <button
+          onClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
+          style={{
+            width: '100%',
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 12, padding: 13,
+            fontSize: 13, fontWeight: 700,
+            color: 'rgba(255,255,255,0.7)',
+            cursor: 'pointer',
+          }}
+        >
+          Final Leaderboard →
+        </button>
+      </div>
 
-      {/* ── CLBHOUZ CALLED IT ───────────────────────────────────────── */}
+      {/* ═══ SECTION 8 — CLBHOUZ CALLED IT ═══ */}
       {allPicks && allPicks.length > 0 && (
-        <div style={{
-          background: 'rgba(245,158,11,0.015)',
-          borderTop: '1px solid hsl(var(--border))',
-          borderBottom: '1px solid hsl(var(--border))',
-        }}>
-          <ClubhouzCalledItSection allPicks={allPicks} tourSlug={tourSlug} />
-        </div>
+        <ClubhouzCalledItSection allPicks={allPicks} tourSlug={tourSlug} />
       )}
-
     </motion.div>
+  );
+}
+
+// ─── Sparkline SVG ───────────────────────────────────────────────────────────
+
+function SparklineChart({ scores }: { scores: number[] }) {
+  const width = 320;
+  const height = 56;
+  const padX = 4;
+  const padY = 6;
+
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  const range = max - min || 1;
+
+  const points = scores.map((s, i) => {
+    const x = padX + (i / (scores.length - 1)) * (width - padX * 2);
+    const y = padY + (1 - (s - min) / range) * (height - padY * 2);
+    return { x, y };
+  });
+
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+  const areaPath = `${linePath} L${points[points.length - 1].x},${height} L${points[0].x},${height} Z`;
+  const lastPoint = points[points.length - 1];
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 56, display: 'block' }}>
+      <defs>
+        <linearGradient id="sparkline-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(247,147,30,0.18)" />
+          <stop offset="100%" stopColor="rgba(247,147,30,0)" />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill="url(#sparkline-fill)" />
+      <path d={linePath} fill="none" stroke={C.amber} strokeWidth={1.5} opacity={0.7} />
+      <circle cx={lastPoint.x} cy={lastPoint.y} r={3.5} fill={C.amber} />
+    </svg>
   );
 }
