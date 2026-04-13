@@ -162,7 +162,7 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell>
         {/* Slate masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: '16px 16px 0' }} className="animate-pulse">
+        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }} className="animate-pulse">
           <div style={{ height: '8px', width: '140px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginBottom: '10px' }} />
           <div style={{ height: '22px', width: '70%', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '10px' }} />
           <div style={{ height: '120px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px 10px 0 0' }} />

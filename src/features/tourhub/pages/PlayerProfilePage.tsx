@@ -104,7 +104,7 @@ export function PlayerProfilePage() {
   if (playerLoading) {
     return (
       <PageRoot className="min-h-screen w-full" hasBottomNav>
-        <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
           <Skeleton className="h-3 w-32 mb-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
           <div style={{ display: 'flex', gap: 12 }}>
             <div style={{ flex: 1 }}>

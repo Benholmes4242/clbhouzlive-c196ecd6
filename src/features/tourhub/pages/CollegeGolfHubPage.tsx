@@ -136,7 +136,7 @@ export function CollegeGolfHubPage() {
 
         {/* Masthead */}
         {statsLoading ? (
-          <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+          <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
             <div style={{ height: '14px', width: '200px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
             <div style={{ height: '24px', width: '180px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
             <div style={{ height: '100px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', marginBottom: '12px' }} className="animate-pulse" />
