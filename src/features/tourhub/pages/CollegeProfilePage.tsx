@@ -120,7 +120,7 @@ export function CollegeProfilePage() {
     : null;
   
   return (
-    <PageRoot className="min-h-screen w-full bg-background" hasBottomNav
+    <PageRoot className="min-h-screen w-full bg-background" hasBottomNav immersive immersiveStatusBar
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
