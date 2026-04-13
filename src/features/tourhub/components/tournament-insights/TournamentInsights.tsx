@@ -7,8 +7,6 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEventWinner } from '../../hooks/useEventWinner';
-import { useTop5Leaderboard } from '../../hooks/useTop5Leaderboard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
 import { TournamentHeroCard } from './TournamentHeroCard';
@@ -340,36 +338,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
   const isLive = tournamentPhase === 'in-progress';
   const isCompleted = tournamentPhase === 'completed';
 
-  // Winner data for completed hero card
+  // Live score check for waiting-for-play detection
   const currentTournamentId = data?.tournament?.id ?? null;
-  const { data: eventWinner } = useEventWinner(isCompleted ? currentTournamentId ?? undefined : undefined);
-  const { data: top5ForHero = [] } = useTop5Leaderboard(isCompleted && !eventWinner ? currentTournamentId ?? undefined : undefined);
-  const heroWinner = useMemo(() => {
-    const w = eventWinner;
-    if (w) {
-      const scoreToPar = w.score_to_par;
-      const scoreDisplay = scoreToPar === null ? 'E' : scoreToPar === 0 ? 'E' : scoreToPar < 0 ? String(scoreToPar) : `+${scoreToPar}`;
-      return {
-        name: w.player?.full_name ?? '',
-        photoUrl: w.player?.photo_url ?? null,
-        scoreDisplay,
-        marginText: w.is_playoff ? 'Playoff' : w.margin === 1 ? 'Won by 1 stroke' : w.margin ? `Won by ${w.margin} strokes` : '',
-        country: w.player?.country ?? null,
-      };
-    }
-    const pos1 = top5ForHero[0];
-    if (pos1) {
-      return {
-        name: pos1.playerName,
-        photoUrl: pos1.photoUrl,
-        scoreDisplay: pos1.scoreDisplay,
-        marginText: '',
-        country: null,
-      };
-    }
-    return null;
-  }, [eventWinner, top5ForHero]);
-
   const { data: liveScoreCount } = useQuery({
     queryKey: ['live-score-check', currentTournamentId],
     queryFn: async () => {
@@ -686,7 +656,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
               >
-                <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={heroIsCompleted} winner={heroIsCompleted ? heroWinner : null} />
+                <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={heroIsCompleted} />
               </motion.div>
             </AnimatePresence>
           </div>
