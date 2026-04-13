@@ -951,7 +951,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <span style={{ fontSize: 14 }}>🏆</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: '#F7931E', letterSpacing: 1 }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: 1 }}>
                           FINAL
                         </span>
                       </div>
