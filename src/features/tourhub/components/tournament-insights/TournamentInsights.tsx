@@ -340,8 +340,36 @@ export const TournamentInsights = memo(function TournamentInsights() {
   const isLive = tournamentPhase === 'in-progress';
   const isCompleted = tournamentPhase === 'completed';
 
-  // Live score check for waiting-for-play detection
+  // Winner data for completed hero card
   const currentTournamentId = data?.tournament?.id ?? null;
+  const { data: eventWinner } = useEventWinner(isCompleted ? currentTournamentId ?? undefined : undefined);
+  const { data: top5ForHero = [] } = useTop5Leaderboard(isCompleted && !eventWinner ? currentTournamentId ?? undefined : undefined);
+  const heroWinner = useMemo(() => {
+    const w = eventWinner;
+    if (w) {
+      const scoreToPar = w.score_to_par;
+      const scoreDisplay = scoreToPar === null ? 'E' : scoreToPar === 0 ? 'E' : scoreToPar < 0 ? String(scoreToPar) : `+${scoreToPar}`;
+      return {
+        name: w.player?.full_name ?? '',
+        photoUrl: w.player?.photo_url ?? null,
+        scoreDisplay,
+        marginText: w.is_playoff ? 'Playoff' : w.margin === 1 ? 'Won by 1 stroke' : w.margin ? `Won by ${w.margin} strokes` : '',
+        country: w.player?.country ?? null,
+      };
+    }
+    const pos1 = top5ForHero[0];
+    if (pos1) {
+      return {
+        name: pos1.playerName,
+        photoUrl: pos1.photoUrl,
+        scoreDisplay: pos1.scoreDisplay,
+        marginText: '',
+        country: null,
+      };
+    }
+    return null;
+  }, [eventWinner, top5ForHero]);
+
   const { data: liveScoreCount } = useQuery({
     queryKey: ['live-score-check', currentTournamentId],
     queryFn: async () => {
