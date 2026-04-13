@@ -1223,6 +1223,28 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
                 >
+                {selectedPlayer ? (
+                  <motion.div
+                    key="completed-scorecard"
+                    initial={{ opacity: 0, x: 60 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 60 }}
+                    transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                    style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                  >
+                    <PlayerScorecardCard
+                      player={selectedPlayer}
+                      tournamentId={tournament.id}
+                      tournamentName={tournament.name}
+                      courseName={tournament.venueName || ''}
+                      onBack={handleBackToLeaderboard}
+                      onClose={() => {
+                        setSelectedPlayer(null);
+                      }}
+                    />
+                  </motion.div>
+                ) : (
+                  <>
                   {/* Fixed content area — winner, sparkline, stats */}
                   <div style={{ padding: '0 16px', flexShrink: 0 }}>
 
