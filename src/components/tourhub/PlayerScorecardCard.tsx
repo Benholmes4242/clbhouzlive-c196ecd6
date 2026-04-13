@@ -464,8 +464,10 @@ export function PlayerScorecardCard({
       <div style={{
         display: 'flex', alignItems: 'flex-end',
         justifyContent: 'space-between',
-        padding: '0 16px 12px',
+        padding: '0 clamp(10px, 3vw, 16px) 12px',
         flexShrink: 0,
+        gap: 8,
+        minWidth: 0,
       }}>
         {/* Left — avatar + name block */}
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
