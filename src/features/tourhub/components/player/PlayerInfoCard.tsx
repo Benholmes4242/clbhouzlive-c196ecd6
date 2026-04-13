@@ -1,10 +1,8 @@
 /**
- * PlayerInfoCard - Clean biographical grid.
- * Editorial layout on page background.
+ * PlayerInfoCard - Dispatch-style flat biographical grid.
  */
 
 import { Link } from 'react-router-dom';
-import { User } from 'lucide-react';
 import type { TourPlayer } from '../../hooks/useTourHubData';
 
 function formatHeight(inches: string | number | null | undefined): string | null {
@@ -43,9 +41,11 @@ interface InfoFieldProps {
 
 function InfoField({ label, value }: InfoFieldProps) {
   return (
-    <div>
-      <p className="text-muted-foreground/50" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{label}</p>
-      <div className="text-foreground" style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px' }}>{value}</div>
+    <div style={{ paddingBottom: '10px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+      <p style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, margin: '0 0 3px' }}>
+        {label}
+      </p>
+      <div style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A' }}>{value}</div>
     </div>
   );
 }
@@ -100,19 +100,18 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div className="px-4 py-6">
+    <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '14px 16px 16px' }}>
       {/* Section header */}
-      <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
-        <User className="w-4 h-4 text-muted-foreground" />
-        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Player Info
-        </h2>
+        </span>
       </div>
 
       {personalFields.length > 0 && (
         <div>
-          {/* Sub-section: PERSONAL — amber */}
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'hsl(var(--accent-amber) / 0.9)', marginBottom: '12px' }}>
+          <p style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>
             Personal
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>
@@ -124,13 +123,12 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       )}
 
       {personalFields.length > 0 && careerFields.length > 0 && (
-        <div style={{ borderTop: '1px solid hsl(var(--border) / 0.15)', margin: '16px 0' }} />
+        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '8px 0' }} />
       )}
 
       {careerFields.length > 0 && (
         <div>
-          {/* Sub-section: GOLF CAREER — amber */}
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'hsl(var(--accent-amber) / 0.9)', marginBottom: '12px' }}>
+          <p style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '14px 0 10px' }}>
             Golf Career
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>

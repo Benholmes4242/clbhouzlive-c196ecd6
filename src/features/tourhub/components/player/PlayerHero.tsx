@@ -1,15 +1,10 @@
 /**
- * PlayerHero - Immersive full-bleed hero with gradient scrim,
- * overlaid player identity, glass rank pills, and Ken Burns animation.
+ * PlayerHero - Dispatch-style slate editorial header with headshot.
  */
 
-import { motion } from 'framer-motion';
-import { Menu } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
-import { openTourNav } from '../../contexts/TourNavContext';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 interface PlayerHeroProps {
@@ -25,147 +20,86 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     : null;
 
   const countryDisplay = player.country ? titleCaseCountry(player.country) : null;
-  const isWorldNo1 = playerStats?.world_rank === 1;
 
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{ height: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
-    >
-      {/* Hero Image or Fallback Gradient */}
-      {heroPhotoUrl ? (
-        <motion.img
-          src={heroPhotoUrl}
-          alt={player.full_name}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center 5%' }}
-          loading="eager"
-          fetchPriority="high"
-          initial={{ scale: 1.06 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 10, ease: 'linear' }}
-          onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-        />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900" />
-      )}
+    <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+      {/* Amber eyebrow */}
+      <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
+        ⚡ CLBHOUZ · PLAYER PROFILE
+      </div>
 
-      {/* Gradient scrim — smooth multi-stop */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.03) 60%, transparent 80%)',
-        }}
-      />
-
-      {/* Burger menu — glass pill */}
-      <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
-        aria-label="Open tour menu"
-        className="absolute z-30 flex items-center justify-center active:scale-[0.97] transition-transform"
-        style={{
-          width: 36,
-          height: 36,
-          top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)',
-          left: 16,
-          borderRadius: 10,
-          background: 'rgba(0,0,0,0.28)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.15)',
-        }}
-      >
-        <Menu
-          className="w-[18px] h-[18px]"
-          strokeWidth={2}
-          style={{ color: '#FFFFFF' }}
-        />
-      </button>
-
-      {/* Overlay Content — bottom of hero */}
-      <motion.div
-        className="absolute bottom-0 left-0 right-0 z-10 px-4"
-        style={{ paddingBottom: '16px' }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
-        {/* Player Name — 28px, weight 700 */}
-        <h1
-          className="text-white"
-          style={{
-            fontSize: '28px',
-            fontWeight: 700,
-            letterSpacing: '-0.3px',
-            lineHeight: 1.15,
-            marginBottom: '4px',
-          }}
-        >
-          {player.full_name}
-        </h1>
-
-        {/* Country + Age — 13px, weight 500 */}
-        <div className="flex items-center gap-2" style={{ marginBottom: '8px' }}>
-          {countryDisplay && (
-            <span className="flex items-center gap-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
-              <CountryFlag country={player.country} size="sm" />
-              {countryDisplay}
-            </span>
-          )}
-          {age && (
-            <>
-              <span style={{ color: 'rgba(255,255,255,0.4)' }}>·</span>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>Age {age}</span>
-            </>
-          )}
-        </div>
-
-        {/* Glass Rank Pills */}
-        <div className="flex flex-wrap" style={{ gap: '8px' }}>
+      {/* Identity row — text left, headshot right */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', marginBottom: 0 }}>
+        {/* Left — rank eyebrow + name + country */}
+        <div style={{ flex: 1, minWidth: 0, paddingBottom: '14px' }}>
+          {/* World rank eyebrow */}
           {playerStats?.world_rank && playerStats.world_rank > 0 && (
-            <motion.span
-              className="inline-flex items-center text-white rounded-full"
-              style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '6px 14px',
-                background: 'rgba(255,255,255,0.15)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                ...(isWorldNo1 ? {
-                  boxShadow: '0 0 12px rgba(245,158,11,0.4)',
-                  borderColor: 'rgba(245,158,11,0.5)',
-                } : {}),
-              }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35, duration: 0.3 }}
-            >
-              #{playerStats.world_rank} World
-            </motion.span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+              <span style={{ fontSize: '20px', fontWeight: 900, color: 'rgba(247,147,30,0.2)', lineHeight: 1, letterSpacing: '-0.03em' }}>
+                {playerStats.world_rank}
+              </span>
+              <div>
+                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>WORLD RANKING</div>
+                <div style={{ fontSize: '8.5px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em' }}>
+                  {player.tour_codes?.[0]?.toUpperCase() ?? 'PGA TOUR'}
+                </div>
+              </div>
+            </div>
           )}
-          {playerStats?.fedex_rank && playerStats.fedex_rank > 0 && (
-            <motion.span
-              className="inline-flex items-center text-white rounded-full"
-              style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '6px 14px',
-                background: 'rgba(255,255,255,0.15)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-              }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
-            >
-              #{playerStats.fedex_rank} FedEx Cup
-            </motion.span>
-          )}
+
+          {/* Player name */}
+          <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.05, margin: '0 0 6px' }}>
+            {player.full_name}
+          </h1>
+
+          {/* Country + age */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CountryFlag country={player.country} size="sm" />
+            {countryDisplay && (
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)' }}>{countryDisplay}</span>
+            )}
+            {age && (
+              <>
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>·</span>
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>Age {age}</span>
+              </>
+            )}
+          </div>
         </div>
-      </motion.div>
+
+        {/* Right — headshot, bottom-anchored */}
+        <div style={{ flexShrink: 0, width: '110px', alignSelf: 'flex-end' }}>
+          <div style={{ width: '110px', height: '130px', borderRadius: '14px 14px 0 0', overflow: 'hidden', background: 'rgba(255,255,255,0.06)' }}>
+            <img
+              src={heroPhotoUrl}
+              alt={player.full_name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
+              onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 4-col key stats grid — flat, on slate */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+        {[
+          { label: 'WORLD', value: playerStats?.world_rank && playerStats.world_rank > 0 ? `#${playerStats.world_rank}` : '—', accent: true },
+          { label: 'FEDEX', value: playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? `#${playerStats.fedex_rank}` : '—', accent: false },
+          { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : '—', accent: playerStats?.wins != null && playerStats.wins > 0 },
+          { label: 'EARNED', value: playerStats?.earnings != null && playerStats.earnings > 0
+              ? playerStats.earnings >= 1_000_000 ? `$${(playerStats.earnings / 1_000_000).toFixed(1)}M` : `$${Math.round(playerStats.earnings / 1_000)}K`
+              : '—', accent: false },
+        ].map((s, i) => (
+          <div key={s.label} style={{ padding: '10px 0 12px', textAlign: 'center', borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+            <div style={{ fontSize: '8.5px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.12em', marginBottom: '3px' }}>
+              {s.label}
+            </div>
+            <div style={{ fontSize: '16px', fontWeight: 900, color: s.accent ? '#F7931E' : '#ffffff', letterSpacing: '-0.02em' }}>
+              {s.value}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

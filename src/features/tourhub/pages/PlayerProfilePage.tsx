@@ -1,6 +1,5 @@
 /**
- * PlayerProfilePage - Editorial player profile with full-bleed hero,
- * no card containers — content flows directly on page background.
+ * PlayerProfilePage - Dispatch-style player profile.
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -9,10 +8,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   PlayerHero,
   PlayerSeasonStats,
@@ -20,13 +17,8 @@ import {
   PlayerTournamentHistory,
   PlayerInfoCard,
 } from '../components/player';
-import { StatRibbon } from '../components/player/StatRibbon';
 import { PlayerRecentForm } from '../components/player/PlayerRecentForm';
-// TEMPORARILY HIDDEN — Clbhouz Rating (re-enable when algorithm is tuned)
-// import { ClbhouzRatingBadge } from '../components/player/ClbhouzRatingBadge';
-// import { RatingBreakdownBar } from '../components/player/RatingBreakdownBar';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
-// import { usePlayerRating } from '../hooks/usePlayerRating';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -44,9 +36,6 @@ export function PlayerProfilePage() {
   const location = useLocation();
   const queryClient = useQueryClient();
   const { hideHeader, showHeader } = useHeader();
-
-  // Transparent status bar for immersive hero bleed into safe area
-  useMedianStatusBar("dark", "transparent", true, false);
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
@@ -111,29 +100,28 @@ export function PlayerProfilePage() {
 
   if (playerLoading) {
     return (
-      <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar>
-        <Skeleton className="w-full" style={{ height: 'calc(35dvh + var(--sat, env(safe-area-inset-top, 0px)))' }} />
-        <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-          <div className="flex justify-between px-5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="text-center space-y-1">
-                <Skeleton className="h-3 w-10 mx-auto" />
-                <Skeleton className="h-5 w-8 mx-auto" />
+      <PageRoot className="min-h-screen w-full" hasBottomNav>
+        <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+          <Skeleton className="h-3 w-32 mb-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <Skeleton className="h-6 w-48 mb-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              <Skeleton className="h-4 w-32" style={{ background: 'rgba(255,255,255,0.1)' }} />
+            </div>
+            <Skeleton className="w-[110px] h-[130px] rounded-t-[14px]" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)', marginTop: 8 }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} style={{ padding: '10px 0 12px', textAlign: 'center' }}>
+                <Skeleton className="h-2 w-8 mx-auto mb-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                <Skeleton className="h-4 w-10 mx-auto" style={{ background: 'rgba(255,255,255,0.1)' }} />
               </div>
             ))}
           </div>
         </div>
-        {/* Sticky header skeleton */}
-        <div className="px-5 pt-3 pb-2">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-4 w-24" />
-            <div className="flex-1" />
-            <Skeleton className="h-[34px] w-28 rounded-[10px]" />
-          </div>
-        </div>
-        <div className="px-5 mt-4 space-y-5">
-          <Skeleton className="h-48 rounded-2xl" />
-          <Skeleton className="h-64 rounded-2xl" />
+        <div style={{ padding: '16px', marginTop: 8 }}>
+          <Skeleton className="h-48 rounded-lg" />
+          <Skeleton className="h-64 rounded-lg mt-4" />
         </div>
       </PageRoot>
     );
@@ -169,10 +157,9 @@ export function PlayerProfilePage() {
 
   return (
     <PageRoot
-      className="min-h-screen w-full bg-background"
-      immersive
-      immersiveStatusBar
+      className="min-h-screen w-full"
       hasBottomNav
+      style={{ background: '#F8FAFC' }}
     >
       {/* Pull-to-refresh indicator */}
       {(pullDistance > 0 || isRefreshing) && (
@@ -204,57 +191,51 @@ export function PlayerProfilePage() {
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
-        {/* Stats Strip — flush below hero */}
-        <StatRibbon playerStats={playerStats ?? null} />
-
-        {/* ══════════════════════════════════════════════
-            STICKY HEADER — ← Back | stat tabs
-            ══════════════════════════════════════════════ */}
+        {/* Sticky header — underline tab bar */}
         <div
-          className="-mx-5 sticky top-0 z-20"
           style={{
-            background: 'hsl(var(--background) / 0.96)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
+            background: 'rgba(248,250,252,0.97)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '1px solid hsl(var(--border) / 0.10)',
-            paddingTop: 10,
-            marginTop: 8,
+            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+            paddingTop: '8px',
           }}
         >
-          {/* Row 1: ← Back */}
-          <div className="flex items-center px-5 pt-2">
+          {/* Back link */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '0 20px 0' }}>
             <button
               onClick={handleBack}
-              className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity"
-              style={{ color: 'hsl(var(--muted-foreground) / 0.70)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
               Back
             </button>
           </div>
 
-          {/* Row 2: Stat tabs — centered */}
-          <div className="flex gap-1 overflow-x-auto scrollbar-hide px-5 pt-2 pb-2.5 justify-center">
+          {/* Underline tab bar */}
+          <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', marginTop: '6px' }}>
             {STAT_TABS.map((tab) => {
               const isActive = activeStatTab === tab;
               return (
                 <button
                   key={tab}
                   onClick={() => setActiveStatTab(tab)}
-                  className="flex-shrink-0 transition-all duration-200 active:scale-[0.97]"
+                  className="flex-shrink-0 active:scale-[0.97] transition-transform"
                   style={{
-                    height: 34,
-                    padding: '0 12px',
-                    borderRadius: 8,
-                    fontSize: 12,
-                    fontWeight: isActive ? 600 : 500,
-                    whiteSpace: 'nowrap',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                    color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-                    border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                    padding: '8px 14px',
+                    fontSize: '11px',
+                    fontWeight: isActive ? 800 : 500,
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap' as const,
+                    transition: 'all 0.15s',
                   }}
                 >
                   {tab}
@@ -264,35 +245,14 @@ export function PlayerProfilePage() {
           </div>
         </div>
 
-        {/* Momentum Strip — flush, 0 gap from stats */}
+        {/* Momentum Strip */}
         {playerId && <PlayerRecentForm playerId={playerId} />}
 
         {/* Content sections */}
-        <div className="w-full max-w-5xl mx-auto px-5" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-          {/* TEMPORARILY HIDDEN — Clbhouz Rating (re-enable when algorithm is tuned)
-          {playerRating && (
-            <motion.div
-              className="flex flex-col items-center text-center"
-              style={{ marginTop: 24, paddingTop: 8, paddingBottom: 8 }}
-              variants={sectionVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.4 }}
-            >
-              <ClbhouzRatingBadge rating={playerRating} />
-              {playerRating.breakdown && (
-                <div className="mt-2">
-                  <RatingBreakdownBar breakdown={playerRating.breakdown} />
-                </div>
-              )}
-            </motion.div>
-          )}
-          */}
-
-          {/* Season Performance — 28px from momentum strip */}
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+          {/* Season Performance */}
           <motion.div
-            style={{ marginTop: 28 }}
+            style={{ marginTop: 8 }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -314,10 +274,10 @@ export function PlayerProfilePage() {
             )}
           </motion.div>
 
-          {/* Skill Build — 28px gap */}
+          {/* Skill Build */}
           {playerId && (
             <motion.div
-              style={{ marginTop: 28 }}
+              style={{ marginTop: 8 }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -328,10 +288,10 @@ export function PlayerProfilePage() {
             </motion.div>
           )}
 
-          {/* Recent Tournaments — 28px gap */}
+          {/* Recent Tournaments */}
           {playerId && (
             <motion.div
-              style={{ marginTop: 28 }}
+              style={{ marginTop: 8 }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -342,9 +302,9 @@ export function PlayerProfilePage() {
             </motion.div>
           )}
 
-          {/* Player Info — 28px gap */}
+          {/* Player Info */}
           <motion.div
-            style={{ marginTop: 28 }}
+            style={{ marginTop: 8 }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -355,7 +315,7 @@ export function PlayerProfilePage() {
           </motion.div>
 
           {/* Bottom spacer */}
-          <div style={{ marginTop: 28 }} />
+          <div style={{ marginTop: 8 }} />
         </div>
       </div>
     </PageRoot>

@@ -1,15 +1,12 @@
 /**
- * PlayerTournamentHistory - Clean editorial list layout.
- * No card container — content sits directly on page background.
+ * PlayerTournamentHistory - Dispatch-style flat ruled table.
  */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../../hooks/usePlayerResults';
-import { TOUR_COLORS } from '../../constants/colors';
 
 interface PlayerTournamentHistoryProps {
   playerId: string;
@@ -24,23 +21,33 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
   return (
-    <div className="px-4 py-6 border-b border-border/30">
-      {/* Section header — 22px / 700 */}
-      <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
-        <Activity className="w-4 h-4 text-muted-foreground" />
-        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Recent Tournaments
-        </h2>
+    <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      {/* Section header */}
+      <div style={{ padding: '14px 16px 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Recent Tournaments
+          </span>
+        </div>
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-3 px-4 pb-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-12 bg-muted/30 rounded-lg animate-pulse" />
           ))}
         </div>
       ) : results && results.length > 0 ? (
         <>
+          {/* Column headers */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
+            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', width: '44px', flexShrink: 0 }}>POS</span>
+            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em' }}>TOURNAMENT</span>
+            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>DATE</span>
+            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>SCORE</span>
+          </div>
+
           <div>
             {results.map((result) => {
               const pos = formatPosition(result.position, result.position_tied, result.status);
@@ -52,55 +59,39 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                 <Link
                   key={result.id}
                   to={`/tourhub/tournament/${result.tournament_id}`}
-                  className="flex items-center gap-3 active:scale-[0.98] transition-transform"
-                  style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
+                  style={{
+                    display: 'flex', alignItems: 'center',
+                    padding: '11px 16px',
+                    borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                    borderLeft: isWin ? '3px solid #F7931E' : '3px solid transparent',
+                    background: isWin ? 'rgba(247,147,30,0.03)' : 'transparent',
+                    textDecoration: 'none',
+                  }}
+                  className="active:bg-black/[0.02] transition-colors"
                 >
-                  {/* Position — 14px, weight 700 */}
-                  <span
-                    className="shrink-0"
-                    style={{
-                      width: '52px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      fontVariantNumeric: 'tabular-nums',
-                      color: isWin ? 'hsl(var(--accent-amber))' : 'hsl(var(--foreground))',
-                    }}
-                  >
-                    {isWin ? (
-                      <span className="flex items-center gap-1" aria-label="Winner">
-                        <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
-                      </span>
-                    ) : pos}
+                  {/* Position */}
+                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? '#F7931E' : '#64748B', display: 'flex', alignItems: 'center' }}>
+                    {isWin ? <Trophy style={{ width: 14, height: 14, color: '#F7931E' }} /> : pos}
                   </span>
 
-                  {/* Tournament name — 14px, weight 500 */}
-                  <span className="text-foreground flex-1 min-w-0 truncate" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
+                  {/* Tournament name */}
+                  <span style={{ flex: 1, fontSize: '13px', fontWeight: isWin ? 700 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                     {result.tournament_name}
                   </span>
 
-                  {/* Date — 12px, weight 500 */}
-                  <span className="text-muted-foreground shrink-0" style={{ fontSize: '12px', fontWeight: 400, width: '56px', textAlign: 'right' }}>
+                  {/* Date */}
+                  <span style={{ fontSize: '10px', color: '#94A3B8', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>
                     {result.tournament_end_date
                       ? format(new Date(result.tournament_end_date), 'MMM d')
                       : '—'}
                   </span>
 
-                  {/* Score — 14px, weight 700 */}
-                  <span
-                    className="shrink-0"
-                    style={{
-                      width: '40px',
-                      textAlign: 'right',
-                      fontSize: '15px',
-                      fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                      color: score !== null && score < 0
-                        ? 'hsl(var(--accent-amber) / 0.9)'
-                        : score !== null && score > 0
-                          ? TOUR_COLORS.scoreOverPar
-                          : TOUR_COLORS.scoreEven,
-                    }}
-                  >
+                  {/* Score */}
+                  <span style={{
+                    fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                    width: '36px', textAlign: 'right' as const, flexShrink: 0,
+                    color: score !== null && score < 0 ? '#F7931E' : score !== null && score > 0 ? '#DC2626' : '#94A3B8',
+                  }}>
                     {scoreStr}
                   </span>
                 </Link>
@@ -111,21 +102,17 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
           {hasMore && (
             <button
               onClick={() => setShowAll(prev => !prev)}
-              className="mt-4 w-full flex items-center justify-center gap-1.5 text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all min-h-[44px]"
-              style={{ fontSize: '14px', fontWeight: 600 }}
+              style={{ width: '100%', padding: '12px 0', fontSize: '12px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
+              className="active:opacity-70 transition-opacity"
             >
-              {showAll ? (
-                <>Show Less <ChevronUp className="w-4 h-4" /></>
-              ) : (
-                <>View All Results <ChevronDown className="w-4 h-4" /></>
-              )}
+              {showAll ? 'Show Less' : 'View All Results ›'}
             </button>
           )}
         </>
       ) : (
         <div className="py-12 text-center">
-          <p className="text-muted-foreground font-medium">No tournament results yet</p>
-          <p className="text-xs text-muted-foreground/70 mt-1">
+          <p style={{ fontWeight: 500, color: '#64748B' }}>No tournament results yet</p>
+          <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '4px' }}>
             Results will appear as tournaments are completed
           </p>
         </div>

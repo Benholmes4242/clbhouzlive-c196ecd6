@@ -1,6 +1,5 @@
 /**
- * PlayerRecentForm - Full-width tinted strip with trend icon
- * showing recent form assessment from last 5 results.
+ * PlayerRecentForm - Dispatch left-rule strip showing recent form.
  */
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
@@ -20,24 +19,20 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
     return r.position !== null && s !== 'CUT' && s !== 'MC' && s !== 'WD';
   });
 
-  // All recent results were cuts — show a specific indicator
+  // All recent results were cuts
   if (completedResults.length === 0) {
     const cutCount = results.filter(r => r.status?.toUpperCase() === 'CUT').length;
     if (cutCount === 0) return null;
     return (
-      <div
-        style={{
-          padding: '12px 16px',
-          backgroundColor: 'hsl(var(--muted) / 0.2)',
-          borderLeft: '3px solid hsl(var(--muted-foreground) / 0.3)',
-          borderBottom: '1px solid hsl(var(--border) / 0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }}
-      >
-        <TrendingDown style={{ width: 16, height: 16, color: 'hsl(var(--muted-foreground))', flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '8px',
+        padding: '10px 14px',
+        background: 'rgba(15,23,42,0.03)',
+        borderLeft: '3px solid rgba(15,23,42,0.15)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+      }}>
+        <TrendingDown style={{ width: 14, height: 14, color: '#94A3B8', flexShrink: 0 }} />
+        <span style={{ fontSize: '12px', fontWeight: 600, color: '#94A3B8' }}>
           Out of form · missed last {cutCount} {cutCount === 1 ? 'cut' : 'cuts'}
         </span>
       </div>
@@ -50,51 +45,40 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
 
   let formLabel: string;
   let textColor: string;
-  let bgColor: string;
-  let borderColor: string;
   let Icon: React.ElementType;
 
   if (avgPosition <= 5) {
     formLabel = 'On fire';
-    textColor = 'hsl(var(--accent-amber))';
-    bgColor = 'hsl(var(--accent-amber) / 0.08)';
-    borderColor = 'hsl(var(--accent-amber))';
+    textColor = '#F7931E';
     Icon = TrendingUp;
   } else if (avgPosition <= 10) {
     formLabel = 'In form';
-    textColor = 'hsl(var(--accent-amber))';
-    bgColor = 'hsl(var(--accent-amber) / 0.08)';
-    borderColor = 'hsl(var(--accent-amber))';
+    textColor = '#F7931E';
     Icon = TrendingUp;
   } else if (avgPosition <= 25) {
     formLabel = 'Steady';
-    textColor = 'hsl(var(--muted-foreground))';
-    bgColor = 'hsl(var(--muted) / 0.2)';
-    borderColor = 'hsl(var(--muted-foreground) / 0.3)';
+    textColor = '#94A3B8';
     Icon = Minus;
   } else {
     formLabel = 'Out of form';
-    textColor = 'hsl(var(--muted-foreground))';
-    bgColor = 'hsl(var(--muted) / 0.2)';
-    borderColor = 'hsl(var(--muted-foreground) / 0.3)';
+    textColor = '#94A3B8';
     Icon = TrendingDown;
   }
 
   return (
-    <div
-      style={{
-        padding: '12px 16px',
-        backgroundColor: bgColor,
-        borderLeft: `3px solid ${borderColor}`,
-        borderBottom: '1px solid hsl(var(--border) / 0.1)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-      }}
-    >
-      <Icon style={{ width: '16px', height: '16px', color: textColor, flexShrink: 0 }} />
-      <span style={{ fontSize: '13px', fontWeight: 600, color: textColor }}>
-        {formLabel} · avg. finish: {avgPosition} over last {completedResults.length} {completedResults.length === 1 ? 'event' : 'events'}
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '8px',
+      padding: '10px 14px',
+      background: avgPosition <= 10 ? 'rgba(247,147,30,0.05)' : 'rgba(15,23,42,0.03)',
+      borderLeft: `3px solid ${avgPosition <= 10 ? '#F7931E' : 'rgba(15,23,42,0.15)'}`,
+      borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+    }}>
+      <Icon style={{ width: 14, height: 14, color: textColor, flexShrink: 0 }} />
+      <span style={{ fontSize: '12px', fontWeight: 700, color: textColor }}>
+        {formLabel}
+      </span>
+      <span style={{ fontSize: '12px', color: '#64748B' }}>
+        · avg. finish: {avgPosition} over last {completedResults.length} events
       </span>
     </div>
   );

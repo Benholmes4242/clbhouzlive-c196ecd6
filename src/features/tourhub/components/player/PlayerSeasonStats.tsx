@@ -1,12 +1,9 @@
 /**
- * PlayerSeasonStats - Editorial tabbed season statistics.
- * No card container — content sits directly on page background.
+ * PlayerSeasonStats - Dispatch-style tabbed season statistics.
  */
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, Trophy, Target, BarChart3, Flag } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 // Tour averages — 2026 PGA Tour season
@@ -48,50 +45,37 @@ interface StatRowProps {
 
 function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps) {
   const hasValue = value !== '—';
-  
-  // Split value and units
   const unitMatch = hasValue ? value.match(/^(.+?)\s*(yds|%)$/) : null;
   const mainValue = unitMatch ? unitMatch[1] : value;
   const unitSuffix = unitMatch ? unitMatch[2] : null;
-  
+
   return (
-    <div
-      style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
-      aria-label={`${label}: ${value}`}
-    >
-      <div className="flex justify-between items-center">
-        <span className="text-foreground" style={{ fontSize: '15px', fontWeight: 500 }}>{label}</span>
-        <div className="flex flex-col items-end">
-          <span style={{
-            fontSize: '15px',
-            fontWeight: 700,
-            fontVariantNumeric: 'tabular-nums',
-            color: hasValue
-              ? (trend === 'positive' ? 'hsl(var(--accent-amber))' : trend === 'negative' ? 'hsl(var(--muted-foreground))' : undefined)
-              : undefined,
-          }} className={hasValue ? (trend ? '' : 'text-foreground') : 'text-muted-foreground'}>
-            {mainValue}
-            {unitSuffix && (
-              <span className="text-muted-foreground" style={{ fontWeight: 500 }}>{' '}{unitSuffix}</span>
-            )}
-          </span>
-          {barPercent !== undefined && hasValue && (
-            <div style={{ marginTop: '4px', width: '120px', height: '4px', borderRadius: '2px', backgroundColor: 'hsl(var(--border))' }} className="overflow-hidden">
-              <motion.div
-                style={{
-                  height: '100%',
-                  borderRadius: '2px',
-                  backgroundColor: 'hsl(var(--accent-amber) / 0.9)',
-                  width: `${Math.min(100, Math.max(0, barPercent))}%`,
-                  originX: 0,
-                }}
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 + barIndex * 0.1, ease: 'easeOut' }}
-              />
-            </div>
-          )}
-        </div>
+    <div style={{ display: 'flex', alignItems: 'center', padding: '11px 0', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
+      <div style={{ textAlign: 'right' as const }}>
+        <span style={{
+          fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+          color: hasValue
+            ? (trend === 'positive' ? '#F7931E' : trend === 'negative' ? '#94A3B8' : '#0F172A')
+            : '#94A3B8',
+        }}>
+          {mainValue}
+          {unitSuffix && <span style={{ fontSize: '10px', fontWeight: 500, color: '#94A3B8' }}> {unitSuffix}</span>}
+        </span>
+        {barPercent !== undefined && hasValue && (
+          <div style={{ marginTop: '4px', width: '100px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)', overflow: 'hidden' }}>
+            <motion.div
+              style={{
+                height: '100%', borderRadius: '2px',
+                background: '#F7931E',
+                originX: 0,
+              }}
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(100, Math.max(0, barPercent))}%` }}
+              transition={{ duration: 0.5, delay: 0.2 + barIndex * 0.08, ease: 'easeOut' }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -104,40 +88,30 @@ interface SGBarProps {
 
 function SGBar({ label, value }: SGBarProps) {
   if (value === null || value === undefined) return null;
-  const maxWidth = 50;
-  const barWidth = Math.min(maxWidth, (Math.abs(value) / 3.0) * maxWidth);
+  const maxPct = 50;
+  const barPct = Math.min(maxPct, (Math.abs(value) / 3.0) * maxPct);
   const isPositive = value >= 0;
-  const formattedValue = value === 0 ? '0.00' : value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
+  const formatted = value === 0 ? '0.00' : value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
 
   return (
-    <div
-      style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
-      aria-label={`${label}: ${formattedValue} strokes gained`}
-    >
-      <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
-        <span className="text-foreground" style={{ fontSize: '15px', fontWeight: 500 }}>{label}</span>
-        <span style={{
-          fontSize: '15px',
-          fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums',
-          color: isPositive ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
-        }}>
-          {formattedValue}
+    <div style={{ padding: '11px 0', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+        <span style={{ fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
+        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? '#F7931E' : '#94A3B8' }}>
+          {formatted}
         </span>
       </div>
-      <div className="relative overflow-hidden" style={{ height: '5px', borderRadius: '2.5px' }} >
-        <div className="absolute inset-0" style={{ backgroundColor: 'hsl(var(--border))' }} />
-        <div className="absolute left-1/2 top-0 bottom-0 z-10" style={{ width: 1, backgroundColor: 'hsl(var(--border))' }} />
+      {/* Centred diverging bar */}
+      <div style={{ position: 'relative', height: '4px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)' }}>
+        <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(15,23,42,0.15)' }} />
         <motion.div
-          className="absolute top-0 bottom-0"
           style={{
-            borderRadius: '2.5px',
-            backgroundColor: isPositive ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground) / 0.5)',
-            width: `${barWidth}%`,
-            left: isPositive ? '50%' : `${50 - barWidth}%`,
+            position: 'absolute', top: 0, bottom: 0, borderRadius: '2px',
+            background: isPositive ? '#F7931E' : '#94A3B8',
+            left: isPositive ? '50%' : `${50 - barPct}%`,
           }}
           initial={{ width: 0 }}
-          animate={{ width: `${barWidth}%` }}
+          animate={{ width: `${barPct}%` }}
           transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
         />
       </div>
@@ -145,9 +119,21 @@ function SGBar({ label, value }: SGBarProps) {
   );
 }
 
+function SubSectionLabel({ label, style }: { label: string; style?: React.CSSProperties }) {
+  return (
+    <p style={{
+      fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1',
+      letterSpacing: '0.14em', textTransform: 'uppercase' as const,
+      padding: '14px 0 6px', margin: 0,
+      ...style,
+    }}>
+      {label}
+    </p>
+  );
+}
+
 interface PlayerSeasonStatsProps {
   playerStats: TourPlayerStatistics;
-  /** Tab controlled externally by PlayerProfilePage sticky header */
   activeTab?: string;
 }
 
@@ -161,15 +147,18 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div className="px-4 py-6 border-b border-border/30">
-      {/* Section header */}
-      <div style={{ marginBottom: '12px' }}>
-        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Season Performance
-        </h2>
+    <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      {/* Dispatch section header */}
+      <div style={{ padding: '14px 16px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Season Performance · 2026
+          </span>
+        </div>
       </div>
 
-      {/* Tab content — 16px gap from tabs */}
+      {/* Tab content */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
@@ -178,11 +167,11 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          style={{ marginTop: '16px' }}
+          style={{ padding: '0 16px 14px' }}
         >
           {activeTab === 'Player Overview' && (
             <div>
-              <SubSectionLabel icon={Trophy} label="RESULTS" style={{ marginTop: 0 }} />
+              <SubSectionLabel label="RESULTS" style={{ marginTop: 0 }} />
               <StatRow label="Events Played" value={fmt(playerStats.events_played)} />
               <StatRow
                 label="Wins"
@@ -204,7 +193,7 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
                 }
               />
 
-              <SubSectionLabel icon={TrendingUp} label="EARNINGS" style={{ marginTop: '24px' }} />
+              <SubSectionLabel label="EARNINGS" style={{ marginTop: '24px' }} />
               <StatRow label="Season Earnings" value={fmt(playerStats.earnings, 'currency')} />
               <StatRow label="FedEx Points" value={fmt(playerStats.fedex_points)} />
             </div>
@@ -212,7 +201,7 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
 
           {activeTab === 'Ball Striking' && (
             <div>
-              <SubSectionLabel icon={Target} label="OFF THE TEE" style={{ marginTop: 0 }} />
+              <SubSectionLabel label="OFF THE TEE" style={{ marginTop: 0 }} />
               <StatRow
                 label="Driving Distance"
                 value={fmt(playerStats.driving_distance, 'yards')}
@@ -238,7 +227,7 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
                 barIndex={1}
               />
 
-              <SubSectionLabel icon={Target} label="APPROACH" style={{ marginTop: 24 }} />
+              <SubSectionLabel label="APPROACH" style={{ marginTop: 24 }} />
               <StatRow
                 label="Greens in Regulation"
                 value={fmt(playerStats.greens_in_reg, 'percent')}
@@ -256,7 +245,7 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
                 barIndex={3}
               />
 
-              <SubSectionLabel icon={Target} label="OVERALL" style={{ marginTop: 24 }} />
+              <SubSectionLabel label="OVERALL" style={{ marginTop: 24 }} />
               <StatRow
                 label="Total Driving"
                 value={playerStats.total_driving ? `#${playerStats.total_driving}` : '—'}
@@ -275,12 +264,12 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
           {activeTab === 'Short Game' && (
             <>
               {!playerStats.putting_average && !playerStats.sand_saves && !playerStats.scrambling ? (
-                <p className="text-muted-foreground text-center" style={{ fontSize: 14, padding: '24px 0' }}>
+                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: '#94A3B8' }}>
                   Short game stats unavailable for this player.
                 </p>
               ) : (
                 <div>
-                  <SubSectionLabel icon={Flag} label="ON THE GREEN" style={{ marginTop: 0 }} />
+                  <SubSectionLabel label="ON THE GREEN" style={{ marginTop: 0 }} />
                   <StatRow
                     label="Putting Average"
                     value={fmt(playerStats.putting_average, 'putting')}
@@ -312,7 +301,7 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
                     barIndex={1}
                   />
 
-                  <SubSectionLabel icon={Target} label="AROUND THE GREEN" style={{ marginTop: 24 }} />
+                  <SubSectionLabel label="AROUND THE GREEN" style={{ marginTop: 24 }} />
                   <StatRow
                     label="Sand Saves"
                     value={fmt(playerStats.sand_saves, 'percent')}
@@ -348,15 +337,15 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
 
           {activeTab === 'Shots Gained' && (
             <div>
-              <SubSectionLabel icon={TrendingUp} label="STROKES GAINED" style={{ marginTop: 0 }} />
-              <p style={{ fontSize: 12, color: 'hsl(var(--muted-foreground) / 0.5)', marginBottom: 16 }}>
+              <SubSectionLabel label="STROKES GAINED" style={{ marginTop: 0 }} />
+              <p style={{ fontSize: 12, color: '#94A3B8', marginBottom: 16 }}>
                 Strokes gained vs. tour average per round
               </p>
               <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
               <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
               <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
               {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && !playerStats.strokes_gained && (
-                <p className="text-muted-foreground text-center" style={{ fontSize: 14, padding: '24px 0' }}>
+                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: '#94A3B8' }}>
                   Strokes Gained data unavailable for this player.
                 </p>
               )}
@@ -365,25 +354,5 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
         </motion.div>
       </AnimatePresence>
     </div>
-  );
-}
-
-function SubSectionLabel({ icon: Icon, label, style }: { icon: React.ElementType; label: string; style?: React.CSSProperties }) {
-  return (
-    <p
-      className="flex items-center gap-1.5 text-muted-foreground/50"
-      style={{
-        fontSize: '11px',
-        fontWeight: 700,
-        letterSpacing: '0.05em',
-        textTransform: 'uppercase' as const,
-        marginTop: '20px',
-        marginBottom: '10px',
-        ...style,
-      }}
-    >
-      <Icon style={{ width: '14px', height: '14px' }} />
-      {label}
-    </p>
   );
 }
