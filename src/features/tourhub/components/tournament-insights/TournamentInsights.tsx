@@ -686,7 +686,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
               >
-                <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={heroIsCompleted} />
+                <TournamentHeroCard tournament={heroData} isLive={heroIsLive} isCompleted={heroIsCompleted} winner={heroIsCompleted ? heroWinner : null} />
               </motion.div>
             </AnimatePresence>
           </div>
