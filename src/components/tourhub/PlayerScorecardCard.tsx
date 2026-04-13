@@ -31,6 +31,7 @@ interface PlayerScorecardCardProps {
   tournamentId: string;
   tournamentName: string;
   courseName: string;
+  isCompleted?: boolean;
   onBack: () => void;
   onClose: () => void;
 }
@@ -373,6 +374,7 @@ export function PlayerScorecardCard({
   player,
   tournamentId,
   tournamentName,
+  isCompleted = false,
   onBack,
   onClose,
 }: PlayerScorecardCardProps) {
@@ -455,6 +457,7 @@ export function PlayerScorecardCard({
         <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)' }}>
           {tournamentName && tournamentName.length < 20 ? tournamentName : 'PGA TOUR'}
           {` · R${currentRound}`}
+          {isCompleted && currentRound === 4 ? ' · Final' : ''}
         </span>
       </div>
 
@@ -519,7 +522,7 @@ export function PlayerScorecardCard({
               <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
                 {`Round ${currentRound}`}
-                {player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
+                {isCompleted && currentRound === 4 ? ' · Final' : player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
               </span>
             </div>
           </div>

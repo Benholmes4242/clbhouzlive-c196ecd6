@@ -1251,6 +1251,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       tournamentId={tournament.id}
                       tournamentName={tournament.name}
                       courseName={tournament.venueName || ''}
+                      isCompleted={true}
                       onBack={handleBackToLeaderboard}
                       onClose={() => {
                         setSelectedPlayer(null);
