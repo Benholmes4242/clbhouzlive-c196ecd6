@@ -365,75 +365,13 @@ export function ScheduleTab() {
         className="sticky top-0 z-30 -mx-5 bg-background/95 backdrop-blur-xl border-b border-border/10"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
-        {/* ── ROW 1: Filter pills + Search icon toggle ── */}
-        <div className="flex items-center gap-2 px-5 pt-2.5 pb-0">
-          <div className="flex items-center flex-1 gap-0">
-            {(['all', 'upcoming', 'live', 'completed'] as const).map((f) => {
-              const isActive = filter === f;
-              const isLive = f === 'live';
-              const label = f === 'all' ? 'All' : f === 'upcoming' ? 'Upcoming' : f === 'live' ? 'Live' : 'Completed';
-              const count = filterStats[f];
-              return (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={cn(
-                    'relative flex-1 h-[38px] rounded-[10px] text-[13px] font-semibold transition-all duration-200',
-                    'flex items-center justify-center gap-1.5 active:scale-[0.97]',
-                    isActive
-                      ? isLive
-                        ? 'text-white'
-                        : 'bg-foreground text-background'
-                      : 'bg-transparent text-muted-foreground'
-                  )}
-                  style={isActive && isLive ? { background: '#22C55E' } : undefined}
-                >
-                  {isLive && count > 0 && (
-                    <span className="relative flex h-[6px] w-[6px] shrink-0">
-                      <span
-                        className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-75"
-                        style={{ background: isActive ? 'rgba(255,255,255,0.8)' : '#22C55E' }}
-                      />
-                      <span
-                        className="relative inline-flex h-[6px] w-[6px] rounded-full"
-                        style={{ background: isActive ? 'rgba(255,255,255,0.9)' : '#22C55E' }}
-                      />
-                    </span>
-                  )}
-                  {label}
-                  {isLive && count > 0 && !isActive && (
-                    <span
-                      className="absolute top-[5px] right-[5px] flex items-center justify-center rounded-full text-white font-bold"
-                      style={{ background: '#22C55E', fontSize: 9, width: 14, height: 14, lineHeight: 1 }}
-                    >
-                      {count}
-                    </span>
-                  )}
-                  {isLive && count > 0 && isActive && (
-                    <span
-                      className="flex items-center justify-center rounded-full font-bold text-white"
-                      style={{ background: 'rgba(255,255,255,0.25)', fontSize: 10, padding: '0 4px', height: 16, lineHeight: '16px' }}
-                    >
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <button
-            onClick={() => setSearchExpanded(v => !v)}
-            className={cn(
-              'w-[38px] h-[38px] rounded-[10px] flex items-center justify-center shrink-0 transition-colors duration-150',
-              searchExpanded ? 'bg-amber-50' : 'bg-transparent'
-            )}
-          >
-            <Search
-              className="w-[17px] h-[17px] transition-colors duration-150"
-              style={{ color: searchExpanded ? '#F59E0B' : undefined }}
-              strokeWidth={2.5}
-            />
-          </button>
+        {/* ── ROW 1: Filter underline tabs ── */}
+        <div style={{ padding: '0' }}>
+          <ScheduleFilterPills
+            activeFilter={filter}
+            onFilterChange={setFilter}
+            counts={filterStats}
+          />
         </div>
 
         {/* ── SEARCH BAR — collapsible ── */}
@@ -471,7 +409,7 @@ export function ScheduleTab() {
           </div>
         </div>
 
-        {/* ── ROW 2: ← Tour Overview + Tour filter pill ── */}
+        {/* ── ROW 2: ← Tour Overview + Search + Tour filter pill ── */}
         <div className="flex items-center justify-between px-5 pt-2 pb-2.5">
           <button
             type="button"
@@ -481,24 +419,39 @@ export function ScheduleTab() {
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
           </button>
-          <button
-            onClick={() => setTourSheetOpen(true)}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] transition-all duration-150 active:scale-[0.97]',
-              'bg-card border border-border/50 shadow-sm',
-              activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
-            )}
-          >
-            <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
-            <span className="text-[12px] font-semibold text-foreground">
-              {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
-            </span>
-            <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSearchExpanded(v => !v)}
+              className={cn(
+                'w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0 transition-colors duration-150',
+                searchExpanded ? 'bg-amber-50' : 'bg-transparent'
+              )}
+            >
+              <Search
+                className="w-[15px] h-[15px] transition-colors duration-150"
+                style={{ color: searchExpanded ? '#F59E0B' : undefined }}
+                strokeWidth={2.5}
+              />
+            </button>
+            <button
+              onClick={() => setTourSheetOpen(true)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] transition-all duration-150 active:scale-[0.97]',
+                'bg-card border border-border/50 shadow-sm',
+                activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
+              )}
+            >
+              <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
+              <span className="text-[12px] font-semibold text-foreground">
+                {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
+              </span>
+              <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="bg-background">
+      <div style={{ background: '#ffffff', marginTop: '8px' }}>
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
@@ -539,14 +492,16 @@ export function ScheduleTab() {
                     />
                   )}
 
-                  {/* Tournament list — 12px gap from header, 12px between cards */}
-                  <div className="flex flex-col gap-3 px-5 mt-3">
-                    {group.tournaments.map((tournament) => (
+                  {/* Tournament list — flat rows with hairline dividers */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    {group.tournaments.map((tournament, idx) => (
                       <InViewCard key={tournament.id}>
-                        <ScheduleTournamentCard 
-                          tournament={tournament}
-                          leaderWinner={leadersWinnersMap?.get(tournament.id)}
-                        />
+                        <div style={{ borderBottom: idx < group.tournaments.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+                          <ScheduleTournamentCard 
+                            tournament={tournament}
+                            leaderWinner={leadersWinnersMap?.get(tournament.id)}
+                          />
+                        </div>
                       </InViewCard>
                     ))}
                   </div>
