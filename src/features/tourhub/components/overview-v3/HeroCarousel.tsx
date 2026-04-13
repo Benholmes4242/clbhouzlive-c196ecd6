@@ -1554,6 +1554,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <ChevronRight style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.6)' }} />
                     </Link>
                   </div>
+                  </>
+                )}
                 </motion.div>
               )}
 
