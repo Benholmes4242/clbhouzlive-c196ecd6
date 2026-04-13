@@ -929,9 +929,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 1, flexShrink: 0 }}>
-                      <span style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.8px', color: 'rgba(255,255,255,0.4)' }}>
-                        Final Round
-                      </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <span style={{ fontSize: 14 }}>🏆</span>
                         <span style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: 1 }}>
@@ -1022,7 +1019,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         className="active:opacity-70 transition-opacity cursor-pointer"
                         style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 5, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
                       >
-                        {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
+                        {tournament.venueName}
                       </button>
                     </div>
                   </div>
@@ -1271,7 +1268,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                     </div>
                                   </button>
                                   <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 3 }}>
-                                    72 Holes · {tournament.venueName || 'Tournament Complete'}
+                                    72 Holes
                                   </div>
                                 </div>
                               </div>
