@@ -24,7 +24,7 @@ import {
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
 import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
-import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
+import { useTournamentLeadersWinners, type TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
@@ -621,6 +621,20 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     setSelectedPlayer(null);
     onScorecardClose?.();
   }, [onScorecardClose]);
+
+  // Convert a TournamentFinisher to PlayerInfo for scorecard
+  const finisherToPlayerInfo = useCallback((f: TournamentFinisher): PlayerInfo => ({
+    id: f.playerId || '',
+    srId: f.pgaTourId || '',
+    name: f.fullName || f.displayName,
+    firstName: f.firstName,
+    lastName: f.lastName,
+    countryCode: f.country || undefined,
+    position: f.position,
+    totalScore: f.score ?? 0,
+    thru: 'F',
+    currentRound: 4,
+  }), []);
 
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
@@ -1223,6 +1237,28 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
                 >
+                {selectedPlayer ? (
+                  <motion.div
+                    key="completed-scorecard"
+                    initial={{ opacity: 0, x: 60 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 60 }}
+                    transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                    style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                  >
+                    <PlayerScorecardCard
+                      player={selectedPlayer}
+                      tournamentId={tournament.id}
+                      tournamentName={tournament.name}
+                      courseName={tournament.venueName || ''}
+                      onBack={handleBackToLeaderboard}
+                      onClose={() => {
+                        setSelectedPlayer(null);
+                      }}
+                    />
+                  </motion.div>
+                ) : (
+                  <>
                   {/* Fixed content area — winner, sparkline, stats */}
                   <div style={{ padding: '0 16px', flexShrink: 0 }}>
 
@@ -1251,7 +1287,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             {/* Winner identity — avatar + name left, giant score right */}
                             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 8 }}>
                               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0, flex: 1 }}>
-                                <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
+                                <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
                                   <PlayerAvatar
                                     displayName={podiumWinner.displayName}
                                     fullName={podiumWinner.fullName}
@@ -1262,7 +1298,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                   />
                                 </button>
                                 <div style={{ paddingBottom: 2, minWidth: 0 }}>
-                                  <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ display: 'block', textAlign: 'left' as const }}>
+                                  <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ display: 'block', textAlign: 'left' as const }}>
                                     <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                                       {podiumWinner.fullName || podiumWinner.displayName}
                                     </div>
@@ -1460,7 +1496,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                               return (
                                 <button
                                   key={p.playerId || i}
-                                  onClick={handlePlayerTapNav(p.playerId)}
+                                  onClick={() => handleScorecardTap(finisherToPlayerInfo(p))}
                                   className="transition-opacity active:opacity-70"
                                   style={{
                                     display: 'flex', alignItems: 'center',
@@ -1532,6 +1568,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <ChevronRight style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.6)' }} />
                     </Link>
                   </div>
+                  </>
+                )}
                 </motion.div>
               )}
 
