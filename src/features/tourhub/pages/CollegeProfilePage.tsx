@@ -259,12 +259,13 @@ export function CollegeProfilePage() {
       {/* Sticky header */}
       <div
         className="-mx-5 sticky top-0 z-20"
-        style={{
-          background: 'rgba(248,250,252,0.97)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-        }}
+          style={{
+            background: 'rgba(248,250,252,0.97)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          }}
       >
         <div style={{ display: 'flex', alignItems: 'center', padding: '8px 20px 10px', gap: '6px' }}>
           <button

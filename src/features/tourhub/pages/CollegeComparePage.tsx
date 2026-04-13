@@ -209,6 +209,7 @@ export function CollegeComparePage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', padding: '9px 20px 9px', gap: '6px' }}>
