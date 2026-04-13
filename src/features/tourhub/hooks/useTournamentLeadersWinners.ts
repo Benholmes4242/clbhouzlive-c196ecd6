@@ -23,7 +23,6 @@ export interface TournamentFinisher {
   money: number | null;
   position: number;
   photoUrl: string | null;
-  country: string | null;
   pgaTourId: string | null;
   /** Primary tour code for R2 headshot folder lookup */
   tourCode: string | null;
@@ -84,7 +83,6 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
             full_name,
             headshot_override,
             photo_url,
-            country,
             pga_tour_id,
             tour_codes
           )
@@ -126,7 +124,6 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           money: entry.money,
           position: entry.position,
           photoUrl: player?.photo_url || null,
-          country: player?.country || null,
           pgaTourId: player?.pga_tour_id || null,
           tourCode: player?.tour_codes?.[0] ?? null,
           displayName: formatDisplayName(firstName, lastName),
