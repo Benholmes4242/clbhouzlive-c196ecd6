@@ -56,7 +56,7 @@ const LINK_ITEMS: LinkItem[] = [
   },
 ];
 
-const ITEM_EASE: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
+
 
 interface TourHubNavOverlayProps {
   isOpen: boolean;
