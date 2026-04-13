@@ -45,6 +45,7 @@ const TournamentInsightsSkeleton = () => (
     <div className="h-40 bg-black/[0.04] rounded-2xl" />
   </div>
 );
+
 // ─── Pick Record Rail ────────────────────────────────────────────────────────
 
 function PickRecordRail() {
@@ -54,13 +55,11 @@ function PickRecordRail() {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '16px 0 8px' }}>
-        <div style={{ padding: '0 16px 10px' }}>
-         <div style={{ fontSize: 15, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Our pick record</div>
-        </div>
-        <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', overflow: 'hidden' }}>
+      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '12px 16px' }}>
+        <div style={{ height: 12, width: 160, borderRadius: 6, background: 'rgba(15,23,42,0.06)', marginBottom: 10 }} />
+        <div style={{ display: 'flex', gap: 8 }}>
           {[1,2,3,4].map(i => (
-            <div key={i} className="animate-pulse" style={{ width: 110, height: 90, borderRadius: 14, background: 'hsl(var(--muted) / 0.4)', flexShrink: 0 }} />
+            <div key={i} className="animate-pulse" style={{ width: 90, height: 88, borderRadius: 10, background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
           ))}
         </div>
       </div>
@@ -74,24 +73,37 @@ function PickRecordRail() {
 
   return (
     <>
-      <div style={{ padding: '8px 0 8px' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 0 }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Our Pick Record</span>
-          <span style={{ fontSize: 9, color: '#CBD5E1', marginLeft: 4 }}>Season 2024–25</span>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-            {wins > 0 && <span style={{ fontSize: 10, fontWeight: 800, color: '#F7931E' }}>🏆 {wins}</span>}
-            {top5 > 0 && <><span style={{ fontSize: 10, color: '#CBD5E1' }}>·</span><span style={{ fontSize: 10, fontWeight: 800, color: '#16A34A' }}>{top5} top-5</span></>}
+      <div style={{
+        background: '#ffffff',
+        borderTop: '1px solid rgba(15,23,42,0.07)',
+        borderBottom: '1px solid rgba(15,23,42,0.07)',
+        padding: '12px 16px',
+      }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              Our Pick Record · Season 2024–25
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 5 }}>
+            {wins > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 7px', borderRadius: 6, background: 'rgba(247,147,30,0.07)', border: '0.5px solid rgba(247,147,30,0.2)' }}>
+                <span style={{ fontSize: 9 }}>🏆</span>
+                <span style={{ fontSize: 9, fontWeight: 800, color: '#F7931E' }}>{wins} win{wins !== 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {top5 > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 7px', borderRadius: 6, background: 'rgba(22,163,74,0.07)', border: '0.5px solid rgba(22,163,74,0.2)' }}>
+                <span style={{ fontSize: 9, fontWeight: 800, color: '#16A34A' }}>{top5} top-5</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Scrollable rail */}
-        <div style={{
-          display: 'flex', gap: 8, padding: '0 16px 16px',
-          overflowX: 'auto', scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
-        }}>
+        {/* Scroll rail */}
+        <div style={{ display: 'flex', gap: 7, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
           {pickHistory.map((entry) => {
             const surname = entry.topPickName.split(' ').pop() ?? entry.topPickName;
             return (
@@ -99,72 +111,26 @@ function PickRecordRail() {
                 key={entry.tournamentId}
                 onClick={() => setSelectedEntry(entry)}
                 style={{
-                  width: 110, flexShrink: 0, borderRadius: 14, padding: 12,
-                  cursor: 'pointer',
-                  background: entry.isWinner
-                    ? 'linear-gradient(160deg, rgba(255,248,225,0.95), rgba(255,252,238,0.98))'
-                    : 'hsl(var(--card))',
-                  border: entry.isWinner
-                    ? '1.5px solid rgba(245,158,11,0.4)'
-                    : '1px solid hsl(var(--border))',
-                  boxShadow: entry.isWinner ? '0 0 12px rgba(245,158,11,0.1)' : '0 1px 4px rgba(15,23,42,0.06)',
+                  width: 88, flexShrink: 0, borderRadius: 10, padding: '9px 10px', cursor: 'pointer',
+                  background: entry.isWinner ? 'rgba(247,147,30,0.06)' : 'rgba(15,23,42,0.03)',
+                  border: entry.isWinner ? '1px solid rgba(247,147,30,0.2)' : '0.5px solid rgba(15,23,42,0.08)',
                 }}
               >
-                {/* Tournament short name */}
-                <div style={{
-                  fontSize: 11, fontWeight: 700,
-                  color: entry.isWinner ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-                  marginBottom: 4,
-                }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: entry.isWinner ? '#F7931E' : '#94A3B8', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                   {entry.shortName}
                 </div>
-
-                {/* Player surname */}
-                <div style={{
-                  fontSize: 14, fontWeight: 700,
-                  color: 'hsl(var(--foreground))',
-                  lineHeight: 1.2, marginBottom: 2,
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-                }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: '#0F172A', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                   {surname}
                 </div>
-                {/* Predicted rank label */}
-                <div style={{
-                  fontSize: 9, color: 'hsl(var(--muted-foreground))', marginBottom: 6,
-                }}>
-                  Pick #{entry.predictedRank}
-                </div>
-
-                {/* Result badge */}
                 {entry.isWinner ? (
-                  <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 3,
-                    padding: '2px 7px', borderRadius: 6,
-                    background: 'rgba(245,158,11,0.15)',
-                    fontSize: 11, fontWeight: 700, color: '#92400E',
-                  }}>
-                    🏆 Won
-                  </div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: '#F7931E' }}>🏆 Won</div>
                 ) : entry.actualPosition && entry.actualPosition <= 5 ? (
-                  <div style={{
-                    display: 'inline-block',
-                    padding: '2px 7px', borderRadius: 6,
-                    background: 'rgba(22,163,74,0.08)',
-                    fontSize: 11, fontWeight: 700, color: '#16A34A',
-                  }}>
-                    {entry.actualPositionTied ? 'T' : ''}{entry.actualPosition}{['st','nd','rd'][((entry.actualPosition % 100) - 20) % 10 - 1] || ['st','nd','rd'][(entry.actualPosition % 100) - 1] || 'th'}
+                  <div style={{ fontSize: 10, fontWeight: 700, color: '#16A34A' }}>
+                    {entry.actualPositionTied ? 'T' : ''}{entry.actualPosition}{['st','nd','rd'][((entry.actualPosition % 100)-20)%10-1] || ['st','nd','rd'][(entry.actualPosition%100)-1] || 'th'}
                   </div>
                 ) : (
-                  <div style={{
-                    display: 'inline-block',
-                    padding: '2px 7px', borderRadius: 6,
-                    background: 'hsl(var(--muted) / 0.3)',
-                    fontSize: 11, fontWeight: 600, color: 'hsl(var(--muted-foreground))',
-                  }}>
-                    {entry.actualPosition
-                      ? `${entry.actualPositionTied ? 'T' : ''}${entry.actualPosition}th`
-                      : '—'}
+                  <div style={{ fontSize: 10, fontWeight: 600, color: '#94A3B8' }}>
+                    {entry.actualPosition ? `${entry.actualPositionTied ? 'T' : ''}${entry.actualPosition}th` : '—'}
                   </div>
                 )}
               </div>
@@ -173,7 +139,7 @@ function PickRecordRail() {
         </div>
       </div>
 
-      {/* Bottom sheet */}
+      {/* Bottom sheet — keep existing portal/sheet JSX unchanged */}
       {typeof window !== 'undefined' && createPortal(
         <AnimatePresence>
           {selectedEntry && (
@@ -303,16 +269,30 @@ function PickRecordBadge() {
   const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 4, flexShrink: 0 }}>
       {wins > 0 && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 7, background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.3)' }}>
-          <span style={{ fontSize: 11 }}>🏆</span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E' }}>{wins} wins</span>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          padding: '3px 8px', borderRadius: 6,
+          background: 'rgba(247,147,30,0.08)',
+          border: '0.5px solid rgba(247,147,30,0.25)',
+        }}>
+          <span style={{ fontSize: 10 }}>🏆</span>
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#F7931E' }}>
+            {wins} win{wins !== 1 ? 's' : ''}
+          </span>
         </div>
       )}
       {top5 > 0 && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 7, background: 'rgba(22,163,74,0.07)', border: '1px solid rgba(22,163,74,0.25)' }}>
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#16A34A' }}>✓ {top5} top‑5s</span>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          padding: '3px 8px', borderRadius: 6,
+          background: 'rgba(22,163,74,0.07)',
+          border: '0.5px solid rgba(22,163,74,0.25)',
+        }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#16A34A' }}>
+            {top5} top-5
+          </span>
         </div>
       )}
     </div>
@@ -370,20 +350,17 @@ export const TournamentInsights = memo(function TournamentInsights() {
   }, [tracker]);
 
   // ═══ TAB SYSTEM ═══
-  // Build available tabs based on tournament state
   const tabs = useMemo(() => {
     const result: Array<{ id: string; label: string; hasLiveDot?: boolean }> = [];
     if (isLive) result.push({ id: 'live', label: 'Live', hasLiveDot: true });
     if (hasUpcoming) result.push({ id: 'nextup', label: 'Next Up' });
     if (isCompleted) result.push({ id: 'results', label: 'Results' });
-    // Pre-tournament with no completed: just show content directly (no tabs)
     if (!isLive && !isCompleted && !hasUpcoming) {
       result.push({ id: 'current', label: 'Current' });
     }
     return result;
   }, [isLive, hasUpcoming, isCompleted]);
 
-  // Compute default tab: Live > Next Up > Results
   const getDefaultTab = useMemo(() => {
     if (isLive) return 'live';
     if (hasUpcoming) return 'nextup';
@@ -393,18 +370,15 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
   const [activeMainTab, setActiveMainTab] = useState(getDefaultTab);
 
-  // Sync active tab when available tabs change (e.g., data loads)
   useEffect(() => {
     if (tabs.length > 0 && !tabs.find(t => t.id === activeMainTab)) {
       setActiveMainTab(getDefaultTab);
     }
   }, [tabs, activeMainTab, getDefaultTab]);
 
-  // Sub-tab for upcoming/pre-tournament content
   const [activeSubTab, setActiveSubTab] = useState<IntelligenceTab>('predictions');
   const [showCourseDNA, setShowCourseDNA] = useState(false);
 
-  // Auto-expand Course DNA while waiting for play
   useEffect(() => {
     if (isWaitingForPlay) setShowCourseDNA(true);
   }, [isWaitingForPlay]);
@@ -448,36 +422,16 @@ export const TournamentInsights = memo(function TournamentInsights() {
         if (isWaitingForPlay) {
           return (
             <div className="space-y-4 pb-6">
-              {/* Amber waiting banner */}
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '10px 16px',
-                  borderRadius: '12px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  padding: '10px 16px', borderRadius: '12px',
                   background: 'rgba(245, 158, 11, 0.08)',
                   border: '1px solid rgba(245, 158, 11, 0.15)',
                 }}
               >
-                <div
-                  style={{
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(245, 158, 11, 0.8)',
-                    animation: 'pulse 2s ease-in-out infinite',
-                    flexShrink: 0,
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: '12.5px',
-                    fontWeight: 600,
-                    color: 'hsl(var(--foreground) / 0.6)',
-                  }}
-                >
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: 'rgba(245, 158, 11, 0.8)', flexShrink: 0 }} />
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'hsl(var(--foreground) / 0.6)' }}>
                   Play begins shortly — tracking starts when scores are in
                 </span>
               </div>
@@ -488,32 +442,35 @@ export const TournamentInsights = memo(function TournamentInsights() {
         }
         if (tracker) {
           return (
-            <div className="space-y-4">
+            <div>
               <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} tournamentLeaderScore={tracker.tournamentLeaderScore} />
 
-              {/* Course DNA toggle */}
-              <div
-                onClick={() => setShowCourseDNA(!showCourseDNA)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 16px',
-                  margin: '4px 0',
-                  background: '#F8FAFC',
-                  borderTop: '0.5px solid rgba(15,23,42,0.07)',
-                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                  cursor: 'pointer',
-                }}
-                className="active:scale-[0.98] transition-transform"
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
-                  <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                    {showCourseDNA ? 'Hide Course DNA' : 'Course DNA'}
-                  </span>
-                </div>
-                <span style={{ fontSize: 14, color: '#94A3B8', transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', display: 'inline-block' }}>›</span>
+              {/* Course DNA toggle — dispatch style */}
+              <div style={{
+                background: '#ffffff',
+                borderTop: '1px solid rgba(15,23,42,0.07)',
+                borderBottom: '1px solid rgba(15,23,42,0.07)',
+                marginTop: 12,
+              }}>
+                <button
+                  onClick={() => setShowCourseDNA(!showCourseDNA)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '11px 16px', background: 'transparent', border: 'none', cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1 }} />
+                    <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                      Course DNA
+                    </span>
+                  </div>
+                  <span style={{
+                    fontSize: 12, color: '#94A3B8',
+                    transform: showCourseDNA ? 'rotate(90deg)' : 'none',
+                    transition: 'transform 0.18s', display: 'inline-block',
+                  }}>›</span>
+                </button>
               </div>
 
               <AnimatePresence>
@@ -578,63 +535,66 @@ export const TournamentInsights = memo(function TournamentInsights() {
   };
 
   return (
-    <section aria-label="Featured tournament analysis" className="space-y-0 px-4">
+    <section aria-label="Featured tournament analysis" style={{ background: '#F8FAFC' }}>
       {/* Section Header */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         viewport={{ once: true }}
-        style={{ marginBottom: '20px' }}
+        style={{ padding: '20px 16px 0' }}
       >
-        {/* Top row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
+        {/* Top row: identity + social proof */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
           <div>
-            {/* AI pill */}
+            {/* Amber stamp eyebrow */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '3px 9px', borderRadius: 5, marginBottom: 10,
-              background: '#F7931E',
+              background: '#F7931E', borderRadius: 6, padding: '3px 9px',
+              marginBottom: 7,
             }}>
               <span style={{ fontSize: 10 }}>⚡</span>
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#451A03', letterSpacing: '0.1em' }}>AI PREDICTIONS</span>
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#451A03', letterSpacing: '0.06em' }}>
+                AI PREDICTIONS
+              </span>
             </div>
-            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05 }}>
               Tournament Intelligence
             </h2>
-            <p style={{ fontSize: 11, color: '#94A3B8', marginTop: 5, marginBottom: 0, lineHeight: 1.5 }}>
-              Course DNA · Form analysis · Field strength
+            <p style={{ fontSize: 11, color: '#94A3B8', margin: '3px 0 0' }}>
+              Course DNA · form · field strength
             </p>
           </div>
           <PickRecordBadge />
         </div>
 
-        {/* Tab bar — only when multiple tabs */}
+        {/* Tab bar — flat underline */}
         {tabs.length > 1 && (
-          <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid rgba(15,23,42,0.08)', marginBottom: '0' }}>
+          <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)' }}>
             {tabs.map(tab => {
               const isActive = tab.id === activeMainTab;
+              const isLiveTab = tab.id === 'live';
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveMainTab(tab.id)}
                   style={{
                     flex: 1,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                    padding: '10px 12px',
-                    borderRadius: 0,
-                    fontSize: 12, fontWeight: 700,
+                    padding: '9px 0',
+                    fontSize: '12px',
+                    fontWeight: isActive ? 800 : 500,
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent',
                     border: 'none',
-                    borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
+                    borderBottom: `2px solid ${isActive ? (isLiveTab ? '#22C55E' : '#F7931E') : 'transparent'}`,
                     cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    letterSpacing: '0.02em',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
+                    transition: 'all 0.15s',
                   }}
+                  className="active:scale-[0.97] transition-transform"
                 >
                   {tab.hasLiveDot && (
-                    <span style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#22C55E', flexShrink: 0 }} />
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
                   )}
                   {tab.label}
                 </button>
@@ -646,7 +606,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
       {/* Hero Card — full bleed with section rule */}
       {heroData && (
-        <div style={{ borderBottom: '3px solid #0F172A', marginBottom: 0 }}>
+        <div style={{ borderBottom: '3px solid #0F172A', marginBottom: 0, padding: '0 16px' }}>
           <div className="-mx-4 relative">
             <AnimatePresence mode="wait">
               <motion.div
@@ -671,16 +631,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-0 pt-6"
+          style={{ paddingTop: 16 }}
         >
-          {/* Section rule */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 14 }}>
-            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              {activeMainTab === 'results' ? 'Tournament Winner' : activeMainTab === 'live' ? 'Active Pick' : 'Primary Selection'}
-            </span>
-          </div>
-
           {activeMainTab === 'live' && !isWaitingForPlay && data.winners.length > 0 && (
             <NextUpPickCard
               featured={data.winners[0]}

@@ -1,6 +1,6 @@
 /**
- * CourseDNACard - What wins here
- * Dispatch-style flat ruled rows — no icon circles
+ * CourseDNACard - Dispatch-style flat ruled rows
+ * No icon circles, no section h3 — title handled by parent toggle
  */
 
 import { memo } from 'react';
@@ -34,44 +34,37 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
   if (items.length === 0) return null;
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
-      {/* Section rule */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.08)', marginBottom: 0 }}>
-        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          What Matters{courseName ? ` at ${courseName}` : ''}
-        </span>
-      </div>
+    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      {items.map((item, i) => {
+        const hexColor = tierToHexColor[item.tier];
+        const fillPercent = tierToFill[item.tier];
 
-      <div style={{ padding: '8px 16px 14px', display: 'flex', flexDirection: 'column', gap: 0 }}>
-        {items.map((item, i) => {
-          const hexColor = tierToHexColor[item.tier];
-          const fillPercent = tierToFill[item.tier];
-
-          return (
-            <div
-              key={item.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '10px 0',
-                borderBottom: i < items.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
-              }}
-            >
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#334155', flex: 1 }}>
-                {item.label}
-              </span>
-              <div style={{ width: 100, height: 3, background: 'rgba(15,23,42,0.06)', borderRadius: 2, overflow: 'hidden', flexShrink: 0 }}>
-                <div style={{ width: `${fillPercent}%`, height: '100%', background: hexColor, borderRadius: 2 }} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 800, color: hexColor, letterSpacing: '0.09em', width: 72, textAlign: 'right' as const, flexShrink: 0 }}>
-                {tierToLabel[item.tier]}
-              </span>
+        return (
+          <div
+            key={item.id}
+            style={{
+              display: 'flex', alignItems: 'center', padding: '10px 16px',
+              borderBottom: i < items.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+            }}
+          >
+            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, width: 96, flexShrink: 0 }}>
+              {item.label}
+            </span>
+            {/* Importance bar */}
+            <div style={{ width: 60, height: 3, background: 'rgba(15,23,42,0.08)', borderRadius: 2, overflow: 'hidden', marginRight: 8, flexShrink: 0 }}>
+              <div style={{ width: `${fillPercent}%`, height: '100%', background: hexColor, borderRadius: 2 }} />
             </div>
-          );
-        })}
-      </div>
+            <span style={{ fontSize: 9, fontWeight: 800, color: hexColor, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginRight: 8, flexShrink: 0 }}>
+              {tierToLabel[item.tier]}
+            </span>
+            {item.note && (
+              <span style={{ fontSize: 10, color: '#94A3B8', flex: 1, textAlign: 'right' as const, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                {item.note}
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 });
