@@ -120,7 +120,7 @@ export function CollegeGolfHubPage() {
   const showSearchResults = searchExpanded && debouncedSearch.length >= 2;
 
   return (
-    <TourHubShell>
+    <TourHubShell immersive>
       <div className="relative" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         {/* Pull-to-refresh indicator */}
         {(pullDistance > 0 || isRefreshing) && (

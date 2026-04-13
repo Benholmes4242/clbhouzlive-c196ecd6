@@ -21,7 +21,7 @@ export function CollegeComparePage() {
   const hasValidParams = c1 && c2;
 
   return (
-    <TourHubShell>
+    <TourHubShell immersive>
       <div className="relative min-h-screen bg-background">
         {/* ── SLATE EDITORIAL MASTHEAD ── */}
         <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
