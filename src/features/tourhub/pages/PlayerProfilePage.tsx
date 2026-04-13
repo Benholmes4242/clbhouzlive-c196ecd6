@@ -10,6 +10,7 @@ import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'luci
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   PlayerHero,
   PlayerSeasonStats,
