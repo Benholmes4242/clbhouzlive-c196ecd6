@@ -1,11 +1,9 @@
 /**
- * FranchiseMovers - Weekly movers using unified FranchiseCard layout
+ * FranchiseMovers - Dispatch movers table
  */
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
@@ -51,100 +49,118 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
     : null;
 
   return (
-    <div className={cn('', className)}>
-      {weekLabel && (
-        <div className="flex items-center justify-center gap-1.5 text-muted-foreground/50 uppercase mb-3" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px' }}>
-          <CalendarDays className="w-3.5 h-3.5" />
-          {weekLabel}
+    <div className={className}>
+      {/* Section header */}
+      <div style={{ padding: '14px 16px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Weekly Franchise Movers
+          </span>
         </div>
-      )}
-
-      {/* Rising / Falling toggle — Tier 2 pill tabs */}
-      <div
-        className="flex items-center justify-center gap-2"
-        role="tablist"
-        style={{ marginBottom: 16 }}
-      >
-        {[
-          { value: 'up' as Direction, label: 'Rising', icon: TrendingUp },
-          { value: 'down' as Direction, label: 'Falling', icon: TrendingDown },
-        ].map(({ value, label, icon: Icon }) => {
-          const isSelected = direction === value;
-          return (
-            <button
-              key={value}
-              role="tab"
-              aria-selected={isSelected}
-              onClick={() => setDirection(value)}
-              className="flex items-center gap-1.5 whitespace-nowrap active:scale-[0.97] transition-all duration-200"
-              style={{
-                borderRadius: 20,
-                padding: '8px 16px',
-                fontSize: 13,
-                fontWeight: isSelected ? 600 : 500,
-                color: isSelected ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
-                background: isSelected ? 'hsl(var(--foreground))' : 'hsl(var(--muted))',
-              }}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {label}
-            </button>
-          );
-        })}
+        {weekLabel && (
+          <p style={{ fontSize: '10px', color: '#94A3B8', margin: '0 0 8px 11px' }}>
+            {weekLabel}
+          </p>
+        )}
       </div>
 
-      {/* Movers List */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={direction}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-          className="flex flex-col"
-          style={{ gap: 8 }}
-        >
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-muted/40 animate-pulse" style={{ minHeight: 110, borderRadius: 16 }} />
-            ))
-          ) : enrichedMovers.length > 0 ? (
-            enrichedMovers.map((mover, idx) => {
-              if (!mover.stats) return null;
-              const alumni = alumniMap?.get(mover.normalized_name) || undefined;
+      {/* Rising / Falling toggle */}
+      <div style={{ padding: '0 16px 8px', background: '#ffffff' }}>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {[
+            { value: 'up' as Direction, label: '📈 Rising' },
+            { value: 'down' as Direction, label: '📉 Falling' },
+          ].map(({ value, label }) => {
+            const isSelected = direction === value;
+            return (
+              <button
+                key={value}
+                onClick={() => setDirection(value)}
+                className="flex-1 active:scale-[0.97] transition-transform"
+                style={{
+                  padding: '7px 0', borderRadius: '8px',
+                  fontSize: '11px', fontWeight: isSelected ? 800 : 600,
+                  color: isSelected ? '#ffffff' : '#94A3B8',
+                  background: isSelected ? '#0F172A' : 'transparent',
+                  border: isSelected ? 'none' : '0.5px solid rgba(15,23,42,0.12)',
+                  cursor: 'pointer', transition: 'all 0.15s',
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-              return (
-                <FranchiseCard
-                  key={mover.id}
-                  stats={mover.stats}
-                  college={mover.college}
-                  activeMetric="earnings"
-                  alumni={alumni}
-                  animationDelay={idx * 0.03}
-                  isDelta
-                  deltas={{
-                    earnings_delta: mover.earnings_delta,
-                    wins_delta: mover.wins_delta,
-                    top10_delta: mover.top10_delta,
-                    earnings_rank_change: mover.earnings_rank_change,
-                  }}
-                />
-              );
-            })
-          ) : (
-            <div className="flex flex-col items-center text-center" style={{ paddingTop: 32 }}>
-               <p style={{ fontSize: 15, fontWeight: 600 }} className="text-foreground">
-                 {direction === 'up' ? 'No risers this week' : 'No fallers this week'}
-               </p>
-               <p style={{ fontSize: 13, fontWeight: 400, marginTop: 4 }} className="text-muted-foreground/70">
-                 {direction === 'up'
-                   ? 'No colleges climbed the rankings this week.'
-                   : 'No colleges dropped in the rankings this week.'}
-               </p>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+      {/* Movers table */}
+      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+        {/* Column headers */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <span style={{ width: '32px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
+          <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
+          <span style={{ width: '40px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>MOVE</span>
+          <span style={{ width: '72px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARNINGS Δ</span>
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={direction}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} style={{ height: '44px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }} className="animate-pulse" />
+              ))
+            ) : enrichedMovers.length > 0 ? (
+              enrichedMovers.map((mover, idx) => {
+                if (!mover.stats) return null;
+                const alumni = alumniMap?.get(mover.normalized_name) || undefined;
+
+                return (
+                  <FranchiseCard
+                    key={mover.id}
+                    stats={mover.stats}
+                    college={mover.college}
+                    activeMetric="earnings"
+                    alumni={alumni}
+                    animationDelay={idx * 0.03}
+                    isDelta
+                    deltas={{
+                      earnings_delta: mover.earnings_delta,
+                      wins_delta: mover.wins_delta,
+                      top10_delta: mover.top10_delta,
+                      earnings_rank_change: mover.earnings_rank_change,
+                    }}
+                  />
+                );
+              })
+            ) : (
+              <div style={{ padding: '32px 16px', textAlign: 'center' as const }}>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: '#0F172A', margin: '0 0 4px' }}>
+                  {direction === 'up' ? 'No risers this week' : 'No fallers this week'}
+                </p>
+                <p style={{ fontSize: '13px', color: '#94A3B8', margin: 0 }}>
+                  {direction === 'up'
+                    ? 'No colleges climbed the rankings this week.'
+                    : 'No colleges dropped in the rankings this week.'}
+                </p>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Footer */}
+        <div style={{ padding: '10px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <p style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
+            WEEKLY EARNINGS CHANGE · {weekLabel?.toUpperCase() ?? 'CURRENT WEEK'}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -10,5 +10,4 @@ export { CollegeRivalsCarousel } from './CollegeRivalsCarousel';
 export { FollowCollegeButton } from './FollowCollegeButton';
 export { CollegeCompareHero } from './CollegeCompareHero';
 export { CollegeCompareSheet } from './CollegeCompareSheet';
-export { CollegeHeroBanner } from './CollegeHeroBanner';
-export { AlumniFaceStrip } from './AlumniFaceStrip';
+export { CollegeMasthead } from './CollegeMasthead';

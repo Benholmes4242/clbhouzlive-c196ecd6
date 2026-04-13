@@ -3,12 +3,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw, ChevronLeft, Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
-import { cn } from '@/lib/utils';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { TourHubShell } from '../components';
 import { FranchiseLeaderboard } from '../components/college';
-import { CollegeHeroBanner } from '../components/college/CollegeHeroBanner';
-import { AlumniFaceStrip } from '../components/college/AlumniFaceStrip';
+import { CollegeMasthead } from '../components/college/CollegeMasthead';
 import { CollegeCard } from '../components/college/CollegeCard';
 import { useCollegeSeasonStats, useCollegeSearch, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
@@ -32,10 +31,6 @@ function getMetricValue(s: CollegeSeasonStats, metric: MetricTab): number {
   }
 }
 
-/**
- * College Golf Hub - Immersive rankings page with full-bleed hero,
- * alumni showcase, franchise leaderboard, and weekly movers.
- */
 export function CollegeGolfHubPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortParam = searchParams.get('sort') || 'earnings';
@@ -45,7 +40,6 @@ export function CollegeGolfHubPage() {
   const { data: allStats, isLoading: statsLoading } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
 
-  // --- New header state ---
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebouncedValue(searchValue, 200);
@@ -59,7 +53,7 @@ export function CollegeGolfHubPage() {
     window.scrollTo(0, 0);
   }, [searchParams, setSearchParams]);
 
-  // --- Pull-to-refresh ---
+  // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
@@ -89,7 +83,7 @@ export function CollegeGolfHubPage() {
     setPullDistance(0);
   }, [pullDistance, isRefreshing, queryClient]);
 
-  // --- Scroll position retention ---
+  // Scroll position retention
   useEffect(() => {
     const saved = sessionStorage.getItem('college-scroll');
     if (saved) {
@@ -126,7 +120,7 @@ export function CollegeGolfHubPage() {
   const showSearchResults = searchExpanded && debouncedSearch.length >= 2;
 
   return (
-    <TourHubShell immersive>
+    <TourHubShell>
       <div className="relative" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         {/* Pull-to-refresh indicator */}
         {(pullDistance > 0 || isRefreshing) && (
@@ -140,50 +134,37 @@ export function CollegeGolfHubPage() {
           </div>
         )}
 
-        {/* Immersive Hero */}
+        {/* Masthead */}
         {statsLoading ? (
-          <div
-            className="animate-pulse relative overflow-hidden"
-            style={{ height: '35dvh', background: 'hsl(var(--muted) / 0.3)' }}
-          >
-            {/* Logo + text skeleton centered */}
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-8 gap-3">
-              <div className="w-[130px] h-[130px] rounded-[24px] bg-muted/30 animate-pulse" />
-              <div className="h-6 w-40 rounded bg-muted/30 animate-pulse" />
-              <div className="h-4 w-28 rounded bg-muted/30 animate-pulse" />
+          <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+            <div style={{ height: '14px', width: '200px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
+            <div style={{ height: '24px', width: '180px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
+            <div style={{ height: '100px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', marginBottom: '12px' }} className="animate-pulse" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} style={{ padding: '12px 0', display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ height: '14px', width: '40px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px' }} className="animate-pulse" />
+                </div>
+              ))}
             </div>
           </div>
         ) : topCollege ? (
-          <CollegeHeroBanner
+          <CollegeMasthead
             stats={topCollege}
             college={topCollegeMedia}
             activeMetric={activeMetric === 'movers' ? 'earnings' : activeMetric}
+            heroAlumni={heroAlumni ?? null}
           />
         ) : null}
 
-
-        {/* Alumni Face Strip — overlaps hero */}
-        {heroAlumni && heroAlumni.length > 0 && topCollege && (
-          <AlumniFaceStrip
-            alumni={heroAlumni}
-            collegeName={topCollegeMedia?.short_name || topCollegeMedia?.college_name || topCollege.normalized_name}
-            collegeSlug={topCollege.normalized_name}
-            totalAlumniCount={topCollege.player_count}
-          />
-        )}
-
-        {/* ══════════════════════════════════════════════
-            STICKY HEADER — back · tabs · search
-            ══════════════════════════════════════════════ */}
+        {/* Sticky header */}
         <div
           className="-mx-5 sticky top-0 z-20"
           style={{
-            background: 'hsl(var(--background) / 0.96)',
+            background: 'rgba(248,250,252,0.97)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '1px solid hsl(var(--border) / 0.10)',
-            paddingTop: 10,
-            marginTop: 8,
+            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
           }}
         >
           {/* Collapsible search bar */}
@@ -195,22 +176,19 @@ export function CollegeGolfHubPage() {
             }}
           >
             <div className="relative pt-2.5">
-              <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[17px] h-[17px] mt-[5px]"
-                strokeWidth={2.5}
-              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[17px] h-[17px] mt-[5px]" strokeWidth={2.5} />
               <input
                 type="text"
                 placeholder="Search colleges..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="w-full h-11 pl-10 pr-9 rounded-xl text-[13px] transition-all duration-200 bg-card border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 border-border/50"
+                className="w-full h-10 pl-9 pr-9 rounded-xl text-[13px] bg-card border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 transition-all"
               />
               <AnimatePresence>
                 {searchValue && (
                   <motion.button
                     onClick={() => setSearchValue('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 mt-[5px] p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors active:scale-90"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 mt-[5px] p-1 rounded-full bg-muted active:scale-90"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
@@ -222,82 +200,85 @@ export function CollegeGolfHubPage() {
             </div>
           </div>
 
-          {/* Control row: ← Tour Overview | tabs | search icon */}
-          <div className="flex items-center gap-1.5 px-5 pt-2 pb-2.5">
-            {/* Back link */}
+          {/* Back link + search icon */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 20px 0' }}>
             <Link
               to="/tourhub?tab=overview"
               replace
-              className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium active:opacity-50 transition-opacity shrink-0"
-              style={{ color: 'hsl(var(--muted-foreground) / 0.70)' }}
+              className="flex items-center gap-0.5 active:opacity-50 transition-opacity"
+              style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', textDecoration: 'none' }}
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
               Tour Overview
             </Link>
 
-            <div className="flex-1" />
-
-            {/* Metric tabs — pill buttons, no track */}
-            <div className="flex items-center gap-0.5">
-              {METRIC_TABS.map((tab) => {
-                const isActive = activeMetric === tab.value;
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => setActiveMetric(tab.value)}
-                    className={cn(
-                      'h-[34px] px-2.5 rounded-[9px] text-[12px] transition-all duration-200 whitespace-nowrap active:scale-[0.97]',
-                      isActive
-                        ? 'bg-foreground text-background font-bold shadow-sm'
-                        : 'bg-transparent text-muted-foreground font-medium'
-                    )}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Search icon toggle */}
             <button
               onClick={() => setSearchExpanded(v => !v)}
-              className={cn(
-                'w-[34px] h-[34px] rounded-[9px] flex items-center justify-center shrink-0 transition-colors duration-150',
-                searchExpanded ? 'bg-amber-50' : 'bg-transparent'
-              )}
+              style={{
+                width: '32px', height: '32px', borderRadius: '8px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: searchExpanded ? 'rgba(247,147,30,0.08)' : 'transparent',
+                border: 'none', cursor: 'pointer',
+              }}
             >
-              <Search
-                className="w-[15px] h-[15px] transition-colors duration-150"
-                style={{ color: searchExpanded ? '#F59E0B' : undefined }}
-                strokeWidth={2.5}
-              />
+              <Search className="w-4 h-4" style={{ color: searchExpanded ? '#F7931E' : '#94A3B8' }} strokeWidth={2.5} />
             </button>
+          </div>
+
+          {/* Underline metric tabs */}
+          <div style={{ display: 'flex', marginTop: '4px' }}>
+            {METRIC_TABS.map(tab => {
+              const isActive = activeMetric === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => setActiveMetric(tab.value)}
+                  className="flex-shrink-0 active:scale-[0.97] transition-transform"
+                  style={{
+                    flex: 1,
+                    padding: '8px 0',
+                    fontSize: '11px',
+                    fontWeight: isActive ? 800 : 500,
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    background: 'transparent', border: 'none',
+                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    cursor: 'pointer', transition: 'all 0.15s',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Search results — only shown when searchExpanded and query >= 2 chars */}
+        {/* Search results */}
         {showSearchResults && (
-          <div className="px-5 mt-3 space-y-2">
+          <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
             {searchLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-[110px] rounded-xl bg-muted/40 animate-pulse" />
+                <div key={i} style={{ height: '52px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }} className="animate-pulse" />
               ))
             ) : searchResults && searchResults.length > 0 ? (
-              searchResults.map((stats, index) => (
-                <motion.div
-                  key={stats.normalized_name}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.04 }}
-                >
-                  <CollegeCard
-                    stats={stats}
-                    college={collegeMap?.get(stats.normalized_name) || null}
-                  />
-                </motion.div>
-              ))
+              searchResults.map((stats, index) => {
+                const college = collegeMap?.get(stats.normalized_name) || null;
+                return (
+                  <motion.div
+                    key={stats.normalized_name}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.15, delay: index * 0.03 }}
+                  >
+                    <CollegeCard
+                      stats={stats}
+                      college={college}
+                      rank={index + 1}
+                    />
+                  </motion.div>
+                );
+              })
             ) : (
-              <div className="text-center py-8 text-sm text-muted-foreground">
+              <div style={{ padding: '32px 16px', textAlign: 'center' as const, fontSize: '13px', color: '#94A3B8' }}>
                 No colleges found matching "{debouncedSearch}"
               </div>
             )}
@@ -305,18 +286,13 @@ export function CollegeGolfHubPage() {
         )}
 
         {/* Content */}
-        <div
-          className="px-5"
-          style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
-        >
-          <section style={{ marginTop: 16 }}>
-            <FranchiseLeaderboard
-              limit={25}
-              activeMetric={activeMetric}
-              onMetricChange={setActiveMetric}
-              hideHeader
-            />
-          </section>
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+          <FranchiseLeaderboard
+            limit={25}
+            activeMetric={activeMetric}
+            onMetricChange={setActiveMetric}
+            hideHeader
+          />
         </div>
       </div>
     </TourHubShell>

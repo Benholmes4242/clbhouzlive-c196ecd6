@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Users, DollarSign, Trophy, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -17,7 +16,7 @@ interface CollegeCardProps {
 }
 
 /**
- * CollegeCard — Matches PlayerCardV2 layout (110px height, photo left, info right)
+ * CollegeCard — Flat dispatch search result row
  */
 export function CollegeCard({ stats, college, rank, alumni, className }: CollegeCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
@@ -27,79 +26,47 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
   return (
     <Link
       to={`/tourhub/college-golf/${slug}`}
-      className={cn(
-        "flex overflow-hidden",
-        "bg-card rounded-xl border border-border/40 shadow-sm",
-        "hover:border-primary/30 hover:shadow-md",
-        "active:scale-[0.98] transition-all",
-        className
-      )}
-      style={{ height: '110px' }}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '10px 16px',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        textDecoration: 'none',
+      }}
+      className={cn('active:bg-black/[0.02] transition-colors', className)}
     >
-      {/* Logo section — left ~110px, matching PlayerCardV2 photo area */}
-      <div className="relative w-[110px] shrink-0 bg-muted overflow-hidden flex items-center justify-center">
+      {rank !== undefined && (
+        <span style={{ fontSize: '12px', fontWeight: 900, color: '#94A3B8', width: '24px', textAlign: 'center' as const, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+          #{rank}
+        </span>
+      )}
+      {/* Logo chip */}
+      <div style={{
+        width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0,
+        background: 'rgba(15,23,42,0.04)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden',
+      }}>
         {logoUrl ? (
-          <img
-            src={logoUrl}
-            alt={displayName}
-            className="w-16 h-16 object-contain"
-            loading="lazy"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
+          <img src={logoUrl} alt={displayName} style={{ width: '22px', height: '22px', objectFit: 'contain' }} loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-            <span className="text-2xl font-bold text-muted-foreground/40">{displayName.charAt(0).toUpperCase()}</span>
-          </div>
+          <span style={{ fontSize: '12px', fontWeight: 800, color: '#94A3B8' }}>{displayName.charAt(0)}</span>
         )}
       </div>
-
-      {/* Info section — right */}
-      <div className="flex-1 min-w-0 px-3.5 py-3 flex flex-col justify-center">
-        {/* Name + Rank */}
-        <div className="flex items-center gap-2">
-          {rank !== undefined && (
-            <span className="text-xs font-semibold text-muted-foreground tabular-nums">#{rank}</span>
-          )}
-          <h3 className="text-base font-semibold text-foreground truncate leading-tight">{displayName}</h3>
-        </div>
-
-        {/* Stats row */}
-        <div className="flex items-center gap-3 mt-1.5">
-          <span className="inline-flex items-center gap-1 text-[13px] font-semibold tabular-nums" style={{ fontVariantNumeric: 'tabular-nums', color: 'hsl(var(--accent-amber))' }}>
-            <DollarSign className="w-3.5 h-3.5" />
-            {formatCurrency(stats.earnings_total)}
-          </span>
-          {stats.wins_total > 0 && (
-            <span className="inline-flex items-center gap-1 text-[13px] font-medium text-primary">
-              <Trophy className="w-3.5 h-3.5" />
-              {stats.wins_total}
-            </span>
-          )}
-          <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50">
-            <Users className="w-3 h-3" />
-            {stats.player_count}
-          </span>
-        </div>
-
-        {/* Alumni face preview */}
-        {alumni && alumni.length > 0 && (
-          <div className="flex items-center -space-x-1.5 mt-2 overflow-hidden flex-nowrap">
-            {alumni.map(a => {
-              const photoUrl = getPlayerHeadshotUrl(a.full_name, a.tour_codes?.[0] ?? 'pga');
-              return (
-                <div key={a.id} className="w-5 h-5 shrink-0 border border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
-                  <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy"
-                    onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
-                </div>
-              );
-            })}
-          </div>
-        )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+          {displayName}
+        </p>
+        <p style={{ fontSize: '10px', color: '#94A3B8', margin: 0 }}>
+          {stats.player_count} alumni
+        </p>
       </div>
-
-      {/* Chevron */}
-      <div className="flex items-center pr-3 shrink-0">
-        <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+      <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
+        <p style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
+          {formatCurrency(stats.earnings_total)}
+        </p>
+        <p style={{ fontSize: '10px', color: '#94A3B8', margin: 0 }}>
+          {stats.wins_total} wins · {stats.top10_total} top 10s
+        </p>
       </div>
     </Link>
   );

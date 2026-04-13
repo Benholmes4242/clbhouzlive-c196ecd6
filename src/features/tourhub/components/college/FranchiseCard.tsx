@@ -1,12 +1,9 @@
 /**
- * FranchiseCard - Unified college card for both Leaderboard and Movers sections
- * ~110px height, logo left (140px) with rank badge, full stats right, player thumbnails
+ * FranchiseCard - Flat dispatch row for college franchise leaderboard
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
@@ -57,51 +54,40 @@ function getInitials(fullName: string): string {
   return parts[0]?.slice(0, 2).toUpperCase() || '?';
 }
 
+function getMetricRaw(stats: CollegeSeasonStats, metric: string): number {
+  if (metric === 'wins') return stats.wins_total;
+  if (metric === 'top10s') return stats.top10_total;
+  return stats.earnings_total;
+}
+
 export function FranchiseCard({
-  stats, college, rank, activeMetric = 'earnings',
+  stats, college, rank, maxValue = 1, activeMetric = 'earnings',
   momentum, alumni, className, animationDelay = 0,
   isDelta = false, deltas,
 }: FranchiseCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
-  
-  const momentumRising = momentum?.isRising ?? false;
   const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
 
   const buildStats = () => {
     if (isDelta && deltas) {
       const items: { label: string; value: string; isAccent: boolean; color?: string }[] = [];
       const earningsStr = formatDeltaValue(deltas.earnings_delta);
-      const winsStr = deltas.wins_delta !== 0 ? `${deltas.wins_delta > 0 ? '+' : ''}${deltas.wins_delta}` : null;
-      const top10Str = deltas.top10_delta !== 0 ? `${deltas.top10_delta > 0 ? '+' : ''}${deltas.top10_delta}` : null;
-      
-      items.push({ label: '', value: earningsStr, isAccent: true, color: deltas.earnings_delta >= 0 ? 'text-emerald-600' : 'text-rose-600' });
-      if (winsStr) items.push({ label: pluralize(deltas.wins_delta, 'win'), value: winsStr, isAccent: false, color: deltas.wins_delta > 0 ? 'text-amber-600' : 'text-muted-foreground' });
-      if (top10Str) items.push({ label: 'top 10s', value: top10Str, isAccent: false });
+      items.push({ label: '', value: earningsStr, isAccent: true, color: deltas.earnings_delta >= 0 ? '#16A34A' : '#DC2626' });
       return items;
     }
 
     const primaryStat = activeMetric === 'wins'
-      ? { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: true, color: undefined as string | undefined }
+      ? { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: true }
       : activeMetric === 'top10s'
-      ? { label: 'top 10s', value: String(stats.top10_total), isAccent: true, color: undefined as string | undefined }
-      : { label: '', value: formatCompact(stats.earnings_total), isAccent: true, color: undefined as string | undefined };
+      ? { label: 'top 10s', value: String(stats.top10_total), isAccent: true }
+      : { label: '', value: formatCompact(stats.earnings_total), isAccent: true };
 
-    const secondaryStat = activeMetric === 'wins' || activeMetric === 'top10s'
-      ? { label: '', value: formatCompact(stats.earnings_total), isAccent: false, color: undefined as string | undefined }
-      : { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: false, color: undefined as string | undefined };
-
-    return [
-      primaryStat,
-      secondaryStat,
-      activeMetric !== 'top10s'
-        ? { label: 'top 10s', value: String(stats.top10_total), isAccent: false, color: undefined as string | undefined }
-        : { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: false, color: undefined as string | undefined },
-    ];
+    return [primaryStat];
   };
 
   const statItems = buildStats();
-  const rankChange = isDelta ? deltas?.earnings_rank_change : null;
+  const proportionPct = maxValue > 0 ? (getMetricRaw(stats, activeMetric) / maxValue) * 100 : 0;
 
   const ariaLabel = [
     rank !== undefined ? `Rank ${rank}` : null,
@@ -113,161 +99,123 @@ export function FranchiseCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -16 }}
+      initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: animationDelay, duration: 0.3 }}
-      whileTap={{ scale: 0.98 }}
+      transition={{ delay: animationDelay, duration: 0.25 }}
     >
       <Link
         to={`/tourhub/college-golf/${slug}`}
         aria-label={ariaLabel}
-        className={cn(
-          'flex overflow-hidden',
-          'active:scale-[0.98] transition-all',
-          className
-        )}
         style={{
-          background: 'hsl(var(--card))',
-          borderRadius: 16,
-          border: '1px solid hsl(var(--border) / 0.5)',
-          minHeight: 110,
+          display: 'flex', alignItems: 'center',
+          padding: '10px 16px',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          textDecoration: 'none',
+          ...(isDelta && deltas ? {
+            borderLeft: deltas.earnings_delta >= 0
+              ? '3px solid #16A34A'
+              : '3px solid #DC2626',
+            background: deltas.earnings_delta >= 0
+              ? 'rgba(22,163,74,0.025)'
+              : 'rgba(220,38,38,0.02)',
+          } : {
+            borderLeft: rank === 1 ? '3px solid #F7931E' : '3px solid transparent',
+            background: rank === 1 ? 'rgba(247,147,30,0.025)' : 'transparent',
+          }),
         }}
+        className="active:bg-black/[0.02] transition-colors"
       >
-        {/* Logo section — left, 140px wide */}
-        <div
-          className="relative shrink-0 overflow-hidden flex items-center justify-center"
-          style={{
-            width: 140,
-            background: 'hsl(var(--muted) / 0.3)',
-            borderRadius: '16px 0 0 16px',
-          }}
-        >
-          {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt={displayName}
-              style={{ width: 64, height: 64, objectFit: 'contain' }}
-              loading="lazy"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
-          )}
-
-          {/* Rank badge — top-left */}
-          {rank !== undefined && (
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                top: 8,
-                left: 10,
-                background: 'transparent',
-                color: rank === 1
-                  ? 'hsl(var(--accent-amber))'
-                  : 'hsl(var(--muted-foreground) / 0.6)',
-                fontSize: 12,
-                fontWeight: rank === 1 ? 700 : 600,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
+        {/* Faded rank number */}
+        {rank !== undefined && (
+          <div style={{ width: '32px', flexShrink: 0, textAlign: 'center' as const }}>
+            <span style={{
+              fontSize: '16px', fontWeight: 900,
+              color: rank === 1 ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.12)',
+              fontVariantNumeric: 'tabular-nums',
+            }}>
               {rank}
-            </div>
-          )}
+            </span>
+          </div>
+        )}
 
-          {/* Rank change for movers */}
-          {isDelta && rankChange !== null && rankChange !== 0 && (
-            <div className={cn(
-              "absolute bottom-2 left-2 text-[10px] font-bold tabular-nums",
-              rankChange > 0 ? "text-emerald-600" : "text-rose-600"
-            )}>
-              {rankChange > 0 ? `+${rankChange}` : rankChange}
-            </div>
-          )}
-
-          {/* Momentum indicator */}
-          {!isDelta && momentumRising && (
-            <div className="absolute bottom-2 left-2">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-            </div>
-          )}
-        </div>
-
-        {/* Info section — right */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ padding: '14px 12px 14px 0', paddingLeft: 14 }}>
-          {/* College name — 16px, 600 */}
-          <h3
-            className="text-foreground leading-tight"
-            style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}
-          >
-            {displayName}
-          </h3>
-
-          {/* Stats inline — 12px, 500 */}
-          <div className="flex items-center gap-1 flex-wrap" style={{ marginTop: 4 }}>
-            {statItems.map((item, i) => (
-              <span key={i} className="flex items-center">
-                {i > 0 && <span className="text-muted-foreground/30 mx-0.5" style={{ fontSize: 10 }}>·</span>}
-                <span
-                  className={cn(
-                    'tabular-nums',
-                    !item.isAccent && (item.color || 'text-muted-foreground')
-                  )}
-                  style={{
-                    fontSize: item.isAccent ? 13 : 12,
-                    fontWeight: item.isAccent ? 600 : 500,
-                    ...(item.isAccent ? { color: 'hsl(var(--accent-amber))' } : {}),
-                  }}
-                >
-                  {item.value}{item.label ? ` ${item.label}` : ''}
-                </span>
+        {/* College logo chip + name + alumni */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+          {/* 30px logo chip */}
+          <div style={{
+            width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0,
+            background: 'rgba(15,23,42,0.04)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+          }}>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={displayName}
+                style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            ) : (
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#94A3B8' }}>
+                {displayName.charAt(0)}
               </span>
-            ))}
+            )}
           </div>
 
-          {/* Alumni face thumbnails — 24×24 squircle */}
-          {alumni && alumni.length > 0 && (
-            <div className="flex items-center overflow-hidden" style={{ marginTop: 6 }}>
-              <div className="flex items-center flex-nowrap">
-                {alumni.map((a, i) => {
-                  const photoUrl = getPlayerHeadshotUrl(a.full_name, a.tour_codes?.[0] ?? 'pga');
-                  return (
-                    <div
-                      key={a.id}
-                      className="bg-muted overflow-hidden"
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: '34%',
-                        border: '1.5px solid hsl(var(--card))',
-                        marginLeft: i === 0 ? 0 : -6,
-                        zIndex: alumni.length - i,
-                        position: 'relative',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {photoUrl ? (
-                        <img
-                          src={photoUrl}
-                          alt={a.full_name}
-                          className="w-full h-full object-cover object-top"
-                          loading="lazy"
-                          onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <span className="text-[6px] font-bold text-muted-foreground/70">
-                            {getInitials(a.full_name)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          <div style={{ minWidth: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+              {displayName}
+            </p>
+            <p style={{ fontSize: '10px', color: '#94A3B8', margin: 0 }}>
+              {stats.player_count} alumni
+            </p>
+          </div>
         </div>
 
+        {/* Secondary stats — wins + top10s (for non-delta rows) */}
+        {!isDelta && (
+          <>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', width: '28px', textAlign: 'center' as const, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {stats.wins_total}
+            </span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', width: '28px', textAlign: 'center' as const, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {stats.top10_total}
+            </span>
+          </>
+        )}
+
+        {/* Primary value + proportion bar OR delta for movers */}
+        <div style={{ textAlign: 'right' as const, flexShrink: 0, minWidth: '72px' }}>
+          {isDelta && deltas ? (
+            <>
+              {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
+                <div style={{
+                  fontSize: '10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                  color: deltas.earnings_rank_change > 0 ? '#16A34A' : '#DC2626',
+                  marginBottom: '2px',
+                }}>
+                  {deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change)}
+                </div>
+              )}
+              <div style={{
+                fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                color: deltas.earnings_delta >= 0 ? '#16A34A' : '#DC2626',
+              }}>
+                {formatDeltaValue(deltas.earnings_delta)}
+              </div>
+            </>
+          ) : (
+            <>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                {statItems[0]?.value ?? '—'}
+              </span>
+              {/* Proportion bar */}
+              <div style={{ marginTop: '4px', width: '60px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.06)', overflow: 'hidden', marginLeft: 'auto' }}>
+                <div style={{ height: '100%', borderRadius: '2px', background: '#F7931E', width: `${Math.min(100, proportionPct)}%`, transition: 'width 0.4s ease' }} />
+              </div>
+            </>
+          )}
+        </div>
       </Link>
     </motion.div>
   );
