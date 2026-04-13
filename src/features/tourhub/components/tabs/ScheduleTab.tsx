@@ -409,7 +409,7 @@ export function ScheduleTab() {
           </div>
         </div>
 
-        {/* ── ROW 2: ← Tour Overview + Tour filter pill ── */}
+        {/* ── ROW 2: ← Tour Overview + Search + Tour filter pill ── */}
         <div className="flex items-center justify-between px-5 pt-2 pb-2.5">
           <button
             type="button"
@@ -419,20 +419,35 @@ export function ScheduleTab() {
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
           </button>
-          <button
-            onClick={() => setTourSheetOpen(true)}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] transition-all duration-150 active:scale-[0.97]',
-              'bg-card border border-border/50 shadow-sm',
-              activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
-            )}
-          >
-            <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
-            <span className="text-[12px] font-semibold text-foreground">
-              {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
-            </span>
-            <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSearchExpanded(v => !v)}
+              className={cn(
+                'w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0 transition-colors duration-150',
+                searchExpanded ? 'bg-amber-50' : 'bg-transparent'
+              )}
+            >
+              <Search
+                className="w-[15px] h-[15px] transition-colors duration-150"
+                style={{ color: searchExpanded ? '#F59E0B' : undefined }}
+                strokeWidth={2.5}
+              />
+            </button>
+            <button
+              onClick={() => setTourSheetOpen(true)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] transition-all duration-150 active:scale-[0.97]',
+                'bg-card border border-border/50 shadow-sm',
+                activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
+              )}
+            >
+              <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
+              <span className="text-[12px] font-semibold text-foreground">
+                {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
+              </span>
+              <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
+            </button>
+          </div>
         </div>
       </div>
 
