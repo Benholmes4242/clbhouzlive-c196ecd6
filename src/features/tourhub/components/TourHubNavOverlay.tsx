@@ -6,10 +6,11 @@
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   ChevronRight, 
 } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
