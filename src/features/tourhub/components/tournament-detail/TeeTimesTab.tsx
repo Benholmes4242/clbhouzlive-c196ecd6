@@ -23,11 +23,27 @@ interface TeeTimesTabProps {
 
 function TeeTimesSkeleton() {
   return (
-    <div className="space-y-3 animate-pulse">
-      <div className="h-10 bg-muted rounded-full w-32" />
-      <div className="h-12 bg-muted/50 rounded-xl" />
+    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      {/* Section rule skeleton */}
+      <div className="animate-pulse" style={{ padding: '14px 20px 10px' }}>
+        <div style={{ height: '9px', width: '160px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+      </div>
+      {/* Column header skeleton */}
+      <div style={{ height: '28px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }} />
+      {/* Group rows */}
       {[1, 2, 3].map(i => (
-        <div key={i} className="h-16 bg-muted/30 rounded" />
+        <div key={i} className="animate-pulse" style={{ padding: '11px 20px', borderBottom: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <div style={{ width: '60px', height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div style={{ width: '30px', height: '11px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          </div>
+          {[1, 2, 3].map(j => (
+            <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0 4px 72px' }}>
+              <div style={{ width: '22px', height: '22px', borderRadius: '34%', background: 'rgba(15,23,42,0.05)' }} />
+              <div style={{ width: '120px', height: '12px', background: 'rgba(15,23,42,0.05)', borderRadius: '4px' }} />
+            </div>
+          ))}
+        </div>
       ))}
     </div>
   );

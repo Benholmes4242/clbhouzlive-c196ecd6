@@ -4,7 +4,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
-import { Skeleton } from '@/components/ui/skeleton';
+
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Trophy, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -161,23 +161,36 @@ export function TournamentDetailPage() {
   if (isLoading) {
     return (
       <TourHubShell>
-        <Skeleton
-          className="w-full"
-          style={{ minHeight: '200px' }}
-        />
-        <div className="px-5 pt-3 pb-2">
-          <div className="flex items-center gap-2 mb-2">
-            <Skeleton className="h-4 w-24" />
-          </div>
-          <div className="flex justify-center gap-4">
-            {['Overview', 'Leaderboard', 'Tee Times', 'Holes'].map((tab) => (
-              <Skeleton key={tab} className="h-4 rounded" style={{ width: tab.length * 8 }} />
+        {/* Slate masthead skeleton */}
+        <div style={{ background: '#0F172A', padding: '16px 16px 0' }} className="animate-pulse">
+          <div style={{ height: '8px', width: '140px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginBottom: '10px' }} />
+          <div style={{ height: '22px', width: '70%', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '10px' }} />
+          <div style={{ height: '120px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px 10px 0 0' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+            {[1,2,3,4].map(i => (
+              <div key={i} style={{ padding: '9px 4px 11px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
+                <div style={{ height: '8px', width: '40px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px' }} />
+                <div style={{ height: '13px', width: '50px', background: 'rgba(255,255,255,0.04)', borderRadius: '4px' }} />
+              </div>
             ))}
           </div>
         </div>
-        <div className="space-y-4 mt-4 px-5">
-          <Skeleton className="h-48 rounded-2xl" />
-          <Skeleton className="h-32 rounded-2xl" />
+        {/* Tab bar skeleton */}
+        <div style={{ background: 'rgba(248,250,252,0.97)', padding: '10px 16px 8px', display: 'flex', gap: '8px' }} className="animate-pulse">
+          {['Overview','Leaderboard','Tee Times','Holes'].map(tab => (
+            <div key={tab} style={{ height: '11px', width: `${tab.length * 7}px`, background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          ))}
+        </div>
+        {/* Content row skeletons */}
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 20px', borderBottom: i < 4 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+              <div style={{ width: '36px', height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+              <div style={{ width: '28px', height: '28px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
+              <div style={{ flex: 1, height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+              <div style={{ width: '44px', height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            </div>
+          ))}
         </div>
       </TourHubShell>
     );
