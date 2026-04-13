@@ -24,7 +24,7 @@ export function CollegeComparePage() {
     <TourHubShell immersive>
       <div className="relative min-h-screen bg-background">
         {/* ── SLATE EDITORIAL MASTHEAD ── */}
-        <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
           {/* Amber eyebrow */}
           <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '8px' }}>
             ⚡ CLBHOUZ · COLLEGE HEAD-TO-HEAD

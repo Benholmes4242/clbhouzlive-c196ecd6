@@ -38,7 +38,7 @@ export function PlayerProfilePage() {
   const queryClient = useQueryClient();
   const { hideHeader, showHeader } = useHeader();
 
-  const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
+  useMedianStatusBar("dark", "transparent", true, false);
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
   const [activeStatTab, setActiveStatTab] = useState<StatTab>('Player Overview');
