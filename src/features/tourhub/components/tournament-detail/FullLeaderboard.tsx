@@ -1,10 +1,10 @@
 /**
- * FullLeaderboard - Expanded tournament leaderboard (no card container)
+ * FullLeaderboard - Expanded dispatch tournament leaderboard
  */
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ChevronRight, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
@@ -42,7 +42,6 @@ interface FullLeaderboardEntry {
   };
 }
 
-/** Get live round data from raw_data for a given round number (1-indexed) */
 function getLiveRoundData(entry: FullLeaderboardEntry, roundNum: number): { score: number | null; thru: number | null } | null {
   const rounds = (entry.raw_data as any)?.rounds as RawRoundData[] | undefined;
   if (!rounds || rounds.length < roundNum) return null;
@@ -60,34 +59,23 @@ interface FullLeaderboardProps {
   onPlayerTap?: () => void;
 }
 
-function ScoreCell({ score, className }: { score: number | null; className?: string }) {
-  if (score === null || score === undefined || score <= 0) {
-    return <span className={cn("text-muted-foreground/50", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>;
-  }
-  return <span className={cn("font-semibold text-foreground", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>{score}</span>;
-}
-
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("text-muted-foreground/50", className)} style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>;
+  if (score === null) return <span className={cn("", className)} style={{ fontVariantNumeric: 'tabular-nums', color: '#94A3B8' }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
   return (
-    <span
-      className={cn("font-bold", className)}
-      style={{
-        fontVariantNumeric: 'tabular-nums',
-        color: score < 0
-          ? 'hsl(var(--accent-amber))'
-          : score > 0
-          ? '#EF4444'
-          : 'hsl(var(--muted-foreground))',
-      }}
-    >
+    <span className={cn("font-bold", className)} style={{ fontVariantNumeric: 'tabular-nums', color: score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : '#94A3B8' }}>
       {formatted}
     </span>
   );
 }
 
-/** Aria label helper for thru/status display */
+function ScoreCell({ score, className }: { score: number | null; className?: string }) {
+  if (score === null || score === undefined || score <= 0) {
+    return <span className={cn("", className)} style={{ fontVariantNumeric: 'tabular-nums', color: '#CBD5E1' }}>—</span>;
+  }
+  return <span className={cn("font-semibold", className)} style={{ fontVariantNumeric: 'tabular-nums', color: '#0F172A' }}>{score}</span>;
+}
+
 function getThruAriaLabel(entry: FullLeaderboardEntry, isMissedCut: boolean, isWD: boolean, isLive: boolean): string {
   if (isMissedCut) return 'missed cut';
   if (isWD) return 'withdrawn';
@@ -100,10 +88,7 @@ const rowVariants = {
   hidden: { opacity: 0 },
   visible: (i: number) => ({
     opacity: 1,
-    transition: {
-      delay: Math.min(i * 0.02, 0.6),
-      duration: 0.25,
-    },
+    transition: { delay: Math.min(i * 0.02, 0.6), duration: 0.25 },
   }),
 };
 
@@ -118,7 +103,6 @@ export function FullLeaderboard({
   const [selectedRound, setSelectedRound] = useState('Overall');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Detect available rounds — check both completed (round_N) and live (raw_data.rounds)
   const availableRounds = useMemo(() => {
     const rounds: string[] = ['Overall'];
     for (let r = 1; r <= 4; r++) {
@@ -136,27 +120,19 @@ export function FullLeaderboard({
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
     const q = searchQuery.toLowerCase();
-    return entries.filter(e =>
-      e.player?.full_name?.toLowerCase().includes(q)
-    );
+    return entries.filter(e => e.player?.full_name?.toLowerCase().includes(q));
   }, [entries, searchQuery]);
 
-  // Sort for round views — use live round score (to-par) from raw_data when round_N is null
   const sortedEntries = useMemo(() => {
     if (selectedRound === 'Overall') return filteredEntries;
-
     const roundNum = parseInt(selectedRound.replace('R', ''), 10);
     const roundKey = `round_${roundNum}` as keyof FullLeaderboardEntry;
-
     return [...filteredEntries].sort((a, b) => {
-      // Prefer completed round strokes; fall back to live round score (to-par)
       const aCompleted = a[roundKey] as number | null;
       const bCompleted = b[roundKey] as number | null;
       if (aCompleted != null && bCompleted != null) return aCompleted - bCompleted;
       if (aCompleted != null) return -1;
       if (bCompleted != null) return 1;
-
-      // Both null — use live round score (to-par, lower is better)
       const aLive = getLiveRoundData(a, roundNum);
       const bLive = getLiveRoundData(b, roundNum);
       const aScore = aLive?.score ?? null;
@@ -179,9 +155,7 @@ export function FullLeaderboard({
     }
     if (lastActiveIdx >= 0 && lastActiveIdx < sortedEntries.length - 1) {
       const nextStatus = sortedEntries[lastActiveIdx + 1]?.status;
-      if (nextStatus === 'MC' || nextStatus === 'CUT') {
-        return lastActiveIdx;
-      }
+      if (nextStatus === 'MC' || nextStatus === 'CUT') return lastActiveIdx;
     }
     return -1;
   }, [sortedEntries, selectedRound]);
@@ -190,35 +164,23 @@ export function FullLeaderboard({
   const isLive = tournamentStatus === 'inprogress';
 
   return (
-    <motion.div
-      className="space-y-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Round selector - pill style */}
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      {/* Round selector */}
       {availableRounds.length > 1 && (
-        <RoundSelector
-          rounds={availableRounds}
-          activeRound={selectedRound}
-          onRoundChange={setSelectedRound}
-        />
+        <div style={{ padding: '8px 20px' }}>
+          <RoundSelector rounds={availableRounds} activeRound={selectedRound} onRoundChange={setSelectedRound} />
+        </div>
       )}
 
       {/* Search input */}
-      <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" strokeWidth={2.5} />
+      <div style={{ padding: '0 20px 8px', position: 'relative' }}>
+        <Search className="absolute left-[32px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
         <input
           type="text"
           placeholder="Search players..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className={cn(
-            "w-full h-12 pl-10 pr-10 rounded-2xl text-[14px] text-foreground placeholder:text-muted-foreground/50",
-            "bg-muted/50 border border-border",
-            "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
-            "transition-all duration-200"
-          )}
+          className="w-full h-10 pl-9 pr-9 rounded-xl text-[13px] bg-card border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 transition-all"
         />
         <AnimatePresence>
           {searchQuery && (
@@ -227,7 +189,7 @@ export function FullLeaderboard({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center active:scale-90 transition-transform"
+              className="absolute right-[32px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center active:scale-90 transition-transform"
             >
               <X className="w-3.5 h-3.5 text-muted-foreground" />
             </motion.button>
@@ -236,46 +198,25 @@ export function FullLeaderboard({
       </div>
 
       {/* Column headers */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-border sticky top-0 bg-background/95 backdrop-blur-sm z-10">
-        <div className="w-7 shrink-0 text-center">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Pos</span>
-        </div>
-        <div className="w-8 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Player</span>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <span style={{ width: '34px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
         {showRoundColumns && (
           <>
-            <div className="w-9 text-center hidden sm:block">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R1</span>
-            </div>
-            <div className="w-9 text-center hidden sm:block">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R2</span>
-            </div>
-            <div className="w-9 text-center hidden sm:block">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R3</span>
-            </div>
-            <div className="w-9 text-center hidden sm:block">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">R4</span>
-            </div>
-            <div className="w-12 text-center hidden sm:block">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Total</span>
-            </div>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R1</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R2</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R3</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R4</span>
           </>
         )}
-        <div className="w-12 text-center">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-            {selectedRound === 'Overall' ? 'To Par' : 'Score'}
-          </span>
-        </div>
-        <div className="w-10 text-center">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Thru</span>
-        </div>
-        <div className="w-4 shrink-0" />
+        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
+          {selectedRound === 'Overall' ? 'TOT' : 'SCORE'}
+        </span>
+        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
-      <div className="divide-y divide-border/15">
+      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
         {sortedEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
           const isWD = entry.status === 'WD';
@@ -285,176 +226,101 @@ export function FullLeaderboard({
           const roundNum = isRoundView ? parseInt(selectedRound.replace('R', ''), 10) : 0;
           const completedRoundScore = isRoundView ? ((entry as any)[`round_${roundNum}`] as number | null) : null;
           const liveRound = isRoundView ? getLiveRoundData(entry, roundNum) : null;
-
-          // For round view: use completed strokes, or live to-par score
-          const roundScoreForSelected = completedRoundScore ?? null;
           const liveRoundScore = liveRound?.score ?? null;
           const liveRoundThru = liveRound?.thru ?? null;
-
-          // Compute position in round view from sort order
           const displayPosition = isRoundView ? index + 1 : entry.position;
 
+          // Round score color helper
+          const getRoundScoreColor = (score: number | null) => {
+            if (score === null) return '#CBD5E1';
+            const par = venuePar ? Math.round(venuePar / 4) : 72; // rough per-round par
+            // We have strokes, compare to ~72 (or just show raw)
+            return '#64748B';
+          };
+
           return (
-            <motion.div
-              key={entry.id}
-              custom={index}
-              variants={rowVariants}
-              initial="hidden"
-              animate="visible"
-            >
+            <motion.div key={entry.id} custom={index} variants={rowVariants} initial="hidden" animate="visible">
               <Link
                 to={`/tourhub/player/${entry.player?.id}`}
                 onClick={onPlayerTap}
-                aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}, ${entry.score === null ? 'no score' : entry.score === 0 ? 'even' : entry.score < 0 ? `${entry.score} to par` : `+${entry.score} to par`}, ${getThruAriaLabel(entry, isMissedCut, isWD, isLive)}`}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-3 transition-transform min-h-[52px]",
-                  "active:scale-[0.995]",
-                  (isMissedCut || isWD) && "opacity-50",
-                )}
+                aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{
-                  ...(entry.position === 1 && !isMissedCut && !isWD ? {
-                    backgroundColor: 'hsl(var(--accent-amber) / 0.06)',
-                    borderLeft: '3px solid hsl(var(--accent-amber) / 0.6)',
-                    paddingLeft: '13px',
-                  } : {}),
+                  display: 'flex', alignItems: 'center',
+                  padding: '9px 20px',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  borderLeft: entry.position === 1 && !isMissedCut && !isWD ? '3px solid #F7931E' : '3px solid transparent',
+                  background: entry.position === 1 && !isMissedCut && !isWD ? 'rgba(247,147,30,0.025)' : 'transparent',
+                  opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
+                  textDecoration: 'none',
                 }}
+                className="active:bg-black/[0.02] transition-colors"
               >
-                {/* Position — plain text */}
-                <span
-                  style={{
-                    width: '28px',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    fontVariantNumeric: 'tabular-nums',
-                    flexShrink: 0,
-                    color: isMissedCut || isWD
-                      ? 'hsl(var(--muted-foreground) / 0.4)'
-                      : displayPosition === 1
-                      ? 'hsl(var(--accent-amber))'
-                      : 'hsl(var(--muted-foreground))',
-                  }}
-                >
-                  {isMissedCut ? 'MC'
-                    : isWD ? 'WD'
-                    : (!isRoundView && entry.position_tied) ? `T${displayPosition}`
-                    : String(displayPosition)}
+                {/* Position */}
+                <span style={{ width: '34px', fontSize: '11px', fontWeight: 900, color: displayPosition === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                  {isMissedCut ? 'MC' : isWD ? 'WD' : (!isRoundView && entry.position_tied) ? `T${displayPosition}` : String(displayPosition)}
                 </span>
 
-                <div className="shrink-0">
-                  <BatchPlayerAvatar
-                    playerId={entry.player?.id || ''}
-                    playerName={entry.player?.full_name || 'Unknown'}
-                    size="sm"
-                  />
+                <div className="shrink-0" style={{ marginRight: '8px' }}>
+                  <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "font-semibold truncate text-foreground text-[14px]",
-                    isWD && "italic"
-                  )} style={{ letterSpacing: '-0.2px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
                     {entry.player?.full_name || 'Unknown'}
                   </p>
-                  {(entry.player?.country || entry.player?.country_code) && (
-                    <p className="text-[10px] text-muted-foreground">
-                      {entry.player.country || entry.player.country_code}
-                    </p>
-                  )}
                 </div>
 
                 {showRoundColumns && (
                   <>
-                    <div className="w-9 text-center hidden sm:block">
-                      <ScoreCell score={entry.round_1 ?? null} className="text-xs" />
-                    </div>
-                    <div className="w-9 text-center hidden sm:block">
-                      <ScoreCell score={entry.round_2 ?? null} className="text-xs" />
-                    </div>
-                    <div className="w-9 text-center hidden sm:block">
-                      <ScoreCell score={entry.round_3 ?? null} className="text-xs" />
-                    </div>
-                    <div className="w-9 text-center hidden sm:block">
-                      <ScoreCell score={entry.round_4 ?? null} className="text-xs" />
-                    </div>
-                    <div className="w-12 text-center hidden sm:block">
-                      <ScoreCell score={entry.strokes ?? null} className="text-xs font-semibold" />
-                    </div>
+                    {[entry.round_1, entry.round_2, entry.round_3, entry.round_4].map((score, ri) => (
+                      <span key={ri} style={{ width: '26px', textAlign: 'center' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                        {score != null ? score : '—'}
+                      </span>
+                    ))}
                   </>
                 )}
 
-                <div className="w-12 text-center">
+                <div style={{ width: '44px', textAlign: 'right' as const, flexShrink: 0 }}>
                   {selectedRound === 'Overall' ? (
                     <ScoreToPar score={entry.score} className="text-sm" />
-                  ) : roundScoreForSelected != null ? (
-                    <ScoreCell score={roundScoreForSelected} className="text-sm font-semibold" />
+                  ) : completedRoundScore != null ? (
+                    <ScoreCell score={completedRoundScore} className="text-sm" />
                   ) : liveRoundScore != null ? (
                     <ScoreToPar score={liveRoundScore} className="text-sm" />
                   ) : (
-                    <span className="text-muted-foreground/50 text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>
+                    <span style={{ color: '#CBD5E1', fontSize: '13px', fontVariantNumeric: 'tabular-nums' }}>—</span>
                   )}
                 </div>
 
-                {/* Thru - shown for overall or round view */}
-                <div className="w-10 text-center">
+                <div style={{ width: '36px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {(() => {
-                    // Round view: show round-specific thru from raw_data
                     if (isRoundView && liveRoundThru != null && liveRoundThru > 0) {
-                      if (liveRoundThru >= 18) {
-                        return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
-                      }
-                      return (
-                        <span className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          Thru {liveRoundThru}
-                        </span>
-                      );
+                      if (liveRoundThru >= 18) return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
+                      return <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>Thru {liveRoundThru}</span>;
                     }
-                    // Round view with completed round — show F
-                    if (isRoundView && roundScoreForSelected != null) {
-                      return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
+                    if (isRoundView && completedRoundScore != null) {
+                      return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
                     }
-
                     if (isLive) {
-                      const display = formatThruDisplay(
-                        entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4,
-                        entry.status, entry.thru_updated_at, tournamentTimezone
-                      );
-                      if (!display) return <span className="text-[10px] text-muted-foreground">—</span>;
-                      if (display === 'MC' || display === 'WD' || display === 'DQ' || display === 'MDF' || display === 'DNS') {
-                        return <span className="text-[10px] text-muted-foreground font-medium">{display}</span>;
-                      }
-                      if (display === 'F') {
-                        return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
-                      }
-                      return (
-                        <span className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          Thru {display}
-                        </span>
-                      );
+                      const display = formatThruDisplay(entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4, entry.status, entry.thru_updated_at, tournamentTimezone);
+                      if (!display) return <span style={{ fontSize: '10px', color: '#94A3B8' }}>—</span>;
+                      if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '10px', color: '#94A3B8', fontWeight: 600 }}>{display}</span>;
+                      if (display === 'F') return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
+                      return <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>Thru {display}</span>;
                     }
-                    // For completed/upcoming: show F if they have scores
-                    if (entry.status === 'MC' || entry.status === 'CUT') {
-                      return <span className="text-[10px] text-muted-foreground font-medium">MC</span>;
-                    }
-                    if (entry.status === 'WD') {
-                      return <span className="text-[10px] text-muted-foreground font-medium">WD</span>;
-                    }
-                    if (entry.strokes) {
-                      return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
-                    }
-                    return <span className="text-[10px] text-muted-foreground">—</span>;
+                    if (isMissedCut) return <span style={{ fontSize: '10px', color: '#94A3B8', fontWeight: 600 }}>MC</span>;
+                    if (isWD) return <span style={{ fontSize: '10px', color: '#94A3B8', fontWeight: 600 }}>WD</span>;
+                    if (entry.strokes) return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
+                    return <span style={{ fontSize: '10px', color: '#94A3B8' }}>—</span>;
                   })()}
                 </div>
-
-                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
               </Link>
 
               {showCutLine && (
-                <div className="flex items-center gap-3 px-4 py-2">
-                  <div className="flex-1 border-t border-dashed border-border/50" />
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                    Cut Line
-                  </span>
-                  <div className="flex-1 border-t border-dashed border-border/50" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+                  <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />
+                  <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em' }}>MISSED CUT</span>
+                  <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />
                 </div>
               )}
             </motion.div>
@@ -463,8 +329,8 @@ export function FullLeaderboard({
       </div>
 
       {/* Results count */}
-      <div className="py-4 border-t border-border/15 text-center">
-        <span className="text-xs text-muted-foreground">
+      <div style={{ padding: '10px 20px', textAlign: 'center' as const }}>
+        <span style={{ fontSize: '10px', color: '#94A3B8' }}>
           {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
