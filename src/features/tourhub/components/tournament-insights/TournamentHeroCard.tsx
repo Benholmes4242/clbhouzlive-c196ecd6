@@ -42,6 +42,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
   tournament,
   isLive = false,
   isCompleted = false,
+  winner = null,
 }: TournamentHeroCardProps) {
   const venueImageQuery = useVenueImage(tournament.courseName, null);
   const imageUrl = venueImageQuery.data?.imageUrl || tournament.heroImageUrl;
