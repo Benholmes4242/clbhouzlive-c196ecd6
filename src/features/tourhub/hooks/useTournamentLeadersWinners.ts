@@ -23,6 +23,7 @@ export interface TournamentFinisher {
   money: number | null;
   position: number;
   photoUrl: string | null;
+  country: string | null;
   pgaTourId: string | null;
   /** Primary tour code for R2 headshot folder lookup */
   tourCode: string | null;
