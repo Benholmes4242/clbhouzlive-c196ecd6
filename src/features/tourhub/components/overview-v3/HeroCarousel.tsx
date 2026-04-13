@@ -1365,7 +1365,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             const last = points[points.length - 1];
                             return (
                               <div style={{ position: 'relative' }}>
-                                <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: H, display: 'block' }}>
+                                <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ width: '100%', height: H, display: 'block' }}>
                                   <defs>
                                     <linearGradient id="completed-sparkline-fill" x1="0" y1="0" x2="0" y2="1">
                                       <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
