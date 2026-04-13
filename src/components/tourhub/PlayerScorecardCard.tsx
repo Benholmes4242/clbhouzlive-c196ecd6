@@ -518,7 +518,7 @@ export function PlayerScorecardCard({
               )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5 }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
+              {!isCompleted && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />}
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
                 {isCompleted ? 'Final' : `Round ${currentRound}`}
                 {!isCompleted && player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
