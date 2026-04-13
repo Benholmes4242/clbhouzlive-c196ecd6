@@ -25,14 +25,12 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
 }) => {
   if (allPicks.length === 0) return null;
 
-  // Sort by actual position (best first) for both live and completed
   const sorted = [...allPicks].slice(0, 3).sort((a, b) => {
     const aPos = a.actualPosition ?? 999;
     const bPos = b.actualPosition ?? 999;
     return aPos - bPos;
   });
 
-  // Use actual tournament leader score (from full leaderboard), NOT picks subset
   const leaderScore: number | null = tournamentLeaderScore ?? null;
 
   return (
@@ -40,29 +38,26 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, delay: isCompleted ? 0.9 : 0.1 }}
-      style={{ marginBottom: 32 }}
     >
-      {/* Live-only header */}
+      {/* Live header — dispatch style */}
       {!isCompleted && (
-        <div className="px-1 flex items-center justify-between" style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ padding: '0 16px 8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              Tournament Picks · Live Positions
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', flex: 1 }}>
+              TOURNAMENT PICKS · LIVE POSITIONS
+            </span>
+            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em' }}>
+              POS / OFF LEAD
             </span>
           </div>
-          <span
-            style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}
-          >
-            POS / OFF LEAD
-          </span>
         </div>
       )}
 
       {/* Live status bar */}
       {!isCompleted && <LiveStatusBar allPicks={allPicks} />}
 
-      {/* Player rows — always show all */}
+      {/* Player rows */}
       <div>
         {sorted.map((prediction, i) => (
           <motion.div

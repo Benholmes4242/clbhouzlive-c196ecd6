@@ -1,8 +1,8 @@
 /**
- * PredictionScorecardRow - Borderless player row with separator
+ * PredictionScorecardRow - Dispatch-style flat ruled player row
  * 
- * Completed layout: [Position Badge] [Avatar] [Name + Flag] ... [Score (large)]
- * Live layout:      [Pick #] [Avatar] [Name + Score] ... [Position/Off Lead]
+ * Completed layout: [Position Badge] [Avatar] [Name + Flag] ... [Score]
+ * Live layout:      [Avatar] [Name + Score] ... [Position/Off Lead]
  */
 
 import React from 'react';
@@ -22,10 +22,6 @@ interface PredictionScorecardRowProps {
   isBestCall?: boolean;
   leaderScore?: number | null;
   tourSlug?: string;
-}
-
-function getAccuracyBorderColor() {
-  return 'hsl(var(--border))';
 }
 
 function formatScore(score: number | null): string {
@@ -48,7 +44,6 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   const isWinner = prediction.actualPosition === 1;
   const isLeader = !isCompleted && prediction.actualPosition === 1;
   const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, tourSlug ?? 'pga');
-  const borderColor = getAccuracyBorderColor();
 
   const offLead = (prediction.score !== null && leaderScore !== null && leaderScore !== undefined)
     ? prediction.score - leaderScore
@@ -63,13 +58,14 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.05,
       }}
-      className="relative"
       style={{
-        padding: '16px 4px',
+        padding: '12px 16px',
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
-        borderBottom: isLast ? 'none' : '1px solid hsl(var(--border) / 0.15)',
-        transition: 'background-color 100ms ease',
+        borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)',
+        borderLeft: (!isCompleted && isLeader) ? '3px solid #F7931E' : '3px solid transparent',
+        background: (!isCompleted && isLeader) ? 'rgba(247,147,30,0.03)' : 'transparent',
         cursor: 'pointer',
+        transition: 'background-color 100ms ease',
       }}
       onPointerDown={(e) => {
         const el = e.currentTarget;
@@ -83,21 +79,6 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         e.currentTarget.style.backgroundColor = 'transparent';
       }}
     >
-      {/* Leader left accent (live only) */}
-      {!isCompleted && isLeader && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 3,
-            background: '#16A34A',
-            borderRadius: '2px',
-          }}
-        />
-      )}
-
       {/* Winner badge */}
       {isCompleted && isWinner && (
         <div
@@ -137,7 +118,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               width: 40,
               height: 42,
               borderRadius: '34%',
-              border: `2px solid ${borderColor}`,
+              border: '2px solid rgba(15,23,42,0.07)',
             }}
           >
             {avatarUrl ? (
@@ -192,12 +173,10 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           </p>
 
           {isCompleted ? (
-            /* Completed: Country flag under name */
             <div className="flex items-center" style={{ marginTop: 3 }}>
               <CountryFlag country={prediction.country} size="sm" />
             </div>
           ) : (
-            /* Live: Score + thru info under name */
             prediction.score !== null && (
               <div className="flex items-center gap-1.5">
                 <p
@@ -208,15 +187,13 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
                   {prediction.thru !== null && prediction.thru > 0 ? ` · thru ${prediction.thru}` : ''}
                   {prediction.currentRound ? ` · R${prediction.currentRound}` : ''}
                 </p>
-                {/* Leader pulsing dot */}
                 {isLeader && (
                   <span
                     style={{
                       width: 6,
                       height: 6,
                       borderRadius: 3,
-                      backgroundColor: '#16A34A',
-                      animation: 'pulse 2s infinite',
+                      backgroundColor: '#22C55E',
                       flexShrink: 0,
                     }}
                   />
@@ -226,10 +203,9 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           )}
         </div>
 
-        {/* RIGHT SECTION — differs between completed and live */}
+        {/* RIGHT SECTION */}
         <div className="flex-shrink-0 ml-auto">
           {isCompleted ? (
-            /* Completed: Score on the right */
             <span
               className={prediction.score !== null && prediction.score < 0 ? 'text-foreground' : 'text-muted-foreground'}
               style={{
@@ -241,7 +217,6 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               {isCut ? 'MC' : isWD ? 'WD' : formatScore(prediction.score)}
             </span>
           ) : (
-            /* Live: Position display on the right */
             <LivePositionDisplay
               position={prediction.actualPosition}
               isTied={prediction.actualPositionTied}
