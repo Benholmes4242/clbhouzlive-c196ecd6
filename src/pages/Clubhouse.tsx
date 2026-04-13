@@ -296,6 +296,7 @@ const ClubhouseContent = () => {
 
   return (
     <PageRoot 
+      immersiveStatusBar
       ref={clubhouseRootRef} 
       className="clubhouse-root" 
       fixedHeight
