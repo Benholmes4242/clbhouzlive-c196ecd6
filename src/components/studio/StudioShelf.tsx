@@ -24,15 +24,16 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Design tokens — edit flow only
+// Design tokens — light mode
 const E = {
-  bg:      '#050505',
-  surface: 'rgba(255,255,255,0.04)',
-  border:  'rgba(255,255,255,0.07)',
-  text:    'rgba(255,255,255,0.95)',
-  mid:     'rgba(255,255,255,0.45)',
-  dim:     'rgba(255,255,255,0.20)',
-  ghost:   'rgba(255,255,255,0.08)',
+  bg:      '#F8FAFC',
+  surface: '#ffffff',
+  border:  'rgba(15,23,42,0.07)',
+  text:    '#0F172A',
+  mid:     'rgba(15,23,42,0.50)',
+  dim:     'rgba(15,23,42,0.25)',
+  ghost:   'rgba(15,23,42,0.05)',
+  panel:   '#ffffff',
 };
 
 type StudioShelfProps = {
@@ -284,7 +285,7 @@ export default function StudioShelf({
                         >
                           <div style={{
                             width: 32, height: 32, borderRadius: 8, overflow: 'hidden',
-                            border: on ? '1.5px solid rgba(255,255,255,0.90)' : '1.5px solid rgba(255,255,255,0.12)',
+                            border: on ? '1.5px solid #0F172A' : '1.5px solid rgba(15,23,42,0.12)',
                             opacity: on ? 1 : 0.5,
                             transition: 'all 0.15s',
                           }}>
@@ -313,9 +314,9 @@ export default function StudioShelf({
                       onClick={() => onClose()}
                       style={{
                         height: 32, padding: '0 16px', borderRadius: 20,
-                        border: `1px solid ${E.border}`,
-                        background: 'transparent',
-                        color: E.text, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                        border: '1px solid rgba(15,23,42,0.07)',
+                        background: '#ffffff',
+                        color: '#0F172A', fontSize: 13, fontWeight: 600, cursor: 'pointer',
                       }}
                     >
                       Done
@@ -333,7 +334,7 @@ export default function StudioShelf({
                 {/* Ambient glow */}
                 <div style={{
                   position: 'absolute', inset: -40,
-                  background: `radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 70%)`,
+                  background: `radial-gradient(ellipse at center, rgba(15,23,42,0.025) 0%, transparent 70%)`,
                   pointerEvents: 'none', zIndex: 0,
                 }} />
 
@@ -342,7 +343,7 @@ export default function StudioShelf({
                   position: 'relative', zIndex: 1,
                   maxWidth: '100%', maxHeight: '100%',
                   borderRadius: 16, overflow: 'hidden',
-                  boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+                  boxShadow: '0 4px 24px rgba(15,23,42,0.15)',
                 }}>
                   {showCropOnCanvas ? (
                     <div style={{ width: '100%', height: '100%', minHeight: 200 }}>
@@ -412,12 +413,12 @@ export default function StudioShelf({
                         />
                       )}
 
-                      {/* Filter badge — top-left */}
+                      {/* Filter badge — top-left (stays dark — on media) */}
                       {hasActiveFilter && !isComparing && (
                         <div style={{
                           position: 'absolute', top: 10, left: 10,
                           background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                          color: E.text, border: `1px solid ${E.border}`,
+                          color: 'rgba(255,255,255,0.95)', border: '1px solid rgba(255,255,255,0.07)',
                           fontSize: 10, fontWeight: 600, borderRadius: 16, padding: '3px 10px',
                           pointerEvents: 'none', zIndex: 20, whiteSpace: 'nowrap',
                         }}>
@@ -425,12 +426,12 @@ export default function StudioShelf({
                         </div>
                       )}
 
-                      {/* Music badge — bottom-left */}
+                      {/* Music badge — bottom-left (stays dark — on media) */}
                       {edits.music && (
                         <div style={{
                           position: 'absolute', bottom: 10, left: 10,
                           background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                          color: E.mid, border: `1px solid ${E.border}`,
+                          color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.07)',
                           fontSize: 10, fontWeight: 500, borderRadius: 16, padding: '3px 10px',
                           pointerEvents: 'none', zIndex: 20, whiteSpace: 'nowrap',
                         }}>
@@ -446,8 +447,10 @@ export default function StudioShelf({
                   <div style={{
                     position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
                     display: 'flex', alignItems: 'center', gap: 10,
-                    background: 'rgba(0,0,0,0.70)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                    border: `1px solid ${E.border}`, borderRadius: 24, padding: '6px 14px',
+                    background: '#ffffff',
+                    border: '1px solid rgba(15,23,42,0.07)',
+                    boxShadow: '0 2px 8px rgba(15,23,42,0.08)',
+                    borderRadius: 24, padding: '6px 14px',
                     zIndex: 30,
                   }}>
                     <span style={{ fontSize: 10, fontWeight: 600, color: E.mid }}>Intensity</span>
@@ -463,8 +466,8 @@ export default function StudioShelf({
                         [&::-webkit-slider-thumb]:w-3
                         [&::-webkit-slider-thumb]:h-3
                         [&::-webkit-slider-thumb]:rounded-full
-                        [&::-webkit-slider-thumb]:bg-white
-                        [&::-webkit-slider-thumb]:shadow-[0_1px_4px_rgba(0,0,0,0.5)]
+                        [&::-webkit-slider-thumb]:bg-[#0F172A]
+                        [&::-webkit-slider-thumb]:shadow-[0_1px_4px_rgba(0,0,0,0.2)]
                         [&::-webkit-slider-thumb]:-mt-[5px]
                         [&::-moz-range-track]:h-[2px]
                         [&::-moz-range-track]:rounded-full
@@ -472,10 +475,10 @@ export default function StudioShelf({
                         [&::-moz-range-thumb]:h-3
                         [&::-moz-range-thumb]:rounded-full
                         [&::-moz-range-thumb]:border-0
-                        [&::-moz-range-thumb]:bg-white"
+                        [&::-moz-range-thumb]:bg-[#0F172A]"
                       style={{
                         width: 90,
-                        background: `linear-gradient(to right, #ffffff ${filterIntensity}%, rgba(255,255,255,0.10) ${filterIntensity}%)`,
+                        background: `linear-gradient(to right, #0F172A ${filterIntensity}%, rgba(15,23,42,0.10) ${filterIntensity}%)`,
                       }}
                     />
                     <span style={{ fontSize: 11, fontWeight: 700, color: E.text, fontVariantNumeric: 'tabular-nums', minWidth: 28, textAlign: 'right' }}>
@@ -490,7 +493,8 @@ export default function StudioShelf({
             <div style={{
               position: 'absolute', bottom: 0, left: 0, right: 0, height: '42vh',
               display: 'flex', flexDirection: 'column',
-              background: 'rgba(10,10,10,0.98)',
+              background: '#ffffff',
+              borderTop: '0.5px solid rgba(15,23,42,0.07)',
               paddingBottom: 'env(safe-area-inset-bottom)',
             }}>
               {/* ── The Dial ── */}

@@ -1,4 +1,4 @@
-// SchedulePanel — Dark sheet, smart quick options, custom drum picker, scheduled posts tab
+// SchedulePanel — Light sheet, smart quick options, custom drum picker, scheduled posts tab
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Zap, Clock, Calendar, ChevronLeft, ChevronRight, X, Trash2 } from 'lucide-react';
@@ -53,12 +53,12 @@ function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selec
     <div className="relative flex-1" style={{ height: ITEM_H * 3, overflow: 'hidden' }}>
       <div className="absolute inset-x-0 pointer-events-none z-10" style={{
         top: ITEM_H, height: ITEM_H,
-        background: 'rgba(255,255,255,0.07)',
-        border: '1px solid rgba(255,255,255,0.12)',
+        background: 'rgba(15,23,42,0.05)',
+        border: '1px solid rgba(15,23,42,0.10)',
         borderRadius: 10,
       }} />
-      <div className="absolute inset-x-0 top-0 z-20 pointer-events-none" style={{ height: ITEM_H, background: 'linear-gradient(to bottom, #161616, transparent)' }} />
-      <div className="absolute inset-x-0 bottom-0 z-20 pointer-events-none" style={{ height: ITEM_H, background: 'linear-gradient(to top, #161616, transparent)' }} />
+      <div className="absolute inset-x-0 top-0 z-20 pointer-events-none" style={{ height: ITEM_H, background: 'linear-gradient(to bottom, #ffffff, transparent)' }} />
+      <div className="absolute inset-x-0 bottom-0 z-20 pointer-events-none" style={{ height: ITEM_H, background: 'linear-gradient(to top, #ffffff, transparent)' }} />
 
       <div
         ref={containerRef}
@@ -76,7 +76,7 @@ function DrumPicker({ items, selectedIndex, onSelect }: { items: string[]; selec
                 height: ITEM_H, scrollSnapAlign: 'center',
                 fontSize: isSelected ? 17 : 15,
                 fontWeight: isSelected ? 700 : 400,
-                color: isSelected ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.28)',
+                color: isSelected ? '#0F172A' : 'rgba(15,23,42,0.30)',
                 transition: 'all 150ms',
               }}
             >
@@ -101,15 +101,15 @@ function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, de
     <div className="flex-1 overflow-y-auto px-5 pb-6" style={{ scrollbarWidth: 'none' }}>
       {isLoading && (
         <div className="flex items-center justify-center py-8">
-          <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.10)', borderTopColor: 'transparent' }} />
+          <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(15,23,42,0.12)', borderTopColor: 'transparent' }} />
         </div>
       )}
 
       {!isLoading && scheduledPosts.length === 0 && (
         <div className="flex flex-col items-center text-center py-10">
-          <Clock className="w-6 h-6 mb-2" style={{ color: 'rgba(255,255,255,0.20)' }} strokeWidth={1.5} />
-          <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.50)' }}>No scheduled posts</p>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 4 }}>Posts you schedule will appear here</p>
+          <Clock className="w-6 h-6 mb-2" style={{ color: 'rgba(15,23,42,0.25)' }} strokeWidth={1.5} />
+          <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(15,23,42,0.55)' }}>No scheduled posts</p>
+          <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.40)', marginTop: 4 }}>Posts you schedule will appear here</p>
         </div>
       )}
 
@@ -119,17 +119,17 @@ function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, de
           className="flex items-center gap-3"
           style={{
             padding: '12px 0',
-            borderBottom: i < scheduledPosts.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+            borderBottom: i < scheduledPosts.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
           }}
         >
           <div className="flex-1 min-w-0">
             <p style={{
-              fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.85)',
+              fontSize: 13, fontWeight: 500, color: '#0F172A',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {post.content || 'No caption'}
             </p>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+            <p style={{ fontSize: 11, color: 'rgba(15,23,42,0.45)', marginTop: 2 }}>
               {post.scheduledAt ? format(new Date(post.scheduledAt), "EEE d MMM · h:mm a") : ''}
             </p>
           </div>
@@ -151,13 +151,13 @@ function ScheduledPostsList({ scheduledPosts, isLoading, refetch, publishNow, de
             disabled={isPublishingNow}
             className="flex items-center justify-center shrink-0"
             style={{
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(15,23,42,0.05)',
+              border: '1px solid rgba(15,23,42,0.10)',
               borderRadius: 20,
               padding: '4px 10px',
               fontSize: 11,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.85)',
+              color: '#0F172A',
             }}
           >
             Post now
@@ -211,7 +211,6 @@ export function SchedulePanel() {
     return 'custom';
   }, [state.scheduledAt, quickOptions]);
 
-  // Drum picker state
   const dayLabels = useMemo(() => {
     const labels: string[] = [];
     for (let i = 0; i < 7; i++) {
@@ -261,7 +260,6 @@ export function SchedulePanel() {
         return;
       }
       schedulePublishRef.current = true;
-      // Re-set scheduledAt to trigger the useEffect in ComposeScreen
       setScheduledAt(new Date(state.scheduledAt.getTime()));
     }
     closePanel();
@@ -276,7 +274,7 @@ export function SchedulePanel() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 z-30"
-        style={{ background: 'rgba(0,0,0,0.55)' }}
+        style={{ background: 'rgba(15,23,42,0.15)' }}
         onClick={closePanel}
       />
 
@@ -295,9 +293,10 @@ export function SchedulePanel() {
         }}
         className="absolute inset-x-0 bottom-0 z-40 flex flex-col"
         style={{
-          background: '#161616',
+          background: '#ffffff',
           borderRadius: '20px 20px 0 0',
-          borderTop: '1px solid rgba(255,255,255,0.10)',
+          borderTop: '0.5px solid rgba(15,23,42,0.07)',
+          boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
           maxHeight: '80vh',
         }}
       >
@@ -305,21 +304,21 @@ export function SchedulePanel() {
           className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing"
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
+          <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pb-3">
           <div>
-            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)' }}>Schedule</p>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>When to post?</h3>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(15,23,42,0.40)' }}>Schedule</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0F172A' }}>When to post?</h3>
           </div>
           <button
             onClick={closePanel}
             className="flex items-center justify-center shrink-0"
-            style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
           >
-            <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2.5} />
+            <X className="w-3.5 h-3.5" style={{ color: 'rgba(15,23,42,0.50)' }} strokeWidth={2.5} />
           </button>
         </div>
 
@@ -336,9 +335,9 @@ export function SchedulePanel() {
                 style={{
                   padding: '7px 14px', borderRadius: 20,
                   fontSize: 13, fontWeight: 600,
-                  background: isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
-                  border: isActive ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.08)',
-                  color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
+                  background: isActive ? 'rgba(15,23,42,0.08)' : 'rgba(15,23,42,0.03)',
+                  border: isActive ? '1px solid rgba(15,23,42,0.14)' : '1px solid rgba(15,23,42,0.07)',
+                  color: isActive ? '#0F172A' : 'rgba(15,23,42,0.45)',
                 }}
               >
                 {label}
@@ -346,7 +345,7 @@ export function SchedulePanel() {
                   <span style={{
                     fontSize: 10, fontWeight: 700, minWidth: 16, height: 16,
                     borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(255,255,255,0.85)', color: '#0D0D0D', padding: '0 4px',
+                    background: '#F7931E', color: '#ffffff', padding: '0 4px',
                   }}>
                     {scheduledCount}
                   </span>
@@ -371,7 +370,7 @@ export function SchedulePanel() {
                   <button
                     onClick={() => setShowDrumPicker(false)}
                     className="flex items-center gap-1 mb-4"
-                    style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.50)' }}
+                    style={{ fontSize: 13, fontWeight: 500, color: 'rgba(15,23,42,0.50)' }}
                   >
                     <ChevronLeft className="w-4 h-4" /> Back
                   </button>
@@ -387,8 +386,8 @@ export function SchedulePanel() {
                     onClick={handleDrumConfirm}
                     className="w-full flex items-center justify-center"
                     style={{
-                      background: 'rgba(255,255,255,0.92)', borderRadius: 16,
-                      fontSize: 15, fontWeight: 700, color: '#0D0D0D',
+                      background: '#0F172A', borderRadius: 16,
+                      fontSize: 15, fontWeight: 700, color: '#ffffff',
                       minHeight: 48,
                     }}
                   >
@@ -413,24 +412,24 @@ export function SchedulePanel() {
                           className="w-full flex items-center gap-3"
                           style={{
                             padding: '12px 14px', borderRadius: 14,
-                            background: isActive ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
-                            border: isActive ? '1px solid rgba(255,255,255,0.14)' : '1px solid transparent',
+                            background: isActive ? 'rgba(15,23,42,0.05)' : 'rgba(15,23,42,0.02)',
+                            border: isActive ? '1px solid rgba(15,23,42,0.12)' : '1px solid transparent',
                           }}
                         >
                           <div className="shrink-0 flex items-center justify-center" style={{
                             width: 36, height: 36, borderRadius: 10,
-                            background: isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
-                            color: isActive ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.40)',
+                            background: isActive ? 'rgba(15,23,42,0.08)' : 'rgba(15,23,42,0.05)',
+                            color: isActive ? '#0F172A' : 'rgba(15,23,42,0.45)',
                           }}>
                             {opt.icon}
                           </div>
                           <div className="flex-1 text-left">
-                            <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>{opt.label}</p>
-                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 1 }}>{opt.sub}</p>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{opt.label}</p>
+                            <p style={{ fontSize: 11, color: 'rgba(15,23,42,0.45)', marginTop: 1 }}>{opt.sub}</p>
                           </div>
-                          {opt.id === 'custom' && <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.20)' }} />}
+                          {opt.id === 'custom' && <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'rgba(15,23,42,0.30)' }} />}
                           {isActive && opt.id !== 'custom' && (
-                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: 'rgba(255,255,255,0.85)' }} />
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: '#F7931E' }} />
                           )}
                         </button>
                       );
@@ -440,10 +439,10 @@ export function SchedulePanel() {
                   {/* Confirmation line */}
                   {state.scheduledAt && (
                     <div className="flex items-center gap-2 mt-3 px-3 py-2.5 rounded-xl" style={{
-                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
+                      background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)',
                     }}>
-                      <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(255,255,255,0.55)' }} />
-                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.60)' }}>
+                      <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(15,23,42,0.50)' }} />
+                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(15,23,42,0.55)' }}>
                         Will post {fmtDate(state.scheduledAt)}
                       </span>
                     </div>
@@ -471,8 +470,8 @@ export function SchedulePanel() {
             flexShrink: 0,
             padding: '12px 20px',
             paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-            background: 'rgba(22,22,22,0.98)',
+            borderTop: '0.5px solid rgba(15,23,42,0.07)',
+            background: '#ffffff',
           }}>
             <motion.button
               whileTap={{ scale: 0.97 }}
@@ -480,9 +479,9 @@ export function SchedulePanel() {
               className="w-full flex items-center justify-center"
               style={{
                 borderRadius: 16, fontSize: 15, fontWeight: 700, minHeight: 48,
-                background: state.scheduledAt ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.08)',
-                color: state.scheduledAt ? '#0D0D0D' : 'rgba(255,255,255,0.55)',
-                boxShadow: state.scheduledAt ? '0 4px 20px rgba(255,255,255,0.12)' : 'none',
+                background: state.scheduledAt ? '#0F172A' : 'rgba(15,23,42,0.06)',
+                color: state.scheduledAt ? '#ffffff' : 'rgba(15,23,42,0.40)',
+                boxShadow: state.scheduledAt ? '0 4px 20px rgba(15,23,42,0.20)' : 'none',
               }}
             >
               {state.scheduledAt ? 'Schedule post' : 'Post now'}

@@ -1,4 +1,4 @@
-// DraftsPanel — Dark sheet, row layout, 3:4 thumbnails, relative timestamps
+// DraftsPanel — Light sheet, row layout, 3:4 thumbnails, relative timestamps
 import React, { useCallback } from 'react';
 import { Trash2, FileText, Layers, X } from 'lucide-react';
 import { motion, useDragControls } from 'framer-motion';
@@ -72,7 +72,7 @@ export function DraftsPanel() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 z-30"
-        style={{ background: 'rgba(0,0,0,0.55)' }}
+        style={{ background: 'rgba(15,23,42,0.15)' }}
         onClick={closePanel}
       />
 
@@ -92,9 +92,10 @@ export function DraftsPanel() {
         className="absolute inset-x-0 bottom-0 z-40 flex flex-col"
         style={{
           maxHeight: '76%',
-          background: '#161616',
+          background: '#ffffff',
           borderRadius: '20px 20px 0 0',
-          borderTop: '1px solid rgba(255,255,255,0.10)',
+          borderTop: '0.5px solid rgba(15,23,42,0.07)',
+          boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
         }}
       >
         {/* Drag handle */}
@@ -102,23 +103,23 @@ export function DraftsPanel() {
           className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing"
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
+          <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
         </div>
 
         {/* Header */}
         <div className="px-5 pb-3 flex items-start justify-between">
           <div>
-            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)' }}>Saved</p>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
-              Your Drafts{drafts.length > 0 && <span style={{ fontSize: 14, fontWeight: 400, color: 'rgba(255,255,255,0.35)', marginLeft: 8 }}>{drafts.length}</span>}
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(15,23,42,0.40)' }}>Saved</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0F172A' }}>
+              Your Drafts{drafts.length > 0 && <span style={{ fontSize: 14, fontWeight: 400, color: 'rgba(15,23,42,0.40)', marginLeft: 8 }}>{drafts.length}</span>}
             </h3>
           </div>
           <button
             onClick={closePanel}
             className="flex items-center justify-center"
-            style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }}
+            style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
           >
-            <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2.5} />
+            <X className="w-3.5 h-3.5" style={{ color: 'rgba(15,23,42,0.50)' }} strokeWidth={2.5} />
           </button>
         </div>
 
@@ -127,10 +128,10 @@ export function DraftsPanel() {
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex gap-3" style={{ padding: '12px 0' }}>
-                  <div className="animate-pulse" style={{ width: 72, aspectRatio: '3/4', borderRadius: 10, background: 'rgba(255,255,255,0.04)' }} />
+                  <div className="animate-pulse" style={{ width: 72, aspectRatio: '3/4', borderRadius: 10, background: 'rgba(15,23,42,0.06)' }} />
                   <div className="flex-1 space-y-2 pt-1">
-                    <div className="animate-pulse" style={{ width: '70%', height: 14, borderRadius: 4, background: 'rgba(255,255,255,0.04)' }} />
-                    <div className="animate-pulse" style={{ width: '40%', height: 10, borderRadius: 4, background: 'rgba(255,255,255,0.04)' }} />
+                    <div className="animate-pulse" style={{ width: '70%', height: 14, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
+                    <div className="animate-pulse" style={{ width: '40%', height: 10, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
                   </div>
                 </div>
               ))}
@@ -141,12 +142,12 @@ export function DraftsPanel() {
             <div className="flex flex-col items-center text-center py-10">
               <div className="flex items-center justify-center mb-3" style={{
                 width: 52, height: 52, borderRadius: 16,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.07)',
               }}>
-                <FileText className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.35)' }} strokeWidth={1.75} />
+                <FileText className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} strokeWidth={1.75} />
               </div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.50)' }}>No drafts yet</p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 4, maxWidth: 200 }}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(15,23,42,0.55)' }}>No drafts yet</p>
+              <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.40)', marginTop: 4, maxWidth: 200 }}>
                 Start a post and save it to pick up where you left off
               </p>
             </div>
@@ -167,22 +168,23 @@ export function DraftsPanel() {
                 className="flex gap-3 cursor-pointer"
                 style={{
                   padding: '12px 0',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
                   alignItems: 'flex-start',
                 }}
               >
                 {/* Thumbnail */}
                 <div className="relative shrink-0 overflow-hidden" style={{
                   width: 72, aspectRatio: '3/4', borderRadius: 10,
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(15,23,42,0.08)',
                 }}>
                   {thumbnailUrl ? (
                     <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                      <FileText className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.20)' }} strokeWidth={1.5} />
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(15,23,42,0.04)' }}>
+                      <FileText className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.25)' }} strokeWidth={1.5} />
                     </div>
                   )}
+                  {/* Media count badge — stays dark (on image) */}
                   {mediaCount > 1 && (
                     <div className="absolute bottom-1 right-1 flex items-center gap-0.5 px-1 py-0.5 rounded" style={{
                       background: 'rgba(0,0,0,0.60)', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.80)',
@@ -197,14 +199,14 @@ export function DraftsPanel() {
                 <div className="flex-1 min-w-0 pt-0.5">
                   {draft.content ? (
                     <p style={{
-                      fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.92)',
+                      fontSize: 14, fontWeight: 500, color: '#0F172A',
                       display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
                     }}>
                       {draft.content}
                     </p>
                   ) : (
-                    <p style={{ fontSize: 14, fontStyle: 'italic', color: 'rgba(255,255,255,0.28)' }}>No caption</p>
+                    <p style={{ fontSize: 14, fontStyle: 'italic', color: 'rgba(15,23,42,0.40)' }}>No caption</p>
                   )}
                   <div className="flex items-center gap-2 mt-1.5">
                     {draft.courseName && (
@@ -216,7 +218,7 @@ export function DraftsPanel() {
                         ⛳ {draft.courseName}
                       </span>
                     )}
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)' }}>{relativeTime(draft.updatedAt)}</span>
+                    <span style={{ fontSize: 11, color: 'rgba(15,23,42,0.40)' }}>{relativeTime(draft.updatedAt)}</span>
                   </div>
                 </div>
 
