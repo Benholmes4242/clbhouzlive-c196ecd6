@@ -42,7 +42,7 @@ export function BusinessLocationStep({
             </label>
 
             {isGolfClub && clubLocation ? (
-              <div className="flex items-center gap-2 bg-muted rounded-xl px-4 py-3 text-[15px] text-muted-foreground">
+              <div className="flex items-center gap-2 rounded-xl px-4 py-3 text-[15px] text-muted-foreground" style={{ background: 'rgba(15,23,42,0.03)', border: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <MapPin className="w-4 h-4 flex-shrink-0" />
                 <span className="flex-1">{clubLocation}</span>
                 <span className="text-[11px] text-muted-foreground/70">From club data</span>
@@ -75,11 +75,12 @@ export function BusinessLocationStep({
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               placeholder="https://yourwebsite.com"
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             />
           </div>
 
-          <div className="h-px bg-border/30" />
+          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
 
           <div className="space-y-1.5">
             <label className="text-[13px] font-medium text-muted-foreground">
@@ -90,11 +91,12 @@ export function BusinessLocationStep({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="contact@business.com"
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             />
           </div>
 
-          <div className="h-px bg-border/30" />
+          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
 
           <div className="space-y-1.5">
             <label className="text-[13px] font-medium text-muted-foreground">

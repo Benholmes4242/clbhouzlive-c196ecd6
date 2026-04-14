@@ -18,7 +18,6 @@ const BusinessProfileLiveSuccessPage = () => {
   const location = useLocation();
   const state = location.state as LocationState | undefined;
 
-  // If no state, redirect to manage page
   if (!state?.businessId) {
     navigate('/businesses/manage', { replace: true });
     return null;
@@ -71,8 +70,8 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
-          <h1 className="text-2xl font-bold text-foreground mb-2">
-            Your business profile is live
+          <h1 className="text-2xl text-foreground mb-2" style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>
+            Your business profile is live 🎉
           </h1>
           <p className="text-muted-foreground">
             Golfers can now discover and follow your business on clbhouz.
@@ -86,7 +85,7 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.3 }}
           className="w-full max-w-sm mb-10"
         >
-          <div className="bg-white border border-[#e2e8f0] rounded-2xl p-4 shadow-sm">
+          <div className="rounded-2xl p-4" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
             <div className="flex items-center gap-3">
               <SquircleAvatar
                 size={56}
@@ -112,12 +111,12 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.4 }}
           className="w-full max-w-sm mb-10"
         >
-          <h2 className="text-sm font-semibold text-foreground mb-4">What you can do next</h2>
+          <h2 className="text-sm text-foreground mb-4" style={{ fontWeight: 900 }}>What you can do next</h2>
           <div className="space-y-3">
-            {/* Post as your business */}
             <button
               onClick={() => navigate('/create-post', { state: { businessId, asBusinessId: businessId } })}
-              className="w-full flex items-center gap-3 p-3 bg-white rounded-xl border border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
                 <Megaphone className="h-5 w-5 text-[#F79E1B]" />
@@ -126,13 +125,13 @@ const BusinessProfileLiveSuccessPage = () => {
                 <p className="text-sm font-medium text-foreground">Post as your business</p>
                 <p className="text-xs text-muted-foreground">Share updates, photos, and moments with golfers.</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
+              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: '#94A3B8' }} />
             </button>
             
-            {/* Request verification */}
             <button
               onClick={() => navigate(`/business/${slug || businessId}/verification/about`)}
-              className="w-full flex items-center gap-3 p-3 bg-white rounded-xl border border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
                 <CheckCircle2 className="h-5 w-5 text-[#F79E1B]" />
@@ -141,13 +140,13 @@ const BusinessProfileLiveSuccessPage = () => {
                 <p className="text-sm font-medium text-foreground">Request verification</p>
                 <p className="text-xs text-muted-foreground">Get a verified badge to build trust with golfers.</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
+              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: '#94A3B8' }} />
             </button>
             
-            {/* Track your reach */}
             <button
               onClick={() => navigate(`/business/${slug || businessId}/insights`)}
-              className="w-full flex items-center gap-3 p-3 bg-white rounded-xl border border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
                 <BarChart3 className="h-5 w-5 text-[#F79E1B]" />
@@ -156,7 +155,7 @@ const BusinessProfileLiveSuccessPage = () => {
                 <p className="text-sm font-medium text-foreground">Track your reach</p>
                 <p className="text-xs text-muted-foreground">See profile views and engagement in Business Insights.</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
+              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: '#94A3B8' }} />
             </button>
           </div>
         </motion.div>
@@ -170,7 +169,8 @@ const BusinessProfileLiveSuccessPage = () => {
         >
           <button
             onClick={handleViewProfile}
-            className="w-full h-12 bg-[#e2e8f0] text-[#1e293b] text-sm font-medium rounded-xl hover:bg-[#cbd5e1] transition-colors flex items-center justify-center gap-2"
+            className="w-full h-12 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+            style={{ background: '#0F172A' }}
           >
             View business profile
             <ArrowRight className="h-4 w-4" />

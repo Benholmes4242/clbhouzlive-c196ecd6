@@ -29,6 +29,13 @@ const roleConfig: Record<RoleKey, { label: string; description: string }> = {
   member: { label: 'Member', description: 'Can post as the business' },
 };
 
+const SectionEyebrow = ({ label }: { label: string }) => (
+  <div className="flex items-center gap-1.5 mb-3">
+    <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+    <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>{label}</span>
+  </div>
+);
+
 export default function BusinessTeamPage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
@@ -128,7 +135,7 @@ export default function BusinessTeamPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}>
+      <div className="sticky top-0 z-10 backdrop-blur-xl" style={{ background: 'rgba(248,250,252,0.97)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <div className="flex items-center px-4 h-14">
           <button
             onClick={() => navigate(-1)}
@@ -137,9 +144,19 @@ export default function BusinessTeamPage() {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 text-center">
-            <h1 className="text-[16px] font-semibold text-foreground">Team & Access</h1>
+            <h1 className="text-[16px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Team & Access</h1>
           </div>
-          <div className="w-11" />
+          {canManage ? (
+            <button
+              onClick={() => navigate(`/business/${businessId}/team/invite`)}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-white active:scale-[0.97] transition-transform"
+              style={{ background: '#F7931E' }}
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          ) : (
+            <div className="w-11" />
+          )}
         </div>
       </div>
 
@@ -153,8 +170,8 @@ export default function BusinessTeamPage() {
         />
         {/* Owners Section */}
         <section>
-          <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Owner</h2>
-          <div className="divide-y divide-border">
+          <SectionEyebrow label="Owner" />
+          <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
             {teamLoading ? (
               <div className="space-y-3 py-2">
                 {[0, 1, 2].map((i) => (
@@ -181,8 +198,8 @@ export default function BusinessTeamPage() {
         {/* Admins Section */}
         {admins.length > 0 && (
           <section>
-            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Admins</h2>
-            <div className="divide-y divide-border">
+            <SectionEyebrow label="Admins" />
+            <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
               {admins.map((member) => (
                 <MemberRow key={member.id} member={member} showActions={true} />
               ))}
@@ -194,8 +211,8 @@ export default function BusinessTeamPage() {
         {/* Members Section */}
         {members.length > 0 && (
           <section>
-            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Members</h2>
-            <div className="divide-y divide-border">
+            <SectionEyebrow label="Members" />
+            <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
               {members.map((member) => (
                 <MemberRow key={member.id} member={member} showActions={true} />
               ))}
@@ -207,20 +224,20 @@ export default function BusinessTeamPage() {
         {/* Pending Invites */}
         {canManage && pendingInvites.length > 0 && (
           <section>
-            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Pending</h2>
-            <div className="divide-y divide-border">
+            <SectionEyebrow label="Pending" />
+            <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
               {pendingInvites.map((invite) => {
                 const role = roleConfig[invite.role as RoleKey] || roleConfig.member;
 
                 return (
                   <div key={invite.id} className="flex items-center gap-3 py-3">
-                    <div className="h-11 w-11 rounded-sq-md bg-muted flex items-center justify-center">
+                    <div className="h-11 w-11 rounded-sq-md flex items-center justify-center" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
                       <Users className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-[15px] truncate">{invite.invitee_email}</p>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)]">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style={{ background: 'rgba(234,179,8,0.10)', color: '#CA8A04', border: '1px solid rgba(234,179,8,0.25)' }}>
                           Pending
                         </span>
                       </div>
@@ -255,7 +272,8 @@ export default function BusinessTeamPage() {
         {/* Invite CTA */}
         {canManage && (
           <Button 
-            className="w-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0" 
+            className="w-full text-white border-0" 
+            style={{ background: '#F7931E' }}
             onClick={() => navigate(`/business/${businessId}/team/invite`)}
           >
             <Plus className="h-4 w-4 mr-2" />
