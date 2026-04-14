@@ -102,29 +102,25 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
     <div className="px-5 pt-12 pb-2 space-y-0">
       <ScrollToTopGlass />
 
-      {/* Handicap Display — Cardless, Centered */}
+      {/* Handicap Display */}
       {handicapIndex !== null ? (
         <div className="pb-8 text-center">
-          {/* Eyebrow Label */}
           <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-4">
             Handicap Index
           </p>
           
-          {/* Handicap Number — Hero */}
           <div className="mb-2">
             <span className="text-6xl font-thin text-foreground tracking-tight tabular-nums">
               {formatHandicap(handicapIndex)}
             </span>
           </div>
           
-          {/* Meta line */}
           {lastUpdatedAt && (
             <p className="text-[13px] text-muted-foreground">
               Last edited {formatDate(lastUpdatedAt)}{isOwnProfile ? ' · By you' : ''}
             </p>
           )}
 
-          {/* Edit CTA — standalone centered */}
           {isOwnProfile && (
             <button
               onClick={() => setIsEditModalOpen(true)}
@@ -136,11 +132,11 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
           )}
         </div>
       ) : (
-        // Empty State — Cardless
+        // Empty State
         <div className="pb-8">
           <div className="flex flex-col items-center text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-4">
-              <Target className="h-7 w-7 text-amber-500" />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(247,147,30,0.08)' }}>
+              <Target className="h-7 w-7" style={{ color: '#F7931E' }} />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {isOwnProfile ? 'Add Your Handicap' : 'No Handicap Set'}
@@ -154,7 +150,8 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
             {isOwnProfile && (
               <button
                 onClick={() => setIsEditModalOpen(true)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-full hover:bg-foreground/90 transition-colors min-h-[44px] active:scale-[0.98]"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-full transition-colors min-h-[44px] active:scale-[0.98]"
+                style={{ background: '#0F172A', color: '#ffffff' }}
               >
                 <Plus className="h-4 w-4" />
                 Add Handicap
@@ -167,15 +164,14 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
       {/* Faded Divider */}
       {isOwnProfile && (
         <div className="mb-8">
-          <div className="h-px mx-auto" style={{ background: 'linear-gradient(to right, transparent, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent)' }} />
+          <div className="h-px mx-auto" style={{ background: 'linear-gradient(to right, transparent, rgba(15,23,42,0.10) 30%, rgba(15,23,42,0.10) 70%, transparent)' }} />
         </div>
       )}
 
-      {/* Official Sync Callout — Premium tinted section, no card */}
+      {/* Official Sync Callout */}
       {isOwnProfile && (
-        <div className="rounded-2xl px-5 py-5 border-l-[3px] border-amber-400/60" style={{ backgroundColor: 'hsla(38, 92%, 50%, 0.04)' }}>
+        <div className="rounded-2xl px-5 py-5 border-l-[3px]" style={{ borderLeftColor: 'rgba(247,147,30,0.60)', backgroundColor: 'rgba(247,147,30,0.04)' }}>
           <div className="flex gap-4">
-            {/* Icon — gold gradient square */}
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-sm">
               <Zap className="h-5 w-5 text-white" />
             </div>
@@ -189,12 +185,12 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
                 Once everything is live, your handicap will update automatically in real time across clbhouz.
               </p>
               
-              {/* CTA */}
               {!hasRegisteredInterest ? (
                 <button
                   onClick={handleRegisterInterest}
                   disabled={isRegistering}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[1.5px] text-amber-500 min-h-[44px] active:scale-95 transition-transform disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[1.5px] min-h-[44px] active:scale-95 transition-transform disabled:opacity-50"
+                  style={{ color: '#F7931E' }}
                 >
                   {isRegistering ? 'Saving...' : (
                     <>

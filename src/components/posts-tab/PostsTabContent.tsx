@@ -15,7 +15,7 @@ import { PostsAutoplay } from './PostsAutoplay';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
-const LONGFORM_THRESHOLD = 180; // 3 min — matches classifyPost in HybridPostsFeed
+const LONGFORM_THRESHOLD = 180;
 
 const FILTER_OPTIONS: { value: PostsFilter; label: string }[] = [
   { value: 'all', label: 'All Posts' },
@@ -82,12 +82,15 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   return (
     <div className="flex flex-col min-h-0">
-      {/* Filter dropdown — right-aligned, matching courses tab sort dropdown */}
+      {/* Filter dropdown */}
       {posts.length > 0 && (
         <div className="flex justify-end px-4 pt-3 pb-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground min-h-[36px] whitespace-nowrap shrink-0">
+              <button
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium min-h-[36px] whitespace-nowrap shrink-0"
+                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+              >
                 {currentFilterLabel}
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
               </button>

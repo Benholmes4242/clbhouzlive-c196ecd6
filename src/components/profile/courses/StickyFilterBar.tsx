@@ -47,13 +47,13 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   return (
     <div className="space-y-3">
       {/* Primary tab row */}
-      <div className="flex border-b border-border">
+      <div className="flex" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <button
           onClick={() => onTabChange('all')}
           className={cn(
             "flex-1 pb-2 text-sm transition-colors duration-150 min-h-[44px]",
             activeTab === 'all'
-              ? "text-foreground font-semibold border-b-2 border-[#F59E0B]"
+              ? "text-foreground font-semibold border-b-2 border-[#F7931E]"
               : "text-muted-foreground font-medium border-b-2 border-transparent"
           )}
         >
@@ -67,7 +67,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
           className={cn(
             "flex-1 pb-2 text-sm transition-colors duration-150 min-h-[44px]",
             activeTab === 'top100'
-              ? "text-foreground font-semibold border-b-2 border-[#F59E0B]"
+              ? "text-foreground font-semibold border-b-2 border-[#F7931E]"
               : "text-muted-foreground font-medium border-b-2 border-transparent"
           )}
         >
@@ -80,13 +80,14 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
 
       {/* Controls: country pills + sort dropdown */}
       <div className="space-y-2 pt-2">
-        {/* Country pills */}
         <CourseRegionPills value={activeCountry} onChange={onCountryChange} />
-        {/* Sort — right aligned */}
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground min-h-[36px] whitespace-nowrap shrink-0">
+              <button
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium min-h-[36px] whitespace-nowrap shrink-0"
+                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+              >
                 {currentSortLabel}
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
               </button>

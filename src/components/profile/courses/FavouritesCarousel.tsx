@@ -1,11 +1,5 @@
 /**
  * FavouritesCarousel - Apple-style premium carousel for Top 10 Rated Courses
- * 
- * Features:
- * - Refined section header with trophy icon
- * - Full-bleed premium cards (280x360px)
- * - Minimal scroll indicator (progress bar)
- * - Empty state cards for incomplete Top 10
  */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -37,7 +31,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Fetch privacy setting for the profile owner
   const { data: privacyData } = useQuery({
     queryKey: ['top-ten-privacy', userId],
     enabled: !!userId,
@@ -52,7 +45,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     staleTime: 5 * 60_000,
   });
 
-  // Stable sorted course IDs for consistent query key (only for pinned courses without ratings)
   const courseIdsNeedingRatings = React.useMemo(() => 
     topTen
       .filter(c => c.is_pinned && c.rating == null)
@@ -61,7 +53,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     [topTen]
   );
 
-  // Fetch user ratings with breakdown scores (for pinned courses that don't have ratings)
   const { data: ratingsMap = {} } = useQuery({
     queryKey: ['user-course-ratings-breakdown', userId, courseIdsNeedingRatings],
     enabled: !!userId && courseIdsNeedingRatings.length > 0,
@@ -95,7 +86,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     staleTime: 60_000,
   });
 
-  // Handle scroll — discrete card index detection
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
@@ -116,32 +106,24 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     }
   }, [handleScroll]);
 
-  // Handle share
   const handleShare = () => {
     toast.info('Coming soon');
   };
 
-  // Dynamic title
   const firstName = displayName?.split(' ')[0] || 'Their';
   const getTitle = () => {
-    if (isOwnProfile) {
-      return "Your Personal Top 10";
-    }
+    if (isOwnProfile) return "Your Personal Top 10";
     return `${firstName}'s Top 10`;
   };
 
-  // Dynamic subtitle
   const getSubtitle = () => {
-    if (isOwnProfile) {
-      return "The very best you've played";
-    }
+    if (isOwnProfile) return "The very best you've played";
     return `The very best ${firstName} has played`;
   };
 
   if (isLoading) {
     return (
       <section className={cn("w-full", className)}>
-        {/* Header skeleton */}
         <div className="px-4 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
@@ -151,7 +133,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
             </div>
           </div>
         </div>
-        {/* Cards skeleton */}
         <div className="flex gap-4 overflow-hidden px-4">
           {[1, 2].map((i) => (
              <div 
@@ -179,7 +160,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
               }}
             >
-              <Trophy className="w-5 h-5 text-amber-600" />
+              <Trophy className="w-5 h-5" style={{ color: '#F7931E' }} />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
@@ -195,10 +176,11 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         {/* Empty Content Card */}
         <div className="px-4">
           <div 
-            className="relative w-full max-w-[320px] h-[280px] rounded-[24px] flex items-center justify-center mx-auto bg-muted border-2 border-dashed border-border"
+            className="relative w-full max-w-[320px] h-[280px] rounded-[24px] flex items-center justify-center mx-auto border-2 border-dashed"
+            style={{ background: 'rgba(15,23,42,0.04)', borderColor: 'rgba(15,23,42,0.12)' }}
           >
             <div className="text-center p-6">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
                 <Trophy className="w-7 h-7 text-muted-foreground/40" />
               </div>
               
@@ -215,7 +197,8 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               {isOwnProfile && onManage && (
                 <button
                   onClick={onManage}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-sm font-medium rounded-full hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm min-h-[44px] active:scale-[0.98]"
+                  className="px-6 py-2.5 text-white text-sm font-medium rounded-full transition-all shadow-sm min-h-[44px] active:scale-[0.98]"
+                  style={{ backgroundColor: '#F7931E' }}
                 >
                   Start Building
                 </button>
@@ -232,14 +215,13 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       {/* Refined Header */}
       <div className="flex items-center justify-between mb-4 px-4">
         <div className="flex items-center gap-3">
-          {/* Trophy icon - subtle gold tint */}
           <div 
             className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{
               background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
             }}
           >
-            <Trophy className="w-5 h-5 text-amber-600" />
+            <Trophy className="w-5 h-5" style={{ color: '#F7931E' }} />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
@@ -264,14 +246,13 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         )}
       </div>
       
-      {/* Carousel - snap scroll with gap */}
+      {/* Carousel */}
       <div 
         ref={scrollContainerRef}
         className="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 pb-2"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {topTen.map((course) => {
-          // Use rating from course if available (auto-populated), otherwise from ratingsMap (pinned)
           const ratingData = ratingsMap[course.course_id];
           const displayRating = course.rating ?? ratingData?.rating;
           
@@ -289,14 +270,15 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           );
         })}
         
-        {/* Empty slot cards - show up to 2 */}
+        {/* Empty slot cards */}
         {isOwnProfile && courseCount < 10 && courseCount > 0 && (
           <>
             {Array.from({ length: Math.min(10 - courseCount, 2) }).map((_, index) => (
               <div 
                 key={`empty-${index}`}
                 onClick={onManage}
-                className="relative w-[245px] h-[315px] rounded-[24px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] bg-muted border-2 border-dashed border-border"
+                className="relative w-[245px] h-[315px] rounded-[24px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] border-2 border-dashed"
+                style={{ background: 'rgba(15,23,42,0.04)', borderColor: 'rgba(15,23,42,0.12)' }}
               >
                 <div className="text-center p-6">
                   <Plus className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
@@ -320,8 +302,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 key={i}
                 className={cn(
                   "rounded-full transition-all duration-300",
-                  isActive ? "w-5 h-1.5 bg-foreground" : "w-1.5 h-1.5 bg-foreground/30"
+                  isActive ? "w-5 h-1.5" : "w-1.5 h-1.5"
                 )}
+                style={{ backgroundColor: isActive ? '#0F172A' : 'rgba(15,23,42,0.20)' }}
               />
             );
           })}
@@ -333,7 +316,8 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         <div className="pt-4 px-4">
           <button
             onClick={handleShare}
-            className="w-full py-2.5 text-sm font-semibold text-[#d97706] bg-[#f5a623]/[0.08] hover:bg-[#f5a623]/[0.15] rounded-xl border border-[#f5a623]/25 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.97]"
+            className="w-full py-2.5 text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.97]"
+            style={{ color: '#F7931E', background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.25)' }}
           >
             <Share2 className="w-4 h-4" />
             Share your Top 10

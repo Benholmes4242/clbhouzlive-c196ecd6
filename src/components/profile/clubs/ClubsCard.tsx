@@ -32,7 +32,6 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
   const displayedSecondary = secondaryClubs.slice(0, MAX_SECONDARY_CLUBS);
   const remainingCount = secondaryClubs.length - MAX_SECONDARY_CLUBS;
 
-  // Empty state: Owner with no clubs
   if (!hasClubs && isOwner) {
     return (
       <motion.div
@@ -61,7 +60,6 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
     );
   }
 
-  // Empty state: Non-owner viewing private clubs
   if (!hasClubs && !isOwner && isPrivate) {
     return (
       <motion.div
@@ -78,7 +76,6 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
     );
   }
 
-  // If no clubs and not owner and not marked private, don't render
   if (!hasClubs) return null;
 
   return (
@@ -88,7 +85,6 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       transition={{ duration: 0.24 }}
       className={cn('', className)}
     >
-      {/* Header - reduced mb: mb-4 → mb-2 (8px from label to first club) */}
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-base font-semibold text-foreground">Clubs & Memberships</h3>
         {isOwner && onEditClick && (
@@ -103,24 +99,21 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         )}
       </div>
 
-      {/* Home Club */}
       {homeClub && (
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-foreground">{homeClub.name}</span>
-          <span className={cn(
-            'px-2 py-0.5 text-xs font-semibold rounded-full',
-            'border border-[#f5a623]/30 bg-[#f5a623]/8 text-[#d97706]'
-          )}>
+          <span
+            className="px-2 py-0.5 text-xs font-semibold rounded-full text-[#F7931E]"
+            style={{ background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.30)' }}
+          >
             Home club
           </span>
         </div>
       )}
 
-      {/* Secondary Clubs - reduced spacing between entries */}
       {displayedSecondary.length > 0 && (
-        <div className="mt-3 pt-2.5 border-t border-border">
+        <div className="mt-3 pt-2.5" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           <p className="text-xs font-medium text-muted-foreground mb-2">Also plays at</p>
-          {/* Reduced gap: space-y-1.5 → space-y-1 (8px between entries) */}
           <div className="space-y-1">
             {displayedSecondary.map(club => (
               <p key={club.id} className="text-sm font-medium text-foreground truncate">

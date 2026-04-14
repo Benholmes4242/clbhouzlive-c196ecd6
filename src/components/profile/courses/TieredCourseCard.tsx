@@ -1,7 +1,5 @@
 /**
  * TieredCourseCard - Visual hierarchy cards for All Courses Played
- * 
- * Updated with Amber (#f59e0b) for Top 100 courses.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -29,11 +27,6 @@ interface TieredCourseCardProps {
   onRateClick?: (courseId: string) => void;
 }
 
-/**
- * Tiered course card with clear visual hierarchy:
- * - Top 100: Larger cards with Amber accent (#f59e0b), trophy icon, strong visual weight
- * - Non-Top-100: Slightly smaller, muted styling - still readable
- */
 export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
   course,
   isOwnProfile,
@@ -60,22 +53,21 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     }
   };
 
-  // Top 100 card - LARGER with amber accent and trophy styling (premium treatment)
+  // Top 100 card
   if (isTop100) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-card rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group border border-amber-400/30"
+        className="relative rounded-xl overflow-hidden cursor-pointer transition-all group"
+        style={{ background: '#ffffff', border: '1px solid rgba(247,147,30,0.30)' }}
       >
-        {/* Trophy Chartreus accent line - prominent 2px */}
         <div 
           className="absolute top-0 left-0 right-0 h-[2px]" 
-          style={{ background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.3) 0%, #f59e0b 50%, rgba(245, 158, 11, 0.3) 100%)' }} 
+          style={{ background: 'linear-gradient(90deg, rgba(247,147,30,0.30) 0%, #F7931E 50%, rgba(247,147,30,0.30) 100%)' }} 
         />
         
         <div className="flex">
-          {/* Thumbnail - LARGER for Top 100 */}
           <div className="relative flex-shrink-0 self-stretch">
             {course.thumbnail_image ? (
               <img
@@ -88,25 +80,21 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             ) : (
               <div className="w-24 h-full bg-gradient-to-br from-muted to-muted/50 rounded-l-xl" />
             )}
-            {/* Top 100 icon overlay - Chartreus */}
             <div 
               className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: '#f59e0b' }}
+              style={{ backgroundColor: '#F7931E' }}
             >
               <Trophy className="w-3 h-3 text-white" />
             </div>
           </div>
 
-          {/* Content - flexible column */}
           <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
-            {/* Course name - single line, wrap to 2 only if needed */}
             <div className="font-semibold text-sm text-foreground leading-tight line-clamp-2 break-words">
               {course.name}
             </div>
             <div className="text-xs text-muted-foreground truncate mt-0.5">
               {course.sub_country || course.country}
             </div>
-            {/* Date row - single line */}
             {course.last_played_at && (
               <div className="flex items-center gap-1 mt-1.5 whitespace-nowrap">
                 <Calendar className="w-3 h-3 text-muted-foreground" />
@@ -117,7 +105,6 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             )}
           </div>
 
-          {/* Rating column - fixed width, bottom-right aligned with date */}
           <div className="flex flex-col items-center justify-end pb-2.5 pr-3 pl-2 flex-shrink-0 min-w-[72px]">
             {isRated && course.rating_value ? (
               <>
@@ -129,7 +116,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
-                className="text-[11px] font-medium text-amber-500 hover:underline whitespace-nowrap"
+                className="text-[11px] font-medium hover:underline whitespace-nowrap"
+                style={{ color: '#F7931E' }}
               >
                 Review
               </button>
@@ -140,14 +128,14 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     );
   }
 
-  // Non-Top-100 cards - ~85-90% height of Top 100
-  // Unrated: Slightly more compact
+  // Non-Top-100 unrated
   if (!isRated) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="bg-card rounded-xl border border-border overflow-hidden cursor-pointer hover:border-border transition-colors"
+        className="rounded-xl overflow-hidden cursor-pointer transition-colors"
+        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
       >
         <div className="flex">
           <div className="relative flex-shrink-0 self-stretch">
@@ -160,13 +148,11 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
                 className="w-16 h-full object-cover opacity-80 rounded-l-xl"
               />
             ) : (
-              <div className="w-16 h-full bg-muted/50 rounded-l-xl" />
+              <div className="w-16 h-full rounded-l-xl" style={{ background: 'rgba(15,23,42,0.04)' }} />
             )}
           </div>
 
-          {/* Content - flexible column */}
           <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
-            {/* Course name - allow 2 lines */}
             <div className="font-semibold text-[13px] text-foreground/80 leading-tight line-clamp-2">
               {course.name}
             </div>
@@ -183,12 +169,12 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             )}
           </div>
 
-          {/* Review CTA - fixed column */}
           {isOwnProfile && (
             <div className="flex items-center pr-2.5 pl-2 flex-shrink-0">
               <button 
                 onClick={handleRateClick}
-                className="text-[10px] text-muted-foreground hover:text-foreground font-medium px-2 py-1 bg-background border border-border/50 rounded-md hover:border-border transition-colors whitespace-nowrap"
+                className="text-[10px] font-medium px-2 py-1 rounded-md transition-colors whitespace-nowrap"
+                style={{ background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.07)', color: '#94A3B8' }}
               >
                 Review
               </button>
@@ -199,12 +185,13 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     );
   }
 
-  // Standard rated non-Top-100 card - ~85% of Top 100 height
+  // Standard rated non-Top-100 card
   return (
     <motion.div
       onClick={handleClick}
       whileTap={{ scale: 0.98 }}
-      className="bg-card rounded-xl border border-border overflow-hidden cursor-pointer hover:border-border transition-colors"
+      className="rounded-xl overflow-hidden cursor-pointer transition-colors"
+      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
     >
       <div className="flex">
         <div className="relative flex-shrink-0 self-stretch">
@@ -217,13 +204,11 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               className="w-[72px] h-full object-cover rounded-l-xl"
             />
           ) : (
-            <div className="w-[72px] h-full bg-muted rounded-l-xl" />
+            <div className="w-[72px] h-full rounded-l-xl" style={{ background: 'rgba(15,23,42,0.04)' }} />
           )}
         </div>
 
-        {/* Content - flexible column */}
         <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
-          {/* Course name - single line, wrap to 2 only if needed */}
           <div className="font-semibold text-[13px] text-foreground leading-tight line-clamp-2 break-words">
             {course.name}
           </div>
@@ -240,7 +225,6 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           )}
         </div>
 
-        {/* Rating column - fixed width, bottom-right aligned with date */}
         <div className="flex flex-col items-center justify-end pb-2 pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
           {course.rating_value && (
             <>
