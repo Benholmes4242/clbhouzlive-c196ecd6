@@ -53,7 +53,6 @@ export default function StudioDial({
     isDragging.current = false;
   };
 
-  // Centre the active tool
   const containerWidth = visibleTools.length * ITEM_W;
   const baseTranslate = -(activeIdx * ITEM_W) + (containerWidth / 2) - (ITEM_W / 2);
 
@@ -66,23 +65,19 @@ export default function StudioDial({
         flexShrink: 0,
         touchAction: 'pan-y',
         cursor: 'grab',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        background: 'rgba(5,5,5,0.98)',
+        borderTop: '0.5px solid rgba(15,23,42,0.08)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+        background: '#ffffff',
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
-      {/* Fade masks */}
-      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 40, background: 'linear-gradient(to right, rgba(5,5,5,0.98), transparent)', zIndex: 2, pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 40, background: 'linear-gradient(to left, rgba(5,5,5,0.98), transparent)', zIndex: 2, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 40, background: 'linear-gradient(to right, #ffffff, transparent)', zIndex: 2, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 40, background: 'linear-gradient(to left, #ffffff, transparent)', zIndex: 2, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-0.5px)', width: 1, height: '100%', background: 'rgba(15,23,42,0.08)', zIndex: 1, pointerEvents: 'none' }} />
 
-      {/* Centre marker */}
-      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-0.5px)', width: 1, height: '100%', background: 'rgba(255,255,255,0.06)', zIndex: 1, pointerEvents: 'none' }} />
-
-      {/* Items */}
       <div
         style={{
           display: 'flex',
@@ -112,7 +107,7 @@ export default function StudioDial({
                 opacity,
                 transition: 'transform 0.2s ease, opacity 0.2s ease',
                 cursor: 'pointer',
-                color: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.40)',
+                color: isActive ? '#0F172A' : 'rgba(15,23,42,0.35)',
               }}
             >
               <t.Icon className="w-5 h-5" />

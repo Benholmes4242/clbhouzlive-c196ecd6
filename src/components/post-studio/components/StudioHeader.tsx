@@ -1,6 +1,6 @@
 // StudioHeader — Unified with Review Wizard design language
 // White progress indicators, amber Share button preserved
-// Dark mode support for ComposeScreen
+// Light mode support for ComposeScreen
 
 import React from 'react';
 import { ChevronLeft, X } from 'lucide-react';
@@ -65,22 +65,22 @@ export function StudioHeader({
                 onClick={leftAction.onClick}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100"
                 style={{
-                  background: darkMode ? 'rgba(255,255,255,0.08)' : '#F5F5F7',
-                  border: darkMode ? '1px solid rgba(255,255,255,0.09)' : 'none',
+                  background: darkMode ? 'rgba(15,23,42,0.05)' : '#F5F5F7',
+                  border: darkMode ? '1px solid rgba(15,23,42,0.07)' : 'none',
                 }}
                 aria-label="Close"
               >
-                <X className="h-[18px] w-[18px]" style={{ color: darkMode ? 'rgba(255,255,255,0.65)' : '#8E8E93' }} />
+                <X className="h-[18px] w-[18px]" style={{ color: darkMode ? 'rgba(15,23,42,0.65)' : '#8E8E93' }} />
               </motion.button>
             ) : (
               <button
                 onClick={leftAction.onClick}
                 disabled={leftAction.disabled}
                 className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-all duration-100 disabled:opacity-50"
-                style={{ background: darkMode ? 'rgba(255,255,255,0.08)' : '#F5F5F7' }}
+                style={{ background: darkMode ? 'rgba(15,23,42,0.05)' : '#F5F5F7' }}
                 aria-label="Back"
               >
-                <ChevronLeft className="h-5 w-5" style={{ color: darkMode ? 'rgba(255,255,255,0.65)' : 'hsl(var(--foreground))' }} />
+                <ChevronLeft className="h-5 w-5" style={{ color: darkMode ? 'rgba(15,23,42,0.65)' : 'hsl(var(--foreground))' }} />
               </button>
             )
           ) : <div />}
@@ -104,21 +104,21 @@ export function StudioHeader({
                         height: 10,
                         borderRadius: 99,
                         background: isCompleted
-                          ? 'rgba(255,255,255,0.92)'
+                          ? '#0F172A'
                           : isActive
                             ? 'transparent'
                             : '#D1D5DB',
-                        border: isActive ? '2px solid rgba(255,255,255,0.90)' : 'none',
+                        border: isActive ? '2px solid #0F172A' : 'none',
                       }}
                     >
                       {isCompleted && (
-                        <span style={{ fontSize: 7, color: '#0D0D0D', fontWeight: 700 }}>✓</span>
+                        <span style={{ fontSize: 7, color: '#ffffff', fontWeight: 700 }}>✓</span>
                       )}
                     </div>
                     <span
                       className="text-[9px] font-semibold tracking-wider"
                       style={{
-                        color: isCompleted || isActive ? 'rgba(255,255,255,0.92)' : '#9CA3AF',
+                        color: isCompleted || isActive ? '#0F172A' : '#9CA3AF',
                       }}
                     >
                       {label}
@@ -134,7 +134,7 @@ export function StudioHeader({
               style={{
                 fontSize: 17,
                 fontWeight: 700,
-                color: darkMode ? 'rgba(255,255,255,0.92)' : TEXT_PRIMARY,
+                color: darkMode ? '#0F172A' : TEXT_PRIMARY,
                 letterSpacing: '-0.03em',
               }}
             >
@@ -154,9 +154,9 @@ export function StudioHeader({
                 className="text-[14px] font-bold px-5 min-h-[38px] flex items-center rounded-full transition-all duration-200 active:scale-[0.96]"
                 style={{
                   background: darkMode
-                    ? (rightAction.disabled ? 'rgba(255,255,255,0.07)' : 'linear-gradient(135deg, #F7931E, #E8980A)')
+                    ? (rightAction.disabled ? 'rgba(15,23,42,0.07)' : 'linear-gradient(135deg, #F7931E, #E8980A)')
                     : (rightAction.disabled ? '#F5F5F7' : '#1C1C1E'),
-                  color: rightAction.disabled ? 'rgba(255,255,255,0.22)' : '#FFFFFF',
+                  color: rightAction.disabled ? 'rgba(15,23,42,0.22)' : '#FFFFFF',
                   pointerEvents: rightAction.disabled ? 'none' : 'auto',
                   boxShadow: darkMode && !rightAction.disabled ? '0 4px 20px rgba(247,147,30,0.35)' : 'none',
                   letterSpacing: '-0.1px',
@@ -169,7 +169,7 @@ export function StudioHeader({
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
                 className="text-[15px] font-semibold disabled:opacity-30"
-                style={{ minHeight: MIN_TAP_TARGET, color: darkMode ? 'rgba(255,255,255,0.55)' : 'rgba(15,23,42,0.55)' }}
+                style={{ minHeight: MIN_TAP_TARGET, color: darkMode ? 'rgba(15,23,42,0.55)' : 'rgba(15,23,42,0.55)' }}
               >
                 {rightAction.label}
               </button>
@@ -181,10 +181,10 @@ export function StudioHeader({
       {/* Progress bar */}
       {showProgress && (
         <div className="px-4 pt-1 pb-2">
-          <div className="h-[3px] rounded-full overflow-hidden bg-muted">
+          <div className="h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.08)' }}>
             <motion.div
               className="h-full rounded-full"
-              style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.90), rgba(255,255,255,0.60))' }}
+              style={{ background: 'linear-gradient(90deg, #0F172A, rgba(15,23,42,0.60))' }}
               initial={{ width: '0%' }}
               animate={{ width: `${(currentStepNum / TOTAL_STEPS) * 100}%` }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -200,7 +200,7 @@ export function StudioHeader({
                   key={label}
                   className="text-[9px] font-semibold tracking-wider"
                   style={{
-                    color: isCompleted || isActive ? 'rgba(255,255,255,0.92)' : '#9CA3AF',
+                    color: isCompleted || isActive ? '#0F172A' : '#9CA3AF',
                   }}
                 >
                   {label}

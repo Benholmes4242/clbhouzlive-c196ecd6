@@ -28,7 +28,7 @@ export function CharacterRing({ count, maxCount = POST_LIMITS.MAX_CAPTION_LENGTH
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className={`-rotate-90 ${isOver ? 'animate-pulse' : ''}`}>
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="hsl(var(--border))" strokeWidth={2.5} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(15,23,42,0.12)" strokeWidth={2.5} />
         <circle
           cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={strokeColor} strokeWidth={2.5}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"

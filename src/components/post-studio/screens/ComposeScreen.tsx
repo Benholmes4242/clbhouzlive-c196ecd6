@@ -417,7 +417,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
       if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last, m.start)}</span>);
-      parts.push(<span key={`m-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.90)', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
+      parts.push(<span key={`m-${partIndex++}`} style={{ color: '#0F172A', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
       last = m.end;
     }
     if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last)}</span>);
@@ -561,7 +561,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               left: 16,
               width: 1.5,
               height: 29,
-              background: 'rgba(255,255,255,0.80)',
+              background: 'rgba(15,23,42,0.75)',
               borderRadius: 0.75,
               animation: 'blink 1s step-end infinite',
               pointerEvents: 'none',
@@ -584,7 +584,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             }
           }}
           placeholder="What's on your mind?"
-          className="w-full resize-none outline-none placeholder:text-white/[.16]"
+          className="w-full resize-none outline-none placeholder:text-black/[.25]"
           style={{
             background: 'transparent',
             fontSize: 20,
@@ -614,8 +614,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             width: 42,
             height: 42,
             borderRadius: '50%',
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.14)',
+            background: 'rgba(15,23,42,0.05)',
+            border: '1px solid rgba(15,23,42,0.07)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -623,12 +623,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             zIndex: 3,
           }}
         >
-          <ImagePlus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
+          <ImagePlus className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.65)' }} strokeWidth={2} />
         </motion.button>
       </div>
 
       {/* Hairline below textarea */}
-      <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginTop: 14 }} />
+      <div className="mx-4" style={{ height: 1, background: 'rgba(15,23,42,0.07)', marginTop: 14 }} />
 
       {pushCourseToBottom && <div className="flex-1" />}
 
@@ -721,7 +721,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
                   className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                  style={{ background: 'rgba(15,23,42,0.06)' }}
                 >
                   <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
                 </div>
@@ -961,12 +961,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   height: '80%',
                   aspectRatio: '1',
                   borderRadius: 12,
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1.5px dashed rgba(255,255,255,0.12)',
+                  background: 'rgba(15,23,42,0.03)',
+                  border: '1.5px dashed rgba(15,23,42,0.12)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
-                <Plus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.25)' }} />
+                <Plus className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.25)' }} />
               </motion.button>
             )}
           </div>
@@ -989,7 +989,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 className="shrink-0 flex items-center gap-2 px-4 py-2 text-sm"
                 style={{ color: DARK_TEXT3 }}
               >
-                <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.12)', borderTopColor: 'transparent' }} />
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(15,23,42,0.15)', borderTopColor: 'transparent' }} />
                 Processing…
               </motion.div>
             )}
@@ -1010,17 +1010,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <div
         className="shrink-0"
         style={{
-          background: 'rgba(13,13,13,0.98)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: '#ffffff',
+          borderTop: '1px solid rgba(15,23,42,0.07)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
         }}
       >
-        {/* Hairline at top */}
-        <div style={{
-          height: 1,
-          background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 80%, transparent 100%)`,
-        }} />
 
         <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0, paddingTop: 8 }}>
 
@@ -1036,11 +1030,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(15,23,42,0.05)',
+                border: '1px solid rgba(15,23,42,0.07)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <ImagePlus className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
+                <ImagePlus className="w-[18px] h-[18px]" style={{ color: 'rgba(15,23,42,0.65)' }} strokeWidth={2} />
               </div>
               <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
@@ -1102,7 +1096,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <div style={{
                   position: 'absolute', top: 8, right: 8,
                   width: 7, height: 7, borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.85)',
+                  background: '#F7931E',
                 }} />
               )}
             </motion.button>
