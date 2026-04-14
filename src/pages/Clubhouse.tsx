@@ -73,37 +73,45 @@ const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
 }) => (
   <Drawer open={open} onOpenChange={onOpenChange}>
     <DrawerContent
-      className="border-white/[0.08] rounded-t-[20px]"
+      className="rounded-t-[20px]"
       style={{
         background: 'rgba(13, 13, 13, 0.98)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderBottom: 'none',
       }}
     >
-      <div className="p-4 space-y-1">
+      {/* Dispatch handle token */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)' }} />
+      </div>
+
+      {/* Flat rows */}
+      <div style={{ padding: '4px 0 0' }}>
         <button
-          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/10 transition-colors"
           onClick={onReport}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer', textAlign: 'left' as const }}
         >
-          <Flag className="w-5 h-5 text-white/50" />
-          <span className="text-[15px] text-white/80">Report this post</span>
+          <Flag className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} />
+          <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>Report this post</span>
         </button>
         <button
-          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/10 transition-colors"
           onClick={onNotInterested}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer', textAlign: 'left' as const }}
         >
-          <EyeOff className="w-5 h-5 text-white/50" />
-          <span className="text-[15px] text-white/80">Not interested</span>
+          <EyeOff className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} />
+          <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>Not interested</span>
         </button>
         <button
-          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/10 transition-colors"
           onClick={onCopyLink}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
         >
-          <LinkIcon className="w-5 h-5 text-white/50" />
-          <span className="text-[15px] text-white/80">Copy link</span>
+          <LinkIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} />
+          <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>Copy link</span>
         </button>
       </div>
-      <div className="h-[env(safe-area-inset-bottom,0px)]" />
+      <div className="h-[env(safe-area-inset-bottom,0px)]" style={{ minHeight: 16 }} />
     </DrawerContent>
   </Drawer>
 );

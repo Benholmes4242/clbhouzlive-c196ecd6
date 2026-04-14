@@ -447,7 +447,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               <span style={{
                 fontSize: 24,
                 fontWeight: 900,
-                color: accent,
+                color: '#ffffff',
                 lineHeight: 1,
                 letterSpacing: '-0.04em',
                 fontFamily: 'Georgia, serif',
@@ -457,7 +457,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               <span style={{
                 fontSize: 10,
                 fontWeight: 500,
-                color: 'rgba(245,158,11,0.45)',
+                color: 'rgba(255,255,255,0.38)',
               }}>
                 /10
               </span>

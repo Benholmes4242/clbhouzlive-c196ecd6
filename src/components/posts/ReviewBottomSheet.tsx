@@ -195,7 +195,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <span style={{
                       fontSize: 28,
                       fontWeight: 900,
-                      color: AMBER,
+                      color: '#ffffff',
                       lineHeight: 1,
                       letterSpacing: '-0.04em',
                       fontFamily: 'Georgia, serif',
@@ -205,7 +205,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <span style={{
                       fontSize: 12,
                       fontWeight: 500,
-                      color: 'rgba(245,158,11,0.45)',
+                      color: 'rgba(255,255,255,0.38)',
                     }}>
                       /10
                     </span>
