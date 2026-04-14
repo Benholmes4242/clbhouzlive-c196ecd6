@@ -196,8 +196,10 @@ export default function PhotosGrid({
 
               {/* Course chip (if present) */}
               {item.golfCourse && (
-                <div className="absolute bottom-2 left-2 bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs font-medium px-2 py-1 rounded-lg flex items-center gap-1">
-                  ⛳️ {item.golfCourse.name}
+                <div className="absolute bottom-2 inset-x-0 flex justify-center z-10">
+                  <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs font-medium px-2 py-1 rounded-lg flex items-center gap-1">
+                    ⛳️ {item.golfCourse.name}
+                  </div>
                 </div>
               )}
 
