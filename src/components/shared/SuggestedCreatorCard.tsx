@@ -113,7 +113,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           <div className="flex items-center justify-center" style={{
             position: 'absolute', bottom: -2, right: -2,
             width: 18, height: 18, borderRadius: '50%',
-            background: '#D97706',
+            background: '#F7931E',
             border: isDark ? '2px solid #000' : '2px solid hsl(var(--background))',
             zIndex: 2,
           }}>
@@ -158,8 +158,8 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
             padding: '2px 6px', borderRadius: 999,
             whiteSpace: 'nowrap',
             ...(isDark
-              ? { background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }
-              : { background: '#FEF3C7', color: '#92400E' }),
+              ? { background: 'rgba(247,147,30,0.12)', color: '#F7931E' }
+              : { background: 'rgba(247,147,30,0.10)', color: '#F7931E' }),
           }}>
             HCP {creator.handicap}
           </div>
@@ -179,10 +179,10 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           ...(following
             ? isDark
               ? { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', border: 'none' }
-              : { background: 'transparent', color: 'hsl(var(--muted-foreground))', border: '1px solid hsl(var(--border))' }
+              : { background: 'transparent', color: 'rgba(15,23,42,0.50)', border: '1px solid rgba(15,23,42,0.10)' }
             : isDark
               ? { background: '#ffffff', color: '#000000', border: 'none' }
-              : { background: 'hsl(var(--foreground))', color: 'hsl(var(--background))', border: 'none' }),
+              : { background: '#0F172A', color: '#ffffff', border: 'none' }),
         }}
       >
         {following ? 'Following' : 'Follow'}
