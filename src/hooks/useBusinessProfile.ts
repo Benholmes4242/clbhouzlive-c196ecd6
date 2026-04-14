@@ -39,6 +39,11 @@ export interface BusinessProfile {
   deleted_at: string | null;
   created_at: string | null;
   updated_at: string | null;
+  // New fields — Edit Wizard upgrade
+  founded_year: number | null;
+  booking_url: string | null;
+  opening_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
+  social_links: { instagram?: string; twitter?: string; facebook?: string; youtube?: string } | null;
 }
 
 export function useBusinessProfile(idOrSlug: string | undefined) {
@@ -107,7 +112,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
       const { golf_clubs: _, ...businessData } = data;
       
       const result: BusinessProfile = {
-        ...(businessData as BusinessProfile),
+        ...(businessData as unknown as BusinessProfile),
         // Use business coords → golf_clubs coords → golf_courses coords
         lat: finalLat,
         lng: finalLng,

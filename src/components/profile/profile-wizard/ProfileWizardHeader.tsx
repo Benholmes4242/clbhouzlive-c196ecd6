@@ -16,10 +16,12 @@ export function ProfileWizardHeader({ title, currentStep, totalSteps, onBack, on
 
   return (
     <div
-      className="flex items-center justify-between px-4 bg-background border-b border-border"
+      className="flex items-center justify-between px-4"
       style={{
         paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+        background: 'var(--bg-page, #F8FAFC)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
       }}
     >
       <button
@@ -37,7 +39,7 @@ export function ProfileWizardHeader({ title, currentStep, totalSteps, onBack, on
         <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
           Step {currentStep} of {totalSteps}
         </p>
-        <p className="text-[16px] font-bold text-foreground leading-tight mt-0.5">
+        <p className="text-[16px] text-foreground leading-tight mt-0.5" style={{ fontWeight: 900 }}>
           {title}
         </p>
       </div>

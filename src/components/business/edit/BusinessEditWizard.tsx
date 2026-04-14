@@ -43,6 +43,16 @@ import { BusinessEditStep3Branding } from './BusinessEditStep3Branding';
 
 const TOTAL_STEPS = 3;
 
+const DEFAULT_OPENING_HOURS: Record<string, { open: string; close: string; closed: boolean }> = {
+  Mon: { open: '08:00', close: '18:00', closed: false },
+  Tue: { open: '08:00', close: '18:00', closed: false },
+  Wed: { open: '08:00', close: '18:00', closed: false },
+  Thu: { open: '08:00', close: '18:00', closed: false },
+  Fri: { open: '08:00', close: '18:00', closed: false },
+  Sat: { open: '08:00', close: '18:00', closed: false },
+  Sun: { open: '08:00', close: '18:00', closed: true },
+};
+
 const slideVariants = {
   enter: (dir: WizardDirection) => ({
     x: dir === 'forward' ? '100%' : '-100%',
@@ -84,12 +94,21 @@ export default function BusinessEditWizard() {
     businessBio: '',
     businessWebsite: '',
     businessContactEmail: '',
+    businessFoundedYear: '',
+    businessBookingUrl: '',
+    businessInstagram: '',
+    businessTwitter: '',
+    businessFacebook: '',
+    businessYoutube: '',
   });
 
   const [address, setAddress] = useState<AddressValue | null>(null);
   const [countrySelection, setCountrySelection] = useState<string | null>(null);
   const [phone, setPhone] = useState<PhoneValue | null>(null);
   const [addressError, setAddressError] = useState<string | null>(null);
+  const [openingHours, setOpeningHours] = useState<Record<string, { open: string; close: string; closed: boolean }>>(
+    { ...DEFAULT_OPENING_HOURS }
+  );
 
   // Deferred photo state
   const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
@@ -105,6 +124,7 @@ export default function BusinessEditWizard() {
     address: AddressValue | null;
     countrySelection: string | null;
     phone: PhoneValue | null;
+    openingHours: typeof openingHours;
   } | null>(null);
 
   // Guard against re-initialising form on background refetches
@@ -122,6 +142,12 @@ export default function BusinessEditWizard() {
       businessBio: business.description || '',
       businessWebsite: business.website || '',
       businessContactEmail: business.email || '',
+      businessFoundedYear: business.founded_year ? String(business.founded_year) : '',
+      businessBookingUrl: business.booking_url || '',
+      businessInstagram: business.social_links?.instagram || '',
+      businessTwitter: business.social_links?.twitter || '',
+      businessFacebook: business.social_links?.facebook || '',
+      businessYoutube: business.social_links?.youtube || '',
     };
     setFormData(newFormData);
 
@@ -174,11 +200,17 @@ export default function BusinessEditWizard() {
       setPhone(newPhone);
     }
 
+    const newOpeningHours = business.opening_hours
+      ? { ...business.opening_hours }
+      : { ...DEFAULT_OPENING_HOURS };
+    setOpeningHours(newOpeningHours);
+
     setInitialValues({
       formData: newFormData,
       address: newAddress,
       countrySelection: newCountrySelection,
       phone: newPhone,
+      openingHours: newOpeningHours,
     });
   }, [business]);
 
@@ -206,8 +238,9 @@ export default function BusinessEditWizard() {
     const countryChanged = countrySelection !== initialValues.countrySelection;
     const phoneChanged = JSON.stringify(phone) !== JSON.stringify(initialValues.phone);
     const photosChanged = !!pendingLogoFile || !!pendingCoverFile || pendingRemoveLogo || pendingRemoveCover;
-    return formChanged || addressChanged || countryChanged || phoneChanged || photosChanged;
-  }, [formData, address, countrySelection, phone, initialValues, pendingLogoFile, pendingCoverFile, pendingRemoveLogo, pendingRemoveCover]);
+    const hoursChanged = JSON.stringify(openingHours) !== JSON.stringify(initialValues.openingHours);
+    return formChanged || addressChanged || countryChanged || phoneChanged || photosChanged || hoursChanged;
+  }, [formData, address, countrySelection, phone, openingHours, initialValues, pendingLogoFile, pendingCoverFile, pendingRemoveLogo, pendingRemoveCover]);
 
   // Validation per step
   const canProceed = useMemo(() => {
@@ -215,9 +248,7 @@ export default function BusinessEditWizard() {
       case 1:
         return formData.businessName.trim().length > 0 || isClubLinked;
       case 2:
-        const hasAddress = address !== null || isClubLinked;
-        const hasContact = formData.businessWebsite.trim().length > 0 || formData.businessContactEmail.trim().length > 0;
-        return hasAddress && hasContact;
+        return address !== null || isClubLinked;
       case 3:
         return true;
       default:
@@ -275,6 +306,14 @@ export default function BusinessEditWizard() {
       if (pendingRemoveCover) await doRemoveCover();
       else if (pendingCoverFile) await doUploadCover(pendingCoverFile);
 
+      const socialLinks = {
+        instagram: formData.businessInstagram || null,
+        twitter: formData.businessTwitter || null,
+        facebook: formData.businessFacebook || null,
+        youtube: formData.businessYoutube || null,
+      };
+      const hasSocialLinks = Object.values(socialLinks).some(Boolean);
+
       const updatePayload: Record<string, unknown> = {
         name: formData.businessName,
         category: formData.businessCategory || null,
@@ -282,6 +321,10 @@ export default function BusinessEditWizard() {
         email: formData.businessContactEmail || null,
         phone: phone?.fullNumber || null,
         description: formData.businessBio || null,
+        founded_year: formData.businessFoundedYear ? parseInt(formData.businessFoundedYear, 10) : null,
+        booking_url: formData.businessBookingUrl || null,
+        opening_hours: openingHours,
+        social_links: hasSocialLinks ? socialLinks : null,
         updated_at: new Date().toISOString(),
       };
 
@@ -329,7 +372,7 @@ export default function BusinessEditWizard() {
       setSaving(false);
     }
   }, [
-    user?.id, id, formData, address, phone, isClubLinked,
+    user?.id, id, formData, address, phone, openingHours, isClubLinked,
     pendingLogoFile, pendingCoverFile, pendingRemoveLogo, pendingRemoveCover,
     doUploadLogo, doRemoveLogo, doUploadCover, doRemoveCover,
     localLogoPreview, localCoverPreview, queryClient, navigate,
@@ -339,7 +382,7 @@ export default function BusinessEditWizard() {
   if (authLoading || businessLoading || membershipLoading) {
     return createPortal(
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
-        <div className="w-8 h-8 rounded-full border-2 border-[#f59e0b] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#F7931E', borderTopColor: 'transparent' }} />
       </div>,
       document.body
     );
@@ -357,7 +400,8 @@ export default function BusinessEditWizard() {
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="text-[14px] font-semibold text-[#d97706]"
+            className="text-[14px] font-semibold"
+            style={{ color: '#F7931E' }}
           >
             Go back
           </button>
@@ -379,7 +423,8 @@ export default function BusinessEditWizard() {
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="text-[14px] font-semibold text-[#d97706]"
+            className="text-[14px] font-semibold"
+            style={{ color: '#F7931E' }}
           >
             Go back
           </button>
@@ -432,6 +477,8 @@ export default function BusinessEditWizard() {
                   setCountrySelection={setCountrySelection}
                   phone={phone}
                   setPhone={setPhone}
+                  openingHours={openingHours}
+                  setOpeningHours={setOpeningHours}
                   isClubLinked={isClubLinked}
                   businessLocation={business.location}
                   addressError={addressError}

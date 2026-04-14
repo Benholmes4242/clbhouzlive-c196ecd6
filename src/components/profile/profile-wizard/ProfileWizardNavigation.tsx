@@ -23,8 +23,12 @@ export function ProfileWizardNavigation({
 
   return (
     <div
-      className="px-4 pt-3 bg-background border-t border-border"
-      style={{ paddingBottom: 'calc(var(--sab) + 16px)' }}
+      className="px-4 pt-3"
+      style={{
+        paddingBottom: 'calc(var(--sab) + 16px)',
+        background: 'var(--bg-page, #F8FAFC)',
+        borderTop: '0.5px solid rgba(15,23,42,0.07)',
+      }}
     >
       <div className="flex gap-3">
         {currentStep > 1 && (
@@ -33,6 +37,7 @@ export function ProfileWizardNavigation({
             onClick={onBack}
             disabled={isSubmitting}
             className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold"
+            style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
           >
             Back
           </Button>
@@ -40,7 +45,8 @@ export function ProfileWizardNavigation({
         <Button
           onClick={isFinalStep ? onSubmit : onNext}
           disabled={!canProceed || isSubmitting}
-          className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold bg-foreground hover:bg-foreground/90 text-background border-0"
+          className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold border-0"
+          style={{ background: '#0F172A', color: '#ffffff' }}
         >
           {isSubmitting ? (
             <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>

@@ -1,9 +1,9 @@
 /**
  * BusinessEditStep3Branding — Step 3 of business edit wizard
- * Logo and cover photo with deferred upload
+ * Logo, cover photo with deferred upload, and brand preview card
  */
 import { useRef, useState } from 'react';
-import { Camera, Plus, Loader2 } from 'lucide-react';
+import { Camera, Plus } from 'lucide-react';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
@@ -72,7 +72,10 @@ export function BusinessEditStep3Branding({
                 fallback={businessName?.[0] || 'B'}
                 size={96}
               />
-              <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#f59e0b] text-white flex items-center justify-center cursor-pointer shadow-sm hover:bg-[#e8920f] transition-colors">
+              <label
+                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full text-white flex items-center justify-center cursor-pointer shadow-sm transition-colors"
+                style={{ backgroundColor: '#F7931E' }}
+              >
                 <input
                   ref={logoInputRef}
                   type="file"
@@ -154,8 +157,14 @@ export function BusinessEditStep3Branding({
                 </div>
               </div>
             ) : (
-              <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-[#f59e0b]/40 hover:bg-[#f59e0b]/5 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center mb-2">
+              <div
+                className="aspect-[3.2/1] rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors"
+                style={{ borderColor: 'rgba(15,23,42,0.12)', background: 'rgba(15,23,42,0.03)' }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
+                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                >
                   <Camera className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <p className="text-[13px] font-medium text-foreground">
@@ -182,6 +191,50 @@ export function BusinessEditStep3Branding({
               Remove
             </button>
           )}
+        </div>
+      </SectionCard>
+
+      {/* Brand Preview Card (NEW) */}
+      <SectionCard>
+        <div className="space-y-2">
+          <p className="text-[14px] font-semibold text-foreground">Preview</p>
+          <p className="text-[12px] text-muted-foreground">
+            How your profile header will look to golfers.
+          </p>
+
+          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(15,23,42,0.07)' }}>
+            {/* Mini cover */}
+            <div className="relative aspect-[3.2/1]" style={{ background: '#1a2040' }}>
+              {effectiveCoverUrl && (
+                <img src={effectiveCoverUrl} alt="" className="w-full h-full object-cover" />
+              )}
+              {/* Mini avatar */}
+              <div className="absolute -bottom-5 left-4">
+                {effectiveLogoUrl ? (
+                  <img
+                    src={effectiveLogoUrl}
+                    alt=""
+                    className="w-12 h-12 object-cover shadow-sm"
+                    style={{ borderRadius: '34%', border: '2px solid #ffffff' }}
+                  />
+                ) : (
+                  <div
+                    className="w-12 h-12 flex items-center justify-center text-lg font-bold text-muted-foreground shadow-sm"
+                    style={{ borderRadius: '34%', border: '2px solid #ffffff', background: 'rgba(15,23,42,0.06)' }}
+                  >
+                    {businessName?.[0] || 'B'}
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Identity strip */}
+            <div className="pt-7 pb-3 px-4" style={{ background: '#ffffff' }}>
+              <p className="text-[15px] text-foreground truncate" style={{ fontWeight: 900 }}>
+                {businessName || 'Your Business'}
+              </p>
+              <p className="text-[11px] text-muted-foreground">Your profile · clbhouz</p>
+            </div>
+          </div>
         </div>
       </SectionCard>
 
