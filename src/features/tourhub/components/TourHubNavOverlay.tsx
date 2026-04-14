@@ -407,12 +407,15 @@ export function TourHubNavOverlay({
           </div>
         )}
 
-        {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', margin: '14px 18px' }} />
+        {/* Header */}
+        <div style={{ padding: '6px 20px 14px' }}>
+          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Navigate</div>
+          <div id="tour-nav-menu-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Tour Hub</div>
+        </div>
 
-        {/* Nav Items + Link Items */}
-        <div style={{ padding: '0 18px' }}>
-          {NAV_ITEMS.map((item, index) => {
+        {/* Nav Items + Link Items — Dispatch flat rows */}
+        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.value;
             const dynamicSubtitle = item.value === 'schedule' ? scheduleSubtitle : item.subtitle;
             
@@ -420,112 +423,130 @@ export function TourHubNavOverlay({
               <button
                 key={item.value}
                 onClick={() => handleItemClick(item.value)}
-                className="active:scale-[0.97] transition-transform"
                 style={{
                   width: '100%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '12px 0',
-                  background: 'transparent',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '12px 20px',
+                  background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
-                  borderBottom: index < NAV_ITEMS.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
-                  cursor: 'pointer',
+                  borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer', textAlign: 'left' as const,
                 }}
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={getAriaLabel(item)}
               >
-                <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                {/* Icon */}
+                <div style={{ width: 36, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {item.icon}
+                </div>
+
+                {/* Label + subtitle */}
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', letterSpacing: '-0.3px' }}>
+                    <span style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: '#0F172A' }}>
                       {item.label}
                     </span>
                     {renderBadge(item)}
                   </div>
-                  <div style={{ fontSize: 11, color: '#64748b' }}>
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
                     {dynamicSubtitle}
                   </div>
                   {renderTeaser(item)}
                 </div>
-                <span style={{ fontSize: 16, color: 'rgba(0,0,0,0.2)', flexShrink: 0, marginLeft: 8 }}>›</span>
+
+                {/* Active dot */}
+                {isActive && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
               </button>
             );
           })}
 
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '4px 0' }} />
+          {LINK_ITEMS.map((item) => {
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleLinkClick(item.path)}
+                style={{
+                  width: '100%',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '12px 20px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderLeft: '3px solid transparent',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer', textAlign: 'left' as const,
+                }}
+                aria-label={`${item.label} — ${item.subtitle}`}
+              >
+                {/* Icon */}
+                <div style={{ width: 36, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {item.icon}
+                </div>
 
-          {LINK_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleLinkClick(item.path)}
-              className="active:scale-[0.97] transition-transform"
-              style={{
-                width: '100%',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '12px 0',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              aria-label={`${item.label} — ${item.subtitle}`}
-            >
-              <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', letterSpacing: '-0.3px' }}>
-                    {item.label}
-                  </span>
-                  {item.badge && (
-                    <span style={{
-                      fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 99,
-                      textTransform: 'uppercase', letterSpacing: '0.5px',
-                      color: '#fff', background: '#F7931E',
-                    }}>
-                      {item.badge}
+                {/* Label + subtitle */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: '#0F172A' }}>
+                      {item.label}
                     </span>
+                    {item.badge && (
+                      <span style={{
+                        fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 99,
+                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                        color: '#fff', background: '#F7931E',
+                      }}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+                    {item.subtitle}
+                  </div>
+                  {item.id === 'college-golf' && !topCollege && (
+                    <div className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                      <div style={{ width: 20, height: 20, borderRadius: 3, background: 'rgba(0,0,0,0.06)' }} />
+                      <div style={{ height: 12, width: 96, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
+                      <div style={{ height: 12, width: 64, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
+                    </div>
+                  )}
+                  {item.id === 'college-golf' && topCollege && (
+                    <p style={{ fontSize: 11, marginTop: 4, color: '#64748b', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', margin: '4px 0 0' }}>
+                      <button
+                        type="button"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#0f172a' }}
+                        className="transition-opacity active:opacity-70 focus:outline-none"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          haptic('light');
+                          onClose();
+                          navigate('/tourhub/college-golf');
+                          window.scrollTo({ top: 0, behavior: 'instant' });
+                        }}
+                      >
+                        {topCollege.logoUrl && (
+                          <img 
+                            src={topCollege.logoUrl} 
+                            alt="" 
+                            style={{ width: 20, height: 20, borderRadius: 3, objectFit: 'contain', flexShrink: 0 }}
+                          />
+                        )}
+                        <span style={{ fontWeight: 500 }}>{topCollege.name}</span>
+                      </button>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {' leads • '}
+                        {formatCurrency(topCollege.earnings)} earned
+                      </span>
+                    </p>
                   )}
                 </div>
-                <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
-                  {item.subtitle}
-                </div>
-                {item.id === 'college-golf' && !topCollege && (
-                  <div className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                    <div style={{ width: 20, height: 20, borderRadius: 3, background: 'rgba(0,0,0,0.06)' }} />
-                    <div style={{ height: 12, width: 96, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
-                    <div style={{ height: 12, width: 64, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
-                  </div>
-                )}
-                {item.id === 'college-golf' && topCollege && (
-                  <p style={{ fontSize: 11, marginTop: 4, color: '#64748b', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', margin: '4px 0 0' }}>
-                    <button
-                      type="button"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#0f172a' }}
-                      className="transition-opacity active:opacity-70 focus:outline-none"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        haptic('light');
-                        onClose();
-                        navigate('/tourhub/college-golf');
-                        window.scrollTo({ top: 0, behavior: 'instant' });
-                      }}
-                    >
-                      {topCollege.logoUrl && (
-                        <img 
-                          src={topCollege.logoUrl} 
-                          alt="" 
-                          style={{ width: 20, height: 20, borderRadius: 3, objectFit: 'contain', flexShrink: 0 }}
-                        />
-                      )}
-                      <span style={{ fontWeight: 500 }}>{topCollege.name}</span>
-                    </button>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {' leads • '}
-                      {formatCurrency(topCollege.earnings)} earned
-                    </span>
-                  </p>
-                )}
-              </div>
-              <ChevronRight style={{ width: 16, height: 16, flexShrink: 0, color: 'rgba(0,0,0,0.2)' }} />
-            </button>
-          ))}
+
+                <ChevronRight style={{ width: 16, height: 16, flexShrink: 0, color: 'rgba(0,0,0,0.2)' }} />
+              </button>
+            );
+          })}
         </div>
+
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
       </div>
     </BottomSheet>
   );
