@@ -91,7 +91,7 @@ function HandicapPageSkeleton() {
         {[...Array(6)].map((_, i) => (
           <div key={i} style={{
             display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-            background: '#FFFFFF', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)',
+            background: '#FFFFFF', borderRadius: 14, border: '1px solid rgba(15,23,42,0.07)',
             borderLeft: '3px solid #e5e7eb',
           }}>
             <Skeleton className="w-5 h-4 rounded" />
@@ -113,7 +113,8 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
     <div className="py-4 px-3">
       <button
         onClick={onRetry}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm active:scale-[0.98] active:opacity-70 transition-all"
+        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
       >
         Couldn't load more entries · Tap to retry
       </button>
@@ -150,7 +151,7 @@ function EmptyState({ scope, clubName, country }: { scope: string; clubName?: st
       <Link
         to="/profile/edit"
         className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.97]"
-        style={{ backgroundColor: '#F5A623' }}
+        style={{ backgroundColor: '#F7931E' }}
       >
         Add Handicap
       </Link>
@@ -180,8 +181,8 @@ function HandicapRow({ entry, userId }: { entry: any; userId?: string }) {
       className="flex items-center gap-3 active:scale-[0.98] transition-transform"
       style={{
         background: isMe ? '#FFFBF0' : '#FFFFFF',
-        border: isMe ? '1px solid rgba(245,166,35,0.27)' : '1px solid rgba(0,0,0,0.07)',
-        borderLeft: `3px solid ${isMe ? '#F5A623' : bandColor}`,
+        border: isMe ? '1px solid rgba(247,147,30,0.27)' : '1px solid rgba(15,23,42,0.07)',
+        borderLeft: `3px solid ${isMe ? '#F7931E' : bandColor}`,
         borderRadius: 14,
         padding: 'clamp(10px,2.5vw,12px) clamp(12px,3vw,14px)',
         marginBottom: 6,
@@ -192,7 +193,7 @@ function HandicapRow({ entry, userId }: { entry: any; userId?: string }) {
       <span style={{
         width: 20, fontSize: 'clamp(12px,3.2vw,13px)', fontWeight: 700,
         fontVariantNumeric: 'tabular-nums', textAlign: 'center', flexShrink: 0,
-        color: rank <= 3 ? '#F5A623' : '#64748B',
+        color: rank <= 3 ? '#F7931E' : '#64748B',
       }}>
         {rank}
       </span>
@@ -215,8 +216,8 @@ function HandicapRow({ entry, userId }: { entry: any; userId?: string }) {
           </p>
           {isMe && (
             <span style={{
-              fontSize: 9, fontWeight: 800, color: '#F5A623',
-              background: 'rgba(245,166,35,0.12)', borderRadius: 4,
+              fontSize: 9, fontWeight: 800, color: '#F7931E',
+              background: 'rgba(247,147,30,0.12)', borderRadius: 4,
               padding: '1px 5px', letterSpacing: '0.5px', flexShrink: 0,
             }}>
               YOU
@@ -601,9 +602,10 @@ export function LowestHandicapLeaderboard({
         )}
 
         {/* Rankings eyebrow */}
-        <p className="font-bold uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#F5A623', marginBottom: 8 }}>
-          Rankings
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Rankings</span>
+        </div>
 
         {/* Rankings List */}
         {allEntries.length > 0 && (
