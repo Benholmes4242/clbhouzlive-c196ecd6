@@ -119,12 +119,11 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           {/* Top row: X / total (primary) + % complete (secondary) */}
           <div className="flex items-baseline justify-between gap-4">
             <div className="flex items-baseline">
-              <span style={{ color: theme.ringColor }}>
+              <span style={{ color: theme.ringColor, fontWeight: 900 }}>
                 <AnimatedNumber 
                   value={playedCount}
                   minCh={1}
                   className="text-[34px] leading-none tabular-nums"
-                  style={{ fontWeight: 900 }}
                 />
               </span>
               <span className="text-muted-foreground/60 text-base ml-0.5 font-normal">/{totalCount}</span>
