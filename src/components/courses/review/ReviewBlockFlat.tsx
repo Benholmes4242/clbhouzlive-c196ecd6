@@ -166,7 +166,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
         {/* Score badge — flat dispatch */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-          <span style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em' }}>
+          <span style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em', fontFeatureSettings: '"kern" 1, "liga" 1' }}>
             {score.toFixed(1)}
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.04em' }}>

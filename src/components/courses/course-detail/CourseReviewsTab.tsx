@@ -423,7 +423,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       <section style={{ padding: '14px 16px 0', textAlign: 'center' }}>
         <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ Community Score</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' }}>
             {communityScore.toFixed(1)}
           </span>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
