@@ -961,12 +961,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   height: '80%',
                   aspectRatio: '1',
                   borderRadius: 12,
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1.5px dashed rgba(255,255,255,0.12)',
+                  background: 'rgba(15,23,42,0.03)',
+                  border: '1.5px dashed rgba(15,23,42,0.12)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
-                <Plus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.25)' }} />
+                <Plus className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.25)' }} />
               </motion.button>
             )}
           </div>
@@ -989,7 +989,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 className="shrink-0 flex items-center gap-2 px-4 py-2 text-sm"
                 style={{ color: DARK_TEXT3 }}
               >
-                <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.12)', borderTopColor: 'transparent' }} />
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(15,23,42,0.15)', borderTopColor: 'transparent' }} />
                 Processing…
               </motion.div>
             )}
@@ -1010,17 +1010,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <div
         className="shrink-0"
         style={{
-          background: 'rgba(13,13,13,0.98)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: '#ffffff',
+          borderTop: '1px solid rgba(15,23,42,0.07)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
         }}
       >
-        {/* Hairline at top */}
-        <div style={{
-          height: 1,
-          background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 80%, transparent 100%)`,
-        }} />
 
         <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0, paddingTop: 8 }}>
 
@@ -1036,11 +1030,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(15,23,42,0.05)',
+                border: '1px solid rgba(15,23,42,0.07)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <ImagePlus className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
+                <ImagePlus className="w-[18px] h-[18px]" style={{ color: 'rgba(15,23,42,0.65)' }} strokeWidth={2} />
               </div>
               <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
@@ -1102,7 +1096,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 <div style={{
                   position: 'absolute', top: 8, right: 8,
                   width: 7, height: 7, borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.85)',
+                  background: '#F7931E',
                 }} />
               )}
             </motion.button>
