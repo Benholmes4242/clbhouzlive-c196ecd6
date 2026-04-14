@@ -43,25 +43,25 @@ export function HandicapInsightBanner({
   if (userRank === 1) {
     messageNode = (
       <>
-        You're <span className="font-bold" style={{ color: '#F5A623' }}>#{userRank}</span> {scopeLabel} — the best handicap!
+        You're <span className="font-bold" style={{ color: '#F7931E' }}>#{userRank}</span> {scopeLabel} — the best handicap!
       </>
     );
   } else if (userRank === 2 && gap !== null) {
     messageNode = (
       <>
-        Drop <span className="font-bold" style={{ color: '#F5A623' }}>{formatHcp(gap)}</span> shots to take the top spot {scopeLabel}
+        Drop <span className="font-bold" style={{ color: '#F7931E' }}>{formatHcp(gap)}</span> shots to take the top spot {scopeLabel}
       </>
     );
   } else if (userRank <= 10) {
     messageNode = (
       <>
-        You're <span className="font-bold" style={{ color: '#F5A623' }}>#{userRank}</span> {scopeLabel} — in the top 10
+        You're <span className="font-bold" style={{ color: '#F7931E' }}>#{userRank}</span> {scopeLabel} — in the top 10
       </>
     );
   } else {
     messageNode = (
       <>
-        You're <span className="font-bold" style={{ color: '#F5A623' }}>#{userRank}</span> {scopeLabel} — keep improving
+        You're <span className="font-bold" style={{ color: '#F7931E' }}>#{userRank}</span> {scopeLabel} — keep improving
       </>
     );
   }

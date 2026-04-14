@@ -33,7 +33,10 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
       value={selectedCountry || ''}
       onValueChange={(value) => onCountrySelect(value || null)}
     >
-      <SelectTrigger className={`w-full min-h-[44px] bg-card border-border active:scale-[0.98] transition-transform ${className}`}>
+      <SelectTrigger
+        className={`w-full min-h-[44px] active:scale-[0.98] transition-transform ${className}`}
+        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
+      >
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-muted-foreground" />
           <SelectValue placeholder="Select a country..." />
