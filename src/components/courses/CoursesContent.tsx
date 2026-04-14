@@ -56,7 +56,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
       <div
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1201,
-          background: 'hsl(var(--background))',
+          background: '#F8FAFC',
           borderTopLeftRadius: 20, borderTopRightRadius: 20,
           maxHeight: '85vh', display: 'flex', flexDirection: 'column',
           boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
@@ -64,17 +64,20 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
       >
         {/* Drag handle */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, paddingBottom: 4 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'hsl(var(--muted-foreground) / 0.25)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 16px 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
           <div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: 'hsl(var(--foreground))', margin: 0 }}>Rate a Course</h3>
-            <p style={{ fontSize: 12, color: 'hsl(var(--muted-foreground))', margin: 0 }}>Search any course you've played</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Rate a Course</span>
+            </div>
+            <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>Search any course you've played</p>
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: 'hsl(var(--muted) / 0.6)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <X size={16} style={{ color: 'hsl(var(--muted-foreground))' }} />
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <X size={16} style={{ color: '#64748B' }} />
           </button>
         </div>
 
@@ -89,11 +92,11 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
             placeholder="Search courses…"
             style={{
               width: '100%', padding: '9px 12px 9px 36px',
-              borderRadius: 10, border: '1px solid hsl(var(--border))',
-              background: 'hsl(var(--muted) / 0.4)',
+              borderRadius: 10, border: '1px solid rgba(15,23,42,0.10)',
+              background: '#ffffff',
               fontSize: 14, outline: 'none',
-              color: 'hsl(var(--foreground))',
-              boxSizing: 'border-box',
+              color: '#0F172A',
+              boxSizing: 'border-box' as const,
             }}
           />
         </div>
@@ -121,7 +124,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '13px 16px',
-                  borderBottom: i < results.length - 1 ? '0.5px solid hsl(var(--border) / 0.5)' : 'none',
+                  borderBottom: i < results.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
                   background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
                 }}
                 className="active:bg-muted/50"
@@ -135,7 +138,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
                     {course.global_rank ? ` · #${course.global_rank} World` : ''}
                   </p>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#F59E0B', flexShrink: 0 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', flexShrink: 0 }}>
                   Rate →
                 </span>
               </button>

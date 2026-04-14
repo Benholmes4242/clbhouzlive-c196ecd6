@@ -220,7 +220,8 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
     </p>
     <button
       onClick={onRetry}
-      className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.98] transition-transform"
+      className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
+      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
     >
       <ChevronDown className="h-4 w-4 rotate-180" />
       Retry
@@ -437,7 +438,7 @@ const CourseExplorer = () => {
 
       <div
         className="sticky top-0 z-10 bg-background pb-3 space-y-5 -mx-4 px-4"
-        style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+        style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
       >
       {/* Search */}
       <div className="relative w-full">
@@ -446,7 +447,8 @@ const CourseExplorer = () => {
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-12 rounded-2xl bg-muted/50 border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border transition-all duration-150 text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-12 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 transition-all duration-150 text-base placeholder:text-[15px]"
+          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
           aria-label="Search golf courses"
           role="searchbox"
         />
@@ -475,7 +477,8 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
           }}>
             <SelectTrigger 
-              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 bg-card border-border text-foreground"
+              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
               aria-label="Select region"
             >
               <div className="flex items-center">
@@ -501,7 +504,8 @@ const CourseExplorer = () => {
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
             <SelectTrigger 
-              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed bg-card border-border text-foreground"
+              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
               aria-label="Select sub-region"
             >
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
@@ -570,7 +574,8 @@ const CourseExplorer = () => {
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.98] transition-transform"
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
             >
               Reset filters
             </button>
