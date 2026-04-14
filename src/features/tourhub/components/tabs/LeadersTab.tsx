@@ -202,7 +202,7 @@ export function LeadersTab() {
     return (
       <div style={{ background: '#F8FAFC' }}>
         {/* Masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: '16px 16px 14px' }}>
+        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 14px' }}>
           <Skeleton className="h-3 w-48 mb-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <Skeleton className="h-6 w-40 mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <Skeleton className="h-24 w-full rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />
