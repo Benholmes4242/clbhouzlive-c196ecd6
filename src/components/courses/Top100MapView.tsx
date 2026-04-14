@@ -574,11 +574,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       fullHeight ? 'h-full' : 'space-y-2'
     )}>
       {/* Map container */}
-      <div className={cn(
-        'relative overflow-hidden',
-        fullHeight ? 'absolute inset-0' : 'rounded-sq-lg',
-        'bg-muted dark:bg-background'
-      )}>
+      <div
+        className={cn(
+          'relative overflow-hidden',
+          fullHeight ? 'absolute inset-0' : 'rounded-sq-lg',
+        )}
+        style={{ background: '#1a2040' }}
+      >
         <div
           ref={mapContainerRef}
           className={cn(
