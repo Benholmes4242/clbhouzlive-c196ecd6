@@ -161,7 +161,6 @@ export default function BusinessVerificationWizardPage() {
       const { proof_value, proof_metadata } = getProofData();
       if (!proof_value) throw new Error('Please complete the required proof details');
 
-      // Check for exclusivity conflicts
       const { data: existingApproved, error: checkError } = await supabase
         .from('business_verification_requests')
         .select('id, business_id')
@@ -260,11 +259,13 @@ export default function BusinessVerificationWizardPage() {
           <div className="space-y-4 mt-4 pl-7">
             <div className="flex gap-2">
               <button type="button" onClick={() => setCreatorContactType('email')}
-                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px] ${creatorContactType === 'email' ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                className="px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px]"
+                style={creatorContactType === 'email' ? { background: '#F7931E', color: '#ffffff' } : { background: 'rgba(15,23,42,0.05)', color: '#64748B' }}>
                 Email
               </button>
               <button type="button" onClick={() => setCreatorContactType('phone')}
-                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px] ${creatorContactType === 'phone' ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                className="px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px]"
+                style={creatorContactType === 'phone' ? { background: '#F7931E', color: '#ffffff' } : { background: 'rgba(15,23,42,0.05)', color: '#64748B' }}>
                 Phone
               </button>
             </div>
@@ -297,9 +298,9 @@ export default function BusinessVerificationWizardPage() {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="space-y-4 px-4 pt-4">
-          <div className="h-12 bg-muted animate-pulse rounded-xl" />
-          <div className="h-24 bg-muted animate-pulse rounded-xl" />
-          <div className="h-12 bg-muted animate-pulse rounded-xl" />
+          <div className="h-12 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+          <div className="h-24 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+          <div className="h-12 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
         </div>
       </PageRoot>
     );
@@ -311,10 +312,8 @@ export default function BusinessVerificationWizardPage() {
         {[1, 2, 3].map((s) => (
           <div
             key={s}
-            className={cn(
-              'h-2.5 w-2.5 rounded-full transition-colors',
-              s === step ? 'bg-[hsl(38,92%,50%)] shadow-sm ring-2 ring-[hsl(38,92%,50%)]/20' : 'bg-muted-foreground/30'
-            )}
+            className={cn('h-2.5 w-2.5 rounded-full transition-colors', s === step ? 'shadow-sm ring-2' : '')}
+            style={{ backgroundColor: s === step ? '#F7931E' : 'rgba(15,23,42,0.25)', outline: s === step ? '2px solid rgba(247,147,30,0.20)' : 'none' }}
           />
         ))}
       </div>
@@ -325,8 +324,8 @@ export default function BusinessVerificationWizardPage() {
     <PageRoot className="min-h-screen bg-background">
       {/* Header */}
       <header
-        className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
+        className="sticky top-0 z-10 backdrop-blur-xl"
+        style={{ background: 'rgba(248,250,252,0.97)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
       >
         <div className="flex items-center px-4 h-14">
           <button
@@ -336,7 +335,7 @@ export default function BusinessVerificationWizardPage() {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 text-center">
-            <h1 className="text-[16px] font-semibold text-foreground">Get Verified</h1>
+            <h1 className="text-[16px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Get Verified</h1>
             <p className="text-[12px] text-muted-foreground leading-none mt-0.5">
               Step {step} of 3
             </p>
@@ -414,12 +413,10 @@ export default function BusinessVerificationWizardPage() {
                   return (
                     <div key={option.id}>
                       <label
-                        className={cn(
-                          'flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors',
-                          isSelected ? 'border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/5' : 'border-border hover:bg-muted/30'
-                        )}
+                        className="flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors"
+                        style={isSelected ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.05)' } : { borderColor: 'rgba(15,23,42,0.10)' }}
                       >
-                        <RadioGroupItem value={option.id} className="mt-0.5 border-[hsl(38,92%,50%)] text-[hsl(38,92%,50%)] data-[state=checked]:border-[hsl(38,92%,50%)] data-[state=checked]:text-[hsl(38,92%,50%)]" />
+                        <RadioGroupItem value={option.id} className="mt-0.5 [&]:border-[#F7931E] [&]:text-[#F7931E] data-[state=checked]:[&]:border-[#F7931E]" />
                         <Icon className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground">{option.label}</p>
@@ -478,7 +475,7 @@ export default function BusinessVerificationWizardPage() {
                     </SelectContent>
                   </Select>
                   {role === 'owner' && (
-                    <p className="text-[10px] text-[hsl(35,80%,43%)] font-medium">Owners are typically verified fastest.</p>
+                    <p className="text-[10px] font-medium" style={{ color: '#F7931E' }}>Owners are typically verified fastest.</p>
                   )}
                 </div>
 
@@ -497,7 +494,7 @@ export default function BusinessVerificationWizardPage() {
                 </div>
               </div>
 
-              <p className="text-[11px] text-muted-foreground border-t border-border/40 pt-4">
+              <p className="text-[11px] text-muted-foreground pt-4" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
                 By submitting, you confirm you're authorised to represent this business on Clbhouz.
               </p>
             </motion.div>
@@ -507,8 +504,8 @@ export default function BusinessVerificationWizardPage() {
 
       {/* Footer */}
       <footer
-        className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur-xl"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+        className="fixed inset-x-0 bottom-0 z-20 backdrop-blur-xl"
+        style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(248,250,252,0.97)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
       >
         <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-3 px-4 py-3">
           {step === 1 ? (
@@ -531,20 +528,20 @@ export default function BusinessVerificationWizardPage() {
 
           {step < 3 ? (
             <Button
-              variant="secondary"
               onClick={() => setStep((s) => (s + 1) as Step)}
               disabled={step === 1 ? !canProceedStep1 : !canProceedStep2}
-              className="flex-[1.5] h-11 gap-1"
+              className="flex-[1.5] h-11 gap-1 text-white border-0"
+              style={{ background: '#0F172A' }}
             >
               Continue
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
             <Button
-              variant="secondary"
               onClick={() => submitMutation.mutate()}
               disabled={!canProceedStep3 || submitMutation.isPending}
-              className="flex-[1.5] h-11"
+              className="flex-[1.5] h-11 text-white border-0"
+              style={{ background: '#0F172A' }}
             >
               {submitMutation.isPending ? (
                 <span className="flex items-center gap-2">
@@ -564,7 +561,7 @@ export default function BusinessVerificationWizardPage() {
 
 function DetailRow({ label, value, missing, missingMessage }: { label: string; value?: string | null; missing?: boolean; missingMessage?: string }) {
   return (
-    <div className="flex items-start gap-3 py-2 border-b border-border/30 last:border-0">
+    <div className="flex items-start gap-3 py-2 last:border-0" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
       <span className="text-sm text-muted-foreground shrink-0 w-[100px]">{label}</span>
       {missing ? (
         <span className="text-xs text-destructive flex-1 min-w-0 text-right break-words">{missingMessage}</span>

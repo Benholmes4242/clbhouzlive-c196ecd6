@@ -94,12 +94,12 @@ export function BusinessCoverUpload({
             )}
           </div>
         ) : (
-          <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-[#f59e0b]/40 hover:bg-[#f59e0b]/5 transition-colors">
+          <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors" style={{ borderColor: 'rgba(15,23,42,0.12)', background: 'rgba(15,23,42,0.04)' }}>
             {isUploading ? (
-              <Loader2 className="w-6 h-6 text-[#f59e0b] animate-spin" />
+              <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#F7931E' }} />
             ) : (
               <>
-                <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center mb-2">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
                   <Camera className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <p className="text-[13px] font-medium text-foreground">

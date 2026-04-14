@@ -18,7 +18,7 @@ type DateRange = '7d' | '28d' | '90d';
 
 /** Placeholder empty state for sections not yet wired to real data */
 const ComingSoonEmpty = ({ title }: { title: string }) => (
-  <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
+  <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
     <h3 className="text-[0.9rem] font-medium text-foreground mb-1">{title}</h3>
     <div className="flex flex-col items-center justify-center py-8 gap-2">
       <BarChart3 className="h-8 w-8 text-muted-foreground/40" />
@@ -33,7 +33,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 
   if (error) {
     return (
-      <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
+      <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
         <div className="px-4 py-8 text-center">
           <p className="text-sm text-muted-foreground">Failed to load review stats.</p>
@@ -44,7 +44,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 
   if (isLoading) {
     return (
-      <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
+      <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
         <div className="space-y-3 px-4">
           <Skeleton className="h-20 rounded-2xl" />
@@ -56,7 +56,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 
   if (!reviewStats) {
     return (
-      <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
+      <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
         <p className="text-[0.8rem] text-muted-foreground text-center py-6">
           No reviews yet. Once golfers review your courses, you'll see ratings and feedback here.
@@ -68,7 +68,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
   const maxCount = Math.max(...reviewStats.distribution.map(d => d.count), 1);
 
   return (
-    <section className="bg-card border border-border rounded-[18px] p-4 md:p-5 space-y-5">
+    <section className="rounded-[18px] p-4 md:p-5 space-y-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
       <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
       
       <div className="flex flex-col md:flex-row gap-6">
@@ -83,17 +83,11 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
           {/* Trend */}
           {reviewStats.recentReviews > 0 && (
             <div className="mt-2 flex items-center gap-1 justify-center md:justify-start">
-              <span className={cn(
-                "text-xs font-medium",
-                reviewStats.reviewTrend >= 0 ? "text-[hsl(35,80%,43%)]" : "text-destructive"
-              )}>
+              <span className={cn("text-xs font-medium", reviewStats.reviewTrend >= 0 ? "" : "text-destructive")} style={reviewStats.reviewTrend >= 0 ? { color: '#F7931E' } : undefined}>
                 {reviewStats.recentReviews} new this month
               </span>
               {reviewStats.reviewTrend !== 0 && (
-                <span className={cn(
-                  "text-xs",
-                  reviewStats.reviewTrend > 0 ? "text-[hsl(35,80%,43%)]" : "text-destructive"
-                )}>
+                <span className={cn("text-xs", reviewStats.reviewTrend > 0 ? "" : "text-destructive")} style={reviewStats.reviewTrend > 0 ? { color: '#F7931E' } : undefined}>
                   ({reviewStats.reviewTrend > 0 ? '+' : ''}{reviewStats.reviewTrend}%)
                 </span>
               )}
@@ -106,10 +100,10 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
           {reviewStats.distribution.slice().reverse().map((item) => (
             <div key={item.score} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-5 text-right">{item.score}</span>
-              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.08)' }}>
                 <div
-                  className="h-full rounded-full transition-all bg-[hsl(38,92%,50%)]"
-                  style={{ width: `${(item.count / maxCount) * 100}%` }}
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${(item.count / maxCount) * 100}%`, background: '#F7931E' }}
                 />
               </div>
               <span className="text-xs text-muted-foreground w-6 text-right">{item.count}</span>
@@ -126,7 +120,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
           { label: 'Facilities', value: reviewStats.subRatings.facilities },
           { label: 'Clubhouse', value: reviewStats.subRatings.clubhouse },
         ].map(sr => (
-          <div key={sr.label} className="rounded-[10px] bg-muted border border-border p-3 text-center">
+          <div key={sr.label} className="rounded-[10px] p-3 text-center" style={{ background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.07)' }}>
             <p className="text-lg font-semibold text-foreground">{sr.value ?? '—'}</p>
             <p className="text-[0.7rem] text-muted-foreground">{sr.label}</p>
           </div>
@@ -136,7 +130,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {/* Action prompts */}
       <div className="flex flex-col sm:flex-row gap-2">
         {reviewStats.unrespondedCount > 0 && (
-          <div className="flex items-center gap-2 text-xs text-[hsl(35,80%,43%)]">
+          <div className="flex items-center gap-2 text-xs" style={{ color: '#F7931E' }}>
             <MessageCircle className="h-3.5 w-3.5" />
             <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
           </div>
@@ -145,13 +139,13 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 
       {/* Multi-course breakdown */}
       {reviewStats.courses.length > 1 && (
-        <div className="space-y-2 pt-2 border-t border-border">
+        <div className="space-y-2 pt-2" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           <h4 className="text-[0.8rem] font-medium text-muted-foreground">Course breakdown</h4>
           {reviewStats.courses.map(course => (
             <button
               key={course.id}
               onClick={() => navigate(`/courses/${course.id}?tab=reviews`)}
-              className="w-full flex items-center justify-between py-2 px-3 rounded-[10px] hover:bg-muted transition-colors text-left active:scale-[0.98]"
+              className="w-full flex items-center justify-between py-2 px-3 rounded-[10px] transition-colors text-left active:scale-[0.98] active:bg-[rgba(15,23,42,0.03)]"
             >
               <div className="min-w-0">
                 <p className="text-[0.8rem] font-medium text-foreground truncate">{course.name}</p>
@@ -161,7 +155,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
                 </p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Star className="h-3 w-3 text-[hsl(38,92%,50%)] fill-[hsl(38,92%,50%)]" />
+                <Star className="h-3 w-3" style={{ color: '#F7931E', fill: '#F7931E' }} />
                 <span className="text-sm font-medium text-foreground">{course.avgRating}</span>
               </div>
             </button>
@@ -173,7 +167,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {reviewStats.courses.length > 0 && (
         <button
           onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
-          className="text-[0.8rem] hover:underline text-[hsl(35,80%,43%)]"
+          className="text-[0.8rem] hover:underline"
+          style={{ color: '#F7931E' }}
         >
           View all reviews ›
         </button>
@@ -185,10 +180,6 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 const BusinessInsightsPageV2 = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  // TODO: dateRange is UI-only and not wired to any query.
-  // useBusinessReviewStats must be updated to accept a dateRange param
-  // and filter results server-side before this toggle has any effect.
-  // Until then, the selector renders but changes nothing.
   const [dateRange, setDateRange] = useState<DateRange>('28d');
   const { user } = useSupabaseSession();
 
@@ -234,7 +225,7 @@ const BusinessInsightsPageV2 = () => {
       <PageRoot className="min-h-screen bg-background">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
           <p className="text-muted-foreground">Business not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4 bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0">Go home</Button>
+          <Button onClick={() => navigate('/')} className="mt-4 text-white border-0" style={{ background: '#F7931E' }}>Go home</Button>
         </div>
       </PageRoot>
     );
@@ -245,8 +236,8 @@ const BusinessInsightsPageV2 = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="space-y-4 px-4 pt-4">
-          <div className="h-32 bg-muted animate-pulse rounded-2xl" />
-          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-32 animate-pulse rounded-2xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+          <div className="h-24 animate-pulse rounded-2xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
         </div>
       </PageRoot>
     );
@@ -261,7 +252,7 @@ const BusinessInsightsPageV2 = () => {
   return (
     <PageRoot className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}>
+      <div className="sticky top-0 z-10 backdrop-blur-xl" style={{ background: 'rgba(248,250,252,0.97)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <div className="flex items-center px-4 h-14">
           <button
             onClick={() => navigate(-1)}
@@ -270,13 +261,13 @@ const BusinessInsightsPageV2 = () => {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 text-center">
-            <h1 className="text-[16px] font-semibold text-foreground">Insights</h1>
+            <h1 className="text-[16px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Insights</h1>
           </div>
           <div className="w-11" />
         </div>
         {/* Date range selector */}
         <div className="flex justify-center pb-3">
-          <div className="inline-flex rounded-full border border-border bg-muted p-1">
+          <div className="inline-flex rounded-full p-1" style={{ border: '1px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.05)' }}>
             {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
               <button
                 key={range}
@@ -284,9 +275,10 @@ const BusinessInsightsPageV2 = () => {
                 className={cn(
                   "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
                   dateRange === range 
-                    ? "bg-[hsl(38,92%,50%)] text-white font-medium" 
+                    ? "text-white font-medium" 
                     : "text-muted-foreground hover:text-foreground"
                 )}
+                style={dateRange === range ? { background: '#F7931E' } : undefined}
               >
                 {rangeLabels[range]}
               </button>
@@ -299,7 +291,7 @@ const BusinessInsightsPageV2 = () => {
         {/* Key Metrics Strip — Coming Soon */}
         <section>
           <h2 className="text-[0.75rem] font-medium text-muted-foreground uppercase tracking-wider mb-3">Overview</h2>
-          <div className="bg-card border border-border rounded-[18px] p-4 md:p-5">
+          <div className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
             <div className="flex flex-col items-center justify-center py-6 gap-2">
               <BarChart3 className="h-8 w-8 text-muted-foreground/40" />
               <p className="text-sm text-muted-foreground text-center">Coming soon — We're building this feature</p>

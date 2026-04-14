@@ -53,8 +53,10 @@ export function BusinessInfoSection({
                 setSelectedClub(null);
                 setSelectedCollege(null);
               }}
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors appearance-none cursor-pointer"
+              className="w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors appearance-none cursor-pointer"
               style={{
+                background: '#ffffff',
+                border: '1px solid rgba(15,23,42,0.07)',
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 16px center',
@@ -90,7 +92,8 @@ export function BusinessInfoSection({
                 <button
                   type="button"
                   onClick={onRequestAccess}
-                  className="text-[13px] font-semibold text-[#d97706] mt-2"
+                  className="text-[13px] font-semibold mt-2"
+                  style={{ color: '#F7931E' }}
                 >
                   Request access to manage this profile
                 </button>
@@ -144,7 +147,8 @@ export function BusinessInfoSection({
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder={category ? 'Enter your business name' : 'Select a category first'}
                   disabled={!category}
-                  className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
                 />
                 <p className="text-[12px] text-muted-foreground">
                   This is shown publicly on your profile and in search.
@@ -172,7 +176,8 @@ export function BusinessInfoSection({
               onChange={(e) => setDescription(e.target.value.slice(0, 2500))}
               placeholder="Tell golfers about your business..."
               rows={4}
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors resize-none"
+              className="w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors resize-none"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             />
             <p className="text-[12px] text-muted-foreground">
               Tip: Mention what makes you different — facilities, coaching style, atmosphere, or events.

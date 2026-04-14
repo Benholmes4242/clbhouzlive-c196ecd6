@@ -26,7 +26,6 @@ const BusinessVerificationRequestPage = () => {
   const [website, setWebsite] = useState('');
   const [note, setNote] = useState('');
 
-  // Fetch business account
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
     queryKey: ['business-account-for-verification', id],
     enabled: !!id && !!user,
@@ -42,14 +41,12 @@ const BusinessVerificationRequestPage = () => {
     },
   });
 
-  // Pre-fill website when business data loads
   useEffect(() => {
     if (business?.website) {
       setWebsite(business.website);
     }
   }, [business?.website]);
 
-  // Check for existing pending request
   const { data: existingRequest, isLoading: isLoadingRequest } = useQuery({
     queryKey: ['business-verification-request', id],
     enabled: !!id && !!user,
@@ -69,7 +66,6 @@ const BusinessVerificationRequestPage = () => {
 
   const isLoading = isLoadingBusiness || isLoadingRequest;
 
-  // Redirect if already pending or verified
   useEffect(() => {
     if (!isLoading && existingRequest?.status === 'pending') {
       navigate(`/business/${id}/verification/status`, { replace: true });
@@ -84,7 +80,6 @@ const BusinessVerificationRequestPage = () => {
       if (!user?.id) throw new Error('Not authenticated');
       if (!id) throw new Error('Business ID is missing');
       
-      // Insert verification request into new table
       const { error } = await supabase
         .from('business_verification_requests')
         .insert({
@@ -97,7 +92,6 @@ const BusinessVerificationRequestPage = () => {
 
       if (error) throw error;
 
-      // Update business website if changed
       if (website && website !== business?.website) {
         const { error: updateError } = await supabase
           .from('business_accounts')
@@ -125,9 +119,9 @@ const BusinessVerificationRequestPage = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="space-y-4 px-4 pt-4">
-          <div className="h-12 bg-muted animate-pulse rounded-xl" />
-          <div className="h-24 bg-muted animate-pulse rounded-xl" />
-          <div className="h-12 bg-muted animate-pulse rounded-xl" />
+          <div className="h-12 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+          <div className="h-24 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+          <div className="h-12 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
         </div>
       </PageRoot>
     );
@@ -137,8 +131,8 @@ const BusinessVerificationRequestPage = () => {
     <PageRoot className="min-h-screen bg-background">
       {/* Header */}
       <header
-        className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
+        className="sticky top-0 z-10 backdrop-blur-xl"
+        style={{ background: 'rgba(248,250,252,0.97)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
       >
         <div className="flex items-center px-4 h-14">
           <button
@@ -149,7 +143,7 @@ const BusinessVerificationRequestPage = () => {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 text-center">
-            <h1 className="text-[16px] font-semibold text-foreground">Request Verification</h1>
+            <h1 className="text-[16px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Request Verification</h1>
           </div>
           <div className="w-11" />
         </div>
@@ -161,27 +155,25 @@ const BusinessVerificationRequestPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          {/* Intro */}
           <div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               We'll review your business details to verify your profile. This usually takes a few days.
             </p>
           </div>
 
-          {/* Business name (read-only) */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Business name</Label>
             <Input
               value={business?.name || ''}
               disabled
-              className="bg-muted/50"
+              className=""
+              style={{ background: 'rgba(15,23,42,0.03)', border: '0.5px solid rgba(15,23,42,0.07)', color: '#94A3B8' }}
             />
             <p className="text-[11px] text-muted-foreground">
               This is the name shown on your profile.
             </p>
           </div>
 
-          {/* Website */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Website</Label>
             <Input
@@ -195,7 +187,6 @@ const BusinessVerificationRequestPage = () => {
             </p>
           </div>
 
-          {/* Optional note */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">
               Additional information <span className="text-muted-foreground font-normal">(optional)</span>
@@ -213,8 +204,8 @@ const BusinessVerificationRequestPage = () => {
 
       {/* Footer CTAs */}
       <footer
-        className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur-xl"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+        className="fixed inset-x-0 bottom-0 z-20 backdrop-blur-xl"
+        style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(248,250,252,0.97)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
       >
         <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-3 px-4 py-3">
           <button
@@ -226,10 +217,10 @@ const BusinessVerificationRequestPage = () => {
             Cancel
           </button>
           <Button
-            variant="secondary"
             onClick={handleSubmit}
             disabled={submitMutation.isPending}
-            className="flex-[1.5] h-11"
+            className="flex-[1.5] h-11 text-white border-0"
+            style={{ background: '#0F172A' }}
           >
             {submitMutation.isPending ? (
               <span className="flex items-center gap-2">
