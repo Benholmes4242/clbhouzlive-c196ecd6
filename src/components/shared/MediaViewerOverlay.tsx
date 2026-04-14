@@ -76,7 +76,16 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
             return !prev;
           });
         }}
-        className="absolute bottom-6 right-6 w-11 h-11 rounded-full bg-black/50 flex items-center justify-center text-white z-10"
+        style={{
+          position: 'absolute', bottom: 24, right: 24,
+          width: 44, height: 44, borderRadius: '50%',
+          background: 'rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', zIndex: 10,
+        }}
       >
         {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
       </button>
@@ -187,12 +196,32 @@ export const MediaViewerOverlay: React.FC = () => {
           >
             <button
               onClick={closeViewer}
-              className="w-11 h-11 rounded-full bg-black/50 flex items-center justify-center text-white"
+              style={{
+                width: 44, height: 44, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}
             >
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6 text-white" />
             </button>
             {items.length > 1 && (
-              <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">
+              <span
+                style={{
+                  background: 'rgba(0,0,0,0.35)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 20,
+                  padding: '5px 12px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#ffffff',
+                }}
+              >
                 {currentIndex + 1} / {items.length}
               </span>
             )}
@@ -207,17 +236,35 @@ export const MediaViewerOverlay: React.FC = () => {
           {items.length > 1 && currentIndex > 0 && (
             <button
               onClick={prev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 flex items-center justify-center text-white hidden md:flex"
+              className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex"
+              style={{
+                width: 44, height: 44, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', transform: 'translateY(-50%)',
+              }}
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6 text-white" />
             </button>
           )}
           {items.length > 1 && currentIndex < items.length - 1 && (
             <button
               onClick={next}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 flex items-center justify-center text-white hidden md:flex"
+              className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex"
+              style={{
+                width: 44, height: 44, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', transform: 'translateY(-50%)',
+              }}
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-6 h-6 text-white" />
             </button>
           )}
         </motion.div>
