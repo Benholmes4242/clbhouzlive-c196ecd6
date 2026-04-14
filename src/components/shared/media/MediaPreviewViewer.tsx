@@ -49,18 +49,50 @@ export function MediaPreviewViewer({
     >
       {/* Header */}
       <div className="flex items-center justify-between shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', paddingLeft: 16, paddingRight: 16, paddingBottom: 12 }}>
-        <button onClick={onClose} className="w-11 h-11 flex items-center justify-center">
+        <button
+          onClick={onClose}
+          style={{
+            width: 44, height: 44, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
           <X className="w-6 h-6 text-white" />
         </button>
-        <span className="text-white text-sm">
+        <span
+          style={{
+            background: 'rgba(0,0,0,0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: 20,
+            padding: '5px 12px',
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#ffffff',
+          }}
+        >
           {currentIndex + 1} / {items.length}
         </span>
         {onSetCover && currentIndex !== coverIndex && (
           <button
             onClick={() => onSetCover(currentIndex)}
-            className="flex items-center gap-1 text-white text-xs bg-white/20 px-3 py-1.5 rounded-full"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: '#F7931E',
+              padding: '7px 14px',
+              borderRadius: 24,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 2px 12px rgba(247,147,30,0.30)',
+            }}
           >
-            <Star className="w-3 h-3" /> Cover
+            <Star className="w-3 h-3" style={{ color: '#ffffff' }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#ffffff' }}>Set as Cover</span>
           </button>
         )}
         {(!onSetCover || currentIndex === coverIndex) && <div className="w-11" />}
@@ -91,7 +123,16 @@ export function MediaPreviewViewer({
         {currentIndex > 0 && !isZoomed && (
           <button
             onClick={() => setCurrentIndex(currentIndex - 1)}
-            className="absolute left-2 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            style={{
+              position: 'absolute', left: 8,
+              width: 44, height: 44, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
@@ -99,7 +140,16 @@ export function MediaPreviewViewer({
         {currentIndex < items.length - 1 && !isZoomed && (
           <button
             onClick={() => setCurrentIndex(currentIndex + 1)}
-            className="absolute right-2 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            style={{
+              position: 'absolute', right: 8,
+              width: 44, height: 44, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}
           >
             <ChevronRight className="w-5 h-5 text-white" />
           </button>
