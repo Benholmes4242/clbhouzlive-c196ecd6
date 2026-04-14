@@ -25,7 +25,7 @@ export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({ tab }) =
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6">
-      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-muted to-muted/80 border border-border/60 flex items-center justify-center mb-4">
+      <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
         <Icon className="w-7 h-7 text-muted-foreground" />
       </div>
       <h3 className="text-[1rem] font-semibold text-foreground mb-1 text-center">

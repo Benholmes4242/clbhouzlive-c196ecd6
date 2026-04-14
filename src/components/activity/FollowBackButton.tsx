@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useFollow } from '@/hooks/useFollow';
 import { toast } from 'sonner';
 
@@ -25,14 +24,8 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
   }, [actorId, ensureInitial, initialized]);
 
   const handleFollowBack = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click
-    
-    if (isMock) {
-      // For mock data, simulate the action
-      toast.info('This is sample data');
-      return;
-    }
-    
+    e.stopPropagation();
+    if (isMock) { toast.info('This is sample data'); return; }
     try {
       await follow();
       toast.success(`You're now following ${actorDisplayName}.`);
@@ -41,19 +34,12 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
     }
   };
 
-  // Don't show anything until we've checked the follow status
-  if (!initialized || isFollowing === 'unknown') {
-    return null;
-  }
+  if (!initialized || isFollowing === 'unknown') return null;
 
-  // Shared base pill class for unified styling - SDS corners
-  const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-7 text-[11px] font-semibold transition-colors active:scale-[0.93]";
-
-  // Already following - show muted "Following" state with unified styling
   if (isFollowing === 'following') {
     return (
       <div className="min-h-[44px] flex items-center">
-        <span className={cn(basePillClass, "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] gap-1")}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px', borderRadius: 20, background: 'rgba(15,23,42,0.06)', border: '0.5px solid rgba(15,23,42,0.15)', fontSize: 12, fontWeight: 600, color: '#64748B' }}>
           <Check className="h-3 w-3" />
           Following
         </span>
@@ -61,17 +47,19 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
     );
   }
 
-  // Not following - show "Follow back" button with blue styling (Fix 8)
   return (
     <div className="min-h-[44px] flex items-center">
       <button
         onClick={handleFollowBack}
         disabled={busy}
-        className={cn(
-          basePillClass,
-          "border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] hover:bg-[hsl(38,92%,50%)]/20",
-          "disabled:opacity-60 disabled:cursor-not-allowed"
-        )}
+        className="disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          padding: '7px 16px', borderRadius: 20,
+          background: '#F7931E', color: '#ffffff',
+          fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(247,147,30,0.22)',
+        }}
       >
         {busy ? 'Following...' : 'Follow back'}
       </button>
