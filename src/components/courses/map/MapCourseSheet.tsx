@@ -149,7 +149,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
       return { 
         text: 'Played', 
         className: 'text-white',
-        style: { background: '#f59e0b', boxShadow: '0 2px 8px rgba(245,158,11,0.3)' },
+        style: { background: '#F7931E', boxShadow: '0 2px 8px rgba(247,147,30,0.30)' },
         icon: <Check className="h-3 w-3 mr-1" />
       };
     }
@@ -309,7 +309,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                   }}
                 >
-                  <Star className="h-3.5 w-3.5 fill-current" style={{ color: 'hsl(var(--accent-amber))' }} />
+                  <Star className="h-3.5 w-3.5 fill-current" style={{ color: '#F7931E' }} />
                   <span className="text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                     Your rating: {course.user_rating.toFixed(1)}
                   </span>
