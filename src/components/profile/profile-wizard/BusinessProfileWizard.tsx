@@ -289,7 +289,7 @@ export function BusinessProfileWizard() {
   if (authLoading) {
     return createPortal(
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
-        <div className="w-8 h-8 rounded-full border-2 border-[#f59e0b] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#F7931E', borderTopColor: 'transparent' }} />
       </div>,
       document.body
     );
