@@ -779,12 +779,11 @@ export function PlayersTab() {
         onClose={() => setSortSheetOpen(false)}
         ariaLabelledBy="players-sort-sheet-title"
       >
-        <div className="px-5 pt-3 pb-4 border-b border-border/10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
-            Sort
-          </p>
-          <p id="players-sort-sheet-title" className="text-[18px] font-bold text-foreground tracking-tight">Sort Players</p>
+        <div style={{ padding: '6px 20px 14px' }}>
+          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Sort</div>
+          <div id="players-sort-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Sort Players</div>
         </div>
+        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
         {(() => {
           const isPGA = activeTour === 'pga';
           const isEuro = activeTour === 'EURO';
@@ -802,23 +801,25 @@ export function PlayersTab() {
             <button
               key={opt.value}
               onClick={() => { setSort(opt.value); setVisibleCount(PAGE_SIZE); setSortSheetOpen(false); }}
-              className={cn(
-                'w-full flex items-center justify-between px-5 py-[14px]',
-                'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
-                sort === opt.value ? 'text-foreground' : 'text-muted-foreground'
-              )}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '12px 20px',
+                background: sort === opt.value ? 'rgba(247,147,30,0.04)' : 'transparent',
+                border: 'none',
+                borderLeft: sort === opt.value ? '3px solid #F7931E' : '3px solid transparent',
+                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                cursor: 'pointer', textAlign: 'left' as const,
+              }}
             >
-              <span className={cn('text-[15px]', sort === opt.value ? 'font-bold' : 'font-medium')}>
+              <span style={{ fontSize: 14, fontWeight: sort === opt.value ? 800 : 500, color: '#0F172A' }}>
                 {opt.label}
               </span>
-              {sort === opt.value && (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6 9 17l-5-5"/>
-                </svg>
-              )}
+              {sort === opt.value && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
             </button>
           ));
         })()}
+        </div>
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
       </BottomSheet>
 
       {/* Tour filter bottom sheet */}
@@ -827,12 +828,11 @@ export function PlayersTab() {
         onClose={() => setTourSheetOpen(false)}
         ariaLabelledBy="players-tour-sheet-title"
       >
-        <div className="px-5 pt-3 pb-4 border-b border-border/10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-0.5" style={{ color: '#F59E0B' }}>
-            Filter
-          </p>
-          <p id="players-tour-sheet-title" className="text-[18px] font-bold text-foreground tracking-tight">Select Tour</p>
+        <div style={{ padding: '6px 20px 14px' }}>
+          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Filter</div>
+          <div id="players-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Select Tour</div>
         </div>
+        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
         {(['all', 'pga', 'EURO', 'LPGA', 'PGAD', 'LIV'] as const).map((code) => {
           const labels: Record<string, string> = {
             all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
@@ -847,43 +847,38 @@ export function PlayersTab() {
             <button
               key={code}
               onClick={() => { setActiveTour(code as PlayerTourCode); setTourSheetOpen(false); }}
-              className={cn(
-                'w-full flex items-center justify-between px-5 py-[14px]',
-                'border-b border-border/[0.06] transition-colors duration-100 active:bg-muted/50 text-left',
-                isSelected ? 'text-foreground' : 'text-muted-foreground'
-              )}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 20px',
+                background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
+                border: 'none',
+                borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                cursor: 'pointer', textAlign: 'left' as const,
+              }}
             >
-              <div className="flex items-center gap-2.5">
-                {code === 'all' ? (
-                  <Globe className="w-5 h-5 flex-shrink-0 text-muted-foreground" />
-                ) : hasTourLogo(code.toLowerCase()) ? (
-                  <img
-                    src={getTourLogo(code.toLowerCase())}
-                    alt=""
-                    aria-hidden="true"
-                    className="object-contain flex-shrink-0"
-                    style={{ width: 32, height: 22 }}
-                  />
-                ) : null}
-                <span className={cn('text-[15px]', isSelected ? 'font-bold' : 'font-medium')}>
-                  {labels[code]}
-                </span>
+              {/* Tour logo chip */}
+              <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {code === 'all'
+                  ? <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                  : hasTourLogo(code.toLowerCase())
+                    ? <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
+                    : null
+                }
               </div>
-              <div className="flex items-center gap-2">
-                {count > 0 && (
-                  <span className="text-[12px] text-muted-foreground/60 font-medium">
-                    {count.toLocaleString()}
-                  </span>
-                )}
-                {isSelected && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6 9 17l-5-5"/>
-                  </svg>
-                )}
-              </div>
+              {/* Label */}
+              <span style={{ flex: 1, fontSize: 14, fontWeight: isSelected ? 800 : 500, color: '#0F172A' }}>
+                {labels[code]}
+              </span>
+              {/* Count */}
+              {count > 0 && <span style={{ fontSize: 12, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count.toLocaleString()}</span>}
+              {/* Active dot */}
+              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
             </button>
           );
         })}
+        </div>
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
       </BottomSheet>
 
       {/* Content — white surface */}
