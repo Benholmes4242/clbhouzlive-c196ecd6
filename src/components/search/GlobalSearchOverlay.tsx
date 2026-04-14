@@ -29,8 +29,9 @@ const FADE_PROPS = {
 /** Eyebrow shimmer pill matching real section headers */
 function EyebrowSkeleton({ width = 'w-16' }: { width?: string }) {
   return (
-    <div className="px-4 pt-4 pb-2">
-      <div className={`h-2.5 ${width} rounded clb-shimmer-dark`} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
+      <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
+      <div className={`h-2.5 ${width} rounded clb-shimmer-light`} />
     </div>
   );
 }
@@ -43,10 +44,10 @@ function RowSkeleton({ avatarShape, nameW = 'w-32', subtitleW = 'w-24' }: {
 }) {
   return (
     <div className="flex items-center gap-3 px-4 min-h-[60px]">
-      <div className={`w-10 h-10 ${avatarShape} clb-shimmer-dark shrink-0`} />
+      <div className={`w-10 h-10 ${avatarShape} clb-shimmer-light shrink-0`} />
       <div className="flex-1 space-y-2">
-        <div className={`h-3.5 ${nameW} rounded clb-shimmer-dark`} />
-        <div className={`h-3 ${subtitleW} rounded clb-shimmer-dark`} />
+        <div className={`h-3.5 ${nameW} rounded clb-shimmer-light`} />
+        <div className={`h-3 ${subtitleW} rounded clb-shimmer-light`} />
       </div>
     </div>
   );
@@ -92,10 +93,10 @@ function TrendingSkeletonSection() {
       <EyebrowSkeleton width="w-20" />
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-4 min-h-[56px]">
-          <div className="w-10 h-10 rounded-xl clb-shimmer-dark shrink-0" />
+          <div className="w-10 h-10 rounded-xl clb-shimmer-light shrink-0" />
           <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-32 rounded clb-shimmer-dark" />
-            <div className="h-3 w-24 rounded clb-shimmer-dark" />
+            <div className="h-3.5 w-32 rounded clb-shimmer-light" />
+            <div className="h-3 w-24 rounded clb-shimmer-light" />
           </div>
         </div>
       ))}
@@ -320,18 +321,17 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 {/* Recent searches */}
                 {recent.length > 0 && (
                   <div>
-                    <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                      <span
-                        className="text-[11px] font-bold uppercase"
-                        style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
-                      >
-                        Recent Searches
-                      </span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                          Recent Searches
+                        </span>
+                      </div>
                       <button
                         type="button"
                         onClick={handleClearAll}
-                        className="text-[11px] font-semibold"
-                        style={{ color: '#F5A623' }}
+                        style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
                       >
                         Clear all
                       </button>
@@ -384,11 +384,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   <TrendingSkeletonSection />
                 ) : trending.length > 0 ? (
                   <div>
-                    <div className="px-4 pt-4 pb-2">
-                      <span
-                        className="text-[11px] font-bold uppercase"
-                        style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
-                      >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
+                      <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                         Today's Picks
                       </span>
                     </div>
@@ -441,11 +439,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   {/* Courses */}
                   {clubs.length > 0 && (
                     <div>
-                      <div className="px-4 pt-4 pb-2">
-                        <span
-                          className="text-[11px] font-bold uppercase"
-                          style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
-                        >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
+                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                           Courses
                         </span>
                       </div>
@@ -510,10 +506,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   style={{
                                     display: 'flex', alignItems: 'center', gap: 4,
                                     padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(245,158,11,0.10)',
-                                    border: '1px solid rgba(245,158,11,0.28)',
+                                    background: 'rgba(247,147,30,0.08)',
+                                    border: '1px solid rgba(247,147,30,0.25)',
                                     fontSize: 11, fontWeight: 700,
-                                    color: '#92400E',
+                                    color: '#F7931E',
                                     cursor: 'pointer',
                                   }}
                                 >
@@ -532,11 +528,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   {/* People */}
                   {people.length > 0 && (
                     <div>
-                      <div className="px-4 pt-4 pb-2">
-                        <span
-                          className="text-[11px] font-bold uppercase"
-                          style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
-                        >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
+                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                           People
                         </span>
                       </div>
@@ -556,7 +550,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               <div className="flex-1 min-w-0 text-left">
                                 <div className="flex items-center gap-1 min-w-0">
                                   <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{person.display_name}</p>
-                                  {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                  {person.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />}
                                   {person.is_public === false && <Lock className="w-3 h-3 shrink-0" style={{ color: '#94a3b8' }} />}
                                 </div>
                                 <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
@@ -580,11 +574,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   {/* Businesses */}
                   {businesses.length > 0 && (
                     <div>
-                      <div className="px-4 pt-4 pb-2">
-                        <span
-                          className="text-[11px] font-bold uppercase"
-                          style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
-                        >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
+                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                           Businesses
                         </span>
                       </div>
@@ -605,7 +597,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               <div className="flex-1 min-w-0 text-left">
                                 <div className="flex items-center gap-1 min-w-0">
                                   <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{business.name}</p>
-                                  {business.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                  {business.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />}
                                 </div>
                                 <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
                                   {[business.city, business.country].filter(Boolean).join(', ')}
