@@ -662,6 +662,7 @@ export type Database = {
           address_label: string | null
           address_line1: string | null
           address_line2: string | null
+          booking_url: string | null
           category: string | null
           city: string | null
           club_id: string | null
@@ -673,6 +674,7 @@ export type Database = {
           deleted_at: string | null
           description: string | null
           email: string | null
+          founded_year: number | null
           id: string
           is_deleted: boolean
           is_system_account: boolean
@@ -686,10 +688,12 @@ export type Database = {
           logo_url: string | null
           mapbox_place_id: string | null
           name: string
+          opening_hours: Json | null
           phone: string | null
           postcode: string | null
           region: string | null
           slug: string | null
+          social_links: Json | null
           updated_at: string | null
           verification_cooldown_until: string | null
           verified_at: string | null
@@ -700,6 +704,7 @@ export type Database = {
           address_label?: string | null
           address_line1?: string | null
           address_line2?: string | null
+          booking_url?: string | null
           category?: string | null
           city?: string | null
           club_id?: string | null
@@ -711,6 +716,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           email?: string | null
+          founded_year?: number | null
           id?: string
           is_deleted?: boolean
           is_system_account?: boolean
@@ -724,10 +730,12 @@ export type Database = {
           logo_url?: string | null
           mapbox_place_id?: string | null
           name: string
+          opening_hours?: Json | null
           phone?: string | null
           postcode?: string | null
           region?: string | null
           slug?: string | null
+          social_links?: Json | null
           updated_at?: string | null
           verification_cooldown_until?: string | null
           verified_at?: string | null
@@ -738,6 +746,7 @@ export type Database = {
           address_label?: string | null
           address_line1?: string | null
           address_line2?: string | null
+          booking_url?: string | null
           category?: string | null
           city?: string | null
           club_id?: string | null
@@ -749,6 +758,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           email?: string | null
+          founded_year?: number | null
           id?: string
           is_deleted?: boolean
           is_system_account?: boolean
@@ -762,10 +772,12 @@ export type Database = {
           logo_url?: string | null
           mapbox_place_id?: string | null
           name?: string
+          opening_hours?: Json | null
           phone?: string | null
           postcode?: string | null
           region?: string | null
           slug?: string | null
+          social_links?: Json | null
           updated_at?: string | null
           verification_cooldown_until?: string | null
           verified_at?: string | null
