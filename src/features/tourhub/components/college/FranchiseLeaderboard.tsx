@@ -79,7 +79,7 @@ export function FranchiseLeaderboard({ limit = 25, className, activeMetric: exte
           <div style={{ padding: '14px 16px 0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 {activeMetric === 'earnings' ? 'Season Earnings Leaderboard'
                   : activeMetric === 'wins' ? 'Season Wins Leaderboard'
                   : 'Top 10s Leaderboard'}
@@ -89,11 +89,11 @@ export function FranchiseLeaderboard({ limit = 25, className, activeMetric: exte
 
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <span style={{ width: '32px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
-            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
-            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
-            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>T10</span>
-            <span style={{ width: '72px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
+            <span style={{ width: '32px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
+            <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
+            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
+            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>T10</span>
+            <span style={{ width: '72px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
               {activeMetric === 'wins' ? 'WINS' : activeMetric === 'top10s' ? 'TOP 10s' : 'EARNINGS'}
             </span>
           </div>
@@ -142,7 +142,7 @@ export function FranchiseLeaderboard({ limit = 25, className, activeMetric: exte
                   })}
                   {/* Footer */}
                   <div style={{ padding: '12px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-                    <p style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
+                    <p style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
                       COLLEGE FRANCHISE RANKINGS · 2025–26 SEASON
                     </p>
                   </div>

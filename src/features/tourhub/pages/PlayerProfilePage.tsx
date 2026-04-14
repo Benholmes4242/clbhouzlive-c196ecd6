@@ -213,7 +213,7 @@ export function PlayerProfilePage() {
           <div style={{ display: 'flex', alignItems: 'center', padding: '0 20px 0' }}>
             <button
               onClick={handleBack}
-              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
@@ -221,26 +221,27 @@ export function PlayerProfilePage() {
             </button>
           </div>
 
-          {/* Underline tab bar */}
-          <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', marginTop: '6px' }}>
+          {/* Underline tab bar — flex:1 equal-width */}
+          <div style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}>
             {STAT_TABS.map((tab) => {
               const isActive = activeStatTab === tab;
               return (
                 <button
                   key={tab}
                   onClick={() => setActiveStatTab(tab)}
-                  className="flex-shrink-0 active:scale-[0.97] transition-transform"
+                  className="active:opacity-70 transition-opacity"
                   style={{
-                    padding: '8px 14px',
-                    fontSize: '11px',
+                    flex: 1,
+                    padding: '10px 4px 9px',
+                    fontSize: '13px',
                     fontWeight: isActive ? 800 : 500,
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent',
                     border: 'none',
-                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
                     cursor: 'pointer',
                     whiteSpace: 'nowrap' as const,
-                    transition: 'all 0.15s',
+                    textAlign: 'center' as const,
                   }}
                 >
                   {tab}

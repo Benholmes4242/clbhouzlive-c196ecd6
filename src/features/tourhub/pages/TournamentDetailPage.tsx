@@ -379,7 +379,7 @@ export function TournamentDetailPage() {
           <div style={{ display: 'flex', alignItems: 'center', padding: '7px 20px 0', gap: '4px' }}>
             <button
               onClick={() => { if (window.history.length > 1) navigate(-1); else navigate('/tourhub?tab=schedule'); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
@@ -387,9 +387,9 @@ export function TournamentDetailPage() {
             </button>
           </div>
 
-          {/* Underline tab bar */}
+          {/* Underline tab bar — flex:1 equal-width */}
           <div
-            style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', marginTop: '6px' }}
+            style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}
             role="tablist"
             aria-label="Tournament Sections"
           >
@@ -414,18 +414,19 @@ export function TournamentDetailPage() {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => handleTabChange(tab.value)}
-                  className="flex-shrink-0 active:scale-[0.97] transition-transform"
+                  className="active:opacity-70 transition-opacity"
                   style={{
-                    padding: '8px 14px',
-                    fontSize: '11px',
+                    flex: 1,
+                    padding: '10px 4px 9px',
+                    fontSize: '13px',
                     fontWeight: isActive ? 800 : 500,
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent',
                     border: 'none',
-                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
                     cursor: 'pointer',
                     whiteSpace: 'nowrap' as const,
-                    transition: 'all 0.15s',
+                    textAlign: 'center' as const,
                   }}
                 >
                   {tab.label}

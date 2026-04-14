@@ -138,7 +138,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             {(
               <span 
                 className={cn(
-                  "text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap overflow-hidden text-ellipsis w-full text-center",
+                  "text-[10px] min-[375px]:text-[11px] leading-none font-medium whitespace-nowrap overflow-hidden text-ellipsis w-full text-center",
                   isLive
                     ? "text-green-500"
                     : isLightTheme
@@ -191,7 +191,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 <div key={i} style={{ background: '#475569', borderRadius: 2 }} />
               ))}
             </div>
-            <span className="text-[9px] min-[375px]:text-[10px] leading-none font-semibold whitespace-nowrap text-slate-500">
+            <span className="text-[10px] min-[375px]:text-[11px] leading-none font-semibold whitespace-nowrap text-slate-500">
               Tour Nav
             </span>
           </button>

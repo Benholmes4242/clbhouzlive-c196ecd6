@@ -163,10 +163,10 @@ export function FranchiseCard({
           </div>
 
           <div style={{ minWidth: 0 }}>
-            <p style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
               {displayName}
             </p>
-            <p style={{ fontSize: '10px', color: '#94A3B8', margin: 0 }}>
+            <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0 }}>
               {stats.player_count} alumni
             </p>
           </div>
@@ -175,10 +175,10 @@ export function FranchiseCard({
         {/* Secondary stats — wins + top10s (for non-delta rows) */}
         {!isDelta && (
           <>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', width: '28px', textAlign: 'center' as const, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', width: '28px', textAlign: 'center' as const, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {stats.wins_total}
             </span>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', width: '28px', textAlign: 'center' as const, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#94A3B8', width: '28px', textAlign: 'center' as const, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {stats.top10_total}
             </span>
           </>
@@ -190,7 +190,7 @@ export function FranchiseCard({
             <>
               {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
                 <div style={{
-                  fontSize: '10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                  fontSize: '12px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
                   color: deltas.earnings_rank_change > 0 ? '#16A34A' : '#DC2626',
                   marginBottom: '2px',
                 }}>
@@ -198,7 +198,7 @@ export function FranchiseCard({
                 </div>
               )}
               <div style={{
-                fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                fontSize: '15px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
                 color: deltas.earnings_delta >= 0 ? '#16A34A' : '#DC2626',
               }}>
                 {formatDeltaValue(deltas.earnings_delta)}
@@ -206,7 +206,7 @@ export function FranchiseCard({
             </>
           ) : (
             <>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                 {statItems[0]?.value ?? '—'}
               </span>
               {/* Proportion bar */}

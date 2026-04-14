@@ -57,7 +57,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
       <div style={{ padding: '12px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Franchise Dispatch
           </span>
         </div>
@@ -67,7 +67,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {/* This Week */}
         <div style={{ padding: '10px 20px 14px', borderRight: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
+          <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             This Week
           </div>
           {hasWeekActivity ? (
@@ -84,13 +84,13 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
               )}
             </>
           ) : (
-            <div style={{ fontSize: '12px', color: '#94A3B8' }}>No activity</div>
+            <div style={{ fontSize: '13px', color: '#94A3B8' }}>No activity</div>
           )}
         </div>
 
         {/* Top Performer */}
         <div style={{ padding: '10px 20px 14px' }}>
-          <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
+          <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             {alumni && alumni.length === 1 ? 'Alumni' : 'Top Performer'}
           </div>
           {topAlumnus ? (
@@ -99,15 +99,15 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
               style={{ display: 'block', textDecoration: 'none' }}
               className="active:opacity-70 transition-opacity"
             >
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, marginBottom: '2px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, marginBottom: '2px' }}>
                 {topAlumnus.first_name} {topAlumnus.last_name}
               </div>
               {topAlumnus.earnings ? (
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#F7931E', marginBottom: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#F7931E', marginBottom: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {formatCurrency(topAlumnus.earnings)}
                 </div>
               ) : null}
-              <div style={{ fontSize: '9.5px', color: '#94A3B8' }}>
+              <div style={{ fontSize: '11px', color: '#94A3B8' }}>
                 {[
                   (topAlumnus.wins ?? 0) > 0 ? `${topAlumnus.wins} ${topAlumnus.wins === 1 ? 'win' : 'wins'}` : null,
                   topAlumnus.world_ranking && topAlumnus.world_ranking < 500 ? `#${topAlumnus.world_ranking} OWGR` : null,
@@ -115,7 +115,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
               </div>
             </Link>
           ) : (
-            <div style={{ fontSize: '12px', color: '#94A3B8' }}>No data</div>
+            <div style={{ fontSize: '13px', color: '#94A3B8' }}>No data</div>
           )}
         </div>
       </div>

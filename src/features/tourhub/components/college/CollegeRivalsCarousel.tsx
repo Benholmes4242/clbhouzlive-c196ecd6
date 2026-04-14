@@ -77,7 +77,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
       <div style={{ padding: '14px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+          <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
             {sectionTitle}
           </span>
         </div>
@@ -85,10 +85,10 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PROGRAM</span>
-        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
-        <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
-        <span style={{ width: '80px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>HEAD-TO-HEAD</span>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PROGRAM</span>
+        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
+        <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
+        <span style={{ width: '80px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>HEAD-TO-HEAD</span>
       </div>
 
       {enrichedRivalries.map((rivalry, i) => {
@@ -125,28 +125,28 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
                     onError={e => { e.currentTarget.style.display = 'none'; }}
                   />
                 ) : (
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(15,23,42,0.3)' }}>{displayName.charAt(0)}</span>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: 'rgba(15,23,42,0.3)' }}>{displayName.charAt(0)}</span>
                 )}
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {displayName}
               </span>
             </div>
 
             {/* Wins */}
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {rivalStats?.wins_total ?? '—'}
             </span>
 
             {/* Earnings compact */}
-            <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {rivalStats ? `$${(rivalStats.earnings_total / 1_000_000).toFixed(0)}M` : '—'}
             </span>
 
             {/* H2H chip */}
             {h2hLabel && (
               <div style={{ width: '80px', display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
-                <span style={{ fontSize: '9.5px', fontWeight: 800, color: h2hColor, background: h2hBg, padding: '3px 7px', borderRadius: '5px', whiteSpace: 'nowrap' as const }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: h2hColor, background: h2hBg, padding: '3px 7px', borderRadius: '5px', whiteSpace: 'nowrap' as const }}>
                   {h2hLabel}
                 </span>
               </div>
@@ -183,7 +183,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
       <div style={{ padding: '10px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)', textAlign: 'center' as const }}>
         <span
           onClick={onCompare ? () => onCompare(enrichedRivalries[0]?.rivalNormalizedName ?? '') : undefined}
-          style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
+          style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
         >
           Compare franchises ›
         </span>

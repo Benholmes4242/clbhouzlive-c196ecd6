@@ -94,7 +94,7 @@ export function LeaderRow({
             />
           ) : (
             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,23,42,0.08)' }}>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#94A3B8' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8' }}>
                 {player.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
               </span>
             </div>
@@ -112,18 +112,18 @@ export function LeaderRow({
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.countryCode || player.country} size="sm" />
             {player.country && (
-              <span style={{ fontSize: '10px', color: '#94A3B8' }}>{player.country}</span>
+              <span style={{ fontSize: '11px', color: '#94A3B8' }}>{player.country}</span>
             )}
           </div>
         </div>
 
         {/* Stat value + proportion bar */}
         <div style={{ padding: '12px 14px 12px 0', textAlign: 'right' as const, flexShrink: 0, minWidth: '72px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: '15px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
             {formattedStat}
           </span>
           {unit && (
-            <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
               {unit}
             </span>
           )}

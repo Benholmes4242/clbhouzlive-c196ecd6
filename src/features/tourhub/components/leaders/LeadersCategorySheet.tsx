@@ -89,9 +89,9 @@ export function LeadersCategorySheet({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '16px' }}>{activeEmoji}</span>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>{activeCategory.shortLabel}</span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A' }}>{activeCategory.shortLabel}</span>
           </div>
-          <span style={{ fontSize: '10px', color: '#94A3B8' }}>▾</span>
+          <span style={{ fontSize: '11px', color: '#94A3B8' }}>▾</span>
         </button>
       )}
 
@@ -107,7 +107,7 @@ export function LeadersCategorySheet({
         >
           {/* Dispatch header */}
           <div style={{ padding: '0 20px 14px' }}>
-            <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
               LEADERBOARDS
             </div>
             <div id="leaders-category-sheet-title" style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
@@ -120,7 +120,7 @@ export function LeadersCategorySheet({
               {/* Group rule marker */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '14px 20px 8px' }}>
                 <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-                <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                   {group.label}
                 </span>
               </div>
@@ -146,15 +146,15 @@ export function LeadersCategorySheet({
                   >
                     <span style={{ fontSize: '16px', flexShrink: 0 }}>{emoji}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '13px', fontWeight: isActive ? 800 : 600, color: '#0F172A' }}>
+                      <div style={{ fontSize: '14px', fontWeight: isActive ? 800 : 600, color: '#0F172A' }}>
                         {cat.shortLabel}
                       </div>
                       {leaderData ? (
-                        <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                        <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                           {leaderData.name} · {leaderData.value}
                         </div>
                       ) : (cat as any).tourAverage && (cat as any).tourAverage !== '—' ? (
-                        <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '1px' }}>
+                        <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '1px' }}>
                           Tour avg: {(cat as any).tourAverage}
                         </div>
                       ) : null}

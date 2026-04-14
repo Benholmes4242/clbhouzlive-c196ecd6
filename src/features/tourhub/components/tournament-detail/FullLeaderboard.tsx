@@ -199,20 +199,20 @@ export function FullLeaderboard({
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <span style={{ width: '34px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
+        <span style={{ width: '34px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
         {showRoundColumns && (
           <>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R1</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R2</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R3</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R4</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R1</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R2</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R3</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R4</span>
           </>
         )}
-        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
+        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
           {selectedRound === 'Overall' ? 'TOT' : 'SCORE'}
         </span>
-        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
@@ -256,7 +256,7 @@ export function FullLeaderboard({
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '34px', fontSize: '11px', fontWeight: 900, color: displayPosition === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '34px', fontSize: '12px', fontWeight: 900, color: displayPosition === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : isWD ? 'WD' : (!isRoundView && entry.position_tied) ? `T${displayPosition}` : String(displayPosition)}
                 </span>
 
@@ -265,7 +265,7 @@ export function FullLeaderboard({
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
+                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
                     {entry.player?.full_name || 'Unknown'}
                   </p>
                 </div>
@@ -273,7 +273,7 @@ export function FullLeaderboard({
                 {showRoundColumns && (
                   <>
                     {[entry.round_1, entry.round_2, entry.round_3, entry.round_4].map((score, ri) => (
-                      <span key={ri} style={{ width: '26px', textAlign: 'center' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                      <span key={ri} style={{ width: '26px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                         {score != null ? score : '—'}
                       </span>
                     ))}
@@ -288,7 +288,7 @@ export function FullLeaderboard({
                   ) : liveRoundScore != null ? (
                     <ScoreToPar score={liveRoundScore} className="text-sm" />
                   ) : (
-                    <span style={{ color: '#CBD5E1', fontSize: '13px', fontVariantNumeric: 'tabular-nums' }}>—</span>
+                    <span style={{ color: '#CBD5E1', fontSize: '14px', fontVariantNumeric: 'tabular-nums' }}>—</span>
                   )}
                 </div>
 
@@ -319,7 +319,7 @@ export function FullLeaderboard({
               {showCutLine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                   <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />
-                  <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em' }}>MISSED CUT</span>
+                  <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em' }}>MISSED CUT</span>
                   <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />
                 </div>
               )}

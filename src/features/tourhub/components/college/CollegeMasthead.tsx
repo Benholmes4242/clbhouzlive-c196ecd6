@@ -63,14 +63,14 @@ export function CollegeMasthead({
         style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}
       >
         {/* Amber eyebrow */}
-        <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
           ⚡ CLBHOUZ · COLLEGE FRANCHISE RANKINGS
         </div>
 
         {/* Masthead double-rule band */}
         <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
               College Franchises
             </h1>
             <span style={{ fontSize: '9px', fontWeight: 600, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>
@@ -79,10 +79,10 @@ export function CollegeMasthead({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', flexWrap: 'wrap' as const }}>
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>Top franchise</span>
-            <span style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E' }}>{displayName}</span>
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)' }}>·</span>
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{primaryValue} {primaryUnit}</span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>Top franchise</span>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#F7931E' }}>{displayName}</span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>·</span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>{primaryValue} {primaryUnit}</span>
           </div>
         </div>
 
@@ -96,16 +96,16 @@ export function CollegeMasthead({
                   1
                 </span>
                 <div>
-                  <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>
                     {METRIC_LABEL[activeMetric]}
                   </div>
-                  <div style={{ fontSize: '8.5px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em' }}>
                     {stats.player_count} alumni on tour
                   </div>
                 </div>
               </div>
 
-              <h2 style={{ fontSize: '26px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.05, margin: '0 0 6px' }}>
+              <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.05, margin: '0 0 6px' }}>
                 {displayName}
               </h2>
 
@@ -173,7 +173,7 @@ export function CollegeMasthead({
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 ) : (
-                  <span style={{ fontSize: '22px', fontWeight: 900, color: 'rgba(255,255,255,0.15)' }}>
+                  <span style={{ fontSize: '24px', fontWeight: 900, color: 'rgba(255,255,255,0.15)' }}>
                     {displayName.charAt(0)}
                   </span>
                 )}
@@ -191,7 +191,7 @@ export function CollegeMasthead({
             { label: 'ALUMNI', value: String(stats.player_count), accent: false },
           ] as const).map((s, i) => (
             <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center', borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
-              <div style={{ fontSize: '8px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>
+              <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>
                 {s.label}
               </div>
               <div style={{ fontSize: '14px', fontWeight: 900, color: s.accent ? '#F7931E' : '#ffffff', letterSpacing: '-0.02em' }}>
