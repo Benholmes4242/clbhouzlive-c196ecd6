@@ -99,14 +99,25 @@ export default function CheckEmailPage() {
         }}
       >
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.06)' }}
+          style={{
+            width: 56, height: 56, borderRadius: 16,
+            background: 'rgba(247,147,30,0.10)',
+            border: '1px solid rgba(247,147,30,0.22)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
         >
-          <Mail className="w-7 h-7 text-white/70" />
+          <Mail style={{ width: 26, height: 26, color: '#F7931E' }} />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Almost there
+          </span>
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-xl font-semibold text-white">Check your inbox</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', margin: 0 }}>Check your inbox</h1>
           <p className="text-sm text-white/50 leading-relaxed">
             We sent a verification link to{' '}
             <span className="text-white/80 font-medium">{email}</span>.

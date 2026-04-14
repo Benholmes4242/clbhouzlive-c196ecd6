@@ -110,7 +110,14 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[52px] flex items-center justify-center rounded-full bg-white text-[#0D0F11] font-medium text-[16px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full h-[52px] flex items-center justify-center rounded-full text-[16px] transition-all active:scale-[0.98]"
+        style={{
+          fontWeight: 700,
+          background: isDisabled ? 'rgba(247,147,30,0.35)' : '#F7931E',
+          color: '#ffffff',
+          cursor: isDisabled ? 'not-allowed' : 'pointer',
+          boxShadow: isDisabled ? 'none' : '0 4px 20px rgba(247,147,30,0.28)',
+        }}
       >
         {submitting ? (
           <Loader2 className="w-5 h-5 animate-spin" />

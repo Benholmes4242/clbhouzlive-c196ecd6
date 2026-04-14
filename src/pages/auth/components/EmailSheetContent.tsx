@@ -158,8 +158,10 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
                 onClick={handleLoginClick}
                 className="flex-1 h-[44px] rounded-full text-[14px] font-medium transition-all active:scale-[0.98]"
                 style={{
-                  background: 'white',
-                  color: '#0D0F11',
+                  background: '#F7931E',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 12px rgba(247,147,30,0.28)',
                 }}
               >
                 Log in
@@ -188,11 +190,11 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
           disabled={isDisabled}
           className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
           style={{
-            fontWeight: 500,
-            background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
-            color: '#0D0F11',
+            fontWeight: 700,
+            background: isDisabled ? 'rgba(247,147,30,0.35)' : '#F7931E',
+            color: '#ffffff',
             cursor: isDisabled ? 'not-allowed' : 'pointer',
-            opacity: isDisabled ? 0.6 : 1,
+            boxShadow: isDisabled ? 'none' : '0 4px 20px rgba(247,147,30,0.28)',
           }}
         >
           {(submitting || checkingEmail) ? (

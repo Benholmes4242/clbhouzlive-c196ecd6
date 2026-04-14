@@ -420,17 +420,17 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
       </div>
       
-      {/* Submit button - premium white */}
+      {/* Submit button - amber primary */}
       <button
         onClick={onSubmit}
         disabled={isSubmitDisabled}
         className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
         style={{
-          fontWeight: 500,
-          background: isSubmitDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
-          color: '#0D0F11',
+          fontWeight: 700,
+          background: isSubmitDisabled ? 'rgba(247,147,30,0.35)' : '#F7931E',
+          color: '#ffffff',
           cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
-          opacity: isSubmitDisabled ? 0.6 : 1,
+          boxShadow: isSubmitDisabled ? 'none' : '0 4px 20px rgba(247,147,30,0.28)',
         }}
       >
         {submitting ? (

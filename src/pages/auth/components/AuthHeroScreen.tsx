@@ -266,18 +266,12 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             </div>
             
             {/* Sign-in eyebrow label */}
-            <p
-              className="auth-button-5 text-center"
-              style={{
-                fontSize: '11px',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '1.5px',
-                color: 'rgba(255, 255, 255, 0.4)',
-              }}
-            >
-              Already have an account? Sign in below
-            </p>
+            <div className="auth-button-5 flex items-center justify-center gap-2">
+              <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                Already have an account? Sign in below
+              </span>
+            </div>
             
             {/* Email input for login */}
             <div className="auth-button-6 space-y-3">
@@ -293,7 +287,12 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   onKeyDown={handleEmailKeyDown}
                   placeholder="Email address"
                   disabled={submitting}
-                  className="w-full h-[56px] px-5 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[16px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
+                  className="w-full h-[56px] px-5 text-white placeholder:text-neutral-500 text-[16px] focus:outline-none transition-all disabled:opacity-50"
+                  style={{
+                    borderRadius: 14,
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                  }}
                   autoComplete="email"
                   inputMode="email"
                 />
@@ -306,21 +305,18 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 </p>
               )}
               
-              {/* Continue button - white primary style when email present */}
+              {/* Continue button - amber primary */}
               <button
                 onClick={handleContinue}
                 disabled={submitting || !loginEmail.trim()}
                 aria-label="Continue to login"
-                className={`w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 ${
-                  loginEmail.trim() 
-                    ? 'bg-white text-[#0D0F11] hover:bg-gray-50 active:brightness-95' 
-                    : 'hover:bg-white/[0.08]'
-                }`}
+                className="w-full h-[56px] flex items-center justify-center rounded-full font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
                 style={{
-                  ...(loginEmail.trim() 
-                    ? { boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)' }
-                    : { background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.92)' }
-                  ),
+                  background: loginEmail.trim() ? '#F7931E' : 'rgba(255,255,255,0.05)',
+                  color: loginEmail.trim() ? '#ffffff' : 'rgba(255,255,255,0.35)',
+                  border: loginEmail.trim() ? 'none' : '1px solid rgba(255,255,255,0.10)',
+                  boxShadow: loginEmail.trim() ? '0 4px 20px rgba(247,147,30,0.30)' : 'none',
+                  cursor: !loginEmail.trim() ? 'not-allowed' : 'pointer',
                 }}
               >
                 Continue
