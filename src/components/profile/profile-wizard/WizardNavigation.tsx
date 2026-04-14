@@ -17,6 +17,7 @@ export function WizardNavigation({
 }: Props) {
   const isFinalStep = step === 3;
   const showCompletion = !isFinalStep && completionPct > 0;
+  const isDisabled = (isFinalStep && (!isValid || !isDirty)) || isSaving;
 
   return (
     <div
@@ -25,19 +26,30 @@ export function WizardNavigation({
     >
       <div className="flex gap-3">
         {step > 1 && (
-          <Button
-            variant="outline"
+          <button
             onClick={onBack}
             disabled={isSaving}
-            className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold border-0"
+            style={{
+              flex: 1, minHeight: 50, borderRadius: 12,
+              background: 'transparent',
+              border: '0.5px solid rgba(15,23,42,0.12)',
+              fontSize: 15, fontWeight: 600,
+              color: '#0F172A',
+              cursor: isSaving ? 'not-allowed' : 'pointer',
+            }}
           >
             Back
-          </Button>
+          </button>
         )}
         <Button
           onClick={onNext}
-          disabled={(isFinalStep && (!isValid || !isDirty)) || isSaving}
-          className="flex-1 min-h-[52px] rounded-[14px] text-[15px] font-semibold bg-foreground hover:bg-foreground/90 text-background border-0"
+          disabled={isDisabled}
+          className="flex-1 min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
+          style={{
+            background: isDisabled ? 'rgba(247,147,30,0.40)' : '#F7931E',
+            color: '#ffffff',
+            boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
+          }}
         >
           {isSaving ? (
             <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>

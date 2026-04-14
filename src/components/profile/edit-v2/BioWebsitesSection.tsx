@@ -12,6 +12,17 @@ interface Props {
   onUpdateWebsite: (id: string, url: string) => void;
 }
 
+function RuleLabel({ text }: { text: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        {text}
+      </span>
+    </div>
+  );
+}
+
 export function BioWebsitesSection({
   bio, websites, bioError, websitesError,
   onBioChange, onAddWebsite, onRemoveWebsite, onUpdateWebsite,
@@ -20,7 +31,7 @@ export function BioWebsitesSection({
     <div className="space-y-4">
       <div>
         <div className="flex justify-between items-baseline mb-2">
-          <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">Bio</label>
+          <RuleLabel text="Bio" />
           <span className={`text-[11px] ${bio.length > BIO_MAX * 0.9 ? 'text-destructive' : 'text-muted-foreground/60'}`}>
             {bio.length}/{BIO_MAX}
           </span>
@@ -37,7 +48,7 @@ export function BioWebsitesSection({
       </div>
 
       <div>
-        <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2 block">Websites</label>
+        <RuleLabel text="Websites" />
         <div className="space-y-2">
           {websites.map((site) => (
             <div key={site.id} className="flex items-center gap-2">
@@ -64,13 +75,13 @@ export function BioWebsitesSection({
             <button
               onClick={onAddWebsite}
               className="flex items-center gap-2.5 text-[14px] font-semibold min-h-[44px]"
-              style={{ color: 'hsl(38,92%,50%)' }}
+              style={{ color: '#F7931E' }}
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: 'rgba(245,166,35,0.12)' }}
+                style={{ backgroundColor: 'rgba(247,147,30,0.10)' }}
               >
-                <Plus size={14} style={{ color: 'hsl(38,92%,50%)' }} />
+                <Plus size={14} style={{ color: '#F7931E' }} />
               </div>
               Add website
             </button>

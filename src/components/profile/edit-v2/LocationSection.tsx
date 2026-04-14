@@ -208,7 +208,7 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
           </button>
         )}
         {loading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-[hsl(38,92%,50%)] border-t-transparent rounded-full animate-spin" />
+          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: '2px solid #F7931E', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
         )}
       </div>
 
@@ -247,9 +247,12 @@ export function LocationSection({ country, city, onCountryChange, onCityChange }
 
   return (
     <div className="space-y-3">
-      <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground block">
-        Location
-      </label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Location
+        </span>
+      </div>
       {/* Country first */}
       <CountryPicker value={country} onChange={handleCountryChange} />
       {/* City second — locked until country selected, biased to that country */}

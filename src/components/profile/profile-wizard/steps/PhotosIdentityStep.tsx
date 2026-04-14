@@ -17,6 +17,17 @@ const GENDER_OPTIONS = [
   { value: 'prefer_not_to_say', label: 'Prefer not to say' },
 ] as const;
 
+function RuleLabel({ text }: { text: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        {text}
+      </span>
+    </div>
+  );
+}
+
 export function PhotosIdentityStep({
   form, usernameIsLocked, displayNameError, onFieldChange,
 }: Props) {
@@ -56,11 +67,9 @@ export function PhotosIdentityStep({
       <SectionCard noPadding>
         <div>
           {/* Display Name field */}
-          <div className="px-4 pt-4 pb-3 border-b border-border/50">
-            <div className="flex justify-between items-baseline mb-2">
-              <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                Display Name
-              </label>
+          <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div className="flex justify-between items-baseline">
+              <RuleLabel text="Display Name" />
               <span className="text-[11px] text-muted-foreground/60">
                 {form.displayName.length}/{DISPLAY_NAME_MAX}
               </span>
@@ -79,11 +88,9 @@ export function PhotosIdentityStep({
           </div>
 
           {/* Username field */}
-          <div className="px-4 pt-3 pb-4 border-b border-border/50">
-            <div className="flex justify-between items-baseline mb-2">
-              <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                Username
-              </label>
+          <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div className="flex justify-between items-baseline">
+              <RuleLabel text="Username" />
               {usernameIsLocked && (
                 <span className="text-[11px] text-muted-foreground/60">
                   Contact{' '}
@@ -113,9 +120,7 @@ export function PhotosIdentityStep({
 
           {/* Gender field */}
           <div className="px-4 pt-3 pb-4">
-            <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2 block">
-              Gender
-            </label>
+            <RuleLabel text="Gender" />
             <div className="flex gap-2 flex-wrap">
               {GENDER_OPTIONS.map((opt) => {
                 const isActive = form.gender === opt.value;
