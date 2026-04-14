@@ -61,7 +61,7 @@ interface CommentsSheetProps {
   aspectRatio?: number;
   isReview?: boolean;
   reviewRating?: number | null;
-  caddiePickCommentId?: string | null;
+  
   likesCount?: number | null;
   likeSource?: 'post' | 'editorial';
   editorialCardId?: string;
@@ -85,7 +85,7 @@ function CommentsSheet({
   creatorUserId,
   initialCommentId,
   initialParentCommentId,
-  caddiePickCommentId,
+  
   caption,
   courseName,
   isReview,
@@ -158,16 +158,8 @@ function CommentsSheet({
         return score(b) - score(a);
       });
     }
-    // Pin caddie pick to top
-    if (caddiePickCommentId) {
-      const idx = sorted.findIndex(c => c.id === caddiePickCommentId);
-      if (idx > 0) {
-        const [picked] = sorted.splice(idx, 1);
-        sorted.unshift(picked);
-      }
-    }
     return sorted;
-  }, [comments, sort, caddiePickCommentId]);
+  }, [comments, sort]);
 
   const totalCount = comments.length;
 
@@ -324,7 +316,7 @@ function CommentsSheet({
   ) => {
     const isOwn = currentUserId === comment.user_id;
     const isOP = comment.user_id === creatorUserId;
-    const isCaddie = comment.id === caddiePickCommentId;
+    
 
     return (
       <div
@@ -333,7 +325,7 @@ function CommentsSheet({
         className={cn(
           'flex gap-3 px-4 py-3 transition-colors duration-300',
           isReply && 'pl-10 sm:pl-14',
-          highlightedId === comment.id && (isDark ? 'bg-white/[0.05]' : 'bg-primary/[0.04]'),
+          highlightedId === comment.id && 'bg-[rgba(247,147,30,0.05)]',
         )}
       >
         {/* Avatar */}
@@ -362,13 +354,8 @@ function CommentsSheet({
               {comment.user_name}
             </span>
             {isOP && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-primary/15 text-primary">
+              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.06em', background: 'rgba(247,147,30,0.10)', color: '#F7931E' }}>
                 OP
-              </span>
-            )}
-            {isCaddie && !isReply && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide" style={{ backgroundColor: '#f59e0b20', color: '#f59e0b' }}>
-                Caddie Pick
               </span>
             )}
             <span className={cn('text-[11px]', isDark ? 'text-white/50' : 'text-muted-foreground/60')}>
@@ -468,7 +455,7 @@ function CommentsSheet({
 
         {/* Replies section */}
         {totalReplies > 0 && (
-          <div className={cn('ml-4 border-l', isDark ? 'border-white/[0.08]' : 'border-border/50')}>
+          <div style={{ marginLeft: 16, borderLeft: '0.5px solid rgba(15,23,42,0.07)' }}>
             {!repliesExpanded ? (
               <button
                 type="button"
@@ -482,10 +469,8 @@ function CommentsSheet({
                     return next;
                   });
                 }}
-                className={cn(
-                  'text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10',
-                  'text-primary'
-                )}
+                className="text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10"
+                style={{ color: '#F7931E' }}
               >
                 <ChevronRight className="w-3.5 h-3.5" />
                 View {totalReplies} {totalReplies === 1 ? 'reply' : 'replies'}
@@ -497,10 +482,10 @@ function CommentsSheet({
                   <div className="space-y-0">
                     {[0, 1].map(i => (
                       <div key={i} className="flex gap-3 pl-10 sm:pl-14 pr-4 py-3">
-                        <div className={cn('w-[28px] h-[28px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                        <div className="w-[28px] h-[28px] rounded-[34%] shrink-0 bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
                         <div className="flex-1 space-y-2 py-0.5">
-                          <div className={cn('h-[18px] w-20 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                          <div className={cn('h-[18px] w-[75%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                          <div className="h-[18px] w-20 rounded bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
+                          <div className="h-[18px] w-[75%] rounded bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
                         </div>
                       </div>
                     ))}
@@ -511,7 +496,8 @@ function CommentsSheet({
                   <button
                     type="button"
                     onClick={() => loadAllReplies(comment.id)}
-                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-10 sm:pl-14"
+                    className="text-[12px] font-semibold min-h-[44px] flex items-center pl-10 sm:pl-14"
+                    style={{ color: '#F7931E' }}
                   >
                     Load {comment.total_replies_count - comment.replies.length} more replies
                   </button>
@@ -533,7 +519,7 @@ function CommentsSheet({
 
         {/* Inset divider */}
         {idx < sortedComments.length - 1 && (
-          <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/8' : 'bg-border/30')} />
+          <div style={{ marginLeft: 56, height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
         )}
       </div>
     );
@@ -569,23 +555,18 @@ function CommentsSheet({
                 onClose();
               }
             }}
-            className={cn(
-              'fixed inset-x-0 bottom-0 z-[211] w-full rounded-t-[20px]',
-              'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px]',
-              'flex flex-col',
-              isDark ? 'bg-[#0d0d0d]' : 'bg-background'
-            )}
+            className="fixed inset-x-0 bottom-0 z-[211] w-full rounded-t-[20px] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col bg-[#F8FAFC]"
             style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0">
-              <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
             </div>
 
             {/* Header */}
             <div
               className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0"
-              style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)'}` }}
+              style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
             >
               {/* Left: tab group */}
               <div className="flex items-end gap-6">
@@ -606,7 +587,7 @@ function CommentsSheet({
                       {/* Amber eyebrow count */}
                       <span
                         className="text-[11px] font-semibold uppercase tracking-[0.05em] leading-none mb-[3px] transition-colors duration-200"
-                        style={{ color: isActive ? '#F59E0B' : isDark ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.25)' }}
+                        style={{ color: isActive ? '#F7931E' : 'rgba(15,23,42,0.25)' }}
                       >
                         {count > 0 ? count : '\u00A0'}
                       </span>
@@ -614,9 +595,7 @@ function CommentsSheet({
                       <span
                         className="text-[15px] font-semibold leading-snug whitespace-nowrap transition-colors duration-200"
                         style={{
-                          color: isActive
-                            ? (isDark ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.90)')
-                            : (isDark ? 'rgba(255,255,255,0.30)' : 'rgba(0,0,0,0.35)')
+                          color: isActive ? '#0F172A' : '#94A3B8'
                         }}
                       >
                         {label}
@@ -643,22 +622,20 @@ function CommentsSheet({
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className={cn(
-                        'flex items-center p-0.5 gap-0.5 rounded-lg',
-                        isDark ? 'bg-white/[0.07]' : 'bg-black/[0.06]'
-                      )}
+                      style={{ display: 'flex', alignItems: 'center', gap: 3, borderRadius: 8, background: 'rgba(15,23,42,0.05)', padding: '3px 3px' }}
                     >
                       {(['best', 'newest'] as const).map(s => (
                         <button
                           key={s}
                           type="button"
                           onClick={() => setSort(s)}
-                          className={cn(
-                            'px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors min-h-[28px] capitalize',
-                            sort === s
-                              ? isDark ? 'bg-white/[0.12] text-white/90' : 'bg-black/[0.10] text-foreground'
-                              : isDark ? 'text-white/35' : 'text-muted-foreground'
-                          )}
+                          className="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors min-h-[28px] capitalize"
+                          style={{
+                            background: sort === s ? '#0F172A' : 'transparent',
+                            color: sort === s ? '#ffffff' : '#94A3B8',
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
                         >
                           {s === 'best' ? 'Best' : 'Newest'}
                         </button>
@@ -671,32 +648,28 @@ function CommentsSheet({
                   onClick={onClose}
                   className="w-9 h-9 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer"
                 >
-                  <X className="w-[15px] h-[15px]" style={{ color: isDark ? 'rgba(255,255,255,0.40)' : undefined }} />
+                  <X className="w-[15px] h-[15px]" style={{ color: '#94A3B8' }} />
                 </button>
               </div>
             </div>
 
             {/* Post caption — shown above comments when present */}
             {activeTab === 'comments' && (cleanCaption || displayCourseName) && (
-              <div className={cn(
-                'px-4 py-3 shrink-0 border-b',
-                isDark ? 'border-white/[0.06]' : 'border-border/50'
-              )}>
+              <div
+                className="px-4 py-3 shrink-0"
+                style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+              >
                 {cleanCaption && (
                   <MentionText
                     text={cleanCaption}
-                    className={cn(
-                      'text-[14px] leading-[20px] line-clamp-2',
-                      isDark ? 'text-white/70' : 'text-foreground/70'
-                    )}
+                    className="text-[14px] leading-[20px] line-clamp-2 text-foreground/70"
                     mentionClassName="font-semibold [color:#E8980A]"
                   />
                 )}
                 {displayCourseName && (
                   <p className={cn(
-                    'text-[13px] leading-[18px] font-semibold truncate',
-                    cleanCaption ? 'mt-1' : '',
-                    isDark ? 'text-white' : 'text-foreground'
+                    'text-[13px] leading-[18px] font-semibold truncate text-foreground',
+                    cleanCaption ? 'mt-1' : ''
                   )}>
                     📍 {displayCourseName}
                   </p>
@@ -718,10 +691,10 @@ function CommentsSheet({
                     <div className="px-4">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <div key={i} className="flex items-center gap-3 py-3">
-                          <div className={cn('w-[40px] h-[40px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className="w-[40px] h-[40px] rounded-[34%] shrink-0 bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
                           <div className="flex-1 space-y-2">
-                            <div className={cn('h-[16px] w-28 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                            <div className={cn('h-[14px] w-20 rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                            <div className="h-[16px] w-28 rounded bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
+                            <div className="h-[14px] w-20 rounded bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
                           </div>
                         </div>
                       ))}
@@ -730,10 +703,10 @@ function CommentsSheet({
                     <div className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]">
                       <span className="text-4xl">🤍</span>
                       <div className="flex flex-col items-center gap-1.5">
-                        <p className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+                         <p className="text-[16px] font-semibold text-foreground">
                           No likes yet
                         </p>
-                        <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                       <p className="text-[13px] text-center leading-relaxed text-muted-foreground">
                           Be the first to like this post
                         </p>
                       </div>
@@ -755,11 +728,11 @@ function CommentsSheet({
                             hideRing
                           />
                           <div className="flex-1 min-w-0">
-                            <p className={cn('text-[14px] font-semibold truncate', isDark ? 'text-white' : 'text-foreground')}>
+                            <p className="text-[14px] font-semibold truncate text-foreground">
                               {liker.displayName}
                             </p>
                             {liker.username && (
-                              <p className={cn('text-[12px] truncate', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                              <p className="text-[12px] truncate text-muted-foreground">
                                 @{liker.username}
                               </p>
                             )}
@@ -784,15 +757,15 @@ function CommentsSheet({
                     {Array.from({ length: 5 }).map((_, i) => (
                       <div key={i}>
                         <div className="flex gap-3 py-3">
-                          <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className="w-[34px] h-[34px] rounded-[34%] shrink-0 bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
                           <div className="flex-1 space-y-2 py-0.5">
-                            <div className={cn('h-[18px] w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                            <div className={cn('h-[18px] w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
-                            <div className={cn('h-[18px] w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
+                            <div className="h-[18px] w-24 rounded bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
+                            <div className="h-[18px] w-[85%] rounded bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
+                            <div className="h-[18px] w-[55%] rounded bg-[rgba(15,23,42,0.06)] clb-shimmer-light" />
                           </div>
                         </div>
                         {i < 4 && (
-                          <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/5' : 'bg-border/20')} />
+                          <div style={{ marginLeft: 56, height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
                         )}
                       </div>
                     ))}
@@ -813,10 +786,10 @@ function CommentsSheet({
                       <span className="inline-block animate-bounce" style={{ animationDelay: '360ms' }}>💬</span>
                     </div>
                     <div className="flex flex-col items-center gap-1.5">
-                      <p className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+                      <p className="text-[16px] font-semibold text-foreground">
                         No comments yet
                       </p>
-                      <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                      <p className="text-[13px] text-center leading-relaxed text-muted-foreground">
                         {isReview
                           ? 'Be the first to review this course'
                           : 'Be the first to drop your thoughts'}
@@ -835,7 +808,7 @@ function CommentsSheet({
                     <div ref={sentinelRef} className="h-px" />
                     {isFetchingNextPage && (
                       <div className="flex items-center justify-center py-4">
-                        <div className={cn('w-5 h-5 border-2 rounded-full animate-spin', isDark ? 'border-white/20 border-t-white/60' : 'border-muted border-t-muted-foreground')} />
+                        <div className="w-5 h-5 border-2 rounded-full animate-spin border-muted border-t-muted-foreground" />
                       </div>
                     )}
                   </motion.div>
@@ -850,8 +823,8 @@ function CommentsSheet({
                 className="shrink-0 px-4 py-3"
                 style={{
                   paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
-                  borderTop: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid hsl(var(--border) / 0.5)',
-                  background: isDark ? '#0d0d0d' : undefined,
+                  borderTop: '0.5px solid rgba(15,23,42,0.07)',
+                  background: '#F8FAFC',
                 }}
               >
                 {/* Reply indicator */}
@@ -863,7 +836,7 @@ function CommentsSheet({
                       exit={{ opacity: 0, height: 0 }}
                       className="flex items-center justify-between mb-2 overflow-hidden"
                     >
-                      <span className={cn('text-[13px]', isDark ? 'text-white/60' : 'text-muted-foreground')}>
+                      <span className="text-[13px] text-muted-foreground">
                         Replying to <span className="font-medium">{replyingTo.displayName}</span>
                       </span>
                       <button
@@ -871,7 +844,7 @@ function CommentsSheet({
                         onClick={() => setReplyingTo(null)}
                         className="min-h-[44px] min-w-[44px] flex items-center justify-center"
                       >
-                        <X className={cn('w-4 h-4', isDark ? 'text-white/50' : 'text-muted-foreground')} />
+                        <X className="w-4 h-4 text-muted-foreground" />
                       </button>
                     </motion.div>
                   )}
@@ -889,10 +862,13 @@ function CommentsSheet({
                   <div className="flex-1 min-w-0 relative">
                     {/* Mention autocomplete dropdown */}
                     {mentionResults.length > 0 && (
-                      <div className={cn(
-                        'absolute bottom-full left-0 right-0 mb-1 rounded-xl shadow-lg border overflow-hidden z-[215]',
-                        isDark ? 'bg-[#1a1a1a] border-white/10' : 'bg-background border-border'
-                      )}>
+                      <div style={{
+                        position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
+                        borderRadius: 10, background: '#ffffff',
+                        border: '1px solid rgba(15,23,42,0.07)',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                        overflow: 'hidden', zIndex: 215,
+                      }}>
                         {mentionResults.map(u => (
                           <button
                             key={u.id}
@@ -903,10 +879,7 @@ function CommentsSheet({
                               setMentionResults([]);
                               textareaRef.current?.focus();
                             }}
-                            className={cn(
-                              'w-full flex items-center gap-3 px-3 py-2 text-left transition-colors',
-                              isDark ? 'hover:bg-white/10' : 'hover:bg-muted/50'
-                            )}
+                            className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-[rgba(15,23,42,0.04)]"
                           >
                             <SquircleAvatar
                               size={28}
@@ -916,10 +889,10 @@ function CommentsSheet({
                               hideRing
                             />
                             <div className="flex flex-col min-w-0">
-                              <span className={cn('text-sm font-medium truncate', isDark ? 'text-white' : 'text-foreground')}>
+                              <span className="text-sm font-medium truncate text-foreground">
                                 {u.display_name}
                               </span>
-                              <span className={cn('text-xs truncate', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                              <span className="text-xs truncate text-muted-foreground">
                                 @{u.username}
                               </span>
                             </div>
@@ -927,12 +900,11 @@ function CommentsSheet({
                         ))}
                       </div>
                     )}
-                    <div className={cn(
-                      'flex items-end rounded-[22px] px-4 py-2',
-                      isDark
-                        ? 'bg-white/10 border border-white/15'
-                        : 'bg-muted border border-border/50'
-                    )}>
+                    <div style={{
+                      display: 'flex', alignItems: 'flex-end', borderRadius: 22, padding: '8px 12px',
+                      background: 'rgba(15,23,42,0.05)',
+                      border: '0.5px solid rgba(15,23,42,0.07)',
+                    }}>
                       <textarea
                         ref={textareaRef}
                         value={inputText}
@@ -950,12 +922,7 @@ function CommentsSheet({
                         onKeyDown={handleInputKeyDown}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                         rows={1}
-                        className={cn(
-                          'flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug',
-                          isDark
-                            ? 'text-white placeholder:text-white/40'
-                            : 'text-foreground placeholder:text-muted-foreground'
-                        )}
+                        className="flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug text-foreground placeholder:text-muted-foreground"
                         style={{ maxHeight: '120px' }}
                       />
                     </div>
@@ -964,14 +931,16 @@ function CommentsSheet({
                     type="button"
                     onClick={handleSend}
                     disabled={!inputText.trim() || isAddingComment}
-                    className={cn(
-                      'w-11 h-11 rounded-full flex items-center justify-center transition-colors shrink-0',
-                      inputText.trim()
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-white/10 text-white/30'
-                    )}
+                    style={{
+                      width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                      background: inputText.trim() ? '#F7931E' : 'rgba(15,23,42,0.08)',
+                      border: 'none', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: inputText.trim() ? '0 2px 12px rgba(247,147,30,0.28)' : 'none',
+                      transition: 'all 0.2s',
+                    }}
                   >
-                    <SendHorizontal className="w-[18px] h-[18px]" />
+                    <SendHorizontal style={{ color: inputText.trim() ? '#ffffff' : 'rgba(15,23,42,0.25)', width: 18, height: 18 }} />
                   </button>
                 </div>
               </div>
