@@ -18,10 +18,10 @@ const POSITION_CONFIG = {
     statSize: 24,
     statWeight: 800,
     labelSize: 13,
-    borderColor: 'hsl(var(--accent-amber))',
-    borderGradient: ['hsl(var(--accent-amber))', '#F0D78C', 'hsl(var(--accent-amber))'],
-    badgeBg: 'hsl(var(--accent-amber))',
-    shadowColor: 'hsl(var(--accent-amber) / 0.25)',
+    borderColor: '#F7931E',
+    borderGradient: ['#F7931E', '#F0D78C', '#F7931E'],
+    badgeBg: '#F7931E',
+    shadowColor: 'rgba(247,147,30,0.25)',
     crownSize: 36,
     verticalOffset: 0,
   },
@@ -112,7 +112,7 @@ function formatNameTwoLines(displayName: string | null): { firstName: string; la
 // Stagger order: #2 first (0ms), #1 second (100ms), #3 third (200ms)
 const ANIMATION_DELAYS = { 1: 0.1, 2: 0, 3: 0.2 } as const;
 
-export function ExplorationPodium({ entries, metric, currentUserId, seasonColor = 'hsl(var(--accent-amber))' }: ExplorationPodiumProps) {
+export function ExplorationPodium({ entries, metric, currentUserId, seasonColor = '#F7931E' }: ExplorationPodiumProps) {
   const gradient = getSeasonGradient(seasonColor);
 
   if (entries.length < 3) {
@@ -178,7 +178,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                     <Crown
                       size={config.crownSize}
                       className="drop-shadow-md"
-                      style={{ color: 'hsl(var(--accent-amber))' }}
+                      style={{ color: '#F7931E' }}
                       fill="#f59e0b"
                       strokeWidth={1.5}
                     />
@@ -196,7 +196,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                         left: '-2rem',
                         right: '-2rem',
                         bottom: '-2rem',
-                        background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.3) 0%, hsl(var(--accent-amber) / 0.1) 50%, transparent 80%)',
+                        background: 'radial-gradient(ellipse at center, rgba(247,147,30,0.30) 0%, rgba(247,147,30,0.10) 50%, transparent 80%)',
                         filter: 'blur(12px)',
                       }}
                     />
@@ -233,7 +233,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                       width: position === 1 ? 26 : 22,
                       height: position === 1 ? 26 : 22,
                       borderRadius: '50%',
-                      backgroundColor: position === 1 ? 'hsl(var(--accent-amber))' : position === 2 ? '#A8B4C0' : '#C4956A',
+                      backgroundColor: position === 1 ? '#F7931E' : position === 2 ? '#A8B4C0' : '#C4956A',
                       border: '2px solid hsl(var(--background))',
                       fontSize: (position === 1 ? 26 : 22) * 0.45,
                       boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
@@ -264,7 +264,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                 {/* Stat — season-colored number + muted label */}
                 <motion.p
                   className="font-bold mt-0.5"
-                  style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
+                  style={{ color: '#F7931E', fontSize: config.statSize, fontWeight: config.statWeight }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: delay + 0.3, duration: 0.3 }}
@@ -287,7 +287,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                         className="text-[11px] px-2 py-0.5 text-muted-foreground rounded-md whitespace-nowrap"
                         style={{
                           background: 'hsl(var(--muted) / 0.5)',
-                          border: '1px solid hsl(var(--border) / 0.3)',
+                          border: '1px solid rgba(15,23,42,0.10)',
                         }}
                       >
                         {getShortContinent(continent)}

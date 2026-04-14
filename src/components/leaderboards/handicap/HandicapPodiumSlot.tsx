@@ -72,7 +72,7 @@ export function HandicapPodiumSlot({
         {isCurrentUser && (
           <p
             className="font-bold uppercase mb-0.5"
-            style={{ fontSize: 9, letterSpacing: '0.12em', color: '#F5A623' }}
+            style={{ fontSize: 9, letterSpacing: '0.12em', color: '#F7931E' }}
           >
             You
           </p>
@@ -99,7 +99,7 @@ export function HandicapPodiumSlot({
               width: config.avatarSize,
               height: config.avatarSize,
               borderRadius: '50%',
-              border: rank === 1 ? '2.5px solid #F5A623' : '1.5px solid rgba(0,0,0,0.07)',
+              border: rank === 1 ? '2.5px solid #F7931E' : '1px solid rgba(15,23,42,0.07)',
             }}
           >
             {avatarUrl ? (
@@ -121,7 +121,7 @@ export function HandicapPodiumSlot({
               width: config.badgeSize,
               height: config.badgeSize,
               borderRadius: '50%',
-              backgroundColor: rank === 1 ? '#F5A623' : '#E2E8F0',
+              backgroundColor: rank === 1 ? '#F7931E' : '#E2E8F0',
               color: rank === 1 ? 'white' : '#64748B',
               border: '1.5px solid white',
               fontSize: 9,
@@ -158,7 +158,7 @@ export function HandicapPodiumSlot({
             className="font-bold"
             style={{
               fontSize: rank === 1 ? 18 : 15,
-              color: rank === 1 ? '#F5A623' : '#0F172A',
+              color: rank === 1 ? '#F7931E' : '#0F172A',
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
