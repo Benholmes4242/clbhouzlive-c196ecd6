@@ -29,7 +29,7 @@ export function AudiencePanel() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 z-30"
-        style={{ background: 'rgba(0,0,0,0.25)' }}
+        style={{ background: 'rgba(15,23,42,0.15)' }}
         onClick={closePanel}
       />
 

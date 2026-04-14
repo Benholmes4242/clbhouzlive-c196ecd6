@@ -1,4 +1,4 @@
-// SuccessScreen — Step 6: Dark celebration moment with staggered entrance + live upload progress
+// SuccessScreen — Step 6: Light celebration moment with staggered entrance + live upload progress
 
 import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -39,7 +39,6 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
   const hasCalledDone = useRef(false);
   const isScheduled = state.scheduledAt !== null;
 
-  // Live upload progress via uploadEventBus (replaces dead useUploadProgress hook)
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadComplete, setUploadComplete] = useState(false);
 
@@ -72,11 +71,11 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8 relative" style={{ background: '#0D0D0D' }}>
+    <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8 relative" style={{ background: '#F8FAFC' }}>
       {/* Radial glow */}
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 34%, rgba(247,147,30,0.05) 0%, transparent 60%)' }} />
 
-      {/* Phase 1 — Check circle + particles (50ms) */}
+      {/* Phase 1 — Check circle + particles */}
       <div className="relative flex items-center justify-center">
         <div className="absolute inset-0 flex items-center justify-center">
           {PARTICLES.map((p, i) => <Particle key={i} delay={p.delay} angle={p.angle} distance={p.distance} opacity={p.opacity} />)}
@@ -124,7 +123,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         </motion.div>
       </div>
 
-      {/* Phase 2 — Copy (400ms) */}
+      {/* Phase 2 — Copy */}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -133,19 +132,19 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
       >
         <p style={{
           fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
-          textTransform: 'uppercase', color: 'rgba(247,147,30,0.60)',
+          textTransform: 'uppercase', color: 'rgba(247,147,30,0.75)',
         }}>
           {isScheduled ? 'Post scheduled' : 'Moment shared'}
         </p>
         <h2 style={{
           fontSize: 34, fontWeight: 800,
-          color: 'rgba(255,255,255,0.92)',
+          color: '#0F172A',
           letterSpacing: '-0.04em', lineHeight: 1.1,
         }}>
           {isScheduled ? 'Locked in.' : 'Your moment is live.'}
         </h2>
         <p style={{
-          fontSize: 14, color: 'rgba(255,255,255,0.50)',
+          fontSize: 14, color: 'rgba(15,23,42,0.50)',
           maxWidth: 230, margin: '0 auto', lineHeight: 1.5,
         }}>
           {isScheduled
@@ -154,7 +153,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         </p>
       </motion.div>
 
-      {/* Phase 3 — Upload progress card (only for non-scheduled) */}
+      {/* Phase 3 — Upload progress card */}
       {!isScheduled && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -162,14 +161,15 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
           transition={{ delay: 0.75, duration: 0.4 }}
           className="w-full max-w-sm relative z-10"
           style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: '#ffffff',
+            border: '1px solid rgba(15,23,42,0.07)',
+            boxShadow: '0 2px 12px rgba(15,23,42,0.06)',
             borderRadius: 16,
             padding: '14px 16px',
           }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.92)' }}>
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#0F172A' }}>
               {uploadComplete ? 'Upload complete' : 'Uploading…'}
             </span>
             <span style={{
@@ -181,7 +181,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
           </div>
           <div style={{
             width: '100%', height: 4, borderRadius: 999,
-            background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+            background: 'rgba(15,23,42,0.08)', overflow: 'hidden',
           }}>
             <div style={{
               height: '100%', borderRadius: 999,
@@ -193,7 +193,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
             }} />
           </div>
           <p style={{
-            fontSize: 12, color: 'rgba(255,255,255,0.35)',
+            fontSize: 12, color: 'rgba(15,23,42,0.40)',
             marginTop: 8,
           }}>
             {uploadComplete ? 'Your moment is live in Clubhouse' : "You can close the app — it'll keep going"}
