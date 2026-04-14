@@ -83,11 +83,12 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       
       {/* Main stat */}
       <div className="text-center mb-6">
-        <AnimatedNumber 
-          value={coursesPlayed}
-          className="text-5xl text-foreground tracking-tight"
-          style={{ fontWeight: 900 }}
-        />
+        <span style={{ fontWeight: 900 }}>
+          <AnimatedNumber 
+            value={coursesPlayed}
+            className="text-5xl text-foreground tracking-tight"
+          />
+        </span>
         <p className="text-sm text-muted-foreground mt-1">
           Courses Played
         </p>
