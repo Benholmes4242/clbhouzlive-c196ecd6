@@ -1,5 +1,5 @@
 /**
- * EchoThinkingCard - Typing indicator bubble (dark theme)
+ * EchoThinkingCard - Typing indicator bubble (light dispatch theme)
  */
 
 import React from 'react';
@@ -26,22 +26,24 @@ export function EchoThinkingCard() {
       <div
         className="px-4 py-3 rounded-[4px_18px_18px_18px] border"
         style={{
-          background: '#1e1e22',
-          borderColor: 'rgba(255,255,255,0.10)',
+          background: '#ffffff',
+          borderColor: 'rgba(15,23,42,0.07)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         }}
       >
         <div className="flex items-center gap-[5px]">
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className={`w-[6px] h-[6px] rounded-full bg-[hsl(38,92%,50%)] ${
+              className={`w-[6px] h-[6px] rounded-full ${
                 prefersReduced ? 'opacity-70' : 'animate-bounce'
               }`}
               style={
                 prefersReduced
-                  ? { opacity: 0.7 }
+                  ? { opacity: 0.7, background: '#F7931E' }
                   : {
                       opacity: 0.7,
+                      background: '#F7931E',
                       animationDelay: `${i * 0.15}s`,
                       animationDuration: '0.8s',
                     }

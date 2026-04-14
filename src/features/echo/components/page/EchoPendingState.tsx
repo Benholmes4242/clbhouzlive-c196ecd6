@@ -1,5 +1,5 @@
 /**
- * EchoPendingState - Dark loading state while prompt is being processed
+ * EchoPendingState - Light loading state while prompt is being processed
  */
 
 import React from 'react';
@@ -32,16 +32,17 @@ export function EchoPendingState({ prompt }: EchoPendingStateProps) {
       <div
         className="px-5 py-4 rounded-2xl max-w-[300px]"
         style={{
-          background: '#161618',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: '#ffffff',
+          border: '1px solid rgba(15,23,42,0.07)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
         }}
       >
-        <p className="text-[14px] text-center line-clamp-2" style={{ color: 'rgba(255,255,255,0.72)' }}>
+        <p className="text-[14px] text-center line-clamp-2" style={{ color: '#0F172A' }}>
           "{prompt}"
         </p>
       </div>
 
-      <p className="mt-4 text-[13px] text-center" style={{ color: 'rgba(255,255,255,0.30)' }}>
+      <p className="mt-4 text-[13px] text-center" style={{ color: '#94A3B8' }}>
         Echo is thinking…
       </p>
     </div>

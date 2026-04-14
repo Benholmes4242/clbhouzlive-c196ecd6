@@ -1,5 +1,5 @@
 /**
- * EchoResponseCard - Left-aligned assistant bubble with waveform avatar (dark theme)
+ * EchoResponseCard - Left-aligned assistant bubble with waveform avatar (light dispatch theme)
  */
 
 import React, { useState, useMemo } from 'react';
@@ -101,21 +101,22 @@ export function EchoResponseCard({
         <div
           className="px-4 py-4 rounded-[4px_18px_18px_18px]"
           style={{
-            background: '#1e1e22',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: '#ffffff',
+            border: '1px solid rgba(15,23,42,0.07)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
           }}
         >
-          <div className="text-[14px] prose prose-sm max-w-none" style={{ lineHeight: 1.65, color: 'rgba(255,255,255,0.88)' }}>
+          <div className="text-[14px] prose prose-sm max-w-none" style={{ lineHeight: 1.65, color: '#1e293b' }}>
             <ReactMarkdown
               allowedElements={ECHO_ALLOWED_ELEMENTS}
               unwrapDisallowed
               components={{
-                p: ({ children }) => <p className="mb-2 last:mb-0" style={{ color: 'rgba(255,255,255,0.88)' }}>{children}</p>,
-                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1" style={{ color: 'rgba(255,255,255,0.88)' }}>{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-2" style={{ color: 'rgba(255,255,255,0.88)' }}>{children}</ol>,
-                li: ({ children }) => <li style={{ color: 'rgba(255,255,255,0.88)' }}>{children}</li>,
-                strong: ({ children }) => <strong className="font-semibold" style={{ color: 'rgba(255,255,255,0.95)' }}>{children}</strong>,
-                em: ({ children }) => <em className="italic" style={{ color: 'rgba(255,255,255,0.80)' }}>{children}</em>,
+                p: ({ children }) => <p className="mb-2 last:mb-0" style={{ color: '#1e293b' }}>{children}</p>,
+                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1" style={{ color: '#1e293b' }}>{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-2" style={{ color: '#1e293b' }}>{children}</ol>,
+                li: ({ children }) => <li style={{ color: '#1e293b' }}>{children}</li>,
+                strong: ({ children }) => <strong className="font-semibold" style={{ color: '#0F172A' }}>{children}</strong>,
+                em: ({ children }) => <em className="italic" style={{ color: '#334155' }}>{children}</em>,
                 text: ({ children }) => {
                   if (typeof children !== 'string' || courseMatches.length === 0) {
                     return <>{children}</>;
@@ -158,7 +159,7 @@ export function EchoResponseCard({
                 code: ({ children }) => (
                   <code
                     className="px-1.5 py-0.5 rounded-md text-[0.8125rem] font-mono"
-                    style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)' }}
+                    style={{ background: 'rgba(15,23,42,0.06)', color: '#334155' }}
                   >
                     {children}
                   </code>
@@ -172,8 +173,9 @@ export function EchoResponseCard({
           {/* Streaming cursor */}
           {isStreaming && (
             <span 
-              className="inline-block w-[3px] h-4 rounded-full ml-1 bg-[hsl(38,92%,50%)]"
+              className="inline-block w-[3px] h-4 rounded-full ml-1"
               style={{
+                background: '#F7931E',
                 animation: prefersReduced ? 'none' : 'echoCursorBlink 1s ease-in-out infinite',
               }}
             />
@@ -181,7 +183,7 @@ export function EchoResponseCard({
           
           {/* Aborted indicator */}
           {wasAborted && (
-            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', marginTop: 4, display: 'block' }}>(stopped)</span>
+            <span style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: 4, display: 'block' }}>(stopped)</span>
           )}
         </div>
 
@@ -190,7 +192,7 @@ export function EchoResponseCard({
           <button
             onClick={handleCopy}
             className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
-            style={{ color: copied ? '#F7931E' : 'rgba(255,255,255,0.3)' }}
+            style={{ color: copied ? '#F7931E' : '#94A3B8' }}
             aria-label="Copy response to clipboard"
           >
             {copied ? (
@@ -215,7 +217,7 @@ export function EchoResponseCard({
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
                 className="flex items-center justify-between gap-2 px-4 py-3 rounded-[13px] text-[13px] font-medium active:scale-[0.98] transition-all duration-150"
-                style={{ background: '#161618', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.72)' }}
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
                 aria-label={`Ask: ${chip}`}
               >
                 <span>{chip}</span>

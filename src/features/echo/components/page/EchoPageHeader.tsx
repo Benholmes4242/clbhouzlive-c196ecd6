@@ -1,5 +1,5 @@
 /**
- * EchoPageHeader - Clean static header with three zones (dark theme)
+ * EchoPageHeader - Light dispatch header with three zones
  */
 
 import React from 'react';
@@ -15,27 +15,32 @@ interface EchoPageHeaderProps {
 
 export function EchoPageHeader({ onBack, onNew, onHistory, hasMessages }: EchoPageHeaderProps) {
   return (
-    <header 
+    <header
       className="flex-none h-[52px] px-2 flex items-center justify-between"
       style={{
-        background: '#0c0c0e',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        background: '#F8FAFC',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
       }}
     >
       {/* Left: Back */}
       <button
         onClick={onBack}
-        className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-        style={{ background: 'rgba(255,255,255,0.07)' }}
+        style={{
+          width: 36, height: 36, borderRadius: '50%',
+          background: 'rgba(15,23,42,0.05)',
+          border: '0.5px solid rgba(15,23,42,0.10)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', flexShrink: 0,
+        }}
         aria-label="Go back"
       >
-        <ChevronLeft className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2.5} />
+        <ChevronLeft className="w-5 h-5" style={{ color: '#64748B' }} strokeWidth={2.5} />
       </button>
 
-      {/* Centre: Title always visible */}
+      {/* Centre: Echo title */}
       <div className="flex-1 flex items-center justify-center gap-2">
         <AnimatedEchoWave size={16} active={true} />
-        <span className="text-[17px] font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
+        <span style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
           Echo
         </span>
       </div>
@@ -47,14 +52,14 @@ export function EchoPageHeader({ onBack, onNew, onHistory, hasMessages }: EchoPa
           className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
           aria-label="View conversation history"
         >
-          <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} />
+          <Clock className="w-5 h-5" style={{ color: '#94A3B8' }} />
         </button>
         <button
           onClick={onNew}
           className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
           aria-label="Start new conversation"
         >
-          <Plus className="w-[22px] h-[22px]" style={{ color: 'rgba(255,255,255,0.45)' }} />
+          <Plus className="w-[22px] h-[22px]" style={{ color: '#94A3B8' }} />
         </button>
       </div>
     </header>

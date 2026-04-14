@@ -1,5 +1,5 @@
 /**
- * EchoPageComposer - Dark pill-style input bar
+ * EchoPageComposer - Light dispatch pill-style input bar
  */
 
 import React, { forwardRef, useEffect } from 'react';
@@ -86,8 +86,8 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
       <div
         className="flex-none px-4 py-3"
         style={{
-          background: '#0c0c0e',
-          borderTop: '1px solid rgba(255,255,255,0.07)',
+          background: '#F8FAFC',
+          borderTop: '0.5px solid rgba(15,23,42,0.07)',
           paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
         }}
       >
@@ -99,7 +99,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
                 "text-[11px]",
                 charsRemaining <= 50 ? "text-destructive" : ""
               )}
-              style={charsRemaining > 50 ? { color: 'rgba(255,255,255,0.3)' } : undefined}
+              style={charsRemaining > 50 ? { color: '#94A3B8' } : undefined}
             >
               {charsRemaining}
             </span>
@@ -110,9 +110,8 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
         <div
           className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2"
           style={{
-            background: '#1e1e22',
-            border: '1px solid rgba(255,255,255,0.10)',
-            boxShadow: 'none',
+            background: '#ffffff',
+            border: '1px solid rgba(15,23,42,0.10)',
           }}
         >
           <input
@@ -125,8 +124,8 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             disabled={disabled}
             aria-label="Type a message to Echo"
             maxLength={MAX_INPUT_LENGTH}
-            className="flex-1 bg-transparent outline-none text-[14px] disabled:cursor-not-allowed placeholder:opacity-100"
-            style={{ color: 'rgba(255,255,255,0.88)', caretColor: '#F7931E' }}
+            className="flex-1 bg-transparent outline-none text-[14px] disabled:cursor-not-allowed placeholder:text-[#94A3B8]"
+            style={{ color: '#0F172A', caretColor: '#F7931E' }}
           />
 
           {/* Send/Stop/Mic button */}
@@ -134,16 +133,16 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             <button
               onClick={handleButtonClick}
               className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]"
-              style={{ background: 'rgba(255,255,255,0.15)' }}
+              style={{ background: 'rgba(15,23,42,0.08)' }}
               aria-label="Stop generating"
             >
-              <Square className="w-3.5 h-3.5 fill-white" style={{ color: 'white' }} />
+              <Square className="w-3.5 h-3.5" style={{ color: '#0F172A', fill: '#0F172A' }} />
             </button>
           ) : canSend ? (
             <button
               onClick={handleButtonClick}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97] bg-[hsl(38,92%,50%)]"
-              style={{ boxShadow: '0 2px 10px rgba(247,147,30,0.4)' }}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]"
+              style={{ background: '#F7931E', boxShadow: '0 2px 10px rgba(247,147,30,0.4)' }}
               aria-label="Send message"
             >
               <ArrowUp className="w-4 h-4 text-white" />
@@ -156,12 +155,12 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
                 isListening && "animate-pulse bg-destructive border-destructive"
               )}
               style={!isListening ? {
-                background: 'rgba(255,255,255,0.07)',
-                border: '1px solid rgba(255,255,255,0.10)',
+                background: 'rgba(15,23,42,0.05)',
+                border: '0.5px solid rgba(15,23,42,0.10)',
               } : undefined}
               aria-label={isListening ? "Stop listening" : "Voice input"}
             >
-              <Mic className={cn("w-4 h-4", isListening ? "text-white" : "")} style={!isListening ? { color: 'rgba(255,255,255,0.35)' } : undefined} />
+              <Mic className={cn("w-4 h-4", isListening ? "text-white" : "")} style={!isListening ? { color: '#94A3B8' } : undefined} />
             </button>
           ) : (
             <button
@@ -169,7 +168,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
               className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent opacity-50"
               aria-label="Send message"
             >
-              <ArrowUp className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
+              <ArrowUp className="w-4 h-4" style={{ color: 'rgba(15,23,42,0.3)' }} />
             </button>
           )}
         </div>
