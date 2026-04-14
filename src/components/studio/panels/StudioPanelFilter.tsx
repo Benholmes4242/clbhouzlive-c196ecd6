@@ -26,144 +26,61 @@ const FILTER_OPTIONS: { id: FilterId; label: string }[] = [
 ];
 
 const FilterCard = memo(function FilterCard({
-  filter,
-  isSelected,
-  onSelect,
-  previewUrl,
-  onCompareStart,
-  onCompareEnd,
+  filter, isSelected, onSelect, previewUrl, onCompareStart, onCompareEnd,
 }: {
-  filter: { id: FilterId; label: string };
-  isSelected: boolean;
-  onSelect: (id: FilterId) => void;
-  previewUrl?: string | null;
-  onCompareStart?: () => void;
-  onCompareEnd?: () => void;
+  filter: { id: FilterId; label: string }; isSelected: boolean; onSelect: (id: FilterId) => void;
+  previewUrl?: string | null; onCompareStart?: () => void; onCompareEnd?: () => void;
 }) {
   const [isComparing, setIsComparing] = useState(false);
   const timerRef = useRef<number>();
 
-  const handlePointerDown = () => {
-    timerRef.current = window.setTimeout(() => {
-      setIsComparing(true);
-      onCompareStart?.();
-    }, 300);
-  };
-
-  const handlePointerUp = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (isComparing) {
-      setIsComparing(false);
-      onCompareEnd?.();
-    }
-  };
+  const handlePointerDown = () => { timerRef.current = window.setTimeout(() => { setIsComparing(true); onCompareStart?.(); }, 300); };
+  const handlePointerUp = () => { if (timerRef.current) clearTimeout(timerRef.current); if (isComparing) { setIsComparing(false); onCompareEnd?.(); } };
 
   return (
     <button
       onClick={() => onSelect(filter.id)}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp} onPointerCancel={handlePointerUp}
       className="flex flex-col items-center gap-1.5 active:scale-[0.96] transition-all"
-      style={{
-        width: 56,
-        flexShrink: 0,
-        opacity: isSelected ? 1 : 0.55,
-        transform: isSelected ? 'scale(1.06)' : undefined,
-        transition: 'all 0.18s cubic-bezier(0.34,1.56,0.64,1)',
-      }}
+      style={{ width: 56, flexShrink: 0, opacity: isSelected ? 1 : 0.55, transform: isSelected ? 'scale(1.06)' : undefined, transition: 'all 0.18s cubic-bezier(0.34,1.56,0.64,1)' }}
     >
-      <div
-        className="overflow-hidden"
-        style={{
-          width: 56,
-          height: 56,
-          borderRadius: 10,
-          outline: isSelected ? '1.5px solid rgba(255,255,255,0.90)' : 'none',
-          outlineOffset: 2,
-        }}
-      >
+      <div className="overflow-hidden" style={{ width: 56, height: 56, borderRadius: 10, outline: isSelected ? '1.5px solid #0F172A' : 'none', outlineOffset: 2 }}>
         {previewUrl ? (
           <div className={`w-full h-full ${isComparing ? '' : getFilterClass(filter.id)}`}>
-            <img
-              src={previewUrl}
-              alt={filter.label}
-              className="w-full h-full object-cover"
-              draggable={false}
-            />
+            <img src={previewUrl} alt={filter.label} className="w-full h-full object-cover" draggable={false} />
           </div>
         ) : (
           <div className={`w-full h-full bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 ${isComparing ? '' : getFilterClass(filter.id)}`} />
         )}
       </div>
-
-      <span
-        className="text-[10px] block truncate w-full text-center"
-        style={{
-          color: isSelected ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.40)',
-          fontWeight: isSelected ? 700 : 400,
-        }}
-      >
+      <span className="text-[10px] block truncate w-full text-center" style={{ color: isSelected ? '#0F172A' : 'rgba(15,23,42,0.40)', fontWeight: isSelected ? 700 : 400 }}>
         {filter.label}
       </span>
     </button>
   );
 });
 
-export default function StudioPanelFilter({
-  edits,
-  updateEdits,
-  previewUrl,
-  onCompareStart,
-  onCompareEnd,
-}: StudioPanelFilterProps) {
+export default function StudioPanelFilter({ edits, updateEdits, previewUrl, onCompareStart, onCompareEnd }: StudioPanelFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
-
-  useEffect(() => {
-    setSelectedFilter(edits?.filter || 'normal');
-  }, [edits?.filter]);
+  useEffect(() => { setSelectedFilter(edits?.filter || 'normal'); }, [edits?.filter]);
 
   const handleSelectFilter = useCallback((filterId: FilterId) => {
     setSelectedFilter(filterId);
-    requestAnimationFrame(() => {
-      updateEdits({ filter: filterId, filterIntensity: 100 });
-    });
+    requestAnimationFrame(() => { updateEdits({ filter: filterId, filterIntensity: 100 }); });
   }, [updateEdits]);
 
   const selectedLabel = FILTER_OPTIONS.find(f => f.id === selectedFilter)?.label || 'Pure';
 
   return (
     <div className="flex flex-col h-full">
-      {/* Subtitle */}
       <div className="px-4 pt-3 pb-2 flex-shrink-0">
-        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-          Selected: <span style={{ color: 'rgba(255,255,255,0.70)' }}>{selectedLabel}</span>
+        <span className="text-[11px]" style={{ color: 'rgba(15,23,42,0.40)' }}>
+          Selected: <span style={{ color: '#0F172A', fontWeight: 600 }}>{selectedLabel}</span>
         </span>
       </div>
-
-      {/* Horizontal scrolling filter rail */}
-      <div
-        className="flex-shrink-0"
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          gap: 10,
-          padding: '8px 16px',
-        }}
-      >
+      <div className="flex-shrink-0" style={{ display: 'flex', flexDirection: 'row', overflowX: 'auto', scrollbarWidth: 'none', gap: 10, padding: '8px 16px' }}>
         {FILTER_OPTIONS.map(filter => (
-          <FilterCard
-            key={filter.id}
-            filter={filter}
-            isSelected={selectedFilter === filter.id}
-            onSelect={handleSelectFilter}
-            previewUrl={previewUrl}
-            onCompareStart={onCompareStart}
-            onCompareEnd={onCompareEnd}
-          />
+          <FilterCard key={filter.id} filter={filter} isSelected={selectedFilter === filter.id} onSelect={handleSelectFilter} previewUrl={previewUrl} onCompareStart={onCompareStart} onCompareEnd={onCompareEnd} />
         ))}
       </div>
     </div>
