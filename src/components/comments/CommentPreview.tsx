@@ -59,7 +59,7 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
     return null;
   }
 
-  const isDark = theme === 'dark';
+  const isDark = false;
 
   return (
     <>

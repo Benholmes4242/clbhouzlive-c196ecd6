@@ -139,7 +139,7 @@ function CommentsSheet({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const commentElsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const isDark = theme === 'dark';
+  const isDark = false;
 
   const cleanCaption = useMemo(() => removeGolfCourseFromContent(caption ?? null), [caption]);
   const extractedCourse = useMemo(() => extractGolfCourseFromContent(caption ?? null), [caption]);
