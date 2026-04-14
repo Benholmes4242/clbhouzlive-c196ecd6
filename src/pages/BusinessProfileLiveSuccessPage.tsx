@@ -118,8 +118,8 @@ const BusinessProfileLiveSuccessPage = () => {
               className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
-                <Megaphone className="h-5 w-5 text-[#F79E1B]" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.20)' }}>
+                <Megaphone className="h-5 w-5" style={{ color: '#F7931E' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Post as your business</p>
@@ -133,8 +133,8 @@ const BusinessProfileLiveSuccessPage = () => {
               className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="h-5 w-5 text-[#F79E1B]" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.20)' }}>
+                <CheckCircle2 className="h-5 w-5" style={{ color: '#F7931E' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Request verification</p>
@@ -148,8 +148,8 @@ const BusinessProfileLiveSuccessPage = () => {
               className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
-                <BarChart3 className="h-5 w-5 text-[#F79E1B]" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.20)' }}>
+                <BarChart3 className="h-5 w-5" style={{ color: '#F7931E' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Track your reach</p>
