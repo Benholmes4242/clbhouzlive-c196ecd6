@@ -95,7 +95,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <h1 className="text-white text-[22px] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" style={{ letterSpacing: '-0.3px' }}>
+            <h1 className="text-white text-[22px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
               {displayLabel}
             </h1>
           </motion.div>
@@ -119,11 +119,11 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           {/* Top row: X / total (primary) + % complete (secondary) */}
           <div className="flex items-baseline justify-between gap-4">
             <div className="flex items-baseline">
-              <span style={{ color: theme.ringColor }}>
+              <span style={{ color: theme.ringColor, fontWeight: 900 }}>
                 <AnimatedNumber 
                   value={playedCount}
                   minCh={1}
-                  className="text-[34px] font-bold leading-none tabular-nums"
+                  className="text-[34px] leading-none tabular-nums"
                 />
               </span>
               <span className="text-muted-foreground/60 text-base ml-0.5 font-normal">/{totalCount}</span>
@@ -146,7 +146,8 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           {/* Progress bar - uses regional accent color with glow */}
           <div className="mt-2.5">
             <div 
-              className="h-2 w-full bg-muted rounded-full overflow-hidden"
+              className="h-2 w-full rounded-full overflow-hidden"
+              style={{ background: 'rgba(15,23,42,0.08)' }}
               role="progressbar"
               aria-valuenow={Math.round(percent)}
               aria-valuemin={0}

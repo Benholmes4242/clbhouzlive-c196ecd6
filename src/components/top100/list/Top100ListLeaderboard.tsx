@@ -41,16 +41,20 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   if (friends.length === 0) {
     return (
       <section className="px-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60 mb-4">
-          Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
-        </h2>
+        <div className="flex items-center gap-1.5 mb-4">
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
+          </span>
+        </div>
         <motion.div 
-          className="text-center py-6 px-4 rounded-2xl bg-card border border-border/60"
+          className="text-center py-6 px-4 rounded-2xl"
+          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(15,23,42,0.05)' }}>
             <Users className="w-6 h-6 text-muted-foreground" />
           </div>
           <p className="text-sm font-semibold text-foreground">
@@ -61,7 +65,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           </p>
           <button
             onClick={() => navigate('/golferstofollow')}
-            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-transform"
+            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 text-sm font-semibold active:scale-[0.97] transition-transform"
+            style={{ background: '#0F172A', color: '#ffffff' }}
           >
             Find golfers to follow
           </button>
@@ -75,16 +80,20 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   if (allFriendsHaveZero && currentUserPlayed === 0) {
     return (
       <section className="px-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/60 mb-4">
-          Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
-        </h2>
+        <div className="flex items-center gap-1.5 mb-4">
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
+          </span>
+        </div>
         <motion.div 
-          className="text-center py-6 px-4 rounded-2xl bg-card border border-border/60"
+          className="text-center py-6 px-4 rounded-2xl"
+          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(15,23,42,0.05)' }}>
             <Trophy className="w-6 h-6 text-muted-foreground" />
           </div>
           <p className="text-sm font-semibold text-foreground">
@@ -95,7 +104,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           </p>
           <button
             onClick={() => navigate('/courses')}
-            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-transform"
+            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 text-sm font-semibold active:scale-[0.97] transition-transform"
+            style={{ background: '#0F172A', color: '#ffffff' }}
           >
             Explore courses
           </button>
@@ -108,12 +118,15 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
 
   return (
     <section>
-      {/* Header - small caps styling */}
+      {/* Header - dispatch eyebrow */}
       <div className="px-4 flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60">
-            Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
-          </h2>
+          <div className="flex items-center gap-1.5 mb-1">
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
+            </span>
+          </div>
           <p className="text-[11px] text-muted-foreground/50 mt-1">
             See how you stack up against friends.
           </p>
@@ -153,16 +166,17 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               onClick={() => navigate(`/profile/${friend.username}`)}
-              className="flex-shrink-0 w-[76px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]"
+              className="flex-shrink-0 w-[76px] p-1.5 rounded-xl transition-all text-center active:scale-[0.95]"
               style={{
+                background: '#ffffff',
                 ...(isCurrentUser ? {
-                  borderColor: 'hsl(var(--accent-amber))',
-                  boxShadow: '0 0 0 2px hsl(var(--accent-amber) / 0.2)',
+                  border: '1px solid #F7931E',
+                  boxShadow: '0 0 0 2px rgba(247,147,30,0.20)',
                 } : isClosestCompetitor ? {
-                  borderColor: 'hsl(var(--accent-amber) / 0.6)',
-                  boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.25)',
+                  border: '1px solid rgba(247,147,30,0.60)',
+                  boxShadow: '0 0 8px rgba(247,147,30,0.25)',
                 } : {
-                  borderColor: 'hsl(var(--border) / 0.6)',
+                  border: '1px solid rgba(15,23,42,0.10)',
                 }),
               }}
             >
@@ -177,7 +191,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
                 {/* Mini progress badge */}
                 <div 
                   className="absolute -bottom-0.5 -right-0.5 rounded flex items-center justify-center text-[8px] font-bold"
-                  style={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border) / 0.4)', padding: '0 3px', color: 'hsl(var(--muted-foreground))' }}
+                  style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.12)', padding: '0 3px', color: '#94A3B8' }}
                   title={`${friend.playedOnList}/${totalInList} played`}
                 >
                   {friend.playedOnList}
@@ -192,9 +206,9 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               {/* Relative position indicator */}
               <div className="mt-0.5 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-full px-1 py-0.5"
                  style={
-                   isAhead ? { background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))' } :
-                   isSame ? { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' } :
-                   isBehind ? { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' } : {}
+                   isAhead ? { background: 'rgba(247,147,30,0.10)', color: '#F7931E' } :
+                   isSame ? { background: 'rgba(15,23,42,0.05)', color: '#94A3B8' } :
+                   isBehind ? { background: 'rgba(15,23,42,0.05)', color: '#94A3B8' } : {}
                  }>
                 {isAhead && (
                   <>
