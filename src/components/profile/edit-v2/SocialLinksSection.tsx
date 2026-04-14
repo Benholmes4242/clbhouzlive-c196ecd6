@@ -60,7 +60,12 @@ export function SocialLinksSection({
 }: Props) {
   return (
     <div className="space-y-2">
-      <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground block mb-1">Social Links</label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Social Links
+        </span>
+      </div>
       <SocialRow icon={<Instagram size={16} />} placeholder="instagram username" value={instagram} onChange={onInstagramChange} />
       <SocialRow icon={<XIcon />} placeholder="x username" value={twitter} onChange={onTwitterChange} />
       <SocialRow icon={<TikTokIcon />} placeholder="tiktok username" value={tiktok} onChange={onTiktokChange} />

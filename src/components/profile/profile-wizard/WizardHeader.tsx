@@ -22,7 +22,7 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
       {(!isFirstStep || !onSkip) ? (
         <button
           onClick={isFirstStep ? onClose : onBack}
-          className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-foreground flex-shrink-0"
+          style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
           {isFirstStep
@@ -36,10 +36,13 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
 
       {/* Centre — step eyebrow + title */}
       <div className="text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
-          Step {step} of 3
-        </p>
-        <p className="text-[16px] font-bold text-foreground leading-tight mt-0.5">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 4 }}>
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Step {step} of 3
+          </span>
+        </div>
+        <p style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
           {STEP_TITLES[step]}
         </p>
       </div>
@@ -48,14 +51,15 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
       {onSkip ? (
         <button
           onClick={onSkip}
-          className="flex items-center justify-center min-h-[44px] -mr-2 text-muted-foreground/40 text-[12px] font-normal"
+          className="flex items-center justify-center min-h-[44px] -mr-2 text-[12px] font-normal"
+          style={{ color: 'rgba(15,23,42,0.30)' }}
         >
           Skip for now
         </button>
       ) : (
         <button
           onClick={onClose}
-          className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-muted-foreground flex-shrink-0"
+          style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
           aria-label="Close"
         >
           <X size={16} strokeWidth={2.5} />

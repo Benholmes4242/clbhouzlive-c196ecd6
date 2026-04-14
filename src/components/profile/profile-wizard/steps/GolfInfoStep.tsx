@@ -30,7 +30,7 @@ export function GolfInfoStep({ form, userId, hasRegisteredInterest, onFieldChang
           onVisibilityChange={(v) => onFieldChange('homeClubVisibility', v)}
         />
         {!form.homeClubName && (
-          <p className="text-[12px] text-[hsl(38,92%,50%)] mt-1.5 ml-1">
+          <p style={{ fontSize: 12, color: '#F7931E', marginTop: 6, marginLeft: 4 }}>
             ⛳ Your home club appears on your profile and leaderboards
           </p>
         )}

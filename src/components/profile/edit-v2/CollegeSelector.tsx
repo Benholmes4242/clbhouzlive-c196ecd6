@@ -26,9 +26,12 @@ export function CollegeSelector({ collegeName, collegeId, onSelect }: Props) {
 
   return (
     <div>
-      <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2 block">
-        College / University
-      </label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          College / University
+        </span>
+      </div>
       <div ref={containerRef} className="relative">
         <GraduationCap size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input

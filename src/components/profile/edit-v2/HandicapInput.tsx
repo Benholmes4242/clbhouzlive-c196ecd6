@@ -47,9 +47,12 @@ export function HandicapInput({ value, onChange }: Props) {
 
   return (
     <div>
-      <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2 block">
-        Handicap Index
-      </label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Handicap Index
+        </span>
+      </div>
 
       {/* Standard / Plus toggle */}
       <div className="flex gap-2 mb-3">

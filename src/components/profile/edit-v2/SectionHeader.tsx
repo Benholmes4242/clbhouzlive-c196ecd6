@@ -8,13 +8,13 @@ interface Props {
   sectionType?: string;
 }
 
-export function SectionHeader({ title, icon }: Props) {
+export function SectionHeader({ title }: Props) {
   return (
-    <div className="flex items-center gap-2 mb-3">
-      {icon}
-      <h3 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
         {title}
-      </h3>
+      </span>
     </div>
   );
 }
