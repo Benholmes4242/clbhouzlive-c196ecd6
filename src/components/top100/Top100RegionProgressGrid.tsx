@@ -57,9 +57,9 @@ const REGION_COLORS: Record<string, { bg: string; fill: string; hover: string }>
 };
 
 const DEFAULT_REGION_COLOR = {
-  bg: 'bg-muted/40',
-  fill: 'bg-foreground/40',
-  hover: 'hover:bg-muted/50'
+  bg: 'bg-[rgba(15,23,42,0.04)]',
+  fill: 'bg-[#0F172A]/40',
+  hover: 'hover:bg-[rgba(15,23,42,0.06)]'
 };
 
 function getRegionColors(slug: string) {
@@ -122,9 +122,10 @@ export function Top100RegionProgressGrid({
     <>
       <section className="w-full px-4">
         {/* Section header - mb-4 */}
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
-          {label}
-        </h3>
+        <div className="flex items-center gap-1.5 mb-4">
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>{label}</span>
+        </div>
 
         {/* Region rows - flat on bg-slate-50, py-4 each, dividers */}
         <div>
@@ -172,7 +173,8 @@ export function Top100RegionProgressGrid({
 
                 {/* Progress bar with gradient fill */}
                   <div 
-                    className="w-full h-1.5 rounded-full bg-slate-200/70 overflow-hidden"
+                    className="w-full h-1.5 rounded-full overflow-hidden"
+                    style={{ background: 'rgba(15,23,42,0.08)' }}
                     role="progressbar"
                     aria-valuenow={Math.round(progressPercent)}
                     aria-valuemin={0}

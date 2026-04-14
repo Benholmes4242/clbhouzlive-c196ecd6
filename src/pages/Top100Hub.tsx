@@ -104,26 +104,34 @@ const Top100Hub = () => {
           <div className="space-y-5 pt-6">
           {/* Hero Section */}
           <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 pb-1">
-            <h1 className="text-center text-[22px] font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>
-              World's Top 100 Golf Courses
+            <div className="flex justify-center mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>World's Best</span>
+              </div>
+            </div>
+            <h1 className="text-center text-[22px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
+              Top 100 Golf Courses
             </h1>
             <p className="text-center text-sm text-muted-foreground">
-              Explore the most prestigious golf courses across the globe
+              Explore the world's most prestigious courses
             </p>
           </div>
 
           {/* Tabs: Courses | My Progress */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
-            <TabsList className="flex gap-1 rounded-xl bg-muted/60 p-1 mb-5 border-0">
+            <TabsList className="flex gap-1 rounded-xl p-1 mb-5 border-0" style={{ background: 'rgba(15,23,42,0.05)' }}>
               <TabsTrigger 
                 value="courses" 
-                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none after:hidden"
+                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] after:hidden data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none data-[state=active]:font-semibold data-[state=inactive]:font-medium"
+                style={{ background: activeTab === 'courses' ? '#0F172A' : 'transparent', color: activeTab === 'courses' ? '#ffffff' : '#64748B' }}
               >
                 Courses
               </TabsTrigger>
               <TabsTrigger 
                 value="my-progress" 
-                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none after:hidden"
+                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] after:hidden data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none data-[state=active]:font-semibold data-[state=inactive]:font-medium"
+                style={{ background: activeTab === 'my-progress' ? '#0F172A' : 'transparent', color: activeTab === 'my-progress' ? '#ffffff' : '#64748B' }}
               >
                 My Progress
               </TabsTrigger>
@@ -150,16 +158,15 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle - Pill toggle style */}
               <div className="flex justify-center py-4">
-                <div className="flex p-1 rounded-xl overflow-hidden bg-muted">
+                <div className="flex p-1 rounded-xl overflow-hidden" style={{ background: 'rgba(15,23,42,0.05)' }}>
                   <button
                     type="button"
                     onClick={handleListClick}
-                    className={cn(
-                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
-                      viewMode === 'list'
-                        ? 'bg-card text-foreground shadow-sm'
-                        : 'text-muted-foreground'
-                    )}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]"
+                    style={viewMode === 'list'
+                      ? { background: '#ffffff', color: '#0F172A', border: '1px solid rgba(15,23,42,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
+                      : { background: 'transparent', color: '#64748B', border: 'none' }
+                    }
                   >
                     <List className="h-3.5 w-3.5" />
                     List
@@ -168,12 +175,11 @@ const Top100Hub = () => {
                   <button
                     type="button"
                     onClick={handleMapClick}
-                    className={cn(
-                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
-                      viewMode === 'map'
-                        ? 'bg-card text-foreground shadow-sm'
-                        : 'text-muted-foreground'
-                    )}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]"
+                    style={viewMode === 'map'
+                      ? { background: '#ffffff', color: '#0F172A', border: '1px solid rgba(15,23,42,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
+                      : { background: 'transparent', color: '#64748B', border: 'none' }
+                    }
                   >
                     <MapIcon className="h-3.5 w-3.5" />
                     Map

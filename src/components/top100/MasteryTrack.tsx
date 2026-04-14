@@ -67,13 +67,13 @@ export const MasteryTrack: React.FC<MasteryTrackProps> = ({
       <div 
         className="rounded-xl p-4 mb-4"
         style={{
-          background: 'hsl(var(--accent-amber) / 0.05)',
-          border: '1px solid hsl(var(--accent-amber) / 0.15)',
+          background: 'rgba(247,147,30,0.05)',
+          border: '1px solid rgba(247,147,30,0.15)',
         }}
       >
         <div className="flex items-center gap-2 mb-1">
-          <Crown className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
-          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'hsl(var(--accent-amber))' }}>
+          <Crown className="w-4 h-4" style={{ color: '#F7931E' }} />
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#F7931E' }}>
             Mastery Track
           </span>
         </div>
@@ -159,17 +159,17 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
             {/* Progress bar - always show for incomplete */}
             {!isComplete && (
               <div className="flex items-center gap-2 mt-3">
-                <div className="flex-1 h-2 bg-muted/40 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.08)' }}>
                   <motion.div 
                     className="h-full rounded-full"
-                    style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
+                    style={{ backgroundColor: '#F7931E' }}
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 0.5, delay: 0.3 }}
                   />
                 </div>
                 <span className="text-sm font-semibold tabular-nums">
-                  <span style={{ color: 'hsl(var(--accent-amber))' }}>{region.played}</span>
+                  <span style={{ color: '#F7931E' }}>{region.played}</span>
                   <span className="text-muted-foreground">/{region.total}</span>
                 </span>
               </div>

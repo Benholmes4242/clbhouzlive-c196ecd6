@@ -119,8 +119,8 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 style={{ 
                   height: `${heightPercent}%`,
                   background: isActive 
-                    ? 'linear-gradient(to top, hsl(var(--accent-amber)), hsl(var(--accent-amber) / 0.7))'
-                    : 'hsl(var(--muted) / 0.3)',
+                    ? 'linear-gradient(to top, #F7931E, rgba(247,147,30,0.70))'
+                    : 'rgba(15,23,42,0.08)',
                   // Animate grow from bottom
                   animation: `bar-grow 0.5s ease-out ${idx * 0.03}s both`,
                 }}
@@ -128,7 +128,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
               >
                 {/* Current month indicator ring */}
                 {isCurrent && !isActive && (
-                  <div className="absolute inset-0 border-2 border-dashed border-primary/30 rounded-t" />
+                  <div className="absolute inset-0 border-2 border-dashed rounded-t" style={{ borderColor: 'rgba(247,147,30,0.30)' }} />
                 )}
               </button>
             );

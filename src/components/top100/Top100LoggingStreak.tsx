@@ -80,13 +80,12 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
           <div
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center transition-all',
-              currentStreak <= 0 && 'bg-muted text-muted-foreground'
             )}
             style={currentStreak > 0 ? {
-              background: 'hsl(var(--accent-amber) / 0.15)',
-              color: 'hsl(var(--accent-amber))',
-              boxShadow: '0 0 12px hsl(var(--accent-amber) / 0.2)',
-            } : undefined}
+              background: 'rgba(247,147,30,0.15)',
+              color: '#F7931E',
+              boxShadow: '0 0 12px rgba(247,147,30,0.20)',
+            } : { background: 'rgba(15,23,42,0.05)', color: '#94A3B8' }}
           >
             <Flame className={cn(
               "h-4.5 w-4.5 transition-transform",
@@ -127,7 +126,8 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
           <button
             type="button"
             onClick={onLogRound}
-            className="text-sm font-semibold text-white bg-[hsl(var(--accent-amber))] px-4 py-2.5 rounded-full whitespace-nowrap hover:opacity-90 active:scale-[0.97] transition-all min-h-[44px]"
+            className="text-sm font-semibold text-white px-4 py-2.5 rounded-full whitespace-nowrap hover:opacity-90 active:scale-[0.97] transition-all min-h-[44px]"
+            style={{ backgroundColor: '#F7931E' }}
           >
             Log now
           </button>
@@ -158,20 +158,28 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium transition-all',
                   !hasLog && isCurrent
-                    ? 'bg-muted/80 border-2 border-dashed border-primary/40 text-muted-foreground animate-[pulse_3s_ease-in-out_infinite]'
+                    ? 'border-2 border-dashed animate-[pulse_3s_ease-in-out_infinite]'
                     : !hasLog
-                    ? 'bg-muted/40 text-muted-foreground/50 border border-dashed border-muted-foreground/20'
+                    ? 'border border-dashed'
                     : ''
                 )}
                 style={hasLog ? {
-                  background: 'hsl(var(--accent-amber) / 0.15)',
-                  color: 'hsl(var(--accent-amber))',
-                  boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.3)',
-                } : undefined}
+                  background: 'rgba(247,147,30,0.15)',
+                  color: '#F7931E',
+                  boxShadow: '0 0 8px rgba(247,147,30,0.30)',
+                } : !hasLog && isCurrent ? {
+                  background: 'rgba(15,23,42,0.05)',
+                  borderColor: 'rgba(247,147,30,0.30)',
+                  color: '#94A3B8',
+                } : {
+                  background: 'rgba(15,23,42,0.04)',
+                  borderColor: 'rgba(15,23,42,0.12)',
+                  color: 'rgba(148,163,184,0.5)',
+                }}
                 aria-hidden="true"
               >
                 {hasLog ? (
-                  <span style={{ color: 'hsl(var(--accent-amber))' }}>✓</span>
+                  <span style={{ color: '#F7931E' }}>✓</span>
                 ) : null}
               </div>
               <span 
