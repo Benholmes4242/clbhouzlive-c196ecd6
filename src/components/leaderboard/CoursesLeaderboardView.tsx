@@ -55,7 +55,7 @@ function readSavedFilters(): SavedFilters | null {
 const CourseLeaderboardSkeleton = () => (
   <div className="flex flex-col">
     {[1, 2, 3].map((i) => (
-      <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border">
+      <div key={i} className="flex items-center gap-3 py-3 px-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <Skeleton className="w-6 h-5 rounded" />
         <Skeleton className="w-14 h-14 rounded-xl" />
         <div className="flex-1 space-y-1.5">
@@ -73,7 +73,8 @@ const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
   <div className="max-w-md mx-auto mt-4 px-4">
     <button
       onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm text-sm transition-colors active:scale-[0.98] active:opacity-70"
+      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
     >
       <RefreshCw className="w-3.5 h-3.5" />
       Couldn't load more courses · Tap to retry
@@ -578,11 +579,11 @@ export function CoursesLeaderboardView() {
           </div>
 
           {/* Row list */}
-          <div style={{ background: '#FFFFFF', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.07)' }}>
+          <div style={{ background: '#FFFFFF', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(15,23,42,0.07)' }}>
             {[...Array(5)].map((_, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px',
-                borderBottom: i < 4 ? '1px solid rgba(0,0,0,0.07)' : 'none',
+                borderBottom: i < 4 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
               }}>
                 <Skeleton className="w-6 h-5 rounded" />
                 <Skeleton className="w-[60px] h-[44px] rounded-[10px]" />
@@ -741,9 +742,8 @@ export function CoursesLeaderboardView() {
                       flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
                       background: '#FFFFFF', borderRadius: 12,
                       padding: '8px 10px',
-                      border: '1px solid rgba(0,0,0,0.07)',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
-                      cursor: 'pointer', textAlign: 'left',
+                      border: '1px solid rgba(15,23,42,0.07)',
+                      cursor: 'pointer', textAlign: 'left' as const,
                       maxWidth: 220,
                     }}
                     className="active:scale-[0.97] transition-all"
@@ -814,7 +814,11 @@ export function CoursesLeaderboardView() {
         <div style={{ padding: '0 clamp(12px,3vw,16px)' }}>
           {/* Rankings header */}
           <div style={{ marginBottom: 16 }}>
-            <h2 style={{ fontSize: 'clamp(20px,5.5vw,24px)', fontWeight: 800, color: '#0C0C0E', fontFamily: 'DM Sans, system-ui, sans-serif', letterSpacing: '-0.3px', margin: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+              <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Rankings</span>
+            </div>
+            <h2 style={{ fontSize: 'clamp(20px,5.5vw,24px)', fontWeight: 900, color: '#0F172A', fontFamily: 'DM Sans, system-ui, sans-serif', letterSpacing: '-0.03em', margin: 0 }}>
               Course Rankings
             </h2>
             <p style={{ fontSize: 'clamp(12px,3.2vw,14px)', color: '#6B7280', fontFamily: 'DM Sans, system-ui, sans-serif', marginTop: 4, margin: 0 }}>
@@ -855,8 +859,7 @@ export function CoursesLeaderboardView() {
                   ref={listContainerRef}
                   style={{
                     background: '#FFFFFF', borderRadius: 16, overflow: 'hidden',
-                    border: '1px solid rgba(0,0,0,0.07)',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                    border: '1px solid rgba(15,23,42,0.07)',
                     marginTop: showPodium ? 16 : 0,
                   }}
                 >
