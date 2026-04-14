@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, ChevronRight, Sparkles, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Sparkles } from 'lucide-react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
-import { cn } from '@/lib/utils';
-import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 
@@ -128,7 +125,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const categories = [
     { id: 'design', label: 'Design', score: ratingAggregates?.avg_design_score },
     { id: 'condition', label: 'Condition', score: ratingAggregates?.avg_condition_score },
-    { id: 'clubhouse', label: 'Clubhouse', score: ratingAggregates?.avg_clubhouse_score },
+    { id: 'clubhouse', label: 'clubhouse', score: ratingAggregates?.avg_clubhouse_score },
     { id: 'facilities', label: 'Facilities', score: ratingAggregates?.avg_facilities_score },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
 
@@ -151,65 +148,40 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   const highlights = getCommunityHighlights();
 
-  const circumference = 2 * Math.PI * 42;
-  const progress = isVisible ? (communityAverage / 10) * circumference : 0;
-
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
-      {/* Header */}
-      <div className="p-5 pb-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">Community Rating</h3>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
-            </p>
-            {onlyUserHasRated && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                Only you have rated this course so far.
-              </p>
-            )}
-          </div>
-          
-          {/* Large animated score ring */}
-          <div className="flex flex-col items-center">
-            <div className="relative w-24 h-24">
-              <svg className="w-24 h-24 -rotate-90">
-                <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(245,158,11,0.06)" strokeWidth="8" />
-                <circle 
-                  cx="48" cy="48" r="42" fill="none" 
-                  stroke="url(#communityScoreGradient)" 
-                  strokeWidth="8" strokeLinecap="round"
-                  strokeDasharray={`${progress} ${circumference}`}
-                  className="transition-all duration-1000 ease-out"
-                />
-                <defs>
-                  <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#f59e0b" />
-                    <stop offset="100%" stopColor="#fbbf24" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold text-foreground tabular-nums leading-none">
-                  {formatScore(communityAverage)}
-                </span>
-              </div>
-            </div>
-            <span 
-              className="mt-2 text-base font-semibold uppercase tracking-wide"
-              style={{ color: '#d97706' }}
-            >
+    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      {/* Dispatch rule marker */}
+      <div style={{ padding: '14px 16px 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Community Rating</span>
+        </div>
+      </div>
+
+      {/* Score — flat, no ring */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 0', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+            <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+              {formatScore(communityAverage)}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
               {tierLabel}
             </span>
           </div>
+          <p style={{ fontSize: 11, color: '#94A3B8' }}>
+            Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
+          </p>
+          {onlyUserHasRated && (
+            <p style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Only you have rated this course so far.</p>
+          )}
         </div>
       </div>
-      
+
       {/* Highlights */}
       {highlights && highlights.length > 0 && (
-        <div className="px-5 pb-4">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-2">
+        <div style={{ padding: '12px 16px 0' }}>
+          <p style={{ fontSize: 9, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: 8 }}>
             Highlights
           </p>
           <div className="flex flex-wrap gap-2">
@@ -228,54 +200,42 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
       {/* User vs community comparison */}
       {comparisonMessage && (
-        <div className="px-5 pb-4">
+        <div style={{ padding: '0 16px 12px' }}>
           {comparisonMessage}
         </div>
       )}
 
       {/* Distribution */}
       {hasDistribution && (
-        <div className="border-t border-border p-5">
+        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)', padding: '12px 16px' }}>
           <RatingTierDistribution distribution={distribution} />
         </div>
       )}
 
-      {/* Category breakdown */}
+      {/* Category breakdown — 4-col grid */}
       {categories.length > 0 && (
-        <div className="border-t border-border p-5 grid grid-cols-2 gap-4">
-          {categories.map((cat) => {
-            const score = cat.score || 0;
-            
-            return (
-              <div key={cat.id} className="space-y-1.5">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{cat.label}</span>
-                  <span className="font-semibold text-foreground tabular-nums">{formatScore(score)}</span>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
-                  <div 
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: `${(score / 10) * 100}%`,
-                      background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
-                    }}
-                  />
-                </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          {categories.map((cat, i) => (
+            <div key={cat.id} style={{ padding: '9px 0', textAlign: 'center' as const, borderRight: i < categories.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+              <div style={{ fontSize: 8, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: 2 }}>
+                {cat.label}
               </div>
-            );
-          })}
+              <div style={{ fontSize: 14, fontWeight: 900, color: '#0F172A' }}>
+                {formatScore(cat.score || 0)}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* See all reviews link */}
+      {/* See all reviews */}
       {onSeeAllReviews && (
-        <button 
+        <button
           type="button"
           onClick={onSeeAllReviews}
-          className="w-full p-4 border-t border-border flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors active:scale-[0.98]"
+          style={{ width: '100%', padding: '11px 0', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', fontSize: 12, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
         >
-          See all reviews
-          <ChevronRight className="w-4 h-4" />
+          See all reviews →
         </button>
       )}
     </div>

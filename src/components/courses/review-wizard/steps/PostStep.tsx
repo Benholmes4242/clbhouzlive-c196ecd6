@@ -44,7 +44,7 @@ const MAX_MEDIA_ITEMS = 10;
 const BREAKDOWN_LABELS: Record<keyof ReviewBreakdowns, string> = {
   design: 'Design',
   condition: 'Condition',
-  clubhouse: 'Clubhouse',
+  clubhouse: 'clubhouse',
   facilities: 'Facilities',
 };
 
@@ -72,7 +72,6 @@ export function PostStep({
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
   const [previewMediaIndex, setPreviewMediaIndex] = useState<number | null>(null);
 
-  // Media file picker
   const handlePickMedia = useCallback(async () => {
     setPermissionDenied(null);
     const remainingSlots = MAX_MEDIA_ITEMS - media.length;
@@ -106,7 +105,6 @@ export function PostStep({
     }
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Convert for MediaThumbnail
   const composerMedia: OrderedMediaItem[] = media.map((item, index) => ({
     id: item.id,
     type: item.type,
@@ -150,7 +148,6 @@ export function PostStep({
           background: media.length > 0 ? 'transparent' : 'rgba(247,147,30,0.02)',
         }}
       >
-        {/* Header row with label + Add more link */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 4px' }}>
           <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
             Photos &amp; Videos · <span style={{ fontWeight: 400, letterSpacing: 'normal', textTransform: 'none' as const }}>optional</span>
@@ -173,7 +170,6 @@ export function PostStep({
         )}
 
         {media.length === 0 ? (
-          /* Empty state */
           <button
             type="button"
             onClick={handlePickMedia}
@@ -189,7 +185,6 @@ export function PostStep({
             <p style={{ fontSize: 12, color: '#94A3B8' }}>Up to 10 · first photo is cover</p>
           </button>
         ) : (
-          /* Thumbnail strip */
           <div>
             <div className="flex gap-2 overflow-x-auto pb-1">
               {composerMedia.map((item, index) => (
@@ -205,7 +200,6 @@ export function PostStep({
                   />
                 </div>
               ))}
-              {/* Add more button */}
               {media.length < MAX_MEDIA_ITEMS && (
                 <button
                   type="button"
@@ -239,11 +233,17 @@ export function PostStep({
               onClick={() => onGoToStep(1)}
               style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'transparent', border: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' as const }}
             >
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>{rating.toFixed(1)}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#94A3B8' }}>{tierInfo.label}</span>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}>
+                    {rating.toFixed(1)}
+                  </span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
+                    {tierInfo.label}
+                  </span>
+                </div>
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#F7931E' }}>Edit ›</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>Edit ›</span>
             </button>
           )}
 
@@ -255,9 +255,13 @@ export function PostStep({
               style={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'transparent', border: 'none', borderBottomStyle: 'solid', borderBottomWidth: 0.5, borderBottomColor: 'rgba(15,23,42,0.07)', padding: 0, cursor: 'pointer' }}
             >
               {(Object.entries(breakdowns) as [keyof ReviewBreakdowns, number | null][]).map(([key, value], i) => (
-                <div key={key} style={{ padding: '8px 0', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
-                  <div style={{ fontSize: 8, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>{BREAKDOWN_LABELS[key].toUpperCase()}</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: value !== null ? '#0F172A' : '#CBD5E1', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>{value !== null ? value.toFixed(1) : '—'}</div>
+                <div key={key} style={{ padding: '7px 0', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+                  <div style={{ fontSize: 8, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginBottom: 2 }}>
+                    {key === 'clubhouse' ? 'CLBHS' : BREAKDOWN_LABELS[key].slice(0, 4).toUpperCase()}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: value !== null ? '#0F172A' : 'rgba(15,23,42,0.2)' }}>
+                    {value !== null ? value.toFixed(1) : '—'}
+                  </div>
                 </div>
               ))}
             </button>

@@ -14,8 +14,6 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import { safeGoBack } from '@/utils/navigation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import CourseClaimBadge from '@/components/courses/course-detail/CourseClaimBadge';
-import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 
 interface GolfClubViewProps {
@@ -124,10 +122,22 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           }}
         />
         
-        {/* Back button for modal only */}
+        {/* Back button for modal */}
         {isInModal && onClose && (
           <button
             onClick={onClose}
+            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm active:scale-95 transition-all z-10"
+            style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)' }}
+            aria-label="Go back"
+          >
+            <ChevronLeft className="h-6 w-6 text-white" strokeWidth={2} />
+          </button>
+        )}
+
+        {/* Back button for non-modal */}
+        {!isInModal && (
+          <button
+            onClick={() => safeGoBack(navigate, '/courses')}
             className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm active:scale-95 transition-all z-10"
             style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)' }}
             aria-label="Go back"
@@ -158,37 +168,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* ← Back text link below hero */}
-      {!isInModal && (
-        <div className="px-4 pt-1.5 pb-0 bg-background">
-          <button
-            type="button"
-            onClick={() => safeGoBack(navigate, '/courses')}
-            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[36px]"
-          >
-            <ChevronLeft size={14} />
-            Back
-          </button>
-        </div>
-      )}
-
-      {/* Claimed By Badge */}
-      <div className="px-4 pt-0 pb-0 bg-background">
-        <CourseClaimBadge courseId={course.id} />
-      </div>
-
-      {/* Echo — course detail contextual */}
-      <div style={{ padding: '10px 16px 4px' }}>
-        <EchoContextualButton
-          prompt={`Tell me everything about ${course.name}${course.country ? ` in ${course.country}` : ''} — what's the course like to play, what are the best holes, any tips for visiting, and how does it rank among courses in the area?`}
-          label={`Ask Echo about ${course.name}`}
-          sublabel="Playing tips · best holes · local knowledge"
-          dark={false}
-          source="course_detail_page"
-        />
-      </div>
-
-      {/* Segmented Control Tabs */}
+      {/* Tabs — flush below hero */}
       <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
 
       {/* Keep-mounted tabs */}

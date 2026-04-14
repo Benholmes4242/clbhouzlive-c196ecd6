@@ -61,8 +61,8 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
               className="min-h-[34px] px-4 text-sm font-semibold transition-colors active:scale-[0.97]"
               style={{
                 borderRadius: 8,
-                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                background: isActive ? '#0F172A' : 'transparent',
+                color: isActive ? '#ffffff' : 'hsl(var(--muted-foreground))',
                 border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
               }}
             >

@@ -6,6 +6,15 @@ import { ExpandableText } from '@/components/common/ExpandableText';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { RatingBreakdownGrid } from '../shared/RatingBreakdownGrid';
 
+function getTierLabel(v: number): string {
+  if (v >= 9.5) return 'Legendary';
+  if (v >= 8.5) return 'Outstanding';
+  if (v >= 7.5) return 'Excellent';
+  if (v >= 6.5) return 'Very Good';
+  if (v >= 5.0) return 'Good';
+  return 'Below Average';
+}
+
 interface Review {
   id: string;
   user: {
@@ -62,7 +71,7 @@ const formatDate = (dateString: string) => {
 const categoryLabels: Record<string, string> = {
   design_score: 'Design',
   condition_score: 'Condition',
-  clubhouse_score: 'Clubhouse',
+  clubhouse_score: 'clubhouse',
   facilities_score: 'Facilities',
 };
 
@@ -122,7 +131,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-foreground">{user.name}</span>
                 {isMine && (
-                  <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[#f59e0b]/10 text-[#d97706]">
+                  <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, color: '#F7931E', background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.2)' }}>
                     You
                   </span>
                 )}
@@ -145,7 +154,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-foreground">{user.name}</span>
                 {isMine && (
-                  <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[#f59e0b]/10 text-[#d97706]">
+                  <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, color: '#F7931E', background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.2)' }}>
                     You
                   </span>
                 )}
@@ -155,12 +164,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </div>
         )}
 
-        {/* Score badge */}
-        <div
-          className="px-2.5 py-1 rounded-lg text-sm font-bold text-white"
-          style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}
-        >
-          {score.toFixed(1)}
+        {/* Score badge — flat dispatch */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+          <span style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em' }}>
+            {score.toFixed(1)}
+          </span>
+          <span style={{ fontSize: 9, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.04em' }}>
+            {getTierLabel(score)}
+          </span>
         </div>
       </div>
 
