@@ -79,12 +79,13 @@ export function ReportSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto">
-        <SheetHeader className="pb-4">
-          <SheetTitle className="flex items-center justify-center gap-2 text-[17px] font-semibold">
-            <Flag className="w-5 h-5 text-red-500" />
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 16px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ width: 3, height: 10, background: '#DC2626', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#DC2626', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Report {reportType === 'group' ? 'Group' : 'User'}
-          </SheetTitle>
-        </SheetHeader>
+          </span>
+        </div>
 
         <div className="space-y-4">
           <p className="text-sm text-[#8E8E93] text-center">
@@ -138,7 +139,8 @@ export function ReportSheet({
           <Button
             onClick={handleSubmit}
             disabled={!selectedReason || (selectedReason === 'other' && !details.trim()) || submitting}
-            className="w-full h-12 rounded-full bg-destructive hover:bg-destructive/90"
+            className="w-full h-12 rounded-full"
+            style={{ background: '#F7931E', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
           >
             {submitting ? (
               <>

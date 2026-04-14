@@ -115,8 +115,13 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
     >
       <div className="p-4 space-y-4">
         {/* Drag handle */}
-        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#e2e8f0', margin: '0 auto 8px' }} />
-        <h2 className="text-lg font-semibold text-foreground mb-4">Add Members</h2>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '0 auto 8px', flexShrink: 0 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Add Members
+          </span>
+        </div>
         {/* Search Input */}
         <div className="relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -124,7 +129,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or username..."
-            className="pl-10 border border-amber-200/30 focus:border-amber-300 focus:ring-1 focus:ring-amber-200"
+            className="pl-10"
+            style={{ border: '1px solid rgba(15,23,42,0.10)', borderRadius: 10, background: '#F8FAFC' }}
           />
         </div>
         
@@ -135,7 +141,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
               <div
                 key={user.id}
                 className="flex items-center gap-2 px-3 py-1 rounded-full text-sm"
-                style={{ background: 'rgba(247,147,30,0.10)', color: '#c2770f' }}
+                style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)', color: '#F7931E' }}
               >
                 <span>{user.display_name || user.username}</span>
                 <button 

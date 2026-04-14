@@ -173,8 +173,7 @@ function ConversationCard({ children }: { children: React.ReactNode }) {
         margin: '0 16px',
         borderRadius: 16,
         background: '#fff',
-        border: '1px solid rgba(0,0,0,0.07)',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        border: '1px solid rgba(15,23,42,0.07)',
         overflow: 'hidden',
       }}
     >
@@ -185,13 +184,11 @@ function ConversationCard({ children }: { children: React.ReactNode }) {
 
 function SectionLabel({ text }: { text: string }) {
   return (
-    <div style={{
-      padding: '10px 16px 4px',
-      fontSize: '10px', fontWeight: 700,
-      letterSpacing: '0.08em', textTransform: 'uppercase' as const,
-      color: '#c0c8d0',
-    }}>
-      {text}
+    <div style={{ padding: '10px 16px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        {text}
+      </span>
     </div>
   );
 }
@@ -457,7 +454,7 @@ export function ConversationList({
           
           {/* Hairline divider */}
           {showDivider && (
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
+            <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
           )}
         </div>
       </SwipeableConversationItem>
@@ -484,7 +481,7 @@ export function ConversationList({
           style={{
             margin: '4px 16px', padding: '8px 12px', borderRadius: 12,
             background: 'rgba(247,147,30,0.05)',
-            border: '1px solid rgba(0,0,0,0.06)',
+            border: '0.5px solid rgba(15,23,42,0.07)',
             fontSize: 13, color: '#94a3b8', gap: 8,
           }}
         >
@@ -540,7 +537,7 @@ export function ConversationList({
             className="flex items-center justify-between w-full"
             style={{
               padding: '10px 14px', borderRadius: 12,
-              background: 'rgba(0,0,0,0.04)', border: 'none',
+              background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.07)',
               cursor: 'pointer',
             }}
           >

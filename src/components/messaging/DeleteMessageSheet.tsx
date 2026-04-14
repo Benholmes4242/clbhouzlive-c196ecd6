@@ -48,20 +48,19 @@ export function DeleteMessageSheet({
         {/* Drag handle */}
         <div
           style={{
-            width: 36, height: 4, borderRadius: 99,
-            background: '#e2e8f0',
-            margin: '12px auto 16px',
+            width: 36, height: 4, borderRadius: 2,
+            background: 'rgba(15,23,42,0.12)',
+            margin: '10px auto 0', flexShrink: 0,
           }}
         />
 
         {/* Title */}
-        <h2 style={{
-          fontSize: 17, fontWeight: 700, color: '#0f172a',
-          textAlign: 'center', marginBottom: 16,
-          padding: '0 16px',
-        }}>
-          Delete Message
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 16px', marginBottom: 4, borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ width: 3, height: 10, background: '#DC2626', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#DC2626', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Delete Message
+          </span>
+        </div>
 
         <div style={{ padding: '0 16px' }}>
           {/* Delete for me */}
@@ -76,7 +75,7 @@ export function DeleteMessageSheet({
           >
             <div
               className="flex items-center justify-center flex-shrink-0"
-              style={{ width: 44, height: 44, borderRadius: '50%', background: '#f1f5f9' }}
+              style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(15,23,42,0.05)' }}
             >
               <User size={18} style={{ color: '#64748b' }} />
             </div>

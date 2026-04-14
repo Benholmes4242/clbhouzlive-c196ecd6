@@ -39,7 +39,7 @@ function FilterChips({ totalUnread, conversationFilter, onFilterChange }: {
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.12s',
-            background: conversationFilter === chip.key ? '#0f172a' : 'rgba(0,0,0,0.05)',
+            background: conversationFilter === chip.key ? '#0f172a' : 'rgba(15,23,42,0.05)',
             color: conversationFilter === chip.key ? '#fff' : '#64748b',
           }}
           className="active:scale-[0.97]"
@@ -196,7 +196,7 @@ function MessagesPageInner() {
             paddingLeft: 16,
             paddingRight: 16,
             background: '#F8FAFC',
-            borderBottom: '1px solid rgba(0,0,0,0.06)',
+            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
           }}
         >
           {/* Back */}
@@ -205,7 +205,8 @@ function MessagesPageInner() {
             className="flex items-center justify-center active:scale-[0.97] transition-transform"
             style={{
               width: 36, height: 36, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.05)', border: 'none',
+              background: 'rgba(15,23,42,0.05)',
+              border: '0.5px solid rgba(15,23,42,0.10)',
             }}
             aria-label="Back"
           >
@@ -213,10 +214,15 @@ function MessagesPageInner() {
           </button>
 
           {/* Title + badge */}
-          <div className="flex items-center" style={{ gap: 6 }}>
-            <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em' }}>
-              Messages
-            </span>
+          <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Direct</span>
+            </div>
+            <div className="flex items-center" style={{ gap: 6 }}>
+              <span style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                Messages
+              </span>
             {totalUnread > 0 && (
               <span
                 className="flex items-center justify-center"
@@ -230,6 +236,7 @@ function MessagesPageInner() {
                 {totalUnread > 99 ? '99+' : totalUnread}
               </span>
             )}
+            </div>
           </div>
 
           {/* Compose — ghost amber */}
@@ -276,13 +283,9 @@ function MessagesPageInner() {
 
         {/* Section label */}
         {!searchInput && conversationFilter === 'all' && conversations.length > 0 && (
-          <div style={{
-            padding: '8px 16px 4px',
-            fontSize: '10.5px', fontWeight: 700,
-            letterSpacing: '0.08em', textTransform: 'uppercase' as const,
-            color: '#c0c8d0',
-          }}>
-            Recent
+          <div style={{ padding: '10px 16px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Recent</span>
           </div>
         )}
         
@@ -333,7 +336,8 @@ function MessagesPageInner() {
             className="flex items-center justify-center active:scale-[0.97] transition-transform"
             style={{
               width: 36, height: 36, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.05)', border: 'none',
+              background: 'rgba(15,23,42,0.05)',
+              border: '0.5px solid rgba(15,23,42,0.10)',
             }}
             aria-label="Back"
           >
@@ -341,7 +345,7 @@ function MessagesPageInner() {
           </button>
 
           <div className="flex items-center" style={{ gap: 6 }}>
-            <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>Messages</span>
+            <span style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>Messages</span>
             {totalUnread > 0 && (
               <span
                 className="flex items-center justify-center"
@@ -444,7 +448,7 @@ function MessagesPageInner() {
                 <div className="absolute rounded-full" style={{ width: 36, height: 36, background: 'rgba(247,147,30,0.15)' }} />
                 <MessageCircle style={{ color: '#F7931E' }} className="w-5 h-5 relative z-10" />
               </div>
-              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 6 }}>
                 Select a conversation
               </h2>
               <p style={{ fontSize: 14, color: '#94a3b8', maxWidth: 240, marginBottom: 20 }}>
