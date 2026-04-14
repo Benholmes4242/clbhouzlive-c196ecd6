@@ -54,7 +54,7 @@ export const USERNAME_MAX = 30;
 export type BusinessWizardStep = 1 | 2 | 3;
 
 export const BUSINESS_STEP_CONFIG: Record<BusinessWizardStep, { title: string; description: string }> = {
-  1: { title: 'Business Info', description: 'Tell us about your business' },
-  2: { title: 'Location & Contact', description: 'Where can golfers find you?' },
-  3: { title: 'Branding', description: 'Make your page stand out' },
+  1: { title: 'Identity', description: 'Tell golfers who you are' },
+  2: { title: 'Find Us', description: 'Location, contact & opening hours' },
+  3: { title: 'Branding', description: 'Logo, cover photo & preview' },
 };
