@@ -308,7 +308,7 @@ export function LeadersTab() {
         </div>
 
         {/* Group underline tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
+        <div style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}>
           {Object.keys(GROUP_KEYS).map((groupLabel) => {
             const isActive = groupLabel === activeGroup;
             const firstKey = GROUP_KEYS[groupLabel]?.[0];
@@ -316,16 +316,16 @@ export function LeadersTab() {
               <button
                 key={groupLabel}
                 onClick={() => { if (firstKey) setCategory(firstKey); }}
-                className="flex-shrink-0 active:scale-[0.97] transition-transform"
+                className="active:opacity-70 transition-opacity"
                 style={{
-                  flex: 1, padding: '7px 14px',
-                  fontSize: '11px',
+                  flex: 1, padding: '10px 4px 9px',
+                  fontSize: '13px',
                   fontWeight: isActive ? 800 : 500,
                   color: isActive ? '#0F172A' : '#94A3B8',
                   background: 'transparent', border: 'none',
-                  borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                  borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
                   cursor: 'pointer', whiteSpace: 'nowrap' as const,
-                  transition: 'all 0.15s',
+                  textAlign: 'center' as const,
                 }}
               >
                 {groupLabel}
