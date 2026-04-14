@@ -15,27 +15,31 @@ export const BucketListStrip: React.FC<BucketListStripProps> = ({ onCourseClick 
   return (
     <div
       style={{
-        borderTop: '1px solid hsl(var(--border))',
-        borderBottom: '1px solid hsl(var(--border))',
-        background: 'hsl(var(--accent-amber) / 0.02)',
+        borderTop: '0.5px solid rgba(15,23,42,0.07)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        background: 'rgba(247,147,30,0.02)',
       }}
     >
       {/* Header */}
       <div style={{ padding: '14px 16px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <p
-            className="uppercase text-muted-foreground"
-            style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.05em' }}
+            className="uppercase"
+            style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', color: '#94A3B8' }}
           >
             On Your Radar
           </p>
-          <p className="text-foreground" style={{ fontSize: 17, fontWeight: 800 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>On Your Radar</span>
+          </div>
+          <p style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
             Bucket List 🎯
           </p>
         </div>
         <button
           onClick={() => navigate('/top100?tab=explore')}
-          style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--accent-amber))' }}
+          style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
         >
           See all ({courses.length}) →
         </button>
@@ -70,10 +74,9 @@ export const BucketListStrip: React.FC<BucketListStripProps> = ({ onCourseClick 
                 flexShrink: 0,
                 borderRadius: 14,
                 overflow: 'hidden',
-                border: '1px solid hsl(var(--border))',
-                boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
-                textAlign: 'left',
-                background: 'hsl(var(--card))',
+                border: '1px solid rgba(15,23,42,0.07)',
+                textAlign: 'left' as const,
+                background: '#ffffff',
               }}
             >
               {/* Thumbnail */}
@@ -116,7 +119,7 @@ export const BucketListStrip: React.FC<BucketListStripProps> = ({ onCourseClick 
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
                   {avgScore != null && (
-                    <span style={{ fontSize: 13, fontWeight: 800, color: 'hsl(var(--accent-amber))' }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: '#F7931E' }}>
                       {Number(avgScore).toFixed(1)}
                     </span>
                   )}
@@ -124,8 +127,8 @@ export const BucketListStrip: React.FC<BucketListStripProps> = ({ onCourseClick 
                     style={{
                       fontSize: 9,
                       fontWeight: 700,
-                      color: 'hsl(var(--accent-amber))',
-                      background: 'hsl(var(--accent-amber) / 0.1)',
+                      color: '#F7931E',
+                      background: 'rgba(247,147,30,0.10)',
                       borderRadius: 4,
                       padding: '1px 5px',
                       textTransform: 'uppercase',
@@ -148,7 +151,7 @@ export const BucketListStrip: React.FC<BucketListStripProps> = ({ onCourseClick 
             minHeight: 130,
             flexShrink: 0,
             borderRadius: 14,
-            border: '1.5px dashed hsl(var(--accent-amber) / 0.3)',
+            border: '1.5px dashed rgba(247,147,30,0.30)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',

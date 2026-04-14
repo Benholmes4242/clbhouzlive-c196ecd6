@@ -85,7 +85,7 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
               position: 'absolute',
               top: 14,
               left: 14,
-              background: 'hsl(var(--accent-amber))',
+              background: '#F7931E',
               borderRadius: 8,
               padding: '5px 12px',
               display: 'inline-flex',

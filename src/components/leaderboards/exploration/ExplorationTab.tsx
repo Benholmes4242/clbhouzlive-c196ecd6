@@ -85,7 +85,7 @@ function ExplorationPageSkeleton() {
         {[...Array(5)].map((_, i) => (
           <div key={i} style={{
             display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-            background: '#FFFFFF', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)',
+            background: '#FFFFFF', borderRadius: 14, border: '1px solid rgba(15,23,42,0.07)',
           }}>
             <Skeleton className="w-5 h-4 rounded" />
             <Skeleton className="w-11 h-11 rounded-lg" />
@@ -106,7 +106,8 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
     <div className="py-4 px-3">
       <button
         onClick={onRetry}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm active:scale-[0.98] active:opacity-70 transition-all"
+        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
       >
         Couldn't load more golfers · Tap to retry
       </button>
@@ -365,7 +366,7 @@ export function ExplorationTab() {
 
   const getPodiumRingColor = (rank: number): string | null => {
     switch (rank) {
-      case 1: return 'hsl(var(--accent-amber))';
+      case 1: return '#F7931E';
       case 2: return '#B8C6C9';
       case 3: return '#C4956A';
       default: return null;
@@ -561,7 +562,7 @@ export function ExplorationTab() {
 
         {/* Scope selector (player mode only) */}
         {viewMode === 'player' && (
-          <div style={{ display: 'flex', gap: 3, background: 'rgba(0,0,0,0.05)', borderRadius: 10, padding: 3, marginBottom: 12 }}>
+          <div style={{ display: 'flex', gap: 3, background: 'rgba(15,23,42,0.05)', borderRadius: 10, padding: 3, marginBottom: 12 }}>
             {[
               { id: 'global' as const, label: '🌍 Global' },
               { id: 'friends' as const, label: '👥 Friends' },
@@ -589,7 +590,7 @@ export function ExplorationTab() {
         {hasUserData && countryList.length > 0 && (
           <div style={{
             background: '#FFFFFF', borderRadius: 14, padding: '12px 14px', marginBottom: 12,
-            border: '1px solid rgba(0,0,0,0.07)',
+            border: '1px solid rgba(15,23,42,0.07)',
           }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>
               Countries Played
@@ -610,9 +611,9 @@ export function ExplorationTab() {
               {countryList.length > MAX_FLAGS && (
                 <div style={{
                   width: 34, height: 24, borderRadius: 5,
-                  border: '1.5px dashed rgba(245,166,35,0.3)',
+                  border: '1.5px dashed rgba(247,147,30,0.30)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, color: '#F5A623',
+                  fontSize: 11, fontWeight: 700, color: '#F7931E',
                 }}>
                   +{countryList.length - MAX_FLAGS}
                 </div>

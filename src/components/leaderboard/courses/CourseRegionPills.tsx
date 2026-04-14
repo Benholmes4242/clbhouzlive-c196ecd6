@@ -43,11 +43,9 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
               cursor: 'pointer',
               fontSize: 13,
               fontWeight: 600,
-              border: isActive
-                ? '1.5px solid hsl(var(--foreground))'
-                : '1.5px solid hsl(var(--border))',
-              background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-              color: isActive ? 'white' : 'hsl(var(--muted-foreground))',
+              border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
+              background: isActive ? '#0F172A' : 'transparent',
+              color: isActive ? '#ffffff' : '#64748B',
               transition: 'all 0.15s ease',
             }}
             className="active:scale-[0.96]"

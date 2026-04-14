@@ -29,8 +29,8 @@ const POSITION_CONFIG = {
     statSize: 24,
     statWeight: 800,
     labelSize: 13,
-    badgeBg: 'hsl(var(--accent-amber))',
-    shadowColor: 'hsl(var(--accent-amber) / 0.25)',
+    badgeBg: '#F7931E',
+    shadowColor: 'rgba(247,147,30,0.25)',
     crownSize: 36,
     verticalOffset: 0,
   },
@@ -86,7 +86,7 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
       <div
         className="absolute pointer-events-none inset-0"
         style={{
-          background: 'radial-gradient(ellipse at 50% 40%, hsl(var(--accent-amber) / 0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at 50% 40%, rgba(247,147,30,0.08) 0%, transparent 70%)',
         }}
       />
 
@@ -128,7 +128,7 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
                     <Crown
                       size={config.crownSize}
                       className="drop-shadow-md"
-                      style={{ color: 'hsl(var(--accent-amber))' }}
+                      style={{ color: '#F7931E' }}
                       fill="#f59e0b"
                       strokeWidth={1.5}
                     />
@@ -146,7 +146,7 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
                         left: '-2rem',
                         right: '-2rem',
                         bottom: '-2rem',
-                        background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.3) 0%, hsl(var(--accent-amber) / 0.1) 50%, transparent 80%)',
+                        background: 'radial-gradient(ellipse at center, rgba(247,147,30,0.30) 0%, rgba(247,147,30,0.10) 50%, transparent 80%)',
                         filter: 'blur(12px)',
                       }}
                     />
@@ -183,7 +183,7 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
                       width: config.badgeSize,
                       height: config.badgeSize,
                       borderRadius: '50%',
-                      backgroundColor: config.badgeBg,
+                      backgroundColor: position === 1 ? '#F7931E' : position === 2 ? '#A8B4C0' : '#C4956A',
                       border: '2px solid hsl(var(--background))',
                       fontSize: config.badgeSize * 0.45,
                       boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
@@ -220,7 +220,7 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
                 >
                   <p
                     className="font-bold"
-                    style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
+                    style={{ color: '#F7931E', fontSize: config.statSize, fontWeight: config.statWeight }}
                   >
                     {formatHcp(handicap)}
                   </p>

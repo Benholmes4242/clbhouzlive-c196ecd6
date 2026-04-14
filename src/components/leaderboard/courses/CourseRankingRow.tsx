@@ -29,10 +29,10 @@ interface Props {
   onClick: () => void;
 }
 
-export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonColor = 'hsl(var(--accent-amber))', onClick }) => {
+export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonColor = '#F7931E', onClick }) => {
   const getRankColor = () => {
-    if (rank === 1) return 'hsl(var(--accent-amber))';
-    return 'hsl(var(--muted-foreground))';
+    if (rank === 1) return '#F7931E';
+    return '#94A3B8';
   };
 
   const getUserHistory = () => {
@@ -57,7 +57,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
         'transition-colors active:scale-[0.98] transition-transform',
       )}
       style={{
-        borderBottom: '1px solid hsl(var(--border) / 0.25)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
         borderLeft: playedBorder ? `3px solid ${playedBorder}` : undefined,
         backgroundColor: playedBg,
       }}
@@ -101,7 +101,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
         {/* Rating row */}
         <div className="flex items-center gap-1.5 mt-1" style={{ fontSize: 13 }}>
           <span className="flex items-center">
-            <span className="font-bold" style={{ color: 'hsl(var(--accent-amber))', fontSize: 16 }}>
+            <span className="font-bold" style={{ color: '#F7931E', fontSize: 16 }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
           </span>
@@ -116,8 +116,8 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
           <div
             className="inline-flex items-center gap-1 mt-1"
             style={{
-              background: 'hsl(var(--accent-amber) / 0.07)',
-              border: '1px solid hsl(var(--accent-amber) / 0.2)',
+              background: 'rgba(247,147,30,0.07)',
+              border: '1px solid rgba(247,147,30,0.20)',
               borderRadius: 6,
               padding: '2px 8px',
             }}
@@ -127,7 +127,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
               style={{
                 fontSize: 11,
                 fontWeight: 600,
-                color: 'hsl(var(--accent-amber))',
+                color: '#F7931E',
               }}
             >
               {course.friends_count}
@@ -146,7 +146,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
           className="font-semibold"
           style={{
             fontSize: 13,
-            color: course.current_user_played ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
+            color: course.current_user_played ? '#F7931E' : '#94A3B8',
           }}
         >
           {getUserHistory()}

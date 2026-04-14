@@ -44,7 +44,7 @@ export function ChampionshipFilters({
         ref={scrollRef}
         className="flex"
         style={{
-          background: 'rgba(0,0,0,0.06)',
+          background: 'rgba(15,23,42,0.05)',
           borderRadius: 12,
           padding: 3,
         }}
@@ -80,11 +80,15 @@ export function ChampionshipFilters({
           <button
             onClick={() => onDivisionFilterChange('all')}
             className={cn(
-              'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl border transition-colors active:scale-[0.95]',
+              'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl transition-colors active:scale-[0.95]',
               divisionFilter === 'all'
-                ? 'bg-card text-foreground font-semibold border-border'
-                : 'bg-card text-muted-foreground border-border'
+                ? 'text-[#0F172A] font-semibold'
+                : 'text-[#64748B]'
             )}
+            style={divisionFilter === 'all'
+              ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }
+              : { background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }
+            }
           >
             All Divisions
           </button>
@@ -93,12 +97,15 @@ export function ChampionshipFilters({
               key={division.id}
               onClick={() => onDivisionFilterChange(division.slug)}
               className={cn(
-                'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl border transition-colors active:scale-[0.95]',
+                'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl transition-colors active:scale-[0.95]',
                 divisionFilter === division.slug
-                  ? 'text-white border-transparent'
-                  : 'bg-card text-muted-foreground border-border'
+                  ? 'text-white'
+                  : 'text-[#64748B]'
               )}
-              style={divisionFilter === division.slug ? { backgroundColor: division.color_hex } : undefined}
+              style={divisionFilter === division.slug
+                ? { backgroundColor: division.color_hex, border: 'none' }
+                : { background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }
+              }
             >
               {division.name}
             </button>

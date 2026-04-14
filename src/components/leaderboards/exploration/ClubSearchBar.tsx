@@ -77,7 +77,7 @@ export function ClubSearchBar({
 
       {/* Search input */}
       <div className="relative">
-        <div className="rounded-xl relative flex items-center gap-2.5 px-3.5 py-3 bg-card border border-border/50">
+        <div className="rounded-xl relative flex items-center gap-2.5 px-3.5 py-3" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}>
           <Search className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
           <input
             ref={inputRef}
@@ -110,7 +110,7 @@ export function ClubSearchBar({
 
         {/* Dropdown results */}
         {isOpen && debouncedSearch.length >= 2 && (
-          <div className="absolute z-50 w-full mt-1 rounded-xl max-h-60 overflow-y-auto bg-background border border-border/60 shadow-lg">
+          <div className="absolute z-50 w-full mt-1 rounded-xl max-h-60 overflow-y-auto shadow-lg" style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.10)' }}>
             {isLoading ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 Searching...
@@ -123,7 +123,7 @@ export function ClubSearchBar({
                     onClick={() => handleSelect(club.id, club.name)}
                     className={cn(
                       'w-full p-3 rounded-xl cursor-pointer transition-all duration-150 text-left active:scale-[0.98]',
-                      club.id === selectedClubId ? 'ring-2 ring-border bg-muted/30' : 'hover:bg-muted/30'
+                      club.id === selectedClubId ? 'ring-2 bg-[rgba(247,147,30,0.06)]' : ''
                     )}
                   >
                     <div className="flex items-center gap-3">

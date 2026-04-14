@@ -41,9 +41,9 @@ export const PillToggle: React.FC<PillToggleProps> = ({
             className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors flex items-center active:scale-[0.97]"
             style={{
               borderRadius: 8,
-              background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+              background: isActive ? '#0F172A' : 'transparent',
+              color: isActive ? '#ffffff' : '#64748B',
+              border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
             }}
           >
             {option.label}
