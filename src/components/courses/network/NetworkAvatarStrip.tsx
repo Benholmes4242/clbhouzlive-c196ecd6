@@ -36,8 +36,8 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
   // Don't render if no active friends
   if (activeFriends.length === 0) return null;
 
-  const visibleFriends = activeFriends.slice(0, maxVisible);
-  const remainingCount = activeFriends.length - maxVisible;
+  const visibleFriends = activeFriends;
+  const remainingCount = 0;
 
   const handleAvatarClick = (friendId: string) => {
     navigate(`/profile/${friendId}`);
@@ -50,11 +50,17 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
 
   return (
     <div className={cn('mt-2 mb-1.5', className)}>
+      <style>{`
+        .avatar-scroll::-webkit-scrollbar { display: none; }
+      `}</style>
       <div 
-        className="flex gap-2"
+        className="flex gap-2 avatar-scroll"
         style={{ 
+          overflowX: 'auto',
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: 2,
         }}
       >
         {visibleFriends.map((friend) => (
