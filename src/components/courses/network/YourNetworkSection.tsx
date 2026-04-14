@@ -50,9 +50,15 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
     >
       {/* Header Row */}
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-[22px] font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>
-          Your Network
-        </h2>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Your Network</span>
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0 }}>
+            Your Network
+          </h2>
+        </div>
         <button
           onClick={handleViewAll}
           className="py-2.5 px-1 text-[13px] text-muted-foreground font-medium active:scale-[0.97] active:opacity-70 transition-all flex items-center gap-0.5"

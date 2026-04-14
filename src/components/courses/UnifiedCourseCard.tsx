@@ -31,6 +31,7 @@ interface UnifiedCourseCardProps {
   showRating?: boolean;
   showPlayedStatus?: boolean;
   showRateChip?: boolean;
+  showGhostRank?: boolean;
   showFriendsContext?: boolean;
   showLastPlayed?: boolean;
   hideLocation?: boolean;
@@ -73,6 +74,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
   showRating = true,
   showPlayedStatus = false,
   showRateChip = false,
+  showGhostRank = false,
   showFriendsContext = false,
   showLastPlayed = false,
   hideLocation = false,
@@ -183,6 +185,32 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
           }}
         />
 
+        {/* Ghost rank number — Top 100 */}
+        {showGhostRank && course.ranks?.global && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: -4,
+              left: 10,
+              lineHeight: 1,
+              userSelect: 'none',
+              pointerEvents: 'none',
+              zIndex: 1,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 72,
+                fontWeight: 900,
+                color: 'rgba(255,255,255,0.12)',
+                letterSpacing: '-0.04em',
+              }}
+            >
+              {course.ranks.global}
+            </span>
+          </div>
+        )}
+
         {/* Rank badges — top-left, stacked vertically */}
         {showRankBadges && (
           <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
@@ -202,9 +230,9 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             style={{
               position: 'absolute', top: 10, right: 10,
               display: 'flex', alignItems: 'center', gap: 4,
-              background: '#F59E0B',
+              background: '#F7931E',
               borderRadius: 7, padding: '4px 9px', border: 'none', cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(245,158,11,0.40)',
+              boxShadow: '0 2px 8px rgba(247,147,30,0.40)',
             }}
           >
             <Star size={10} fill="white" color="white" />

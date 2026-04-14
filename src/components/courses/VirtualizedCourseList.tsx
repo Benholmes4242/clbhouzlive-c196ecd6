@@ -36,6 +36,7 @@ interface VirtualizedCourseListProps {
   onCourseClick?: () => void;
   footer?: React.ReactNode;
   activeListSlug?: string | null;
+  showGhostRank?: boolean;
 }
 
 // Row height for scroll calculations (per grid row, not per item)
@@ -48,6 +49,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   onCourseClick,
   footer,
   activeListSlug = null,
+  showGhostRank = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -163,6 +165,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
                 course={fromGolfCourse(course)}
                 showRankBadges={true}
                 showRating={true}
+                showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
                 onClick={() => {
                   onCourseClick?.();
@@ -196,6 +199,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
                 course={fromGolfCourse(course)}
                 showRankBadges={true}
                 showRating={true}
+                showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
                 onClick={() => {
                   onCourseClick?.();

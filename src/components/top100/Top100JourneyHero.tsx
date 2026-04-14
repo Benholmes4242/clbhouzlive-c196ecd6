@@ -51,12 +51,6 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
         className="transform -rotate-90"
       >
         {/* Gradient definition — amber-500/amber-400, consistent with accent-amber */}
-        <defs>
-          <linearGradient id="outstandingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(245, 158, 11, 0.9)" />
-            <stop offset="100%" stopColor="rgba(251, 191, 36, 0.9)" />
-          </linearGradient>
-        </defs>
         {/* Background track */}
         <circle
           cx={size / 2}
@@ -73,7 +67,8 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="url(#outstandingGradient)"
+          stroke="#F7931E"
+          strokeOpacity={0.9}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -118,13 +113,12 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         className={cn(
           'relative w-full p-4',
           'rounded-2xl',
-          'bg-card',
-          'border border-border/50',
           'text-left',
           'cursor-pointer',
           'active:scale-[0.99]',
           'transition-transform duration-200'
         )}
+        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
         aria-label="View your Top 100 Journey"
       >
         {/* Progress Ring - Top Right */}
@@ -139,10 +133,13 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
 
         {/* Text content */}
         <div className="pr-20">
-          {/* Title */}
+          {/* Eyebrow + Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Progress</span>
+          </div>
           <h2
-            className="text-[22px] font-bold text-foreground mb-2"
-            style={{ letterSpacing: '-0.3px' }}
+            style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: '0 0 8px' }}
           >
             Your Top 100 Journey
           </h2>
@@ -150,8 +147,7 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
           {/* Progress Headline — accent-amber number */}
           <div className="flex items-baseline gap-2 mb-3">
             <span 
-              className="text-3xl font-bold"
-              style={{ color: 'hsl(var(--accent-amber))' }}
+              style={{ fontSize: 28, fontWeight: 900, color: '#F7931E', lineHeight: 1 }}
             >
               {completedCourses}
             </span>
@@ -166,12 +162,12 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
               'inline-flex items-center gap-0.5',
               'px-4 py-2.5',
               'text-sm font-medium',
-              'bg-muted text-foreground',
               'rounded-lg',
               'active:scale-[0.97]',
               'transition-transform duration-150',
               'whitespace-nowrap'
             )}
+            style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
           >
             {isZeroProgress ? 'Start your Top 100 Journey' : 'View your Top 100 Journey'}
             <ChevronRight size={14} />

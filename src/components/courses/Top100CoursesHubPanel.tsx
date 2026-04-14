@@ -190,7 +190,7 @@ const Top100CoursesHubPanel = () => {
       {/* Controls Section - sticky search + filters */}
       <div
         className="sticky top-0 z-10 bg-background pb-3 space-y-3 -mx-4 px-4"
-        style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+        style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
       >
         {/* Search */}
         <div className="relative">
@@ -200,7 +200,8 @@ const Top100CoursesHubPanel = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search within this Top 100 list"
             aria-label="Search within Top 100 list"
-            className="pl-10 pr-10 h-12 bg-muted/50 border border-border rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border focus-visible:outline-none"
+            className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
+            style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
           />
           {searchTerm && (
             <button
@@ -221,8 +222,8 @@ const Top100CoursesHubPanel = () => {
             <Select value={selectedList} onValueChange={setSelectedList}>
               <SelectTrigger 
                 aria-label="Select Top 100 list" 
-                className="h-11 w-full rounded-2xl bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150"
-                style={{ color: 'hsl(var(--foreground))' }}
+                className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
               >
                 <SelectValue placeholder="Global Top 100" />
               </SelectTrigger>
@@ -241,8 +242,8 @@ const Top100CoursesHubPanel = () => {
             <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
               <SelectTrigger 
                 aria-label="Sort courses" 
-                className="h-11 w-full rounded-2xl bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150"
-                style={{ color: 'hsl(var(--foreground))' }}
+                className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
               >
                 <SelectValue placeholder="Official ranking" />
               </SelectTrigger>
@@ -263,7 +264,7 @@ const Top100CoursesHubPanel = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="space-y-3 p-3 rounded-2xl bg-card border border-border/40">
+            <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
               <Skeleton className="h-40 w-full rounded-xl" />
               <div className="space-y-2">
                 <Skeleton className="h-5 w-3/4" />
@@ -298,7 +299,8 @@ const Top100CoursesHubPanel = () => {
           {searchTerm ? (
             <button
               onClick={() => setSearchTerm('')}
-              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.97] transition-transform"
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
             >
               <X className="h-3.5 w-3.5" />
               Clear search
@@ -306,7 +308,8 @@ const Top100CoursesHubPanel = () => {
           ) : (
             <button
               onClick={handleResetFilters}
-              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.97] transition-transform"
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
             >
               Reset filters
             </button>
@@ -317,6 +320,7 @@ const Top100CoursesHubPanel = () => {
           courses={allCourses}
           onCourseClick={handleCourseClick}
           activeListSlug={selectedList}
+          showGhostRank={true}
         />
       )}
       </div>
