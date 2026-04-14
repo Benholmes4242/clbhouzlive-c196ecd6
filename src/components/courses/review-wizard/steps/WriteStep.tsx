@@ -1,6 +1,6 @@
 /**
  * Step 2: Write Your Review (The Verdict)
- * Voice input, tappable prompt chips, amber focus cards
+ * Voice input, tappable prompt chips, dispatch-styled focus cards
  * @mention support, grapheme-aware counting
  */
 
@@ -281,13 +281,10 @@ export function WriteStep({
       style={{ background: 'transparent' }}
     >
       {/* Header */}
-      <div className="text-center pb-4">
-        <h2 className="text-[22px] text-foreground" style={{ fontWeight: 900 }}>
-          The Verdict
-        </h2>
-        <p className="text-[13px] text-muted-foreground mt-1">
-          Optional — your ratings already tell the story
-        </p>
+      <div style={{ textAlign: 'center', paddingBottom: 16 }}>
+        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ The Verdict</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>The Verdict</div>
+        <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Optional — your ratings already tell the story</div>
       </div>
 
       {/* Form Fields */}
@@ -297,21 +294,23 @@ export function WriteStep({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="shrink-0 rounded-[14px] p-4 transition-all duration-200"
           style={{
-            background: (isTitleFocused || title.length > 0) ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
-            border: (isTitleFocused || title.length > 0)
-              ? '1.5px solid rgba(245, 158, 11, 0.3)'
-              : '1.5px solid transparent',
+            flexShrink: 0,
+            borderRadius: 12,
+            padding: 16,
+            transition: 'all 0.2s',
+            background: (isTitleFocused || title.length > 0) ? 'rgba(247,147,30,0.04)' : 'rgba(15,23,42,0.03)',
+            border: (isTitleFocused || title.length > 0) ? '1.5px solid rgba(247,147,30,0.25)' : '1.5px solid transparent',
           }}
         >
-          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">
+          <label style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
             Headline
           </label>
           <input
             id="review-title"
             type="text"
-            className="w-full bg-transparent text-foreground text-[16px] font-semibold mt-1 outline-none placeholder:text-muted-foreground/40"
+            className="w-full bg-transparent text-[16px] font-semibold mt-1 outline-none placeholder:text-muted-foreground/40"
+            style={{ color: '#0F172A' }}
             placeholder="Sum up your experience"
             value={title}
             onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
@@ -344,16 +343,16 @@ export function WriteStep({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex-1 flex flex-col min-h-0 rounded-[14px] transition-all duration-200"
+          className="flex-1 flex flex-col min-h-0"
           style={{
-            background: (isReviewFocused || review.length > 0) ? 'rgba(245, 158, 11, 0.04)' : 'hsl(var(--muted) / 0.5)',
-            border: (isReviewFocused || review.length > 0)
-              ? '1.5px solid rgba(245, 158, 11, 0.3)'
-              : '1.5px solid transparent',
+            borderRadius: 12,
+            transition: 'all 0.2s',
+            background: (isReviewFocused || review.length > 0) ? 'rgba(247,147,30,0.04)' : 'rgba(15,23,42,0.03)',
+            border: (isReviewFocused || review.length > 0) ? '1.5px solid rgba(247,147,30,0.25)' : '1.5px solid transparent',
           }}
         >
           <div className="p-4 pb-0 flex-1 flex flex-col min-h-0">
-            <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px]">
+            <label style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
               Your review
             </label>
             <textarea
@@ -364,8 +363,8 @@ export function WriteStep({
               onFocus={() => setIsReviewFocused(true)}
               onBlur={() => setIsReviewFocused(false)}
               placeholder="Share what other golfers should expect"
-              className="w-full bg-transparent text-foreground text-[15px] mt-1 outline-none resize-none placeholder:text-muted-foreground/40"
-              style={{ minHeight: '120px' }}
+              className="w-full bg-transparent text-[15px] mt-1 outline-none resize-none placeholder:text-muted-foreground/40"
+              style={{ minHeight: '120px', color: '#0F172A' }}
               maxLength={MAX_REVIEW_LENGTH + 100}
             />
           </div>
@@ -373,7 +372,7 @@ export function WriteStep({
           {/* Voice toolbar — separated by thin border */}
           <div
             className="flex items-center gap-3 px-4 py-2.5"
-            style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
+            style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}
           >
             <VoiceMic onTranscript={handleVoiceTranscript} onStateChange={setCurrentVoiceState} />
             <span className="text-[12px] text-muted-foreground flex-1">
@@ -393,14 +392,21 @@ export function WriteStep({
 
         {/* Tappable prompt chips */}
         <div>
-          <p className="text-[11px] text-muted-foreground mb-2 ml-0.5">Write about…</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Write about…</span>
+          </div>
           <div className="flex flex-wrap gap-2">
             {CHIPS.map(chip => (
               <button
                 key={chip.label}
                 type="button"
                 onClick={() => insertChip(chip.text)}
-                className="px-3.5 py-1.5 rounded-full border border-border bg-card text-foreground text-[13px] font-medium shadow-sm active:scale-[0.95] active:bg-[rgba(247,147,30,0.1)] transition-all"
+                style={{
+                  padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                  color: '#0F172A', background: '#ffffff', border: '0.5px solid rgba(15,23,42,0.12)', cursor: 'pointer',
+                }}
+                className="active:scale-[0.95] transition-all"
               >
                 {chip.label}
               </button>
