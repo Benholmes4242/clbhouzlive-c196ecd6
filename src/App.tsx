@@ -197,7 +197,7 @@ const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 const BusinessFollowersPage = lazy(() => import("./pages/BusinessFollowersPage"));
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessCreatePage = lazy(() => import("./pages/BusinessCreatePage"));
-const BusinessIntroPage = lazy(() => import("./pages/BusinessIntroPage"));
+
 const BusinessEditWizard = lazy(() => import("./components/business/edit/BusinessEditWizard"));
 const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfileLiveSuccessPage"));
 const BusinessVerificationAboutPage = lazy(() => import("./pages/BusinessVerificationAboutPage"));
@@ -369,7 +369,7 @@ function AppRoutes() {
         {/* Business routes */}
         <Route path="/business-profiles" element={<Navigate to="/businesses/manage" replace />} />
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
-        <Route path="/business/intro" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessIntroPage /></Suspense>} />
+        
         <Route path="/business/create" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessCreatePage /></Suspense>} />
         <Route path="/business/manage" element={<Navigate to="/businesses/manage" replace />} />
         <Route path="/business/insights" element={<Navigate to="/businesses/manage" replace />} />

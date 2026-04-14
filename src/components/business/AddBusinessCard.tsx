@@ -17,8 +17,8 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         className="flex flex-col items-center justify-center py-20 px-6 text-center"
       >
         {/* Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-5">
-          <Building2 className="w-8 h-8 text-[hsl(38,92%,50%)]" />
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.20)' }}>
+          <Building2 className="w-8 h-8" style={{ color: '#F7931E' }} />
         </div>
 
         <h2 className="text-[18px] font-bold text-foreground mb-2">
@@ -31,7 +31,8 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
 
         <button
           onClick={onClick}
-          className="bg-[hsl(38,92%,50%)] text-white min-h-[50px] rounded-2xl px-8 text-[15px] font-semibold hover:bg-[hsl(36,84%,46%)] active:scale-[0.97] transition-all"
+          className="text-white min-h-[50px] rounded-2xl px-8 text-[15px] font-semibold active:scale-[0.97] transition-all"
+          style={{ background: '#F7931E' }}
         >
           Create Business Profile
         </button>
@@ -48,10 +49,11 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
     >
       <button
         onClick={onClick}
-        className="w-full flex items-center gap-3.5 p-4 bg-card border border-dashed border-border rounded-2xl active:bg-muted/50 transition-colors min-h-[44px]"
+        className="w-full flex items-center gap-3.5 p-4 rounded-2xl transition-colors min-h-[44px]"
+        style={{ background: '#ffffff', border: '2px dashed rgba(15,23,42,0.12)' }}
       >
         {/* Icon in muted circle */}
-        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
           <Plus className="w-5 h-5 text-muted-foreground" />
         </div>
 
