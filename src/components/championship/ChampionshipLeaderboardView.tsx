@@ -150,7 +150,8 @@ const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
   <div className="max-w-md mx-auto mt-4">
     <button
       onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm text-sm transition-colors active:scale-[0.98] active:opacity-70"
+      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
     >
       <RefreshCw className="w-3.5 h-3.5" />
       Couldn't load more entries · Tap to retry
@@ -949,9 +950,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             style={{
               padding: '8px 20px',
               borderRadius: 8,
-              border: timeFilter === t.id ? 'none' : '1.5px solid hsl(var(--border))',
-              background: timeFilter === t.id ? 'hsl(var(--foreground))' : 'transparent',
-              color: timeFilter === t.id ? '#fff' : 'hsl(var(--muted-foreground))',
+              border: timeFilter === t.id ? 'none' : '1px solid rgba(15,23,42,0.10)',
+              background: timeFilter === t.id ? '#0F172A' : 'transparent',
+              color: timeFilter === t.id ? '#fff' : '#64748B',
               fontSize: 13,
               fontWeight: 600,
               cursor: 'pointer',
@@ -1072,7 +1073,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           style={{
             background: '#FFFFFF',
             borderRadius: 18,
-            border: '1px solid rgba(0,0,0,0.07)',
+            border: '1px solid rgba(15,23,42,0.07)',
           }}
         >
           <span style={{ fontSize: 36 }}>⛳</span>
@@ -1105,7 +1106,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         style={{
           background: '#FFFFFF',
           borderRadius: 'clamp(14px,4vw,18px)',
-          border: '1px solid rgba(0,0,0,0.07)',
+          border: '1px solid rgba(15,23,42,0.07)',
           overflow: 'hidden',
           overflowAnchor: 'auto',
         }}
@@ -1113,7 +1114,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {/* Loading overlay */}
         {leaderboardLoading && allEntries.length > 0 && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-background/80 backdrop-blur-sm rounded-full shadow-sm border border-border/50">
+            <div className="flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-full" style={{ background: 'rgba(248,250,252,0.85)', border: '0.5px solid rgba(15,23,42,0.10)', boxShadow: '0 1px 6px rgba(0,0,0,0.08)' }}>
               <Loader2 className="w-4 h-4 animate-spin text-primary" />
               <span className="text-xs text-muted-foreground">Updating...</span>
             </div>
