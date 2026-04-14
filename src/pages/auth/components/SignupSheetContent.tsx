@@ -427,10 +427,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
         style={{
           fontWeight: 700,
-          background: isSubmitDisabled ? 'rgba(247,147,30,0.35)' : '#F7931E',
-          color: '#ffffff',
+          background: isSubmitDisabled ? 'rgba(255,255,255,0.35)' : '#ffffff',
+          color: isSubmitDisabled ? 'rgba(15,23,42,0.4)' : '#0F172A',
           cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
-          boxShadow: isSubmitDisabled ? 'none' : '0 4px 20px rgba(247,147,30,0.28)',
+          boxShadow: 'none',
         }}
       >
         {submitting ? (

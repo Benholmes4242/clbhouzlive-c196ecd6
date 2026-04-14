@@ -254,16 +254,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               Create account with Email
             </button>
             
-            {/* OR Divider */}
-            <div className="flex items-center gap-3 py-2 auth-button-4">
-              <div className="flex-1 h-px bg-neutral-700" />
-              <span 
-                className="text-sm font-medium text-neutral-500"
-              >
-                OR
-              </span>
-              <div className="flex-1 h-px bg-neutral-700" />
-            </div>
             
             {/* Sign-in eyebrow label */}
             <div className="auth-button-5 flex items-center justify-center gap-2">
@@ -312,10 +302,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 aria-label="Continue to login"
                 className="w-full h-[56px] flex items-center justify-center rounded-full font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
                 style={{
-                  background: loginEmail.trim() ? '#F7931E' : 'rgba(255,255,255,0.05)',
-                  color: loginEmail.trim() ? '#ffffff' : 'rgba(255,255,255,0.35)',
+                  background: loginEmail.trim() ? '#ffffff' : 'rgba(255,255,255,0.05)',
+                  color: loginEmail.trim() ? '#0F172A' : 'rgba(255,255,255,0.35)',
                   border: loginEmail.trim() ? 'none' : '1px solid rgba(255,255,255,0.10)',
-                  boxShadow: loginEmail.trim() ? '0 4px 20px rgba(247,147,30,0.30)' : 'none',
+                  boxShadow: 'none',
                   cursor: !loginEmail.trim() ? 'not-allowed' : 'pointer',
                 }}
               >
