@@ -112,7 +112,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
       const { golf_clubs: _, ...businessData } = data;
       
       const result: BusinessProfile = {
-        ...(businessData as BusinessProfile),
+        ...(businessData as unknown as BusinessProfile),
         // Use business coords → golf_clubs coords → golf_courses coords
         lat: finalLat,
         lng: finalLng,
