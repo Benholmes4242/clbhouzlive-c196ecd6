@@ -163,7 +163,7 @@ export function FranchiseCard({
           </div>
 
           <div style={{ minWidth: 0 }}>
-            <p style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
               {displayName}
             </p>
             <p style={{ fontSize: '12px', color: '#94A3B8', margin: 0 }}>
