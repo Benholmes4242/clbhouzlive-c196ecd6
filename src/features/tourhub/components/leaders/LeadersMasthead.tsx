@@ -79,7 +79,7 @@ export function LeadersMasthead({
         style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}
       >
         {/* Amber eyebrow */}
-        <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
+        <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
           ⚡ CLBHOUZ · PERFORMANCE RANKINGS
         </div>
 
@@ -87,7 +87,7 @@ export function LeadersMasthead({
         <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Category name as headline */}
-            <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>
               {category.label}
             </h1>
 
@@ -103,11 +103,11 @@ export function LeadersMasthead({
               }}
               className="active:scale-[0.97] transition-transform"
             >
-              <span style={{ fontSize: '13px' }}>{(category as any).emoji}</span>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+              <span style={{ fontSize: '15px' }}>{(category as any).emoji}</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
                 Change
               </span>
-              <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>▾</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>▾</span>
             </button>
           </div>
 
@@ -116,17 +116,17 @@ export function LeadersMasthead({
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
               {category.tourAverage && category.tourAverage !== '—' && (
                 <>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>Tour avg</span>
-                  <span style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Tour avg</span>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>
                     {category.tourAverage}
                   </span>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)' }}>·</span>
+                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.15)' }}>·</span>
                 </>
               )}
               {leaderValue && (
                 <>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>Leader</span>
-                  <span style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Leader</span>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
                     {leaderValue}
                   </span>
                 </>
@@ -149,11 +149,11 @@ export function LeadersMasthead({
                 1
               </span>
               <div>
-                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>SEASON LEADER</div>
+                <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>SEASON LEADER</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
                   <CountryFlag country={leader.player.country_code || leader.player.country} size="sm" />
                   {countryName && (
-                    <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>{countryName}</span>
+                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>{countryName}</span>
                   )}
                 </div>
               </div>
@@ -216,11 +216,11 @@ export function LeadersMasthead({
                         onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
                       />
                     </div>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    <span style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                       {runnersLastName}
                     </span>
                   </div>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginLeft: '6px' }}>
+                  <span style={{ fontSize: '15px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginLeft: '6px' }}>
                     {fmtRunner(runner.value)}{unitRunner ? ` ${unitRunner}` : ''}
                   </span>
                 </Link>

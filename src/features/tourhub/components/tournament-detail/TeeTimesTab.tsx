@@ -82,13 +82,13 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
     <div style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: hasMatchingPlayer ? 'rgba(247,147,30,0.03)' : 'transparent' }}>
       {/* Time + hole row */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '11px 20px 5px' }}>
-        <span style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', width: '72px', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', width: '72px', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {format(new Date(group.teeTime), 'h:mm a')}
         </span>
-        <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', flexShrink: 0 }}>
+        <span style={{ fontSize: '12px', fontWeight: 700, color: '#94A3B8', flexShrink: 0 }}>
           Hole {group.startingHole}
         </span>
-        {group.backNine && <span style={{ fontSize: '9px', color: '#94A3B8', marginLeft: '6px' }}>Back 9</span>}
+        {group.backNine && <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '6px' }}>Back 9</span>}
       </div>
       {/* Players */}
       <div style={{ padding: '0 20px 10px 72px' }}>
@@ -100,7 +100,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
             className="active:opacity-70 transition-opacity"
           >
             <BatchPlayerAvatar playerId={player.playerId || player.id || ''} playerName={player.name} size="sm" />
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A' }}>{player.name}</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A' }}>{player.name}</span>
             {player.country && <CountryFlag country={player.country} size="sm" />}
           </Link>
         ))}
@@ -199,7 +199,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
       <div style={{ padding: '14px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
             Tee Times · {teeTimeDate ?? `Round ${roundNumber}`}
           </span>
           <span style={{ fontSize: '10px', color: '#94A3B8' }}>{groups.length} groups</span>
@@ -228,23 +228,23 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', width: '72px', flexShrink: 0 }}>TIME</span>
-        <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', width: '52px', flexShrink: 0 }}>HOLE</span>
-        <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flex: 1 }}>PLAYERS</span>
+        <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', width: '72px', flexShrink: 0 }}>TIME</span>
+        <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', width: '52px', flexShrink: 0 }}>HOLE</span>
+        <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flex: 1 }}>PLAYERS</span>
       </div>
 
       {/* Groups */}
       <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
         {filteredGroups.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center' as const, padding: '24px 20px' }}>
-            <p style={{ fontSize: '12px', color: '#94A3B8' }}>No players matching "{searchQuery}"</p>
+            <p style={{ fontSize: '14px', color: '#94A3B8' }}>No players matching "{searchQuery}"</p>
           </div>
         )}
 
         {hasSplitTees && groupedByHole ? (
           groupedByHole.map(([hole, holeGroups]) => (
             <div key={hole}>
-              <p style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
+              <p style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (

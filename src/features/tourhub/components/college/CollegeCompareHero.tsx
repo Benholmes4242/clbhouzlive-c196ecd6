@@ -39,13 +39,13 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   return (
     <div style={{ padding: '9px 20px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
-        <span style={{ flex: 1, fontSize: '14px', fontWeight: isLeading1 ? 800 : 500, color: isLeading1 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'left' as const }}>
+        <span style={{ flex: 1, fontSize: '15px', fontWeight: isLeading1 ? 800 : 500, color: isLeading1 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'left' as const }}>
           {format(value1)}
         </span>
-        <span style={{ fontSize: '9px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
+        <span style={{ fontSize: '13px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
           {label}
         </span>
-        <span style={{ flex: 1, fontSize: '14px', fontWeight: isLeading2 ? 800 : 500, color: isLeading2 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'right' as const }}>
+        <span style={{ flex: 1, fontSize: '15px', fontWeight: isLeading2 ? 800 : 500, color: isLeading2 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'right' as const }}>
           {format(value2)}
         </span>
       </div>
@@ -85,7 +85,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
       <div style={{ padding: '14px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '13px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             {title}
           </span>
         </div>
@@ -94,11 +94,11 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '4px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <span style={{ width: '18px', flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', paddingRight: '8px' }}>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', paddingRight: '8px' }}>
           {name1.toUpperCase()}
         </span>
         <div style={{ width: '1px', height: '12px', background: 'rgba(15,23,42,0.07)', flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', paddingLeft: '8px' }}>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', paddingLeft: '8px' }}>
           {name2.toUpperCase()}
         </span>
       </div>
@@ -132,16 +132,16 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     />
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                       {a1.last_name}
                     </div>
-                    <div style={{ fontSize: '9.5px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ fontSize: '11px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
                       {formatStat(a1)}
                     </div>
                   </div>
                 </Link>
               ) : (
-                <span style={{ fontSize: '11px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
+                <span style={{ fontSize: '13px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
               )}
             </div>
 
@@ -165,16 +165,16 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     />
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                       {a2.last_name}
                     </div>
-                    <div style={{ fontSize: '9.5px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ fontSize: '11px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
                       {formatStat(a2)}
                     </div>
                   </div>
                 </Link>
               ) : (
-                <span style={{ fontSize: '11px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
+                <span style={{ fontSize: '13px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
               )}
             </div>
           </div>
@@ -285,7 +285,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
         <div style={{ padding: '14px 20px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
               Season Verdict · {seasonYear}
             </span>
           </div>
@@ -299,21 +299,21 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
               {logo1 ? (
                 <img src={logo1} alt={name1} style={{ width: '26px', height: '26px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
-                <span style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name1.charAt(0)}</span>
+                <span style={{ fontSize: '15px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name1.charAt(0)}</span>
               )}
             </div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>{name1}</div>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>{name1}</div>
             <div style={{ fontSize: '28px', fontWeight: 900, color: c1Wins > c2Wins ? '#F7931E' : '#94A3B8', letterSpacing: '-0.04em', lineHeight: 1 }}>
               {c1Wins}
             </div>
-            <div style={{ fontSize: '9px', color: '#94A3B8' }}>categories led</div>
+            <div style={{ fontSize: '13px', color: '#94A3B8' }}>categories led</div>
           </div>
 
           {/* Centre — verdict chip */}
           <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '6px' }}>
             <div style={{ fontSize: '13px', fontWeight: 900, color: 'rgba(15,23,42,0.1)' }}>—</div>
             <div style={{ padding: '4px 10px', borderRadius: '6px', background: c1Wins === c2Wins ? 'rgba(15,23,42,0.05)' : 'rgba(247,147,30,0.08)', border: `1px solid ${c1Wins === c2Wins ? 'rgba(15,23,42,0.08)' : '#F7931E33'}` }}>
-              <span style={{ fontSize: '9px', fontWeight: 900, color: c1Wins === c2Wins ? '#94A3B8' : '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+              <span style={{ fontSize: '13px', fontWeight: 900, color: c1Wins === c2Wins ? '#94A3B8' : '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
                 {c1Wins === c2Wins ? 'TIED' : c1Wins > c2Wins ? `${name1.split(' ')[0].toUpperCase()} WINS` : `${name2.split(' ')[0].toUpperCase()} WINS`}
               </span>
             </div>
@@ -325,14 +325,14 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
               {logo2 ? (
                 <img src={logo2} alt={name2} style={{ width: '26px', height: '26px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
-                <span style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name2.charAt(0)}</span>
+                <span style={{ fontSize: '15px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name2.charAt(0)}</span>
               )}
             </div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>{name2}</div>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>{name2}</div>
             <div style={{ fontSize: '28px', fontWeight: 900, color: c2Wins > c1Wins ? '#F7931E' : '#94A3B8', letterSpacing: '-0.04em', lineHeight: 1 }}>
               {c2Wins}
             </div>
-            <div style={{ fontSize: '9px', color: '#94A3B8' }}>categories led</div>
+            <div style={{ fontSize: '13px', color: '#94A3B8' }}>categories led</div>
           </div>
         </div>
       </div>
@@ -345,14 +345,14 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
             <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo1 ? <img src={logo1} alt={name1} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B' }}>{name1}</span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748B' }}>{name1}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
-            <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
           </div>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B' }}>{name2}</span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748B' }}>{name2}</span>
             <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo2 ? <img src={logo2} alt={name2} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
@@ -375,7 +375,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
           <div style={{ padding: '14px 20px 0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
+              <span style={{ fontSize: '13px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
             </div>
           </div>
           <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
@@ -393,7 +393,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
           <div style={{ padding: '14px 20px 0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Ball Striking</span>
+              <span style={{ fontSize: '13px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Ball Striking</span>
             </div>
           </div>
           <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>

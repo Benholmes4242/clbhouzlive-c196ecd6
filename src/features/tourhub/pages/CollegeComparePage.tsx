@@ -26,13 +26,13 @@ export function CollegeComparePage() {
         {/* ── SLATE EDITORIAL MASTHEAD ── */}
         <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
           {/* Amber eyebrow */}
-          <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '8px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '8px' }}>
             ⚡ CLBHOUZ · COLLEGE HEAD-TO-HEAD
           </div>
 
           {!hasValidParams ? (
             <div style={{ paddingBottom: '20px' }}>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>
+              <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>
                 Select two colleges to compare
               </p>
             </div>
@@ -48,7 +48,7 @@ export function CollegeComparePage() {
                   <div style={{ height: '20px', width: '100px', borderRadius: '4px', background: 'rgba(255,255,255,0.04)' }} />
                 </div>
                 <div style={{ width: '40px', display: 'flex', justifyContent: 'center', paddingBottom: '22px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 900, color: 'rgba(255,255,255,0.06)' }}>VS</span>
+                  <span style={{ fontSize: '13px', fontWeight: 900, color: 'rgba(255,255,255,0.06)' }}>VS</span>
                 </div>
                 <div style={{ flex: 1, paddingBottom: '14px', display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end' }}>
                   <div style={{ height: '8px', width: '70px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', marginBottom: '8px' }} />
@@ -121,19 +121,19 @@ export function CollegeComparePage() {
                           )}
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: '14px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                          <div style={{ fontSize: '15px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                             {name1}
                           </div>
-                          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginTop: '1px' }}>
+                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '1px' }}>
                             {c1Alumni} alumni
                           </div>
                         </div>
                       </div>
-                      <div style={{ fontSize: '20px', fontWeight: 900, color: c1Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                      <div style={{ fontSize: '22px', fontWeight: 900, color: c1Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
                         {formatEarnings(c1Earnings)}
                       </div>
                       {c1Overall && (
-                        <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginTop: '3px' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginTop: '3px' }}>
                           LEADING
                         </div>
                       )}
@@ -141,7 +141,7 @@ export function CollegeComparePage() {
 
                     {/* VS slug */}
                     <div style={{ flexShrink: 0, width: '40px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', paddingBottom: '22px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 900, color: 'rgba(255,255,255,0.12)', letterSpacing: '0.1em' }}>VS</span>
+                      <span style={{ fontSize: '13px', fontWeight: 900, color: 'rgba(255,255,255,0.12)', letterSpacing: '0.1em' }}>VS</span>
                     </div>
 
                     {/* College 2 right */}
@@ -155,10 +155,10 @@ export function CollegeComparePage() {
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px', justifyContent: 'flex-end' }}>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: '14px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                          <div style={{ fontSize: '15px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                             {name2}
                           </div>
-                          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginTop: '1px' }}>
+                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '1px' }}>
                             {c2Alumni} alumni
                           </div>
                         </div>
@@ -170,11 +170,11 @@ export function CollegeComparePage() {
                           )}
                         </div>
                       </div>
-                      <div style={{ fontSize: '20px', fontWeight: 900, color: c2Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                      <div style={{ fontSize: '22px', fontWeight: 900, color: c2Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
                         {formatEarnings(c2Earnings)}
                       </div>
                       {c2Overall && (
-                        <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginTop: '3px' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginTop: '3px' }}>
                           LEADING
                         </div>
                       )}
@@ -190,8 +190,8 @@ export function CollegeComparePage() {
                       { l: 'PLAYERS', v: `${c1Alumni} – ${c2Alumni}` },
                     ] as const).map((s, i) => (
                       <div key={s.l} style={{ padding: '8px 0 10px', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
-                        <div style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', marginBottom: '3px' }}>{s.l}</div>
-                        <div style={{ fontSize: '11px', fontWeight: 800, color: i === 0 ? '#F7931E' : '#ffffff' }}>{s.v}</div>
+                        <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', marginBottom: '3px' }}>{s.l}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 800, color: i === 0 ? '#F7931E' : '#ffffff' }}>{s.v}</div>
                       </div>
                     ))}
                   </div>
@@ -232,7 +232,7 @@ export function CollegeComparePage() {
             <div style={{ textAlign: 'center' as const, padding: '48px 20px' }}>
               <button
                 onClick={() => navigate('/tourhub/college-golf')}
-                style={{ fontSize: '14px', fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ fontSize: '15px', fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 Browse colleges
               </button>
@@ -251,7 +251,7 @@ export function CollegeComparePage() {
             </div>
           ) : error ? (
             <div style={{ textAlign: 'center' as const, padding: '48px 20px' }}>
-              <p style={{ fontSize: '14px', color: '#94A3B8' }}>Failed to load comparison data</p>
+              <p style={{ fontSize: '15px', color: '#94A3B8' }}>Failed to load comparison data</p>
             </div>
           ) : data ? (
             <CollegeCompareHero data={data} />

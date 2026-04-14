@@ -94,7 +94,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: { winner: any; runnerUp: 
       <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
+          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
         </div>
       </div>
 
@@ -104,8 +104,8 @@ function WinnerCard({ winner, runnerUp, headshotMap }: { winner: any; runnerUp: 
           <div style={{ padding: '12px 20px 14px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
-                <div style={{ fontSize: '22px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                <div style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
+                <div style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                   {winner.player?.full_name ?? 'Unknown'}
                 </div>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' as const }}>
@@ -121,7 +121,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: { winner: any; runnerUp: 
 
               <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
                 <div style={{ fontSize: '32px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.05em', lineHeight: 1 }}>{scoreToPar}</div>
-                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#94A3B8', letterSpacing: '0.08em' }}>TO PAR</div>
+                <div style={{ fontSize: '10px', fontWeight: 900, color: '#94A3B8', letterSpacing: '0.08em' }}>TO PAR</div>
               </div>
             </div>
           </div>
@@ -171,25 +171,25 @@ export function SummaryTab({
           <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1 }} />
-              <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
+              <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
             </div>
           </div>
 
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             {['ROUND', 'LOW', 'AVG', 'BIRDIES', 'BOGEYS'].map((h, i) => (
-              <span key={h} style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flex: i === 0 ? '0 0 52px' : '1', textAlign: i > 0 ? 'center' as const : 'left' as const }}>{h}</span>
+              <span key={h} style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flex: i === 0 ? '0 0 52px' : '1', textAlign: i > 0 ? 'center' as const : 'left' as const }}>{h}</span>
             ))}
           </div>
 
           <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
             {scoringStats.rounds.map((round: any) => (
               <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', fontVariantNumeric: 'tabular-nums' }}>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', flex: '0 0 52px' }}>R{round.round}</span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#F7931E', flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
-                <span style={{ fontSize: '13px', color: '#64748B', flex: 1, textAlign: 'center' as const }}>{round.avgScore.toFixed(1)}</span>
-                <span style={{ fontSize: '13px', color: '#16A34A', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
-                <span style={{ fontSize: '13px', color: '#DC2626', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', flex: '0 0 52px' }}>R{round.round}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#F7931E', flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
+                <span style={{ fontSize: '14px', color: '#64748B', flex: 1, textAlign: 'center' as const }}>{round.avgScore.toFixed(1)}</span>
+                <span style={{ fontSize: '14px', color: '#16A34A', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
+                <span style={{ fontSize: '14px', color: '#DC2626', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
               </div>
             ))}
           </div>
@@ -215,7 +215,7 @@ export function SummaryTab({
             <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                 <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1 }} />
-                <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
+                <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
               </div>
             </div>
             <div style={{ background: '#ffffff', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '12px 20px 16px' }}>
@@ -227,8 +227,8 @@ export function SummaryTab({
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px', textAlign: 'center' as const }}>
                 {segments.map((seg) => (
                   <div key={seg.label}>
-                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{seg.count}</div>
-                    <div style={{ fontSize: '8.5px', fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>{seg.label}</div>
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{seg.count}</div>
+                    <div style={{ fontSize: '10px', fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>{seg.label}</div>
                   </div>
                 ))}
               </div>
@@ -243,15 +243,15 @@ export function SummaryTab({
           <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1 }} />
-              <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Top Finishers</span>
+              <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Top Finishers</span>
             </div>
           </div>
 
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <span style={{ width: '36px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
-            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>SCORE</span>
+            <span style={{ width: '36px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
+            <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
+            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>SCORE</span>
           </div>
 
           <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
@@ -279,12 +279,12 @@ export function SummaryTab({
                     }}
                     className="active:bg-black/[0.02] transition-colors"
                   >
-                    <span style={{ width: '36px', fontSize: '12px', fontWeight: 900, color: isWinner ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                    <span style={{ width: '36px', fontSize: '14px', fontWeight: 900, color: isWinner ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                       {entry.position_tied ? `T${entry.position}` : entry.position}
                     </span>
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
-                      <span style={{ fontSize: '13px', fontWeight: isWinner ? 800 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                      <span style={{ fontSize: '14px', fontWeight: isWinner ? 800 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                         {entry.player?.full_name || 'Unknown'}
                       </span>
                     </div>
@@ -308,20 +308,20 @@ export function SummaryTab({
               <div style={{ padding: '14px 20px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-                  <span style={{ fontSize: '9px', fontWeight: 900, color: '#22C55E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Live Round Summary</span>
+                  <span style={{ fontSize: '10px', fontWeight: 900, color: '#22C55E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Live Round Summary</span>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', textAlign: 'center' as const, padding: '0 20px 14px' }}>
                 <div>
-                  <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>LOW ROUND</div>
+                  <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>LOW ROUND</div>
                   <div style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.lowScore}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>SCORING AVG</div>
+                  <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>SCORING AVG</div>
                   <div style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>FIELD</div>
+                  <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>FIELD</div>
                   <div style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.playerCount}</div>
                 </div>
               </div>

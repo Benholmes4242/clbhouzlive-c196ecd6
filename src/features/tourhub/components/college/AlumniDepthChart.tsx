@@ -74,16 +74,16 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
               />
             ) : (
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#94A3B8' }}>{initials}</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#94A3B8' }}>{initials}</span>
               </div>
             )}
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
               {fullName}
             </div>
             {hasWorldRank && (
-              <div style={{ fontSize: '9.5px', color: '#94A3B8', marginTop: '1px' }}>
+              <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '1px' }}>
                 #{alumnus.world_ranking} OWGR
               </div>
             )}
@@ -91,17 +91,17 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
         </div>
 
         {/* OWGR number */}
-        <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '10px', color: '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '12px', color: '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {hasWorldRank ? `#${alumnus.world_ranking}` : '—'}
         </span>
 
         {/* Earnings */}
-        <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 700, color: '#F7931E', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '13px', fontWeight: 700, color: '#F7931E', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {hasEarnings ? formatCurrency(alumnus.earnings ?? 0) : '—'}
         </span>
 
         {/* Wins */}
-        <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '11px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {alumnus.wins ?? 0}
         </span>
       </Link>
@@ -134,11 +134,11 @@ function Section({ title, subtitle, alumni, defaultExpanded = true, tierAccent }
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' as const, borderTop: '0.5px solid rgba(15,23,42,0.07)' }}
       >
         <div style={{ width: 3, height: 14, background: tierBorderColor[tierAccent], borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: '9px', fontWeight: 900, color: tierBorderColor[tierAccent], letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+        <span style={{ fontSize: '12px', fontWeight: 900, color: tierBorderColor[tierAccent], letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
           {title} · {subtitle}
         </span>
-        <span style={{ fontSize: '9.5px', color: '#94A3B8' }}>{alumni.length}</span>
-        <span style={{ fontSize: '10px', color: '#CBD5E1', marginLeft: '4px' }}>
+        <span style={{ fontSize: '12px', color: '#94A3B8' }}>{alumni.length}</span>
+        <span style={{ fontSize: '12px', color: '#CBD5E1', marginLeft: '4px' }}>
           {isExpanded ? '▾' : '▸'}
         </span>
       </button>
@@ -147,10 +147,10 @@ function Section({ title, subtitle, alumni, defaultExpanded = true, tierAccent }
         <>
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '4px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
-            <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>OWGR</span>
-            <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
-            <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>W</span>
+            <span style={{ flex: 1, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
+            <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>OWGR</span>
+            <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
+            <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>W</span>
           </div>
 
           {displayedAlumni.map((alumnus, index) => (
@@ -160,7 +160,7 @@ function Section({ title, subtitle, alumni, defaultExpanded = true, tierAccent }
           {hasMore && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              style={{ width: '100%', padding: '10px 0', fontSize: '11px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
+              style={{ width: '100%', padding: '10px 0', fontSize: '12px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
             >
               {isExpanded ? `View all ${alumni.length} ▾` : 'Show less ▴'}
             </button>

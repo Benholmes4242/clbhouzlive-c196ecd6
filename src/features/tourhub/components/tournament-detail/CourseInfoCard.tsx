@@ -43,7 +43,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
       <div style={{ padding: '14px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Course Info
           </span>
         </div>
@@ -52,13 +52,13 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
       {/* Flat ruled rows */}
       {items.map((item) => (
         <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
+          <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
           {item.link ? (
-            <Link to={item.link} style={{ fontSize: '13px', fontWeight: 600, color: '#F7931E', textDecoration: 'none', flex: 1 }} className="active:opacity-70 transition-opacity">
+            <Link to={item.link} style={{ fontSize: '14px', fontWeight: 600, color: '#F7931E', textDecoration: 'none', flex: 1 }} className="active:opacity-70 transition-opacity">
               {item.value}
             </Link>
           ) : (
-            <span style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', flex: 1 }}>{item.value}</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A', flex: 1 }}>{item.value}</span>
           )}
         </div>
       ))}

@@ -53,18 +53,18 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
         )}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+        <p style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
           {displayName}
         </p>
-        <p style={{ fontSize: '10px', color: '#94A3B8', margin: 0 }}>
+        <p style={{ fontSize: '11px', color: '#94A3B8', margin: 0 }}>
           {stats.player_count} alumni
         </p>
       </div>
       <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
-        <p style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <p style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
           {formatCurrency(stats.earnings_total)}
         </p>
-        <p style={{ fontSize: '10px', color: '#94A3B8', margin: 0 }}>
+        <p style={{ fontSize: '11px', color: '#94A3B8', margin: 0 }}>
           {stats.wins_total} wins · {stats.top10_total} top 10s
         </p>
       </div>
