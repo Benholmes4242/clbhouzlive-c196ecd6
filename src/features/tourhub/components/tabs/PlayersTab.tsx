@@ -436,6 +436,7 @@ export function PlayersTab() {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      style={{ background: '#F8FAFC' }}
     >
       {/* Pull-to-refresh indicator */}
       <AnimatePresence>
