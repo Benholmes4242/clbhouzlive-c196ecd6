@@ -311,7 +311,7 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
         className="inline-flex"
       >
         <div className="glass-card flex items-center gap-2 px-3 py-1.5 rounded-full">
-          <Sparkles className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+          <Sparkles className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#F7931E' }} />
           
           <span className="text-[11px] text-white/90 leading-tight font-medium">{currentInsight.text}</span>
           

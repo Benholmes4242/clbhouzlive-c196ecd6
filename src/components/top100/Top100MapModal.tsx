@@ -24,11 +24,11 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="bottom" 
-        className="h-full p-0 overflow-hidden border-t-0"
+        className="!inset-0 !max-h-full !h-full p-0 overflow-hidden border-t-0 border-0"
         hideCloseButton
       >
-        {/* Full-bleed map - no header, extends to top of screen */}
-        <div className="h-full">
+        {/* Full-bleed map - extends to very top of screen including safe area */}
+        <div className="h-full w-full">
           <Top100MapView 
             scope={scope}
             onScopeChange={onScopeChange}

@@ -52,7 +52,7 @@ const REGION_CONFIG: Record<
   },
 };
 
-const PLAYED_COLOR = '#f59e0b';       // amber-400 — brand colour, matches accent-amber
+const PLAYED_COLOR = '#F7931E';       // dispatch amber — clbhouz brand token
 const WANT_TO_PLAY_COLOR = '#22c55e'; // green-500 — aspiration, growth
 
 // Shared fog config
@@ -84,7 +84,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // Played markers always use amber per design system (not season-themed)
-  const seasonColor = '#f59e0b';
+  const seasonColor = '#F7931E';
 
   const {
     data: courses = [],
@@ -559,7 +559,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   if (!MAP_CONFIG.TOKEN) {
     return (
-      <div className="rounded-sq-lg border border-dashed border-border bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
+      <div className="rounded-sq-lg px-4 py-6 text-center text-sm" style={{ background: '#ffffff', border: '1px dashed rgba(15,23,42,0.15)', color: '#64748B' }}>
         <p className="font-semibold">Map Temporarily Unavailable</p>
         <p className="mt-1 text-xs text-muted-foreground">
           The interactive map feature is currently unavailable.
@@ -574,11 +574,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       fullHeight ? 'h-full' : 'space-y-2'
     )}>
       {/* Map container */}
-      <div className={cn(
-        'relative overflow-hidden',
-        fullHeight ? 'absolute inset-0' : 'rounded-sq-lg',
-        'bg-muted dark:bg-background'
-      )}>
+      <div
+        className={cn(
+          'relative overflow-hidden',
+          fullHeight ? 'absolute inset-0' : 'rounded-sq-lg',
+        )}
+        style={{ background: '#1a2040' }}
+      >
         <div
           ref={mapContainerRef}
           className={cn(
@@ -590,10 +592,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
         {/* Loading overlay */}
         {(isLoading || !mapLoaded) && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-background/80 backdrop-blur-sm">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center backdrop-blur-sm" style={{ background: 'rgba(26,32,64,0.80)' }}>
             <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 rounded-full border-2 border-border border-t-muted-foreground animate-spin" />
-              <span className="text-xs text-muted-foreground font-medium">Loading map...</span>
+              <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
+              <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>Loading map...</span>
             </div>
           </div>
         )}
