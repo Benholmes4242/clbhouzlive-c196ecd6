@@ -417,7 +417,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
       if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last, m.start)}</span>);
-      parts.push(<span key={`m-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.90)', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
+      parts.push(<span key={`m-${partIndex++}`} style={{ color: '#0F172A', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
       last = m.end;
     }
     if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: DARK_TEXT }}>{state.caption.slice(last)}</span>);
@@ -561,7 +561,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               left: 16,
               width: 1.5,
               height: 29,
-              background: 'rgba(255,255,255,0.80)',
+              background: 'rgba(15,23,42,0.75)',
               borderRadius: 0.75,
               animation: 'blink 1s step-end infinite',
               pointerEvents: 'none',
@@ -584,7 +584,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             }
           }}
           placeholder="What's on your mind?"
-          className="w-full resize-none outline-none placeholder:text-white/[.16]"
+          className="w-full resize-none outline-none placeholder:text-black/[.25]"
           style={{
             background: 'transparent',
             fontSize: 20,
@@ -614,8 +614,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             width: 42,
             height: 42,
             borderRadius: '50%',
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.14)',
+            background: 'rgba(15,23,42,0.05)',
+            border: '1px solid rgba(15,23,42,0.07)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -623,12 +623,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             zIndex: 3,
           }}
         >
-          <ImagePlus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2} />
+          <ImagePlus className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.65)' }} strokeWidth={2} />
         </motion.button>
       </div>
 
       {/* Hairline below textarea */}
-      <div className="mx-4" style={{ height: 1, background: 'rgba(255,255,255,0.08)', marginTop: 14 }} />
+      <div className="mx-4" style={{ height: 1, background: 'rgba(15,23,42,0.07)', marginTop: 14 }} />
 
       {pushCourseToBottom && <div className="flex-1" />}
 
@@ -721,7 +721,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
                   className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                  style={{ background: 'rgba(15,23,42,0.06)' }}
                 >
                   <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
                 </div>
