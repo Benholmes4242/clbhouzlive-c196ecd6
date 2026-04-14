@@ -244,12 +244,13 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
     <PageRoot className="min-h-screen bg-background">
       {/* Read-only header when viewing another user's quest */}
       {!isOwnProfile && (
-        <header className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 bg-background/80 backdrop-blur-lg border-b border-border/60"
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        <header className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 backdrop-blur-lg"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)', background: 'rgba(248,250,252,0.95)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
         >
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.97] transition-transform"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
+            style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -285,7 +286,13 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 
         {/* Section 4: Journey Map - directly on page background */}
         <section className="px-4 mb-10" ref={journeyMapRef}>
-          <h2 className="text-sm font-semibold text-muted-foreground mb-4">Journey Map</h2>
+          <div className="mb-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Journey Map</span>
+            </div>
+            <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Milestone Ladder</h2>
+          </div>
           {showJourneyHint && (
             <p className="text-sm mb-3 text-muted-foreground/60 transition-opacity duration-500">
               Your journey unfolds here
@@ -313,7 +320,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         {/* Section 7: Friends Leaderboard — own profile only */}
         {isOwnProfile && (
           <section className="px-4 mb-10">
-            <div className="bg-card rounded-2xl p-4 border border-border">
+            <div className="rounded-2xl p-4" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
               <LeaderboardCard userId={targetUserId} totalPlayed={totalPlayed} />
             </div>
           </section>

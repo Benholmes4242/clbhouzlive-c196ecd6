@@ -96,7 +96,13 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
   return (
     <section>
       {/* Section header */}
-      <h2 className="text-sm font-semibold text-muted-foreground mb-4">Momentum</h2>
+      <div className="mb-4">
+        <div className="flex items-center gap-1.5 mb-1">
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Momentum</span>
+        </div>
+        <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Your Momentum</h2>
+      </div>
       
       {/* Icon + stat rows */}
       <motion.div
@@ -156,7 +162,8 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
         ) : (
           <div className="flex items-center gap-3 py-2">
             <div 
-              className="w-9 h-9 rounded-xl flex items-center justify-center bg-muted border border-border"
+               className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
             >
               <Flame className="w-4 h-4 text-muted-foreground" />
             </div>

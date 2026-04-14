@@ -157,7 +157,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           />
           {/* Earned checkmark overlay */}
           {milestone.isUnlocked && (
-            <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-[#f59e0b] flex items-center justify-center border-2 border-white">
+            <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white" style={{ backgroundColor: '#F7931E' }}>
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
@@ -324,9 +324,9 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
         />
         {/* Earned checkmark */}
         {milestone.isUnlocked && (
-          <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-[#f59e0b] flex items-center justify-center border-2 border-white">
-            <Check className="w-3 h-3 text-white" />
-          </div>
+           <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white" style={{ backgroundColor: '#F7931E' }}>
+             <Check className="w-3 h-3 text-white" />
+           </div>
         )}
       </motion.div>
       
@@ -463,7 +463,8 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       {/* Mastery Track Section */}
       {regionMilestones.length > 0 && (
         <motion.div 
-          className="relative mt-8 pt-6 border-t border-border/60"
+          className="relative mt-8 pt-6"
+          style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}

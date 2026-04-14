@@ -132,20 +132,25 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
     <section>
       {/* Section header with toggle */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-sm font-semibold text-muted-foreground">
-          Trophy Case
-        </h2>
+        <div>
+          <div className="flex items-center gap-1.5 mb-1">
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Trophy Case</span>
+          </div>
+          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Achievements</h2>
+        </div>
         
         {/* Hub-style toggle bar */}
-        <div className="inline-flex items-center gap-1 p-1 bg-muted/50 rounded-full border border-border/50">
+        <div className="inline-flex items-center gap-1 p-1 rounded-full" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
           <button
             onClick={() => setFilter('milestones')}
             className={cn(
               "px-3 min-h-[44px] text-xs font-medium rounded-full transition-all duration-200 active:scale-[0.98]",
               filter === 'milestones'
-                ? "bg-card text-foreground shadow-sm"
+                ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
+            style={filter === 'milestones' ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' } : undefined}
           >
             Milestones
           </button>
@@ -154,9 +159,10 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
             className={cn(
               "px-3 min-h-[44px] text-xs font-medium rounded-full transition-all duration-200 active:scale-[0.98]",
               filter === 'regions'
-                ? "bg-card text-foreground shadow-sm"
+                ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
+            style={filter === 'regions' ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' } : undefined}
           >
             Regions
           </button>
@@ -203,11 +209,11 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                     <div className="relative mb-2">
                       {/* Earned: subtle glow */}
                       {m.isUnlocked && (
-                        <div className="absolute inset-0 rounded-full bg-amber-400/15 blur-md scale-110" />
+                        <div className="absolute inset-0 rounded-full blur-md scale-110" style={{ background: 'rgba(247,147,30,0.15)' }} />
                       )}
                       {/* Next up: pulsing amber ring */}
                       {isNext && !m.isUnlocked && (
-                        <div className="absolute inset-[-4px] rounded-full border-2 border-amber-400/60 animate-pulse" />
+                        <div className="absolute inset-[-4px] rounded-full border-2 animate-pulse" style={{ borderColor: 'rgba(247,147,30,0.60)' }} />
                       )}
                       <img
                         src={BADGE_IMAGES[m.threshold]}
@@ -233,7 +239,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                     </span>
                     {/* Progress text under locked badges */}
                     {!m.isUnlocked && isNext && (
-                      <span className="text-xs text-amber-600 font-semibold tabular-nums mt-0.5">
+                      <span className="text-xs font-semibold tabular-nums mt-0.5" style={{ color: '#F7931E' }}>
                         {remaining} away!
                       </span>
                     )}
@@ -273,7 +279,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   {/* Region badge */}
                   <div className="relative mb-2">
                     {r.isUnlocked && (
-                      <div className="absolute inset-0 rounded-full bg-amber-400/15 blur-md scale-110" />
+                      <div className="absolute inset-0 rounded-full blur-md scale-110" style={{ background: 'rgba(247,147,30,0.15)' }} />
                     )}
                     <img
                       src={badgeImage}
