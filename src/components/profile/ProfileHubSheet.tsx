@@ -50,6 +50,18 @@ interface ProfileHubSheetProps {
   isLoading?: boolean;
 }
 
+// ── Dispatch Rule Marker ──
+function RuleMarker({ label }: { label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
+      <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
 // ── Skeleton ──
 
 function ProfileHubSheetSkeleton() {
@@ -68,8 +80,11 @@ function ProfileHubSheetSkeleton() {
       <Skeleton className="h-[48px] w-full rounded-[12px] mb-3" />
 
       {/* ── Switch Profile skeleton ── */}
-      <div className="pb-3">
-        <Skeleton className="h-3 w-24 rounded-lg mb-2" />
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
+          <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
+          <Skeleton className="h-2.5 w-24 rounded" />
+        </div>
         <div className="flex gap-3 overflow-hidden">
           {[0, 1, 2].map(i => (
             <div key={i} className="flex flex-col items-center gap-1.5 shrink-0 min-w-[72px]">
@@ -82,7 +97,7 @@ function ProfileHubSheetSkeleton() {
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-border/50 -mx-4" />
+      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
       {/* ── Quick action tiles skeleton — 3 columns ── */}
       <div className="grid grid-cols-3 gap-2 py-4">
@@ -92,11 +107,14 @@ function ProfileHubSheetSkeleton() {
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-border/50 -mx-4" />
+      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
       {/* ── Account rows skeleton ── */}
       <div className="py-3 space-y-1">
-        <Skeleton className="h-3 w-16 rounded-lg mb-2" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
+          <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
+          <Skeleton className="h-2.5 w-16 rounded" />
+        </div>
         {[0, 1, 2].map(i => (
           <div key={i} className="flex items-center gap-3 min-h-[48px] px-2">
             <Skeleton className="w-[34px] h-[34px] rounded-[10px]" />
@@ -210,13 +228,10 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { emoji: '✏️', bg: 'rgba(0,0,0,0.06)', label: 'Edit profile', route: '/edit-profile' },
-    { emoji: '🏢', bg: 'rgba(0,0,0,0.06)', label: 'Manage business profiles', route: '/businesses/manage' },
-    { emoji: '⚙️', bg: 'rgba(0,0,0,0.06)', label: 'Settings', route: '/settings' },
+    { emoji: '✏️', bg: 'rgba(15,23,42,0.05)', label: 'Edit profile', route: '/edit-profile' },
+    { emoji: '🏢', bg: 'rgba(15,23,42,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
+    { emoji: '⚙️', bg: 'rgba(15,23,42,0.05)', label: 'Settings', route: '/settings' },
   ];
-
-  // ── Section label class ──
-  const sectionLabelClass = "text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mb-2";
 
   // ── Portal content ──
 
@@ -254,7 +269,7 @@ function ProfileHubSheet({
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0 touch-none cursor-grab active:cursor-grabbing">
-              <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
             </div>
 
             {/* Scrollable content */}
@@ -333,11 +348,9 @@ function ProfileHubSheet({
               </button>
 
               {/* ── Switch profile ── */}
-              <div className="pb-3">
+              <div>
 
-                <div className={sectionLabelClass}>
-                  Switch Profile
-                </div>
+                <RuleMarker label="Switch Profile" />
                 <div
                   className="flex gap-3 overflow-x-auto pb-2 pt-1 no-scrollbar"
                   style={{
@@ -403,7 +416,7 @@ function ProfileHubSheet({
               </div>
 
               {/* ── Divider ── */}
-              <div className="h-px bg-border/50 -mx-4" />
+              <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
               {/* ── Quick actions — 3 column grid ── */}
               <div className="grid grid-cols-3 gap-2 py-4">
@@ -477,20 +490,18 @@ function ProfileHubSheet({
               </div>
 
               {/* ── Divider ── */}
-              <div className="h-px bg-border/50 -mx-4" />
+              <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
-              {/* ── Account section — #4 icon boxes ── */}
-              <div className="py-3">
-                <div className={sectionLabelClass}>
-                  Account
-                </div>
+              {/* ── Account section ── */}
+              <div>
+                <RuleMarker label="Account" />
                 {accountRows.map(({ emoji, bg, label, route }, index) => (
                   <div key={label}>
-                    {index > 0 && <div className="h-px bg-border/30 mx-1" />}
+                    {index > 0 && <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', marginLeft: 46 }} />}
                     <button
                       type="button"
                       onClick={() => handleNav(route)}
-                      className="w-full flex items-center gap-3 min-h-[48px] hover:bg-muted/40 active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors duration-150"
+                      className="w-full flex items-center gap-3 min-h-[48px] rounded-xl active:bg-[rgba(15,23,42,0.03)] transition-colors duration-150"
                     >
                       <div
                         className="flex items-center justify-center rounded-[10px]"
@@ -508,29 +519,27 @@ function ProfileHubSheet({
               {/* ── Admin section ── */}
               {isAdmin && (
                 <>
-                  <div className="h-px bg-border/50 -mx-4" />
-                  <div className="py-3">
-                    <div className={sectionLabelClass}>
-                      Admin
-                    </div>
+                  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
+                  <div>
+                    <RuleMarker label="Admin" />
                     <button
                       type="button"
                       onClick={() => handleNav('/admin/command-center')}
-                      className="w-full flex items-center gap-3 min-h-[48px] bg-primary/10 rounded-2xl px-4 hover:bg-primary/15 active:bg-primary/20 transition-colors duration-150"
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, minHeight: 48, background: 'rgba(247,147,30,0.06)', border: '1px solid rgba(247,147,30,0.18)', borderRadius: 12, padding: '0 14px', cursor: 'pointer' }}
                     >
-                      <Shield className="w-5 h-5 text-primary" />
+                      <Shield className="w-5 h-5" style={{ color: '#F7931E' }} />
                       <div className="flex-1 text-left">
-                        <div className="text-[14px] font-semibold text-primary">Command Center</div>
-                        <div className="text-[11px] text-primary/60">Manage site settings</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#F7931E' }}>Command Center</div>
+                        <div style={{ fontSize: 11, color: 'rgba(247,147,30,0.55)' }}>Manage site settings</div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-primary/60" />
+                      <ChevronRight className="w-4 h-4" style={{ color: 'rgba(247,147,30,0.40)' }} />
                     </button>
                   </div>
                 </>
               )}
 
               {/* ── Divider ── */}
-              <div className="h-px bg-border/50 -mx-4" />
+              <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
               {/* ── Logout — #6 pill buttons ── */}
               <div className="py-3" style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom, 0px))' }}>
@@ -548,14 +557,15 @@ function ProfileHubSheet({
                     <button
                       type="button"
                       onClick={() => setShowLogoutConfirm(false)}
-                      className="flex-1 min-h-[50px] rounded-full border border-border/60 bg-black/[0.04] text-[14px] font-semibold text-muted-foreground hover:bg-muted/40 active:bg-muted/50 transition-colors duration-150"
+                      style={{ flex: 1, minHeight: 50, borderRadius: 25, background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.12)', fontSize: 14, fontWeight: 600, color: '#64748B', cursor: 'pointer' }}
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex-1 min-h-[50px] rounded-full bg-destructive text-[14px] font-bold text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 transition-colors duration-150"
+                      className="active:opacity-90 transition-opacity"
+                      style={{ flex: 1, minHeight: 50, borderRadius: 25, background: '#DC2626', border: 'none', fontSize: 14, fontWeight: 700, color: '#ffffff', cursor: 'pointer' }}
                     >
                       Sign out
                     </button>
