@@ -1,6 +1,6 @@
 /**
  * PickFranchiseSheet — Bottom sheet for discovering and following college franchises.
- * Uses BottomSheet component for consistent sheet behaviour.
+ * Dispatch flat-row design.
  */
 
 import { useState, useMemo } from 'react';
@@ -50,9 +50,9 @@ function FollowBtn({
         fontWeight: 600,
         borderRadius: '20px',
         padding: '8px 18px',
-        border: isFollowed ? 'none' : '1px solid hsl(var(--border) / 0.6)',
-        background: isFollowed ? 'hsl(var(--foreground) / 0.9)' : 'hsl(var(--card))',
-        color: isFollowed ? 'hsl(var(--background))' : 'hsl(var(--foreground))',
+        background: isFollowed ? '#0F172A' : 'transparent',
+        color: isFollowed ? '#ffffff' : '#0F172A',
+        border: isFollowed ? 'none' : '1px solid rgba(15,23,42,0.15)',
         cursor: isPending ? 'not-allowed' : 'pointer',
         opacity: isPending ? 0.6 : 1,
         transition: 'all 0.2s ease',
@@ -61,6 +61,41 @@ function FollowBtn({
     >
       {isFollowed ? 'Following ✓' : 'Follow'}
     </button>
+  );
+}
+
+function CollegeRow({
+  normalizedName,
+  displayName,
+  logoUrl,
+  playerCount,
+  userId,
+  isFollowed,
+}: {
+  normalizedName: string;
+  displayName: string;
+  logoUrl: string | null;
+  playerCount: number;
+  userId: string | undefined;
+  isFollowed: boolean;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+      {/* Logo chip */}
+      <div style={{ width: 30, height: 30, borderRadius: 8, overflow: 'hidden', background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        {logoUrl
+          ? <img src={logoUrl} alt={displayName} style={{ width: 22, height: 22, objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
+          : <span style={{ fontSize: 12, fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{displayName.charAt(0)}</span>
+        }
+      </div>
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{displayName}</div>
+        <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>{playerCount} {playerCount === 1 ? 'pro' : 'pros'} on tour</div>
+      </div>
+      {/* Follow button */}
+      <FollowBtn normalizedName={normalizedName} userId={userId} isFollowed={isFollowed} />
+    </div>
   );
 }
 
@@ -96,66 +131,40 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
       ariaLabelledBy="pick-franchise-title"
     >
       <div
-        className="overflow-y-auto overscroll-contain px-4 pb-2"
+        className="overflow-y-auto overscroll-contain"
         style={{ maxHeight: 'calc(85dvh - 60px)' }}
       >
         {/* Header */}
-        <div style={{ paddingBottom: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--accent-amber))', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: 4 }}>
-            College Golf
-          </div>
-          <h2
-            id="pick-franchise-title"
-            style={{ fontSize: 20, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: '-0.02em', margin: 0 }}
-          >
-            Pick Your Franchise
-          </h2>
-          <p
-            style={{ fontSize: 13, color: 'hsl(var(--muted-foreground) / 0.6)', marginTop: 4, marginBottom: 0 }}
-          >
-            Follow a college and join the rivalry
-          </p>
+        <div style={{ padding: '6px 20px 10px' }}>
+          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>College Golf</div>
+          <div id="pick-franchise-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Pick Your Franchise</div>
+          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Follow a college and join the rivalry</div>
         </div>
 
         {/* Search input */}
-        <div className="pb-2">
-          <div
-            className="flex items-center gap-2 bg-muted rounded-xl px-3"
-            style={{ height: '44px' }}
-          >
-            <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <input
-              type="text"
-              placeholder="Search colleges..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground"
-              style={{ fontSize: '15px' }}
-            />
-          </div>
+        <div style={{ margin: '0 20px 10px', display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(15,23,42,0.04)', borderRadius: 10, padding: '0 12px', height: 40, border: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <Search className="w-4 h-4" style={{ color: '#94A3B8', flexShrink: 0 }} />
+          <input
+            type="text"
+            placeholder="Search colleges..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: '#0F172A' }}
+          />
         </div>
 
         {/* Section label */}
         {!isSearching && (
-          <p
-            style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase' as const,
-              color: 'hsl(var(--muted-foreground) / 0.5)',
-              marginBottom: '8px',
-              marginTop: '4px',
-            }}
-          >
-            Popular Franchises
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 20px 6px' }}>
+            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Popular Franchises</span>
+          </div>
         )}
 
         {/* Search results */}
         {isSearching && searchResults ? (
           searchResults.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8" style={{ fontSize: '14px' }}>
+            <p style={{ textAlign: 'center', color: '#94A3B8', padding: '32px 20px', fontSize: 14 }}>
               No colleges found for "{searchQuery}"
             </p>
           ) : (
@@ -195,18 +204,8 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
 
         {/* View All link */}
         <button
-          onClick={() => {
-            onOpenChange(false);
-            navigate('/tourhub/college-golf');
-          }}
-          className="w-full text-center py-4 bg-transparent border-none cursor-pointer"
-          style={{
-            fontSize: '14px',
-            fontWeight: 600,
-            color: 'hsl(var(--accent-amber))',
-            borderTop: '1px solid hsl(var(--border) / 0.2)',
-            marginTop: '8px',
-          }}
+          onClick={() => { onOpenChange(false); navigate('/tourhub/college-golf'); }}
+          style={{ width: '100%', padding: '14px 0', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', fontSize: 12, fontWeight: 700, color: '#F7931E', cursor: 'pointer', marginTop: 4 }}
         >
           View All Franchises →
         </button>
@@ -215,64 +214,5 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
       {/* Safe area bottom padding */}
       <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
     </BottomSheet>
-  );
-}
-
-function CollegeRow({
-  normalizedName,
-  displayName,
-  logoUrl,
-  playerCount,
-  userId,
-  isFollowed,
-}: {
-  normalizedName: string;
-  displayName: string;
-  logoUrl: string | null;
-  playerCount: number;
-  userId: string | undefined;
-  isFollowed: boolean;
-}) {
-  return (
-    <div
-      className="flex items-center"
-      style={{
-        padding: '14px 0',
-        borderBottom: '1px solid hsl(var(--border) / 0.2)',
-        gap: '12px',
-      }}
-    >
-      {/* Logo */}
-      {logoUrl ? (
-        <img
-          src={logoUrl}
-          alt={displayName}
-          className="object-contain rounded-full flex-shrink-0"
-          style={{ width: '32px', height: '32px' }}
-        />
-      ) : (
-        <div
-          className="flex-shrink-0 bg-muted rounded-full flex items-center justify-center"
-          style={{ width: '32px', height: '32px' }}
-        >
-          <span className="text-xs font-semibold text-muted-foreground">
-            {displayName.charAt(0).toUpperCase()}
-          </span>
-        </div>
-      )}
-
-      {/* Name + player count */}
-      <div className="flex-1 min-w-0">
-        <p className="m-0 text-foreground truncate" style={{ fontSize: '15px', fontWeight: 600 }}>
-          {displayName}
-        </p>
-        <p className="m-0" style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground) / 0.6)' }}>
-          {playerCount} {playerCount === 1 ? 'pro' : 'pros'} on tour
-        </p>
-      </div>
-
-      {/* Follow button */}
-      <FollowBtn normalizedName={normalizedName} userId={userId} isFollowed={isFollowed} />
-    </div>
   );
 }

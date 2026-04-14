@@ -253,66 +253,42 @@ export function UnifiedWorldRankings() {
       </div>
 
       {/* Bottom sheet — kept exactly as is */}
-      <BottomSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        ariaLabelledBy="rankings-tour-sheet-title"
-      >
-        <div className="px-5 pb-6 pt-2">
-          <div style={{ paddingBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--accent-amber))', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: 4 }}>
-              Filter
-            </div>
-            <h3
-              id="rankings-tour-sheet-title"
-              style={{ fontSize: 20, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: '-0.02em', margin: 0 }}
-            >
-              Rankings by tour
-            </h3>
-          </div>
-          <div className="flex flex-col gap-2">
-            {RANKING_TOUR_OPTIONS.map(tour => {
-              const isActive = activeTour === tour.code;
-              return (
-                <button
-                  key={tour.code}
-                  onClick={() => handleTourChange(tour.code)}
-                  aria-pressed={isActive}
-                  className="w-full flex items-center gap-3 text-left transition-all duration-150"
-                  style={{
-                    borderRadius: 12,
-                    padding: '14px 16px',
-                    border: isActive
-                      ? '1.5px solid hsl(var(--accent-amber) / 0.40)'
-                      : '1px solid hsl(var(--border) / 0.5)',
-                    background: isActive
-                      ? 'hsl(var(--accent-amber) / 0.10)'
-                      : 'hsl(var(--card))',
-                  }}
-                >
-                  <img
-                    src={getTourLogo(tour.code)}
-                    alt={tour.label}
-                    style={{ width: 32, height: 22, objectFit: 'contain', flexShrink: 0 }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[0.875rem] font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
-                      {tour.label}
-                    </div>
-                    <div className="text-[0.75rem]" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                      {tour.description}
-                    </div>
-                  </div>
-                  {isActive && (
-                    <div className="flex-shrink-0">
-                      <Check className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} ariaLabelledBy="rankings-tour-sheet-title">
+        <div style={{ padding: '6px 20px 14px' }}>
+          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Filter</div>
+          <div id="rankings-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Rankings by Tour</div>
         </div>
+        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          {RANKING_TOUR_OPTIONS.map(tour => {
+            const isActive = activeTour === tour.code;
+            return (
+              <button
+                key={tour.code}
+                onClick={() => handleTourChange(tour.code)}
+                aria-pressed={isActive}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '12px 20px',
+                  background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                  border: 'none',
+                  borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer', textAlign: 'left' as const,
+                }}
+              >
+                <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <img src={getTourLogo(tour.code)} alt={tour.label} style={{ width: 28, height: 18, objectFit: 'contain' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: '#0F172A' }}>{tour.label}</div>
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{tour.description}</div>
+                </div>
+                {isActive && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+              </button>
+            );
+          })}
+        </div>
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
       </BottomSheet>
 
       {/* ═══ NO.1 COVER STORY ═══ */}

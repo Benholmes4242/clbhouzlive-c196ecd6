@@ -7,8 +7,6 @@ import { useState, useCallback } from 'react';
 import { ChevronDown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
-import { motion } from 'framer-motion';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 
 export type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
@@ -97,101 +95,58 @@ export function ScheduleTourFilter({
         onClose={() => setOpen(false)}
         ariaLabelledBy="schedule-tour-sheet-title"
       >
-        <div
-          className="overflow-y-auto overscroll-contain px-4 pb-2"
-          style={{ maxHeight: 'calc(70vh - 60px)' }}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2
-              id="schedule-tour-sheet-title"
-              className="text-lg font-bold text-foreground"
-            >
-              Filter by Tour
-            </h2>
-          </div>
-
-          {/* Tour options */}
-          <div className="space-y-2" role="group" aria-label="Tour options">
-            {TOUR_OPTIONS.filter(tour => 
-              tour.code === 'all' || (tourCounts[tour.code] ?? 0) > 0
-            ).map((tour) => {
-              const isActive = activeTour === tour.code;
-              const count = tour.code === 'all'
-                ? totalCount
-                : (tourCounts[tour.code] || 0);
-
-              return (
-                <motion.button
-                  key={tour.code}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleSelect(tour.code)}
-                  aria-pressed={isActive}
-                  className="w-full flex items-center gap-2.5 text-left transition-all duration-150"
-                  style={{
-                    borderRadius: 12,
-                    padding: '14px 16px',
-                    border: isActive
-                      ? '1px solid hsl(var(--foreground))'
-                      : '1px solid hsl(var(--border) / 0.5)',
-                    background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
-                  }}
-                >
-                  {tour.code === 'all' ? (
-                    <Globe className="w-5 h-5 flex-shrink-0"
-                      style={{ color: isActive ? 'white' : 'hsl(var(--muted-foreground))' }}
-                    />
-                  ) : (
-                    <img
-                      src={getTourLogo(tour.code.toLowerCase())}
-                      alt=""
-                      aria-hidden="true"
-                      className="object-contain flex-shrink-0"
-                      style={{ width: 32, height: 22 }}
-                    />
-                  )}
-
-                  <div className="flex-1">
-                    <p
-                      style={{
-                        fontSize: 14,
-                        fontWeight: isActive ? 600 : 500,
-                        color: isActive ? 'white' : 'hsl(var(--foreground))',
-                      }}
-                    >
-                      {tour.label}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 11,
-                        marginTop: 2,
-                        color: isActive ? 'rgba(255,255,255,0.7)' : 'hsl(var(--muted-foreground) / 0.7)',
-                      }}
-                    >
-                      {tour.description}
-                    </p>
-                  </div>
-
-                  <span
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      fontVariantNumeric: 'tabular-nums',
-                      color: isActive ? 'rgba(255,255,255,0.65)' : 'hsl(var(--muted-foreground) / 0.6)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {count}
-                  </span>
-
-                  
-                </motion.button>
-              );
-            })}
-          </div>
+        {/* Header */}
+        <div style={{ padding: '6px 20px 14px' }}>
+          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Filter</div>
+          <div id="schedule-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Select Tour</div>
         </div>
 
-        <div style={{ paddingBottom: 'calc(var(--sab, 0px) + 8px)' }} />
+        {/* Flat option rows */}
+        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          {TOUR_OPTIONS.filter(tour => tour.code === 'all' || (tourCounts[tour.code] ?? 0) > 0).map((tour) => {
+            const isActive = activeTour === tour.code;
+            const count = tour.code === 'all' ? totalCount : (tourCounts[tour.code] || 0);
+
+            return (
+              <button
+                key={tour.code}
+                onClick={() => handleSelect(tour.code)}
+                aria-pressed={isActive}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '12px 20px',
+                  background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                  border: 'none',
+                  borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer', textAlign: 'left' as const,
+                }}
+              >
+                {/* Tour logo chip */}
+                <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {tour.code === 'all'
+                    ? <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                    : <img src={getTourLogo(tour.code.toLowerCase())} alt="" style={{ width: 28, height: 18, objectFit: 'contain' }} />
+                  }
+                </div>
+
+                {/* Label + description */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: '#0F172A' }}>{tour.label}</div>
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{tour.description}</div>
+                </div>
+
+                {/* Count */}
+                <span style={{ fontSize: 12, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
+
+                {/* Active dot */}
+                {isActive && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+              </button>
+            );
+          })}
+        </div>
+
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
       </BottomSheet>
     </>
   );

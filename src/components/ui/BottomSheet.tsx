@@ -132,7 +132,7 @@ export function BottomSheet({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="w-9 h-1 mx-auto rounded-full bg-muted-foreground/30" />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '0 auto' }} />
         </div>
         {children}
       </div>
