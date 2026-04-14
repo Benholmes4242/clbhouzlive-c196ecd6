@@ -28,9 +28,9 @@ export function SegmentedTabs({ options, value, onChange, className = '' }: Segm
             className="px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold"
             style={{
               borderRadius: 8,
-              background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+              background: isActive ? '#0F172A' : 'transparent',
+              color: isActive ? '#ffffff' : '#64748B',
+              border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
             }}
           >
             {option.label}

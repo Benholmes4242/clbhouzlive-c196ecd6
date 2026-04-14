@@ -300,7 +300,7 @@ const BusinessProfilePage: React.FC = () => {
               className="w-full h-full object-cover object-center"
             />
           ) : (
-            <div className="w-full h-full bg-muted" />
+            <div className="w-full h-full" style={{ background: '#1a2040' }} />
           )}
 
           {/* P7: Cover photo edit button for owners */}
@@ -346,7 +346,7 @@ const BusinessProfilePage: React.FC = () => {
         {/* Avatar - unified button, left-aligned */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
           <button
-            className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onClick={() => {
               if (isOwner) {
                 logoFileInputRef.current?.click();
@@ -375,7 +375,7 @@ const BusinessProfilePage: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
+                <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground" style={{ background: 'rgba(15,23,42,0.06)' }}>
                   {initials}
                 </div>
               )}
@@ -415,7 +415,8 @@ const BusinessProfilePage: React.FC = () => {
             const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });
             return cityDisplay ? (
               <span 
-                className="px-4 py-1.5 text-sm font-semibold rounded-full bg-card text-foreground flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center gap-1.5"
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
               >
                 <MapPin className="w-3.5 h-3.5" />
                 {cityDisplay}
@@ -426,12 +427,13 @@ const BusinessProfilePage: React.FC = () => {
           {/* Verified pill - only shows if verified */}
           {business.is_verified && (
             <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#d97706] flex items-center gap-1.5"
+              className="px-4 py-1.5 text-sm font-semibold rounded-full flex items-center gap-1.5"
               style={{ 
-                background: 'rgba(245, 158, 11, 0.12)',
+                color: '#F7931E',
+                background: 'rgba(247, 147, 30, 0.12)',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(245, 158, 11, 0.3)'
+                border: '1px solid rgba(247, 147, 30, 0.30)'
               }}
             >
               <VerifiedBadge size="sm" />
@@ -445,7 +447,7 @@ const BusinessProfilePage: React.FC = () => {
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name + Verified */}
         <div className="flex items-center gap-1.5">
-          <h1 className="text-[28px] font-bold text-foreground">
+          <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
             {business.name}
           </h1>
           {business.is_verified && <VerifiedBadge size="lg" />}
@@ -458,7 +460,8 @@ const BusinessProfilePage: React.FC = () => {
       <div className="mt-4 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {/* P1+P3: Follow button — h-11, matching personal profile gradient variant */}
         <button 
-          className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60 border border-border/60 bg-card text-foreground"
+          className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60"
+          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
           onClick={handleFollowToggle}
           disabled={followBusy}
         >
@@ -476,7 +479,8 @@ const BusinessProfilePage: React.FC = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button 
-              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center bg-card border border-border active:scale-[0.97] transition-transform"
+              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
             >
               <MoreHorizontal className="w-5 h-5 text-foreground" />
             </button>
@@ -535,7 +539,7 @@ const BusinessProfilePage: React.FC = () => {
             <span className="text-base font-semibold text-foreground">{postsCount}</span>
           </button>
 
-          <div className="w-px h-6 bg-border/50 self-center" />
+          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
           
           {/* Followers — taps navigate to business followers list */}
           <button
@@ -547,7 +551,7 @@ const BusinessProfilePage: React.FC = () => {
             <span className="text-base font-semibold text-foreground">{followersCount}</span>
           </button>
 
-          <div className="w-px h-6 bg-border/50 self-center" />
+          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
 
           {/* Following — TODO: wire up business following count */}
           <div
@@ -563,7 +567,13 @@ const BusinessProfilePage: React.FC = () => {
       <div className="pb-2 min-h-[60vh]">
         {/* About section */}
         <section className="px-5 mb-6">
-          <h3 className="text-[17px] font-semibold text-foreground mb-2">About</h3>
+          <div className="mb-2">
+            <div className="flex items-center gap-1.5 mb-1">
+              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>About</span>
+            </div>
+            <h3 className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>About</h3>
+          </div>
           {bioText ? (
             <div>
               <p 
@@ -579,7 +589,8 @@ const BusinessProfilePage: React.FC = () => {
               {(isBioClamped || bioExpanded) && (
                  <button
                    onClick={() => setBioExpanded(!bioExpanded)}
-                   className="text-[0.8125rem] font-semibold text-[#d97706] mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+                   className="text-[0.8125rem] font-semibold mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+                   style={{ color: '#F7931E' }}
                  >
                   {bioExpanded ? 'Show less' : 'Show more'}
                 </button>
@@ -598,7 +609,8 @@ const BusinessProfilePage: React.FC = () => {
               href={ensureProtocol(business.website)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
+              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
               onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -610,7 +622,8 @@ const BusinessProfilePage: React.FC = () => {
           {business.phone && (
             <button
               onClick={handleCall}
-              className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
+              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
             >
               <Phone className="w-3.5 h-3.5" />
               Call
@@ -650,9 +663,13 @@ const BusinessProfilePage: React.FC = () => {
                   className={cn(
                     "relative flex-1 min-h-[44px] transition-all duration-200 whitespace-nowrap active:scale-[0.98] rounded-lg px-4 py-1.5 text-sm",
                     isActive
-                      ? "bg-foreground text-background font-semibold shadow-sm"
-                      : "text-muted-foreground font-medium hover:text-foreground"
+                      ? "font-semibold"
+                      : "font-medium text-[#64748B] hover:text-foreground"
                   )}
+                  style={{
+                    background: isActive ? '#0F172A' : 'transparent',
+                    color: isActive ? '#ffffff' : undefined,
+                  }}
                 >
                   {tab.label}
                 </button>

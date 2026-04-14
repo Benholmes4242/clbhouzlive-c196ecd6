@@ -31,7 +31,8 @@ function BioSection({ text }: { text: string }) {
         <button
           type="button"
           onClick={() => setExpanded(v => !v)}
-          className="mt-1 text-[0.8125rem] font-semibold text-[#d97706] flex items-center gap-0.5 min-h-[44px] active:scale-[0.97] transition-transform"
+          className="mt-1 text-[0.8125rem] font-semibold flex items-center gap-0.5 min-h-[44px] active:scale-[0.97] transition-transform"
+          style={{ color: '#F7931E' }}
           aria-expanded={expanded}
         >
           {expanded ? 'Show less' : 'Read more'}
@@ -46,7 +47,7 @@ function BioSection({ text }: { text: string }) {
 
 /* ── Thin section divider ── */
 function SectionDivider() {
-  return <div className="mx-6 h-px bg-border/40" />;
+  return <div className="mx-6 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />;
 }
 
 /* ── Section eyebrow heading ── */
@@ -80,9 +81,9 @@ function ContactRow({
     >
       <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className={`text-sm font-medium truncate ${isLink ? 'text-amber-600' : 'text-foreground'}`}>
+        <p className="text-sm font-medium truncate" style={{ color: isLink ? '#F7931E' : undefined }}>
           {value}
-          {isLink && <ArrowUpRight className="inline h-3 w-3 ml-0.5 text-amber-600 opacity-70" />}
+          {isLink && <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" style={{ color: '#F7931E' }} />}
         </p>
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
@@ -163,7 +164,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
           <SectionDivider />
           <section className="px-6 py-5">
             <SectionHeading>Contact</SectionHeading>
-            <div className="flex flex-col divide-y divide-border/30">
+            <div className="flex flex-col [&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
               {business.phone && (
                 <ContactRow icon={Phone} value={business.phone} label="Phone" onClick={handleCall} />
               )}
@@ -197,10 +198,11 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                 <button
                   type="button"
                   onClick={handleDirections}
-                  className="text-[0.8125rem] font-semibold text-amber-600 mt-2 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+                  className="text-[0.8125rem] font-semibold mt-2 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+                  style={{ color: '#F7931E' }}
                 >
                   Get directions
-                  <ArrowUpRight className="h-3.5 w-3.5 text-amber-600 opacity-70" />
+                  <ArrowUpRight className="h-3.5 w-3.5 opacity-70" style={{ color: '#F7931E' }} />
                 </button>
               </div>
             </div>

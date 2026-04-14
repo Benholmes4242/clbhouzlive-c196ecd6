@@ -32,7 +32,7 @@ export function PersonRow({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left px-4 py-0 flex items-center gap-3 hover:bg-muted/30 active:bg-muted/40 transition-colors min-h-[44px]"
+      className="w-full text-left px-4 py-0 flex items-center gap-3 transition-colors min-h-[44px] active:bg-[rgba(15,23,42,0.03)]"
     >
       {/* Avatar */}
       <div className="shrink-0">
