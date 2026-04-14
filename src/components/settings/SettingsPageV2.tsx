@@ -123,7 +123,6 @@ export function SettingsPageV2() {
           onClick={() => navigate(`/profile/${p?.username}`)}
           className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left active:opacity-70"
           style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)' }}
-          style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)' }}
         >
           <SquircleAvatar
             src={p?.profile_photo_url}
