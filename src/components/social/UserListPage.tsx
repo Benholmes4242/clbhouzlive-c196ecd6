@@ -87,10 +87,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 300);
-  // Track IDs optimistically removed (e.g. after unfriend)
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
 
-  // Tab state for followers page (followers vs following)
   const hasFollowingTab = mode === 'followers' && followingUsers !== undefined;
   const initialTab = searchParams.get('tab') === 'following' ? 'following' : 'followers';
   const [activeTab, setActiveTab] = useState<'followers' | 'following'>(hasFollowingTab ? initialTab : 'followers');
@@ -100,7 +98,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     setActiveTab(tab);
     setSearchInput('');
     setRemovedIds(new Set());
-    // Update URL without navigation
     if (tab === 'following') {
       setSearchParams({ tab: 'following' }, { replace: true });
     } else {
@@ -108,7 +105,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     }
   };
 
-  // Determine active data source based on tab
   const isFollowingTab = hasFollowingTab && activeTab === 'following';
   const activeUsers = isFollowingTab ? (followingUsers ?? []) : users;
   const activeTotalCount = isFollowingTab ? followingTotalCount : totalCount;
@@ -120,14 +116,12 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const activeOnRefetch = isFollowingTab ? onFollowingRefetch : onRefetch;
   const activeMode: ListMode = isFollowingTab ? 'following' : mode;
 
-  // Dynamic title/subtitle based on active tab
   const displayTitle = isFollowingTab ? 'Following' : title;
   const displaySubtitle = isFollowingTab && profileUsername
     ? `People @${profileUsername} follows`
     : subtitle;
   const activeSearchPlaceholder = isFollowingTab ? 'Search following by name or club' : searchPlaceholder;
 
-  // Filter users client-side based on search and optimistic removals
   const filteredUsers = useMemo(() => {
     let result = activeUsers.filter(u => !removedIds.has(u.id));
     if (!debouncedSearch.trim()) return result;
@@ -160,10 +154,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     setRemovedIds(prev => new Set(prev).add(userId));
   };
 
-  // Get mode display name for messages
   const modeDisplayName = activeMode === 'followers' ? 'followers' : activeMode === 'following' ? 'following' : 'friends';
 
-  // Pill toggle options for followers page
   const followersTabOptions = useMemo(() => {
     if (!hasFollowingTab) return [];
     const followersCount = Math.max(0, (totalCount ?? users.length) - removedIds.size);
@@ -174,7 +166,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     ];
   }, [hasFollowingTab, totalCount, users.length, removedIds, followingTotalCount, followingUsers?.length]);
 
-  // Batch relationship status lookup — single RPC call for all visible users
   const visibleUserIds = useMemo(() => filteredUsers.map(u => u.id), [filteredUsers]);
   const { data: relationshipMap = {} } = useRelationshipStatuses(visibleUserIds);
 
@@ -183,8 +174,12 @@ export const UserListPage: React.FC<UserListPageProps> = ({
       <div className="w-full">
         {/* Sticky header + search */}
         <div
-          className="sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+          className="sticky top-0 z-40 backdrop-blur-xl"
+          style={{ 
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            background: 'rgba(248,250,252,0.97)',
+            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          }}
         >
           {/* Header row */}
           <div className="flex items-center justify-between px-4 pb-2 pt-2">
@@ -219,7 +214,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 placeholder={activeSearchPlaceholder}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10 h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-[#f59e0b]/40"
+                className="pl-10 h-11 rounded-xl text-foreground placeholder:text-muted-foreground focus-visible:ring-[#F7931E]/40"
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
                 aria-label={activeSearchPlaceholder}
               />
             </div>
@@ -256,7 +252,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               {activeOnRefetch && (
                 <button
                   onClick={activeOnRefetch}
-                  className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors active:scale-[0.97] min-h-[44px]"
+                  className="px-5 py-2.5 text-white text-sm font-semibold rounded-full transition-colors active:scale-[0.97] min-h-[44px]"
+                  style={{ backgroundColor: '#F7931E' }}
                 >
                   Try again
                 </button>
@@ -268,20 +265,20 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           {activeIsLoading && !activeError && (
             <div>
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-start gap-3 px-4 py-4 border-b border-border/30">
+                <div key={i} className="flex items-start gap-3 px-4 py-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                   {/* Avatar skeleton */}
-                  <div className="w-14 h-14 rounded-sq-md bg-muted animate-pulse flex-shrink-0" />
+                  <div className="w-14 h-14 rounded-sq-md animate-pulse flex-shrink-0" style={{ background: 'rgba(15,23,42,0.08)' }} />
                   
                   {/* Content skeleton */}
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-muted animate-pulse rounded w-32" />
-                    <div className="h-3 bg-muted animate-pulse rounded w-24" />
-                    <div className="h-3 bg-muted animate-pulse rounded w-40" />
+                    <div className="h-4 animate-pulse rounded w-32" style={{ background: 'rgba(15,23,42,0.08)' }} />
+                    <div className="h-3 animate-pulse rounded w-24" style={{ background: 'rgba(15,23,42,0.06)' }} />
+                    <div className="h-3 animate-pulse rounded w-40" style={{ background: 'rgba(15,23,42,0.06)' }} />
                     
                     {/* Button skeletons */}
                     <div className="flex gap-2 pt-1">
-                      <div className="h-11 bg-muted animate-pulse rounded-md flex-1" />
-                      <div className="h-11 bg-muted animate-pulse rounded-md flex-1" />
+                      <div className="h-11 animate-pulse rounded-md flex-1" style={{ background: 'rgba(15,23,42,0.06)' }} />
+                      <div className="h-11 animate-pulse rounded-md flex-1" style={{ background: 'rgba(15,23,42,0.06)' }} />
                     </div>
                   </div>
                 </div>
@@ -295,7 +292,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               {isSearching ? (
                 /* Search empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-14 h-14 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
                     <Search className="w-6 h-6 text-muted-foreground" />
                   </div>
                   <h3 className="text-base font-semibold text-foreground mb-1 text-center">
@@ -314,7 +311,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               ) : activeMode === 'followers' ? (
                 /* Followers empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-16 h-16 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
                     <Users className="w-7 h-7 text-muted-foreground" />
                   </div>
                   <h3 className="text-base font-semibold text-foreground mb-1 text-center">
@@ -329,7 +326,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors active:scale-[0.97] min-h-[44px]"
+                      className="px-5 py-2.5 text-white text-sm font-semibold rounded-full transition-colors active:scale-[0.97] min-h-[44px]"
+                      style={{ backgroundColor: '#F7931E' }}
                     >
                       Find golfers to follow
                     </button>
@@ -338,7 +336,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               ) : activeMode === 'friends' ? (
                 /* Friends empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-16 h-16 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
                     <Users className="w-7 h-7 text-muted-foreground" />
                   </div>
                   <h3 className="text-base font-semibold text-foreground mb-1 text-center">
@@ -353,7 +351,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors active:scale-[0.97] min-h-[44px]"
+                      className="px-5 py-2.5 text-white text-sm font-semibold rounded-full transition-colors active:scale-[0.97] min-h-[44px]"
+                      style={{ backgroundColor: '#F7931E' }}
                     >
                       Find golfers
                     </button>
@@ -362,7 +361,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               ) : (
                 /* Following empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-16 h-16 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
                     <UserPlus className="w-7 h-7 text-muted-foreground" />
                   </div>
                   <h3 className="text-base font-semibold text-foreground mb-1 text-center">
@@ -377,7 +376,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors active:scale-[0.97] min-h-[44px]"
+                      className="px-5 py-2.5 text-white text-sm font-semibold rounded-full transition-colors active:scale-[0.97] min-h-[44px]"
+                      style={{ backgroundColor: '#F7931E' }}
                     >
                       Find golfers to follow
                     </button>
@@ -441,7 +441,6 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
   const loadMoreLockRef = useRef(false);
   const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Intersection observer for infinite scroll
   useEffect(() => {
     if (!hasNextPage || !onLoadMore) return;
 
@@ -454,7 +453,6 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
         if (entry?.isIntersecting && !isFetchingNextPage && !loadMoreLockRef.current) {
           loadMoreLockRef.current = true;
           onLoadMore();
-          // Unlock after a short delay to prevent rapid-fire loads
           if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
           lockTimerRef.current = setTimeout(() => {
             loadMoreLockRef.current = false;
@@ -493,7 +491,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
       {hasNextPage && <div ref={sentinelRef} className="h-1" />}
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">
-          <div className="w-5 h-5 rounded-full border-2 border-[#f59e0b] border-t-transparent animate-spin" />
+          <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#F7931E', borderTopColor: 'transparent' }} />
         </div>
       )}
 
@@ -573,7 +571,6 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
         setOptimisticFriend('none');
       }
     } else if (friendStatus === 'friends' && mode === 'friends') {
-      // Show confirmation dialog instead of immediate unfriend
       setShowUnfriendDialog(true);
     }
   };
@@ -595,7 +592,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
         tabIndex={0}
         onClick={handleRowClick}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRowClick(); }}
-        className="w-full flex items-start gap-3 px-4 py-4 text-left transition-colors active:bg-muted/50 cursor-pointer"
+        className="w-full flex items-start gap-3 px-4 py-4 text-left transition-colors active:bg-[rgba(15,23,42,0.03)] cursor-pointer"
       >
         {/* Avatar */}
         <SquircleAvatar
@@ -635,12 +632,16 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
               <Button
                 variant="outline"
                 size="sm"
-                className={cn(
-                  "h-11 flex-1 font-medium active:scale-[0.95] transition-transform",
-                  isFollowing
-                    ? "border-border bg-muted text-muted-foreground hover:bg-muted/80"
-                    : "border-[#f5a623]/40 bg-[#f5a623]/10 text-[#d97706] hover:bg-[#f5a623]/20"
-                )}
+                className="h-11 flex-1 font-medium active:scale-[0.95] transition-transform"
+                style={isFollowing ? {
+                  border: '1px solid rgba(15,23,42,0.07)',
+                  background: 'rgba(15,23,42,0.05)',
+                  color: '#64748B',
+                } : {
+                  border: '1px solid rgba(247,147,30,0.40)',
+                  background: 'rgba(247,147,30,0.10)',
+                  color: '#F7931E',
+                }}
                 disabled={followLoading}
                 onClick={handleFollowToggle}
                 aria-label={isFollowing ? `Unfollow ${user.displayName}` : `Follow ${user.displayName}`}
@@ -672,14 +673,22 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
                   <Button
                     variant="outline"
                     size="sm"
-                    className={cn(
-                      "h-11 flex-1 font-medium active:scale-[0.95] transition-transform",
-                      friendStatus === 'friends'
-                        ? "border-[#f5a623]/30 bg-[#f5a623]/10 text-[#d97706]"
-                        : friendStatus === 'pending'
-                        ? "border-border bg-muted/50 text-muted-foreground"
-                        : "border-[#f5a623]/40 text-[#d97706] hover:bg-[#f5a623]/10"
-                    )}
+                    className="h-11 flex-1 font-medium active:scale-[0.95] transition-transform"
+                    style={
+                      friendStatus === 'friends' ? {
+                        border: '1px solid rgba(247,147,30,0.30)',
+                        background: 'rgba(247,147,30,0.10)',
+                        color: '#F7931E',
+                      } : friendStatus === 'pending' ? {
+                        border: '1px solid rgba(15,23,42,0.07)',
+                        background: 'rgba(15,23,42,0.05)',
+                        color: '#64748B',
+                      } : {
+                        border: '1px solid rgba(247,147,30,0.40)',
+                        background: 'transparent',
+                        color: '#F7931E',
+                      }
+                    }
                     disabled={friendLoading || friendStatus === 'friends' || friendStatus === 'pending'}
                     onClick={handleFriendAction}
                     aria-label={
@@ -709,7 +718,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
       </div>
 
       {/* Inset divider — starts after avatar column */}
-      <div className="ml-[72px] border-b border-border/30" />
+      <div className="ml-[72px]" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }} />
 
       {/* Unfriend confirmation dialog */}
       <AlertDialog open={showUnfriendDialog} onOpenChange={setShowUnfriendDialog}>
