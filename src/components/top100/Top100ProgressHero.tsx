@@ -28,7 +28,7 @@ const BADGE_IMAGES: Record<number, string> = {
   400: grandslamBadgeImage,
 };
 
-const SEASON_COLOR = 'hsl(var(--accent-amber))';
+const SEASON_COLOR = '#F7931E';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;

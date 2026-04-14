@@ -70,8 +70,8 @@ export function Top100RecentRoundsCarousel({
         </div>
         
         {/* Premium empty state card (G3) */}
-        <div className="mx-2.5 rounded-sq-md border border-border/50 bg-card/60 p-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+        <div className="mx-2.5 rounded-sq-md p-6 text-center" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(15,23,42,0.05)' }}>
             <Plus className="w-5 h-5 text-muted-foreground" />
           </div>
           <p className="text-sm font-medium text-foreground mb-1">
@@ -87,7 +87,7 @@ export function Top100RecentRoundsCarousel({
               type="button"
               onClick={onAddRound}
               className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-white rounded-full hover:opacity-90 active:scale-[0.97] transition-all min-h-[44px]"
-              style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
+              style={{ backgroundColor: '#F7931E' }}
             >
               <Plus className="w-4 h-4" />
               Log your first round
@@ -140,12 +140,13 @@ export function Top100RecentRoundsCarousel({
               type="button"
               onClick={() => api?.scrollPrev()}
               disabled={current === 0}
-              className={cn(
-                'h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200',
-                current === 0
-                  ? 'bg-muted text-muted-foreground/30 cursor-not-allowed'
-                  : 'bg-muted text-muted-foreground active:scale-95 active:opacity-70'
-              )}
+              className="h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200"
+              style={{
+                background: 'rgba(15,23,42,0.05)',
+                border: '0.5px solid rgba(15,23,42,0.07)',
+                color: current === 0 ? 'rgba(15,23,42,0.20)' : '#64748B',
+                cursor: current === 0 ? 'not-allowed' : 'pointer',
+              }}
               aria-label="Previous round"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -158,10 +159,9 @@ export function Top100RecentRoundsCarousel({
                   key={idx}
                   className={cn(
                     'h-1.5 rounded-full transition-all duration-200',
-                    idx === current
-                      ? 'w-5 bg-foreground/70'
-                      : 'w-2 bg-foreground/20'
+                    idx === current ? 'w-5' : 'w-2'
                   )}
+                  style={{ backgroundColor: idx === current ? 'rgba(15,23,42,0.50)' : 'rgba(15,23,42,0.15)' }}
                 />
               ))}
             </div>
@@ -170,12 +170,13 @@ export function Top100RecentRoundsCarousel({
               type="button"
               onClick={() => api?.scrollNext()}
               disabled={current === count - 1}
-              className={cn(
-                'h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200',
-                current === count - 1
-                  ? 'bg-muted text-muted-foreground/30 cursor-not-allowed'
-                  : 'bg-muted text-muted-foreground active:scale-95 active:opacity-70'
-              )}
+              className="h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200"
+              style={{
+                background: 'rgba(15,23,42,0.05)',
+                border: '0.5px solid rgba(15,23,42,0.07)',
+                color: current === count - 1 ? 'rgba(15,23,42,0.20)' : '#64748B',
+                cursor: current === count - 1 ? 'not-allowed' : 'pointer',
+              }}
               aria-label="Next round"
             >
               <ChevronRight className="w-4 h-4" />
@@ -191,7 +192,8 @@ export function Top100RecentRoundsCarousel({
             variant="outline"
             size="sm"
             onClick={onAddRound}
-            className="w-full rounded-2xl border-dashed border-border active:opacity-70 transition-opacity"
+            className="w-full rounded-2xl border-dashed active:opacity-70 transition-opacity"
+            style={{ borderColor: 'rgba(15,23,42,0.12)' }}
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add another Top 100 round

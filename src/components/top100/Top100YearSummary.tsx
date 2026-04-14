@@ -40,7 +40,7 @@ function StatItem({
       </p>
       {/* Micro-delta line (A4) */}
       {showDelta && (
-        <p className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>
+        <p className="text-[10px] font-medium" style={{ color: '#F7931E' }}>
           {deltaPrefix}{delta} this year
         </p>
       )}
@@ -61,7 +61,7 @@ export function Top100YearSummary({
   return (
     <section>
       {/* Stats Row - card with subtle dividers between columns */}
-      <div className="bg-card border border-border/60 rounded-2xl p-5 min-h-[72px]">
+      <div className="rounded-2xl p-5 min-h-[72px]" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
         <div className="grid grid-cols-4 gap-0">
           {/* Year */}
           <div className="relative">
@@ -72,7 +72,7 @@ export function Top100YearSummary({
               delta={yearDelta}
             />
             {/* Subtle divider */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
           </div>
           
           {/* Regions */}
@@ -83,7 +83,7 @@ export function Top100YearSummary({
               label="Regions"
               delta={regionsDelta}
             />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
           </div>
           
           {/* New */}
@@ -94,7 +94,7 @@ export function Top100YearSummary({
               label="New"
               delta={newCoursesDelta}
             />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
           </div>
           
           {/* Avg rating - no divider after last */}

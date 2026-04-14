@@ -41,7 +41,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
     // Podium styling for ranks 1-3
     if (rank === 1) {
       return (
-        <span className="inline-flex items-center rounded-full px-2 py-[2px] text-xs font-semibold" style={{ borderColor: 'hsl(var(--accent-amber) / 0.3)', background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))', border: '1px solid' }}>
+        <span className="inline-flex items-center rounded-full px-2 py-[2px] text-xs font-semibold" style={{ background: 'rgba(247,147,30,0.10)', color: '#F7931E', border: '1px solid rgba(247,147,30,0.30)' }}>
           #{rank}
         </span>
       );
@@ -63,7 +63,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
     
     // Ghost pill for ranks 4-10
     return (
-      <span className="inline-flex items-center rounded-full border border-border/60 bg-background/40 px-2 py-[2px] text-xs font-medium text-muted-foreground">
+      <span className="inline-flex items-center rounded-full px-2 py-[2px] text-xs font-medium" style={{ background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', color: '#94A3B8' }}>
         #{rank}
       </span>
     );
@@ -74,7 +74,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
   }
 
   return (
-    <Card className="bg-card border border-border/60 rounded-xl overflow-hidden">
+    <Card className="rounded-xl overflow-hidden" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
       {/* Header - Always visible, clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -96,19 +96,20 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
         
         {/* Top 10 pill on its own row */}
         <div className="flex justify-start mt-3">
-          <span className="inline-flex items-center rounded-full px-2.5 py-[2px] text-xs font-semibold" style={{ borderColor: 'hsl(var(--accent-amber) / 0.3)', background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))', border: '1px solid' }}>
+          <span className="inline-flex items-center rounded-full px-2.5 py-[2px] text-xs font-semibold" style={{ background: 'rgba(247,147,30,0.10)', color: '#F7931E', border: '1px solid rgba(247,147,30,0.30)' }}>
             Top 10
           </span>
         </div>
       </button>
 
       {/* Leaderboard List */}
-      <div className="border-t border-border/60">
+      <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
         {visibleEntries.map((friend, index) => (
           <div
             key={friend.friend_id}
             onClick={() => navigate(`/profile/${friend.friend_id}?tab=top100`)}
-            className="px-5 py-3 flex items-center justify-between active:bg-muted/30 active:scale-[0.98] transition-all cursor-pointer border-b last:border-b-0 border-border/40"
+            className="px-5 py-3 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer"
+            style={{ borderBottom: index < visibleEntries.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <SquircleAvatar
@@ -136,7 +137,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
 
       {/* Show more indicator */}
       {!isExpanded && topFriends.length > 3 && (
-        <div className="px-5 py-2 text-center border-t border-border/60">
+        <div className="px-5 py-2 text-center" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           <p className="text-xs text-muted-foreground">
             +{topFriends.length - 3} more player{topFriends.length - 3 !== 1 ? 's' : ''}
           </p>

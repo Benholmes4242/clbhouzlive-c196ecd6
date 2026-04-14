@@ -7,7 +7,7 @@ import React from 'react';
 import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 import { cn } from '@/lib/utils';
 
-const SEASON_COLOR = 'hsl(var(--accent-amber))';
+const SEASON_COLOR = '#F7931E';
 
 type Props = {
   ratedCount: number;

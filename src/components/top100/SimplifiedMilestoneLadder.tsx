@@ -207,7 +207,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
               !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
             )}
             style={milestone.isUnlocked ? {
-              filter: 'drop-shadow(0 4px 20px hsl(var(--accent-amber) / 0.3))',
+              filter: 'drop-shadow(0 4px 20px rgba(247,147,30,0.30))',
             } : undefined}
           />
         </motion.div>
@@ -239,7 +239,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
             {/* Progress bar for current target */}
             {isCurrent && !milestone.isUnlocked && (
               <div className="flex items-center gap-2 mt-3">
-                <div className="flex-1 h-2 bg-muted/50 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.08)' }}>
                   <motion.div 
                     className="h-full rounded-full relative overflow-hidden"
                     style={{ backgroundColor: tierColor }}
