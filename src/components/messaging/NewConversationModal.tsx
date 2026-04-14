@@ -310,7 +310,7 @@ export function NewConversationModal({
           )}
         </button>
         {index < total - 1 && (
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 20px' }} />
+          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
         )}
       </div>
     );
@@ -363,7 +363,7 @@ export function NewConversationModal({
           </div>
         </button>
         {index < total - 1 && (
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 20px' }} />
+          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
         )}
       </div>
     );
@@ -420,27 +420,29 @@ export function NewConversationModal({
         {/* Drag handle */}
         <div
           style={{
-            width: 36, height: 4, borderRadius: 99,
-            background: '#e2e8f0',
-            margin: '12px auto 0',
+            width: 36, height: 4, borderRadius: 2,
+            background: 'rgba(15,23,42,0.12)',
+            margin: '10px auto 0',
           }}
         />
 
         {/* Header */}
-        <div className="relative flex items-center justify-center" style={{ padding: '12px 20px 14px' }}>
-          <h2
-            id="new-message-title"
-            style={{ fontSize: 17, fontWeight: 700, color: '#0f172a' }}
-          >
-            New Message
-          </h2>
+        <div className="relative flex items-center justify-center" style={{ padding: '12px 20px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }} id="new-message-title">
+              New Message
+            </span>
+          </div>
           <button
             onClick={handleClose}
             className="absolute flex items-center justify-center"
             style={{
               right: 16,
               width: 30, height: 30, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.06)', border: 'none', cursor: 'pointer',
+              background: 'rgba(15,23,42,0.05)',
+              border: '0.5px solid rgba(15,23,42,0.10)',
+              cursor: 'pointer',
             }}
           >
             <X style={{ color: '#64748b' }} size={16} />
@@ -452,7 +454,7 @@ export function NewConversationModal({
           className="flex"
           style={{
             margin: '0 16px 14px',
-            background: '#f1f5f9', borderRadius: 12,
+            background: 'rgba(15,23,42,0.05)', borderRadius: 12,
             padding: 3, gap: 2,
           }}
         >
@@ -500,13 +502,11 @@ export function NewConversationModal({
             />
 
             {/* Section label */}
-            <div style={{
-              padding: '4px 20px 6px',
-              fontSize: '10.5px', fontWeight: 700,
-              letterSpacing: '0.08em', textTransform: 'uppercase' as const,
-              color: '#c0c8d0',
-            }}>
+            <div style={{ padding: '6px 20px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
               {dmSearch.trim() ? 'Results' : 'Suggested'}
+              </span>
             </div>
 
             <ScrollArea className="flex-1">
@@ -559,7 +559,7 @@ export function NewConversationModal({
                 style={{
                   height: 44, borderRadius: 12,
                   background: '#f8fafc',
-                  border: '1px solid rgba(0,0,0,0.07)',
+                  border: '1px solid rgba(15,23,42,0.10)',
                   padding: '0 14px', fontSize: 14, color: '#1e293b',
                 }}
               />
@@ -629,7 +629,7 @@ export function NewConversationModal({
               className="flex-shrink-0"
               style={{
                 padding: '10px 16px 20px',
-                borderTop: '1px solid rgba(0,0,0,0.06)',
+                borderTop: '0.5px solid rgba(15,23,42,0.07)',
               }}
             >
               {/* Member stack */}
@@ -671,9 +671,10 @@ export function NewConversationModal({
                   cursor: isGroupValid && !creatingGroup ? 'pointer' : 'default',
                   ...(isGroupValid
                     ? {
-                        background: 'rgba(247,147,30,0.10)',
-                        border: '1px solid rgba(247,147,30,0.28)',
-                        color: '#F7931E',
+                        background: '#F7931E',
+                        border: 'none',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 16px rgba(247,147,30,0.28)',
                       }
                     : {
                         background: 'rgba(0,0,0,0.04)',

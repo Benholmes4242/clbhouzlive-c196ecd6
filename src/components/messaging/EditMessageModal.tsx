@@ -9,8 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from '@/components/ui/sheet';
 import { haptic } from '@/utils/haptics';
 
@@ -58,12 +56,13 @@ export function EditMessageModal({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
         {/* Drag handle */}
-        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#e2e8f0', margin: '12px auto' }} />
-        <SheetHeader className="pb-4">
-          <SheetTitle className="text-center text-[17px] font-semibold">
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0', flexShrink: 0 }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 16px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Edit Message
-          </SheetTitle>
-        </SheetHeader>
+          </span>
+        </div>
 
         <div className="space-y-4">
           <Textarea
@@ -78,7 +77,8 @@ export function EditMessageModal({
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="flex-1 h-12 rounded-full border-border/40"
+              className="flex-1 h-12 rounded-full"
+              style={{ border: '0.5px solid rgba(15,23,42,0.12)', background: 'transparent', fontSize: 14, fontWeight: 600, color: '#64748B' }}
             >
               <X className="w-4 h-4 mr-2" />
               Cancel

@@ -451,7 +451,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           paddingLeft: 16,
           paddingRight: 16,
           background: '#F8FAFC',
-          borderBottom: '1px solid rgba(0,0,0,0.06)',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
           gap: 10,
         }}
       >
@@ -461,7 +461,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
           style={{
             width: 34, height: 34, borderRadius: '50%',
-            background: 'rgba(0,0,0,0.06)', border: 'none',
+            background: 'rgba(15,23,42,0.05)',
+            border: '0.5px solid rgba(15,23,42,0.10)',
           }}
         >
           <ChevronLeft style={{ color: '#475569' }} strokeWidth={2.5} className="w-5 h-5" />
@@ -512,7 +513,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <div className="flex items-center" style={{ gap: 6 }}>
               <span
                 className="truncate"
-                style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em' }}
+                style={{ fontSize: 15, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}
               >
                 {headerInfo.name}
               </span>
@@ -595,9 +596,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 className="flex items-center justify-center active:scale-[0.97] transition-transform disabled:opacity-50"
                 style={{
                   padding: '6px 16px', borderRadius: 99,
-                  background: 'rgba(0,0,0,0.05)',
+                  background: 'rgba(15,23,42,0.05)',
+                  border: '0.5px solid rgba(15,23,42,0.08)',
                   fontSize: 12, color: '#64748b', fontWeight: 500,
-                  border: 'none', cursor: 'pointer',
+                  cursor: 'pointer',
                 }}
               >
                 {loadingMore ? (
@@ -667,8 +669,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               style={{
                 bottom: 72, right: 16,
                 width: 36, height: 36, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.95)',
-                border: '1px solid rgba(0,0,0,0.10)',
+                background: '#ffffff',
+                border: '0.5px solid rgba(15,23,42,0.10)',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.12)',
               }}
             >

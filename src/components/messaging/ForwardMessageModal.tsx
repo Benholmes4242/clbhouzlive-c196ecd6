@@ -7,8 +7,6 @@ import { Search, MessageCircle, Users, Loader2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -108,12 +106,13 @@ export function ForwardMessageModal({
         style={{ height: 'min(70vh, calc(100dvh - 120px))' }}
       >
         {/* Drag handle */}
-        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#e2e8f0', margin: '12px auto' }} />
-        <SheetHeader className="px-4 pb-4">
-          <SheetTitle className="text-center text-[17px] font-semibold">
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0', flexShrink: 0 }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 16px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Forward Message
-          </SheetTitle>
-        </SheetHeader>
+          </span>
+        </div>
 
         {/* Search */}
         <div className="px-4 mb-4">
@@ -123,7 +122,8 @@ export function ForwardMessageModal({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="pl-10 h-10 rounded-full bg-[rgba(247,147,30,0.05)] border border-border"
+              className="pl-10 h-10 rounded-full"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
             />
           </div>
         </div>

@@ -66,7 +66,7 @@ function IconBox({ bg, children }: { bg: string; children: React.ReactNode }) {
 }
 
 function Hairline() {
-  return <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />;
+  return <div style={{ height: '0.5px', backgroundColor: 'rgba(15,23,42,0.06)' }} />;
 }
 
 export function ChatHeaderMenu({
@@ -171,9 +171,9 @@ export function ChatHeaderMenu({
           className="z-50 overflow-hidden p-0"
           style={{
             width: 224,
-            background: '#F8FAFC',
+            background: '#ffffff',
             borderRadius: 14,
-            border: '1px solid rgba(0,0,0,0.07)',
+            border: '1px solid rgba(15,23,42,0.07)',
             boxShadow: '0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.07)',
           }}
         >
@@ -192,7 +192,7 @@ export function ChatHeaderMenu({
               <DropdownMenuItem onClick={handleToggleMute} className={itemStyle}>
                 {isMuted ? (
                   <>
-                    <IconBox bg="rgba(245,166,35,0.10)"><Bell size={16} style={{ color: '#F5A623' }} /></IconBox>
+                    <IconBox bg="rgba(247,147,30,0.10)"><Bell size={16} style={{ color: '#F7931E' }} /></IconBox>
                     <span style={{ fontSize: '13.5px', fontWeight: 500, color: '#0f172a' }}>Unmute Notifications</span>
                   </>
                 ) : (
@@ -233,7 +233,7 @@ export function ChatHeaderMenu({
               <DropdownMenuItem onClick={handleToggleMute} className={itemStyle}>
                 {isMuted ? (
                   <>
-                    <IconBox bg="rgba(245,166,35,0.10)"><Bell size={16} style={{ color: '#F5A623' }} /></IconBox>
+                    <IconBox bg="rgba(247,147,30,0.10)"><Bell size={16} style={{ color: '#F7931E' }} /></IconBox>
                     <span style={{ fontSize: '13.5px', fontWeight: 500, color: '#0f172a' }}>Unmute Notifications</span>
                   </>
                 ) : (

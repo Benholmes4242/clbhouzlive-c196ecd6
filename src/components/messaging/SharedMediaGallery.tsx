@@ -125,13 +125,13 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           paddingBottom: 10,
           paddingLeft: 16, paddingRight: 16,
           background: '#F8FAFC',
-          borderBottom: '1px solid rgba(0,0,0,0.06)',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
         }}
       >
         <button
           onClick={onClose}
           className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
-          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(0,0,0,0.06)', border: 'none' }}
+          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)' }}
         >
           <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
@@ -144,7 +144,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
       {/* Tab bar */}
       <div
         className="flex flex-shrink-0"
-        style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.07)' }}
+        style={{ background: '#fff', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
       >
         {tabs.map(tab => {
           const isActive = activeTab === tab.key;
@@ -221,8 +221,8 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     onClick={() => navigate(course.url)}
                     className="w-full flex items-center text-left active:opacity-80 transition-opacity"
                     style={{
-                      gap: 12, padding: '10px 14px', borderRadius: 14,
-                      background: '#fff', border: '1px solid rgba(0,0,0,0.07)',
+                       gap: 12, padding: '10px 14px', borderRadius: 14,
+                      background: '#fff', border: '1px solid rgba(15,23,42,0.07)',
                       cursor: 'pointer',
                     }}
                   >
@@ -277,7 +277,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     className="flex items-center"
                     style={{
                       gap: 12, padding: '10px 14px', borderRadius: 14,
-                      background: '#fff', border: '1px solid rgba(0,0,0,0.07)',
+                      background: '#fff', border: '1px solid rgba(15,23,42,0.07)',
                       textDecoration: 'none',
                     }}
                   >

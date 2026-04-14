@@ -28,9 +28,8 @@ export function ConversationSearchBar({
       className={cn("relative", className)}
       style={{
         height: 38, borderRadius: 12,
-        background: '#fff',
-        border: '1px solid rgba(0,0,0,0.07)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        background: '#ffffff',
+        border: '1px solid rgba(15,23,42,0.08)',
         display: 'flex', alignItems: 'center',
         padding: '0 12px 0 36px',
       }}
