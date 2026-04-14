@@ -78,7 +78,7 @@ export function SettingsRow({
       </div>
 
       {showDivider && !isLast && (
-        <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
+        <div style={{ position: 'absolute', bottom: 0, left: 64, right: 0, height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
       )}
     </div>
   );

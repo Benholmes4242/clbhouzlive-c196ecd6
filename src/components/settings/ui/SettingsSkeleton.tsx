@@ -6,9 +6,6 @@ interface SettingsSkeletonProps {
   sections?: Array<{ title: string; rows: number }>;
 }
 
-/**
- * SettingsSkeleton - Loading state matching cardless design
- */
 export function SettingsSkeleton({ 
   sections = [
     { title: 'Account', rows: 3 },
@@ -25,8 +22,9 @@ export function SettingsSkeleton({
     <div className="space-y-8 px-4">
       {sections.map((section, sectionIdx) => (
         <div key={sectionIdx}>
-          {/* Section title skeleton */}
-          <div className="mb-3 ml-1">
+          {/* Section title skeleton — dispatch rule marker shape */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <div style={{ width: 3, height: 10, borderRadius: 1, background: 'rgba(15,23,42,0.10)', flexShrink: 0 }} />
             <Skeleton 
               className="h-2.5"
               style={{ width: `${section.title.length * 7}px` }}
@@ -34,7 +32,7 @@ export function SettingsSkeleton({
           </div>
 
           {/* Rows */}
-          <div>
+          <div style={{ borderRadius: 16, background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', overflow: 'hidden' }}>
             {Array.from({ length: section.rows }).map((_, rowIdx) => (
               <SkeletonRow 
                 key={rowIdx} 
@@ -59,7 +57,7 @@ function SkeletonRow({ isLast, index }: { isLast: boolean; index?: number }) {
   return (
     <div className="relative min-h-[60px] px-4 py-3 flex items-center gap-3">
       {/* Icon container skeleton */}
-      <Skeleton className="w-10 h-10 rounded-xl" />
+      <Skeleton className="rounded-[10px]" style={{ width: 36, height: 36, flexShrink: 0 }} />
 
       {/* Text content */}
       <div className="flex-1 space-y-2">
@@ -78,7 +76,7 @@ function SkeletonRow({ isLast, index }: { isLast: boolean; index?: number }) {
 
       {/* Divider */}
       {!isLast && (
-        <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
+        <div style={{ position: 'absolute', bottom: 0, left: 64, right: 0, height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
       )}
     </div>
   );
