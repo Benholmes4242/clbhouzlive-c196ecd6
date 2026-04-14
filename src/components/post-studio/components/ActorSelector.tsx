@@ -1,4 +1,4 @@
-// ActorSelector — Dark identity pill + dark bottom sheet with account + visibility sections
+// ActorSelector — Light identity pill + light bottom sheet with account + visibility sections
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -72,7 +72,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
     : businesses.find(b => b.id === state.actorId)?.name ?? 'Business';
   const hasMultiple = businesses.length > 0;
 
-  // ── Compact header mode: dark identity pill ──
+  // ── Compact header mode: light identity pill ──
   if (compact) {
     return (
       <>
@@ -84,8 +84,8 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
           className="relative flex items-center"
           style={{
             gap: 8,
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(15,23,42,0.05)',
+            border: '1px solid rgba(15,23,42,0.07)',
             borderRadius: 24,
             padding: '6px 11px 6px 6px',
             cursor: 'pointer',
@@ -99,14 +99,14 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
               width: 28,
               height: 28,
               borderRadius: '34%',
-              background: 'rgba(255,255,255,0.10)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(15,23,42,0.08)',
+              border: '1px solid rgba(15,23,42,0.08)',
             }}
           >
             {activeAvatar ? (
               <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[11px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>
+              <div className="w-full h-full flex items-center justify-center text-[11px] font-bold" style={{ color: 'rgba(15,23,42,0.50)' }}>
                 {activeName.charAt(0).toUpperCase()}
               </div>
             )}
@@ -128,7 +128,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
             )}
           </div>
 
-          <ChevronDown className="w-[10px] h-[10px] shrink-0 ml-auto" style={{ color: 'rgba(255,255,255,0.35)' }} />
+          <ChevronDown className="w-[10px] h-[10px] shrink-0 ml-auto" style={{ color: 'rgba(15,23,42,0.35)' }} />
         </div>
 
         {createPortal(
@@ -140,7 +140,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="fixed inset-0 z-[10000]"
-                  style={{ background: 'rgba(0,0,0,0.55)' }}
+                  style={{ background: 'rgba(15,23,42,0.30)' }}
                   onClick={() => setSheetOpen(false)}
                 />
 
@@ -151,18 +151,16 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                   transition={{ type: 'spring', damping: 32, stiffness: 380 }}
                   className="fixed bottom-0 left-0 right-0 z-[10001] w-full flex flex-col"
                   style={{
-                    background: 'rgba(16,16,16,0.99)',
-                    backdropFilter: 'blur(40px)',
-                    WebkitBackdropFilter: 'blur(40px)',
+                    background: '#ffffff',
                     borderRadius: '20px 20px 0 0',
-                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    borderTop: '0.5px solid rgba(15,23,42,0.07)',
                     paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)',
-                    boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
+                    boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
                   }}
                 >
                   {/* Drag handle */}
                   <div className="flex justify-center" style={{ padding: '10px 0 6px' }}>
-                    <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.12)' }} />
+                    <div style={{ width: 36, height: 3, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
                   </div>
 
                   {/* Title + close */}
@@ -171,15 +169,15 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                     <button
                       onClick={() => setSheetOpen(false)}
                       className="w-7 h-7 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(255,255,255,0.08)', border: 'none' }}
+                      style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
                     >
-                      <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2.5} />
+                      <X className="w-3.5 h-3.5" style={{ color: 'rgba(15,23,42,0.50)' }} strokeWidth={2.5} />
                     </button>
                   </div>
 
                   {/* Posting as section */}
                   <div className="px-5 pb-2">
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.28)' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(15,23,42,0.40)' }}>
                       Posting as
                     </p>
                   </div>
@@ -190,11 +188,11 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                       className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                       style={{
                         borderRadius: 14,
-                        background: state.actorType === 'personal' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
-                        border: state.actorType === 'personal' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(255,255,255,0.08)',
+                        background: state.actorType === 'personal' ? 'rgba(15,23,42,0.05)' : 'rgba(15,23,42,0.03)',
+                        border: state.actorType === 'personal' ? '1px solid rgba(15,23,42,0.10)' : '1px solid rgba(15,23,42,0.06)',
                       }}
                     >
-                      <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.08)' }}>
+                      <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}>
                         {userAvatar
                           ? <img src={userAvatar} alt="" className="w-full h-full object-cover" />
                           : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: DARK_TEXT2 }}>{userName.charAt(0)}</div>
@@ -205,7 +203,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                         <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>Personal profile</p>
                       </div>
                       {state.actorType === 'personal' && (
-                        <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.90)' }} strokeWidth={2.5} />
+                        <Check className="w-5 h-5 shrink-0" style={{ color: '#0F172A' }} strokeWidth={2.5} />
                       )}
                     </button>
 
@@ -218,11 +216,11 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                           className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                           style={{
                             borderRadius: 14,
-                            background: isActive ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
-                            border: isActive ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(255,255,255,0.08)',
+                            background: isActive ? 'rgba(15,23,42,0.05)' : 'rgba(15,23,42,0.03)',
+                            border: isActive ? '1px solid rgba(15,23,42,0.10)' : '1px solid rgba(15,23,42,0.06)',
                           }}
                         >
-                          <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.08)' }}>
+                          <div className="w-10 h-10 overflow-hidden shrink-0" style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}>
                             {biz.logo_url
                               ? <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
                               : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: DARK_TEXT2 }}>{biz.name.charAt(0)}</div>
@@ -233,7 +231,7 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                             <p className="text-[11px] mt-0.5" style={{ color: DARK_TEXT3 }}>Business profile</p>
                           </div>
                           {isActive && (
-                            <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.90)' }} strokeWidth={2.5} />
+                            <Check className="w-5 h-5 shrink-0" style={{ color: '#0F172A' }} strokeWidth={2.5} />
                           )}
                         </button>
                       );
@@ -241,11 +239,11 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                   </div>
 
                   {/* Divider */}
-                  <div className="mx-5 mb-3" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                  <div className="mx-5 mb-3" style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
 
                   {/* Who can see this section */}
                   <div className="px-5 pb-2">
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.28)' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(15,23,42,0.40)' }}>
                       Who can see this
                     </p>
                   </div>
@@ -253,11 +251,11 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                   <div className="px-5 pb-3 flex flex-col gap-2">
                     {([
                       { value: 'anyone' as const, label: 'Everyone', desc: 'Visible to all Clbhouz users', icon: '🌍',
-                        activeBg: 'rgba(255,255,255,0.06)', activeBorder: '1px solid rgba(255,255,255,0.14)', checkColor: 'rgba(255,255,255,0.90)' },
+                        activeBg: 'rgba(15,23,42,0.05)', activeBorder: '1px solid rgba(15,23,42,0.10)', checkColor: '#0F172A' },
                       { value: 'followers' as const, label: 'Friends only', desc: 'Only people who follow you', icon: '👥',
                         activeBg: 'rgba(34,197,94,0.08)', activeBorder: '1px solid rgba(34,197,94,0.25)', checkColor: '#22c55e' },
                       { value: 'private' as const, label: 'Only me', desc: 'Private — only you can see this', icon: '🔒',
-                        activeBg: 'rgba(255,255,255,0.07)', activeBorder: '1px solid rgba(255,255,255,0.15)', checkColor: 'rgba(255,255,255,0.55)' },
+                        activeBg: 'rgba(15,23,42,0.04)', activeBorder: '1px solid rgba(15,23,42,0.08)', checkColor: 'rgba(15,23,42,0.55)' },
                     ]).map((opt) => {
                       const isActive = state.visibility === opt.value;
                       return (
@@ -267,11 +265,11 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
                           className="w-full flex items-center gap-3.5 px-4 py-3.5 active:scale-[0.97] transition-transform"
                           style={{
                             borderRadius: 14,
-                            background: isActive ? opt.activeBg : 'rgba(255,255,255,0.04)',
-                            border: isActive ? opt.activeBorder : '1px solid rgba(255,255,255,0.08)',
+                            background: isActive ? opt.activeBg : 'rgba(15,23,42,0.03)',
+                            border: isActive ? opt.activeBorder : '1px solid rgba(15,23,42,0.06)',
                           }}
                         >
-                          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)', fontSize: 16 }}>
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(15,23,42,0.05)', fontSize: 16 }}>
                             {opt.icon}
                           </div>
                           <div className="flex-1 text-left">
@@ -288,12 +286,12 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
 
                   {/* Summary card */}
                   <div className="mx-5 mb-4" style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'rgba(15,23,42,0.03)',
+                    border: '1px solid rgba(15,23,42,0.07)',
                     borderRadius: 12,
                     padding: '11px 14px',
                   }}>
-                    <p style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
+                    <p style={{ fontSize: 12, fontWeight: 500, color: 'rgba(15,23,42,0.55)' }}>
                       Posting as <span style={{ color: DARK_TEXT, fontWeight: 600 }}>{activeName}</span>
                       {' · visible to '}
                       <span style={{ color: DARK_TEXT, fontWeight: 600 }}>
