@@ -1,16 +1,11 @@
 /**
  * ReviewPostingOptionsSheet - Account & Visibility selection for Reviews
- * 
- * Key difference from PostingOptionsSheet:
- * - Business accounts are DISABLED (grayed out) for reviews
- * - Only personal profiles can write course reviews
- * 
- * A* Polish: tokens, color-coded visibility, radio animations,
- * consistent card treatment, removed Info icon on disabled row
+ * Dispatch flat-row design with amber active states
  */
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Globe, Users, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/lib/ui/haptics';
@@ -25,9 +20,7 @@ interface VisibilityOption {
   label: string;
   description: string;
   icon: React.ReactNode;
-  /** Color classes for the icon circle when selected */
   selectedColor: string;
-  /** Color classes for the icon circle when unselected */
   defaultColor: string;
 }
 
@@ -68,10 +61,6 @@ interface ReviewPostingOptionsSheetProps {
   onVisibilityChange: (visibility: ReviewVisibility) => void;
 }
 
-/**
- * Check if an actor can write reviews
- * Business accounts CANNOT review courses
- */
 function canActorReview(actor: ActiveActor): boolean {
   return actor.type === 'personal';
 }
@@ -141,7 +130,7 @@ export function ReviewPostingOptionsSheet({
         onClick={onClose}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.4)' }} />
         
         {/* Sheet */}
         <motion.div
@@ -149,139 +138,130 @@ export function ReviewPostingOptionsSheet({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-           className="absolute bottom-0 left-0 right-0 rounded-t-[20px] overflow-hidden"
+          className="absolute bottom-0 left-0 right-0 overflow-hidden"
           style={{ 
-            backgroundColor: 'var(--bg-page)',
+            backgroundColor: '#ffffff',
+            borderRadius: '20px 20px 0 0',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             maxHeight: '85vh',
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Handle */}
-          <div className="flex justify-center pt-2.5 pb-1">
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
           </div>
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
             {/* Account Section */}
-            <div className="px-5 pt-3 pb-4">
-              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-3">
-                Account
-              </h3>
-              
-              <div className="space-y-1.5">
-                {availableActors.map(actor => {
-                  const isSelected = selectedActor?.type === actor.type && selectedActor?.id === actor.id;
-                  const canReview = canActorReview(actor);
-                  
-                  return (
-                    <motion.button
-                      key={`${actor.type}-${actor.id}`}
-                      whileTap={canReview ? { scale: 0.98 } : undefined}
-                      onClick={() => handleActorSelect(actor)}
-                      disabled={!canReview}
-                      className={cn(
-                        "w-full flex items-center gap-3 p-3 rounded-xl transition-all",
-                        canReview && isSelected && "bg-primary/5 border border-primary/20",
-                        canReview && !isSelected && "bg-muted/10 hover:bg-muted/20",
-                        !canReview && "bg-muted/10 opacity-50 cursor-not-allowed"
-                      )}
-                    >
-                      <SquircleAvatar
-                        size={40}
-                        src={actor.avatarUrl}
-                        alt={actor.name}
-                        fallback={getInitials(actor.name)}
-                        hideRing
-                        className={cn(!canReview && "grayscale")}
-                      />
-                      
-                      <div className="flex-1 text-left min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className={cn(
-                            "font-semibold text-sm truncate",
-                            canReview ? "text-foreground" : "text-muted-foreground"
-                          )}>
-                            {actor.name}
-                          </span>
-                          {actor.verified && canReview && <VerifiedBadge size="sm" />}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {!canReview 
-                            ? "Business accounts can't review courses"
-                            : 'Personal profile'
-                          }
-                        </p>
-                      </div>
-                      
-                      {/* Radio indicator — no icon on disabled rows */}
-                      {canReview && <RadioDot selected={isSelected} />}
-                    </motion.button>
-                  );
-                })}
+            <div style={{ padding: '8px 0 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px 8px' }}>
+                <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+                <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Account</span>
               </div>
+              
+              {availableActors.map(actor => {
+                const isSelected = selectedActor?.type === actor.type && selectedActor?.id === actor.id;
+                const canReview = canActorReview(actor);
+                
+                return (
+                  <button
+                    key={`${actor.type}-${actor.id}`}
+                    onClick={() => handleActorSelect(actor)}
+                    disabled={!canReview}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 20px',
+                      background: canReview && isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
+                      border: 'none',
+                      borderLeft: canReview && isSelected ? '3px solid #F7931E' : '3px solid transparent',
+                      borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                      cursor: canReview ? 'pointer' : 'not-allowed',
+                      textAlign: 'left' as const,
+                      opacity: !canReview ? 0.45 : 1,
+                    }}
+                  >
+                    <SquircleAvatar
+                      size={40}
+                      src={actor.avatarUrl}
+                      alt={actor.name}
+                      fallback={getInitials(actor.name)}
+                      hideRing
+                      className={cn(!canReview && "grayscale")}
+                    />
+                    <div style={{ flex: 1, minWidth: 0, textAlign: 'left' as const }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 14, fontWeight: isSelected ? 800 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                          {actor.name}
+                        </span>
+                        {actor.verified && canReview && <VerifiedBadge size="sm" />}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+                        {!canReview ? "Business accounts can't review courses" : 'Personal profile'}
+                      </div>
+                    </div>
+                    {canReview && <RadioDot selected={isSelected} />}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Divider */}
-            <div className="h-px mx-5" style={{ backgroundColor: 'hsla(38, 92%, 80%, 0.2)' }} />
+            <div style={{ height: 0.5, margin: '0 20px', background: 'rgba(15,23,42,0.07)' }} />
 
             {/* Who Can See Section */}
-            <div className="px-5 pt-4 pb-2">
-              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-3">
-                Who can see this?
-              </h3>
+            <div style={{ padding: '12px 0 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px 8px' }}>
+                <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+                <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Who Can See</span>
+              </div>
               
-              <div className="space-y-1.5">
-                {VISIBILITY_OPTIONS.map(option => {
-                  const isSelected = visibility === option.value;
-                  
-                  return (
-                    <motion.button
-                      key={option.value}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleVisibilitySelect(option.value)}
+              {VISIBILITY_OPTIONS.map(option => {
+                const isSelected = visibility === option.value;
+                
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => handleVisibilitySelect(option.value)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 20px',
+                      background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
+                      border: 'none',
+                      borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+                      borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                      cursor: 'pointer', textAlign: 'left' as const,
+                    }}
+                  >
+                    <div
                       className={cn(
-                        "w-full flex items-center gap-3 p-3 rounded-xl transition-all",
-                        isSelected 
-                          ? "bg-primary/5 border border-primary/20"
-                          : "bg-muted/10 hover:bg-muted/20"
+                        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200",
+                        isSelected ? option.selectedColor : option.defaultColor
                       )}
                     >
-                      {/* Icon circle — color-coded per visibility level */}
-                      <div 
-                        className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200",
-                          isSelected ? option.selectedColor : option.defaultColor
-                        )}
-                      >
-                        {option.icon}
-                      </div>
-                      
-                      <div className="flex-1 text-left">
-                        <p className="font-semibold text-sm text-foreground">
-                          {option.label}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {option.description}
-                        </p>
-                      </div>
-                      
-                      {/* Radio indicator with animation */}
-                      <RadioDot selected={isSelected} />
-                    </motion.button>
-                  );
-                })}
-              </div>
+                      {option.icon}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0, textAlign: 'left' as const }}>
+                      <div style={{ fontSize: 14, fontWeight: isSelected ? 800 : 500, color: '#0F172A' }}>{option.label}</div>
+                      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{option.description}</div>
+                    </div>
+                    {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Done Button — primary token */}
-          <div className="px-5 pt-3 pb-4 border-t border-border">
+          {/* Done Button */}
+          <div style={{ padding: '12px 20px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <button
               onClick={handleDone}
-              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] text-white"
-              style={{ backgroundColor: '#f59e0b' }}
+              style={{
+                width: '100%', height: 48, borderRadius: 12, fontSize: 14, fontWeight: 700,
+                background: '#0F172A', color: '#ffffff', border: 'none', cursor: 'pointer',
+              }}
+              className="active:scale-[0.98] transition-all"
             >
               Done
             </button>

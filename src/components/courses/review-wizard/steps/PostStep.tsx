@@ -1,7 +1,6 @@
 /**
  * Step 3: Post Your Review
- * Combines media upload + inline review summary + submit CTA
- * Replaces old MediaStep + ConfirmStep
+ * Dispatch-styled media upload + inline review summary
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -136,42 +135,39 @@ export function PostStep({
       style={{ background: 'transparent' }}
     >
       {/* Header */}
-      <div className="text-center pb-5">
-        <h2 className="text-[22px] text-foreground" style={{ fontWeight: 900 }}>
-          Almost there
-        </h2>
-        <p className="text-[13px] text-muted-foreground mt-1">
-          Add photos, then post your review
-        </p>
+      <div style={{ textAlign: 'center', paddingBottom: 20 }}>
+        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ Almost There</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Almost there</div>
+        <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Add photos, then post your review</div>
       </div>
 
       {/* Media block */}
       <div
-        className="rounded-[16px] mb-5 transition-all"
         style={{
-          border: media.length > 0
-            ? '1.5px solid hsl(var(--border))'
-            : '2px dashed rgba(247,147,30,0.3)',
+          borderRadius: 12,
+          marginBottom: 20,
+          border: media.length > 0 ? '1px solid rgba(15,23,42,0.07)' : '2px dashed rgba(247,147,30,0.3)',
           background: media.length > 0 ? 'transparent' : 'rgba(247,147,30,0.02)',
         }}
       >
         {/* Header row with label + Add more link */}
-        <div className="flex items-center justify-between px-3 pt-3 pb-1">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.12em]">
-            Photos &amp; Videos · <span className="font-normal normal-case tracking-normal">optional</span>
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 4px' }}>
+          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
+            Photos &amp; Videos · <span style={{ fontWeight: 400, letterSpacing: 'normal', textTransform: 'none' as const }}>optional</span>
+          </span>
           {media.length > 0 && media.length < MAX_MEDIA_ITEMS && (
             <button
               type="button"
               onClick={handlePickMedia}
-              className="text-[13px] font-bold bg-transparent border-none cursor-pointer active:scale-[0.95] transition-all"
-              style={{ color: '#F7931E' }}
+              style={{ fontSize: 13, fontWeight: 700, color: '#F7931E', background: 'transparent', border: 'none', cursor: 'pointer' }}
+              className="active:scale-[0.95] transition-all"
             >
               + Add more
             </button>
           )}
         </div>
-        <div className="px-3 pb-3">
+
+        <div style={{ padding: '0 12px 12px' }}>
         {permissionDenied && (
           <PermissionDeniedCard type={permissionDenied} onRetry={() => setPermissionDenied(null)} />
         )}
@@ -182,15 +178,15 @@ export function PostStep({
             type="button"
             onClick={handlePickMedia}
             className="w-full py-8 flex flex-col items-center gap-2 active:scale-[0.97] transition-all"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{ background: 'rgba(247,147,30,0.08)' }}
+              style={{ width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(247,147,30,0.08)' }}
             >
               <Camera className="w-5 h-5" style={{ color: '#F7931E' }} />
             </div>
-            <p className="text-[14px] font-semibold text-foreground">Add photos or videos</p>
-            <p className="text-[12px] text-muted-foreground">Up to 10 · first photo is cover</p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Add photos or videos</p>
+            <p style={{ fontSize: 12, color: '#94A3B8' }}>Up to 10 · first photo is cover</p>
           </button>
         ) : (
           /* Thumbnail strip */
@@ -229,97 +225,68 @@ export function PostStep({
       </div>
 
       {/* Inline review summary */}
-      <div className="mb-5">
-        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-2.5">
-          Your review
-        </p>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Your Review Summary</span>
+        </div>
 
-        {/* Overall rating tile */}
-        {rating !== null && tierInfo && (
-          <button
-            type="button"
-            onClick={() => onGoToStep(1)}
-            className="w-full flex items-center justify-between rounded-[14px] p-3.5 mb-2 active:scale-[0.97] transition-all"
-            style={{
-              background: tierInfo.bg || 'hsl(var(--muted) / 0.5)',
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-foreground" style={{ fontSize: 30, fontWeight: 900 }}>
-                {rating.toFixed(1)}
-              </span>
-              <span className="text-[13px] font-semibold text-foreground/80">
-                {tierInfo.label}
-              </span>
-            </div>
-            <span className="text-[13px] font-semibold" style={{ color: '#F7931E' }}>
-              Edit ›
-            </span>
-          </button>
-        )}
+        <div style={{ border: '1px solid rgba(15,23,42,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+          {/* Score + tier row */}
+          {rating !== null && tierInfo && (
+            <button
+              type="button"
+              onClick={() => onGoToStep(1)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'transparent', border: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' as const }}
+            >
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>{rating.toFixed(1)}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#94A3B8' }}>{tierInfo.label}</span>
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#F7931E' }}>Edit ›</span>
+            </button>
+          )}
 
-        {/* Breakdown grid */}
-        {hasBreakdowns && (
-          <button
-            type="button"
-            onClick={() => onGoToStep(1)}
-            className="w-full grid grid-cols-2 gap-2 mb-2 active:scale-[0.98] transition-all"
-          >
-            {(Object.entries(breakdowns) as [keyof ReviewBreakdowns, number | null][])
-              .filter(([, v]) => v !== null)
-              .map(([key, value]) => {
-                const bdTier = getScoreTier(value!);
-                return (
-                  <div
-                    key={key}
-                    className="rounded-[10px] p-2.5"
-                    style={{ background: 'hsl(var(--muted) / 0.5)' }}
-                  >
-                    <p className="text-[10px] text-muted-foreground font-medium">
-                      {BREAKDOWN_LABELS[key]}
-                    </p>
-                    <p className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>
-                      {value!.toFixed(1)}
-                    </p>
-                  </div>
-                );
-              })}
-          </button>
-        )}
+          {/* Breakdown strip — 4-col grid */}
+          {hasBreakdowns && (
+            <button
+              type="button"
+              onClick={() => onGoToStep(1)}
+              style={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'transparent', border: 'none', borderBottomStyle: 'solid', borderBottomWidth: 0.5, borderBottomColor: 'rgba(15,23,42,0.07)', padding: 0, cursor: 'pointer' }}
+            >
+              {(Object.entries(breakdowns) as [keyof ReviewBreakdowns, number | null][]).map(([key, value], i) => (
+                <div key={key} style={{ padding: '8px 0', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+                  <div style={{ fontSize: 8, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>{BREAKDOWN_LABELS[key].toUpperCase()}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: value !== null ? '#0F172A' : '#CBD5E1', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>{value !== null ? value.toFixed(1) : '—'}</div>
+                </div>
+              ))}
+            </button>
+          )}
 
-        {/* Text preview */}
-        {hasText ? (
-          <button
-            type="button"
-            onClick={() => onGoToStep(2)}
-            className="w-full flex items-center justify-between rounded-[14px] p-3.5 mb-2 active:scale-[0.97] transition-all"
-            style={{ background: 'hsl(var(--muted) / 0.5)' }}
-          >
-            <div className="flex-1 min-w-0 text-left">
-              {title && (
-                <p className="text-[14px] font-bold text-foreground truncate">{title}</p>
-              )}
-              {review && (
-                <p className="text-[13px] text-muted-foreground mt-0.5 line-clamp-2">{review}</p>
-              )}
-            </div>
-            <span className="text-[13px] font-semibold flex-shrink-0 ml-3" style={{ color: '#F7931E' }}>
-              Edit ›
-            </span>
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => onGoToStep(2)}
-            className="w-full flex items-center justify-between rounded-[14px] p-3.5 mb-2 active:scale-[0.97] transition-all"
-            style={{ background: 'hsl(var(--muted) / 0.5)' }}
-          >
-            <span className="text-[13px] text-muted-foreground">No written review · ratings only</span>
-            <span className="text-[13px] font-semibold" style={{ color: '#F7931E' }}>
-              Add ›
-            </span>
-          </button>
-        )}
+          {/* Written review preview */}
+          {hasText ? (
+            <button
+              type="button"
+              onClick={() => onGoToStep(2)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {title && <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{title}</div>}
+                {review && <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{review}</div>}
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#F7931E', flexShrink: 0, marginLeft: 12 }}>Edit ›</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onGoToStep(2)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
+            >
+              <span style={{ fontSize: 13, color: '#94A3B8' }}>No written review · ratings only</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#F7931E' }}>Add ›</span>
+            </button>
+          )}
+        </div>
 
         {/* Tags */}
         {selectedTags.length > 0 && (
@@ -335,7 +302,6 @@ export function PostStep({
           </div>
         )}
       </div>
-
 
       {/* Fullscreen media preview */}
       {previewMediaIndex !== null && (

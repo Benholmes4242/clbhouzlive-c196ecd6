@@ -200,12 +200,12 @@ export function SuccessScreen({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: '#F7931E',
-            marginBottom: 8,
+          fontSize: 8.5,
+          fontWeight: 900,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: '#F7931E',
+          marginBottom: 8,
           }}
         >
           {isEditMode ? 'RATING UPDATED' : 'COURSE RATED'}
@@ -381,7 +381,7 @@ export function SuccessScreen({
             gap: 6,
             width: '100%',
             background: '#F7931E',
-            borderRadius: 16,
+            borderRadius: 12,
             padding: 15,
             fontSize: 15,
             fontWeight: 700,
@@ -407,7 +407,7 @@ export function SuccessScreen({
             width: '100%',
             background: '#fff',
             border: '1px solid #e2e8f0',
-            borderRadius: 16,
+            borderRadius: 12,
             padding: 14,
             fontSize: 13,
             fontWeight: 500,

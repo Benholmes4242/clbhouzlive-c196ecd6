@@ -1,6 +1,6 @@
 /**
  * Step 1: Rate Your Experience
- * Compact course row + amber-fill sliders with animated values
+ * Dispatch-styled course row + amber-fill sliders with animated values
  * Hero variant for overall, compact variant for categories
  */
 
@@ -241,38 +241,38 @@ export function RateStep({
     >
       {/* Compact course row */}
       {course && (
-        <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'hsl(var(--border) / 0.5)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
           {course.thumbnail_image ? (
             <img
               src={course.thumbnail_image}
               alt={course.name}
               loading="eager"
-              className="w-14 h-14 rounded-xl object-cover shrink-0"
+              style={{ width: 48, height: 48, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
             />
           ) : (
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-400 to-blue-500 shrink-0" />
+            <div style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
           )}
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-foreground text-[15px] truncate">{course.name}</p>
-            {locationText && (
-              <p className="text-sm text-muted-foreground truncate">{locationText}</p>
-            )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.name}</div>
+            {locationText && <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{locationText}</div>}
           </div>
         </div>
       )}
 
       {/* Overall Rating — hero treatment */}
-      <div className="px-4 pt-6 pb-4">
-        <p className="text-center text-lg font-semibold text-foreground">Your Verdict</p>
-        
-        {/* Animated value display */}
-        <div className="flex justify-center py-4">
+      <div style={{ padding: '24px 16px 16px' }}>
+        {/* Dispatch eyebrow */}
+        <div style={{ textAlign: 'center', fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 12 }}>
+          ⚡ Your Verdict
+        </div>
+
+        {/* Large animated score */}
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
           <motion.span
             key={(rating ?? 5).toFixed(1)}
             initial={{ opacity: 0, y: -8, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            className="text-5xl font-bold tabular-nums leading-none"
-            style={{ color: getScoreTier(rating ?? 5).accent }}
+            style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: getScoreTier(rating ?? 5).accent }}
           >
             {rating !== null ? rating.toFixed(1) : '5.0'}
           </motion.span>
@@ -280,13 +280,13 @@ export function RateStep({
 
         {/* Tier label */}
         {overallTier && (
-          <motion.p
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center text-sm font-semibold text-muted-foreground mb-3"
+            style={{ textAlign: 'center', fontSize: 14, fontWeight: 600, color: '#94A3B8', marginBottom: 12 }}
           >
             {overallTier.label}
-          </motion.p>
+          </motion.div>
         )}
 
         <SegmentedSlider
@@ -300,13 +300,14 @@ export function RateStep({
       </div>
 
       {/* Divider */}
-      <div className="mx-4 h-px bg-border/40" />
+      <div style={{ margin: '0 16px', height: 0.5, background: 'rgba(15,23,42,0.07)' }} />
 
       {/* Category Ratings */}
-      <div className="px-4 pt-4">
-        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[1.5px] mb-2">
-          Rate each area
-        </p>
+      <div style={{ padding: '16px 16px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Rate each area</span>
+        </div>
         
         {BREAKDOWN_FIELDS.map(({ key, label, description }, index) => {
           const score = breakdowns[key];
@@ -315,29 +316,31 @@ export function RateStep({
           return (
             <div key={key}>
               {index > 0 && (
-                <div className="mx-4 h-px bg-border/40" />
+                <div style={{ height: 0.5, background: 'rgba(15,23,42,0.07)' }} />
               )}
               <motion.div 
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.06, duration: 0.25 }}
-                className="py-3"
+                style={{ padding: '12px 0' }}
               >
-                {/* Label + value inline */}
-                <div className="flex items-center justify-between mb-0.5">
-                  <p className="text-[15px] font-bold text-foreground">{label}</p>
+                {/* Label + description + value inline */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 2 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A' }}>{label}</div>
+                    <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 1 }}>{description}</div>
+                  </div>
                   {isTouched && score !== null ? (
                     <motion.span
                       key={score?.toFixed(1)}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="text-lg font-bold tabular-nums"
-                      style={{ color: getScoreTier(score).accent }}
+                      style={{ fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: getScoreTier(score).accent, flexShrink: 0, marginLeft: 8 }}
                     >
                       {score?.toFixed(1)}
                     </motion.span>
                   ) : (
-                    <span className="text-lg font-bold text-muted-foreground/30">—</span>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(15,23,42,0.12)', flexShrink: 0, marginLeft: 8 }}>—</span>
                   )}
                 </div>
                 
@@ -349,8 +352,6 @@ export function RateStep({
                   size="compact"
                   ariaLabel={`${label} rating`}
                 />
-                
-                <p className="text-[13px] text-muted-foreground mt-0.5">{description}</p>
               </motion.div>
             </div>
           );
