@@ -410,7 +410,7 @@ export function PlayersTab() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="space-y-4 -mx-5">
+      <div className="space-y-4 -mx-5" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <Skeleton className="w-full" style={{ height: '35dvh' }} />
         <div className="px-5 space-y-3">
           <div className="flex gap-2 overflow-hidden">
@@ -471,7 +471,7 @@ export function PlayersTab() {
         const champPhotoUrl = getPlayerHeadshotUrl(champion.playerName, champion.tourCode ?? 'pga');
 
         return (
-          <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
+          <div style={{ padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0', background: '#F8FAFC' }}>
             {/* ── MASTHEAD ── */}
             <div style={{ borderBottom: '2px solid #0F172A', paddingBottom: '10px', marginBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
