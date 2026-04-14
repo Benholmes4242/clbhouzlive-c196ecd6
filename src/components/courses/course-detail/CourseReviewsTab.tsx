@@ -14,9 +14,7 @@ import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, X, Pencil } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { 
@@ -26,7 +24,6 @@ import {
   MOCK_CYPRESS_POINT_REVIEWS 
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
@@ -38,11 +35,9 @@ export type SortOption = ReviewsSortBy;
 interface CourseReviewsTabProps {
   courseId: string;
   courseName: string;
-  /** Optional review ID to scroll to and highlight (from deep link) */
   highlightReviewId?: string | null;
 }
 
-// Alias for local usage - CourseReview from the hook is our canonical type
 type ReviewData = CourseReview;
 
 const getInitials = (name: string) => {
@@ -64,40 +59,31 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   
   const queryClient = useQueryClient();
 
-  // Business claim context + review responses
   const { data: businessClaim } = useBusinessClaimForCourse(courseId);
   const { data: reviewResponses } = useReviewResponses(courseId);
   const submitResponseMutation = useSubmitReviewResponse(courseId);
 
-  // Sorting, filtering, and search state
   const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
   
-  // Convert RatingFilterValue to the hook's format
   const hookRatingFilter = ratingFilter === 'outstanding' ? '10-9' 
     : ratingFilter === 'excellent' ? '8-7'
     : ratingFilter === 'veryGood' ? '6-5'
     : ratingFilter === 'good' || ratingFilter === 'fair' ? '<5'
     : 'all';
   
-  // Track which review to highlight (from deep link or prop)
-  // External prop takes priority over URL param
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
 
-  // Sort options for Reviews tab
   const sortOptions: SegmentedTabOption[] = [
     { value: 'recent', label: 'Most recent' },
     { value: 'highest', label: 'Highest rated' },
     { value: 'helpful', label: 'Most helpful' },
   ];
 
-  // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
 
-  // Check for reviewId query param OR external prop for deep linking
   useEffect(() => {
-    // Check URL param first
     const searchParams = new URLSearchParams(location.search);
     const reviewIdFromUrl = searchParams.get('review') || searchParams.get('reviewId');
     const reviewIdToHighlight = reviewIdFromUrl || externalHighlightReviewId;
@@ -105,7 +91,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     if (reviewIdToHighlight) {
       setHighlightedReviewId(reviewIdToHighlight);
       
-      // Clear the query param from URL without navigating
       if (reviewIdFromUrl) {
         searchParams.delete('review');
         searchParams.delete('reviewId');
@@ -114,7 +99,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         window.history.replaceState({}, '', newUrl);
       }
       
-      // Clear highlight after animation
       const timeout = setTimeout(() => {
         setHighlightedReviewId(null);
       }, 3000);
@@ -123,13 +107,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     }
   }, [location.search, location.pathname]);
 
-  // Check if we should highlight the user's review (from confirmation flow)
-  // Support both location state and sessionStorage flag
   const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(() => {
     const fromLocationState = Boolean(location.state?.highlightMyReview);
     const fromSessionStorage = sessionStorage.getItem(`highlight-review-${courseId}`) === 'true';
     
-    // Clear the sessionStorage flag if it was set
     if (fromSessionStorage) {
       sessionStorage.removeItem(`highlight-review-${courseId}`);
     }
@@ -139,16 +120,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   useEffect(() => {
     if (!isJustSubmittedOrUpdated) return;
-
     const timeout = setTimeout(() => {
       setIsJustSubmittedOrUpdated(false);
-    }, 2500); // ~2.5s subtle pulse
-
+    }, 2500);
     return () => clearTimeout(timeout);
   }, [isJustSubmittedOrUpdated]);
 
-  // FIX #1: Use centralized useCourseReviews hook instead of inline query
-  // This ensures consistent query keys across the app for proper cache invalidation
   const { data: reviewsData, isLoading, isError, refetch } = useCourseReviews(
     courseId,
     sortBy,
@@ -160,7 +137,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     user?.id
   );
 
-  // Fetch user's votes on reviews
   const { data: userVotes } = useQuery({
     queryKey: ['review-votes', user?.id],
     queryFn: async () => {
@@ -169,14 +145,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         .from('course_review_votes')
         .select('rating_id, vote_type')
         .eq('user_id', user.id);
-
       if (error) throw error;
       return data || [];
     },
     enabled: !!user?.id,
   });
 
-  // Toggle helpful mutation
   const toggleHelpfulMutation = useMutation({
     mutationFn: async ({
       reviewId,
@@ -186,29 +160,18 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       action: 'helpful' | 'unhelpful' | 'clear';
     }) => {
       if (!user?.id) throw new Error('Must be logged in');
-
       if (action === 'clear') {
-        // Remove vote
         const { error } = await supabase
           .from('course_review_votes')
           .delete()
           .eq('rating_id', reviewId)
           .eq('user_id', user.id);
-
         if (error) throw error;
       } else {
-        // Upsert vote
         const { error } = await supabase.from('course_review_votes').upsert(
-          {
-            rating_id: reviewId,
-            user_id: user.id,
-            vote_type: action,
-          },
-          {
-            onConflict: 'rating_id,user_id',
-          }
+          { rating_id: reviewId, user_id: user.id, vote_type: action },
+          { onConflict: 'rating_id,user_id' }
         );
-
         if (error) throw error;
       }
     },
@@ -240,12 +203,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setSearchQuery('');
   };
 
-  // Convert review media to FeedPost format and open CourseMediaViewer
   const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number, review: CourseReview) => {
     if (!media || media.length === 0) return;
-    
     const userProfile = review.user_profiles;
-
     const posts: FeedPost[] = media.map((item) => {
       const isVideo = item.media_type === 'video';
       const mediaItem: MediaItemType = {
@@ -280,14 +240,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         tags: [],
       };
     });
-
     useCourseMediaViewerStore.getState().open(posts, startIndex);
   }, []);
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
   
-  // Apply rating filter client-side (after search and sort from server)
   const filteredReviews = useMemo(() => {
     if (!ratingFilter) return reviews;
     return reviews.filter((r) => {
@@ -299,25 +257,19 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const filteredMyReview = filteredReviews.find((r) => r.user_id === user?.id);
   const otherReviews = filteredReviews.filter((r) => r.user_id !== user?.id);
 
-  // Scroll to highlighted review when data is loaded
   useEffect(() => {
     if (!highlightedReviewId || !reviewsData) return;
-    
-    // Small delay to ensure DOM is rendered
     const timeout = setTimeout(() => {
       const element = document.querySelector(`[data-review-id="${highlightedReviewId}"]`);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 300);
-    
     return () => clearTimeout(timeout);
   }, [highlightedReviewId, reviewsData]);
 
-  // Check if we should use mock data for Cypress Point
   const isMockCypressPoint = ENABLE_MOCK_TOP100_REVIEWS && courseId === CYPRESS_POINT_COURSE_ID;
 
-  // Use mock data for Cypress Point when enabled, otherwise use real aggregates
   const communityScore = isMockCypressPoint 
     ? MOCK_CYPRESS_POINT_REVIEWS.averageRating 
     : (ratingAggregates?.avg_overall_score || 0);
@@ -326,13 +278,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     : (ratingAggregates?.review_count ?? 0);
   const hasRatings = ratingCount > 0;
 
-
-  // Transform reviews into ReviewBlockFlat format
   const transformReview = (review: ReviewData, isHighlighted = false) => {
     const profile = review.user_profiles;
     const displayName = profile?.display_name || profile?.username || 'Anonymous';
     const userVote = userVotes?.find((v) => v.rating_id === review.id);
-
     return {
       id: review.id,
       user: {
@@ -357,7 +306,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     };
   };
 
-  // Pull-to-refresh handler (declared before early returns)
   const handlePullToRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
   };
@@ -365,23 +313,19 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        {/* Score header skeleton */}
         <section className="px-4 py-4 flex flex-col items-center gap-2">
           <Skeleton className="h-10 w-16 rounded-lg" />
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-3 w-20" />
         </section>
-        {/* Search skeleton */}
         <section className="px-4 pb-4">
           <Skeleton className="h-11 w-full rounded-xl" />
         </section>
-        {/* Sort chips skeleton */}
         <section className="px-4 pb-4 flex gap-2 justify-center">
           <Skeleton className="h-8 w-24 rounded-full" />
           <Skeleton className="h-8 w-28 rounded-full" />
           <Skeleton className="h-8 w-24 rounded-full" />
         </section>
-        {/* Review card skeletons */}
         <section className="px-4 space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="rounded-2xl bg-card border border-border p-5">
@@ -407,7 +351,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     );
   }
 
-  // Fix 2: Error state
   if (isError) {
     return (
       <section className="px-4 py-8">
@@ -431,54 +374,43 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     );
   }
 
-  // Empty state - use aggregates as source of truth
+  // Empty state
   if (!hasRatings) {
     return (
       <div className="flex flex-col px-4 pt-8 pb-8">
-        <div className="flex flex-col items-center text-center gap-4">
-          {/* Star icon */}
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/40">
-              <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>
-            </svg>
+        <div style={{ padding: '28px 24px', textAlign: 'center' }}>
+          <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 14 }}>⚡ Reviews</div>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(247,147,30,0.08)', border: '1.5px solid rgba(247,147,30,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+            <span style={{ fontSize: 26 }}>⭐</span>
           </div>
-          {/* Heading + subtext */}
-          <div>
-            <p className="text-lg font-bold text-foreground">No reviews yet</p>
-            <p className="mt-1.5 text-sm text-muted-foreground max-w-[260px] mx-auto leading-relaxed">
-              Be the first to share your experience at {courseName}.
-            </p>
-          </div>
-          {/* PRIMARY CTA - amber filled */}
+          <p style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: '0 0 6px' }}>No reviews yet</p>
+          <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 18, lineHeight: 1.5, maxWidth: 260, marginLeft: 'auto', marginRight: 'auto' }}>
+            Be the first to share your experience at {courseName}.
+          </p>
           <button
             type="button"
             onClick={handleRateClick}
-            className="w-full h-11 rounded-xl text-sm font-semibold text-white active:scale-[0.97] transition-all"
-            style={{ background: '#F7931E' }}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: '#F7931E', color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.25)' }}
           >
             Write the first review
           </button>
         </div>
         {/* Supporting tips card */}
-        <div className="mt-8 rounded-2xl border border-border bg-card p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
-            Reviews help other golfers discover great courses
-          </p>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
-            What to include
-          </p>
-          <div className="flex flex-col gap-4">
-            {[
-              { icon: '🏌️‍♂️', label: 'Course condition — greens, fairways, bunkers' },
-              { icon: '🏌️', label: 'Layout and design — challenge, variety, scenery' },
-              { icon: '🏠', label: 'Facilities — clubhouse, practice areas, service' },
-            ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-3">
-                <span className="text-base">{icon}</span>
-                <p className="text-sm text-muted-foreground">{label}</p>
-              </div>
-            ))}
+        <div style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', borderRadius: 12, padding: '14px 16px', marginTop: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>What to include</span>
           </div>
+          {[
+            { icon: '🏌️‍♂️', label: 'Course condition — greens, fairways, bunkers' },
+            { icon: '🏌️', label: 'Layout and design — challenge, variety, scenery' },
+            { icon: '🏠', label: 'Facilities — clubhouse, practice areas, service' },
+          ].map(({ icon, label }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <span style={{ fontSize: 16 }}>{icon}</span>
+              <span style={{ fontSize: 13, color: '#64748B' }}>{label}</span>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -487,58 +419,32 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div className="flex flex-col">
-      {/* Compact rating context */}
-      <section className="px-4 py-4">
-        <div className="flex flex-col items-center gap-1">
-          {/* Score ring */}
-          <div className="relative w-24 h-24">
-            <svg className="w-24 h-24 -rotate-90">
-              <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(245,158,11,0.06)" strokeWidth="8" />
-              <circle 
-                cx="48" cy="48" r="42" fill="none" 
-                stroke="url(#reviewsScoreGradient)" 
-                strokeWidth="8" strokeLinecap="round"
-                strokeDasharray={`${(communityScore / 10) * 2 * Math.PI * 42} ${2 * Math.PI * 42}`}
-                className="transition-all duration-1000 ease-out"
-              />
-              <defs>
-                <linearGradient id="reviewsScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#f59e0b" />
-                  <stop offset="100%" stopColor="#fbbf24" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-3xl font-bold text-foreground tabular-nums leading-none">
-                {communityScore.toFixed(1)}
-              </span>
-            </div>
-          </div>
-          <span
-            className="text-sm font-bold uppercase tracking-[0.05em]"
-            style={{ color: '#d97706' }}
-          >
+      {/* Compact score header — flat dispatch */}
+      <section style={{ padding: '14px 16px 0', textAlign: 'center' }}>
+        <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ Community Score</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}>
+            {communityScore.toFixed(1)}
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
             {getScoreTier(communityScore).label}
           </span>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
-            <span>{ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}</span>
-            {myReview && (
-              <>
-                <span>·</span>
-                <button
-                  onClick={handleRateClick}
-                  className="flex items-center gap-1.5 text-muted-foreground active:scale-[0.98] transition-transform"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                  Edit yours
-                </button>
-              </>
-            )}
-          </div>
+        </div>
+        <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+          {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
+          {myReview && (
+            <>
+              {' · '}
+              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: '#F7931E', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Pencil className="w-3.5 h-3.5" />
+                Edit yours
+              </button>
+            </>
+          )}
         </div>
       </section>
 
-      {/* Section 2 – Search bar */}
+      {/* Search bar */}
       <section className="px-4 pt-4 pb-4">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -549,7 +455,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-11 pl-10 pr-10 border border-border bg-card text-base placeholder:text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-border focus:ring-offset-1 focus:border-foreground transition rounded-sq-sm"
           />
-          {/* Clear button */}
           {searchQuery && (
             <button
               type="button"
@@ -563,28 +468,30 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         </div>
       </section>
 
-      {/* Section 3 – Sort & Filter controls (16px from search) */}
+      {/* Sort & Filter controls */}
       <div className="px-5 pt-1 pb-4">
-        {/* Sort tabs */}
-        <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)} className="w-full">
-          <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
-            {sortOptions.map((option) => (
-              <TabsTrigger
+        {/* Sort buttons — dispatch style */}
+        <div className="w-full flex justify-center gap-2">
+          {sortOptions.map((option) => {
+            const isActive = sortBy === option.value;
+            return (
+              <button
                 key={option.value}
-                value={option.value}
-                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none after:hidden
-                  data-[state=active]:text-background data-[state=active]:bg-foreground data-[state=active]:shadow-none
-                  data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground"
+                onClick={() => setSortBy(option.value as SortOption)}
                 style={{
-                  borderRadius: 8,
-                  border: option.value !== sortBy ? '1.5px solid hsl(var(--border))' : 'none',
+                  padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: isActive ? 800 : 600,
+                  background: isActive ? '#0F172A' : 'transparent',
+                  color: isActive ? '#ffffff' : '#94A3B8',
+                  border: isActive ? 'none' : '1px solid rgba(15,23,42,0.12)',
+                  cursor: 'pointer',
+                  minHeight: 36,
                 }}
               >
                 {option.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+              </button>
+            );
+          })}
+        </div>
         
         {/* Rating filter chips */}
         <div className="mt-3">
@@ -595,9 +502,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         </div>
       </div>
 
-      {/* Section 4 – Reviews list */}
+      {/* Reviews list */}
       <section className="px-4 pt-6 pb-4">
-        {/* Write a review prompt - only for non-reviewers */}
         {!myReview && (
           <div className="mb-4">
             <WriteReviewPrompt onRateClick={handleRateClick} />
@@ -607,9 +513,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Your review section */}
         {filteredMyReview && (
           <div className="mb-4">
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground/60">
-              Your review
-            </p>
+            <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 8 }}>
+              Your Review
+            </div>
             <ReviewBlockFlat
               review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
               isMine
@@ -622,7 +528,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               }}
               onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
             />
-            {/* Response for my review */}
             {(() => {
               const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
               if (response) return <ResponseDisplay response={response} />;
@@ -651,9 +556,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                     }}
                     onUserClick={() => navigate(getProfilePathById(review.user_id))}
                   />
-                  {/* Existing response */}
                   {response && <ResponseDisplay response={response} />}
-                  {/* Reply form for verified business owners */}
                   {canReply && (
                     <ReplyForm
                       businessClaim={businessClaim}
@@ -689,7 +592,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         )}
       </section>
 
-      {/* Section 5 – End message */}
+      {/* End message */}
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
         <section className="px-4 pt-4 pb-6">
           <div className="text-center">

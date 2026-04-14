@@ -23,7 +23,7 @@ interface RateStepProps {
 const BREAKDOWN_FIELDS = [
   { key: 'design' as const, label: 'Course Design', description: 'Layout, design and landscape' },
   { key: 'condition' as const, label: 'Course Condition', description: 'Greens, fairways, and overall upkeep' },
-  { key: 'clubhouse' as const, label: 'Clubhouse & Service', description: 'Clubhouse, changing rooms and staff friendliness' },
+  { key: 'clubhouse' as const, label: 'clubhouse & Service', description: 'clubhouse, changing rooms and staff friendliness' },
   { key: 'facilities' as const, label: 'Practice Facilities', description: 'Range, putting green, and amenities' },
 ];
 
@@ -122,7 +122,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
-      {/* Track container with touch area */}
       <div
         ref={trackRef}
         className="relative w-full cursor-pointer"
@@ -132,7 +131,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        {/* Track background */}
         <div
           className="absolute left-0 right-0"
           style={{
@@ -143,7 +141,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
             background: 'hsl(var(--muted))',
           }}
         />
-        {/* Track fill — amber gradient */}
         <div
           className="absolute left-0"
           style={{
@@ -158,7 +155,6 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
             transition: isDragging ? 'none' : 'width 50ms ease',
           }}
         />
-        {/* Thumb — white with amber border */}
         <div
           style={{
             position: 'absolute',
@@ -272,7 +268,7 @@ export function RateStep({
             key={(rating ?? 5).toFixed(1)}
             initial={{ opacity: 0, y: -8, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: getScoreTier(rating ?? 5).accent }}
+            style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: '#0F172A' }}
           >
             {rating !== null ? rating.toFixed(1) : '5.0'}
           </motion.span>
@@ -280,13 +276,13 @@ export function RateStep({
 
         {/* Tier label */}
         {overallTier && (
-          <motion.div
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            style={{ textAlign: 'center', fontSize: 14, fontWeight: 600, color: '#94A3B8', marginBottom: 12 }}
+            style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}
           >
             {overallTier.label}
-          </motion.div>
+          </motion.p>
         )}
 
         <SegmentedSlider
@@ -335,7 +331,7 @@ export function RateStep({
                       key={score?.toFixed(1)}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      style={{ fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: getScoreTier(score).accent, flexShrink: 0, marginLeft: 8 }}
+                      style={{ fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#0F172A', flexShrink: 0, marginLeft: 8 }}
                     >
                       {score?.toFixed(1)}
                     </motion.span>

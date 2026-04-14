@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2, Pencil } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -19,7 +17,6 @@ import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import CourseExploreLinks from './CourseExploreLinks';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { SectionHeading } from './SectionHeading';
 
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -117,11 +114,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     navigate(`/courses/${course.id}/rate`);
   };
 
-  const rateButtonLabel = userRating ? 'Edit Your Rating' : 'Rate this course';
-  const rateButtonHelper = userRating 
-    ? 'Update your community score & breakdown' 
-    : 'Add your rating to see how it compares';
-
   return (
     <div className="animate-in fade-in duration-200">
       {/* 1. Location Pills */}
@@ -141,17 +133,24 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
         {/* Edit/Rate button */}
         {userRating && (
-          <div className="space-y-2">
-            <Button 
+          <div style={{ marginTop: 8 }}>
+            <button
               onClick={handleRateClick}
-              className="w-full justify-center h-11 rounded-xl bg-card text-foreground border border-border/60 font-semibold active:scale-[0.98] transition-colors"
-              variant="outline"
+              style={{ width: '100%', padding: '11px 0', borderRadius: 10, background: 'transparent', border: '1px solid rgba(15,23,42,0.12)', fontSize: 13, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
             >
-              {rateButtonLabel}
-            </Button>
-            <p className="text-xs text-muted-foreground text-center">
-              {rateButtonHelper}
-            </p>
+              ✏ Edit Your Rating
+            </button>
+          </div>
+        )}
+
+        {!userRating && (
+          <div style={{ marginTop: 8 }}>
+            <button
+              onClick={handleRateClick}
+              style={{ width: '100%', padding: '12px 0', borderRadius: 10, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 3px 12px rgba(247,147,30,0.25)' }}
+            >
+              ⭐ Rate this course
+            </button>
           </div>
         )}
       </section>
@@ -172,7 +171,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {course.description && (
         <section className="pt-8 pb-6 space-y-4 md:pt-10" style={{ marginTop: 12 }}>
           <div className="px-5">
-            <SectionHeading title="About" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>About</span>
+            </div>
           </div>
           <div className="px-5 relative">
             <div 
@@ -243,7 +245,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 8. Location Section */}
       <section className="pt-6 pb-5 md:pt-8" style={{ marginTop: 12 }}>
         <div className="px-5 mb-4">
-          <SectionHeading title="Location" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Location</span>
+          </div>
         </div>
         
         {coordsLoading && (
@@ -302,7 +307,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="px-4 pt-2 pb-4 flex justify-center">
           <button
             onClick={handleWebsiteClick}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] rounded-full bg-card border border-border/60 hover:bg-muted transition-colors active:scale-[0.98] text-foreground text-sm font-semibold"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 18px', borderRadius: 20, background: '#ffffff', border: '1px solid rgba(15,23,42,0.12)', fontSize: 13, fontWeight: 600, color: '#0F172A', cursor: 'pointer' }}
           >
             <ExternalLink className="h-4 w-4" />
             Official course website

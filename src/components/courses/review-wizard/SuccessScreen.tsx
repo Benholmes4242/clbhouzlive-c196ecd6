@@ -48,14 +48,10 @@ function ShareLoadingSkeleton() {
           border-radius: 12px;
         }
       `}</style>
-      {/* Circle */}
       <div className="skel" style={{ width: 80, height: 80, borderRadius: '50%', marginBottom: 24 }} />
-      {/* Text lines */}
       <div className="skel" style={{ width: 120, height: 12, marginBottom: 10 }} />
       <div className="skel" style={{ width: 200, height: 20, marginBottom: 12 }} />
-      {/* Card */}
       <div className="skel" style={{ width: '80%', maxWidth: 300, height: 72, marginBottom: 24 }} />
-      {/* Buttons */}
       <div className="skel" style={{ width: '100%', maxWidth: 340, height: 52, marginBottom: 10 }} />
       <div className="skel" style={{ width: '100%', maxWidth: 340, height: 48 }} />
     </div>
@@ -128,7 +124,7 @@ export function SuccessScreen({
       {/* Safe area spacer */}
       <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', flexShrink: 0 }} />
 
-      {/* Close button — positioned below safe area, matching fullscreen view */}
+      {/* Close button */}
       <button
         onClick={onDone}
         className="absolute z-50 flex items-center justify-center transition-colors active:scale-[0.97]"
@@ -150,41 +146,16 @@ export function SuccessScreen({
         {/* Hero zone */}
         <div
           className="relative flex items-center justify-center flex-shrink-0"
-          style={{
-            width: '100%',
-            height: 180,
-          }}
+          style={{ width: '100%', height: 180 }}
         >
-          {/* Outer ring */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 160,
-              height: 160,
-              border: '1px solid rgba(247,147,30,0.10)',
-            }}
-          />
-          {/* Inner ring */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 120,
-              height: 120,
-              border: '1px solid rgba(247,147,30,0.14)',
-            }}
-          />
-          {/* Amber orb */}
+          <div className="absolute rounded-full" style={{ width: 160, height: 160, border: '1px solid rgba(247,147,30,0.10)' }} />
+          <div className="absolute rounded-full" style={{ width: 120, height: 120, border: '1px solid rgba(247,147,30,0.14)' }} />
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
             className="relative flex items-center justify-center rounded-full"
-            style={{
-              width: 80,
-              height: 80,
-              background: 'rgba(247,147,30,0.12)',
-              border: '1.5px solid rgba(247,147,30,0.28)',
-            }}
+            style={{ width: 80, height: 80, background: 'rgba(247,147,30,0.12)', border: '1.5px solid rgba(247,147,30,0.28)' }}
           >
             {isEditMode ? (
               <RotateCw className="w-8 h-8" style={{ color: '#F7931E' }} strokeWidth={2.5} />
@@ -200,12 +171,12 @@ export function SuccessScreen({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           style={{
-          fontSize: 8.5,
-          fontWeight: 900,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          color: '#F7931E',
-          marginBottom: 8,
+            fontSize: 8.5,
+            fontWeight: 900,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: '#F7931E',
+            marginBottom: 8,
           }}
         >
           {isEditMode ? 'RATING UPDATED' : 'COURSE RATED'}
@@ -217,13 +188,7 @@ export function SuccessScreen({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="success-headline"
-          style={{
-            fontSize: 28,
-            fontWeight: 800,
-            color: '#0f172a',
-            letterSpacing: '-0.5px',
-            margin: 0,
-          }}
+          style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', margin: 0 }}
         >
           {isEditMode ? 'Verdict revised.' : 'Your take is live.'}
         </motion.h2>
@@ -233,14 +198,7 @@ export function SuccessScreen({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          style={{
-            fontSize: 13,
-            color: '#94a3b8',
-            textAlign: 'center',
-            marginTop: 6,
-            marginBottom: 20,
-            maxWidth: 280,
-          }}
+          style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', marginTop: 6, marginBottom: 20, maxWidth: 280 }}
         >
           {isEditMode
             ? `Your updated take on ${courseName} is live`
@@ -263,9 +221,7 @@ export function SuccessScreen({
           }}
         >
           {isEditMode && previousRating != null ? (
-            /* Before → After card for edits */
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
-              {/* Before */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
                   BEFORE
@@ -274,75 +230,45 @@ export function SuccessScreen({
                   {previousRating === 10 ? '10' : previousRating.toFixed(1)}
                 </span>
               </div>
-              {/* Arrow */}
               <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: '#F7931E' }} />
-              {/* Now */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
                   NOW
                 </span>
-                <span style={{ fontSize: 24, fontWeight: 800, color: '#F7931E' }}>
+                <span style={{ fontSize: 24, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                   {rating != null ? (rating === 10 ? '10' : rating.toFixed(1)) : '—'}
                 </span>
               </div>
             </div>
           ) : (
-            /* Standard rating card for new reviews */
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-              {/* Score row */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                 <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E', marginRight: 2, position: 'relative', top: 1 }} />
-                <span style={{ fontSize: 22, fontWeight: 800, color: tierData?.accent || '#F7931E' }}>
+                <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                   {rating != null ? (rating === 10 ? '10' : rating.toFixed(1)) : '—'}
                 </span>
                 <span style={{ fontSize: 13, color: '#94a3b8' }}>/10</span>
                 {tierData && (
-                  <span style={{ fontSize: 13, color: '#94a3b8', marginLeft: 4 }}>{tierData.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginLeft: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{tierData.label}</span>
                 )}
               </div>
 
-              {/* In Clubhouse pill */}
               {isNewReview && !optedOut && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    background: '#f0fdf4',
-                    border: '1px solid #bbf7d0',
-                    borderRadius: 20,
-                    padding: '4px 10px',
-                  }}
-                >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 10px' }}>
                   <Check className="w-3 h-3" style={{ color: '#16a34a' }} strokeWidth={3} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a' }}>
-                    Review saved
-                  </span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a' }}>Review saved</span>
                 </div>
               )}
 
               {isNewReview && optedOut && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    background: '#f1f5f9',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: 20,
-                    padding: '4px 10px',
-                  }}
-                >
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>
-                    Not shared
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 20, padding: '4px 10px' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>Not shared</span>
                 </div>
               )}
             </div>
           )}
         </motion.div>
 
-        {/* Sub-label for new reviews */}
         {isNewReview && !optedOut && (
           <motion.p
             initial={{ opacity: 0 }}
@@ -354,7 +280,6 @@ export function SuccessScreen({
           </motion.p>
         )}
 
-        {/* Spacer to push buttons down */}
         <div style={{ flex: 1, minHeight: 24 }} />
       </div>
 
@@ -364,76 +289,42 @@ export function SuccessScreen({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
         className="flex-shrink-0 flex flex-col"
-        style={{
-          padding: '0 20px',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
-          gap: 8,
-        }}
+        style={{ padding: '0 20px', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)', gap: 8 }}
       >
-        {/* Primary CTA */}
         <button
           onClick={onViewReview}
           className="active:scale-[0.98] transition-transform"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            width: '100%',
-            background: '#F7931E',
-            borderRadius: 12,
-            padding: 15,
-            fontSize: 15,
-            fontWeight: 700,
-            color: '#fff',
-            boxShadow: '0 4px 16px rgba(247,147,30,0.28)',
-            border: 'none',
-            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            width: '100%', background: '#F7931E', borderRadius: 12, padding: 15,
+            fontSize: 15, fontWeight: 700, color: '#fff',
+            boxShadow: '0 4px 16px rgba(247,147,30,0.28)', border: 'none', cursor: 'pointer',
           }}
         >
           <Eye className="w-4 h-4" />
           View my review →
         </button>
 
-        {/* Secondary CTA */}
         <button
           onClick={isEditMode ? onDone : onGoToClubhouse}
           className="active:scale-[0.98] transition-transform"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            width: '100%',
-            background: '#fff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 12,
-            padding: 14,
-            fontSize: 13,
-            fontWeight: 500,
-            color: '#64748b',
-            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            width: '100%', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12,
+            padding: 14, fontSize: 13, fontWeight: 500, color: '#64748b', cursor: 'pointer',
           }}
         >
           <Home className="w-4 h-4" />
           {isEditMode ? 'Back to clbhouz' : 'Go to Clubhouse'}
         </button>
 
-        {/* Ghost opt-out for new reviews only */}
         {isNewReview && !optedOut && onOptOutShare && (
           <button
             onClick={handleOptOut}
             style={{
-              fontSize: 11,
-              color: '#d1d5db',
-              textDecoration: 'underline',
-              textUnderlineOffset: '3px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              marginTop: 4,
-              background: 'none',
-              border: 'none',
-              width: '100%',
+              fontSize: 11, color: '#d1d5db', textDecoration: 'underline', textUnderlineOffset: '3px',
+              cursor: 'pointer', textAlign: 'center', marginTop: 4,
+              background: 'none', border: 'none', width: '100%',
             }}
           >
             Don't share to Clubhouse
@@ -441,7 +332,6 @@ export function SuccessScreen({
         )}
       </motion.div>
 
-      {/* Responsive headline style */}
       <style>{`
         @media (max-width: 375px) {
           .success-headline { font-size: 24px !important; }
