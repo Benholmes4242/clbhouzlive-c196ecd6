@@ -60,16 +60,17 @@ export function ProfileCompleteNudge() {
         gap: 12,
         padding: '12px 14px',
         borderRadius: 14,
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+        background: 'rgba(13, 13, 13, 0.95)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.10)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
       }}
     >
       {/* Progress ring */}
       <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
         <svg width={40} height={40} viewBox="0 0 40 40">
-          <circle cx={20} cy={20} r={radius} fill="none" stroke="hsl(0 0% 90%)" strokeWidth={3} />
+          <circle cx={20} cy={20} r={radius} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth={3} />
           <circle
             cx={20} cy={20} r={radius} fill="none"
             stroke="hsl(38 92% 50%)"
@@ -83,7 +84,7 @@ export function ProfileCompleteNudge() {
         <span style={{
           position: 'absolute', inset: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 10, fontWeight: 700, color: 'hsl(0 0% 20%)',
+          fontSize: 10, fontWeight: 700, color: '#F7931E',
         }}>
           {pct}%
         </span>
@@ -94,13 +95,13 @@ export function ProfileCompleteNudge() {
         onClick={() => navigate('/edit-profile')}
         style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
-        <p style={{ fontSize: 13, fontWeight: 700, color: 'hsl(0 0% 10%)', margin: 0 }}>Complete your profile</p>
-        <p style={{ fontSize: 11, color: 'hsl(0 0% 45%)', margin: '2px 0 0', lineHeight: 1.3 }}>{message}</p>
+        <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)', margin: 0 }}>Complete your profile</p>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', margin: '2px 0 0', lineHeight: 1.3 }}>{message}</p>
       </button>
 
       {/* Dismiss */}
       <button onClick={handleDismiss} style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer' }}>
-        <X size={16} color="hsl(0 0% 60%)" />
+        <X size={16} color="rgba(255,255,255,0.35)" />
       </button>
     </div>
   );
