@@ -73,12 +73,12 @@ export function SettingsToggleRow({
             checked={checked}
             onCheckedChange={onCheckedChange}
             disabled={disabled || isLoading}
-            className="data-[state=checked]:bg-[hsl(38,92%,50%)] data-[state=unchecked]:bg-muted"
+            className="data-[state=checked]:bg-[#F7931E] data-[state=unchecked]:bg-muted"
           />
         </div>
 
         {showDivider && !isLast && !showHelper && (
-          <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
+          <div style={{ position: 'absolute', bottom: 0, left: 64, right: 0, height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
         )}
       </div>
 
@@ -86,7 +86,7 @@ export function SettingsToggleRow({
         <div className={cn('px-4 pb-3 -mt-1', isIndented && 'pl-6')}>
           <p className="text-[12px] text-muted-foreground ml-[52px]">{helperNote}</p>
           {showDivider && !isLast && (
-            <div className="absolute bottom-0 left-16 right-0 h-px bg-border/40" />
+            <div style={{ position: 'absolute', bottom: 0, left: 64, right: 0, height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
           )}
         </div>
       )}

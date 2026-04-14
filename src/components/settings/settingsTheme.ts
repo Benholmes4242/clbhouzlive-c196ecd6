@@ -8,7 +8,7 @@ export const iconThemeStyles: Record<IconTheme, { bg: string; text: string }> = 
   account: { bg: 'bg-indigo-50', text: 'text-indigo-500' },
   creator: { bg: 'bg-purple-50', text: 'text-purple-500' },
   privacy: { bg: 'bg-emerald-50', text: 'text-emerald-500' },
-  notifications: { bg: 'bg-amber-50', text: 'text-amber-500' },
+  notifications: { bg: 'bg-amber-50', text: 'text-[#F7931E]' },
   security: { bg: 'bg-red-50', text: 'text-red-400' },
   support: { bg: 'bg-sky-50', text: 'text-sky-500' },
   legal: { bg: 'bg-slate-100', text: 'text-slate-400' },

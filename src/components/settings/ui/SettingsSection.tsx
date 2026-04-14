@@ -9,14 +9,6 @@ interface SettingsSectionProps {
   variant?: 'default' | 'danger';
 }
 
-/**
- * SettingsSection - Cardless section with header and flat content
- * 
- * Premium visual design:
- * - Section header: uppercase, subtle gray, canonical tracking
- * - No card wrapper — rows sit directly on page background
- * - Danger Zone gets a subtle tinted background
- */
 export function SettingsSection({ 
   title, 
   children, 
@@ -27,24 +19,21 @@ export function SettingsSection({
 
   return (
     <section className={cn('w-full px-4', className)}>
-      {/* Section header */}
-      <h2 
-        className={cn(
-          'text-[11px] font-semibold uppercase tracking-[0.1em] mb-2 ml-1',
-          isDanger ? 'text-destructive' : 'text-muted-foreground'
-        )}
-      >
-        {title}
-      </h2>
+      {/* Dispatch rule marker eyebrow */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <div style={{ width: 3, height: 10, background: isDanger ? '#DC2626' : '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: isDanger ? '#DC2626' : '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          {title}
+        </span>
+      </div>
 
-      {/* Content */}
+      {/* Content card */}
       <div
-        className={cn(
-          'w-full rounded-2xl overflow-hidden',
-          isDanger
-            ? 'bg-destructive/5 border border-destructive/10'
-            : 'bg-card border border-border/60 shadow-sm'
-        )}
+        className="w-full rounded-2xl overflow-hidden"
+        style={isDanger
+          ? { background: 'rgba(220,38,38,0.04)', border: '1px solid rgba(220,38,38,0.10)' }
+          : { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }
+        }
       >
         {children}
       </div>

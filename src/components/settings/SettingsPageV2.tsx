@@ -101,22 +101,28 @@ export function SettingsPageV2() {
       <div className="flex items-center gap-3 px-4 pt-1 pb-4">
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-foreground flex-shrink-0"
+          style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
           aria-label="Back"
         >
-          <ChevronLeft size={20} strokeWidth={2.5} />
+          <ChevronLeft size={20} strokeWidth={2.5} style={{ color: '#64748B' }} />
         </button>
-        <h1 className="text-[22px] font-extrabold tracking-[-0.5px] text-foreground">
-          Settings
-        </h1>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Profile</span>
+          </div>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0 }}>
+            Settings
+          </h1>
+        </div>
       </div>
 
       {/* Profile hero card */}
       <div className="px-4 pb-4">
         <button
           onClick={() => navigate(`/profile/${p?.username}`)}
-          className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl bg-card border border-border/60 shadow-sm text-left active:opacity-70"
-          style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)' }}
+          className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left active:opacity-70"
+          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)' }}
         >
           <SquircleAvatar
             src={p?.profile_photo_url}
@@ -237,8 +243,8 @@ export function SettingsPageV2() {
           />
           {/* Top 10 Comments Privacy */}
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-              <Star size={18} className="text-amber-500" />
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(247,147,30,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Star size={18} style={{ color: '#F7931E' }} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-medium text-foreground">Top 10 Comments</p>
@@ -255,7 +261,7 @@ export function SettingsPageV2() {
                 queryClient.invalidateQueries({ queryKey: ['profile'] });
                 queryClient.invalidateQueries({ queryKey: ['top-ten-privacy'] });
               }}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              style={{ borderRadius: 8, border: '0.5px solid rgba(15,23,42,0.12)', background: '#F8FAFC', padding: '6px 10px', fontSize: 13, fontWeight: 500, color: '#0F172A', cursor: 'pointer' }}
             >
               <option value="open">Everyone</option>
               <option value="followers">Followers only</option>
@@ -373,12 +379,17 @@ export function SettingsPageV2() {
           <AlertDialogHeader>
             <AlertDialogTitle>Enable Creator Mode?</AlertDialogTitle>
             <AlertDialogDescription>
-              You'll unlock creator tools, analytics, and the ability to monetise your content on Clbhouz.
+              You'll unlock creator tools, analytics, and the ability to monetise your content on clbhouz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => creator.toggleCreatorMode(true)}>Enable</AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => creator.toggleCreatorMode(true)}
+              style={{ background: '#F7931E', color: '#ffffff', boxShadow: '0 2px 10px rgba(247,147,30,0.28)' }}
+            >
+              Enable
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
