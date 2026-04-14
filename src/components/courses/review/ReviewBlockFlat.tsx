@@ -7,12 +7,11 @@ import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { RatingBreakdownGrid } from '../shared/RatingBreakdownGrid';
 
 function getTierLabel(v: number): string {
-  if (v >= 9.5) return 'Legendary';
-  if (v >= 8.5) return 'Outstanding';
-  if (v >= 7.5) return 'Excellent';
-  if (v >= 6.5) return 'Very Good';
-  if (v >= 5.0) return 'Good';
-  return 'Below Average';
+  if (v >= 9) return 'Outstanding';
+  if (v >= 8) return 'Excellent';
+  if (v >= 7) return 'Very Good';
+  if (v >= 6) return 'Good';
+  return 'Fair';
 }
 
 interface Review {
