@@ -152,16 +152,13 @@ const ProfilePageV2Content: React.FC = () => {
   
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
   const { data: top100Overview } = useTop100Overview(profileUserId);
-  // Post count comes from usePersonalPostsCount below
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
-  // Determine if viewing own profile
   const isSelf = user?.id === profileUserId;
   
 
-  // Follow and friendship hooks for other users
   const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(isSelf ? undefined : profileUserId);
   const {
     status: friendshipStatus,
@@ -173,21 +170,17 @@ const ProfilePageV2Content: React.FC = () => {
     unfriend,
   } = useFriendship(isSelf ? undefined : profileUserId);
 
-  // Private profile gate: hide content for non-friends viewing a private profile
   const isPrivateAndLocked =
     !isSelf &&
     profile?.is_public === false &&
     friendshipStatus !== 'friends';
   
-  // Initialize follow state
   useEffect(() => {
     if (!isSelf && profileUserId) {
       ensureInitial();
     }
   }, [isSelf, profileUserId, ensureInitial]);
 
-  // Fallback: if follow state never resolves from 'unknown' after 5s,
-  // treat as not-following so buttons don't stay disabled forever.
   const [followResolved, setFollowResolved] = useState(false);
   useEffect(() => {
     if (isFollowing !== 'unknown') { setFollowResolved(true); return; }
@@ -195,13 +188,12 @@ const ProfilePageV2Content: React.FC = () => {
     return () => clearTimeout(t);
   }, [isFollowing]);
   
-  // Fix 4: Read initial tab from URL search params
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = useMemo(() => {
     const tabParam = searchParams.get('tab');
     const validTabs = ['activity', 'courses', 'top100', 'handicap', 'achievements', 'stats'];
     return tabParam && validTabs.includes(tabParam) ? tabParam : 'activity';
-  }, []); // Only read on mount
+  }, []);
   
   const [activeSection, setActiveSection] = useState(initialTab);
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -211,7 +203,6 @@ const ProfilePageV2Content: React.FC = () => {
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showTopTenModal, setShowTopTenModal] = useState(false);
 
-  // Inline photo upload state
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const heroFileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -225,25 +216,20 @@ const ProfilePageV2Content: React.FC = () => {
   const { isPersonal } = profileTypeInfo;
   const tabs = getProfileTabs(profile?.user_type);
 
-  // Fix 5: Use React Query for social counts instead of raw useEffect
   const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
   const followersCount = socialCounts?.followers ?? 0;
   const followingCount = socialCounts?.following ?? 0;
   const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;
   
-  // Enable real-time updates for social counts
   useRealtimeSocialCounts({
     viewerUserId: user?.id ?? null,
     profileUserId: profileUserId ?? null,
   });
 
-  // Block actions for other users
   const { blockUser } = useBlockActions({ currentUserId: user?.id || '' });
 
-  // Check if user has business profiles (for "Switch to business" menu item)
   const { data: myBusinesses } = useMyBusinesses(isSelf ? user?.id : undefined);
 
-  // Update URL when tab changes
   const handleTabChange = (tab: string) => {
     setActiveSection(tab);
     if (tab === 'activity') {
@@ -253,10 +239,8 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
 
-  // postsCount now comes from usePersonalPostsCount (fetches total from DB)
   const unlockedAchievements = achievements || [];
 
-  // File selected handlers — open crop modal instead of uploading directly
   const handleAvatarFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -275,7 +259,6 @@ const ProfilePageV2Content: React.FC = () => {
     if (heroFileInputRef.current) heroFileInputRef.current.value = '';
   };
 
-  // Upload handlers — receive cropped File from ImageCropModal
   const handleAvatarUpload = async (croppedFile: File) => {
     if (!user?.id) return;
     setIsUploadingAvatar(true);
@@ -348,13 +331,11 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
 
-  // Format handicap with 1 decimal place
   const formatHandicap = (hcp: number | null | undefined): string => {
     if (hcp == null) return '–';
     return hcp.toFixed(1);
   };
   
-  // Format URL for display (domain only)
   const formatUrlForDisplay = (url: string): string => {
     if (!url) return '';
     try {
@@ -365,13 +346,11 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
   
-  // Ensure URL has protocol for linking
   const ensureProtocol = (url: string): string => {
     if (!url) return '';
     return url.startsWith('http') ? url : `https://${url}`;
   };
   
-  // Get friend button label based on status
   const getFriendButtonLabel = () => {
     switch (friendshipStatus) {
       case 'friends':
@@ -385,7 +364,6 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
   
-  // Handle friend button click
   const handleFriendAction = async () => {
     switch (friendshipStatus) {
       case 'none':
@@ -405,7 +383,6 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
 
-  // Redirect to auth if not logged in (must be before early returns but after all hooks)
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth', { replace: true });
@@ -432,7 +409,8 @@ const ProfilePageV2Content: React.FC = () => {
           </p>
           <button
             onClick={() => safeGoBack(navigate, '/clubhouse')}
-            className="px-6 py-2.5 bg-[#f59e0b] text-white rounded-full text-sm font-semibold hover:bg-[#e8920f] transition-colors active:scale-[0.97]"
+            className="px-6 py-2.5 text-white rounded-full text-sm font-semibold transition-colors active:scale-[0.97]"
+            style={{ backgroundColor: '#F7931E' }}
           >
             Go back
           </button>
@@ -498,8 +476,6 @@ const ProfilePageV2Content: React.FC = () => {
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar immersive>
       {/* Hero Section - full-bleed immersive, extends behind notch */}
-      {/* pointer-events: none on container allows clicks to pass through to content below */}
-      {/* Children with pointer-events: auto remain interactive */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         {/* Hero Image Container - full-bleed behind notch */}
         <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
@@ -553,13 +529,13 @@ const ProfilePageV2Content: React.FC = () => {
           <ArrowLeft className="h-4 w-4 text-white" />
         </button>
 
-        {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
+        {/* Avatar - squircle, left-aligned */}
         <div
           className="absolute left-5 z-20 pointer-events-auto"
           style={{ bottom: '-62px' }}
         >
           <button
-            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             data-debug-id="profile-photo"
             onPointerDown={(e) => {
               logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
@@ -630,7 +606,6 @@ const ProfilePageV2Content: React.FC = () => {
         </div>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
-        {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
         <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
@@ -645,14 +620,15 @@ const ProfilePageV2Content: React.FC = () => {
             </span>
           )}
           
-          {/* Golfer pill - transparent green glass, bigger size */}
+          {/* Golfer pill - dispatch amber glass */}
           <span 
-            className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#d97706] flex items-center justify-center"
+            className="px-4 py-1.5 text-sm font-semibold rounded-full flex items-center justify-center"
             style={{ 
-              background: 'rgba(245, 158, 11, 0.12)',
+              color: '#F7931E',
+              background: 'rgba(247, 147, 30, 0.12)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(245, 158, 11, 0.3)'
+              border: '1px solid rgba(247, 147, 30, 0.30)'
             }}
           >
             Golfer
@@ -661,11 +637,10 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
-      {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name + Creator Badge */}
         <div className="flex items-center gap-2">
-          <h1 className="text-[28px] font-bold text-foreground">
+          <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
             {displayName}
           </h1>
           {profile?.is_creator && <CreatorBadge />}
@@ -673,14 +648,14 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* Action Buttons - different for self vs other */}
-      {/* relative z-10 ensures buttons are above hero overlay */}
       <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {isSelf ? (
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
           <div className="flex items-center gap-3 w-full">
             <button
               onClick={() => navigate('/edit-profile')}
-              className="flex-1 h-11 rounded-full bg-muted text-foreground font-semibold text-sm flex items-center justify-center gap-2 border border-border active:scale-[0.98] transition-transform"
+              className="flex-1 h-11 rounded-full font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
             >
               <Pencil className="w-4 h-4" />
               Edit Profile
@@ -691,7 +666,8 @@ const ProfilePageV2Content: React.FC = () => {
             }}>
               <DropdownMenuTrigger asChild>
                 <button 
-                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.97] transition-transform"
+                  className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
+                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
                 >
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
@@ -741,15 +717,15 @@ const ProfilePageV2Content: React.FC = () => {
           </div>
         ) : (
           /* ── Other user: Follow + Add Friend + Overflow menu ── */
-          /* If blocked (either direction), show only a muted status label */
           friendshipStatus === 'blocked' ? (
-            <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center text-muted-foreground bg-muted border border-border">
+            <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center text-[#94A3B8]" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
               Unavailable
             </div>
           ) : (
           <>
             <button 
-              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border bg-card text-foreground"
+              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
               onClick={toggleFollow}
               disabled={followBusy || (isFollowing === 'unknown' && !followResolved)}
             >
@@ -769,21 +745,25 @@ const ProfilePageV2Content: React.FC = () => {
               className={cn(
                 'h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5',
                 'whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform border',
-                // State-specific colour tokens — no hardcoded hex
                 friendshipStatus === 'friends'
-                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
+                  ? ''
                   : friendshipStatus === 'request_received'
                     ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-card text-foreground border-border',
+                    : '',
               )}
+              style={
+                friendshipStatus === 'friends'
+                  ? { background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }
+                  : friendshipStatus === 'request_received'
+                    ? undefined
+                    : { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
+              }
               onClick={handleFriendAction}
-              // Only disable during an in-flight mutation — never permanently
               disabled={friendshipUpdating}
             >
               {friendshipUpdating ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  {/* Keep a text label so button width doesn't collapse */}
                   {friendshipStatus === 'friends' ? 'Unfriending…'
                     : friendshipStatus === 'request_sent' ? 'Cancelling…'
                     : friendshipStatus === 'request_received' ? 'Accepting…'
@@ -818,7 +798,8 @@ const ProfilePageV2Content: React.FC = () => {
             }}>
               <DropdownMenuTrigger asChild>
                 <button 
-                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.97] transition-transform"
+                  className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
+                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
                 >
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
@@ -843,7 +824,6 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                {/* Unfriend — only show when already friends */}
                 {friendshipStatus === 'friends' && (
                   <DropdownMenuItem
                     onClick={() => unfriend()}
@@ -871,8 +851,7 @@ const ProfilePageV2Content: React.FC = () => {
         )}
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Friends - with staggered fade animations */}
-      {/* relative z-10 ensures stats row is above hero overlay */}
+      {/* Mini-nav row: Posts | Followers | Friends */}
       <div className="mt-3 px-5 relative z-10 pointer-events-auto">
         <motion.div 
           className="flex items-center justify-evenly"
@@ -901,7 +880,7 @@ const ProfilePageV2Content: React.FC = () => {
             <span className="text-xs text-muted-foreground">Posts</span>
           </motion.button>
           
-          <div className="w-px h-6 bg-border/50 self-center" />
+          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
 
           {/* Reviews */}
           <motion.button
@@ -921,7 +900,7 @@ const ProfilePageV2Content: React.FC = () => {
             <span className="text-xs text-muted-foreground">Reviews</span>
           </motion.button>
           
-          <div className="w-px h-6 bg-border/50 self-center" />
+          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
           
           {/* Followers */}
           <motion.button
@@ -944,7 +923,7 @@ const ProfilePageV2Content: React.FC = () => {
             <span className="text-xs text-muted-foreground">Followers</span>
           </motion.button>
           
-          {isPersonal && <div className="w-px h-6 bg-border/50 self-center" />}
+          {isPersonal && <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />}
           
           {/* Friends */}
           {isPersonal && (
@@ -972,7 +951,6 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* White content sheet */}
-      {/* relative z-10 ensures white sheet and all content is above hero overlay */}
       <div className="pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
         {isPrivateAndLocked ? (
           <PrivateProfileGate
@@ -983,9 +961,7 @@ const ProfilePageV2Content: React.FC = () => {
           />
         ) : (
         <>
-        {/* About section - removed "About" heading, just the bio text */}
-        {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
-        {/* Fix 1: Bio section — contextual handling */}
+        {/* About section */}
         {profile?.bio ? (
           <section className="px-5 mb-4">
             <div 
@@ -1000,7 +976,8 @@ const ProfilePageV2Content: React.FC = () => {
             {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && !bioExpanded && (
               <button 
                 onClick={() => setBioExpanded(true)}
-                className="text-[0.8125rem] font-semibold text-[#d97706] mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+                className="text-[0.8125rem] font-semibold mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+                style={{ color: '#F7931E' }}
               >
                 Read more
                 <ChevronDown className="w-4 h-4 ml-1" />
@@ -1016,7 +993,8 @@ const ProfilePageV2Content: React.FC = () => {
                     href={ensureProtocol(website)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
+                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {formatUrlForDisplay(website)}
@@ -1030,7 +1008,7 @@ const ProfilePageV2Content: React.FC = () => {
             <button
               onClick={() => navigate('/edit-profile')}
               className="text-sm font-medium italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
-              style={{ color: '#f59e0b' }}
+              style={{ color: '#F7931E' }}
             >
               Add a bio
             </button>
@@ -1043,7 +1021,8 @@ const ProfilePageV2Content: React.FC = () => {
                     href={ensureProtocol(website)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
+                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {formatUrlForDisplay(website)}
@@ -1061,7 +1040,8 @@ const ProfilePageV2Content: React.FC = () => {
                   href={ensureProtocol(website)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-muted border border-border px-3 min-h-[44px] text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98]"
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
+                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   {formatUrlForDisplay(website)}
@@ -1092,10 +1072,10 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Divider above Clubs section */}
         <div className="px-5 mb-3">
-          <div className="border-t border-border" />
+          <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }} />
         </div>
 
-        {/* Clubs section - directly on page background without card */}
+        {/* Clubs section */}
         <ClubsSectionWrapper
           profileId={profile?.id}
           viewerId={user?.id}
@@ -1103,7 +1083,7 @@ const ProfilePageV2Content: React.FC = () => {
           isSelf={isSelf}
         />
 
-        {/* Achievements Rail - shows earned badges with CTA to quest page */}
+        {/* Achievements Rail */}
         {isPersonal && profile?.id && username && (
           <ProfileAchievementsRail
             userId={profile.id}
@@ -1113,13 +1093,12 @@ const ProfilePageV2Content: React.FC = () => {
           />
         )}
 
-        {/* Creator Section - featured video, pinned posts, weekly stats */}
+        {/* Creator Section */}
         {isPersonal && profileUserId && (
           <CreatorSection userId={profileUserId} isOwnProfile={isSelf} />
         )}
 
-        {/* Segmented control tabs - matches schedule page exactly */}
-        {/* Explicit touch-action and z-index to ensure tappability on mobile */}
+        {/* Segmented control tabs */}
         <section 
           className="px-4 py-2 relative"
           style={{ 
@@ -1140,10 +1119,14 @@ const ProfilePageV2Content: React.FC = () => {
                   className={cn(
                     "relative py-1.5 px-2 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg flex-1",
                     isActive 
-                      ? "bg-foreground text-background font-semibold shadow-sm" 
-                      : "text-muted-foreground font-medium hover:text-foreground"
+                      ? "font-semibold" 
+                      : "font-medium text-[#64748B] hover:text-foreground"
                   )}
-                  style={{ touchAction: 'auto' }}
+                  style={{ 
+                    touchAction: 'auto',
+                    background: isActive ? '#0F172A' : 'transparent',
+                    color: isActive ? '#ffffff' : undefined,
+                  }}
                 >
                   {tab.label}
                 </button>
@@ -1152,7 +1135,7 @@ const ProfilePageV2Content: React.FC = () => {
           </div>
         </section>
 
-        {/* Tab Content - 14px gap from tabs to grid */}
+        {/* Tab Content */}
         <div className={cn("pt-3.5", activeSection === 'activity' ? 'px-0' : activeSection === 'courses' ? 'px-2.5' : 'px-5')}>
           {getCurrentContent()}
         </div>
@@ -1271,4 +1254,3 @@ const ProfilePageV2: React.FC = () => {
 };
 
 export default ProfilePageV2;
-

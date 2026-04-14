@@ -1,8 +1,5 @@
 /**
  * JourneySummaryCard - Premium hero card for Course Legacy stats
- * 
- * Shows: Courses Played (primary), Countries, Average Rating
- * Updated to Hub design system with consistent styling
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -34,33 +31,30 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   // Empty state
   if (coursesPlayed === 0) {
     return (
-      <div className={cn(
-        "bg-card rounded-2xl border border-border p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
-        className
-      )}>
+      <div
+        className={cn("rounded-2xl p-8", className)}
+        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+      >
         <div className="flex flex-col items-center justify-center text-center">
-          {/* Icon */}
-          <div className="w-14 h-14 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
             <MapPin className="w-6 h-6 text-muted-foreground" />
           </div>
           
-          {/* Title */}
           <h3 className="text-base font-semibold text-foreground mb-1">
             {isOwnProfile ? "Start Building Your Legacy" : "No Courses Played Yet"}
           </h3>
           
-          {/* Description */}
           <p className="text-sm text-muted-foreground mb-5 max-w-xs">
             {isOwnProfile 
               ? "Play and rate courses to track your golf journey"
               : "This golfer hasn't logged any courses yet."}
           </p>
           
-          {/* CTA */}
           {isOwnProfile && (
             <button
               onClick={() => navigate('/courses')}
-              className="px-5 py-2.5 bg-card text-foreground border border-border/60 text-sm font-semibold rounded-full hover:bg-muted transition-colors min-h-[44px] active:scale-[0.97]"
+              className="px-5 py-2.5 text-sm font-semibold rounded-full transition-colors min-h-[44px] active:scale-[0.97]"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
             >
               Find Courses
             </button>
@@ -89,10 +83,12 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       
       {/* Main stat */}
       <div className="text-center mb-6">
-        <AnimatedNumber 
-          value={coursesPlayed}
-          className="text-5xl font-bold text-foreground tracking-tight"
-        />
+        <span style={{ fontWeight: 900 }}>
+          <AnimatedNumber 
+            value={coursesPlayed}
+            className="text-5xl text-foreground tracking-tight"
+          />
+        </span>
         <p className="text-sm text-muted-foreground mt-1">
           Courses Played
         </p>
@@ -103,7 +99,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         {/* Countries */}
         {countriesPlayed > 0 && (
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
               <Globe className="w-4 h-4 text-muted-foreground" />
             </div>
             <div className="text-center">
@@ -121,8 +117,8 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         {/* Average Rating */}
         {avgRating !== null && avgRating > 0 && (
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
-              <Star className="w-4 h-4 text-amber-500" />
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.25)' }}>
+              <Star className="w-4 h-4" style={{ color: '#F7931E' }} />
             </div>
             <div className="text-center">
               <AnimatedNumber 

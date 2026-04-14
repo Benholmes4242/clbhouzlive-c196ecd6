@@ -168,9 +168,15 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
     >
       {/* Title row */}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-[17px] font-semibold text-foreground">
-          Achievements
-        </h2>
+        <div>
+          <div className="flex items-center gap-1.5 mb-1">
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Achievements</span>
+          </div>
+          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>
+            Achievements
+          </h2>
+        </div>
         <button
           type="button"
           data-debug-id="profile-achievements-view-all"
@@ -211,14 +217,14 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
                   className="w-[88px] h-[110px] object-contain opacity-40 grayscale-[60%] transition-transform duration-200 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-[88px] h-[110px] rounded-xl bg-muted flex items-center justify-center opacity-40">
+                <div className="w-[88px] h-[110px] rounded-xl flex items-center justify-center opacity-40" style={{ background: 'rgba(15,23,42,0.06)' }}>
                   <span className="text-3xl font-bold text-muted-foreground/40">
                     {nudge.type === 'global' ? nudge.nextThreshold : '?'}
                   </span>
                 </div>
               )}
               {/* Padlock icon - bottom right corner with slight overlap */}
-              <div className="absolute bottom-2 right-0 w-5 h-5 rounded-full bg-muted flex items-center justify-center shadow-sm ring-1 ring-white/50">
+              <div className="absolute bottom-2 right-0 w-5 h-5 rounded-full flex items-center justify-center shadow-sm ring-1 ring-white/50" style={{ background: 'rgba(15,23,42,0.06)' }}>
                 <Lock className="w-3 h-3 text-muted-foreground" />
               </div>
             </div>
@@ -254,7 +260,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
                     className="w-[88px] h-[110px] object-contain transition-transform duration-200 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-[88px] h-[110px] rounded-xl bg-muted flex items-center justify-center">
+                  <div className="w-[88px] h-[110px] rounded-xl flex items-center justify-center" style={{ background: 'rgba(15,23,42,0.06)' }}>
                     <span className="text-3xl font-bold text-muted-foreground">
                       {ach.threshold || '?'}
                     </span>
