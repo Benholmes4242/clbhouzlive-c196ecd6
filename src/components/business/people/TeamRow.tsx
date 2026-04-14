@@ -42,7 +42,7 @@ export function TeamRow({
   const hasCustomTitle = !!displayTitle?.trim();
 
   return (
-    <div className="w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/30 active:scale-[0.98] transition-all">
+    <div className="w-full flex items-center gap-3 px-4 py-4 active:scale-[0.98] transition-all active:bg-[rgba(15,23,42,0.03)]">
       {/* Clickable profile area */}
       <button
         type="button"
@@ -72,7 +72,7 @@ export function TeamRow({
             {hasCustomTitle ? (
               <span className="text-sm text-muted-foreground">{displayTitle}</span>
             ) : (
-              <span className="text-xs px-2 py-0.5 rounded-full border inline-flex bg-muted text-muted-foreground border-border/60">
+              <span className="text-xs px-2 py-0.5 rounded-full inline-flex" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#64748B' }}>
                 {roleLabel}
               </span>
             )}
@@ -87,7 +87,7 @@ export function TeamRow({
             <button
               type="button"
               onClick={(e) => e.stopPropagation()}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md hover:bg-muted/50 text-muted-foreground"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-muted-foreground"
               aria-label="More options"
             >
               <MoreVertical className="h-4 w-4" />
