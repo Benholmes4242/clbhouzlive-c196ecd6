@@ -36,15 +36,6 @@ const SORT_OPTIONS: { value: Top100SortMode; label: string; requiresReviewData?:
   { value: 'za', label: 'Z to A' },
 ];
 
-/**
- * Two inline Explore-style dropdowns for filter (Show) and sort (Sort).
- * 
- * Polish applied:
- * - Smooth transitions between states
- * - Better visual hierarchy
- * - Animated chevron on dropdown open
- * - Semantic design tokens throughout
- */
 export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   activeFilter,
   onFilterChange,
@@ -57,10 +48,8 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official Rating';
   const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'High to Low';
 
-  // When Played/Unplayed is active, only rating_high is enabled
   const isPlayedOrUnplayed = activeFilter === 'played' || activeFilter === 'unplayed';
 
-  // Filter sort options based on available data
   const availableSortOptions = SORT_OPTIONS.filter(
     opt => !opt.requiresReviewData || hasReviewData
   );
@@ -69,9 +58,13 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
     <motion.div 
       className={`px-4 py-3 transition-all duration-200 ${
         isSticky 
-          ? 'bg-muted/98 backdrop-blur-md border-b border-border/80 shadow-sm' 
-          : 'bg-muted/50 border-b border-border/60'
+          ? 'backdrop-blur-md shadow-sm' 
+          : ''
       }`}
+      style={{
+        background: isSticky ? 'rgba(248,250,252,0.97)' : 'rgba(15,23,42,0.03)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+      }}
       initial={false}
       animate={{ 
         boxShadow: isSticky ? '0 4px 12px rgba(0,0,0,0.06)' : '0 0 0 rgba(0,0,0,0)' 
@@ -83,13 +76,14 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-card border border-border transition-all duration-150 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-border active:scale-[0.98]"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm transition-all duration-150 text-sm font-medium focus:outline-none active:scale-[0.98]"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
             >
               <span className="truncate">{currentFilterLabel}</span>
               <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-card border-border shadow-lg z-50">
+          <DropdownMenuContent align="start" className="min-w-[180px] shadow-lg z-50" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
             {FILTER_OPTIONS.map((option) => {
               const isActive = activeFilter === option.value;
               return (
@@ -98,9 +92,10 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                   onClick={() => onFilterChange(option.value)}
                   className={`cursor-pointer transition-colors duration-100 ${
                     isActive 
-                      ? 'bg-muted/50 border border-border text-foreground font-medium' 
+                      ? 'text-foreground font-medium' 
                       : 'text-muted-foreground'
                   }`}
+                  style={isActive ? { background: 'rgba(15,23,42,0.04)', fontWeight: 600 } : undefined}
                 >
                   <span className="flex items-center gap-2">
                     {option.label}
@@ -120,16 +115,16 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-card border border-border transition-all duration-150 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-border active:scale-[0.98]"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm transition-all duration-150 text-sm font-medium focus:outline-none active:scale-[0.98]"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
             >
               <span className="truncate">{currentSortLabel}</span>
               <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-card border-border shadow-lg z-50">
+          <DropdownMenuContent align="start" className="min-w-[180px] shadow-lg z-50" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
             {availableSortOptions.map((option) => {
               const isActive = activeSort === option.value;
-              // When Played/Unplayed: only rating_high is enabled
               const isDisabled = isPlayedOrUnplayed && option.value !== 'rating_high';
               
               return (
@@ -144,9 +139,10 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                     isDisabled
                       ? 'text-muted-foreground/60 cursor-not-allowed'
                       : isActive 
-                        ? 'bg-muted/50 border border-border text-foreground font-medium cursor-pointer' 
+                        ? 'text-foreground font-medium cursor-pointer' 
                         : 'text-muted-foreground cursor-pointer'
                   }`}
+                  style={isActive && !isDisabled ? { background: 'rgba(15,23,42,0.04)', fontWeight: 600 } : undefined}
                   disabled={isDisabled}
                 >
                   {option.label}

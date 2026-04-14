@@ -78,8 +78,13 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   return (
     <motion.button
       onClick={handleClick}
-      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-2xl bg-card border border-border transition-all duration-150"
-      style={{ borderLeftWidth: '3px', borderLeftColor: theme.ringColor }}
+      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-2xl transition-all duration-150"
+      style={{ 
+        background: '#ffffff',
+        border: '1px solid rgba(15,23,42,0.07)',
+        borderLeftWidth: '3px',
+        borderLeftColor: theme.ringColor,
+      }}
       whileTap={{ scale: 0.99 }}
     >
       <div className="flex items-center justify-between gap-3">
