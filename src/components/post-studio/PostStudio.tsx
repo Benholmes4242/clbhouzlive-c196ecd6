@@ -136,7 +136,7 @@ function StudioExitSheet({ onSaveDraft, onDiscard, onKeepEditing, isSaving }: St
               onClick={onSaveDraft}
               disabled={isSaving}
               className="w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 min-h-[48px] disabled:opacity-50"
-              style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.30)', color: '#D97706' }}
+              style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)', color: '#F7931E' }}
             >
               {isSaving ? (
                 <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(217,119,6,0.3)', borderTopColor: 'transparent' }} />
@@ -265,16 +265,16 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
     const prevShieldColor = currentShieldColor;
 
     // Apply dark status bar for the dark studio surface
-    applyShieldColor('#0D0D0D');
-    document.documentElement.style.backgroundColor = '#0D0D0D';
-    document.body.style.backgroundColor = '#0D0D0D';
+    applyShieldColor('#F8FAFC');
+    document.documentElement.style.backgroundColor = '#F8FAFC';
+    document.body.style.backgroundColor = '#F8FAFC';
 
-    // Dark studio — white status bar icons
+    // Light studio — dark status bar icons
     try {
       if (typeof window !== 'undefined' && window.median?.statusbar?.set) {
         window.median.statusbar.set({
-          style: 'dark',
-          color: '0D0D0D',
+          style: 'light',
+          color: 'F8FAFC',
           overlay: true,
           blur: false,
         });
@@ -310,7 +310,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         className="fixed inset-0 z-[9999] flex flex-col overflow-hidden"
         style={{
           top: 0,
-          background: '#0D0D0D',
+          background: '#F8FAFC',
         }}
       >
 

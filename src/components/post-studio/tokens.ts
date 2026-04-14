@@ -36,11 +36,11 @@ export const RAIL_BG    = 'rgba(248,250,252,0.98)';
 export const RAIL_HAIRLINE = 'rgba(0,0,0,0.08)';
 
 // Dark compose surface
-export const COMPOSE_BG = '#0D0D0D';
-export const DARK_TEXT  = 'rgba(255,255,255,0.92)';
-export const DARK_TEXT2 = 'rgba(255,255,255,0.50)';
-export const DARK_TEXT3 = 'rgba(255,255,255,0.30)';
-export const DARK_ICON  = 'rgba(255,255,255,0.55)';
-export const DARK_BG    = '#0D0D0D';
-export const DARK_CARD  = 'rgba(255,255,255,0.06)';
-export const DARK_BORDER = 'rgba(255,255,255,0.08)';
+export const COMPOSE_BG = '#F8FAFC';
+export const DARK_TEXT  = '#0F172A';
+export const DARK_TEXT2 = 'rgba(15,23,42,0.50)';
+export const DARK_TEXT3 = 'rgba(15,23,42,0.40)';
+export const DARK_ICON  = 'rgba(15,23,42,0.55)';
+export const DARK_BG    = '#F8FAFC';
+export const DARK_CARD  = 'rgba(15,23,42,0.05)';
+export const DARK_BORDER = 'rgba(15,23,42,0.07)';
