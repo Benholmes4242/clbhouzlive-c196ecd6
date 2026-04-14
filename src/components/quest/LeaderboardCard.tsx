@@ -54,16 +54,20 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
   if (isLoading) {
     return (
       <section>
-        <h2 className="text-sm font-semibold text-muted-foreground mb-4">
-          Friends Leaderboard
-        </h2>
+        <div className="mb-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Leaderboard</span>
+          </div>
+          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Friends Leaderboard</h2>
+        </div>
         <div className="animate-pulse space-y-3">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-muted rounded-lg" />
-              <div className="w-8 h-8 bg-muted rounded-full" />
-              <div className="flex-1 h-4 bg-muted rounded" />
-              <div className="w-8 h-4 bg-muted rounded" />
+              <div className="w-8 h-8 rounded-lg" style={{ background: 'rgba(15,23,42,0.08)' }} />
+              <div className="w-8 h-8 rounded-full" style={{ background: 'rgba(15,23,42,0.08)' }} />
+              <div className="flex-1 h-4 rounded" style={{ background: 'rgba(15,23,42,0.06)' }} />
+              <div className="w-8 h-4 rounded" style={{ background: 'rgba(15,23,42,0.06)' }} />
             </div>
           ))}
         </div>
@@ -80,11 +84,15 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
   if (friends.length === 0) {
     return (
       <section>
-        <h2 className="text-sm font-semibold text-muted-foreground mb-4">
-          Friends Leaderboard
-        </h2>
+        <div className="mb-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Leaderboard</span>
+          </div>
+          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Friends Leaderboard</h2>
+        </div>
         <div className="text-center py-6">
-          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
             <UserPlus className="w-7 h-7 text-muted-foreground" />
           </div>
           <h3 className="text-base font-bold text-foreground mb-2">
@@ -124,9 +132,13 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
 
   return (
     <section>
-      <h2 className="text-sm font-semibold text-muted-foreground mb-4">
-        Friends Leaderboard
-      </h2>
+      <div className="mb-4">
+        <div className="flex items-center gap-1.5 mb-1">
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Leaderboard</span>
+        </div>
+        <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Friends Leaderboard</h2>
+      </div>
       
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -143,8 +155,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                 key={entry.id}
                 className={cn(
                   "flex items-center gap-3 p-2.5 rounded-xl min-h-[44px] active:opacity-80 transition-opacity",
-                  entry.isCurrentUser && "bg-amber-50 border border-amber-200/60"
                 )}
+                style={entry.isCurrentUser ? { background: 'rgba(247,147,30,0.06)', border: '1px solid rgba(247,147,30,0.25)' } : undefined}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
@@ -176,10 +188,9 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
 
                 {/* Name */}
                 <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "text-sm font-semibold truncate text-foreground",
-                    entry.isCurrentUser && "text-amber-700"
-                  )}>
+                  <p className="text-sm font-semibold truncate text-foreground"
+                    style={entry.isCurrentUser ? { color: '#F7931E' } : undefined}
+                  >
                     {entry.displayName}
                   </p>
                 </div>
@@ -198,14 +209,12 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
 
         {/* Remaining entries (4-10) - compact list */}
         {remaining.length > 0 && (
-          <div className="border-t border-border pt-3 mt-3 space-y-1">
+          <div className="pt-3 mt-3 space-y-1" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             {remaining.map((entry, index) => (
               <motion.div
                 key={entry.id}
-                className={cn(
-                  "flex items-center gap-3 py-1.5 px-2 min-h-[44px] active:opacity-80 transition-opacity rounded-lg",
-                  entry.isCurrentUser && "bg-amber-50 border border-amber-200/60"
-                )}
+                className="flex items-center gap-3 py-1.5 px-2 min-h-[44px] active:opacity-80 transition-opacity rounded-lg"
+                style={entry.isCurrentUser ? { background: 'rgba(247,147,30,0.06)', border: '1px solid rgba(247,147,30,0.25)' } : undefined}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15 + index * 0.03 }}
@@ -221,8 +230,10 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                 />
                 <span className={cn(
                   "flex-1 text-sm truncate text-muted-foreground",
-                  entry.isCurrentUser && "text-amber-700 font-semibold"
-                )}>
+                  entry.isCurrentUser && "font-semibold"
+                )}
+                  style={entry.isCurrentUser ? { color: '#F7931E' } : undefined}
+                >
                   {entry.displayName}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground">

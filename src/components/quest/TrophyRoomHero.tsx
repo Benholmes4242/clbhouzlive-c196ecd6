@@ -133,7 +133,8 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
 
       {/* HORIZONTAL LAYOUT: Badge | Ring | Stats */}
       <motion.div 
-        className="relative flex items-center justify-between bg-card rounded-2xl p-4 border border-border mb-4 overflow-hidden"
+        className="relative flex items-center justify-between rounded-2xl p-4 mb-4 overflow-hidden"
+        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -214,7 +215,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         {/* Right: Count */}
         <div className="relative text-right">
           <div className="flex items-baseline justify-end gap-0.5">
-            <span className="text-4xl font-bold tracking-tight text-foreground">
+            <span className="text-4xl tracking-tight text-foreground" style={{ fontWeight: 900 }}>
               {totalPlayed}
             </span>
             <span className="text-lg font-medium text-muted-foreground/60">
@@ -234,7 +235,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="h-2 rounded-full overflow-hidden bg-muted">
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.08)' }}>
           <motion.div
             className="h-full rounded-full"
             style={{

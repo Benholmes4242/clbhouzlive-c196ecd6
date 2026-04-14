@@ -25,7 +25,7 @@ export const QuestEmptyState: React.FC<QuestEmptyStateProps> = ({
   className,
 }) => (
   <div className={cn("flex flex-col items-center justify-center py-12 px-6 text-center", className)}>
-    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4 border border-border">
+    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
       {icon}
     </div>
     <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
