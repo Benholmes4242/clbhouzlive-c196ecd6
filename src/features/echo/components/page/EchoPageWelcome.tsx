@@ -1,5 +1,5 @@
 /**
- * EchoPageWelcome - Dark atmospheric welcome state
+ * EchoPageWelcome - Light dispatch welcome state
  */
 
 import React, { useMemo } from 'react';
@@ -119,13 +119,13 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         <div className="text-center mb-2">
           <h1
             className="text-[28px] font-bold tracking-tight"
-            style={{ color: 'rgba(255,255,255,0.90)' }}
+            style={{ color: '#0F172A' }}
           >
             {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
           </h1>
           <p
             className="text-[15px] mt-1.5"
-            style={{ color: 'rgba(255,255,255,0.45)' }}
+            style={{ color: '#64748B' }}
           >
             Your caddie is ready.
           </p>
@@ -133,14 +133,14 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-6 w-full max-w-[340px]">
-          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+          <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
           <span
             className="text-[11px] font-semibold uppercase tracking-[0.12em]"
-            style={{ color: 'rgba(255,255,255,0.22)' }}
+            style={{ color: '#94A3B8' }}
           >
             Try asking
           </span>
-          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+          <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
         </div>
 
         {/* Prompt chips */}
@@ -151,19 +151,19 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
               onClick={() => handleChipClick(prompt)}
               className="px-4 py-[11px] rounded-[13px] text-[13px] font-medium text-left active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2"
               style={{
-                background: '#161618',
-                border: '1px solid rgba(255,255,255,0.07)',
+                background: '#ffffff',
+                border: '1px solid rgba(15,23,42,0.07)',
               }}
               aria-label={`Ask Echo: ${prompt}`}
             >
-              <span style={{ color: 'rgba(255,255,255,0.72)' }}>{prompt}</span>
+              <span style={{ color: '#0F172A' }}>{prompt}</span>
               <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.4)' }} />
             </button>
           ))}
         </div>
 
         {/* Hint */}
-        <p className="mt-4 text-[12px] text-center" style={{ color: 'rgba(255,255,255,0.18)' }}>
+        <p className="mt-4 text-[12px] text-center" style={{ color: 'rgba(15,23,42,0.25)' }}>
           Ask me anything about golf
         </p>
       </div>

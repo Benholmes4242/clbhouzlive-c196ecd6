@@ -1,5 +1,5 @@
 /**
- * EchoHistorySheet - Bottom sheet for viewing past Echo conversations (dark theme)
+ * EchoHistorySheet - Bottom sheet for viewing past Echo conversations (light dispatch theme)
  */
 
 import React, { useEffect, useState } from 'react';
@@ -75,13 +75,13 @@ function HistorySkeleton() {
   return (
     <div className="px-4">
       {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex items-center gap-3 px-0 py-3.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+        <div key={i} className="flex items-center gap-3 px-0 py-3.5" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+          <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" style={{ background: 'rgba(15,23,42,0.07)' }} />
           <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 rounded-full w-3/4" style={{ background: 'rgba(255,255,255,0.06)' }} />
-            <Skeleton className="h-3 rounded-full w-1/2" style={{ background: 'rgba(255,255,255,0.04)' }} />
+            <Skeleton className="h-4 rounded-full w-3/4" style={{ background: 'rgba(15,23,42,0.07)' }} />
+            <Skeleton className="h-3 rounded-full w-1/2" style={{ background: 'rgba(15,23,42,0.05)' }} />
           </div>
-          <Skeleton className="h-3 rounded-full w-12" style={{ background: 'rgba(255,255,255,0.04)' }} />
+          <Skeleton className="h-3 rounded-full w-12" style={{ background: 'rgba(15,23,42,0.05)' }} />
         </div>
       ))}
     </div>
@@ -143,9 +143,9 @@ function SwipeableConversationRow({
         dragConstraints={{ left: -80, right: 0 }}
         dragElastic={{ left: 0.1, right: 0 }}
         onDragEnd={handleDragEnd}
-        style={{ x, background: '#161618' }}
+        style={{ x, background: '#ffffff' }}
         onClick={handleSelect}
-        className="relative px-4 py-3 flex items-center gap-3 active:bg-white/[0.02] transition-colors cursor-pointer"
+        className="relative px-4 py-3 flex items-center gap-3 active:bg-black/[0.02] transition-colors cursor-pointer"
         role="listitem"
         aria-label={`Open conversation: ${displayTitle}`}
       >
@@ -166,13 +166,13 @@ function SwipeableConversationRow({
         <div className="flex-1 min-w-0">
           <span
             className="text-[14px] font-semibold truncate block"
-            style={{ color: 'rgba(255,255,255,0.88)' }}
+            style={{ color: '#0F172A' }}
           >
             {displayTitle}
           </span>
           <p
             className="text-[12px] truncate"
-            style={{ color: 'rgba(255,255,255,0.28)' }}
+            style={{ color: '#94A3B8' }}
           >
             Tap to continue conversation
           </p>
@@ -180,7 +180,7 @@ function SwipeableConversationRow({
 
         <span
           className="text-[11px] flex-shrink-0 ml-1"
-          style={{ color: 'rgba(255,255,255,0.22)' }}
+          style={{ color: '#94A3B8' }}
         >
           {formatRelativeDate(conv.last_message_at || conv.created_at)}
         </span>
@@ -189,7 +189,7 @@ function SwipeableConversationRow({
       </motion.div>
       
       {showDivider && (
-        <div className="h-px ml-[62px]" style={{ background: 'rgba(255,255,255,0.05)' }} />
+        <div style={{ height: '0.5px', marginLeft: 62, background: 'rgba(15,23,42,0.06)' }} />
       )}
     </div>
   );
@@ -265,7 +265,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.5 }}
             onDragEnd={handleSheetDragEnd}
-            style={{ y: sheetY, background: '#0c0c0e', height: 'min(75vh, calc(100vh - 120px))', maxHeight: '85vh' }}
+            style={{ y: sheetY, background: '#F8FAFC', height: 'min(75vh, calc(100vh - 120px))', maxHeight: '85vh' }}
             className="fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px] rounded-t-[22px] flex flex-col"
             initial={sheetAnimProps.initial}
             animate={{ y: 0 }}
@@ -279,35 +279,31 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
               className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
               aria-label="Drag to close"
             >
-              <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
             </div>
             
             {/* Header */}
             <div
               className="px-5 pb-3 flex items-center justify-between"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+              style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
             >
-              <div className="flex items-center gap-2">
-                <AnimatedEchoWave size={14} active={true} />
-                <h2
-                  className="text-[17px] font-bold"
-                  style={{ color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.01em' }}
-                >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                   Conversations
-                </h2>
+                </span>
               </div>
               <button
                 onClick={onClose}
                 className="flex items-center justify-center active:scale-[0.95] transition-transform"
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.07)',
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: 'rgba(15,23,42,0.05)',
+                  border: '0.5px solid rgba(15,23,42,0.10)',
                 }}
                 aria-label="Close history"
               >
-                <X className="w-[16px] h-[16px]" style={{ color: 'rgba(255,255,255,0.45)' }} />
+                <X className="w-[16px] h-[16px]" style={{ color: '#64748B' }} />
               </button>
             </div>
             
@@ -322,12 +318,12 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                 <div className="flex flex-col items-center justify-center py-8">
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
+                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
                   >
-                    <Clock className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.25)' }} />
+                    <Clock className="w-7 h-7" style={{ color: '#94A3B8' }} />
                   </div>
-                  <h3 className="text-base font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>No history yet</h3>
-                  <p className="text-[14px] text-center px-8" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                  <h3 className="text-base font-semibold" style={{ color: '#0F172A' }}>No history yet</h3>
+                  <p className="text-[14px] text-center px-8" style={{ color: '#94A3B8' }}>
                     Your past conversations will appear here
                   </p>
                 </div>
@@ -362,7 +358,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
 
                   <p
                     className="text-center mt-3 text-[12px] pb-4"
-                    style={{ color: 'rgba(255,255,255,0.18)' }}
+                    style={{ color: '#94A3B8' }}
                   >
                     Swipe left to delete a conversation
                   </p>
@@ -390,7 +386,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                 >
                   <motion.div 
                     className="rounded-2xl p-6 max-w-[300px] w-full shadow-xl"
-                    style={{ background: '#161618', border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
                     initial={prefersReduced ? false : { scale: 0.9 }}
                     animate={{ scale: 1 }}
                     exit={prefersReduced ? undefined : { scale: 0.9 }}
@@ -399,13 +395,13 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                   >
                     <h3
                       className="text-[1.0625rem] font-semibold mb-2"
-                      style={{ color: 'rgba(255,255,255,0.90)' }}
+                      style={{ color: '#0F172A' }}
                     >
                       Delete conversation?
                     </h3>
                     <p
                       className="text-[0.875rem] mb-6"
-                      style={{ color: 'rgba(255,255,255,0.40)' }}
+                      style={{ color: '#64748B' }}
                     >
                       This can't be undone.
                     </p>
@@ -413,7 +409,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                       <button 
                         onClick={() => setConfirmDelete(null)}
                         className="flex-1 rounded-full text-[0.9375rem] font-semibold active:scale-[0.97] transition-transform"
-                        style={{ background: 'rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.80)', height: 48 }}
+                        style={{ background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.12)', color: '#64748B', height: 48 }}
                       >
                         Cancel
                       </button>
