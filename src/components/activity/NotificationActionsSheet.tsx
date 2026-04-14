@@ -3,8 +3,6 @@ import { Bell, BellOff, Trash2, BellMinus, UserX } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from '@/components/ui/sheet';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { supabase } from '@/integrations/supabase/client';
@@ -113,67 +111,88 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
     onClose();
   };
 
+  const rowStyle: React.CSSProperties = {
+    width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+    padding: '14px 20px', background: 'transparent', border: 'none',
+    borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer',
+    textAlign: 'left' as const,
+  };
+
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-[20px]"
+        className="rounded-t-[20px] bg-[#F8FAFC]"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
       >
-        <SheetHeader className="text-left border-b border-border/40 pb-3" aria-label="Notification options">
-          <SheetTitle className="text-[1rem] font-semibold">Notification options</SheetTitle>
-        </SheetHeader>
-        
-        <div className="p-2 space-y-1">
+        {/* Dispatch handle */}
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
+        </div>
+
+        {/* Dispatch eyebrow header */}
+        <div style={{ padding: '6px 20px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              Notification options
+            </span>
+          </div>
+        </div>
+
+        {/* Flat action rows */}
+        <div>
           <button
             onClick={handleToggleRead}
-            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2"
+            style={rowStyle}
             aria-label={isUnread ? 'Mark notification as read' : 'Mark notification as unread'}
           >
-            {isUnread ? (
-              <>
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="text-[0.875rem] font-medium">Mark as read</span>
-              </>
-            ) : (
-              <>
-                <BellOff className="h-5 w-5 text-muted-foreground" />
-                <span className="text-[0.875rem] font-medium">Mark as unread</span>
-              </>
-            )}
+            {isUnread
+              ? <Bell className="h-5 w-5" style={{ color: '#94A3B8' }} />
+              : <BellOff className="h-5 w-5" style={{ color: '#94A3B8' }} />
+            }
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#0F172A' }}>
+              {isUnread ? 'Mark as read' : 'Mark as unread'}
+            </span>
           </button>
 
           <button
             onClick={handleMuteType}
-            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2"
+            style={rowStyle}
             aria-label={`Mute ${notificationType.replace(/_/g, ' ')} notifications`}
           >
-            <BellMinus className="h-5 w-5 text-muted-foreground" />
-            <span className="text-[0.875rem] font-medium">Mute {notificationType.replace(/_/g, ' ')} notifications</span>
+            <BellMinus className="h-5 w-5" style={{ color: '#94A3B8' }} />
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#0F172A' }}>
+              Mute {notificationType.replace(/_/g, ' ')} notifications
+            </span>
           </button>
 
           {actorId && notification.actor_type === 'user' && (
             <button
               onClick={handleMuteUser}
-              className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2"
+              style={rowStyle}
               aria-label={`Mute notifications from ${actorName}`}
             >
-              <UserX className="h-5 w-5 text-muted-foreground" />
-              <span className="text-[0.875rem] font-medium">Mute {actorName}</span>
+              <UserX className="h-5 w-5" style={{ color: '#94A3B8' }} />
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0F172A' }}>
+                Mute {actorName}
+              </span>
             </button>
           )}
 
           <button
             onClick={handleDelete}
-            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-destructive/10 transition-colors text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+            style={{ ...rowStyle, borderBottom: 'none' }}
             aria-label="Delete notification"
           >
-            <Trash2 className="h-5 w-5" />
-            <span className="text-[0.875rem] font-medium">Delete notification</span>
+            <Trash2 className="h-5 w-5" style={{ color: '#DC2626' }} />
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#DC2626' }}>
+              Delete notification
+            </span>
           </button>
         </div>
 
-        <div className="h-[env(safe-area-inset-bottom)]" />
+        <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 8px)' }} />
       </SheetContent>
     </Sheet>
   );

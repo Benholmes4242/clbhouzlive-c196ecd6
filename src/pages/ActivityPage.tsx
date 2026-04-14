@@ -238,22 +238,27 @@ const ActivityPage: React.FC = () => {
           {/* Header */}
           <div className="px-5 pt-4 pb-0 flex items-end justify-between">
             <div>
-              <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-muted-foreground mb-1">
-                Today
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Activity</span>
+              </div>
               <h1
                 onClick={handleRefresh}
                 className={cn(
-                  "font-display text-[28px] font-semibold leading-tight text-foreground cursor-pointer transition-opacity",
+                  "text-[28px] leading-tight cursor-pointer transition-opacity",
                   isRefreshing && "opacity-50"
                 )}
+                style={{ fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}
                 aria-label="Notifications - tap to refresh"
               >
                 Notifications
               </h1>
             </div>
             {sessionNewCount && sessionNewCount > 0 ? (
-              <span className="mb-1.5 inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-semibold bg-[hsl(38,92%,50%)] text-white">
+              <span
+                className="mb-1.5 inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-semibold text-white"
+                style={{ background: '#F7931E' }}
+              >
                 {sessionNewCount} new
               </span>
             ) : null}
@@ -265,12 +270,12 @@ const ActivityPage: React.FC = () => {
               <button
                 key={chip}
                 onClick={() => setChipFilter(chip)}
-                className={cn(
-                  "shrink-0 px-4 py-1.5 rounded-full text-[12.5px] font-semibold transition-all active:scale-[0.95]",
-                  chipFilter === chip
-                    ? "bg-foreground text-background"
-                    : "bg-foreground/[0.07] text-muted-foreground"
-                )}
+                className="shrink-0 px-4 py-1.5 rounded-full text-[12.5px] font-semibold transition-all active:scale-[0.95]"
+                style={{
+                  background: chipFilter === chip ? '#0F172A' : 'rgba(15,23,42,0.06)',
+                  color: chipFilter === chip ? '#ffffff' : '#64748B',
+                  border: 'none',
+                }}
               >
                 {chip}
               </button>
@@ -296,7 +301,8 @@ const ActivityPage: React.FC = () => {
                 </p>
                 <button
                   onClick={() => queryClient.invalidateQueries({ queryKey: ['activity-feed'] })}
-                  className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full active:scale-[0.97] transition-transform"
+                  className="px-6 py-2.5 text-sm font-bold rounded-full active:scale-[0.97] transition-transform"
+                  style={{ background: '#F7931E', color: '#ffffff' }}
                 >
                   Try again
                 </button>

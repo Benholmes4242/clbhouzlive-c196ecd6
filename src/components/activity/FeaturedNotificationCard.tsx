@@ -207,6 +207,20 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
         {/* Layer 3 — Content area */}
         <div className="px-3.5 pt-2.5 pb-3.5">
           <p className="text-[13.5px] leading-[1.45] text-foreground">
+            {notification.is_unread && (
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 6, height: 6,
+                  borderRadius: '50%',
+                  background: '#F7931E',
+                  marginRight: 6,
+                  verticalAlign: 'middle',
+                  marginTop: -1,
+                  flexShrink: 0,
+                }}
+              />
+            )}
             <span className="font-semibold">{actorName}</span>{' '}
             <span className="text-muted-foreground font-normal">{actionText}</span>
           </p>
