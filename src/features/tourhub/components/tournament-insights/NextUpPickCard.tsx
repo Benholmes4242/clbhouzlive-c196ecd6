@@ -1,21 +1,17 @@
 /**
  * NextUpPickCard — Flat dispatch ruled rows for AI tournament picks.
- * Expandable rows with tier labels, course fit bars, and bullet points.
+ * Full-width layout: avatar + name + fit bar | world rank + tier label
  */
 
 import React, { useState } from 'react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { WinnerProfile, ContenderCard, ConfidenceTier } from './types';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 interface NextUpPickCardProps {
   featured: WinnerProfile;
   cards: ContenderCard[];
   withdrawnPlayerIds?: Set<string>;
 }
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getTierLabel(index: number): string {
   if (index === 0) return 'Top Pick';
@@ -28,8 +24,6 @@ function getTierColor(tier: ConfidenceTier): string {
   if (tier === 'high') return '#2563EB';
   return '#9CA3AF';
 }
-
-// ─── Single flat pick row — expandable ───────────────────────────────────────
 
 function PickRow({
   item,
@@ -47,6 +41,7 @@ function PickRow({
   const bullets = (item as WinnerProfile).fitBullets ?? (item as ContenderCard).fitBullets ?? [];
   const color = getTierColor(tier);
   const matchPct = tier === 'elite' ? 95 : tier === 'high' ? 88 : 78;
+  const worldRank = (item as WinnerProfile).worldRank ?? (item as ContenderCard).worldRank;
 
   return (
     <div>
@@ -54,7 +49,8 @@ function PickRow({
         onClick={() => setOpen(!open)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center',
-          padding: '0', background: 'transparent', border: 'none',
+          padding: '0', background: isTop ? 'rgba(247,147,30,0.02)' : 'transparent',
+          border: 'none',
           borderLeft: isTop ? '3px solid #F7931E' : '3px solid transparent',
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
           cursor: 'pointer', textAlign: 'left' as const,
@@ -62,7 +58,7 @@ function PickRow({
         }}
       >
         <div style={{ flex: 1, padding: '12px 12px 12px 12px' }}>
-          {/* Tier label row */}
+          {/* Tier label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <span style={{ fontSize: 8.5, fontWeight: 900, color, letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
               {getTierLabel(index)}
@@ -72,8 +68,9 @@ function PickRow({
             )}
           </div>
 
-          {/* Player row */}
+          {/* Player row — avatar + name/bar + world rank */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Avatar */}
             <div style={{ width: isTop ? 36 : 30, height: isTop ? 36 : 30, borderRadius: '34%', background: 'rgba(15,23,42,0.07)', flexShrink: 0, overflow: 'hidden' }}>
               <img
                 src={getPlayerHeadshotUrl(item.name, 'pga') || PLAYER_SILHOUETTE_URL}
@@ -82,11 +79,12 @@ function PickRow({
                 onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             </div>
+
+            {/* Name + fit bar */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: isTop ? 15 : 13, fontWeight: isTop ? 900 : 700, color: '#0F172A', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {item.name}
               </div>
-              {/* Course fit bar */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
                 <div style={{ width: 64, height: 3, background: 'rgba(15,23,42,0.08)', borderRadius: 2, overflow: 'hidden' }}>
                   <div style={{ width: `${matchPct}%`, height: '100%', background: color, borderRadius: 2 }} />
@@ -95,6 +93,18 @@ function PickRow({
                 <span style={{ fontSize: 9, color: '#94A3B8' }}>course fit</span>
               </div>
             </div>
+
+            {/* World rank — right side */}
+            {worldRank && (
+              <div style={{ flexShrink: 0, paddingLeft: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
+                  <span style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em' }}>WR</span>
+                  <span style={{ fontSize: 13, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                    #{worldRank}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -120,8 +130,6 @@ function PickRow({
   );
 }
 
-// ─── Main component ──────────────────────────────────────────────────────────
-
 export function NextUpPickCard({
   featured,
   cards,
@@ -134,20 +142,16 @@ export function NextUpPickCard({
 
   return (
     <div>
-      {/* Section header */}
+      {/* Section header — no model attribution */}
       <div style={{ padding: '0 16px 8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
           <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
             AI Tournament Picks
           </span>
-          <span style={{ fontSize: 9, color: '#94A3B8', letterSpacing: '0.06em' }}>
-            CLAUDE · GPT-4 · GEMINI
-          </span>
         </div>
       </div>
 
-      {/* Flat ruled table */}
       <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
         {allItems.map((item, i) => (
           <PickRow

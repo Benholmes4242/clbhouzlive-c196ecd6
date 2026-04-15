@@ -54,11 +54,11 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
             <div style={{ width: 60, height: 3, background: 'rgba(15,23,42,0.08)', borderRadius: 2, overflow: 'hidden', marginRight: 8, flexShrink: 0 }}>
               <div style={{ width: `${fillPercent}%`, height: '100%', background: hexColor, borderRadius: 2 }} />
             </div>
-            <span style={{ fontSize: 9, fontWeight: 800, color: hexColor, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginRight: 8, flexShrink: 0 }}>
+            <span style={{ fontSize: 8, fontWeight: 800, color: hexColor, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginRight: 8, flexShrink: 0, background: `${hexColor}10`, padding: '2px 6px', borderRadius: 3 }}>
               {tierToLabel[item.tier]}
             </span>
             {item.note && (
-              <span style={{ fontSize: 10, color: '#94A3B8', flex: 1, textAlign: 'right' as const, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+              <span style={{ fontSize: 10, color: '#94A3B8', flex: 1, textAlign: 'right' as const }}>
                 {item.note}
               </span>
             )}
