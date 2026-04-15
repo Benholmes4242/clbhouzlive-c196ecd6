@@ -109,7 +109,7 @@ export default function ExploreGrid({
       <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
 
       {/* Grid */}
-      <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
+      <div ref={gridRef} className="grid grid-cols-2 gap-[1px] px-[1px]">
         {coursePosts.map((post, index) => (
           <div className="contents" key={post.id}>
             <ExploreTile

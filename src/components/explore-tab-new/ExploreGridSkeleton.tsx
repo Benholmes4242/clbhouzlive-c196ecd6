@@ -51,7 +51,7 @@ export default function ExploreGridSkeleton() {
       </div>
 
       {/* Grid skeleton — 2 columns */}
-      <div className="grid grid-cols-2 gap-[2px] px-[2px]">
+      <div className="grid grid-cols-2 gap-[1px] px-[1px]">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="aspect-[4/5] rounded-[4px]" />
         ))}
