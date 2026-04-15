@@ -130,20 +130,17 @@ export function ScheduleTourFilter({
                   }
                 </div>
 
-                {/* Label */}
-                <div style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: isActive ? 700 : 500, color: '#0F172A' }}>
-                  {tour.label}
+                {/* Label + description */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: isActive ? 700 : 500, color: '#0F172A' }}>{tour.label}</div>
+                  <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>{tour.description}</div>
                 </div>
 
                 {/* Count */}
                 <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
 
-                {/* Active checkmark */}
-                {isActive && (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-                    <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#F7931E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
+                {/* Active dot */}
+                {isActive && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
               </button>
             );
           })}
