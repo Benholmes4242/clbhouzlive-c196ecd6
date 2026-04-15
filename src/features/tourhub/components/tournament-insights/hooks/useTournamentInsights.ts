@@ -124,7 +124,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       fitBullets: p.reasons?.slice(0, 3) || [],
       keyTag: extractKeyTag(p.reasons?.[0]),
       promoted: !!p.promoted,
-      worldRank: p.worldRank ?? undefined,
+      worldRank: p.worldRanking ?? undefined,
     })),
 
     dangerous: [],
