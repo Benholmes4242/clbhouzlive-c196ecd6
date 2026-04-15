@@ -341,6 +341,33 @@ export function PlayersTab() {
       (debouncedSearch ? true : !heroPlayerIds.has(p.id))
     );
 
+    // OWGR tab in All Tours: only show players with a confirmed world rank
+    if (activeTour === 'all' && sort === 'world-rank-desc') {
+      filtered = filtered.filter(p => {
+        const wr = rankMap.get(p.id)?.worldRank;
+        if (!wr || wr <= 0) return false;
+        const codes = p.tour_codes ?? [];
+        if (codes.length > 0 && codes.every((c: string) => c === 'LPGA')) return false;
+        return true;
+      });
+    }
+
+    // Earnings tab: only show players who have earnings data this season
+    if (activeTour === 'all' && sort === 'highest-earnings') {
+      filtered = filtered.filter(p => {
+        const earnings = statsMap.get(p.id)?.earnings;
+        return earnings != null && earnings > 0;
+      });
+    }
+
+    // Wins tab: only show players with at least 1 win
+    if (activeTour === 'all' && sort === 'most-wins') {
+      filtered = filtered.filter(p => {
+        const wins = statsMap.get(p.id)?.wins;
+        return wins != null && wins > 0;
+      });
+    }
+
     filtered = [...filtered].sort((a, b) => {
       const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
       const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
@@ -806,7 +833,13 @@ export function PlayersTab() {
         <div style={{ padding: '5px 16px 8px' }}>
           <span style={{ fontSize: '10px', color: '#94A3B8' }}>
             {activeTour === 'all'
-              ? `${totalCount.toLocaleString()} players · ${getSortShortLabel(sort, activeTour)}`
+              ? sort === 'world-rank-desc'
+                ? `${totalCount.toLocaleString()} ranked · OWGR (Men's)`
+                : sort === 'highest-earnings'
+                ? `${totalCount.toLocaleString()} players · Season earnings`
+                : sort === 'most-wins'
+                ? `${totalCount.toLocaleString()} players · Season wins`
+                : `${totalCount.toLocaleString()} players · ${getSortShortLabel(sort, activeTour)}`
               : `${(tourCounts[activeTour] ?? 0).toLocaleString()} players`}
           </span>
         </div>
