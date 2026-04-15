@@ -410,11 +410,11 @@ export function ScheduleTab() {
         </div>
 
         {/* ── ROW 2: ← Tour Overview + Search + Tour filter pill ── */}
-        <div className="flex items-center justify-between px-5 pt-2 pb-2.5">
+        <div className="flex items-center justify-between px-6 pt-2 pb-2.5">
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
+            className="flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
