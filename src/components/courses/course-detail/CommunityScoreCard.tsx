@@ -68,7 +68,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
         <button
           onClick={onRateClick}
-          className="flex-shrink-0 px-4 py-2 rounded-[10px] text-[13px] font-bold text-white active:scale-[0.97] transition-all"
+          className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-bold text-white active:scale-[0.97] transition-all"
           style={{ background: '#F7931E' }}
         >
           Rate
