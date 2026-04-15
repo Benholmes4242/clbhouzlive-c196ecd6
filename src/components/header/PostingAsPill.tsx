@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-
+import { ChevronDown } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -141,6 +141,14 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           )}
         </div>
         
+        {/* Chevron */}
+        <ChevronDown 
+          className={cn(
+            "h-3 w-3 flex-shrink-0 transition-transform duration-200",
+            (useLightTheme && !useGlassTheme) ? "text-muted-foreground" : "text-white/70",
+            isOpen && "rotate-180"
+          )} 
+        />
       </button>
     );
   }
