@@ -319,7 +319,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
               <img
                 src="/assets/logomark-orange.png"
                 alt=""
-                className="w-3.5 h-3.5 object-contain"
+                className="w-4 h-4 object-contain"
                 aria-hidden="true"
               />
               <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1 }}>
