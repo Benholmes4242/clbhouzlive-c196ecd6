@@ -414,7 +414,7 @@ export function ScheduleTab() {
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
+            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
