@@ -6,7 +6,7 @@
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
-export type PlayerTourCode = 'all' | 'pga' | 'EURO' | 'PGAD' | 'LIV' | 'LPGA';
+export type PlayerTourCode = 'all' | 'pga' | 'EURO' | 'PGAD' | 'LIV' | 'LPGA' | 'CHAMP';
 
 interface TourOption {
   code: PlayerTourCode;
@@ -30,6 +30,7 @@ export const TOUR_LABELS: Record<PlayerTourCode, string> = {
   PGAD: 'Korn Ferry Tour',
   LIV: 'LIV Golf',
   LPGA: 'LPGA Tour',
+  CHAMP: 'Champions Tour',
 };
 
 interface PlayersTourFilterProps {
