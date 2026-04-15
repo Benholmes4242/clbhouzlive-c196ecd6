@@ -35,7 +35,7 @@ function ExploreHeaderInner({
         ...(!embedded && { paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }),
       }}
     >
-      <div className="px-4 pt-3.5 pb-2.5">
+      <div className={embedded ? "px-3 pt-2 pb-1.5" : "px-4 pt-3.5 pb-2.5"}>
         <button
           type="button"
           onClick={onOpenSearch}
