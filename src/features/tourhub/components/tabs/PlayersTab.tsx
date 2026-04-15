@@ -301,6 +301,7 @@ export function PlayersTab() {
       tourCode: p.tour_codes?.[0] ?? null,
       worldRank: rankMap.get(p.id)?.worldRank ?? 0,
       avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
+      totalPoints: null,
       priorRank: null,
       rankChange: null,
     });
@@ -543,14 +544,21 @@ export function PlayersTab() {
                   {champion.playerName}
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'baseline', flexWrap: 'wrap' as const }}>
-                  {champion.avgPoints != null && (
+                  {champion.totalPoints != null ? (
+                    <div>
+                      <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
+                        {champion.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                      </span>
+                      <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>total pts</span>
+                    </div>
+                  ) : champion.avgPoints != null ? (
                     <div>
                       <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                         {champion.avgPoints.toFixed(2)}
                       </span>
                       <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>avg pts</span>
                     </div>
-                  )}
+                  ) : null}
                   {champStats?.earnings != null && champStats.earnings > 0 && (
                     <span style={{ fontSize: '12px', color: '#64748B' }}>
                       {champStats.earnings >= 1_000_000
@@ -617,11 +625,15 @@ export function PlayersTab() {
                           <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                             {player.playerName.split(' ').slice(-1)[0]}
                           </div>
-                          {player.avgPoints != null && (
+                          {player.totalPoints != null ? (
+                            <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                              {player.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}pts
+                            </div>
+                          ) : player.avgPoints != null ? (
                             <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                               {player.avgPoints.toFixed(2)}pts
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       </div>
                     );
