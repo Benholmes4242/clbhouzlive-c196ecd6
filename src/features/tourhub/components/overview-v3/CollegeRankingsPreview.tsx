@@ -334,16 +334,13 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
         aria-label="Franchise statistical leaders by category"
         style={{
           gap: '8px',
-          paddingRight: '16px',
           WebkitOverflowScrolling: 'touch',
           msOverflowStyle: 'none',
           scrollbarWidth: 'none',
           scrollSnapType: 'x mandatory',
         }}
       >
-        {/* Left spacer — paddingLeft on overflow-x containers gets scrolled away */}
-        <div style={{ minWidth: '16px', flexShrink: 0 }} aria-hidden="true" />
-        {leaders.map((leader) => {
+        {leaders.map((leader, index) => {
           const logoUrl = getCollegeLogoUrl(leader.media?.college_name || leader.college.normalized_name);
 
           return (
@@ -354,6 +351,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
               style={{
                 width: '152px',
                 minHeight: '140px',
+                marginLeft: index === 0 ? '50px' : 0,
                 background: '#ffffff',
                 border: '1px solid rgba(15,23,42,0.08)',
                 borderRadius: '14px',
