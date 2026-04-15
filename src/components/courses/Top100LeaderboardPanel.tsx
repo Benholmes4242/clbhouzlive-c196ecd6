@@ -41,8 +41,14 @@ const Top100LeaderboardPanel = () => {
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div
-          className="sticky top-0 z-10 pb-2 pt-1 -mx-4 px-4"
-          style={{ background: '#F8FAFC', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+          className="sticky top-0 z-20 pb-2 -mx-4 px-4"
+          style={{
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 4px)',
+            background: 'rgba(248,250,252,0.97)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          }}
         >
           <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex">
             {tabs.map((tab) => (
