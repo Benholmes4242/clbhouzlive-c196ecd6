@@ -543,12 +543,12 @@ export function PlayersTab() {
                   {champion.playerName}
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'baseline', flexWrap: 'wrap' as const }}>
-{champStats?.points != null && champStats.points > 0 && (
+                  {champion.avgPoints != null && (
                     <div>
                       <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                        {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {champion.avgPoints.toFixed(2)}
                       </span>
-                      <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>pts</span>
+                      <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>avg pts</span>
                     </div>
                   )}
                   {champStats?.earnings != null && champStats.earnings > 0 && (
@@ -617,15 +617,11 @@ export function PlayersTab() {
                           <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                             {player.playerName.split(' ').slice(-1)[0]}
                           </div>
-{(() => {
-                            const runnerStats = statsMap.get(player.playerId);
-                            const pts = runnerStats?.points;
-                            return pts != null && pts > 0 ? (
-                              <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
-                              </div>
-                            ) : null;
-                          })()}
+                          {player.avgPoints != null && (
+                            <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                              {player.avgPoints.toFixed(2)}pts
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
