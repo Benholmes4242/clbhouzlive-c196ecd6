@@ -201,7 +201,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
           >
             <span
               style={{
-                fontSize: 72,
+                fontSize: 84,
                 fontWeight: 900,
                 color: 'rgba(255,255,255,0.12)',
                 letterSpacing: '-0.04em',
