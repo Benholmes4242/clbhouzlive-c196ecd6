@@ -333,7 +333,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
         role="list"
         aria-label="Franchise statistical leaders by category"
         style={{
-          gap: '10px',
+          gap: '8px',
           paddingLeft: '16px',
           paddingRight: '16px',
           WebkitOverflowScrolling: 'touch',
