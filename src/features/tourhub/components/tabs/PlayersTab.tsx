@@ -950,6 +950,7 @@ export function PlayersTab() {
                       earnings={pStats?.earnings}
                       wins={pStats?.wins}
                       points={pStats?.points}
+                      totalPoints={rank?.totalPoints}
                       tournamentsPlayed={pStats?.tournamentsPlayed}
                       showTourBadge={activeTour === 'all'}
                       index={index}
