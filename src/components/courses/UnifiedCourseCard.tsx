@@ -21,8 +21,8 @@ import { format } from 'date-fns';
 const META_PADDING = 'px-4 py-3.5';
 const META_PADDING_HORIZONTAL = 'p-3';
 
-// Image aspect ratio - matches CinematicCourseCard (16:9)
-const IMAGE_ASPECT = 'aspect-[16/9]';
+// Image aspect ratio - slightly taller than 16:9
+const IMAGE_ASPECT = 'aspect-[16/9.5]';
 
 interface UnifiedCourseCardProps {
   course: CourseCardModel;
@@ -273,7 +273,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
           {/* Left: name + location */}
           <div className="flex-1 min-w-0">
             <h3
-              className="text-[13px] font-bold text-white truncate leading-tight"
+              className="text-[15px] font-bold text-white truncate leading-tight"
               style={{ textShadow: '0 1px 5px rgba(0,0,0,0.55)' }}
               title={course.name}
             >
@@ -281,7 +281,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             </h3>
             {!hideLocation && (
               <p
-                className="text-[10px] truncate mt-0.5"
+                className="text-[11.5px] truncate mt-0.5"
                 style={{ color: 'rgba(255,255,255,0.68)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}
               >
                 {course.locationText}
@@ -310,7 +310,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
               style={{
                 background: 'rgba(255,255,255,0.12)',
                 border: '0.5px solid rgba(255,255,255,0.20)',
-                borderRadius: 6,
+                borderRadius: 9999,
                 padding: '4px 8px',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
@@ -322,7 +322,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
                 className="w-3.5 h-3.5 object-contain"
                 aria-hidden="true"
               />
-              <span className="text-xs font-bold text-white" style={{ lineHeight: 1 }}>
+              <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1 }}>
                 {course.communityRating.toFixed(1)}
               </span>
             </div>
