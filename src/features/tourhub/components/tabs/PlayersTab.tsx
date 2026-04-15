@@ -560,7 +560,7 @@ export function PlayersTab() {
                     </div>
                   ) : null}
                   {champStats?.earnings != null && champStats.earnings > 0 && (
-                    <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 700 }}>
+                    <span style={{ fontSize: '12px', color: '#0F172A', fontWeight: 700 }}>
                       {champStats.earnings >= 1_000_000
                         ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
                         : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
@@ -628,10 +628,26 @@ export function PlayersTab() {
                           {player.totalPoints != null ? (
                             <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                               {player.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}pts
+                              {(() => {
+                                const ps = statsMap.get(player.playerId);
+                                if (ps?.earnings != null && ps.earnings > 0) {
+                                  const e = ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`;
+                                  return <span style={{ color: '#0F172A', fontWeight: 800, marginLeft: '4px' }}>{e}</span>;
+                                }
+                                return null;
+                              })()}
                             </div>
                           ) : player.avgPoints != null ? (
                             <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                               {player.avgPoints.toFixed(2)}pts
+                              {(() => {
+                                const ps = statsMap.get(player.playerId);
+                                if (ps?.earnings != null && ps.earnings > 0) {
+                                  const e = ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`;
+                                  return <span style={{ color: '#0F172A', fontWeight: 800, marginLeft: '4px' }}>{e}</span>;
+                                }
+                                return null;
+                              })()}
                             </div>
                           ) : null}
                         </div>
