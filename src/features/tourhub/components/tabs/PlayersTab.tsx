@@ -301,6 +301,7 @@ export function PlayersTab() {
       tourCode: p.tour_codes?.[0] ?? null,
       worldRank: rankMap.get(p.id)?.worldRank ?? 0,
       avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
+      totalPoints: null,
       priorRank: null,
       rankChange: null,
     });

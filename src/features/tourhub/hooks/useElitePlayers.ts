@@ -89,6 +89,12 @@ export function useElitePlayers(limit: number = 50) {
         const avgPoints = rawAvgPoints !== null && rawAvgPoints !== undefined 
           ? parseFloat(String(rawAvgPoints)) 
           : null;
+
+        // Extract total points from raw_data.statistics.points
+        const rawTotalPoints = rawData?.statistics?.points;
+        const totalPoints = rawTotalPoints !== null && rawTotalPoints !== undefined
+          ? parseFloat(String(rawTotalPoints))
+          : null;
         
         // Calculate rank change
         const rankChange = ranking.prior_rank 
@@ -108,6 +114,7 @@ export function useElitePlayers(limit: number = 50) {
           tourCode: player?.tour_codes?.[0] ?? null,
           worldRank: ranking.rank,
           avgPoints: avgPoints,
+          totalPoints: totalPoints,
           priorRank: ranking.prior_rank,
           rankChange: rankChange,
         };
