@@ -88,7 +88,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
               display: 'inline-flex',
               alignItems: 'center',
               gap: 5,
-              padding: '8px 18px',
+              padding: '6px 18px',
               fontSize: 13,
               fontWeight: 700,
               color: 'white',
