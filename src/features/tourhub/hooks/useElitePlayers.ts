@@ -19,6 +19,7 @@ export interface ElitePlayer {
   tourCode: string | null;
   worldRank: number;
   avgPoints: number | null;
+  totalPoints: number | null;
   priorRank: number | null;
   rankChange: number | null;
 }
