@@ -136,7 +136,7 @@ export function PlayersTab() {
   const { data: playerStats } = useTourPlayerStatistics(season?.id);
 
   // Tour season rankings
-  const tourRankingsCode = activeTour === 'EURO' ? 'euro' : (activeTour === 'LPGA' ? 'lpga' : (activeTour === 'PGAD' ? 'pgad' : (activeTour === 'LIV' ? 'liv' : '')));
+  const tourRankingsCode = activeTour === 'EURO' ? 'euro' : (activeTour === 'LPGA' ? 'lpga' : (activeTour === 'PGAD' ? 'pgad' : (activeTour === 'LIV' ? 'liv' : (activeTour === 'CHAMP' ? 'champ' : ''))));
   const seasonYear = useMemo(() => {
     const now = new Date();
     return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
@@ -179,7 +179,7 @@ export function PlayersTab() {
         });
       });
     }
-    if ((activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV') && tourRankings) {
+    if ((activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP') && tourRankings) {
       tourRankings.forEach(r => {
         const playerId = r.player_id || r.manual_player_id;
         if (playerId) {
@@ -332,8 +332,13 @@ export function PlayersTab() {
   }, [debouncedSearch]);
 
   // Pipeline: tour → search → sort → pagination
+  const heroPlayerIds = useMemo(() => new Set(heroPlayers.map(p => p.playerId)), [heroPlayers]);
+
   const { rows, totalCount } = useMemo(() => {
-    let filtered = tourFilteredPlayers.filter(p => matchesSearch(p.full_name, p.country));
+    let filtered = tourFilteredPlayers.filter(p =>
+      matchesSearch(p.full_name, p.country) &&
+      (debouncedSearch ? true : !heroPlayerIds.has(p.id))
+    );
 
     filtered = [...filtered].sort((a, b) => {
       const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
@@ -398,7 +403,7 @@ export function PlayersTab() {
     });
 
     return { rows: filtered, totalCount: filtered.length };
-  }, [tourFilteredPlayers, matchesSearch, sort, rankMap, statsMap, activeTour]);
+  }, [tourFilteredPlayers, matchesSearch, sort, rankMap, statsMap, activeTour, heroPlayerIds, debouncedSearch]);
 
   const isLoading = allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0);
 
@@ -461,10 +466,7 @@ export function PlayersTab() {
 
       {/* ── EDITORIAL OPENING — Masthead + No.1 Cover Story + Movers Grid ── */}
       {!debouncedSearch && elitePlayers && elitePlayers.length > 0 && (() => {
-        const top5 = elitePlayers
-          .filter(p => p.worldRank && p.worldRank > 0)
-          .sort((a, b) => (a.worldRank || 999) - (b.worldRank || 999))
-          .slice(0, 5);
+        const top5 = heroPlayers;
         const champion = top5[0];
         const runners = top5.slice(1, 5);
         if (!champion) return null;
@@ -498,7 +500,10 @@ export function PlayersTab() {
                     cursor: 'pointer', marginBottom: '2px',
                   }}
                 >
-                  <Globe className="w-3 h-3 shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+                  {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
+                    ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+                    : <Globe className="w-[14px] h-[14px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+                  }
                   <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>
                     {activeTour === 'all' ? 'All Tours'
                       : activeTour === 'pga' ? 'PGA Tour'
@@ -573,7 +578,7 @@ export function PlayersTab() {
 
             {/* ── MOVERS GRID — #2–5 ── */}
             {runners.length > 0 && (
-              <div style={{ marginBottom: '16px' }}>
+              <div style={{ marginBottom: '4px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                   <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
                   <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
@@ -583,7 +588,7 @@ export function PlayersTab() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, background: '#ffffff', borderRadius: '12px', border: '1px solid rgba(15,23,42,0.08)', overflow: 'hidden' }}>
                   {runners.map((player, i) => {
                     const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
-                    const displayRank = activeTour === 'all' ? player.worldRank : (statsMap.get(player.playerId)?.tourRank || player.worldRank);
+                    const displayRank = i + 2; // positional: 2, 3, 4, 5
                     return (
                       <div
                         key={player.playerId}
