@@ -25,7 +25,7 @@ export const SeasonToggle = memo(function SeasonToggle({
   }
 
   return (
-    <div className="flex items-center" style={{ gap: '6px' }}>
+    <div className="flex items-center" style={{ gap: '16px' }}>
       {availableSeasons.map((season) => {
         const isSelected = season.year === selectedYear;
 
@@ -34,15 +34,15 @@ export const SeasonToggle = memo(function SeasonToggle({
             key={season.id}
             onClick={() => onYearChange(season.year)}
             
-            className={`flex-shrink-0 active:scale-[0.97] transition-all min-h-[36px] px-4 text-xs sm:text-sm font-semibold ${
-              isSelected
-                ? 'text-white shadow-none border-0'
-                : 'bg-transparent text-muted-foreground border-[1.5px] border-border'
-            }`}
+            className="flex-shrink-0 active:scale-[0.97] transition-all px-0 text-sm font-semibold"
             style={{
-              borderRadius: 8,
               cursor: 'pointer',
-              background: isSelected ? '#0F172A' : 'transparent',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: isSelected ? '2px solid #F7931E' : '2px solid transparent',
+              borderRadius: 0,
+              color: isSelected ? '#0F172A' : '#94A3B8',
+              paddingBottom: '6px',
             }}
           >
             {season.year}
