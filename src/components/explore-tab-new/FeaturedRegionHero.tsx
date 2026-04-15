@@ -95,7 +95,7 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
             <p className="text-sm text-white/80 mt-0.5">{region.subtitle}</p>
           )}
           <span
-103:             className="inline-block mt-2.5 text-xs font-semibold text-white rounded-full liquid-glass"
+            className="inline-block mt-2.5 text-xs font-semibold text-white rounded-full liquid-glass"
             style={{ padding: '6px 14px' }}
           >
             Explore →
