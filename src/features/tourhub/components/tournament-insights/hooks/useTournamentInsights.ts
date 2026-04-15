@@ -181,7 +181,7 @@ function buildContenderCards(
     avatarUrl: getPlayerHeadshotUrl(p.playerName, 'pga'),
     description: limitText(p.reasons?.[0] || '', 50),
     fitBullets: p.reasons?.slice(0, 3) || [],
-    worldRank: p.worldRank ?? undefined,
+    worldRank: p.worldRanking ?? undefined,
     type: 'contender' as const,
     rank: i + 2,
     confidenceTier: getConfidenceTier(i + 1),
