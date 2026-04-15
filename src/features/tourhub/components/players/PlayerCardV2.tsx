@@ -25,6 +25,7 @@ interface PlayerCardV2Props {
   earnings?: number | null;
   wins?: number | null;
   points?: number | null;
+  totalPoints?: number | null;
   tournamentsPlayed?: number | null;
   showTourBadge?: boolean;
   index?: number;
@@ -49,6 +50,7 @@ export function PlayerCardV2({
   earnings,
   wins,
   points,
+  totalPoints,
   tournamentsPlayed,
   showTourBadge = true,
   index = 0,
@@ -170,18 +172,25 @@ export function PlayerCardV2({
         </div>
 
         {/* Right value */}
-        {rightValue && (
-          <div style={{ padding: '12px 14px 12px 0', textAlign: 'right' as const, flexShrink: 0 }}>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A' }}>
-              {rightValue.main}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px 12px 0', flexShrink: 0 }}>
+          {/* Total points — shown for OWGR/default sorts when available */}
+          {!isTourRanking && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
+              {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+              <span style={{ fontSize: '8px', marginLeft: '1px' }}>pts</span>
             </span>
-            {rightValue.label && (
-              <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
-                {rightValue.label}
-              </span>
-            )}
-          </div>
-        )}
+          )}
+          {rightValue && (
+            <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              {rightValue.main}
+              {rightValue.label && (
+                <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
+                  {rightValue.label}
+                </span>
+              )}
+            </span>
+          )}
+        </div>
       </Link>
     </motion.div>
   );

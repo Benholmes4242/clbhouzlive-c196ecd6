@@ -150,10 +150,10 @@ export function PlayersTab() {
 
   // Build world rank & stats lookup from elite players
   const rankMap = useMemo(() => {
-    const map = new Map<string, { worldRank: number; avgPoints: number | null }>();
+    const map = new Map<string, { worldRank: number; avgPoints: number | null; totalPoints: number | null }>();
     if (elitePlayers) {
       elitePlayers.forEach(ep => {
-        map.set(ep.playerId, { worldRank: ep.worldRank, avgPoints: ep.avgPoints });
+        map.set(ep.playerId, { worldRank: ep.worldRank, avgPoints: ep.avgPoints, totalPoints: ep.totalPoints });
       });
     }
     return map;
@@ -560,7 +560,7 @@ export function PlayersTab() {
                     </div>
                   ) : null}
                   {champStats?.earnings != null && champStats.earnings > 0 && (
-                    <span style={{ fontSize: '12px', color: '#64748B' }}>
+                    <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 700 }}>
                       {champStats.earnings >= 1_000_000
                         ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
                         : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
@@ -950,6 +950,7 @@ export function PlayersTab() {
                       earnings={pStats?.earnings}
                       wins={pStats?.wins}
                       points={pStats?.points}
+                      totalPoints={rank?.totalPoints}
                       tournamentsPlayed={pStats?.tournamentsPlayed}
                       showTourBadge={activeTour === 'all'}
                       index={index}
