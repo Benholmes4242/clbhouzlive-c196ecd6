@@ -100,7 +100,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
 
             {/* Rating badge */}
             <span
-              className="absolute rounded-lg flex items-center gap-[3px] text-[12px] font-semibold text-white leading-none liquid-glass"
+              className="absolute rounded-full flex items-center gap-[3px] text-[12px] font-semibold text-white leading-none liquid-glass"
               style={{ top: 8, right: 8, padding: '4px 9px' }}
             >
               <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[12px] h-[12px]" />

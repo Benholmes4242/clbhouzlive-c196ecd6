@@ -75,14 +75,15 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
       {courseName && (
         <div
           style={{
-            position: 'absolute', bottom: 7, left: 7,
-            display: 'flex', alignItems: 'center', gap: 4,
+            position: 'absolute', bottom: 7, left: 7, right: 7,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
             background: 'rgba(0,0,0,0.45)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 6, padding: '3px 7px',
+            borderRadius: 9999, padding: '3px 7px',
             maxWidth: 'calc(100% - 14px)',
+            margin: '0 auto',
           }}
         >
           <span style={{ fontSize: 9, flexShrink: 0, lineHeight: 1 }}>📍</span>
