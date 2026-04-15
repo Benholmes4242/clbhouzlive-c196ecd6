@@ -114,7 +114,7 @@ export function ScheduleTourFilter({
                 aria-pressed={isActive}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 20px',
+                  padding: '14px 20px',
                   background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
@@ -130,17 +130,20 @@ export function ScheduleTourFilter({
                   }
                 </div>
 
-                {/* Label + description */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: '#0F172A' }}>{tour.label}</div>
-                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{tour.description}</div>
+                {/* Label */}
+                <div style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: isActive ? 700 : 500, color: '#0F172A' }}>
+                  {tour.label}
                 </div>
 
                 {/* Count */}
-                <span style={{ fontSize: 12, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
+                <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
 
-                {/* Active dot */}
-                {isActive && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+                {/* Active checkmark */}
+                {isActive && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#F7931E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
               </button>
             );
           })}
