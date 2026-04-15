@@ -549,14 +549,14 @@ export function PlayersTab() {
                       <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                         {champion.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                       </span>
-                      <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>total pts</span>
+                      <span style={{ fontSize: '10px', color: '#F7931E', marginLeft: '3px' }}>pts</span>
                     </div>
                   ) : champion.avgPoints != null ? (
                     <div>
                       <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                         {champion.avgPoints.toFixed(2)}
                       </span>
-                      <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>avg pts</span>
+                      <span style={{ fontSize: '10px', color: '#F7931E', marginLeft: '3px' }}>pts</span>
                     </div>
                   ) : null}
                   {champStats?.earnings != null && champStats.earnings > 0 && (
