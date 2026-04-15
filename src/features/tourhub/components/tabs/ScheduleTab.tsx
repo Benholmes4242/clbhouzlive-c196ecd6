@@ -410,7 +410,7 @@ export function ScheduleTab() {
         </div>
 
         {/* ── ROW 2: ← Tour Overview + Search + Tour filter pill ── */}
-        <div className="flex items-center justify-between px-6 pt-2 pb-2.5">
+        <div className="flex items-center justify-between pt-2 pb-2.5" style={{ paddingLeft: 16, paddingRight: 16 }}>
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
