@@ -40,10 +40,12 @@ export function useElitePlayers(limit: number = 50) {
           rank,
           prior_rank,
           avg_points,
-          raw_data
+          raw_data,
+          ranking_date
         `)
+        .order('ranking_date', { ascending: false })
         .order('rank', { ascending: true })
-        .limit(limit);
+        .limit(limit * 10);
       
       if (rankingsError) {
         console.error('[useElitePlayers] Error fetching rankings:', rankingsError);
