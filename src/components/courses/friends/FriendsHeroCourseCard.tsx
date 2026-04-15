@@ -79,7 +79,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course })
               </div>
             </div>
             <div style={{ fontSize: '11px', color: '#94A3B8', flexShrink: 0 }}>
-              {formatDistanceToNow(new Date(friend.friend_profile.played_at || friend.played_at), { addSuffix: true })}
+              {formatDistanceToNow(new Date(friend.played_at), { addSuffix: true })}
             </div>
           </div>
         );
