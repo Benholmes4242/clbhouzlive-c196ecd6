@@ -34,14 +34,14 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
       style={{
         background: 'rgba(255,255,255,0.12)',
         border: '0.5px solid rgba(255,255,255,0.20)',
-        borderRadius: 6,
+        borderRadius: 9999,
         padding: '4px 8px',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}
     >
       {renderIcon()}
-      <span className="text-xs font-bold text-white" style={{ lineHeight: 1 }}>
+      <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1 }}>
         #{rank}
       </span>
     </div>
