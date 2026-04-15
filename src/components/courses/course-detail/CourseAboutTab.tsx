@@ -143,16 +143,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </div>
         )}
 
-        {!userRating && (
-          <div style={{ marginTop: 8 }}>
-            <button
-              onClick={handleRateClick}
-              style={{ width: '100%', padding: '12px 0', borderRadius: 10, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 3px 12px rgba(247,147,30,0.25)' }}
-            >
-              ⭐ Rate this course
-            </button>
-          </div>
-        )}
       </section>
 
       {/* 3. Your Journey Section */}
