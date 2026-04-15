@@ -334,7 +334,6 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
         aria-label="Franchise statistical leaders by category"
         style={{
           gap: '8px',
-          paddingLeft: '50px',
           paddingRight: '16px',
           WebkitOverflowScrolling: 'touch',
           msOverflowStyle: 'none',
@@ -342,6 +341,8 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
           scrollSnapType: 'x mandatory',
         }}
       >
+        {/* Left spacer — paddingLeft on overflow-x containers gets scrolled away */}
+        <div style={{ minWidth: '16px', flexShrink: 0 }} aria-hidden="true" />
         {leaders.map((leader) => {
           const logoUrl = getCollegeLogoUrl(leader.media?.college_name || leader.college.normalized_name);
 
