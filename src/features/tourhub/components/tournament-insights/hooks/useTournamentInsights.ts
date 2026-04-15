@@ -124,6 +124,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       fitBullets: p.reasons?.slice(0, 3) || [],
       keyTag: extractKeyTag(p.reasons?.[0]),
       promoted: !!p.promoted,
+      worldRank: p.worldRanking ?? undefined,
     })),
 
     dangerous: [],
@@ -180,6 +181,7 @@ function buildContenderCards(
     avatarUrl: getPlayerHeadshotUrl(p.playerName, 'pga'),
     description: limitText(p.reasons?.[0] || '', 50),
     fitBullets: p.reasons?.slice(0, 3) || [],
+    worldRank: p.worldRanking ?? undefined,
     type: 'contender' as const,
     rank: i + 2,
     confidenceTier: getConfidenceTier(i + 1),
@@ -374,6 +376,15 @@ function assignTierByPosition(index: number): ImportanceTier {
   }
 }
 
+const COURSE_DNA_NOTES: Record<string, string> = {
+  'Driving Accuracy': 'Tight fairways penalise wayward drives',
+  'Driving Distance': 'Length gives scoring opportunity',
+  'Approach Play': 'Small greens demand precise irons',
+  'Short Game': 'Chip-and-run around firm greens',
+  'Putting Precision': 'Undulating greens reward touch',
+  'Course Management': 'Local knowledge separates the field',
+};
+
 function transformCourseDNA(keyStats: string[]): CourseDNAItem[] {
   // Format stats with labels and EXCLUDE "Overall Form" (not course-specific)
   const formattedStats = keyStats
@@ -435,6 +446,7 @@ function transformCourseDNA(keyStats: string[]): CourseDNAItem[] {
       label: stat.label,
       icon,
       tier: assignTierByPosition(index),
+      note: COURSE_DNA_NOTES[stat.label] || undefined,
     };
   });
 }

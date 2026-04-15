@@ -353,7 +353,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
   const tabs = useMemo(() => {
     const result: Array<{ id: string; label: string; hasLiveDot?: boolean }> = [];
     if (isLive) result.push({ id: 'live', label: 'Live', hasLiveDot: true });
-    if (hasUpcoming) result.push({ id: 'nextup', label: 'Next Up' });
+    if (hasUpcoming) result.push({ id: 'nextup', label: 'Upcoming' });
     if (isCompleted) result.push({ id: 'results', label: 'Results' });
     if (!isLive && !isCompleted && !hasUpcoming) {
       result.push({ id: 'current', label: 'Current' });

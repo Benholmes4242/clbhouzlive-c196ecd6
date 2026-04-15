@@ -47,6 +47,7 @@ export interface WinnerProfile {
   fitBullets: string[];
   keyTag?: string;
   promoted?: boolean;
+  worldRank?: number;
 }
 
 export interface DangerousProfile {
@@ -71,6 +72,7 @@ export interface ContenderCard {
   confidenceTier?: ConfidenceTier;
   fitBullets?: string[];
   promoted?: boolean;
+  worldRank?: number;
 }
 
 export type ImportanceTier = 'critical' | 'significant' | 'useful';
