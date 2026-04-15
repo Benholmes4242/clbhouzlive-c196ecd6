@@ -64,15 +64,6 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
 
   return (
     <div>
-      {/* Section header */}
-      <div style={{ padding: '14px 16px 8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Clbhouz Called It
-          </span>
-        </div>
-      </div>
 
       {/* Best pick highlight — white ruled block */}
       <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
@@ -120,7 +111,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
         </div>
 
         {/* All picks table */}
-        <div style={{ padding: '8px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
+        <div style={{ padding: '20px 16px 8px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
             <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>

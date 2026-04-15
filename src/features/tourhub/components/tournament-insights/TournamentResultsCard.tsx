@@ -228,11 +228,10 @@ export function TournamentResultsCard({
           </div>
         )}
 
-        {/* Narrative — amber left-rule pull quote */}
+        {/* Narrative — centred pull quote */}
         {narrative && (
-          <div style={{ display: 'flex', gap: 10, padding: '12px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <div style={{ width: 3, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <p style={{ fontSize: 12, fontWeight: 500, color: '#475569', margin: 0, lineHeight: 1.6, fontStyle: 'italic' }}>
+          <div style={{ padding: '12px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <p style={{ fontSize: 12, fontWeight: 500, color: '#475569', margin: 0, lineHeight: 1.6, fontStyle: 'italic', textAlign: 'center' }}>
               "{narrative}"
             </p>
           </div>

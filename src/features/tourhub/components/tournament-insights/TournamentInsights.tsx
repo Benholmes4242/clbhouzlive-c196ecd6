@@ -84,7 +84,7 @@ function PickRecordRail() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
             <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              Our Pick Record · Season 2024–25
+              Our Pick Record · Season 2025–26
             </span>
           </div>
           <div style={{ display: 'flex', gap: 5 }}>
