@@ -328,19 +328,19 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
       </div>
 
       {/* Scroll container */}
-      <div
-        className="flex overflow-x-auto scrollbar-hide"
-        role="list"
-        aria-label="Franchise statistical leaders by category"
-        style={{
-          gap: '8px',
-          WebkitOverflowScrolling: 'touch',
-          msOverflowStyle: 'none',
-          scrollbarWidth: 'none',
-          scrollSnapType: 'x mandatory',
-        }}
-      >
-        {leaders.map((leader, index) => {
+      <div style={{ padding: '0 16px' }}>
+        <div
+          className="flex overflow-x-auto scrollbar-hide"
+          role="list"
+          aria-label="Franchise statistical leaders by category"
+          style={{
+            gap: '8px',
+            WebkitOverflowScrolling: 'touch',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+          }}
+        >
+        {leaders.map((leader) => {
           const logoUrl = getCollegeLogoUrl(leader.media?.college_name || leader.college.normalized_name);
 
           return (
@@ -351,13 +351,11 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
               style={{
                 width: '152px',
                 minHeight: '140px',
-                marginLeft: index === 0 ? '50px' : 0,
                 background: '#ffffff',
                 border: '1px solid rgba(15,23,42,0.08)',
                 borderRadius: '14px',
                 padding: '14px',
                 boxShadow: '0 1px 4px rgba(15,23,42,0.04)',
-                scrollSnapAlign: 'start',
               }}
               aria-label={`${leader.title} leader: ${leader.media?.short_name || leader.college.normalized_name}`}
               role="listitem"
@@ -404,6 +402,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
             </Link>
           );
         })}
+        </div>
       </div>
     </div>
   );
