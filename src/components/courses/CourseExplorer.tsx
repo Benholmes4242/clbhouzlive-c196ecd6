@@ -437,8 +437,14 @@ const CourseExplorer = () => {
       <YourNetworkSection className="mt-2 px-4" />
 
       <div
-        className="sticky top-0 z-10 bg-background pb-3 space-y-5 -mx-4 px-4"
-        style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+        className="sticky top-0 z-20 pb-3 space-y-5 -mx-4 px-4"
+        style={{
+          background: 'rgba(248,250,252,0.97)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        }}
       >
       {/* Search */}
       <div className="relative w-full">
