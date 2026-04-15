@@ -40,10 +40,12 @@ export function useElitePlayers(limit: number = 50) {
           rank,
           prior_rank,
           avg_points,
-          raw_data
+          raw_data,
+          ranking_date
         `)
+        .order('ranking_date', { ascending: false })
         .order('rank', { ascending: true })
-        .limit(limit);
+        .limit(limit * 10);
       
       if (rankingsError) {
         console.error('[useElitePlayers] Error fetching rankings:', rankingsError);
@@ -55,9 +57,15 @@ export function useElitePlayers(limit: number = 50) {
         return [];
       }
       
+      // Post-filter to latest ranking date only (table has multiple weekly snapshots)
+      const latestDate = rankings?.[0]?.ranking_date ?? null;
+      const latestRankings = latestDate
+        ? rankings.filter(r => r.ranking_date === latestDate)
+        : rankings;
+
       // Deduplicate by player_id — keep first occurrence (lowest rank due to ORDER BY rank ASC)
       const seen = new Set<string>();
-      const deduplicated = rankings.filter(row => {
+      const deduplicated = latestRankings.filter(row => {
         if (seen.has(row.player_id)) return false;
         seen.add(row.player_id);
         return true;
