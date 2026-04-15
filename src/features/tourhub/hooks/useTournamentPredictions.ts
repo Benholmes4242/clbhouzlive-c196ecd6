@@ -48,6 +48,7 @@ export interface PlayerPrediction {
   pgaTourId: string | null;
   country: string;
   worldRank: number;
+  earnings: number | null;
   momentum: number;
   predictionScore: number;
   winProbability: number;
@@ -91,6 +92,7 @@ interface PlayerWithStats {
   pgaTourId: string | null;
   country: string;
   worldRank: number;
+  earnings: number | null;
   momentum: number;
   stats: {
     drivingDistance: number;
@@ -705,6 +707,7 @@ export function useTournamentPredictions(tournamentId?: string) {
             pgaTourId: player.pga_tour_id || null,
             country: player.country || 'USA',
             worldRank: ranking?.rank || 999,
+            earnings: parseFloat(String(stats.earnings)) || null,
             momentum: ranking?.prior_rank ? ranking.prior_rank - ranking.rank : 0,
             stats: {
               drivingDistance: parseFloat(String(stats.drive_avg)) || 280,
@@ -745,6 +748,7 @@ export function useTournamentPredictions(tournamentId?: string) {
           pgaTourId: player.pgaTourId,
           country: player.country,
           worldRank: player.worldRank,
+          earnings: player.earnings,
           momentum: player.momentum,
           predictionScore,
           winProbability: 0,

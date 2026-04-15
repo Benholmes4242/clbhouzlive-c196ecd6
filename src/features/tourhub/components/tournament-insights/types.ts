@@ -48,6 +48,7 @@ export interface WinnerProfile {
   keyTag?: string;
   promoted?: boolean;
   worldRank?: number;
+  earningsText?: string;
 }
 
 export interface DangerousProfile {
@@ -73,6 +74,7 @@ export interface ContenderCard {
   fitBullets?: string[];
   promoted?: boolean;
   worldRank?: number;
+  earningsText?: string;
 }
 
 export type ImportanceTier = 'critical' | 'significant' | 'useful';
