@@ -13,6 +13,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe } from 'lucide-react';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
@@ -441,7 +442,10 @@ export function ScheduleTab() {
                 activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
               )}
             >
-              <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
+              {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
+                ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
+              }
               <span className="text-[12px] font-semibold text-foreground">
                 {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
               </span>
