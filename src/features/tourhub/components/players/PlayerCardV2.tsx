@@ -175,7 +175,7 @@ export function PlayerCardV2({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px 12px 0', flexShrink: 0 }}>
           {/* Total points — shown for OWGR/default sorts when available */}
           {!isTourRanking && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-            <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
               {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
               <span style={{ fontSize: '8px', marginLeft: '1px' }}>pts</span>
             </span>
