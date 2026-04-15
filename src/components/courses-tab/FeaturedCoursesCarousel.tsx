@@ -37,7 +37,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
       <div className="absolute top-0 left-0 right-0 p-4">
         <div
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full liquid-glass"
-          style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+          style={{ border: '1px solid rgba(255,255,255,0.12)', transform: 'rotate(-2deg)' }}
         >
           <span style={{ fontSize: 10 }}>⛳</span>
           <span style={{ fontSize: 11, fontWeight: 700, color: 'white', letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
@@ -92,7 +92,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
               fontSize: 13,
               fontWeight: 700,
               color: 'white',
-              borderRadius: 10,
+              borderRadius: 9999,
               border: '1px solid rgba(255,255,255,0.12)',
               cursor: 'pointer',
             }}
