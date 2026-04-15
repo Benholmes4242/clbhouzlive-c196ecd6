@@ -1,210 +1,103 @@
 import React from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const FriendsCoursesSkeleton: React.FC = () => {
   return (
-    <div className="w-full animate-fade-in">
-      {/* Header skeleton */}
-      <div className="mb-3">
-        <Skeleton className="h-6 w-32 mb-1" />
-        <Skeleton className="h-4 w-56" />
-      </div>
-
-      {/* Filters row */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1">
-          <Skeleton className="h-11 w-full rounded-xl" />
+    <div style={{ background: '#F8FAFC' }} className="animate-pulse">
+      {/* Slate masthead skeleton */}
+      <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+        <div style={{ height: '11px', width: '180px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', marginBottom: '12px' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
+          <div>
+            <div style={{ height: '24px', width: '160px', borderRadius: '6px', background: 'rgba(255,255,255,0.08)', marginBottom: '6px' }} />
+            <div style={{ height: '11px', width: '220px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }} />
+          </div>
+          <div style={{ height: '28px', width: '80px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)' }} />
         </div>
-        <div className="flex-1">
-          <Skeleton className="h-11 w-full rounded-xl" />
-        </div>
-      </div>
-
-      {/* Stats grid skeleton */}
-      <div className="mt-6 rounded-xl overflow-hidden bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] px-4 py-5">
-        <div className="grid grid-cols-2 gap-y-4">
-          {/* Row 1 */}
-          <div className="text-center relative">
-            <Skeleton className="h-3 w-20 mx-auto mb-2" />
-            <Skeleton className="h-6 w-8 mx-auto" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
-          </div>
-          <div className="text-center">
-            <Skeleton className="h-3 w-14 mx-auto mb-2" />
-            <Skeleton className="h-6 w-6 mx-auto" />
-          </div>
-
-          {/* Horizontal divider */}
-          <div className="col-span-2 h-px bg-border/60 my-1" />
-
-          {/* Row 2 */}
-          <div className="text-center relative">
-            <Skeleton className="h-3 w-16 mx-auto mb-2" />
-            <Skeleton className="h-6 w-10 mx-auto" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
-          </div>
-          <div className="text-center">
-            <Skeleton className="h-3 w-20 mx-auto mb-2" />
-            <Skeleton className="h-6 w-8 mx-auto" />
-          </div>
-        </div>
-        <Skeleton className="h-3 w-48 mx-auto mt-4" />
-      </div>
-
-      {/* Hero course card skeleton */}
-      <div className="mt-6 w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-        <div className="rounded-none sm:rounded-xl overflow-hidden bg-card border border-border/60 shadow-md">
-          <Skeleton className="w-full aspect-[1.77/1]" />
-          <div className="px-4 py-3 space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <Skeleton className="h-4 w-40 mb-1" />
-                <Skeleton className="h-3 w-24" />
-              </div>
-              <Skeleton className="h-6 w-32 rounded-full" />
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <Skeleton className="h-4 w-48 mb-1" />
-                <Skeleton className="h-3 w-20" />
-              </div>
-              <div className="flex -space-x-2">
-                <Skeleton className="h-9 w-9 rounded-lg" />
-                <Skeleton className="h-9 w-9 rounded-lg" />
-                <Skeleton className="h-9 w-9 rounded-lg" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Friends activity leaderboard skeleton */}
-      <div className="mt-6 rounded-xl bg-card border border-border/60 shadow-sm overflow-hidden">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Skeleton className="h-8 w-8 rounded-full" />
-            <div>
-              <Skeleton className="h-4 w-28 mb-1" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-          </div>
-          <Skeleton className="h-5 w-12 rounded-full" />
-        </div>
-        <div className="border-t border-border/60">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="px-4 py-2.5 flex items-center justify-between border-b last:border-b-0 border-border/40"
-            >
-              <div className="flex items-center gap-2.5">
-                <Skeleton className="h-9 w-9 rounded-lg" />
-                <div>
-                  <Skeleton className="h-4 w-28 mb-1" />
-                  <Skeleton className="h-3 w-40" />
-                </div>
-              </div>
-              <Skeleton className="h-5 w-6 rounded-full" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+          {[1,2,3,4].map(i => (
+            <div key={i} style={{ padding: '9px 0 11px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
+              <div style={{ height: '9px', width: '36px', borderRadius: '3px', background: 'rgba(255,255,255,0.06)' }} />
+              <div style={{ height: '13px', width: '24px', borderRadius: '3px', background: 'rgba(255,255,255,0.08)' }} />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Trending section skeleton */}
-      <div className="mt-6 rounded-xl bg-card border border-border/60 shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-border/60">
-          <div className="flex items-center gap-2.5">
-            <Skeleton className="h-8 w-8 rounded-full" />
-            <div>
-              <Skeleton className="h-4 w-40 mb-1" />
-              <Skeleton className="h-3 w-52" />
-            </div>
+      {/* Sticky header skeleton */}
+      <div style={{ height: '44px', background: 'rgba(248,250,252,0.97)', borderBottom: '1px solid rgba(15,23,42,0.07)' }} />
+
+      {/* Challenge prompt skeleton */}
+      <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '12px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: 34, height: 34, borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ height: '13px', width: '80%', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', marginBottom: '8px' }} />
+            <div style={{ height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.06)' }} />
           </div>
         </div>
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className={`px-4 py-3.5 flex items-center gap-3 ${i !== 3 ? 'border-b border-border/40' : ''}`}
-          >
-            <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
-            <div className="flex-1">
-              <Skeleton className="h-4 w-36 mb-1" />
-              <Skeleton className="h-3 w-24 mb-1" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-            <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
+
+      {/* Hero course skeleton */}
+      <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        <div style={{ padding: '14px 20px 10px' }}>
+          <div style={{ height: '11px', width: '160px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '10px', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ height: '15px', width: '70%', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', marginBottom: '6px' }} />
+            <div style={{ height: '11px', width: '40%', borderRadius: '4px', background: 'rgba(15,23,42,0.04)' }} />
+          </div>
+        </div>
+        {[1,2].map(i => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div style={{ width: 28, height: 28, borderRadius: '34%', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+            <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: 'rgba(15,23,42,0.04)' }} />
           </div>
         ))}
       </div>
 
-      {/* Activity summary skeleton */}
-      <div className="mt-6 rounded-xl bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] overflow-hidden">
-        <div className="px-4 py-3 border-b border-border/40">
-          <div className="flex items-center gap-2.5">
-            <Skeleton className="h-7 w-7 rounded-full" />
-            <div>
-              <Skeleton className="h-4 w-36 mb-1" />
-              <Skeleton className="h-3 w-24" />
+      {/* Active friends skeleton */}
+      <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        <div style={{ padding: '14px 20px 10px' }}>
+          <div style={{ height: '11px', width: '140px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          {[36, 120, 80].map((w, i) => <div key={i} style={{ width: i === 1 ? 'auto' : w, flex: i === 1 ? 1 : 'none', height: '10px', borderRadius: '3px', background: 'rgba(15,23,42,0.05)', marginRight: i < 2 ? '8px' : 0 }} />)}
+        </div>
+        {[1,2,3].map(i => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div style={{ width: 36, height: 16, borderRadius: '4px', background: 'rgba(15,23,42,0.04)', flexShrink: 0 }} />
+            <div style={{ width: 34, height: 34, borderRadius: '34%', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ height: '14px', width: '60%', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', marginBottom: '5px' }} />
+              <div style={{ height: '11px', width: '80%', borderRadius: '4px', background: 'rgba(15,23,42,0.04)' }} />
+            </div>
+            <div style={{ width: 80, display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end', gap: 4 }}>
+              <div style={{ height: '15px', width: '24px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+              <div style={{ height: '3px', width: '64px', borderRadius: '2px', background: 'rgba(15,23,42,0.06)' }} />
             </div>
           </div>
-        </div>
-        <div className="px-4 py-3 flex items-center justify-center gap-8 border-b border-border/40">
-          <div className="text-center">
-            <Skeleton className="h-5 w-8 mx-auto mb-1" />
-            <Skeleton className="h-2 w-12 mx-auto" />
-          </div>
-          <div className="h-6 w-px bg-border/60" />
-          <div className="text-center">
-            <Skeleton className="h-5 w-6 mx-auto mb-1" />
-            <Skeleton className="h-2 w-14 mx-auto" />
-          </div>
-        </div>
-        <div className="px-4 py-2.5 space-y-1.5">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-5 w-5 rounded-full" />
-            <Skeleton className="h-3 w-40" />
-          </div>
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-5 w-5 rounded-md" />
-            <Skeleton className="h-3 w-48" />
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Network activity feed skeleton */}
-      <div className="mt-6">
-        <div className="mb-3">
-          <Skeleton className="h-5 w-32" />
+      {/* Feed skeleton */}
+      <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        <div style={{ padding: '14px 20px 10px' }}>
+          <div style={{ height: '11px', width: '120px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
         </div>
-        
-        {/* Filter chips */}
-        <div className="flex items-center gap-2 mb-4">
-          <Skeleton className="h-8 w-12 rounded-full" />
-          <Skeleton className="h-8 w-20 rounded-full" />
-          <Skeleton className="h-8 w-24 rounded-full" />
-          <Skeleton className="h-8 w-16 rounded-full" />
-        </div>
-
-        {/* Feed items */}
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-card/60 border border-border/50 rounded-xl p-3.5"
-            >
-              <div className="flex gap-3">
-                <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <Skeleton className="h-4 w-56 mb-1" />
-                  <Skeleton className="h-3 w-24" />
-                </div>
-                <Skeleton className="h-14 w-14 rounded-lg shrink-0" />
-              </div>
-              <div className="mt-3 pt-3 border-t border-border/40">
-                <Skeleton className="h-8 w-24 rounded-full" />
-              </div>
+        <div style={{ height: '40px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }} />
+        {[1,2,3].map(i => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div style={{ width: 34, height: 34, borderRadius: '34%', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ height: '13px', width: '55%', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', marginBottom: '5px' }} />
+              <div style={{ height: '14px', width: '75%', borderRadius: '4px', background: 'rgba(15,23,42,0.08)', marginBottom: '5px' }} />
+              <div style={{ height: '11px', width: '50%', borderRadius: '4px', background: 'rgba(15,23,42,0.04)' }} />
             </div>
-          ))}
-        </div>
+            <div style={{ width: 44, height: 44, borderRadius: '10px', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+          </div>
+        ))}
       </div>
     </div>
   );

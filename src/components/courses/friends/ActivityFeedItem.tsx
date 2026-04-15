@@ -2,7 +2,6 @@ import React from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 interface ActivityFeedItemProps {
@@ -11,11 +10,7 @@ interface ActivityFeedItemProps {
   index?: number;
 }
 
-const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
-  hit,
-  isTrending = false,
-  index = 0,
-}) => {
+const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({ hit }) => {
   const navigate = useNavigate();
   const friendName = hit.friend_profile.display_name || hit.friend_profile.username;
 
@@ -29,64 +24,47 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.15, delay: index * 0.03 }}
-      className="rounded-2xl p-3 cursor-pointer bg-card border border-border/50 active:scale-[0.98] transition-transform"
+    <div
+      style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
       onClick={handleCourseClick}
+      className="active:opacity-80 transition-opacity"
     >
-      <div className="flex gap-3">
-        {/* Friend Avatar */}
-        <button
-          className="shrink-0 focus:outline-none"
-          onClick={handleFriendClick}
-        >
-            <SquircleAvatar
-              size={36}
-              src={hit.friend_profile.profile_photo_url}
-              alt={friendName}
-              fallback={friendName.charAt(0)}
-              hideRing
-            />
-        </button>
+      {/* Friend avatar */}
+      <button onClick={handleFriendClick} style={{ flexShrink: 0, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+        <SquircleAvatar size={34} src={hit.friend_profile.profile_photo_url} alt={friendName} fallback={friendName.charAt(0)} hideRing />
+      </button>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm">
-            <button
-              className="font-semibold text-foreground active:opacity-70 transition-opacity"
-              onClick={handleFriendClick}
-            >
-              {friendName}
-            </button>
-            <span className="text-muted-foreground"> played</span>
-          </p>
-          <p className="text-sm font-semibold mt-0.5 text-foreground">
-            {hit.course_name}
-          </p>
-          {(hit.course_country) && (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {hit.course_country}{hit.course_sub_country ? `, ${hit.course_sub_country}` : ''}
-            </p>
-          )}
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
-          </p>
+      {/* Course info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+          {friendName}
         </div>
-
-        {/* Course Thumbnail */}
-        <div className="shrink-0">
-          <img
-            src={hit.thumbnail_url || '/placeholder.svg'}
-            alt={hit.course_name}
-            className="w-14 h-14 rounded-[10px] object-cover"
-            style={{ border: '1px solid hsl(var(--border) / 0.5)' }}
-            onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
-          />
+        <div style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, marginTop: '1px' }}>
+          {hit.course_name}
+        </div>
+        <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '1px' }}>
+          {hit.course_country}{hit.course_sub_country ? `, ${hit.course_sub_country}` : ''} · {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
         </div>
       </div>
-    </motion.div>
+
+      {/* Thumbnail + rating */}
+      <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
+        <div style={{ width: '44px', height: '44px', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.04)' }}>
+          {hit.thumbnail_url ? (
+            <img src={hit.thumbnail_url} alt={hit.course_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: '18px' }}>⛳</span>
+            </div>
+          )}
+        </div>
+        {hit.rating != null && (
+          <span style={{ fontSize: '11px', fontWeight: 800, color: hit.rating >= 9.0 ? '#F7931E' : '#64748B', fontVariantNumeric: 'tabular-nums' }}>
+            {hit.rating.toFixed(1)}
+          </span>
+        )}
+      </div>
+    </div>
   );
 };
 

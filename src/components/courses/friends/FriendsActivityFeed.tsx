@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
 import ActivityFeedItem from './ActivityFeedItem';
 import ActivityCluster from './ActivityCluster';
 import FeedFilterChips, { type FeedFilter } from './FeedFilterChips';
@@ -91,15 +90,23 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
   }, [activeFilter]);
 
   return (
-    <div className="space-y-4">
-      {/* Filter Chips — always rendered so user can switch tabs */}
-      <div className="flex justify-center">
+    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      {/* Section rule marker */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '14px 20px 0', marginBottom: '10px' }}>
+        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: '11px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Network Activity
+        </span>
+      </div>
+
+      {/* Filter tabs */}
+      <div style={{ marginTop: '10px' }}>
         <FeedFilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       </div>
 
       {feedItems.length === 0 ? (
-        <div className="py-8 text-center">
-          <p className="text-sm text-muted-foreground">
+        <div style={{ padding: '32px 20px', textAlign: 'center' as const }}>
+          <p style={{ fontSize: '13px', color: '#94A3B8' }}>
             {activeFilter === 'new_for_you'
               ? "No new courses to discover – you've played them all!"
               : activeFilter === 'trending'
@@ -110,13 +117,7 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
       ) : (
         <>
           {/* Feed Items */}
-          <motion.div
-            key={`${activeFilter}-${page}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
-            className="space-y-2.5"
-          >
+          <div key={`${activeFilter}-${page}`}>
             {paginatedItems.map((item, idx) => {
               if (item.type === 'cluster') {
                 return (
@@ -141,7 +142,7 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
                 />
               );
             })}
-          </motion.div>
+          </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -158,6 +159,7 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
           )}
         </>
       )}
+      <div style={{ height: '4px' }} />
     </div>
   );
 };

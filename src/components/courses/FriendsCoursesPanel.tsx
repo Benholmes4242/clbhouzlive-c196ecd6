@@ -5,9 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { toast } from 'sonner';
 import { type Timeframe } from '@/lib/timeWindow';
-import { CalendarDays } from 'lucide-react';
 
-import NetworkStatsBar from './friends/NetworkStatsBar';
 import NetworkChallengePrompt from './friends/NetworkChallengePrompt';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
 import FriendsActivityCard from './friends/FriendsActivityCard';
@@ -19,6 +17,7 @@ import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCours
 const FriendsCoursesPanel: React.FC = () => {
   const { user } = useSupabaseSession();
   const [timeframe, setTimeframe] = useState<Timeframe>('90d');
+  const [showTfPicker, setShowTfPicker] = useState(false);
 
   const { data: realData, isLoading: isRealLoading, isError, error } = useFriendsCourses(user?.id, timeframe);
   const sourceData = realData;
@@ -140,64 +139,113 @@ const FriendsCoursesPanel: React.FC = () => {
 
   if (!user) return null;
   if (isLoading && !filteredData) return <FriendsCoursesSkeleton />;
-
-  // Only show onboarding empty state when user genuinely has no friends
   if (!hasFriends && !isLoading) return <FriendsCoursesEmpty />;
 
   return (
-    <div className="w-full pb-6">
-      {/* Inline Stats Bar — ALWAYS visible when user has friends */}
-      <NetworkStatsBar
-        totalRounds={totalRounds}
-        totalCourses={totalCourses}
-        averageRating={averageRating}
-        timeframe={timeframe}
-        onTimeframeChange={setTimeframe}
-      />
+    <div style={{ background: '#F8FAFC' }} onClick={() => setShowTfPicker(false)}>
 
-      {totalCourses === 0 ? (
-        /* Inline "no activity" for this period — user can change filter */
-        <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-          <CalendarDays className="w-10 h-10 text-muted-foreground/30 mb-3" />
-          <p className="text-sm font-semibold text-foreground">No activity in this period</p>
-          <p className="text-xs text-muted-foreground mt-1">Try expanding your time range</p>
+      {/* ── SLATE MASTHEAD ── */}
+      <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
+        {/* Eyebrow */}
+        <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '8px' }}>
+          ⚡ CLBHOUZ · YOUR NETWORK
         </div>
-      ) : (
-        <>
-          {/* Challenge Prompt */}
-          <div className="px-4 mt-2">
-            <NetworkChallengePrompt
-              userPlayedCount={userPlayedCount}
-              totalCourses={totalCourses}
-            />
+
+        {/* Headline + timeframe picker row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div>
+            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
+              Friends Activity
+            </h1>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '3px' }}>
+              {totalRounds} rounds · {totalCourses} courses{averageRating != null ? ` · ${averageRating.toFixed(1)} avg rating` : ''}
+            </div>
           </div>
 
-          {/* Hero Course — cinematic spotlight */}
-          {heroCourse && (
-            <div className="mt-4">
-              <FriendsHeroCourseCard course={heroCourse} filterType="all" />
-            </div>
-          )}
+          {/* Timeframe pill + dropdown */}
+          <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowTfPicker(!showTfPicker)}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '5px 10px', cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff' }}>
+                {({ '7d': '7 days', '30d': '30 days', '90d': '90 days', '12m': '12 months', 'all': 'All time' } as Record<string,string>)[timeframe]}
+              </span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>▾</span>
+            </button>
+            {showTfPicker && (
+              <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', borderRadius: '10px', overflow: 'hidden', zIndex: 50, minWidth: '140px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}>
+                {(['7d','30d','90d','12m','all'] as Timeframe[]).map((tf) => {
+                  const label = { '7d': '7 days', '30d': '30 days', '90d': '90 days', '12m': '12 months', 'all': 'All time' }[tf];
+                  return (
+                    <button key={tf} onClick={() => { setTimeframe(tf); setShowTfPicker(false); }}
+                      style={{ width: '100%', padding: '9px 14px', textAlign: 'left' as const, background: tf === timeframe ? 'rgba(247,147,30,0.06)' : 'transparent', borderLeft: tf === timeframe ? '3px solid #F7931E' : '3px solid transparent', borderTop: 'none', borderRight: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', fontSize: '13px', fontWeight: tf === timeframe ? 800 : 500, color: tf === timeframe ? '#0F172A' : '#64748B', cursor: 'pointer', display: 'block' }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
 
-          {/* Most Active Friends */}
-          <div className="px-4 mt-6">
+        {/* 4-col stat grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+          {([
+            { l: 'ROUNDS',     v: String(totalRounds) },
+            { l: 'COURSES',    v: String(totalCourses) },
+            { l: 'AVG RATING', v: averageRating != null ? averageRating.toFixed(1) : '—', amber: true },
+            { l: 'FRIENDS',    v: String(filteredData?.totalFriendsActive || 0) },
+          ] as { l: string; v: string; amber?: boolean }[]).map((s, i) => (
+            <div key={s.l} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+              <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '3px' }}>{s.l}</div>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: s.amber ? '#F7931E' : '#ffffff' }}>{s.v}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── STICKY HEADER ── */}
+      <div
+        style={{
+          position: 'sticky', top: 0, zIndex: 30,
+          background: 'rgba(248,250,252,0.97)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(15,23,42,0.07)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', padding: '9px 20px', gap: '6px' }}>
+          <span style={{ fontSize: '13px', color: 'rgba(15,23,42,0.5)', fontWeight: 500 }}>‹ Discover</span>
+          <div style={{ flex: 1 }} />
+          <span style={{ fontSize: '9.5px', color: '#CBD5E1', fontWeight: 600 }}>Your Network</span>
+        </div>
+      </div>
+
+      {/* ── CONTENT ── */}
+      <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+        {totalCourses === 0 && !isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', padding: '48px 20px', textAlign: 'center' as const }}>
+            <span style={{ fontSize: '32px', marginBottom: '12px' }}>📅</span>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A' }}>No activity in this period</p>
+            <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '4px' }}>Try expanding your time range</p>
+          </div>
+        ) : (
+          <>
+            <NetworkChallengePrompt userPlayedCount={userPlayedCount} totalCourses={totalCourses} />
+            {heroCourse && <FriendsHeroCourseCard course={heroCourse} filterType="all" />}
             <FriendsActivityCard leaderboard={leaderboard} timeframe={timeframe} />
-          </div>
-
-          {/* Network Activity Feed */}
-          <div className="px-4 mt-6">
-            <div className="mb-3">
-              <h3 className="text-lg font-bold text-foreground">Network Activity</h3>
-            </div>
             <FriendsActivityFeed
               recent={recent}
               courses={heroCourse ? courses.filter(c => c.course_id !== heroCourse.course_id) : courses}
               trendingCourseIds={trendingCourseIds}
               userPlayedCourseIds={userPlayedCourseIds}
             />
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
