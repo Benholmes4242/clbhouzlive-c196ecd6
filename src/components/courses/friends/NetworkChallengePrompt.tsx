@@ -1,6 +1,4 @@
 import React from 'react';
-import { Flag, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface NetworkChallengePromptProps {
   userPlayedCount: number;
@@ -14,40 +12,36 @@ const NetworkChallengePrompt: React.FC<NetworkChallengePromptProps> = ({
   onSeeCoursesClick,
 }) => {
   if (totalCourses === 0) return null;
-
   const remaining = totalCourses - userPlayedCount;
   const allPlayed = remaining <= 0;
+  const pct = totalCourses > 0 ? Math.round((userPlayedCount / totalCourses) * 100) : 0;
 
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, delay: 0.1 }}
-      onClick={onSeeCoursesClick}
-      className="w-full flex items-center gap-3 rounded-[14px] px-4 py-3 text-left transition-all active:scale-[0.98]"
-      style={{
-        background: allPlayed ? 'rgba(82, 183, 136, 0.06)' : 'rgba(82, 183, 136, 0.06)',
-        border: '1px solid rgba(82, 183, 136, 0.12)',
-      }}
-    >
-      <Flag className="w-5 h-5 shrink-0" style={{ color: '#40916C' }} />
-      <span className="flex-1 text-sm text-foreground">
-        You've played{' '}
-        <span
-          className="font-bold"
-          style={{ color: userPlayedCount === 0 ? '#E76F51' : '#40916C' }}
+    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 20px' }}>
+        <div style={{ width: 34, height: 34, borderRadius: '34%', background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <span style={{ fontSize: '16px' }}>⛳</span>
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
+            You've played{' '}
+            <span style={{ color: allPlayed ? '#16A34A' : userPlayedCount === 0 ? '#DC2626' : '#16A34A', fontWeight: 900 }}>
+              {userPlayedCount}
+            </span>{' '}
+            of <span style={{ fontWeight: 900 }}>{totalCourses}</span> courses your friends explored
+          </div>
+          <div style={{ marginTop: '6px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${pct}%`, background: '#16A34A', borderRadius: '2px', transition: 'width 0.4s' }} />
+          </div>
+        </div>
+        <button
+          onClick={onSeeCoursesClick}
+          style={{ fontSize: '11px', fontWeight: 800, color: '#16A34A', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, padding: 0 }}
         >
-          {userPlayedCount}
-        </span>
-        {' '}of{' '}
-        <span className="font-bold text-foreground">{totalCourses}</span>
-        {' '}courses your friends explored
-      </span>
-      <span className="flex items-center gap-0.5 text-sm font-semibold shrink-0" style={{ color: '#40916C' }}>
-        See courses
-        <ChevronRight className="w-4 h-4" />
-      </span>
-    </motion.button>
+          See all →
+        </button>
+      </div>
+    </div>
   );
 };
 

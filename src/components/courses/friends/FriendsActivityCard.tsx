@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface LeaderboardEntry {
   friendId: string;
@@ -26,6 +25,8 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
 
   if (trimmed.length === 0) return null;
 
+  const maxRounds = trimmed[0]?.roundCount || 1;
+
   const getTimeLabel = () => {
     switch (timeframe) {
       case '7d': return 'This week';
@@ -37,83 +38,78 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
-    >
-      {/* Section header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-bold text-foreground">Most Active Friends</h3>
-        <span className="text-xs text-muted-foreground">{getTimeLabel()}</span>
+    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      {/* Section rule marker */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '14px 20px 0', marginBottom: '10px' }}>
+        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
+        <span style={{ fontSize: '11px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Most Active Friends
+        </span>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: '11px', color: '#CBD5E1', fontWeight: 600 }}>{getTimeLabel()}</span>
+      </div>
+
+      {/* Column headers */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <span style={{ width: '36px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>RK</span>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRIEND</span>
+        <span style={{ width: '80px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>ROUNDS</span>
       </div>
 
       {/* Friend rows */}
-      <div>
-        <AnimatePresence mode="sync">
-          {visible.map((entry, index) => (
-            <motion.div
-              key={entry.friendId}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15, delay: index * 0.03 }}
-              onClick={() => navigate(`/profile/${entry.friendId}`)}
-              className="flex items-center gap-3 py-3 cursor-pointer active:scale-[0.98] transition-transform"
-              style={{
-                borderBottom: index < visible.length - 1 ? '1px solid hsl(var(--border) / 0.3)' : 'none',
-              }}
-            >
-              {/* Avatar */}
-              <SquircleAvatar
-                size={40}
-                src={entry.avatarUrl}
-                alt={entry.friendName}
-                fallback={entry.friendName.charAt(0)}
-                hideRing
-              />
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{entry.friendName}</p>
-                <p className="text-xs text-muted-foreground">
-                  {entry.roundCount} round{entry.roundCount !== 1 ? 's' : ''}
-                  <span className="mx-1">·</span>
-                  Last played {formatDistanceToNow(new Date(entry.lastPlayedAt), { addSuffix: true })}
-                </p>
-              </div>
-
-              {/* Rank number */}
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: index === 0
-                    ? 'hsl(var(--accent-amber))'
-                    : 'hsl(var(--muted-foreground))',
-                  width: 18,
-                  textAlign: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {index + 1}
-              </span>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {/* See all */}
-      {!showAll && trimmed.length > 3 && (
-        <button
-          onClick={() => setShowAll(true)}
-          className="mt-1 text-xs font-medium text-muted-foreground active:opacity-70 transition-opacity"
+      {visible.map((entry, index) => (
+        <div
+          key={entry.friendId}
+          onClick={() => navigate(`/profile/${entry.friendId}`)}
+          style={{
+            display: 'flex', alignItems: 'center', padding: '10px 20px',
+            borderBottom: index < visible.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+            borderLeft: index === 0 ? '3px solid #F7931E' : '3px solid transparent',
+            background: index === 0 ? 'rgba(247,147,30,0.025)' : 'transparent',
+            cursor: 'pointer',
+          }}
+          className="active:opacity-80 transition-opacity"
         >
-          See all {trimmed.length} friends
+          {/* Faded rank */}
+          <div style={{ width: '36px', fontSize: '16px', fontWeight: 900, color: index === 0 ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)', flexShrink: 0 }}>
+            {index + 1}
+          </div>
+          {/* Avatar + name */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <SquircleAvatar size={34} src={entry.avatarUrl} alt={entry.friendName} fallback={entry.friendName.charAt(0)} hideRing />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: '14px', fontWeight: index === 0 ? 800 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                {entry.friendName}
+              </div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '1px' }}>
+                Last played {formatDistanceToNow(new Date(entry.lastPlayedAt), { addSuffix: true })}
+              </div>
+            </div>
+          </div>
+          {/* Rounds + proportion bar */}
+          <div style={{ width: '80px', display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
+            <span style={{ fontSize: '15px', fontWeight: 800, color: index === 0 ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              {entry.roundCount}
+            </span>
+            <div style={{ width: '64px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${(entry.roundCount / maxRounds) * 100}%`, background: index === 0 ? '#F7931E' : 'rgba(15,23,42,0.2)' }} />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* See all / Show less */}
+      {!showAll && trimmed.length > 3 && (
+        <button onClick={() => setShowAll(true)} style={{ width: '100%', padding: '10px 20px', fontSize: '11px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' as const }}>
+          See all {trimmed.length} friends ▾
         </button>
       )}
-    </motion.div>
+      {showAll && (
+        <button onClick={() => setShowAll(false)} style={{ width: '100%', padding: '10px 20px', fontSize: '11px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' as const }}>
+          Show less ▴
+        </button>
+      )}
+    </div>
   );
 };
 
