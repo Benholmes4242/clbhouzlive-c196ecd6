@@ -42,6 +42,7 @@ function PickRow({
   const color = getTierColor(tier);
   const matchPct = tier === 'elite' ? 95 : tier === 'high' ? 88 : 78;
   const worldRank = (item as WinnerProfile).worldRank ?? (item as ContenderCard).worldRank;
+  const earningsText = (item as WinnerProfile).earningsText ?? (item as ContenderCard).earningsText;
 
   return (
     <div>
@@ -94,15 +95,22 @@ function PickRow({
               </div>
             </div>
 
-            {/* World rank — right side */}
-            {worldRank && (
-              <div style={{ flexShrink: 0, paddingLeft: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-                  <span style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em' }}>WR</span>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
-                    #{worldRank}
-                  </span>
-                </div>
+            {/* World rank + earnings — right side */}
+            {(worldRank || earningsText) && (
+              <div style={{ flexShrink: 0, textAlign: 'right' as const, paddingLeft: 8 }}>
+                {worldRank && (
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 2 }}>
+                    <span style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em' }}>WR</span>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                      #{worldRank}
+                    </span>
+                  </div>
+                )}
+                {earningsText && (
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', fontVariantNumeric: 'tabular-nums', textAlign: 'right' as const, marginTop: 2 }}>
+                    {earningsText}
+                  </div>
+                )}
               </div>
             )}
           </div>

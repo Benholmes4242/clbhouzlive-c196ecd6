@@ -21,6 +21,13 @@ import type {
   NextTournamentPreview,
 } from '../types';
 
+function formatEarnings(val: number | null | undefined): string | undefined {
+  if (!val) return undefined;
+  if (val >= 1_000_000) return `$${(val / 1_000_000).toFixed(1)}M`;
+  if (val >= 1_000) return `$${(val / 1_000).toFixed(0)}K`;
+  return `$${val}`;
+}
+
 export function useTournamentInsights() {
   const {
     data: aiData,
@@ -125,6 +132,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       keyTag: extractKeyTag(p.reasons?.[0]),
       promoted: !!p.promoted,
       worldRank: p.worldRanking ?? undefined,
+      earningsText: formatEarnings(p.earnings),
     })),
 
     dangerous: [],
@@ -182,6 +190,7 @@ function buildContenderCards(
     description: limitText(p.reasons?.[0] || '', 50),
     fitBullets: p.reasons?.slice(0, 3) || [],
     worldRank: p.worldRanking ?? undefined,
+    earningsText: formatEarnings(p.earnings),
     type: 'contender' as const,
     rank: i + 2,
     confidenceTier: getConfidenceTier(i + 1),

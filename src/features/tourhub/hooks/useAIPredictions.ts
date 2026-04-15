@@ -25,6 +25,7 @@ export interface AITopContender {
   pgaTourId: string | null;
   country: string;
   worldRanking: number;
+  earnings?: number | null;
   winProbability: number;
   courseFitScore: number;
   reasons: string[];

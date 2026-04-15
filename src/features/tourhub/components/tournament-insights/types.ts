@@ -48,6 +48,7 @@ export interface WinnerProfile {
   keyTag?: string;
   promoted?: boolean;
   worldRank?: number;
+  earningsText?: string;
 }
 
 export interface DangerousProfile {
