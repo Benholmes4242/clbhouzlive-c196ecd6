@@ -33,7 +33,7 @@ interface PlayerSortControlProps {
 /** Per-tour default sort mapping */
 export function getDefaultSortForTour(tour: string): PlayerSortType {
   switch (tour) {
-    case 'all': return 'alpha-az';
+    case 'all': return 'world-rank-desc';
     case 'pga': return 'world-rank-desc';
     case 'EURO': return 'race-to-dubai';
     case 'LPGA': return 'race-to-cme';
