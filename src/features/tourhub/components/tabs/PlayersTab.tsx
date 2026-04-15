@@ -630,11 +630,14 @@ export function PlayersTab() {
                               <span style={{ color: '#F7931E' }}>{player.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}pts</span>
                               {(() => {
                                 const ps = statsMap.get(player.playerId);
-                                if (ps?.earnings != null && ps.earnings > 0) {
-                                  const e = ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`;
-                                  return <span style={{ color: '#0F172A' }}>{e}</span>;
-                                }
-                                return null;
+                                const e = ps?.earnings != null && ps.earnings > 0
+                                  ? (ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`)
+                                  : null;
+                                const w = (ps?.wins ?? 0) > 0 ? ps!.wins : null;
+                                return <>
+                                  {e && <span style={{ color: '#0F172A' }}>{e}</span>}
+                                  {w != null && <span style={{ color: '#16A34A' }}>{w} {w === 1 ? 'win' : 'wins'}</span>}
+                                </>;
                               })()}
                             </div>
                           ) : player.avgPoints != null ? (
@@ -642,11 +645,14 @@ export function PlayersTab() {
                               <span style={{ color: '#F7931E' }}>{player.avgPoints.toFixed(2)}pts</span>
                               {(() => {
                                 const ps = statsMap.get(player.playerId);
-                                if (ps?.earnings != null && ps.earnings > 0) {
-                                  const e = ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`;
-                                  return <span style={{ color: '#0F172A' }}>{e}</span>;
-                                }
-                                return null;
+                                const e = ps?.earnings != null && ps.earnings > 0
+                                  ? (ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`)
+                                  : null;
+                                const w = (ps?.wins ?? 0) > 0 ? ps!.wins : null;
+                                return <>
+                                  {e && <span style={{ color: '#0F172A' }}>{e}</span>}
+                                  {w != null && <span style={{ color: '#16A34A' }}>{w} {w === 1 ? 'win' : 'wins'}</span>}
+                                </>;
                               })()}
                             </div>
                           ) : null}
