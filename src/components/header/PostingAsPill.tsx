@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { ChevronDown } from 'lucide-react';
+
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -85,7 +85,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         ref={ref}
         onClick={onClick}
           className={cn(
-            "flex items-center gap-1.5 pl-1 pr-2 h-11",
+            "flex items-center p-1.5 h-11",
             "rounded-xl transition-all duration-500",
             "max-w-[160px] min-w-0",
             "active:scale-[0.97]",
@@ -141,22 +141,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           )}
         </div>
         
-        {/* Name */}
-        <span className={cn(
-          "text-sm font-medium truncate max-w-[100px] leading-none",
-          (useLightTheme && !useGlassTheme) ? "text-foreground" : "text-white"
-        )}>
-          {activeActor.name}
-        </span>
-        
-        {/* Chevron */}
-        <ChevronDown 
-          className={cn(
-            "h-3 w-3 flex-shrink-0 transition-transform duration-200",
-            (useLightTheme && !useGlassTheme) ? "text-muted-foreground" : "text-white/70",
-            isOpen && "rotate-180"
-          )} 
-        />
       </button>
     );
   }

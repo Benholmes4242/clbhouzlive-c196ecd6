@@ -24,6 +24,8 @@ interface NavigationBarProps {
   showBurger?: boolean;
   /** Called when the burger button is clicked */
   onBurgerClick?: () => void;
+  /** When true, use slate-900 colours for the Tour Nav button */
+  isTourHubActive?: boolean;
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -38,6 +40,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   liveTabs = new Set(),
   showBurger = false,
   onBurgerClick,
+  isTourHubActive = false,
 }) => {
   const isLightTheme = variant === 'default';
   const isClubhouseTheme = variant === 'clubhouse';
@@ -184,14 +187,17 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               gridTemplateColumns: '1fr 1fr',
               gap: 3,
               padding: 4,
-              background: 'rgba(15,23,42,0.07)',
+              background: isTourHubActive ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.07)',
               borderRadius: 7,
             }}>
               {[0, 1, 2, 3].map(i => (
-                <div key={i} style={{ background: '#475569', borderRadius: 2 }} />
+                <div key={i} style={{ background: isTourHubActive ? '#0F172A' : '#475569', borderRadius: 2 }} />
               ))}
             </div>
-            <span className="text-[10px] min-[375px]:text-[11px] leading-none font-semibold whitespace-nowrap text-slate-500">
+            <span
+              className="text-[10px] min-[375px]:text-[11px] leading-none font-semibold whitespace-nowrap"
+              style={{ color: isTourHubActive ? '#0F172A' : '#64748B' }}
+            >
               Tour Nav
             </span>
           </button>

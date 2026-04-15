@@ -196,6 +196,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 liveTabs={liveTabs}
                 showBurger={isTourHubRoute}
                 onBurgerClick={() => openTourNav()}
+                isTourHubActive={isTourHubRoute}
               />
             </div>
           </motion.div>
