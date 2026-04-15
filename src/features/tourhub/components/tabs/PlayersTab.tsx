@@ -549,14 +549,14 @@ export function PlayersTab() {
                       <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                         {champion.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                       </span>
-                      <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>total pts</span>
+                      <span style={{ fontSize: '10px', color: '#F7931E', marginLeft: '3px' }}>pts</span>
                     </div>
                   ) : champion.avgPoints != null ? (
                     <div>
                       <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                         {champion.avgPoints.toFixed(2)}
                       </span>
-                      <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>avg pts</span>
+                      <span style={{ fontSize: '10px', color: '#F7931E', marginLeft: '3px' }}>pts</span>
                     </div>
                   ) : null}
                   {champStats?.earnings != null && champStats.earnings > 0 && (
@@ -626,25 +626,25 @@ export function PlayersTab() {
                             {player.playerName.split(' ').slice(-1)[0]}
                           </div>
                           {player.totalPoints != null ? (
-                            <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                              {player.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}pts
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'baseline', fontSize: '10px', fontWeight: 800, marginTop: '1px' }}>
+                              <span style={{ color: '#F7931E' }}>{player.totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}pts</span>
                               {(() => {
                                 const ps = statsMap.get(player.playerId);
                                 if (ps?.earnings != null && ps.earnings > 0) {
                                   const e = ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`;
-                                  return <span style={{ color: '#0F172A', fontWeight: 800, marginLeft: '4px' }}>{e}</span>;
+                                  return <span style={{ color: '#0F172A' }}>{e}</span>;
                                 }
                                 return null;
                               })()}
                             </div>
                           ) : player.avgPoints != null ? (
-                            <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                              {player.avgPoints.toFixed(2)}pts
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'baseline', fontSize: '10px', fontWeight: 800, marginTop: '1px' }}>
+                              <span style={{ color: '#F7931E' }}>{player.avgPoints.toFixed(2)}pts</span>
                               {(() => {
                                 const ps = statsMap.get(player.playerId);
                                 if (ps?.earnings != null && ps.earnings > 0) {
                                   const e = ps.earnings >= 1_000_000 ? `$${(ps.earnings / 1_000_000).toFixed(1)}M` : `$${(ps.earnings / 1_000).toFixed(0)}K`;
-                                  return <span style={{ color: '#0F172A', fontWeight: 800, marginLeft: '4px' }}>{e}</span>;
+                                  return <span style={{ color: '#0F172A' }}>{e}</span>;
                                 }
                                 return null;
                               })()}
