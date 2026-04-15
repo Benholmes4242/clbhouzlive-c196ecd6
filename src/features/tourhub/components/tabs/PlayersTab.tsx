@@ -833,10 +833,19 @@ export function PlayersTab() {
           <div id="players-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Select Tour</div>
         </div>
         <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-        {(['all', 'pga', 'EURO', 'LPGA', 'PGAD', 'LIV'] as const).map((code) => {
+        {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
           const labels: Record<string, string> = {
             all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
-            LPGA: 'LPGA', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
+            LPGA: 'LPGA', CHAMP: 'Champions', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
+          };
+          const descriptions: Record<string, string> = {
+            all: 'Show players from every tour',
+            pga: 'PGA Tour players',
+            EURO: 'DP World Tour players',
+            LPGA: 'LPGA Tour players',
+            CHAMP: 'PGA Champions Tour players',
+            PGAD: 'Korn Ferry Tour players',
+            LIV: 'LIV Golf players',
           };
           const isSelected = activeTour === code;
           const count = code === 'all'
@@ -847,9 +856,10 @@ export function PlayersTab() {
             <button
               key={code}
               onClick={() => { setActiveTour(code as PlayerTourCode); setTourSheetOpen(false); }}
+              aria-pressed={isSelected}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 20px',
+                padding: '14px 20px',
                 background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
                 border: 'none',
                 borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
@@ -866,12 +876,17 @@ export function PlayersTab() {
                     : null
                 }
               </div>
-              {/* Label */}
-              <span style={{ flex: 1, fontSize: 14, fontWeight: isSelected ? 800 : 500, color: '#0F172A' }}>
-                {labels[code]}
-              </span>
+              {/* Label + description */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>
+                  {labels[code]}
+                </div>
+                <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
+                  {descriptions[code]}
+                </div>
+              </div>
               {/* Count */}
-              {count > 0 && <span style={{ fontSize: 12, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count.toLocaleString()}</span>}
+              {count > 0 && <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count.toLocaleString()}</span>}
               {/* Active dot */}
               {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
             </button>
