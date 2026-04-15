@@ -122,11 +122,26 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
   return (
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
-      {/* ── Chip filter row (dark bg) ── */}
-      <div style={{ background: '#F8FAFC', position: 'sticky', top: '47px', zIndex: 20 }}>
+
+      {/* ── Section 1: Trending clips (dark hero block) ── */}
+      <div>
+        <TrendingThisWeek />
+      </div>
+
+      {/* ── Section 2: Latest videos ── */}
+      <div>
+        <SectionHeader eyebrow="Videos" title="Latest videos" onSeeAll={() => navigate('/watch/videos')} paddingTop={26} />
+        <Suspense fallback={<VideosFeedSkeleton />}>
+          <VideosTabContent embedded={embedded} hideStickyHeader limitCards={3} />
+        </Suspense>
+      </div>
+
+      <div>
+        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} />
+        {/* ── Filter chips — directly above the clips grid ── */}
         <div
           className="flex gap-2 overflow-x-auto px-4"
-          style={{ scrollbarWidth: 'none', paddingTop: 12, paddingBottom: 10 }}
+          style={{ scrollbarWidth: 'none', paddingTop: 4, paddingBottom: 10 }}
         >
           <ChipButton
             label="For you"
@@ -151,23 +166,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
               ))
           }
         </div>
-      </div>
-
-      {/* ── Section 1: Trending clips (dark hero block) ── */}
-      <div>
-        <TrendingThisWeek />
-      </div>
-
-      {/* ── Section 2: Latest videos ── */}
-      <div>
-        <SectionHeader eyebrow="Videos" title="Latest videos" onSeeAll={() => navigate('/watch/videos')} paddingTop={26} />
-        <Suspense fallback={<VideosFeedSkeleton />}>
-          <VideosTabContent embedded={embedded} hideStickyHeader limitCards={3} />
-        </Suspense>
-      </div>
-
-      <div>
-        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} />
         <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
         <WatchGrid
