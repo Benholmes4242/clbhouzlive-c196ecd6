@@ -74,10 +74,10 @@ export function OverviewPageV3() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {/* 1. Hero Carousel */}
+        {/* 1. Hero Carousel — capped at 960px on wide screens, full-bleed on mobile */}
         <motion.div 
-          className="relative w-full z-0"
-          style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
+          className="relative w-full z-0 mx-auto"
+          style={{ ...HERO_STYLES.containerNoHeader, maxWidth: 960, opacity: heroOpacity, scale: heroScale }}
         >
           <HeroCarousel hasHeader={false} />
         </motion.div>
