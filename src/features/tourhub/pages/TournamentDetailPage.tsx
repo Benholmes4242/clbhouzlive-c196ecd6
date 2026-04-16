@@ -438,7 +438,7 @@ export function TournamentDetailPage() {
 
         {/* Live leader — floating pill */}
         {isLive && leader && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 16px 6px', background: '#F8FAFC' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 16px', background: '#F8FAFC' }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '6px 14px', borderRadius: 20,
