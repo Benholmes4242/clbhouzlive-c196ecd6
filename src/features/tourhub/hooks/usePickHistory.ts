@@ -45,20 +45,31 @@ export function usePickHistory() {
       const pgaSeasonIds = (seasons || []).map((s: any) => s.id);
       if (!pgaSeasonIds.length) return [];
 
-      // Step 1: fetch predictions with tournament data (PGA only)
+      // Also fetch EURO season IDs so cross-tour majors (e.g. The Masters) are included
+      const { data: euroSeasons } = await supabase
+        .from('sr_seasons')
+        .select('id')
+        .eq('tour_name', 'EURO')
+        .order('year', { ascending: false })
+        .limit(3);
+
+      const euroSeasonIds = (euroSeasons || []).map((s: any) => s.id);
+      const allSeasonIds = [...pgaSeasonIds, ...euroSeasonIds];
+
+      // Step 1: fetch predictions with tournament data (PGA + cross-tour majors)
       const { data: predRows, error: predError } = await supabase
         .from('ai_predictions')
         .select(`
           tournament_id,
           predictions,
           sr_tournaments!inner(
-            id, name, status, start_date, season_id
+            id, name, status, start_date, season_id, is_major
           )
         `)
         .in('sr_tournaments.status', ['closed', 'complete'])
-        .in('sr_tournaments.season_id', pgaSeasonIds)
+        .in('sr_tournaments.season_id', allSeasonIds)
         .order('sr_tournaments(start_date)', { ascending: false })
-        .limit(10);
+        .limit(15);
 
       if (predError) {
         console.error('usePickHistory predictions error:', predError);
@@ -100,6 +111,9 @@ export function usePickHistory() {
       for (const row of predRows) {
         const tournament = (row as any).sr_tournaments;
         if (!tournament) continue;
+
+        // For EURO season tournaments, only include majors (e.g. The Masters)
+        if (euroSeasonIds.includes(tournament.season_id) && !tournament.is_major) continue;
 
         const rawPredictions = (row.predictions as any[]) || [];
         const maps = lbByTournament.get(row.tournament_id);
