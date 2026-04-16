@@ -65,7 +65,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   }
 
   return (
-    <div className="animate-in fade-in duration-200 flex flex-col">
+    <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: '#F8FAFC', minHeight: '100%' }}>
       <CourseMediaHeader
         mediaCounts={mediaCounts}
         activeFilter={activeFilter}
@@ -82,6 +82,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         fetchNextPage={fetchNextPage}
         refetch={refetch}
         courseName={courseName}
+        courseId={courseId}
       />
       <CourseMediaAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
       <ScrollToTopGlass />
