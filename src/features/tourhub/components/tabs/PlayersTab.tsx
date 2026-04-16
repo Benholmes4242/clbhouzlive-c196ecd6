@@ -298,7 +298,8 @@ export function PlayersTab() {
       return false;
     });
 
-    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings';
+    const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings' || (isNonPgaTour && (sort === 'alpha-az' || sort === 'alpha-za'));
     
     const toEliteShape = (p: TourPlayer): ElitePlayer => ({
       id: p.id,
