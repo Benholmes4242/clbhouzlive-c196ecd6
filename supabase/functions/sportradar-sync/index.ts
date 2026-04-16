@@ -154,6 +154,11 @@ Deno.serve(async (req) => {
           break;
         case 'player_stats':
           result = await syncPlayerStatistics(supabase, sportradarApiKey, effectiveTour, effectiveYear);
+          // Bridge: also update tour_season_rankings from the freshly-synced stats
+          if (result.records > 0) {
+            const bridgeResult = await syncTourSeasonRankings(supabase, effectiveTour, effectiveYear);
+            console.log(`[Bridge] Updated ${bridgeResult.records} tour_season_rankings rows for ${effectiveTour}`);
+          }
           break;
         case 'seasons':
           result = await syncSeasons(supabase, sportradarApiKey);
@@ -1380,6 +1385,7 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
     'champions-tour': 'champ',
     champ: 'champ',
     liv: 'liv',
+    pgad: 'pgad',
   };
   const tourUrlSlug = tourUrlMap[tour] || tour;
   const url = `${getTourBaseUrl(tourUrlSlug)}/${year}/players/statistics.json`;
@@ -1398,6 +1404,8 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
     'champions-tour': 'CHAMP',
     champ: 'CHAMP',
     liv: 'LIV',
+    pgad: 'PGAD',
+  };
   };
   const tourName = tourNameMap[tour] || tour;
   const { data: season } = await supabase
@@ -1460,8 +1468,94 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
 }
 
 // ============================================================================
-// BACKFILL TEE TIMES — Sync tee times for all completed/inprogress tournaments
+// BRIDGE: sr_player_statistics → tour_season_rankings
+// Reads freshly-synced stats and upserts into tour_season_rankings so the
+// Players tab always shows current standings without separate scrapers.
 // ============================================================================
+async function syncTourSeasonRankings(supabase: any, tour: string, year: number) {
+  // Map tour param to tour_code used in tour_season_rankings
+  const tourCodeMap: Record<string, string> = {
+    pga: 'pga', lpga: 'lpga', euro: 'euro', eur: 'euro',
+    pgad: 'pgad', liv: 'liv', champ: 'champ',
+  };
+  const tourCode = tourCodeMap[tour] || tour;
+
+  // Map tour param to tour_name in sr_seasons
+  const tourNameMap: Record<string, string> = {
+    pga: 'pga', lpga: 'LPGA', euro: 'EURO', eur: 'EURO',
+    pgad: 'PGAD', liv: 'LIV', champ: 'CHAMP',
+  };
+  const tourName = tourNameMap[tour] || tour;
+
+  const { data: season } = await supabase
+    .from('sr_seasons')
+    .select('id')
+    .eq('year', year)
+    .eq('tour_name', tourName)
+    .limit(1)
+    .maybeSingle();
+
+  if (!season) {
+    console.log(`[Bridge] No season found for ${tourName} ${year}`);
+    return { records: 0 };
+  }
+
+  // Fetch all player stats with rankings for this season
+  const { data: stats, error: statsError } = await supabase
+    .from('sr_player_statistics')
+    .select(`
+      player_id,
+      fedex_points,
+      fedex_rank,
+      earnings,
+      wins,
+      events_played,
+      sr_players!inner(id, full_name, country)
+    `)
+    .eq('season_id', season.id)
+    .not('fedex_rank', 'is', null)
+    .order('fedex_rank', { ascending: true });
+
+  if (statsError || !stats?.length) {
+    console.log(`[Bridge] No ranked stats for ${tourCode} ${year}: ${statsError?.message || 'empty'}`);
+    return { records: 0 };
+  }
+
+  console.log(`[Bridge] Found ${stats.length} ranked players for ${tourCode} ${year}`);
+
+  const now = new Date().toISOString();
+  const rows = stats.map((stat: any) => ({
+    player_id: stat.player_id,
+    player_name: stat.sr_players.full_name,
+    tour_code: tourCode,
+    season_year: year,
+    position: stat.fedex_rank,
+    points: stat.fedex_points,
+    wins: stat.wins || 0,
+    tournaments_played: stat.events_played,
+    country: stat.sr_players.country,
+    scraped_at: now,
+  }));
+
+  // Upsert in batches of 100
+  let totalRecords = 0;
+  for (let i = 0; i < rows.length; i += 100) {
+    const batch = rows.slice(i, i + 100);
+    const { error } = await supabase
+      .from('tour_season_rankings')
+      .upsert(batch, { onConflict: 'tour_code,season_year,player_name' });
+    if (!error) {
+      totalRecords += batch.length;
+    } else {
+      console.error(`[Bridge] Upsert error batch ${i}: ${error.message}`);
+    }
+  }
+
+  console.log(`[Bridge] Upserted ${totalRecords} tour_season_rankings rows for ${tourCode}`);
+  return { records: totalRecords };
+}
+
+
 async function backfillTeeTimes(supabase: any, apiKey: string) {
   const { data: tournaments } = await supabase
     .from('sr_tournaments')
