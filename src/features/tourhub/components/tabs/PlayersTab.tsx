@@ -231,8 +231,15 @@ export function PlayersTab() {
         switch (sort) {
           case 'alpha-az':
           case 'alpha-za': {
-            // Hero always frozen to world rank — tourRank intentionally excluded
-            // to prevent FedEx/tour standings overriding OWGR on PGA
+            // For non-PGA tours, freeze hero to tour ranking order
+            const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+            if (isNonPgaTour) {
+              const aRank = aStats?.tourRank ?? Infinity;
+              const bRank = bStats?.tourRank ?? Infinity;
+              if (aRank !== bRank) return aRank - bRank;
+              return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+            }
+            // PGA: freeze to world rank
             const aWR = a.worldRank ?? Infinity;
             const bWR = b.worldRank ?? Infinity;
             return aWR - bWR;
@@ -631,11 +638,12 @@ export function PlayersTab() {
                     )
                   ) : (
                     (() => {
-                      const tourPts = champStats?.points != null && champStats.points > 0 && sort !== 'world-rank-desc' && sort !== 'alpha-az' && sort !== 'alpha-za'
+                      const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+                      const tourPts = champStats?.points != null && champStats.points > 0 && (sort !== 'world-rank-desc' && (sort !== 'alpha-az' && sort !== 'alpha-za' || isNonPgaTour))
                         ? champStats.points
                         : null;
                       const owgrPts = champion.totalPoints ?? champion.avgPoints;
-                      const displayPts = tourPts ?? owgrPts;
+                      const displayPts = tourPts ?? (isNonPgaTour ? null : owgrPts);
                       const label = 'pts';
                       return displayPts != null ? (
                         <div>
@@ -738,7 +746,9 @@ export function PlayersTab() {
                                 </div>;
                               }
                               if (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') {
-                                const pts = player.totalPoints ?? player.avgPoints;
+                                const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+                                const tourPts = isNonPgaTour ? (runnerStats?.points ?? null) : null;
+                                const pts = tourPts ?? player.totalPoints ?? player.avgPoints;
                                 if (!pts || pts <= 0) return null;
                                 return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                                   {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
@@ -919,7 +929,7 @@ export function PlayersTab() {
             isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isPGA  ? [{ value: 'world-rank-desc', label: 'World Ranking' }, { value: 'fedex-points', label: 'FedEx Cup Points' }, { value: 'highest-earnings', label: 'Earnings' }, { value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }]
             : [{ value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }];
           return opts.map(opt => (
