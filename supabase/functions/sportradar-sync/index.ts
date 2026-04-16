@@ -1404,6 +1404,8 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
     'champions-tour': 'CHAMP',
     champ: 'CHAMP',
     liv: 'LIV',
+    pgad: 'PGAD',
+  };
   };
   const tourName = tourNameMap[tour] || tour;
   const { data: season } = await supabase
