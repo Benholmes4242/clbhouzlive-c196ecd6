@@ -65,7 +65,7 @@ export function PlayersTab() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 200);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const initialTour = searchParams.get('tour') || 'all';
+  const initialTour = searchParams.get('tour') || 'pga';
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
@@ -115,14 +115,10 @@ export function PlayersTab() {
   }, [pullDistance, handleRefresh]);
 
   // Tour filter from URL
-  const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'all';
+  const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'pga';
   const setActiveTour = useCallback((tour: PlayerTourCode) => {
     const params = new URLSearchParams(searchParams);
-    if (tour === 'all') {
-      params.delete('tour');
-    } else {
-      params.set('tour', tour);
-    }
+    params.set('tour', tour);
     params.set('tab', 'players');
     setSearchParams(params, { replace: true });
     setVisibleCount(PAGE_SIZE);
@@ -546,26 +542,23 @@ export function PlayersTab() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '5px',
                     borderRadius: '9px', padding: '6px 10px',
-                    border: activeTour !== 'all'
-                      ? '1px solid rgba(247,147,30,0.4)'
-                      : '1px solid rgba(15,23,42,0.09)',
-                    background: activeTour !== 'all' ? 'rgba(247,147,30,0.06)' : '#ffffff',
+                    border: '1px solid rgba(247,147,30,0.4)',
+                    background: 'rgba(247,147,30,0.06)',
                     boxShadow: '0 1px 3px rgba(15,23,42,0.05)',
                     cursor: 'pointer', marginBottom: '2px',
                   }}
                 >
-                  {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
+                  {hasTourLogo(activeTour.toLowerCase())
                     ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
                     : <Globe className="w-[14px] h-[14px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
                   }
                   <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>
-                    {activeTour === 'all' ? 'All Tours'
-                      : activeTour === 'pga' ? 'PGA Tour'
+                    {activeTour === 'pga' ? 'PGA Tour'
                       : activeTour === 'EURO' ? 'DP World Tour'
                       : activeTour === 'LPGA' ? 'LPGA'
                       : activeTour === 'PGAD' ? 'Korn Ferry'
                       : activeTour === 'LIV' ? 'LIV Golf'
-                      : 'All Tours'}
+                      : 'PGA Tour'}
                   </span>
                   <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
                 </button>
@@ -792,7 +785,7 @@ export function PlayersTab() {
           <div style={{ flex: 1 }} />
 
           {/* Sort pill — only for specific tours */}
-          {activeTour !== 'all' && (
+          {(
             <button
               onClick={() => setSortSheetOpen(true)}
               style={{
@@ -941,13 +934,12 @@ export function PlayersTab() {
           <div id="players-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Select Tour</div>
         </div>
         <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-        {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
+        {(['pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
           const labels: Record<string, string> = {
-            all: 'All Tours', pga: 'PGA Tour', EURO: 'DP World Tour',
+            pga: 'PGA Tour', EURO: 'DP World Tour',
             LPGA: 'LPGA', CHAMP: 'Champions', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
           };
           const descriptions: Record<string, string> = {
-            all: 'Show players from every tour',
             pga: 'PGA Tour players',
             EURO: 'DP World Tour players',
             LPGA: 'LPGA Tour players',
@@ -956,10 +948,8 @@ export function PlayersTab() {
             LIV: 'LIV Golf players',
           };
           const isSelected = activeTour === code;
-          const count = code === 'all'
-            ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
-            : (tourCounts[code] ?? 0);
-          if (code !== 'all' && count === 0) return null;
+          const count = tourCounts[code] ?? 0;
+          if (count === 0) return null;
           return (
             <button
               key={code}
