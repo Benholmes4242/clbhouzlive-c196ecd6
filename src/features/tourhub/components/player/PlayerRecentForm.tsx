@@ -49,17 +49,17 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
   let Icon: React.ElementType;
   let bgChip: string;
 
-  if (avgPosition <= 5) {
+  if (avgPosition <= 10) {
     formLabel = 'On fire';
     textColor = '#F7931E';
     Icon = TrendingUp;
     bgChip = 'rgba(247,147,30,0.1)';
-  } else if (avgPosition <= 10) {
+  } else if (avgPosition <= 20) {
     formLabel = 'In form';
     textColor = '#F7931E';
     Icon = TrendingUp;
     bgChip = 'rgba(247,147,30,0.1)';
-  } else if (avgPosition <= 25) {
+  } else if (avgPosition <= 30) {
     formLabel = 'Steady';
     textColor = '#94A3B8';
     Icon = Minus;
