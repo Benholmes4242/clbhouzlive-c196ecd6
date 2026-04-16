@@ -614,10 +614,8 @@ export function PlayersTab() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                   <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
                   <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                    {activeTour === 'all'
-                      ? sort === 'highest-earnings' ? 'Top Earners · 2–5'
+                    {sort === 'highest-earnings' ? 'Top Earners · 2–5'
                       : sort === 'most-wins' ? 'Most Wins · 2–5'
-                      : 'World Rankings · 2–5'
                       : 'Tour Rankings · 2–5'}
                   </span>
                 </div>
@@ -787,20 +785,13 @@ export function PlayersTab() {
 
         {/* Underline sort tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
-          {(activeTour === 'all'
-            ? [
-                { value: 'world-rank-desc' as PlayerSortType, label: 'OWGR' },
-                { value: 'highest-earnings' as PlayerSortType, label: 'Earnings' },
-                { value: 'most-wins' as PlayerSortType, label: 'Wins' },
-                { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
-              ]
-            : [
+          {[
                 { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
                 { value: 'most-wins' as PlayerSortType, label: 'Wins' },
                 { value: 'highest-earnings' as PlayerSortType, label: 'Earnings' },
                 { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
-              ]
-          ).map(tab => {
+              ].filter((tab, i, arr) => i === arr.findIndex(t => t.value === tab.value))
+          .map(tab => {
             const isActive = sort === tab.value;
             return (
               <button
@@ -824,15 +815,7 @@ export function PlayersTab() {
         {/* Count line */}
         <div style={{ padding: '5px 16px 8px' }}>
           <span style={{ fontSize: '10px', color: '#94A3B8' }}>
-            {activeTour === 'all'
-              ? sort === 'world-rank-desc'
-                ? `${totalCount.toLocaleString()} ranked · OWGR (Men's)`
-                : sort === 'highest-earnings'
-                ? `${totalCount.toLocaleString()} players · Season earnings`
-                : sort === 'most-wins'
-                ? `${totalCount.toLocaleString()} players · Season wins`
-                : `${totalCount.toLocaleString()} players · ${getSortShortLabel(sort, activeTour)}`
-              : `${(tourCounts[activeTour] ?? 0).toLocaleString()} players`}
+            {`${(tourCounts[activeTour] ?? 0).toLocaleString()} players`}
           </span>
         </div>
       </div>
@@ -930,9 +913,7 @@ export function PlayersTab() {
             >
               {/* Tour logo chip */}
               <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {code === 'all'
-                  ? <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
-                  : hasTourLogo(code.toLowerCase())
+                {hasTourLogo(code.toLowerCase())
                     ? <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
                     : null
                 }
@@ -986,7 +967,7 @@ export function PlayersTab() {
                         tourCodes: player.tour_codes,
                       }}
                       worldRank={
-                        sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za' || activeTour === 'all'
+                        sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za'
                           ? rank?.worldRank
                           : (pStats?.tourRank || rank?.worldRank)
                       }
@@ -996,11 +977,11 @@ export function PlayersTab() {
                       points={pStats?.points}
                       totalPoints={rank?.totalPoints}
                       tournamentsPlayed={pStats?.tournamentsPlayed}
-                      showTourBadge={activeTour === 'all'}
+                      showTourBadge={false}
                       index={index}
                       activeSort={sort}
                       activeTour={activeTour}
-                      directoryMode={activeTour === 'all'}
+                      directoryMode={false}
                       onNavigate={() => sessionStorage.setItem('players-scroll', String(window.scrollY))}
                     />
                   );
