@@ -135,40 +135,37 @@ export function LiveRightNow() {
   if (!liveTournaments || liveTournaments.length === 0) return null;
 
   return (
-    <div style={{ paddingLeft: 16 }}>
+    <div style={{ padding: '0 20px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingRight: 16 }}>
-        <div className="animate-live-pulse" style={{ width: 7, height: 7, borderRadius: '50%', background: TOUR_COLORS.liveGreen }} />
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))', letterSpacing: '-0.01em' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <div
+          className="animate-live-pulse"
+          style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }}
+        />
+        <span style={{ fontSize: 9, fontWeight: 900, color: '#16A34A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Live Now
-        </span>
-        <span style={{
-          fontSize: 11,
-          fontWeight: 700,
-          color: TOUR_COLORS.liveGreen,
-          background: `${TOUR_COLORS.liveGreen}18`,
-          borderRadius: 5,
-          padding: '2px 7px',
-          letterSpacing: '0.02em',
-        }}>
-          {liveTournaments.length}
         </span>
       </div>
 
-      {/* Horizontal scroll strip */}
+      {/* Flat horizontal scroll — vertical dividers only */}
       <div
         className="[&::-webkit-scrollbar]:hidden"
         style={{
           display: 'flex',
-          gap: 10,
           overflowX: 'auto',
-          paddingRight: 16,
           scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
+          WebkitOverflowScrolling: 'touch' as any,
+          marginLeft: -20,
+          paddingLeft: 20,
+          paddingRight: 20,
         }}
       >
-        {liveTournaments.map((tournament) => (
-          <LiveBroadcastCard key={tournament.id} tournament={tournament} />
+        {liveTournaments.map((tournament, i) => (
+          <LiveEventRow
+            key={tournament.id}
+            tournament={tournament}
+            isLast={i === liveTournaments.length - 1}
+          />
         ))}
       </div>
     </div>
