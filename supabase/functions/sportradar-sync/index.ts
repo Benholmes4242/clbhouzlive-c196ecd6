@@ -154,6 +154,11 @@ Deno.serve(async (req) => {
           break;
         case 'player_stats':
           result = await syncPlayerStatistics(supabase, sportradarApiKey, effectiveTour, effectiveYear);
+          // Bridge: also update tour_season_rankings from the freshly-synced stats
+          if (result.records > 0) {
+            const bridgeResult = await syncTourSeasonRankings(supabase, effectiveTour, effectiveYear);
+            console.log(`[Bridge] Updated ${bridgeResult.records} tour_season_rankings rows for ${effectiveTour}`);
+          }
           break;
         case 'seasons':
           result = await syncSeasons(supabase, sportradarApiKey);
