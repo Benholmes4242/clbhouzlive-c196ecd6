@@ -195,7 +195,7 @@ export function PlayersTab() {
 
   // Tour-level filtering
   const tourFilteredPlayers = useMemo(() => {
-    if (!allPlayers || activeTour === 'all') return allPlayers || [];
+    if (!allPlayers) return allPlayers || [];
     return allPlayers.filter(p => {
       if (p.tour_codes?.includes(activeTour)) return true;
       if (activeTour === 'pga' && (!p.tour_codes || p.tour_codes.length === 0)) {
@@ -265,39 +265,6 @@ export function PlayersTab() {
       });
     };
 
-    if (activeTour === 'all') {
-      const pool = (elitePlayers || []).filter(p => p.worldRank && p.worldRank > 0);
-      // For earnings/wins sort, also include players from rows who have stats data
-      if (sort === 'highest-earnings' || sort === 'most-wins') {
-        const eliteIds = new Set(pool.map(p => p.playerId));
-        const additional = (tourFilteredPlayers || [])
-          .filter(p => !eliteIds.has(p.id))
-          .filter(p => sort === 'highest-earnings'
-            ? (statsMap.get(p.id)?.earnings ?? 0) > 0
-            : (statsMap.get(p.id)?.wins ?? 0) > 0
-          )
-          .map(p => ({
-            id: p.id,
-            playerId: p.id,
-            playerName: p.full_name,
-            firstName: p.first_name || '',
-            lastName: p.last_name || '',
-            country: p.country,
-            countryCode: p.country_code,
-            photoUrl: p.photo_url,
-            pgaTourId: p.pga_tour_id,
-            tourCode: p.tour_codes?.[0] ?? null,
-            worldRank: rankMap.get(p.id)?.worldRank ?? 0,
-            avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
-            totalPoints: null,
-            priorRank: null,
-            rankChange: null,
-          }));
-        return sortCandidates([...pool, ...additional]).slice(0, 5);
-      }
-      return sortCandidates(pool).slice(0, 5);
-    }
-    
     const tourElite = (elitePlayers || []).filter(ep => {
       const player = allPlayers?.find(p => p.id === ep.playerId);
       if (!player) return false;
@@ -363,8 +330,8 @@ export function PlayersTab() {
       (debouncedSearch ? true : !heroPlayerIds.has(p.id))
     );
 
-    // OWGR tab in All Tours: only show players with a confirmed world rank
-    if (activeTour === 'all' && sort === 'world-rank-desc') {
+    // OWGR tab on PGA: only show players with a confirmed world rank
+    if (activeTour === 'pga' && sort === 'world-rank-desc') {
       filtered = filtered.filter(p => {
         const wr = rankMap.get(p.id)?.worldRank;
         if (!wr || wr <= 0) return false;
@@ -374,13 +341,7 @@ export function PlayersTab() {
       });
     }
 
-    // Earnings tab: only show players who have earnings data this season
-    if (activeTour === 'all' && sort === 'highest-earnings') {
-      filtered = filtered.filter(p => {
-        const earnings = statsMap.get(p.id)?.earnings;
-        return earnings != null && earnings > 0;
-      });
-    }
+    if (activeTour === 'pga' && sort === 'highest-earnings') {
 
     // Wins tab: only show players with at least 1 win
     if (activeTour === 'all' && sort === 'most-wins') {
