@@ -48,6 +48,10 @@ const getInitials = (name: string) => {
   return name.slice(0, 2).toUpperCase();
 };
 
+const Divider = () => (
+  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
+);
+
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseId,
   courseName,
@@ -377,154 +381,137 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Empty state
   if (!hasRatings) {
     return (
-      <div className="flex flex-col px-4 pt-8 pb-8">
-        <div style={{ padding: '28px 24px', textAlign: 'center' }}>
-          <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 14 }}>⚡ Reviews</div>
-          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(247,147,30,0.08)', border: '1.5px solid rgba(247,147,30,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-            <span style={{ fontSize: 26 }}>⭐</span>
+      <div style={{ paddingBottom: 40 }}>
+        {/* Hero */}
+        <div style={{ padding: '40px 24px 28px', textAlign: 'center' }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}>
+            ⭐
           </div>
-          <p style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: '0 0 6px' }}>No reviews yet</p>
-          <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 18, lineHeight: 1.5, maxWidth: 260, marginLeft: 'auto', marginRight: 'auto' }}>
+          <div style={{ fontSize: 19, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
+          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
             Be the first to share your experience at {courseName}.
           </p>
           <button
             type="button"
             onClick={handleRateClick}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: '#F7931E', color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.25)' }}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
           >
             Write the first review
           </button>
         </div>
-        {/* Supporting tips card */}
-        <div style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', borderRadius: 12, padding: '14px 16px', marginTop: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>What to include</span>
+        <div style={{ margin: '0 16px' }}><Divider /></div>
+        {/* What to include guide */}
+        <div style={{ padding: '20px 16px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to include</span>
           </div>
           {[
-            { icon: '🏌️‍♂️', label: 'Course condition — greens, fairways, bunkers' },
-            { icon: '🏌️', label: 'Layout and design — challenge, variety, scenery' },
-            { icon: '🏠', label: 'Facilities — clubhouse, practice areas, service' },
-          ].map(({ icon, label }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <span style={{ fontSize: 16 }}>{icon}</span>
-              <span style={{ fontSize: 13, color: '#64748B' }}>{label}</span>
+            { icon: '⛳', label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
+            { icon: '🏔️', label: 'Layout & design', sub: 'Challenge, variety, scenery, routing' },
+            { icon: '🏠', label: 'Facilities', sub: 'Clubhouse, practice areas, service' },
+            { icon: '💰', label: 'Value', sub: 'Was it worth the green fee?' },
+          ].map(({ icon, label, sub }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(15,23,42,0.02)', border: '0.5px solid rgba(15,23,42,0.06)' }}>
+              <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, color: '#94A3B8' }}>{sub}</div>
+              </div>
             </div>
           ))}
         </div>
+        <ScrollToTopGlass />
       </div>
     );
   }
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-    <div className="flex flex-col">
-      {/* Compact score header — flat dispatch */}
-      <section style={{ padding: '14px 16px 0', textAlign: 'center' }}>
-        <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ Community Score</div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' }}>
+    <div style={{ paddingBottom: 40 }}>
+      {/* Community score header */}
+      <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
+        <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 8 }}>⚡ Community Score</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
+          <span style={{ fontSize: 34, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums' }}>
             {communityScore.toFixed(1)}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: 12, fontWeight: 800, color: '#0F172A', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
             {getScoreTier(communityScore).label}
           </span>
         </div>
-        <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+        <div style={{ fontSize: 11, color: '#94A3B8' }}>
           {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
           {myReview && (
             <>
               {' · '}
               <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: '#F7931E', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Pencil className="w-3.5 h-3.5" />
-                Edit yours
+                <Pencil className="w-3.5 h-3.5" /> Edit yours
               </button>
             </>
           )}
         </div>
-      </section>
+      </div>
 
-      {/* Search bar */}
-      <section className="px-4 pt-4 pb-4">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Divider />
+
+      {/* Search */}
+      <div style={{ padding: '10px 16px 0' }}>
+        <div style={{ position: 'relative' }}>
+          <Search className="h-4 w-4 text-muted-foreground" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
-            placeholder="Search reviews (name or keywords)"
+            placeholder="Search reviews…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-10 pr-10 border border-border bg-card text-base placeholder:text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-border focus:ring-offset-1 focus:border-foreground transition rounded-sq-sm"
+            style={{ width: '100%', height: 40, paddingLeft: 36, paddingRight: searchQuery ? 36 : 16, borderRadius: 10, border: '1px solid rgba(15,23,42,0.1)', background: 'rgba(15,23,42,0.02)', fontSize: 13, color: '#0F172A', outline: 'none', boxSizing: 'border-box' as const }}
           />
           {searchQuery && (
-            <button
-              type="button"
-              onClick={handleClearSearch}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
-              aria-label="Clear search"
-            >
+            <button type="button" onClick={handleClearSearch} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
               <X className="h-4 w-4 text-muted-foreground" />
             </button>
           )}
         </div>
-      </section>
-
-      {/* Sort & Filter controls */}
-      <div className="px-5 pt-1 pb-4">
-        {/* Sort buttons — dispatch style */}
-        <div className="w-full flex justify-center gap-2">
-          {sortOptions.map((option) => {
-            const isActive = sortBy === option.value;
-            return (
-              <button
-                key={option.value}
-                onClick={() => setSortBy(option.value as SortOption)}
-                style={{
-                  padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: isActive ? 800 : 600,
-                  background: isActive ? '#0F172A' : 'transparent',
-                  color: isActive ? '#ffffff' : '#94A3B8',
-                  border: isActive ? 'none' : '1px solid rgba(15,23,42,0.12)',
-                  cursor: 'pointer',
-                  minHeight: 36,
-                }}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-        
-        {/* Rating filter chips */}
-        <div className="mt-3">
-          <RatingFilterChips 
-            value={ratingFilter}
-            onChange={setRatingFilter}
-          />
-        </div>
       </div>
 
-      {/* Reviews list */}
-      <section className="px-4 pt-6 pb-4">
-        {!myReview && (
-          <div className="mb-4">
-            <WriteReviewPrompt onRateClick={handleRateClick} />
-          </div>
-        )}
+      {/* Sort buttons */}
+      <div style={{ display: 'flex', gap: 6, padding: '10px 16px 8px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        {sortOptions.map((option) => {
+          const isActive = sortBy === option.value;
+          return (
+            <button
+              key={option.value}
+              onClick={() => setSortBy(option.value as SortOption)}
+              style={{ padding: '6px 13px', borderRadius: 8, fontSize: 11.5, fontWeight: isActive ? 800 : 600, background: isActive ? '#0F172A' : 'transparent', color: isActive ? '#fff' : '#94A3B8', border: isActive ? 'none' : '1px solid rgba(15,23,42,0.1)', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' as const }}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
 
-        {/* Your review section */}
-        {filteredMyReview && (
-          <div className="mb-4">
-            <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 8 }}>
-              Your Review
-            </div>
+      {/* Rating filter chips */}
+      <div style={{ padding: '0 16px 10px' }}>
+        <RatingFilterChips value={ratingFilter} onChange={setRatingFilter} />
+      </div>
+
+      <Divider />
+
+      {/* Your review — pinned first */}
+      {filteredMyReview && (
+        <div style={{ borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '14px 16px 0' }}>
+            <div style={{ width: 3, height: 11, background: '#F7931E', borderRadius: 1 }} />
+            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Your Review</span>
+          </div>
+          <div style={{ padding: '0 16px 14px' }}>
             <ReviewBlockFlat
               review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
               isMine
               isHighlighted={isJustSubmittedOrUpdated}
               onToggleHelpful={handleToggleHelpful}
               onMediaClick={(index) => {
-                if (filteredMyReview.media) {
-                  handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview);
-                }
+                if (filteredMyReview.media) handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview);
               }}
               onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
             />
@@ -534,84 +521,89 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               return null;
             })()}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Other reviews */}
-        {otherReviews.length > 0 && (
-          <div>
-            {otherReviews.map((review) => {
-              const isDeepLinked = review.id === highlightedReviewId;
-              const response = reviewResponses?.find(r => r.review_id === review.id);
-              const canReply = businessClaim?.isVerified && !response;
-              return (
-                <div key={review.id}>
-                  <ReviewBlockFlat
-                    review={transformReview(review, isDeepLinked)}
-                    isHighlighted={isDeepLinked}
-                    onToggleHelpful={handleToggleHelpful}
-                    onMediaClick={(index) => {
-                      if (review.media) {
-                        handleReviewMediaClick(review.media, index, review);
-                      }
-                    }}
-                    onUserClick={() => navigate(getProfilePathById(review.user_id))}
+      {/* Write prompt if no review */}
+      {!myReview && (
+        <div style={{ padding: '14px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+          <button
+            type="button"
+            onClick={handleRateClick}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
+          >
+            ⭐ Write your review
+          </button>
+        </div>
+      )}
+
+      {/* Other reviews */}
+      <div>
+        {otherReviews.map((review) => {
+          const isDeepLinked = review.id === highlightedReviewId;
+          const response = reviewResponses?.find(r => r.review_id === review.id);
+          const canReply = businessClaim?.isVerified && !response;
+          return (
+            <div key={review.id} style={{ borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+              <div style={{ padding: '0 16px' }}>
+                <ReviewBlockFlat
+                  review={transformReview(review, isDeepLinked)}
+                  isHighlighted={isDeepLinked}
+                  onToggleHelpful={handleToggleHelpful}
+                  onMediaClick={(index) => {
+                    if (review.media) handleReviewMediaClick(review.media, index, review);
+                  }}
+                  onUserClick={() => navigate(getProfilePathById(review.user_id))}
+                />
+                {response && <ResponseDisplay response={response} />}
+                {canReply && (
+                  <ReplyForm
+                    businessClaim={businessClaim}
+                    reviewId={review.id}
+                    onSubmit={(reviewId, businessId, text) =>
+                      submitResponseMutation.mutate({ reviewId, businessId, responseText: text })
+                    }
+                    isSubmitting={submitResponseMutation.isPending}
                   />
-                  {response && <ResponseDisplay response={response} />}
-                  {canReply && (
-                    <ReplyForm
-                      businessClaim={businessClaim}
-                      reviewId={review.id}
-                      onSubmit={(reviewId, businessId, text) =>
-                        submitResponseMutation.mutate({ reviewId, businessId, responseText: text })
-                      }
-                      isSubmitting={submitResponseMutation.isPending}
-                    />
-                  )}
-                  <div className="mb-3" />
-                </div>
-              );
-            })}
-          </div>
-        )}
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-        {/* No results message for search/filter */}
-        {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-sm text-muted-foreground">No reviews match your criteria.</p>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setRatingFilter(null);
-              }}
-              className="mt-2 text-sm font-medium text-foreground hover:text-foreground/80 underline active:scale-[0.98] transition-transform"
-            >
-              Clear filters
-            </button>
-          </div>
-        )}
-      </section>
+      {/* No results */}
+      {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+          <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 10 }}>No reviews match your criteria.</p>
+          <button
+            type="button"
+            onClick={() => { setSearchQuery(''); setRatingFilter(null); }}
+            style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
 
       {/* End message */}
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
-        <section className="px-4 pt-4 pb-6">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              You've seen all {filteredReviews.length} {filteredReviews.length === 1 ? 'review' : 'reviews'}.
-            </p>
-            {!myReview && (
-              <button
-                type="button"
-                onClick={handleRateClick}
-                className="mt-2 text-sm font-medium text-foreground hover:text-foreground/80 underline active:scale-[0.98] transition-transform min-h-[44px] inline-flex items-center"
-              >
-                Share your experience
-              </button>
-            )}
-          </div>
-        </section>
+        <div style={{ padding: '20px 16px 0', textAlign: 'center' }}>
+          <p style={{ fontSize: 12, color: '#CBD5E1', marginBottom: 8 }}>
+            You've seen all {filteredReviews.length} {filteredReviews.length === 1 ? 'review' : 'reviews'}.
+          </p>
+          {!myReview && (
+            <button
+              type="button"
+              onClick={handleRateClick}
+              style={{ fontSize: 12, fontWeight: 700, color: '#64748B', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              Share your experience
+            </button>
+          )}
+        </div>
       )}
-      
+
       <ScrollToTopGlass />
     </div>
     </PullToRefreshContainer>
