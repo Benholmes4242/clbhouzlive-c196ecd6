@@ -602,6 +602,15 @@ export function PlayersTab() {
                         <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>earnings</span>
                       </div>
                     )
+                  ) : sort === 'fedex-points' ? (
+                    champStats?.points != null && champStats.points > 0 && (
+                      <div>
+                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
+                          {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        </span>
+                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>FedEx pts</span>
+                      </div>
+                    )
                   ) : sort === 'most-wins' ? (
                     (champStats?.wins ?? 0) > 0 && (
                       <div>
