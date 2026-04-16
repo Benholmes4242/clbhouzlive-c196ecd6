@@ -158,7 +158,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
                 }}
               >
-                {isLive && tab.id !== 'tourhub' ? 'LIVE' : tab.label}
+                {isLive && tab.id === 'tourhub' ? 'Live' : isLive && tab.id !== 'tourhub' ? 'LIVE' : tab.label}
               </span>
             )}
           </button>
