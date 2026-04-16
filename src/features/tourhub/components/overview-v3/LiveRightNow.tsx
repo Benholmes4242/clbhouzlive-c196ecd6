@@ -113,7 +113,7 @@ export function LiveRightNow() {
     return (
       <div style={{ padding: '0 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <div className="animate-live-pulse" style={{ width: 7, height: 7, borderRadius: '50%', background: TOUR_COLORS.liveGreen }} />
+          <div className="animate-live-pulse" style={{ width: 7, height: 7, borderRadius: '50%', background: '#22C55E' }} />
           <span style={{ fontSize: '12px', fontWeight: 600, color: 'hsl(var(--foreground))', letterSpacing: '-0.01em' }}>
             Live Now
           </span>
