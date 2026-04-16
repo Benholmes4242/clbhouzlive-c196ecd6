@@ -126,11 +126,19 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-sq-xs bg-white/90 backdrop-blur-md border border-slate-300/70 active:scale-95 transition-all z-10 shadow-sm"
-            style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)' }}
+            className="absolute left-4 flex h-[28px] w-[28px] items-center justify-center active:scale-95 transition-all z-10"
+            style={{
+              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
+              borderRadius: '12px',
+              background: 'rgba(0, 0, 0, 0.28)',
+              backdropFilter: 'blur(22px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-[18px] w-[18px] text-slate-700" strokeWidth={2.5} />
+            <ChevronLeft className="h-[16px] w-[16px] text-white" strokeWidth={2.5} />
           </button>
         )}
 
@@ -138,11 +146,19 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {!isInModal && (
           <button
             onClick={() => safeGoBack(navigate, '/courses')}
-            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-sq-xs bg-white/90 backdrop-blur-md border border-slate-300/70 active:scale-95 transition-all z-10 shadow-sm"
-            style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)' }}
+            className="absolute left-4 flex h-[28px] w-[28px] items-center justify-center active:scale-95 transition-all z-10"
+            style={{
+              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
+              borderRadius: '12px',
+              background: 'rgba(0, 0, 0, 0.28)',
+              backdropFilter: 'blur(22px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-[18px] w-[18px] text-slate-700" strokeWidth={2.5} />
+            <ChevronLeft className="h-[16px] w-[16px] text-white" strokeWidth={2.5} />
           </button>
         )}
 
