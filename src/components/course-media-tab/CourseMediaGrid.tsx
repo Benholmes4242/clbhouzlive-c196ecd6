@@ -101,10 +101,17 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
           </p>
           <button
             type="button"
-            onClick={() => {}}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
+            onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)', marginBottom: 10 }}
           >
             📷 Share your experience
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/share')}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', color: '#0F172A', fontSize: 13, fontWeight: 700, border: '1.5px solid rgba(15,23,42,0.1)', cursor: 'pointer' }}
+          >
+            🎬 Upload a video
           </button>
         </div>
 
