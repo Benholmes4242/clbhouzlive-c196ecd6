@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { AlertCircle, Camera, Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -15,6 +16,7 @@ interface CourseMediaGridProps {
   fetchNextPage: () => void;
   refetch: () => void;
   courseName?: string;
+  courseId?: string;
 }
 
 function isLandscape(post: FeedPost): boolean {
