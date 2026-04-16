@@ -2053,9 +2053,25 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
                     )}
                   </div>
                   {/* Score for completed, status for upcoming */}
-                  {isLive ? (
-                    <span style={{ fontSize: '7.5px', fontWeight: 700, color: '#22C55E', flexShrink: 0, letterSpacing: '0.04em' }}>LIVE</span>
-                  ) : slide.type === 'upcoming' ? (
+                  {isLive ? (() => {
+                    const leaderData = leadersWinnersMap?.get(slide.tournament.id);
+                    const score = leaderData?.displayScore ?? leaderData?.score;
+                    const scoreStr = score !== undefined && score !== null
+                      ? (typeof score === 'number'
+                          ? (score === 0 ? 'E' : score < 0 ? String(score) : `+${score}`)
+                          : String(score))
+                      : null;
+                    return scoreStr ? (
+                      <span style={{
+                        fontSize: '11px', fontWeight: 900, flexShrink: 0, letterSpacing: '-0.02em',
+                        color: scoreStr === 'E' ? '#ffffff' : scoreStr.startsWith('+') ? '#EF4444' : '#22C55E',
+                      }}>
+                        {scoreStr}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: '7.5px', fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>LIVE</span>
+                    );
+                  })() : slide.type === 'upcoming' ? (
                     <span style={{ fontSize: 7, color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>Soon</span>
                   ) : (
                     <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>Final</span>
