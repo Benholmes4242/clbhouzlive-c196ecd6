@@ -112,7 +112,7 @@ export function CollegeMasthead({
             </div>
 
             {/* College logo — centered in the right dead space */}
-            <div style={{ position: 'absolute', top: '50%', left: '75%', transform: 'translate(-50%, -50%)', width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logoUrl ? (
                 <img
                   src={logoUrl}
