@@ -197,19 +197,17 @@ export function LeadersMasthead({
                   to={`/tourhub/player/${runner.player.id}`}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '10px 12px',
+                    padding: '8px 10px',
                     borderRight: i === 0 ? '0.5px solid rgba(255,255,255,0.06)' : 'none',
                     textDecoration: 'none',
-                    overflow: 'hidden',
                   }}
                   className="active:opacity-70 transition-opacity"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, overflow: 'hidden' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(255,255,255,0.15)', width: '16px', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                    <span style={{ fontSize: '12px', fontWeight: 900, color: 'rgba(255,255,255,0.15)', width: '14px', flexShrink: 0 }}>
                       {runner.rank}
                     </span>
-                    {/* 22px squircle avatar */}
-                    <div style={{ width: '22px', height: '22px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.06)' }}>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.06)' }}>
                       <img
                         src={runnerPhoto}
                         alt={runner.player.full_name}
@@ -217,11 +215,11 @@ export function LeadersMasthead({
                         onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
                       />
                     </div>
-                    <span style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, minWidth: 0 }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
                       {runnersLastName}
                     </span>
                   </div>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginLeft: '6px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginLeft: '4px' }}>
                     {fmtRunner(runner.value)}{unitRunner ? ` ${unitRunner}` : ''}
                   </span>
                 </Link>
