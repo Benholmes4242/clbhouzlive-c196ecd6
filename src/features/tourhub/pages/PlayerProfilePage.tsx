@@ -28,7 +28,7 @@ const sectionVariants = {
 
 const PULL_THRESHOLD = 50;
 
-const STAT_TABS = ['Player Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
+const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
 type StatTab = (typeof STAT_TABS)[number];
 
 export function PlayerProfilePage() {
@@ -43,7 +43,7 @@ export function PlayerProfilePage() {
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
-  const [activeStatTab, setActiveStatTab] = useState<StatTab>('Player Overview');
+  const [activeStatTab, setActiveStatTab] = useState<StatTab>('Overview');
 
   // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);

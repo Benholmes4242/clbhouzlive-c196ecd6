@@ -138,7 +138,7 @@ interface PlayerSeasonStatsProps {
 }
 
 export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: PlayerSeasonStatsProps) {
-  const [internalTab, setInternalTab] = useState('Player Overview');
+  const [internalTab, setInternalTab] = useState('Overview');
   const activeTab = externalTab ?? internalTab;
 
   const top10Ratio = (playerStats.top_10s && playerStats.events_played && playerStats.events_played > 0)
@@ -169,7 +169,7 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
           transition={{ duration: 0.15 }}
           style={{ padding: '0 16px 14px' }}
         >
-          {activeTab === 'Player Overview' && (
+          {activeTab === 'Overview' && (
             <div>
               <SubSectionLabel label="RESULTS" style={{ marginTop: 0 }} />
               <StatRow label="Events Played" value={fmt(playerStats.events_played)} />
