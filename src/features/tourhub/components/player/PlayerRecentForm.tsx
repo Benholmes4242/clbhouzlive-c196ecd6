@@ -1,5 +1,5 @@
 /**
- * PlayerRecentForm - Dispatch left-rule strip showing recent form.
+ * PlayerRecentForm - Stat strip showing form label + avg finish + dot sparkline.
  */
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
@@ -19,22 +19,23 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
     return r.position !== null && s !== 'CUT' && s !== 'MC' && s !== 'WD';
   });
 
-  // All recent results were cuts
   if (completedResults.length === 0) {
     const cutCount = results.filter(r => r.status?.toUpperCase() === 'CUT').length;
     if (cutCount === 0) return null;
     return (
       <div style={{
-        display: 'flex', alignItems: 'center', gap: '8px',
-        padding: '10px 14px',
-        background: 'rgba(15,23,42,0.03)',
-        borderLeft: '3px solid rgba(15,23,42,0.15)',
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '12px 20px',
+        background: '#F8FAFC',
         borderBottom: '0.5px solid rgba(15,23,42,0.07)',
       }}>
-        <TrendingDown style={{ width: 14, height: 14, color: '#94A3B8', flexShrink: 0 }} />
-        <span style={{ fontSize: '12px', fontWeight: 600, color: '#94A3B8' }}>
-          Out of form · missed last {cutCount} {cutCount === 1 ? 'cut' : 'cuts'}
-        </span>
+        <TrendingDown style={{ width: 16, height: 16, color: '#94A3B8', flexShrink: 0 }} />
+        <div>
+          <div style={{ fontSize: '14px', fontWeight: 900, color: '#94A3B8', letterSpacing: '-0.02em' }}>Out of form</div>
+          <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: 1 }}>
+            missed last {cutCount} {cutCount === 1 ? 'cut' : 'cuts'}
+          </div>
+        </div>
       </div>
     );
   }
@@ -46,40 +47,72 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
   let formLabel: string;
   let textColor: string;
   let Icon: React.ElementType;
+  let bgChip: string;
 
   if (avgPosition <= 5) {
     formLabel = 'On fire';
     textColor = '#F7931E';
     Icon = TrendingUp;
+    bgChip = 'rgba(247,147,30,0.1)';
   } else if (avgPosition <= 10) {
     formLabel = 'In form';
     textColor = '#F7931E';
     Icon = TrendingUp;
+    bgChip = 'rgba(247,147,30,0.1)';
   } else if (avgPosition <= 25) {
     formLabel = 'Steady';
     textColor = '#94A3B8';
     Icon = Minus;
+    bgChip = 'rgba(15,23,42,0.06)';
   } else {
     formLabel = 'Out of form';
-    textColor = '#94A3B8';
+    textColor = '#DC2626';
     Icon = TrendingDown;
+    bgChip = 'rgba(220,38,38,0.08)';
   }
+
+  const getDotColor = (pos: number) => {
+    if (pos <= 10) return '#F7931E';
+    if (pos <= 25) return '#94A3B8';
+    return '#DC2626';
+  };
 
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: '8px',
-      padding: '10px 14px',
-      background: avgPosition <= 10 ? 'rgba(247,147,30,0.05)' : 'rgba(15,23,42,0.03)',
-      borderLeft: `3px solid ${avgPosition <= 10 ? '#F7931E' : 'rgba(15,23,42,0.15)'}`,
+      padding: '12px 20px',
+      background: '#F8FAFC',
       borderBottom: '0.5px solid rgba(15,23,42,0.07)',
     }}>
-      <Icon style={{ width: 14, height: 14, color: textColor, flexShrink: 0 }} />
-      <span style={{ fontSize: '12px', fontWeight: 700, color: textColor }}>
-        {formLabel}
-      </span>
-      <span style={{ fontSize: '12px', color: '#64748B' }}>
-        · avg. finish: {avgPosition} over last {completedResults.length} events
-      </span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Left — icon + label + avg */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Icon style={{ width: 16, height: 16, color: textColor, flexShrink: 0 }} />
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 900, color: textColor, letterSpacing: '-0.02em' }}>
+              {formLabel}
+            </div>
+            <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: 1 }}>
+              avg. finish T{avgPosition} · last {completedResults.length} events
+            </div>
+          </div>
+        </div>
+
+        {/* Right — dot sparkline of recent finishes */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5 }}>
+          {completedResults.map((r, i) => {
+            const pos = r.position || 0;
+            const dotColor = getDotColor(pos);
+            return (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor }} />
+                <div style={{ fontSize: '7px', fontWeight: 700, color: dotColor, fontVariantNumeric: 'tabular-nums' }}>
+                  {pos <= 9 ? `T${pos}` : String(pos)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
