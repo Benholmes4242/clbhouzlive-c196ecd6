@@ -1385,6 +1385,7 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
     'champions-tour': 'champ',
     champ: 'champ',
     liv: 'liv',
+    pgad: 'pgad',
   };
   const tourUrlSlug = tourUrlMap[tour] || tour;
   const url = `${getTourBaseUrl(tourUrlSlug)}/${year}/players/statistics.json`;
