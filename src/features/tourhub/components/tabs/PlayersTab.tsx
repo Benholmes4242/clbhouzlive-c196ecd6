@@ -239,9 +239,11 @@ export function PlayersTab() {
             return (bStats?.points ?? 0) - (aStats?.points ?? 0);
           }
           case 'alpha-az':
-            return a.playerName.localeCompare(b.playerName);
-          case 'alpha-za':
-            return b.playerName.localeCompare(a.playerName);
+          case 'alpha-za': {
+            const aWR = a.worldRank ?? Infinity;
+            const bWR = b.worldRank ?? Infinity;
+            return aWR - bWR;
+          }
           case 'highest-earnings': {
             const aEarn = aStats?.earnings ?? 0;
             const bEarn = bStats?.earnings ?? 0;
@@ -591,7 +593,7 @@ export function PlayersTab() {
                   {champion.playerName}
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'baseline', flexWrap: 'wrap' as const }}>
-                  {sort === 'highest-earnings' ? (
+                  {(() => { const effectiveSort = (sort === 'alpha-az' || sort === 'alpha-za') ? 'world-rank-desc' : sort; return effectiveSort === 'highest-earnings' ? (
                     champStats?.earnings != null && champStats.earnings > 0 && (
                       <div>
                         <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
@@ -601,7 +603,7 @@ export function PlayersTab() {
                         </span>
                       </div>
                     )
-                  ) : sort === 'fedex-points' ? (
+                  ) : effectiveSort === 'fedex-points' ? (
                     champStats?.points != null && champStats.points > 0 && (
                       <div>
                         <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
@@ -610,7 +612,7 @@ export function PlayersTab() {
                         <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>pts</span>
                       </div>
                     )
-                  ) : sort === 'most-wins' ? (
+                  ) : effectiveSort === 'most-wins' ? (
                     (champStats?.wins ?? 0) > 0 && (
                       <div>
                         <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
@@ -630,7 +632,7 @@ export function PlayersTab() {
                       </div>
                     ) : null;
                   })()}
-                  {sort === 'most-wins' && champStats?.earnings != null && champStats.earnings > 0 && (
+                  {effectiveSort === 'most-wins' && champStats?.earnings != null && champStats.earnings > 0 && (
                     <span style={{ fontSize: '12px', color: '#64748B' }}>
                       {champStats.earnings >= 1_000_000
                         ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
