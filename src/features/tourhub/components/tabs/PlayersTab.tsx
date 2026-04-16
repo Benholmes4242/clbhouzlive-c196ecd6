@@ -597,57 +597,69 @@ export function PlayersTab() {
                   {champion.playerName}
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'baseline', flexWrap: 'wrap' as const }}>
-                  {(() => {
-                    const effectiveSort = (sort === 'alpha-az' || sort === 'alpha-za') ? 'world-rank-desc' : sort;
-                    return <>
-                      {effectiveSort === 'highest-earnings' ? (
-                        champStats?.earnings != null && champStats.earnings > 0 && (
-                          <div>
-                            <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                              {champStats.earnings >= 1_000_000
-                                ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
-                                : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
-                            </span>
-                          </div>
-                        )
-                      ) : effectiveSort === 'fedex-points' ? (
-                        champStats?.points != null && champStats.points > 0 && (
-                          <div>
-                            <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                              {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                            </span>
-                            <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>pts</span>
-                          </div>
-                        )
-                      ) : effectiveSort === 'most-wins' ? (
-                        (champStats?.wins ?? 0) > 0 && (
-                          <div>
-                            <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                              {champStats!.wins}
-                            </span>
-                            <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>{champStats!.wins === 1 ? 'win' : 'wins'}</span>
-                          </div>
-                        )
-                      ) : (() => {
-                        const pts = champStats?.points ?? champion.totalPoints ?? champion.avgPoints;
-                        return pts != null && pts > 0 ? (
-                          <div>
-                            <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                              {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </span>
-                            <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>pts</span>
-                          </div>
-                        ) : null;
-                      })()}
-                      {effectiveSort === 'most-wins' && champStats?.earnings != null && champStats.earnings > 0 && (
-                        <span style={{ fontSize: '12px', color: '#64748B' }}>
+                  {/* Primary stat — depends on active sort */}
+                  {sort === 'fedex-points' ? (
+                    champStats?.points != null && champStats.points > 0 && (
+                      <div>
+                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
+                          {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>FedEx pts</span>
+                      </div>
+                    )
+                  ) : sort === 'highest-earnings' ? (
+                    champStats?.earnings != null && champStats.earnings > 0 && (
+                      <div>
+                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                           {champStats.earnings >= 1_000_000
                             ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
                             : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
                         </span>
-                      )}
-                    </>;
-                  })()}
+                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>earnings</span>
+                      </div>
+                    )
+                  ) : sort === 'most-wins' ? (
+                    (champStats?.wins ?? 0) > 0 && (
+                      <div>
+                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
+                          {champStats!.wins}
+                        </span>
+                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>
+                          {champStats!.wins === 1 ? 'win' : 'wins'}
+                        </span>
+                      </div>
+                    )
+                  ) : (
+                    (() => {
+                      const tourPts = champStats?.points != null && champStats.points > 0 && sort !== 'world-rank-desc' && sort !== 'alpha-az' && sort !== 'alpha-za'
+                        ? champStats.points
+                        : null;
+                      const owgrPts = champion.avgPoints;
+                      const displayPts = tourPts ?? owgrPts;
+                      const label = (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') ? 'avg pts' : 'pts';
+                      return displayPts != null ? (
+                        <div>
+                          <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
+                            {displayPts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                          <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>{label}</span>
+                        </div>
+                      ) : null;
+                    })()
+                  )}
+                  {/* Secondary stats */}
+                  {sort !== 'highest-earnings' && champStats?.earnings != null && champStats.earnings > 0 && (
+                    <span style={{ fontSize: '12px', color: '#64748B' }}>
+                      {champStats.earnings >= 1_000_000
+                        ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
+                        : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
+                    </span>
+                  )}
+                  {sort !== 'most-wins' && (champStats?.wins ?? 0) > 0 && (
+                    <span style={{ fontSize: '12px', color: '#16A34A', fontWeight: 700 }}>
+                      {champStats!.wins} {champStats!.wins === 1 ? 'win' : 'wins'}
+                    </span>
+                  )}
                 </div>
               </div>
               {/* Headshot */}
@@ -709,32 +721,39 @@ export function PlayersTab() {
                             <CountryFlag country={player.country} size="sm" />
                             {(() => {
                               const runnerStats = statsMap.get(player.playerId);
-                              if (sort === 'highest-earnings') {
-                                const earn = runnerStats?.earnings;
-                                if (!earn || earn <= 0) return null;
-                                return <span style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E' }}>
-                                  {earn >= 1_000_000 ? `$${(earn / 1_000_000).toFixed(1)}M` : `$${(earn / 1_000).toFixed(0)}K`}
-                                </span>;
-                              }
                               if (sort === 'fedex-points') {
                                 const pts = runnerStats?.points;
                                 if (!pts || pts <= 0) return null;
-                                return <span style={{ fontSize: '10px' }}>
-                                  <span style={{ fontWeight: 800, color: '#F7931E' }}>{pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                                </span>;
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                  {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} pts
+                                </div>;
+                              }
+                              if (sort === 'highest-earnings') {
+                                const earn = runnerStats?.earnings;
+                                if (!earn || earn <= 0) return null;
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                  {earn >= 1_000_000 ? `$${(earn / 1_000_000).toFixed(1)}M` : `$${(earn / 1_000).toFixed(0)}K`}
+                                </div>;
                               }
                               if (sort === 'most-wins') {
                                 const wins = runnerStats?.wins;
                                 if (!wins || wins <= 0) return null;
-                                return <span style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E' }}>
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                                   {wins} {wins === 1 ? 'win' : 'wins'}
-                                </span>;
+                                </div>;
                               }
-                              const pts = runnerStats?.points ?? player.totalPoints ?? player.avgPoints;
+                              if (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') {
+                                const pts = player.avgPoints;
+                                if (!pts || pts <= 0) return null;
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                  {pts.toFixed(2)}pts
+                                </div>;
+                              }
+                              const pts = runnerStats?.points ?? player.avgPoints;
                               if (!pts || pts <= 0) return null;
-                              return <span style={{ fontSize: '10px' }}>
-                                <span style={{ fontWeight: 800, color: '#F7931E' }}>{pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                              </span>;
+                              return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
+                              </div>;
                             })()}
                           </div>
                         </div>
