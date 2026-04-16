@@ -48,6 +48,10 @@ const getInitials = (name: string) => {
   return name.slice(0, 2).toUpperCase();
 };
 
+const Divider = () => (
+  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
+);
+
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseId,
   courseName,
