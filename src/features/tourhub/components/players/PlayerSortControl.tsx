@@ -85,7 +85,6 @@ const PGAD_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }
 
 const LIV_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'liv-standings', label: 'Standings', shortLabel: 'Standings' },
-  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
 ];
