@@ -95,6 +95,18 @@ export function ScheduleTab() {
     });
   }, []);
 
+  // Detect when tabs become sticky
+  useEffect(() => {
+    const sentinel = stickysentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsTabsSticky(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
   // Default to upcoming tab on fresh mount (no filter param in URL)
   useEffect(() => {
     if (!searchParams.get('filter')) {
