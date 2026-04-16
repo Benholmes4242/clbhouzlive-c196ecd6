@@ -440,15 +440,15 @@ export function ScheduleTab() {
           )}
 
           {/* Live Now — reuse the Tour Overview component */}
-          <LiveRightNow />
+          <div style={{ paddingBottom: 12 }}>
+            <LiveRightNow />
+          </div>
 
         </div>
       )}
 
-      {/* Hero Carousel — identical to Overview */}
-      {!search && (
-        <HeroCarousel hasHeader={false} />
-      )}
+
+
 
       {/* Content below hero */}
       <div
