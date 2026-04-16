@@ -381,41 +381,47 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Empty state
   if (!hasRatings) {
     return (
-      <div className="flex flex-col px-4 pt-8 pb-8">
-        <div style={{ padding: '28px 24px', textAlign: 'center' }}>
-          <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 14 }}>⚡ Reviews</div>
-          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(247,147,30,0.08)', border: '1.5px solid rgba(247,147,30,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-            <span style={{ fontSize: 26 }}>⭐</span>
+      <div style={{ paddingBottom: 40 }}>
+        {/* Hero */}
+        <div style={{ padding: '40px 24px 28px', textAlign: 'center' }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}>
+            ⭐
           </div>
-          <p style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: '0 0 6px' }}>No reviews yet</p>
-          <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 18, lineHeight: 1.5, maxWidth: 260, marginLeft: 'auto', marginRight: 'auto' }}>
+          <div style={{ fontSize: 19, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
+          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
             Be the first to share your experience at {courseName}.
           </p>
           <button
             type="button"
             onClick={handleRateClick}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: '#F7931E', color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.25)' }}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
           >
             Write the first review
           </button>
         </div>
-        {/* Supporting tips card */}
-        <div style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', borderRadius: 12, padding: '14px 16px', marginTop: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>What to include</span>
+        <div style={{ margin: '0 16px' }}><Divider /></div>
+        {/* What to include guide */}
+        <div style={{ padding: '20px 16px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to include</span>
           </div>
           {[
-            { icon: '🏌️‍♂️', label: 'Course condition — greens, fairways, bunkers' },
-            { icon: '🏌️', label: 'Layout and design — challenge, variety, scenery' },
-            { icon: '🏠', label: 'Facilities — clubhouse, practice areas, service' },
-          ].map(({ icon, label }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <span style={{ fontSize: 16 }}>{icon}</span>
-              <span style={{ fontSize: 13, color: '#64748B' }}>{label}</span>
+            { icon: '⛳', label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
+            { icon: '🏔️', label: 'Layout & design', sub: 'Challenge, variety, scenery, routing' },
+            { icon: '🏠', label: 'Facilities', sub: 'Clubhouse, practice areas, service' },
+            { icon: '💰', label: 'Value', sub: 'Was it worth the green fee?' },
+          ].map(({ icon, label, sub }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(15,23,42,0.02)', border: '0.5px solid rgba(15,23,42,0.06)' }}>
+              <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, color: '#94A3B8' }}>{sub}</div>
+              </div>
             </div>
           ))}
         </div>
+        <ScrollToTopGlass />
       </div>
     );
   }
