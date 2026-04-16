@@ -30,7 +30,7 @@ export function useCollegeCompare(c1: string | undefined, c2: string | undefined
   const { data: collegeMap } = useCollegeMediaMap();
   
   return useQuery({
-    queryKey: ['college-compare', c1, c2, seasonId],
+    queryKey: ['college-compare', c1, c2, seasonId, collegeMap ? 'map-ready' : 'map-loading'],
     queryFn: async (): Promise<CollegeCompareData> => {
       if (!c1 || !c2 || !seasonId) {
         return {
@@ -78,7 +78,7 @@ export function useCollegeCompare(c1: string | undefined, c2: string | undefined
         },
       };
     },
-    enabled: !!c1 && !!c2 && !!seasonId,
+    enabled: !!c1 && !!c2 && !!seasonId && !!collegeMap,
     staleTime: 5 * 60 * 1000,
   });
 }
