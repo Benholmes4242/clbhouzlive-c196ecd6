@@ -42,7 +42,6 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       </div>
 
       <div style={{ display: 'flex', gap: 10 }}>
-        <div style={{ width: 3, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
         <div>
           <p style={{ fontSize: 13, color: '#475569', margin: 0, lineHeight: 1.6 }}>
             {insight.primaryText}
