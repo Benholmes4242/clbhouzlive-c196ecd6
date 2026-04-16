@@ -1,7 +1,6 @@
 /**
  * useWorldRankingsLeaders — Fetches world rankings from sr_world_rankings.
- * Extracts avg_points from raw_data.statistics since the column is unpopulated.
- * Returns ranked players with avg points for the Leaders tab World category.
+ * Returns ranked players with total points for the Leaders tab World category.
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -11,6 +10,7 @@ export interface WorldRankEntry {
   id: string;
   rank: number;
   priorRank: number | null;
+  totalPoints: number;
   avgPoints: number;
   playerId: string;
   player: {
@@ -35,6 +35,7 @@ export function useWorldRankingsLeaders(limit = 50) {
           rank,
           prior_rank,
           avg_points,
+          points,
           raw_data,
           ranking_date,
           player_id,
@@ -68,6 +69,9 @@ export function useWorldRankingsLeaders(limit = 50) {
         .filter((d) => d.player && d.rank > 0)
         .map((d) => {
           const rawStats = (d.raw_data as any)?.statistics;
+          const totalPts =
+            d.points ??
+            (rawStats?.points ? Number(rawStats.points) : 0);
           const avgPts =
             d.avg_points ??
             (rawStats?.avg_points ? Number(rawStats.avg_points) : 0);
@@ -76,6 +80,7 @@ export function useWorldRankingsLeaders(limit = 50) {
             id: d.id,
             rank: d.rank,
             priorRank: d.prior_rank,
+            totalPoints: totalPts,
             avgPoints: avgPts,
             playerId: d.player_id!,
             player: d.player as any,
