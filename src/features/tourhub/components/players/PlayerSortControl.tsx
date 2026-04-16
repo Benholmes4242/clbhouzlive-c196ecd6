@@ -79,7 +79,6 @@ const LPGA_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }
 
 const PGAD_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
   { value: 'points-list', label: 'Points List', shortLabel: 'Points List' },
-  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
   { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
   { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
 ];
