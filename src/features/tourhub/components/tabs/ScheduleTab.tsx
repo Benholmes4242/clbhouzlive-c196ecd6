@@ -374,7 +374,7 @@ export function ScheduleTab() {
       
       {/* ── SCHEDULE MASTHEAD ── */}
       {!search && (
-        <div style={{ padding: '0 20px', background: '#F8FAFC' }}>
+        <div style={{ padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0', background: '#F8FAFC' }}>
 
           {/* Eyebrow */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, paddingTop: 8 }}>
