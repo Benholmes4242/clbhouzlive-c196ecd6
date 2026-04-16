@@ -5,53 +5,76 @@ import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
-import { ChevronRight } from 'lucide-react';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { SectionHeading } from './SectionHeading';
 import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
-
-// LocalMediaItem interface
-interface LocalMediaItem {
-  id: string;
-  source: 'post' | 'review';
-  sourceId: string;
-  type: 'image' | 'video';
-  url: string;
-  thumbnailUrl?: string;
-  width?: number;
-  height?: number;
-  createdAt: string;
-  author: {
-    id: string;
-    displayName: string;
-    username?: string;
-    avatarUrl?: string;
-  };
-  placeholder?: boolean;
-}
 
 interface AboutMediaStripProps {
   clubId: string;
   onSeeAllClick: () => void;
 }
 
+const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () => void }> = ({
+  photoCount,
+  videoCount,
+  onSeeAll,
+}) => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 16px',
+      marginBottom: 10,
+    }}
+  >
+    <div>
+      <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>Media</div>
+      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+        {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount}{' '}
+        {videoCount === 1 ? 'video' : 'videos'}
+      </div>
+    </div>
+    {onSeeAll && (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onSeeAll();
+        }}
+        style={{
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: 12,
+          fontWeight: 700,
+          color: '#0F172A',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        See all <span style={{ fontSize: 14, color: '#CBD5E1' }}>›</span>
+      </button>
+    )}
+  </div>
+);
+
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
+
   const maxItems = isMobile ? 3 : 9;
   const fetchLimit = isMobile ? 10 : 20;
 
   const { data: rawMedia, isLoading: loading } = useClubMedia(clubId, fetchLimit);
-  
+
   const items = useMemo(() => {
     if (!rawMedia) return [];
     const sliced = rawMedia.slice(0, maxItems);
     return adaptClubMediaArrayToExploreItems(sliced);
   }, [rawMedia, maxItems]);
 
-  // Build FeedPost[] for CourseMediaViewer
   const feedPosts = useMemo((): FeedPost[] => {
     if (!rawMedia) return [];
     return rawMedia.slice(0, maxItems).map((item: any) => {
@@ -96,11 +119,12 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       const u = new URL(hls);
       const parts = u.pathname.split('/').filter(Boolean);
       return parts[0] || null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   };
 
-  const streamThumb = (uid: string) =>
-    generateStreamThumbnailUrl(uid);
+  const streamThumb = (uid: string) => generateStreamThumbnailUrl(uid);
 
   const mediaTiles = (items ?? []).slice(0, maxItems).map((item) => {
     const src = item.src ?? '';
@@ -132,8 +156,6 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     };
   });
 
-  const displayItems = Array.from({ length: maxItems }, (_, i) => mediaTiles[i] || null);
-
   const { photoCount, videoCount, totalCount } = useMemo(() => {
     if (loading || !rawMedia) return { photoCount: 0, videoCount: 0, totalCount: 0 };
     const photos = rawMedia.filter((m: any) => m.type === 'image').length;
@@ -147,79 +169,101 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   if (loading) {
     return (
-      <>
-        <div className="flex items-center justify-between mb-3 px-4">
-          <SectionHeading title="Media" />
-        </div>
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
+      <div>
+        <Header photoCount={0} videoCount={0} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }}>
           {Array.from({ length: maxItems }).map((_, i) => (
-            <div key={i} className="aspect-square bg-muted/70 animate-pulse border border-border/60 sm:border-border/40" />
+            <div
+              key={i}
+              style={{
+                aspectRatio: '1',
+                borderRadius: 10,
+                background: 'rgba(15,23,42,0.06)',
+              }}
+            />
           ))}
         </div>
-      </>
+      </div>
     );
   }
 
-  // Empty state
+  // Empty state — small ghost grid + prompt
   if (!hasMedia) {
     return (
-      <>
-        <div className="px-4 mb-3">
-          <SectionHeading title="Media" />
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', marginBottom: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>Media</div>
         </div>
-        <div className="px-4">
-          <div className="px-4 py-5 text-center">
-            <p className="text-sm font-semibold text-foreground mb-1">
-              No photos or videos yet
-            </p>
-            <p className="text-sm text-muted-foreground mb-4">
-              Help other golfers discover this course — be the first to share your experience.
-            </p>
-            <button
-              type="button"
-              onClick={() => navigate(`/courses/${clubId}/rate`)}
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-card text-foreground border border-border/60 hover:bg-muted active:scale-[0.98] transition"
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 4,
+            padding: '0 16px',
+            marginBottom: 12,
+          }}
+        >
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                aspectRatio: '1',
+                borderRadius: 10,
+                background: 'rgba(15,23,42,0.04)',
+                border: '1px dashed rgba(15,23,42,0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 22,
+              }}
             >
-              Share your experience
-            </button>
-          </div>
+              {i === 0 ? '📷' : i === 1 ? '🎬' : '⛳'}
+            </div>
+          ))}
         </div>
-      </>
+
+        <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 14px', lineHeight: 1.5 }}>
+          No photos or videos yet — be the first to share your experience.
+        </p>
+
+        <div style={{ padding: '0 16px' }}>
+          <button
+            type="button"
+            onClick={() => navigate(`/courses/${clubId}/rate`)}
+            style={{
+              width: '100%',
+              padding: '12px 0',
+              borderRadius: 12,
+              background: 'transparent',
+              border: '1.5px solid rgba(15,23,42,0.1)',
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#0F172A',
+              cursor: 'pointer',
+            }}
+          >
+            Share your experience
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-3 px-4">
-        <div>
-          <SectionHeading title="Media" />
-          <p className="mt-1 ml-11 text-sm font-semibold text-muted-foreground">
-            {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount} {videoCount === 1 ? 'video' : 'videos'}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-foreground/80 active:scale-[0.98] transition-all"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSeeAllClick();
-          }}
-        >
-          <span>See all</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </button>
-      </div>
+    <div>
+      <Header photoCount={photoCount} videoCount={videoCount} onSeeAll={onSeeAllClick} />
 
-      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }}>
         {mediaTiles.map((media, index) => {
           const isLastTile = index === mediaTiles.length - 1;
           const showOverflow = isLastTile && overflowCount > 0;
-          
+
           return (
             <button
               key={media.id}
               type="button"
-            onClick={(e) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 if (showOverflow) {
                   onSeeAllClick();
@@ -227,27 +271,39 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   useCourseMediaViewerStore.getState().open(feedPosts, index);
                 }
               }}
-              className="relative overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow hover:shadow-md border border-border/60 sm:border-border/40 active:scale-[0.98]"
+              style={{
+                position: 'relative',
+                aspectRatio: '1',
+                borderRadius: 10,
+                overflow: 'hidden',
+                padding: 0,
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+              }}
               aria-label="Open Media tab"
             >
-              <SquareCardMedia
-                media={media}
-                cardType={CardType.SQUARE}
-                className="w-full h-full"
-              />
-              
+              <SquareCardMedia media={media} cardType={CardType.SQUARE} className="w-full h-full" />
+
               {showOverflow && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span className="text-white text-xl font-semibold">
-                    +{overflowCount}
-                  </span>
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <span style={{ color: '#fff', fontSize: 18, fontWeight: 700 }}>+{overflowCount}</span>
                 </div>
               )}
             </button>
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,13 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import {
   dbValueToRegionKey,
   normalizeLabel,
   getRegionFromSubregion,
   type PrimaryRegionKey,
 } from '@/constants/courseRegions';
-import { SectionHeading } from './SectionHeading';
 
 interface Course {
   id: string;
@@ -31,7 +29,7 @@ interface CourseExploreLinksProps {
 const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
   const navigate = useNavigate();
 
-  const primaryRegionKey: PrimaryRegionKey = 
+  const primaryRegionKey: PrimaryRegionKey =
     (course.sub_country ? getRegionFromSubregion(course.sub_country) : null) ||
     dbValueToRegionKey(course.region || course.country);
 
@@ -42,67 +40,97 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
   const primaryListSlug = membership?.top100_lists?.slug ?? 'global-top-100';
   const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
+  const normalizeListSlug = (dbSlug: string): string => {
+    const slug = dbSlug.toLowerCase();
+    if (slug.includes('gb-i') || slug.includes('britain') || slug.includes('ireland')) return 'gb-i';
+    if (slug.includes('usa') || slug.includes('united-states')) return 'usa';
+    if (slug.includes('europe')) return 'europe';
+    if (slug.includes('rest')) return 'rest';
+    if (slug.includes('global') || slug.includes('world')) return 'global';
+    return 'global';
+  };
+
+  const links: { label: React.ReactNode; onClick: () => void }[] = [];
+
+  if (subCountryLabel) {
+    links.push({
+      label: (
+        <>
+          More <span style={{ fontWeight: 700 }}>{subCountryLabel}</span> courses
+        </>
+      ),
+      onClick: () => {
+        const params = new URLSearchParams({
+          tab: 'explore',
+          region: primaryRegionKey,
+          sub: subKey || '',
+        });
+        navigate(`/courses?${params.toString()}`);
+      },
+    });
+  }
+
+  links.push({
+    label: (
+      <>
+        Explore{' '}
+        <span style={{ fontWeight: 700 }}>
+          {primaryListName.includes('Top 100') ? primaryListName : `${primaryListName} Top 100`}
+        </span>
+      </>
+    ),
+    onClick: () => {
+      const params = new URLSearchParams({
+        tab: 'top100',
+        list: normalizeListSlug(primaryListSlug),
+      });
+      navigate(`/courses?${params.toString()}`);
+    },
+  });
+
   return (
-    <div className="px-4 pt-4 pb-2">
-      <div className="mb-3">
-        <SectionHeading title="Explore More" />
+    <div>
+      {/* Section header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', marginBottom: 6 }}>
+        <div style={{ width: 3, height: 13, background: '#0F172A', borderRadius: 1 }} />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 900,
+            color: '#0F172A',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase' as const,
+          }}
+        >
+          Explore More
+        </span>
       </div>
-      
-      <div className="space-y-2">
-        {/* Sub-country filter */}
-        {subCountryLabel && (
+
+      {links.map((l, i) => (
+        <div key={i}>
           <button
             type="button"
-            onClick={() => {
-              const params = new URLSearchParams({
-                tab: 'explore',
-                region: primaryRegionKey,
-                sub: subKey || '',
-              });
-              navigate(`/courses?${params.toString()}`);
+            onClick={l.onClick}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 16px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              textAlign: 'left',
             }}
-            className="w-full flex items-center justify-between px-0 py-3 min-h-[44px] text-base text-foreground group hover:opacity-70 transition-opacity active:scale-[0.98]"
           >
-            <span>
-              Explore more <span className="font-semibold">{subCountryLabel}</span> courses
-            </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>{l.label}</span>
+            <span style={{ fontSize: 16, color: '#CBD5E1' }}>›</span>
           </button>
-        )}
-
-        {/* Divider */}
-        <div className="flex justify-center py-0.5">
-          <div className="w-[85%] h-[0.7px] bg-border" />
+          {i < links.length - 1 && (
+            <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px' }} />
+          )}
         </div>
-
-        {/* List-specific Top 100 */}
-        <button
-          type="button"
-          onClick={() => {
-            const normalizeListSlug = (dbSlug: string): string => {
-              const slug = dbSlug.toLowerCase();
-              if (slug.includes('gb-i') || slug.includes('britain') || slug.includes('ireland')) return 'gb-i';
-              if (slug.includes('usa') || slug.includes('united-states')) return 'usa';
-              if (slug.includes('europe')) return 'europe';
-              if (slug.includes('rest')) return 'rest';
-              if (slug.includes('global') || slug.includes('world')) return 'global';
-              return 'global';
-            };
-            
-            const params = new URLSearchParams({
-              tab: 'top100',
-              list: normalizeListSlug(primaryListSlug),
-            });
-            navigate(`/courses?${params.toString()}`);
-          }}
-          className="w-full flex items-center justify-between px-0 py-3 min-h-[44px] text-base text-foreground group hover:opacity-70 transition-opacity active:scale-[0.98]"
-        >
-          <span>
-            Explore <span className="font-semibold">{primaryListName.includes('Top 100') ? primaryListName : `${primaryListName} Top 100`}</span>
-          </span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-        </button>
-      </div>
+      ))}
     </div>
   );
 };

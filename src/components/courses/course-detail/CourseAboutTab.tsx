@@ -131,8 +131,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationPills course={course} />
 
       {/* 2. Community Rating — CommunityScoreCard renders its own header internally, no SectionLabel */}
-      <div style={{ padding: '20px 0 0' }}>
-        <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: '20px 16px 0' }}>
+        <div>
           <CommunityScoreCard
             courseId={course.id}
             courseName={course.name}
@@ -175,7 +175,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* 4. Friends Who've Played */}
-      <section style={{ padding: '0 16px' }}>
+      <section>
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
