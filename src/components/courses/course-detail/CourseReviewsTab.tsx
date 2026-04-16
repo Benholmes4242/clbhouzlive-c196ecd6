@@ -428,7 +428,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-    <div style={{ paddingBottom: 40 }}>
+    <div style={{ paddingBottom: 40, background: '#F8FAFC', minHeight: '100%' }}>
       {/* Community score header */}
       <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
         <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 8 }}>⚡ Community Score</div>
@@ -499,28 +499,23 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Your review — pinned first */}
       {filteredMyReview && (
-        <div style={{ borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '14px 16px 0' }}>
-            <div style={{ width: 3, height: 11, background: '#F7931E', borderRadius: 1 }} />
-            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Your Review</span>
-          </div>
-          <div style={{ padding: '0 16px 14px' }}>
-            <ReviewBlockFlat
-              review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
-              isMine
-              isHighlighted={isJustSubmittedOrUpdated}
-              onToggleHelpful={handleToggleHelpful}
-              onMediaClick={(index) => {
-                if (filteredMyReview.media) handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview);
-              }}
-              onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
-            />
-            {(() => {
-              const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
-              if (response) return <ResponseDisplay response={response} />;
-              return null;
-            })()}
-          </div>
+        <div style={{ padding: '0 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+          <ReviewBlockFlat
+            review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
+            isMine
+            isHighlighted={isJustSubmittedOrUpdated}
+            onToggleHelpful={handleToggleHelpful}
+            onEditClick={handleRateClick}
+            onMediaClick={(index) => {
+              if (filteredMyReview.media) handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview);
+            }}
+            onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
+          />
+          {(() => {
+            const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
+            if (response) return <div style={{ paddingBottom: 14 }}><ResponseDisplay response={response} /></div>;
+            return null;
+          })()}
         </div>
       )}
 
