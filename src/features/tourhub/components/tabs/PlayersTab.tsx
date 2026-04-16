@@ -32,6 +32,7 @@ function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
     'alpha-za': 'Z–A',
     'most-wins': 'Wins',
     'highest-earnings': 'Earnings',
+    'fedex-points': 'FedEx',
     'race-to-dubai': 'Race to Dubai',
     'race-to-cme': 'Race to CME Globe',
     'points-list': 'Points List',
@@ -172,8 +173,8 @@ export function PlayersTab() {
         map.set(ps.player_id, { 
           earnings: ps.earnings, 
           wins: ps.wins,
-          tourRank: ps.earnings_rank ?? ps.fedex_rank ?? null,
-          points: null,
+          tourRank: ps.fedex_rank ?? ps.earnings_rank ?? null,
+          points: ps.fedex_points ?? null,
           tournamentsPlayed: null,
         });
       });
@@ -249,6 +250,12 @@ export function PlayersTab() {
             const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
             return aRank - bRank;
           }
+          case 'fedex-points': {
+            const aPts = aStats?.points ?? 0;
+            const bPts = bStats?.points ?? 0;
+            if (bPts !== aPts) return bPts - aPts;
+            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+          }
           case 'race-to-dubai':
           case 'race-to-cme':
           case 'points-list':
@@ -278,7 +285,7 @@ export function PlayersTab() {
       return false;
     });
 
-    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings';
+    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings';
     
     const toEliteShape = (p: TourPlayer): ElitePlayer => ({
       id: p.id,
@@ -360,6 +367,11 @@ export function PlayersTab() {
       });
     }
 
+    // FedEx tab: only show players with FedEx points
+    if (sort === 'fedex-points') {
+      filtered = filtered.filter(p => (statsMap.get(p.id)?.points ?? 0) > 0);
+    }
+
     filtered = [...filtered].sort((a, b) => {
       const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
       const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
@@ -402,6 +414,12 @@ export function PlayersTab() {
           const aEarn = statsMap.get(a.id)?.earnings ?? 0;
           const bEarn = statsMap.get(b.id)?.earnings ?? 0;
           return bEarn - aEarn || aRank - bRank;
+        }
+        case 'fedex-points': {
+          const apts = statsMap.get(a.id)?.points ?? 0;
+          const bpts = statsMap.get(b.id)?.points ?? 0;
+          if (bpts !== apts) return bpts - apts;
+          return (rankMap.get(a.id)?.worldRank ?? Infinity) - (rankMap.get(b.id)?.worldRank ?? Infinity);
         }
         case 'race-to-dubai':
         case 'race-to-cme':
@@ -584,6 +602,15 @@ export function PlayersTab() {
                         <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>earnings</span>
                       </div>
                     )
+                  ) : sort === 'fedex-points' ? (
+                    champStats?.points != null && champStats.points > 0 && (
+                      <div>
+                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
+                          {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        </span>
+                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>FedEx pts</span>
+                      </div>
+                    )
                   ) : sort === 'most-wins' ? (
                     (champStats?.wins ?? 0) > 0 && (
                       <div>
@@ -632,6 +659,7 @@ export function PlayersTab() {
                   <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                     {sort === 'highest-earnings' ? 'Top Earners · 2–5'
                       : sort === 'most-wins' ? 'Most Wins · 2–5'
+                      : sort === 'fedex-points' ? 'FedEx Cup · 2–5'
                       : 'Tour Rankings · 2–5'}
                   </span>
                 </div>
@@ -674,6 +702,13 @@ export function PlayersTab() {
                               if (!earn || earn <= 0) return null;
                               return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                                 {earn >= 1_000_000 ? `$${(earn / 1_000_000).toFixed(1)}M` : `$${(earn / 1_000).toFixed(0)}K`}
+                              </div>;
+                            }
+                            if (sort === 'fedex-points') {
+                              const pts = runnerStats?.points;
+                              if (!pts || pts <= 0) return null;
+                              return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} pts
                               </div>;
                             }
                             if (sort === 'most-wins') {
@@ -802,8 +837,9 @@ export function PlayersTab() {
         {/* Underline sort tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
           {[
-                { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
-                { value: 'most-wins' as PlayerSortType, label: 'Wins' },
+                { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: activeTour === 'pga' ? 'World Ranking' : getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
+                ...(activeTour === 'pga' ? [{ value: 'fedex-points' as PlayerSortType, label: 'FedEx' }] : []),
+                ...(activeTour === 'pga' ? [] : [{ value: 'most-wins' as PlayerSortType, label: 'Wins' }]),
                 { value: 'highest-earnings' as PlayerSortType, label: 'Earnings' },
                 { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
               ].filter((tab, i, arr) => i === arr.findIndex(t => t.value === tab.value))
@@ -858,8 +894,8 @@ export function PlayersTab() {
             : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isPGA  ? [{ value: 'world-rank-desc', label: 'Highest World Ranking' }, { value: 'highest-earnings', label: 'Highest Earnings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : [{ value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }];
+            : isPGA  ? [{ value: 'world-rank-desc', label: 'World Ranking' }, { value: 'fedex-points', label: 'FedEx Cup Points' }, { value: 'highest-earnings', label: 'Earnings' }, { value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }]
+            : [{ value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }];
           return opts.map(opt => (
             <button
               key={opt.value}
