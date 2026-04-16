@@ -27,22 +27,21 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="px-4 pt-3 pb-2 flex flex-col gap-3">
-      {/* Summary row - hidden when both counts are 0 */}
+    <div style={{ padding: '12px 16px 10px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* Count row + Add media */}
       {(mediaCounts.photos > 0 || mediaCounts.videos > 0) && (
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748B' }}>
             <Camera className="w-3.5 h-3.5" />
-            <span className="animate-in fade-in duration-300">
-              <span className="font-semibold text-foreground">{mediaCounts.photos}</span> photos
+            <span>
+              <b style={{ color: '#0F172A' }}>{mediaCounts.photos}</b> photos
               {' · '}
-              <span className="font-semibold text-foreground">{mediaCounts.videos}</span> videos
+              <b style={{ color: '#0F172A' }}>{mediaCounts.videos}</b> videos
             </span>
           </div>
           <button
             onClick={() => navigate(`/courses/${courseId}/rate`)}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold active:scale-[0.97] transition-all min-h-[36px]"
-            style={{ borderRadius: 8, background: 'hsl(var(--muted))', color: 'hsl(var(--foreground))', border: 'none' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'rgba(15,23,42,0.05)', border: 'none', fontSize: 12, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
           >
             <Plus className="w-3.5 h-3.5" />
             Add media
@@ -50,21 +49,15 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         </div>
       )}
 
-      {/* Filter chips — pill style */}
-      <div className="flex items-center justify-center gap-2">
+      {/* Filter chips */}
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
         {FILTERS.map(({ key, label }) => {
           const isActive = activeFilter === key;
           return (
             <button
               key={key}
               onClick={() => onFilterChange(key)}
-              className="min-h-[34px] px-4 text-sm font-semibold transition-colors active:scale-[0.97]"
-              style={{
-                borderRadius: 8,
-                background: isActive ? '#0F172A' : 'transparent',
-                color: isActive ? '#ffffff' : 'hsl(var(--muted-foreground))',
-                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
-              }}
+              style={{ padding: '6px 18px', borderRadius: 8, fontSize: 12, fontWeight: isActive ? 800 : 600, background: isActive ? '#0F172A' : 'transparent', color: isActive ? '#fff' : '#94A3B8', border: isActive ? 'none' : '1px solid rgba(15,23,42,0.1)', cursor: 'pointer', minHeight: 34 }}
             >
               {label}
             </button>
