@@ -380,7 +380,7 @@ export function ScheduleTab() {
 
           {/* Eyebrow */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, paddingTop: 8 }}>
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1 }} />
+            
             <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
               ⚡ Clbhouz · Tour Hub
             </span>
