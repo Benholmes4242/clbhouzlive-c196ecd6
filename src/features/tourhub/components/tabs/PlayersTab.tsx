@@ -634,9 +634,9 @@ export function PlayersTab() {
                       const tourPts = champStats?.points != null && champStats.points > 0 && sort !== 'world-rank-desc' && sort !== 'alpha-az' && sort !== 'alpha-za'
                         ? champStats.points
                         : null;
-                      const owgrPts = champion.avgPoints;
+                      const owgrPts = champion.totalPoints ?? champion.avgPoints;
                       const displayPts = tourPts ?? owgrPts;
-                      const label = (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') ? 'avg pts' : 'pts';
+                      const label = (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') ? 'total pts' : 'pts';
                       return displayPts != null ? (
                         <div>
                           <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
@@ -743,10 +743,10 @@ export function PlayersTab() {
                                 </div>;
                               }
                               if (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') {
-                                const pts = player.avgPoints;
+                                const pts = player.totalPoints ?? player.avgPoints;
                                 if (!pts || pts <= 0) return null;
                                 return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                  {pts.toFixed(2)}pts
+                                  {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
                                 </div>;
                               }
                               const pts = runnerStats?.points ?? player.avgPoints;
