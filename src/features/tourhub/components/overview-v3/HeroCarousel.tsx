@@ -2063,9 +2063,9 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
                   ) : isLive ? (
                     <span style={{ fontSize: '7px', fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>LIVE</span>
                   ) : slide.type === 'upcoming' ? (
-                    <span style={{ fontSize: '7px', color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>Soon</span>
+                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>SOON</span>
                   ) : (
-                    <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>Final</span>
+                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>FINAL</span>
                   )}
                 </button>
               );
