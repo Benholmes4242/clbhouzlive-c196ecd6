@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2 } from 'lucide-react';
 
 interface ClaimCourseCTAProps {
   clubId: string;
@@ -20,32 +19,34 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
   };
 
   return (
-    <section className="px-4 py-5">
-      <div className="p-6 text-center">
-        <div className="mx-auto mb-3 h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-          <Building2 className="h-6 w-6 text-muted-foreground" />
-        </div>
-        <h3 className="text-base font-semibold text-foreground mb-1">
-          Own or manage this course?
-        </h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Claim this course to respond to reviews, update information, and access insights.
-        </p>
-        <button
-          onClick={handleClaim}
-          className="active:scale-[0.97] transition-all"
-          style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            padding: '10px 24px', borderRadius: 999,
-            background: 'rgba(247,147,30,0.10)',
-            border: '1px solid rgba(247,147,30,0.25)',
-            color: '#F7931E', fontSize: 14, fontWeight: 600,
-          }}
-        >
-          Claim this course →
-        </button>
+    <div style={{ padding: '8px 16px', textAlign: 'center' }}>
+      <div style={{ fontSize: 20, marginBottom: 8 }}>🏌️</div>
+      <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>
+        Own or manage this course?
       </div>
-    </section>
+      <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 0 14px', lineHeight: 1.5 }}>
+        Claim this listing to respond to reviews and update information.
+      </p>
+      <button
+        type="button"
+        onClick={handleClaim}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '10px 22px',
+          borderRadius: 20,
+          background: 'transparent',
+          border: '1.5px solid #F7931E',
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#F7931E',
+          cursor: 'pointer',
+        }}
+      >
+        Claim this course →
+      </button>
+    </div>
   );
 };
 

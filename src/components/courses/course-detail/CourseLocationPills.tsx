@@ -21,13 +21,28 @@ interface CourseLocationPillsProps {
   course: Course;
 }
 
-const pillClass =
-  "inline-flex items-center px-3 py-2 min-h-[44px] rounded-full bg-card border border-border/60 hover:bg-muted transition-colors active:scale-[0.98] text-foreground";
+const pillStyle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 600,
+  color: '#64748B',
+  background: '#ffffff',
+  border: '1px solid rgba(15,23,42,0.08)',
+  borderRadius: 20,
+  padding: '3px 10px',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+};
+
+const sepStyle: React.CSSProperties = {
+  fontSize: 10,
+  color: '#CBD5E1',
+};
 
 const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => {
   const navigate = useNavigate();
 
-  const primaryRegionKey: PrimaryRegionKey = 
+  const primaryRegionKey: PrimaryRegionKey =
     (course.sub_country ? getRegionFromSubregion(course.sub_country) : null) ||
     dbValueToRegionKey(course.region || course.country);
 
@@ -42,66 +57,58 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
   if (!primaryRegionLabel) return null;
 
   return (
-    <div className="px-4 pt-3 pb-0">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        {/* Level 1 – Primary region */}
-        <button
-          type="button"
-          onClick={() => {
-            const params = new URLSearchParams({
-              tab: 'explore',
-              region: primaryRegionKey,
-            });
-            navigate(`/courses?${params.toString()}`);
-          }}
-          className={pillClass}
-        >
-          {primaryRegionLabel}
-        </button>
+    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, padding: '14px 16px 0' }}>
+      <button
+        type="button"
+        onClick={() => {
+          const params = new URLSearchParams({ tab: 'explore', region: primaryRegionKey });
+          navigate(`/courses?${params.toString()}`);
+        }}
+        style={pillStyle}
+      >
+        {primaryRegionLabel}
+      </button>
 
-        {/* → separator & Level 2 – Sub-country */}
-        {subCountryLabel && (
-          <>
-            <span className="text-muted-foreground/50">›</span>
-            <button
-              type="button"
-              onClick={() => {
-                const params = new URLSearchParams({
-                  tab: 'explore',
-                  region: primaryRegionKey,
-                  sub: subKey || '',
-                });
-                navigate(`/courses?${params.toString()}`);
-              }}
-              className={pillClass}
-            >
-              {subCountryLabel}
-            </button>
-          </>
-        )}
+      {subCountryLabel && (
+        <>
+          <span style={sepStyle}>›</span>
+          <button
+            type="button"
+            onClick={() => {
+              const params = new URLSearchParams({
+                tab: 'explore',
+                region: primaryRegionKey,
+                sub: subKey || '',
+              });
+              navigate(`/courses?${params.toString()}`);
+            }}
+            style={pillStyle}
+          >
+            {subCountryLabel}
+          </button>
+        </>
+      )}
 
-        {/* → separator & Level 3 – Local area / county / state */}
-        {localAreaLabel && (
-          <>
-            <span className="text-muted-foreground/50">›</span>
-            <button
-              type="button"
-              onClick={() => {
-                const params = new URLSearchParams({
-                  tab: 'explore',
-                  region: primaryRegionKey,
-                  ...(subKey ? { sub: subKey } : {}),
-                  query: localAreaLabel,
-                });
-                navigate(`/courses?${params.toString()}`);
-              }}
-              className={pillClass}
-            >
-              {localAreaLabel}
-            </button>
-          </>
-        )}
-      </div>
+      {localAreaLabel && (
+        <>
+          <span style={sepStyle}>›</span>
+          <button
+            type="button"
+            onClick={() => {
+              const params = new URLSearchParams({
+                tab: 'explore',
+                region: primaryRegionKey,
+                ...(subKey ? { sub: subKey } : {}),
+                query: localAreaLabel,
+              });
+              navigate(`/courses?${params.toString()}`);
+            }}
+            style={pillStyle}
+          >
+            {localAreaLabel}
+          </button>
+        </>
+      )}
     </div>
   );
 };
