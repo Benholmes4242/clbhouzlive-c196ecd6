@@ -126,195 +126,208 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="animate-in fade-in duration-200">
-      {/* 1. Location Pills */}
+    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80 }}>
+      {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
-      {/* 2. Community Rating Section */}
-      <section className="px-4 py-5 md:px-6 space-y-5">
-        <CommunityScoreCard
-          courseId={course.id}
-          courseName={course.name}
-          ratingAggregates={ratingAggregates}
-          userRating={userRating}
-          distribution={distribution}
-          onRateClick={handleRateClick}
-          onSeeAllReviews={() => onTabChange?.('reviews')}
-        />
-
-        {/* Edit/Rate button */}
-        {userRating && (
-          <div style={{ marginTop: 8 }}>
-            <button
-              onClick={handleRateClick}
-              style={{ width: '100%', padding: '11px 0', borderRadius: 10, background: 'transparent', border: '1px solid rgba(15,23,42,0.12)', fontSize: 13, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
-            >
-              ✏ Edit Your Rating
-            </button>
-          </div>
-        )}
-
-      </section>
-
-      {/* 3. Your Journey Section */}
-      {user && (
-        <section style={{ marginTop: 12 }}>
-          <PersonalSection courseId={course.id} courseName={course.name} />
-        </section>
-      )}
-
-      {/* 4. Friends Who've Played */}
-      <section className="px-4 pt-4 pb-4 md:px-6" style={{ marginTop: 12 }}>
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
-      </section>
-
-      {/* 5. About Section */}
-      {course.description && (
-        <section className="pt-8 pb-6 space-y-4 md:pt-10" style={{ marginTop: 12 }}>
-          <div className="px-5">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>About</span>
-            </div>
-          </div>
-          <div className="px-5 relative">
-            <div 
-              className={`text-base md:text-lg leading-relaxed text-muted-foreground ${
-                !showFullDescription && shouldShowReadMore ? 'relative' : ''
-              }`}
-            >
-              {formatDescription(displayDescription)}
-              {!showFullDescription && shouldShowReadMore && (
-                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-              )}
-            </div>
-            {shouldShowReadMore && (
+      {/* 2. Community Rating */}
+      <div style={{ padding: '22px 16px 0' }}>
+        <SectionLabel text="Community Rating" />
+        <div style={{ padding: '0 16px' }}>
+          <CommunityScoreCard
+            courseId={course.id}
+            courseName={course.name}
+            ratingAggregates={ratingAggregates}
+            userRating={userRating}
+            distribution={distribution}
+            onRateClick={handleRateClick}
+            onSeeAllReviews={() => onTabChange?.('reviews')}
+          />
+          <div style={{ marginTop: 12 }}>
+            {userRating ? (
               <button
-                onClick={() => setShowFullDescription(!showFullDescription)}
-                className="flex items-center gap-1.5 mt-3 min-h-[44px] text-base font-medium text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
+                onClick={handleRateClick}
+                style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', border: '1.5px solid rgba(15,23,42,0.1)', fontSize: 13, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
               >
-                <span>{showFullDescription ? 'Show less' : 'Read more'}</span>
-                {showFullDescription ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
+                ✏️ Edit Your Rating
+              </button>
+            ) : (
+              <button
+                onClick={handleRateClick}
+                style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
+              >
+                ⭐ Rate this course
               </button>
             )}
           </div>
-          {/* Suggest an edit - only for verified business members */}
-          {businessClaim?.isVerified && (
-            <button
-              type="button"
-              onClick={() => setShowSuggestEdit(true)}
-              className="flex items-center gap-1 mt-2 text-xs text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
-            >
-              <Pencil className="h-3 w-3" />
-              Suggest an edit
-            </button>
-          )}
-        </section>
+        </div>
+      </div>
+
+      <div style={{ margin: '24px 0' }}><Divider /></div>
+
+      {/* 3. Your Journey */}
+      {user && (
+        <>
+          <div style={{ padding: '0 16px' }}>
+            <SectionLabel text="Your Journey" />
+          </div>
+          <section style={{ padding: '0 16px' }}>
+            <PersonalSection courseId={course.id} courseName={course.name} />
+          </section>
+          <div style={{ margin: '24px 0' }}><Divider /></div>
+        </>
       )}
 
-      {/* Suggest Edit Modal */}
+      {/* 4. Friends Who've Played */}
+      <section style={{ padding: '0 16px' }}>
+        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
+      </section>
+
+      <div style={{ margin: '24px 0' }}><Divider /></div>
+
+      {/* 5. About */}
+      {course.description && (
+        <>
+          <div style={{ padding: '0 16px' }}>
+            <SectionLabel text="About" />
+            <div style={{ padding: '0 16px' }}>
+              <div style={{ fontSize: 14, color: '#475569', lineHeight: 1.7, position: 'relative' }}>
+                {formatDescription(displayDescription)}
+                {!showFullDescription && shouldShowReadMore && (
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: 'linear-gradient(to top, #F8FAFC, transparent)', pointerEvents: 'none' }} />
+                )}
+              </div>
+              {shouldShowReadMore && (
+                <button
+                  onClick={() => setShowFullDescription(!showFullDescription)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#94A3B8', padding: '8px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}
+                >
+                  {showFullDescription ? 'Show less ↑' : 'Read more ↓'}
+                </button>
+              )}
+              {businessClaim?.isVerified && (
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestEdit(true)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#94A3B8' }}
+                >
+                  <Pencil className="h-3 w-3" />
+                  Suggest an edit
+                </button>
+              )}
+            </div>
+          </div>
+          <div style={{ margin: '24px 0' }}><Divider /></div>
+        </>
+      )}
+
       {businessClaim?.isVerified && (
         <SuggestEditModal
           open={showSuggestEdit}
           onClose={() => setShowSuggestEdit(false)}
           courseId={course.id}
           businessId={businessClaim.businessId}
-          currentData={{
-            description: course.description,
-            website_url: course.website_url,
-          }}
+          currentData={{ description: course.description, website_url: course.website_url }}
         />
       )}
 
       {/* 6. Top 100 Spotlight */}
       {course.id && (
-        <section className="px-4 pt-5 pb-5 md:px-6" style={{ marginTop: 12 }}>
-          <CourseTop100Spotlight
-            courseId={course.id}
-            courseName={course.name}
-          />
-        </section>
+        <>
+          <div style={{ padding: '0 16px' }}>
+            <SectionLabel text="Top 100 Spotlight" accent />
+            <div style={{ margin: '0 0 0 0' }}>
+              <CourseTop100Spotlight courseId={course.id} courseName={course.name} />
+            </div>
+          </div>
+          <CourseTop100Summary />
+          <div style={{ margin: '24px 0' }}><Divider /></div>
+        </>
       )}
 
-      {/* 7. Top 100 mini-journey summary */}
-      <CourseTop100Summary />
-
-      {/* 8. Location Section */}
-      <section className="pt-6 pb-5 md:pt-8" style={{ marginTop: 12 }}>
-        <div className="px-5 mb-4">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Location</span>
+      {/* 7. Course stats grid */}
+      {(course.global_rank || course.usa_rank || course.country_rank) && (
+        <>
+          <div style={{ padding: '0 16px' }}>
+            <SectionLabel text="Course Details" />
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${[course.global_rank, course.usa_rank, course.country_rank].filter(Boolean).length}, 1fr)`, padding: '0 8px' }}>
+              {[
+                course.global_rank && { label: 'Global Rank', value: `#${course.global_rank}` },
+                course.usa_rank && { label: 'USA Rank', value: `#${course.usa_rank}` },
+                course.country_rank && { label: 'Country Rank', value: `#${course.country_rank}` },
+              ].filter(Boolean).map((s: any, i, arr) => (
+                <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.08)' : 'none' }}>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.04em' }}>{s.value}</div>
+                  <div style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        
-        {coordsLoading && (
-          <div className="px-4">
-            <Skeleton className="w-full h-[200px] rounded-sq-md" />
-          </div>
-        )}
+          <div style={{ margin: '24px 0' }}><Divider /></div>
+        </>
+      )}
 
+      {/* 8. Location */}
+      <section style={{ padding: '0 16px' }}>
+        <SectionLabel text="Location" />
+        {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl mx-auto" />}
         {coords && (
-          <div className="px-4">
-            <LocationMapCard
-              lat={coords.lat}
-              lng={coords.lng}
-              name={course.name}
-              locationText={formatCourseLocation(course)}
-              colorful
-            />
-          </div>
-        )}
-
-        {!coords && !coordsLoading && (
-          <div className="px-5">
-            <p className="text-base text-muted-foreground">
-              Location data isn't available for this course yet.
-            </p>
-          </div>
-        )}
-      </section>
-
-
-      {/* Claim This Course CTA - only for unclaimed courses with a club_id */}
-      {!courseClaim && course.club_id && (
-        <div style={{ marginTop: 12 }}>
-          <ClaimCourseCTA
-            clubId={course.club_id}
-            clubName={course.name}
+          <LocationMapCard
+            lat={coords.lat}
+            lng={coords.lng}
+            name={course.name}
+            locationText={formatCourseLocation(course)}
+            colorful
           />
-        </div>
-      )}
-
-      {/* 10. Media Section */}
-      <section className="pt-6 pb-5 space-y-3 md:pt-8" style={{ marginTop: 12 }}>
-        <AboutMediaStrip 
-          clubId={course.id} 
-          onSeeAllClick={() => onTabChange?.('media')}
-        />
+        )}
+        {!coords && !coordsLoading && (
+          <p style={{ fontSize: 13, color: '#94A3B8', padding: '0 16px' }}>Location data isn't available yet.</p>
+        )}
       </section>
 
-      {/* 11. Explore More Links */}
-      <div style={{ marginTop: 12 }}>
-        <CourseExploreLinks course={course} />
-      </div>
+      <div style={{ margin: '24px 0' }}><Divider /></div>
 
-      {/* 12. Visit Website */}
-      {course.website_url && (
-        <section className="px-4 pt-2 pb-4 flex justify-center">
-          <button
-            onClick={handleWebsiteClick}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 18px', borderRadius: 20, background: '#ffffff', border: '1px solid rgba(15,23,42,0.12)', fontSize: 13, fontWeight: 600, color: '#0F172A', cursor: 'pointer' }}
-          >
-            <ExternalLink className="h-4 w-4" />
-            Official course website
-          </button>
-        </section>
+      {/* 9. Claim Course */}
+      {!courseClaim && course.club_id && (
+        <>
+          <div style={{ padding: '8px 16px', textAlign: 'center' }}>
+            <div style={{ fontSize: 20, marginBottom: 8 }}>🏌️</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Own or manage this course?</div>
+            <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 0 14px', lineHeight: 1.5 }}>
+              Claim this listing to respond to reviews and update information.
+            </p>
+            <ClaimCourseCTA clubId={course.club_id} clubName={course.name} />
+          </div>
+          <div style={{ margin: '24px 0' }}><Divider /></div>
+        </>
       )}
+
+      {/* 10. Media */}
+      <section style={{ padding: '0 16px' }}>
+        <SectionLabel text="Media" />
+        <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
+      </section>
+
+      <div style={{ margin: '24px 0' }}><Divider /></div>
+
+      {/* 11. Explore More + Website */}
+      <div>
+        <div style={{ padding: '0 16px' }}>
+          <SectionLabel text="Explore More" accent />
+        </div>
+        <CourseExploreLinks course={course} />
+        {course.website_url && (
+          <div style={{ padding: '12px 16px 4px' }}>
+            <button
+              onClick={handleWebsiteClick}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Official Course Website
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* External Website Sheet */}
       {course.website_url && (
@@ -325,7 +338,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           title={`${course.name || 'Course'} Website`}
         />
       )}
-      
+
       <ScrollToTopGlass />
     </div>
   );
