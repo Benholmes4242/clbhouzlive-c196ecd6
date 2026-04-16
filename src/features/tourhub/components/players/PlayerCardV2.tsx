@@ -87,14 +87,14 @@ export function PlayerCardV2({
   // Build the right-side value based on active sort
   const rightValue = (() => {
     if (isTourRanking) {
-      if (points != null && points > 0) return { main: points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), label: 'pts' };
+      if (points != null && points > 0) return { main: points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), label: '' };
       return null;
     }
     // PGA OWGR: only total points shown (handled separately below), no earnings here
     if (isPgaOwgr) return null;
     if (isPgaFedex) {
       return points != null && points > 0
-        ? { main: points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }), label: 'pts' }
+        ? { main: points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }), label: '' }
         : null;
     }
     if (activeSort === 'highest-earnings') {
