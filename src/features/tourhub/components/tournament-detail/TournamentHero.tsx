@@ -5,6 +5,25 @@
 import { format, isSameMonth } from 'date-fns';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
+const COUNTRY_NAMES: Record<string, string> = {
+  USA: 'United States', ENG: 'England', SCO: 'Scotland', WAL: 'Wales', IRL: 'Ireland',
+  MEX: 'Mexico', CAN: 'Canada', AUS: 'Australia', RSA: 'South Africa', ESP: 'Spain',
+  GER: 'Germany', FRA: 'France', JPN: 'Japan', KOR: 'South Korea', CHN: 'China',
+  NZL: 'New Zealand', SWE: 'Sweden', DEN: 'Denmark', NOR: 'Norway', FIN: 'Finland',
+  ITA: 'Italy', ARG: 'Argentina', COL: 'Colombia', VEN: 'Venezuela', BRA: 'Brazil',
+  ZIM: 'Zimbabwe', FIJ: 'Fiji', THA: 'Thailand', PHI: 'Philippines', IND: 'India',
+  TPE: 'Chinese Taipei', CHI: 'Chile', PAR: 'Paraguay', URU: 'Uruguay', PAN: 'Panama',
+  BAH: 'Bahamas', BER: 'Bermuda', PUR: 'Puerto Rico', GRN: 'Grenada', TTO: 'Trinidad',
+  AUT: 'Austria', BEL: 'Belgium', NED: 'Netherlands', POR: 'Portugal', CZE: 'Czech Republic',
+  POL: 'Poland', SVK: 'Slovakia', HUN: 'Hungary', SUI: 'Switzerland', GBR: 'Great Britain',
+  NIR: 'Northern Ireland',
+};
+
+function expandCountry(code: string | null | undefined): string | null {
+  if (!code) return null;
+  return COUNTRY_NAMES[code.toUpperCase()] ?? code;
+}
+
 interface TournamentHeroProps {
   tournament: TourTournament;
   imageUrl: string | null;
@@ -23,7 +42,6 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
   const formattedPurse = tournament.purse
     ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
     : null;
-
 
   const dateRange = tournament.start_date && tournament.end_date
     ? formatDateRange(tournament.start_date, tournament.end_date)
@@ -54,14 +72,29 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             }}
             loading="eager"
             fetchPriority="high"
-            onError={e => { e.currentTarget.style.display = 'none'; }}
+            onError={e => {
+              e.currentTarget.style.display = 'none';
+            }}
           />
         ) : (
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.07) 100%)' }} />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.07) 100%)',
+            }}
+          />
         )}
 
         {/* Dark gradient overlay — top and bottom */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.0) 35%, rgba(15,23,42,0.75) 70%, rgba(15,23,42,1) 100%)' }} />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(to bottom, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.0) 35%, rgba(15,23,42,0.75) 70%, rgba(15,23,42,1) 100%)',
+          }}
+        />
 
         {/* Top — eyebrow + live badge */}
         <div style={{ position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 14px)', left: 16, right: 16 }}>
@@ -77,7 +110,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           </h1>
           {(tournament.venue_city || tournament.venue_country) && (
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginBottom: 2 }}>
-              📍 {[tournament.venue_city, tournament.venue_country].filter(Boolean).join(', ')}
+              📍 {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
             </div>
           )}
           {dateRange && (
