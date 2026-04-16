@@ -72,15 +72,19 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
 
         {/* Bottom — location + tournament name */}
         <div style={{ position: 'absolute', bottom: 0, left: 16, right: 16, paddingBottom: 14 }}>
-          {(tournament.venue_city || tournament.venue_country) && (
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: 600, marginBottom: 4 }}>
-              📍 {[tournament.venue_city, tournament.venue_country].filter(Boolean).join(', ')}
-              {dateRange && <span style={{ marginLeft: 8, color: 'rgba(255,255,255,0.35)' }}>· {dateRange}</span>}
-            </div>
-          )}
-          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: '0 0 6px' }}>
             {tournament.name}
           </h1>
+          {(tournament.venue_city || tournament.venue_country) && (
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginBottom: 2 }}>
+              📍 {[tournament.venue_city, tournament.venue_country].filter(Boolean).join(', ')}
+            </div>
+          )}
+          {dateRange && (
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>
+              {dateRange}
+            </div>
+          )}
         </div>
       </div>
 
