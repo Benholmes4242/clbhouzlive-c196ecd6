@@ -1017,11 +1017,18 @@ export function PlayersTab() {
                         pgaTourId: player.pga_tour_id,
                         tourCodes: player.tour_codes,
                       }}
-                      worldRank={
-                        sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za'
-                          ? rank?.worldRank
-                          : (pStats?.tourRank || rank?.worldRank)
-                      }
+                      worldRank={(() => {
+                        if (sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'most-wins') {
+                          return index + 6;
+                        }
+                        if (sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings') {
+                          return pStats?.tourRank || rank?.worldRank;
+                        }
+                        if (sort === 'alpha-az' || sort === 'alpha-za') {
+                          return null;
+                        }
+                        return rank?.worldRank;
+                      })()}
                       owgr={rank?.worldRank}
                       earnings={pStats?.earnings}
                       wins={pStats?.wins}
