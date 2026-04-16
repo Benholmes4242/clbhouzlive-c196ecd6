@@ -159,24 +159,13 @@ export function CollegeProfilePage() {
           )}
         </div>
 
-        {/* Subtitle + compare button */}
+        {/* Subtitle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           {subtitleText && (
             <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>{subtitleText}</span>
           )}
           <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)' }}>·</span>
           <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>Season {seasonYear}</span>
-          <div style={{ flex: 1 }} />
-          {stats && rivalSlugs.length > 0 && (
-            <button
-              onClick={handleCompareClick}
-              style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 9px', borderRadius: '8px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer', flexShrink: 0 }}
-              className="active:opacity-70 transition-opacity"
-            >
-              <GitCompare className="w-[11px] h-[11px]" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-              <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>Compare</span>
-            </button>
-          )}
         </div>
 
         {/* Cover story — earnings dominant left, logo chip right */}
