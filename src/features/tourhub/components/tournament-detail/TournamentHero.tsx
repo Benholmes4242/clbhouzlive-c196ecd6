@@ -53,9 +53,8 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
       <div
         style={{
           position: 'relative',
-          height: 220,
+          height: 'calc(220px + var(--sat, env(safe-area-inset-top, 0px)))',
           overflow: 'hidden',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         }}
       >
         {imageUrl ? (
