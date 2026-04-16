@@ -97,10 +97,10 @@ export function LeaderboardCard({
       )}
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <span style={{ width: '36px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
         <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
-        <span style={{ width: '36px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
         <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>SCORE</span>
       </div>
 
@@ -119,7 +119,7 @@ export function LeaderboardCard({
               <Link
                 to={`/tourhub/player/${entry.player?.id}`}
                 style={{
-                  display: 'flex', alignItems: 'center',
+                  display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '10px 20px',
                   borderBottom: '0.5px solid rgba(15,23,42,0.07)',
                   borderLeft: entry.position === 1 ? '3px solid #F7931E' : '3px solid transparent',
@@ -143,7 +143,7 @@ export function LeaderboardCard({
                 </div>
 
                 {/* Thru */}
-                <div style={{ width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>
+                <div style={{ width: '36px', textAlign: 'center' as const, flexShrink: 0 }}>
                   <ThruDisplay thru={entry.thru} />
                 </div>
 
