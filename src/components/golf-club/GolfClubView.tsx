@@ -138,7 +138,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-[16px] w-[16px] text-white" strokeWidth={2.5} />
+            <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
           </button>
         )}
 
@@ -158,7 +158,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-[16px] w-[16px] text-white" strokeWidth={2.5} />
+            <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
           </button>
         )}
 
