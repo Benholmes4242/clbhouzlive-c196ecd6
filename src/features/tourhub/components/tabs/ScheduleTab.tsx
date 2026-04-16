@@ -400,32 +400,8 @@ export function ScheduleTab() {
             )}
           </div>
 
-          {/* Flat stat row — hairlines only, no cards */}
-          <div style={{
-            display: 'flex',
-            borderTop: '0.5px solid rgba(15,23,42,0.07)',
-            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-            padding: '10px 0',
-            marginBottom: 18,
-          }}>
-            {[
-              { value: filterStats.live, label: 'Live', color: '#16A34A' },
-              { value: filterStats.upcoming, label: 'Upcoming', color: '#0F172A' },
-              { value: filterStats.completed, label: 'Completed', color: '#0F172A' },
-            ].map((s, i) => (
-              <div key={s.label} style={{
-                flex: 1, textAlign: 'center' as const,
-                borderRight: i < 2 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
-              }}>
-                <div style={{ fontSize: 20, fontWeight: 900, color: s.color, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
-                  {s.value}
-                </div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 1 }}>
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
+
+
 
           {/* Next Up — flat, no card */}
           {nextUpTournament && daysUntilNext !== null && (
