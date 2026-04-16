@@ -95,7 +95,7 @@ export function PlayerCardV2({
     if (isPgaOwgr) return null;
     if (isPgaFedex) {
       return points != null && points > 0
-        ? { main: points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }), label: '' }
+        ? { main: points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }), label: 'pts' }
         : null;
     }
     if (activeSort === 'highest-earnings') {
