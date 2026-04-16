@@ -5,10 +5,8 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
-import { TOUR_COLORS } from '../../constants/colors';
 
 function abbreviateName(fullName: string): string {
   const parts = fullName.trim().split(' ');
