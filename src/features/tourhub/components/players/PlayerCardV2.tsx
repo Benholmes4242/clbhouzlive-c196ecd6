@@ -191,7 +191,7 @@ export function PlayerCardV2({
               <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                 {rightValue.main}
                 {rightValue.label && (
-                  <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>
                     {rightValue.label}
                   </span>
                 )}
