@@ -272,7 +272,7 @@ function PickRecordBadge() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 4, flexShrink: 0 }}>
       {wins > 0 && (
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 4,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 4,
           padding: '3px 8px', borderRadius: 6,
           background: 'rgba(247,147,30,0.08)',
           border: '0.5px solid rgba(247,147,30,0.25)',
@@ -285,7 +285,7 @@ function PickRecordBadge() {
       )}
       {top5 > 0 && (
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 4,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 4,
           padding: '3px 8px', borderRadius: 6,
           background: 'rgba(22,163,74,0.07)',
           border: '0.5px solid rgba(22,163,74,0.25)',
