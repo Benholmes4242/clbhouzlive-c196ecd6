@@ -436,22 +436,29 @@ export function TournamentDetailPage() {
           </div>
         </div>
 
-        {/* Live leader strip */}
+        {/* Live leader — floating pill */}
         {isLive && leader && (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '8px',
-            padding: '9px 20px',
-            background: 'rgba(34,197,94,0.05)',
-            borderLeft: '3px solid #22C55E',
-            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-            marginTop: 0,
-          }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-            <span style={{ fontSize: '11px', fontWeight: 900, color: '#22C55E' }}>LIVE</span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>{leader.name}</span>
-            {leader.score && (
-              <span style={{ fontSize: '12px', color: '#F7931E', fontWeight: 800 }}>at {leader.score}</span>
-            )}
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 16px 6px', background: '#F8FAFC' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '6px 14px', borderRadius: 20,
+              background: '#ffffff',
+              border: '1px solid rgba(34,197,94,0.2)',
+              boxShadow: '0 1px 8px rgba(34,197,94,0.08), 0 1px 3px rgba(15,23,42,0.06)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span className="animate-live-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
+                <span style={{ fontSize: '9px', fontWeight: 900, color: '#16A34A', letterSpacing: '0.1em' }}>LIVE</span>
+              </div>
+              <div style={{ width: '0.5px', height: 12, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>{leader.name}</span>
+              {leader.score && (
+                <>
+                  <div style={{ width: '0.5px', height: 12, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', fontWeight: 900, color: '#16A34A', letterSpacing: '-0.02em' }}>{leader.score}</span>
+                </>
+              )}
+            </div>
           </div>
         )}
 
