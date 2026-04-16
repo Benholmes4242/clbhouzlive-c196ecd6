@@ -636,13 +636,13 @@ export function PlayersTab() {
                         : null;
                       const owgrPts = champion.totalPoints ?? champion.avgPoints;
                       const displayPts = tourPts ?? owgrPts;
-                      const label = (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') ? 'total pts' : 'pts';
+                      const label = (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') ? 'pnts' : 'pts';
                       return displayPts != null ? (
                         <div>
                           <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                             {displayPts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
-                          <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>{label}</span>
+                          <span style={{ fontSize: '10px', color: '#F7931E', marginLeft: '3px' }}>{label}</span>
                         </div>
                       ) : null;
                     })()
