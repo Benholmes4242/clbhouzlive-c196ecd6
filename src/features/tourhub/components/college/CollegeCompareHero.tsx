@@ -348,7 +348,6 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
             <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748B' }}>{name1}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
             <span style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
           </div>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end' }}>
