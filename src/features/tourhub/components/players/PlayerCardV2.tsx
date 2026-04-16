@@ -88,7 +88,7 @@ export function PlayerCardV2({
   // Build the right-side value based on active sort
   const rightValue = (() => {
     if (isTourRanking) {
-      if (points != null && points > 0) return { main: points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), label: '' };
+      if (points != null && points > 0) return { main: points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), label: 'pts' };
       return null;
     }
     // PGA OWGR: only total points shown (handled separately below), no earnings here

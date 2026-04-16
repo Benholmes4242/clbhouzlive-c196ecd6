@@ -35,7 +35,7 @@ function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
     'fedex-points': 'FedEx',
     'race-to-dubai': 'Race to Dubai',
     'race-to-cme': 'Race to CME Globe',
-    'points-list': 'Points List',
+    'points-list': 'Standings',
     'liv-standings': 'Standings',
   };
   return map[sort] ?? 'Sort';
@@ -928,7 +928,7 @@ export function PlayersTab() {
           const isLIV = activeTour === 'LIV';
           const opts: { value: PlayerSortType; label: string }[] =
             isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            : isPGAD ? [{ value: 'points-list', label: 'Standings' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isPGA  ? [{ value: 'world-rank-desc', label: 'World Ranking' }, { value: 'fedex-points', label: 'FedEx Cup Points' }, { value: 'highest-earnings', label: 'Earnings' }, { value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }]
