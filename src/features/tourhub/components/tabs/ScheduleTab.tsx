@@ -456,7 +456,6 @@ export function ScheduleTab() {
         className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
         style={{ paddingTop: isStuck ? 'max(env(safe-area-inset-top, 0px), 47px)' : '0px' }}
       >
-      >
         {/* ── ROW 1: Filter underline tabs ── */}
         <div style={{ padding: '0' }}>
           <ScheduleFilterPills
