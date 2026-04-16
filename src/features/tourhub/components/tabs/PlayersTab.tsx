@@ -273,7 +273,7 @@ export function PlayersTab() {
       return (elitePlayers || [])
         .filter(p => p.worldRank && p.worldRank > 0)
         .sort((a, b) => (a.worldRank || 999) - (b.worldRank || 999))
-        .slice(0, 8);
+        .slice(0, 5);
     }
     
     const tourElite = (elitePlayers || []).filter(ep => {
