@@ -95,8 +95,8 @@ function PickRecordRail() {
               </div>
             )}
             {top5 > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, padding: '3px 7px', borderRadius: 6, background: 'rgba(22,163,74,0.07)', border: '0.5px solid rgba(22,163,74,0.2)', lineHeight: 1 }}>
-                <span style={{ fontSize: 9, fontWeight: 800, color: '#16A34A', lineHeight: 1 }}>{top5} top-5</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3px 7px', borderRadius: 6, background: 'rgba(22,163,74,0.07)', border: '0.5px solid rgba(22,163,74,0.2)', lineHeight: 1 }}>
+                <span style={{ fontSize: 9, fontWeight: 800, color: '#16A34A', lineHeight: 1, textAlign: 'center' as const, width: '100%' }}>{top5} top-5</span>
               </div>
             )}
           </div>
