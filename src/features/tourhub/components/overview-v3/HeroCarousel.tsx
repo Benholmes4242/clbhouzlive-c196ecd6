@@ -1835,11 +1835,16 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
     }
   }, [safeSlides.length, currentIndex]);
 
-  // Auto-scroll the tour pill rail so the active pill is centered
+  // Auto-scroll the tour pill rail so the active pill is centered (rail-only, never the page)
   useEffect(() => {
     if (!railRef.current) return;
-    const card = railRef.current.children[currentIndex] as HTMLElement | undefined;
-    if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    const rail = railRef.current;
+    const card = rail.children[currentIndex] as HTMLElement | undefined;
+    if (!card) return;
+    const railRect = rail.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const offset = cardRect.left - railRect.left - (railRect.width / 2) + (cardRect.width / 2);
+    rail.scrollBy({ left: offset, behavior: 'smooth' });
   }, [currentIndex]);
 
   // Auto-collapse if slide index changes
