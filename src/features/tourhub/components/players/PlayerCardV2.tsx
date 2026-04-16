@@ -162,12 +162,6 @@ export function PlayerCardV2({
             {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
               <span style={{ fontSize: '10px', color: '#CBD5E1', marginLeft: '4px' }}>· #{owgr} OWGR</span>
             )}
-            {/* Win count secondary for earnings/OWGR sort */}
-            {!isTourRanking && (winCount > 0) && activeSort !== 'most-wins' && (
-              <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '4px' }}>
-                · {winCount} {winCount === 1 ? 'win' : 'wins'}
-              </span>
-            )}
           </div>
         </div>
 
@@ -188,6 +182,12 @@ export function PlayerCardV2({
                   {rightValue.label}
                 </span>
               )}
+            </span>
+          )}
+          {/* Win count — bold green, next to earnings */}
+          {!isTourRanking && winCount > 0 && activeSort !== 'most-wins' && (
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
+              {winCount} {winCount === 1 ? 'win' : 'wins'}
             </span>
           )}
         </div>
