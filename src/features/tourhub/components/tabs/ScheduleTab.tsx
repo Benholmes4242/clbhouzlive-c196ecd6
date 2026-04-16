@@ -447,10 +447,8 @@ export function ScheduleTab() {
         </div>
       )}
 
-      {/* Hero Carousel — identical to Overview */}
-      {!search && (
-        <HeroCarousel hasHeader={false} />
-      )}
+
+
 
       {/* Content below hero */}
       <div
