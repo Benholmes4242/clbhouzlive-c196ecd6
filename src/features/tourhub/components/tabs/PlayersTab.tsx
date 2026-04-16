@@ -230,19 +230,19 @@ export function PlayersTab() {
         const bStats = statsMap.get(b.playerId);
         switch (sort) {
           case 'most-wins': {
-            const aWins = aStats?.wins ?? 0;
-            const bWins = bStats?.wins ?? 0;
-            if (bWins !== aWins) return bWins - aWins;
-            const aEarn = aStats?.earnings ?? 0;
-            const bEarn = bStats?.earnings ?? 0;
-            if (bEarn !== aEarn) return bEarn - aEarn;
-            return (bStats?.points ?? 0) - (aStats?.points ?? 0);
+            // Hero always shows tour's primary ranking regardless of Wins tab
+            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
+            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
+            if (aRank !== bRank) return aRank - bRank;
+            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
           }
           case 'alpha-az':
           case 'alpha-za': {
-            const aWR = a.worldRank ?? Infinity;
-            const bWR = b.worldRank ?? Infinity;
-            return aWR - bWR;
+            // Hero always shows tour's primary ranking in A-Z view
+            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
+            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
+            if (aRank !== bRank) return aRank - bRank;
+            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
           }
           case 'highest-earnings': {
             const aEarn = aStats?.earnings ?? 0;
@@ -848,7 +848,7 @@ export function PlayersTab() {
           {[
                 { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: activeTour === 'pga' ? 'World Ranking' : getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
                 ...(activeTour === 'pga' ? [{ value: 'fedex-points' as PlayerSortType, label: 'FedEx' }] : []),
-                ...(activeTour === 'pga' ? [] : [{ value: 'most-wins' as PlayerSortType, label: 'Wins' }]),
+                
                 { value: 'highest-earnings' as PlayerSortType, label: 'Earnings' },
                 { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
               ].filter((tab, i, arr) => i === arr.findIndex(t => t.value === tab.value))
