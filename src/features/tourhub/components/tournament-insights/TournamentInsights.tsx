@@ -562,7 +562,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
               Tournament Intelligence
             </h2>
             <p style={{ fontSize: 11, color: '#94A3B8', margin: '3px 0 0' }}>
-              Course DNA · form · field strength
+              Know who to back before a shot is hit. AI picks built on course history, player form and field strength.
             </p>
           </div>
           <PickRecordBadge />
