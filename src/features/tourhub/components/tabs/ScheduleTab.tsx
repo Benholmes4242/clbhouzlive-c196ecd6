@@ -355,6 +355,145 @@ export function ScheduleTab() {
         )}
       </AnimatePresence>
       
+      {/* ── SCHEDULE MASTHEAD ── */}
+      {!search && (
+        <div style={{ padding: '0 20px', background: '#F8FAFC' }}>
+
+          {/* Eyebrow */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, paddingTop: 8 }}>
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              ⚡ Clbhouz · Tour Hub
+            </span>
+          </div>
+
+          {/* Title + Live badge */}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', margin: 0, letterSpacing: '-0.04em' }}>
+              Schedule
+            </h1>
+            {filterStats.live > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#16A34A' }}>
+                  {filterStats.live} Live Now
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Flat stat row — hairlines only, no cards */}
+          <div style={{
+            display: 'flex',
+            borderTop: '0.5px solid rgba(15,23,42,0.07)',
+            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+            padding: '10px 0',
+            marginBottom: 18,
+          }}>
+            {[
+              { value: filterStats.live, label: 'Live', color: '#16A34A' },
+              { value: filterStats.upcoming, label: 'Upcoming', color: '#0F172A' },
+              { value: filterStats.completed, label: 'Completed', color: '#0F172A' },
+            ].map((s, i) => (
+              <div key={s.label} style={{
+                flex: 1, textAlign: 'center' as const,
+                borderRight: i < 2 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+              }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: s.color, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
+                  {s.value}
+                </div>
+                <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 1 }}>
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Next Up — flat, no card */}
+          {nextUpTournament && daysUntilNext !== null && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1 }} />
+                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                  Next Up
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 2 }}>
+                    {TOUR_LABELS[nextUpTournament.tour_code ?? ''] ?? nextUpTournament.tour_code ?? 'Tour'}
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    {nextUpTournament.name}
+                  </div>
+                  {nextUpTournament.purse && (
+                    <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 2 }}>
+                      {nextUpTournament.start_date ? new Date(nextUpTournament.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : ''} · ${(nextUpTournament.purse / 1_000_000).toFixed(1)}M
+                    </div>
+                  )}
+                </div>
+                <div style={{ textAlign: 'right' as const, flexShrink: 0, marginLeft: 16 }}>
+                  <span style={{ fontSize: 28, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.04em' }}>
+                    {daysUntilNext}
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', marginLeft: 3 }}>
+                    {daysUntilNext === 1 ? 'day' : 'days'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Live Now — scrollable flat list, vertical dividers */}
+          {filterStats.live > 0 && tournaments && (() => {
+            const liveEvents = tournaments.filter(t => t.status === 'inprogress');
+            const liveLeaders = leadersWinnersMap;
+            return (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
+                  <span style={{ fontSize: 9, fontWeight: 900, color: '#16A34A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                    Live Now
+                  </span>
+                </div>
+                <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', marginLeft: -20, paddingLeft: 20, paddingRight: 20 }}>
+                  {liveEvents.map((event, i) => {
+                    const leader = liveLeaders?.[event.id]?.leader;
+                    return (
+                      <div
+                        key={event.id}
+                        onClick={() => navigate(`/tourhub/tournament/${event.id}`)}
+                        style={{
+                          flexShrink: 0,
+                          paddingRight: 20,
+                          marginRight: i < liveEvents.length - 1 ? 20 : 0,
+                          borderRight: i < liveEvents.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+                          cursor: 'pointer',
+                        }}
+                        className="active:opacity-70 transition-opacity"
+                      >
+                        <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 2 }}>
+                          {TOUR_LABELS[event.tour_code ?? ''] ?? event.tour_code ?? 'Tour'}
+                        </div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap' as const, marginBottom: 1 }}>
+                          {event.name}
+                        </div>
+                        {leader && (
+                          <div style={{ fontSize: 11, fontWeight: 800, color: '#16A34A', whiteSpace: 'nowrap' as const }}>
+                            {leader.playerName} {leader.scoreDisplay}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+        </div>
+      )}
+
       {/* Hero Carousel — identical to Overview */}
       {!search && (
         <HeroCarousel hasHeader={false} />
