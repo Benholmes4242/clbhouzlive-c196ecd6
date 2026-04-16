@@ -6,7 +6,7 @@
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
-export type PlayerTourCode = 'all' | 'pga' | 'EURO' | 'PGAD' | 'LIV' | 'LPGA' | 'CHAMP';
+export type PlayerTourCode = 'pga' | 'EURO' | 'PGAD' | 'LIV' | 'LPGA' | 'CHAMP';
 
 interface TourOption {
   code: PlayerTourCode;
@@ -14,7 +14,6 @@ interface TourOption {
 }
 
 const TOUR_OPTIONS: TourOption[] = [
-  { code: 'all', label: 'All Tours' },
   { code: 'pga', label: 'PGA Tour' },
   { code: 'EURO', label: 'DP World' },
   { code: 'PGAD', label: 'Korn Ferry' },
@@ -24,7 +23,6 @@ const TOUR_OPTIONS: TourOption[] = [
 
 /** Map of tour code → display label */
 export const TOUR_LABELS: Record<PlayerTourCode, string> = {
-  all: 'All Tours',
   pga: 'PGA Tour',
   EURO: 'DP World Tour',
   PGAD: 'Korn Ferry Tour',
@@ -53,9 +51,7 @@ export function PlayersTourFilter({
     >
       {TOUR_OPTIONS.map((tour) => {
         const isActive = activeTour === tour.code;
-        const count = tour.code === 'all'
-          ? Object.values(tourCounts).reduce((sum, c) => sum + c, 0)
-          : (tourCounts[tour.code] || 0);
+        const count = tourCounts[tour.code] || 0;
 
         return (
           <motion.button
