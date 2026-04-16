@@ -710,7 +710,6 @@ export function PlayersTab() {
                                 if (!pts || pts <= 0) return null;
                                 return <span style={{ fontSize: '10px' }}>
                                   <span style={{ fontWeight: 800, color: '#F7931E' }}>{pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                                  <span style={{ fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>pts</span>
                                 </span>;
                               }
                               if (sort === 'most-wins') {
@@ -724,7 +723,6 @@ export function PlayersTab() {
                               if (!pts || pts <= 0) return null;
                               return <span style={{ fontSize: '10px' }}>
                                 <span style={{ fontWeight: 800, color: '#F7931E' }}>{pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                <span style={{ fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>pts</span>
                               </span>;
                             })()}
                           </div>

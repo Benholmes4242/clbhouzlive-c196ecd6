@@ -181,7 +181,6 @@ export function PlayerCardV2({
           {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
             <span style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
               {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-              <span style={{ fontSize: '8px', fontWeight: 500, marginLeft: '1px', color: '#94A3B8' }}>pts</span>
             </span>
           )}
           {rightValue && (
