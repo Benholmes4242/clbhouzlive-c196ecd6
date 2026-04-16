@@ -3,7 +3,7 @@
  * Flat ruled design with editorial opening.
  */
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, SlidersHorizontal } from 'lucide-react';
@@ -76,6 +76,8 @@ export function PlayersTab() {
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef(false);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -143,6 +145,7 @@ export function PlayersTab() {
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [debouncedSearch, sort]);
+
 
   // Build world rank & stats lookup from elite players
   const rankMap = useMemo(() => {
@@ -423,6 +426,23 @@ export function PlayersTab() {
   const displayRows = rows.slice(0, visibleCount);
   const hasMore = visibleCount < totalCount;
 
+  // Auto-load more players when sentinel scrolls into view
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingRef.current) {
+          isFetchingRef.current = true;
+          setVisibleCount(c => c + PAGE_SIZE);
+          setTimeout(() => { isFetchingRef.current = false; }, 300);
+        }
+      },
+      { rootMargin: '400px', threshold: 0 },
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, visibleCount]);
+
   const contentKey = `${activeTour}-${debouncedSearch}-${sort}`;
 
   // Loading skeleton
@@ -573,26 +593,22 @@ export function PlayersTab() {
                         <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>{champStats!.wins === 1 ? 'win' : 'wins'}</span>
                       </div>
                     )
-                  ) : (
-                    champStats?.points != null && champStats.points > 0 && (
+                  ) : (() => {
+                    const pts = champStats?.points ?? champion.totalPoints ?? champion.avgPoints;
+                    return pts != null && pts > 0 ? (
                       <div>
                         <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                          {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                         <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>pts</span>
                       </div>
-                    )
-                  )}
+                    ) : null;
+                  })()}
                   {sort === 'most-wins' && champStats?.earnings != null && champStats.earnings > 0 && (
                     <span style={{ fontSize: '12px', color: '#64748B' }}>
                       {champStats.earnings >= 1_000_000
                         ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
                         : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
-                    </span>
-                  )}
-                  {sort === 'highest-earnings' && (champStats?.wins ?? 0) > 0 && (
-                    <span style={{ fontSize: '12px', color: '#16A34A', fontWeight: 700 }}>
-                      {champStats!.wins} {champStats!.wins === 1 ? 'win' : 'wins'}
                     </span>
                   )}
                 </div>
@@ -993,21 +1009,13 @@ export function PlayersTab() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Load More */}
+        {/* Sentinel — triggers auto-load when scrolled into view */}
         {hasMore && (
-          <div style={{ padding: '14px 16px', textAlign: 'center' as const, borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <button
-              onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-              style={{
-                fontSize: '13px', fontWeight: 700, color: '#0F172A',
-                background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0',
-              }}
-              className="active:opacity-70 transition-opacity"
-            >
-              Load more ({Math.min(visibleCount + PAGE_SIZE, totalCount) - visibleCount} players) ›
-            </button>
+          <div ref={sentinelRef} style={{ padding: '20px 16px', textAlign: 'center' as const }}>
+            <div style={{ width: 20, height: 20, margin: '0 auto', border: '2px solid rgba(15,23,42,0.12)', borderTopColor: '#F7931E', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
           </div>
         )}
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
         {totalCount > 0 && (
           <div style={{ padding: '8px 16px 32px', textAlign: 'center' as const }}>

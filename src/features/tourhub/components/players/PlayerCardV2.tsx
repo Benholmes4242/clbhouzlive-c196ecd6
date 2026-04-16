@@ -71,6 +71,8 @@ export function PlayerCardV2({
   const isPGAD = activeTour === 'PGAD';
   const isLIV = activeTour === 'LIV';
   const isTourRanking = isEuro || isLPGA || isPGAD || isLIV;
+  const isPgaOwgr = activeTour === 'pga' && activeSort === 'world-rank-desc';
+  const isPgaEarnings = activeTour === 'pga' && activeSort === 'highest-earnings';
   const winCount = wins ?? 0;
 
   const ariaLabel = [
@@ -87,6 +89,8 @@ export function PlayerCardV2({
       if (points != null && points > 0) return { main: points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), label: 'pts' };
       return null;
     }
+    // PGA OWGR: only total points shown (handled separately below), no earnings here
+    if (isPgaOwgr) return null;
     if (activeSort === 'highest-earnings') {
       return earnings != null ? { main: formatEarnings(earnings), label: '' } : null;
     }
@@ -167,8 +171,8 @@ export function PlayerCardV2({
 
         {/* Right value */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px 12px 0', flexShrink: 0 }}>
-          {/* Total points — shown for OWGR/default sorts when available */}
-          {!isTourRanking && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
+          {/* Total points — shown for OWGR/default sorts when available, hidden for earnings sort */}
+          {!isTourRanking && !isPgaEarnings && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
             <span style={{ fontSize: '11px', fontWeight: 600, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
               {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
               <span style={{ fontSize: '8px', marginLeft: '1px' }}>pts</span>
@@ -184,8 +188,8 @@ export function PlayerCardV2({
               )}
             </span>
           )}
-          {/* Win count — bold green, next to earnings */}
-          {!isTourRanking && winCount > 0 && activeSort !== 'most-wins' && (
+          {/* Win count — bold green, hidden for OWGR and earnings sorts */}
+          {!isTourRanking && !isPgaOwgr && !isPgaEarnings && winCount > 0 && activeSort !== 'most-wins' && (
             <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
               {winCount} {winCount === 1 ? 'win' : 'wins'}
             </span>
