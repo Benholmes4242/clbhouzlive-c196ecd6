@@ -1758,7 +1758,10 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
   const completedIds = safeSlides
     .filter(s => s.type === 'completed')
     .map(s => s.tournament.id);
-  const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
+  const liveIds = safeSlides
+    .filter(s => s.type === 'live')
+    .map(s => s.tournament.id);
+  const { data: leadersWinnersMap } = useTournamentLeadersWinners([...completedIds, ...liveIds]);
   
   // Touch swipe state
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
