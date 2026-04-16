@@ -341,10 +341,16 @@ export function PlayersTab() {
       });
     }
 
+    // Earnings tab: only show players who have earnings data this season
     if (activeTour === 'pga' && sort === 'highest-earnings') {
+      filtered = filtered.filter(p => {
+        const earnings = statsMap.get(p.id)?.earnings;
+        return earnings != null && earnings > 0;
+      });
+    }
 
     // Wins tab: only show players with at least 1 win
-    if (activeTour === 'all' && sort === 'most-wins') {
+    if (activeTour === 'pga' && sort === 'most-wins') {
       filtered = filtered.filter(p => {
         const wins = statsMap.get(p.id)?.wins;
         return wins != null && wins > 0;
@@ -355,12 +361,8 @@ export function PlayersTab() {
       const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
       const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
       
-      const aRank = activeTour === 'all' 
-        ? aWorldRank 
-        : (statsMap.get(a.id)?.tourRank ?? aWorldRank);
-      const bRank = activeTour === 'all' 
-        ? bWorldRank 
-        : (statsMap.get(b.id)?.tourRank ?? bWorldRank);
+      const aRank = statsMap.get(a.id)?.tourRank ?? aWorldRank;
+      const bRank = statsMap.get(b.id)?.tourRank ?? bWorldRank;
 
       switch (sort) {
         case 'world-rank-desc': {
