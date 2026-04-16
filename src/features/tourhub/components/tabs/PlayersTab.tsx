@@ -230,13 +230,28 @@ export function PlayersTab() {
         const bStats = statsMap.get(b.playerId);
         switch (sort) {
           case 'alpha-az':
-          case 'alpha-za':
-          case 'most-wins':
-          case 'highest-earnings': {
-            // Hero always frozen to tour's primary ranking for these tabs
+          case 'alpha-za': {
+            // Hero frozen to tour's primary ranking in A-Z view
             const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
             const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
             if (aRank !== bRank) return aRank - bRank;
+            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+          }
+          case 'highest-earnings': {
+            // Hero shows top earners
+            const aEarn = aStats?.earnings ?? 0;
+            const bEarn = bStats?.earnings ?? 0;
+            if (bEarn !== aEarn) return bEarn - aEarn;
+            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+          }
+          case 'most-wins': {
+            // Hero shows most wins leaders
+            const aWins = aStats?.wins ?? 0;
+            const bWins = bStats?.wins ?? 0;
+            if (bWins !== aWins) return bWins - aWins;
+            const aEarn = aStats?.earnings ?? 0;
+            const bEarn = bStats?.earnings ?? 0;
+            if (bEarn !== aEarn) return bEarn - aEarn;
             return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
           }
           case 'fedex-points': {
