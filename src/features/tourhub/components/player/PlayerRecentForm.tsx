@@ -9,14 +9,14 @@ interface PlayerRecentFormProps {
 }
 
 export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
-  const { data: results, isLoading } = usePlayerResults(playerId, 5);
+  const { data: results, isLoading } = usePlayerResults(playerId, 10);
 
   if (isLoading || !results || results.length === 0) return null;
 
   const completedResults = results.filter(r => {
     const s = r.status?.toUpperCase();
     return r.position !== null && s !== 'CUT' && s !== 'MC' && s !== 'WD';
-  });
+  }).slice(0, 5);
 
   if (completedResults.length === 0) {
     const cutCount = results.filter(r => r.status?.toUpperCase() === 'CUT').length;
