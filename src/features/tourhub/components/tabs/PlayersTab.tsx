@@ -229,30 +229,18 @@ export function PlayersTab() {
         const aStats = statsMap.get(a.playerId);
         const bStats = statsMap.get(b.playerId);
         switch (sort) {
-          case 'most-wins': {
-            // Hero always shows tour's primary ranking regardless of Wins tab
-            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
-            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
-            if (aRank !== bRank) return aRank - bRank;
-            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
-          }
           case 'alpha-az':
-          case 'alpha-za': {
-            // Hero always shows tour's primary ranking in A-Z view
+          case 'alpha-za':
+          case 'most-wins':
+          case 'highest-earnings': {
+            // Hero always frozen to tour's primary ranking for these tabs
             const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
             const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
             if (aRank !== bRank) return aRank - bRank;
             return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
-          }
-          case 'highest-earnings': {
-            const aEarn = aStats?.earnings ?? 0;
-            const bEarn = bStats?.earnings ?? 0;
-            if (bEarn !== aEarn) return bEarn - aEarn;
-            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
-            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
-            return aRank - bRank;
           }
           case 'fedex-points': {
+            // Hero frozen to FedEx points order for PGA
             const aPts = aStats?.points ?? 0;
             const bPts = bStats?.points ?? 0;
             if (bPts !== aPts) return bPts - aPts;
@@ -268,6 +256,7 @@ export function PlayersTab() {
             return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
           }
           default: {
+            // world-rank-desc and any other sort — use world rank
             const aWR = a.worldRank ?? Infinity;
             const bWR = b.worldRank ?? Infinity;
             if (aWR !== bWR) return aWR - bWR;
