@@ -126,11 +126,11 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm active:scale-95 transition-all z-10"
+            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-sq-xs bg-white/90 backdrop-blur-md border border-slate-300/70 active:scale-95 transition-all z-10 shadow-sm"
             style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)' }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-6 w-6 text-white" strokeWidth={2} />
+            <ChevronLeft className="h-[18px] w-[18px] text-slate-700" strokeWidth={2.5} />
           </button>
         )}
 
@@ -138,11 +138,11 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {!isInModal && (
           <button
             onClick={() => safeGoBack(navigate, '/courses')}
-            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm active:scale-95 transition-all z-10"
+            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-sq-xs bg-white/90 backdrop-blur-md border border-slate-300/70 active:scale-95 transition-all z-10 shadow-sm"
             style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)' }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-6 w-6 text-white" strokeWidth={2} />
+            <ChevronLeft className="h-[18px] w-[18px] text-slate-700" strokeWidth={2.5} />
           </button>
         )}
 
