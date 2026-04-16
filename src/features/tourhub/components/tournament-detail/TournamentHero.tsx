@@ -96,7 +96,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         />
 
         {/* Top — eyebrow + live badge */}
-        <div style={{ position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 14px)', left: 16, right: 16 }}>
+        <div style={{ position: 'absolute', top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 14px)', left: 16, right: 16 }}>
           <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             ⚡ {tournament.tour_full_name?.toUpperCase() ?? 'PGA TOUR'}
           </span>
