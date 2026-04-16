@@ -466,7 +466,7 @@ export function ScheduleTab() {
       {/* Content below hero */}
       <div
         className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
-        style={{ paddingTop: isTabsSticky ? 'calc(16px + env(safe-area-inset-top, 0px))' : '0px', transition: 'padding-top 0.15s ease' }}
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         {/* ── ROW 1: Filter underline tabs ── */}
         <div style={{ padding: '0' }}>
