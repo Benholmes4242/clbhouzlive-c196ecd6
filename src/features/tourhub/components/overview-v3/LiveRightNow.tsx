@@ -1,5 +1,6 @@
 /**
- * LiveRightNow - Flat dispatch-style horizontal scroll strip
+ * LiveRightNow - Landscape leaderboard strip cards
+ * Horizontal scroll of broadcast-style cards, one per live tournament.
  */
 
 import React from 'react';
@@ -33,30 +34,64 @@ const LiveEventRow: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boo
     }
   })();
 
+  const roundLabel = tournament.currentRound === 4
+    ? 'Final Round'
+    : tournament.currentRound > 0
+    ? `Round ${tournament.currentRound}`
+    : 'Starting Soon';
+
+  const venue = [tournament.venueName, tournament.venueCity].filter(Boolean).join(' · ');
+
   return (
     <div
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className="active:opacity-70 transition-opacity"
       style={{
         flexShrink: 0,
+        width: 200,
         paddingRight: 20,
         marginRight: isLast ? 0 : 20,
         borderRight: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)',
         cursor: 'pointer',
       }}
     >
-      <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 2 }}>
-        {tourLabel}
+      {/* Tour · Round */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
+        <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>
+          {tourLabel}
+        </span>
+        <span style={{ fontSize: 9, color: 'rgba(15,23,42,0.2)' }}>·</span>
+        <span style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em' }}>
+          {roundLabel}
+        </span>
       </div>
-      <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap' as const, marginBottom: 2 }}>
+
+      {/* Tournament name */}
+      <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
         {tournament.name}
       </div>
-      {tournament.leader && (
-        <div style={{ fontSize: 11, fontWeight: 800, color: '#16A34A', whiteSpace: 'nowrap' as const }}>
-          {abbreviateName(tournament.leader.name)} {tournament.leader.scoreDisplay}
+
+      {/* Course + city */}
+      {venue && (
+        <div style={{ fontSize: 10, color: '#94A3B8', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+          {venue}
         </div>
       )}
-      {!tournament.leader && (
+
+      {/* Hairline */}
+      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', marginBottom: 8 }} />
+
+      {/* Leader */}
+      {tournament.leader ? (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
+            {abbreviateName(tournament.leader.name)}
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: '#16A34A', letterSpacing: '-0.03em' }}>
+            {tournament.leader.scoreDisplay}
+          </span>
+        </div>
+      ) : (
         <div style={{ fontSize: 10, color: '#94A3B8' }}>Starting soon</div>
       )}
     </div>
@@ -76,18 +111,18 @@ export function LiveRightNow() {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '0 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-          <div className="animate-live-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#16A34A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+      <div style={{ padding: '0 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+          <div className="animate-live-pulse" style={{ width: 7, height: 7, borderRadius: '50%', background: '#22C55E' }} />
+          <span style={{ fontSize: '12px', fontWeight: 600, color: 'hsl(var(--foreground))', letterSpacing: '-0.01em' }}>
             Live Now
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 20 }}>
-          {[0, 1, 2].map((i) => (
+        <div style={{ display: 'flex', gap: 10, overflowX: 'auto' }}>
+           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              style={{ width: 160, height: 48, borderRadius: 4, background: 'rgba(15,23,42,0.05)', flexShrink: 0 }}
+              style={{ width: 286, height: 99, borderRadius: 14, background: 'rgba(15,23,42,0.4)', flexShrink: 0 }}
             />
           ))}
         </div>
