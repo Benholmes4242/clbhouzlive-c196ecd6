@@ -599,7 +599,6 @@ export function PlayersTab() {
                             ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
                             : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
                         </span>
-                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>earnings</span>
                       </div>
                     )
                   ) : sort === 'fedex-points' ? (
@@ -608,7 +607,7 @@ export function PlayersTab() {
                         <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                           {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                         </span>
-                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>FedEx pts</span>
+                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>pts</span>
                       </div>
                     )
                   ) : sort === 'most-wins' ? (
@@ -707,7 +706,7 @@ export function PlayersTab() {
                             if (sort === 'fedex-points') {
                               const pts = runnerStats?.points;
                               if (!pts || pts <= 0) return null;
-                              return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                              return <div style={{ fontSize: '10px', fontWeight: 500, color: '#94A3B8', marginTop: '1px' }}>
                                 {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} pts
                               </div>;
                             }
@@ -720,8 +719,8 @@ export function PlayersTab() {
                             }
                             const pts = runnerStats?.points ?? player.totalPoints ?? player.avgPoints;
                             if (!pts || pts <= 0) return null;
-                            return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                              {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
+                            return <div style={{ fontSize: '10px', fontWeight: 500, color: '#94A3B8', marginTop: '1px' }}>
+                              {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts
                             </div>;
                           })()}
                         </div>
