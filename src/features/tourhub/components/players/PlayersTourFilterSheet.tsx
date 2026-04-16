@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChevronDown, Globe } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
@@ -18,7 +18,6 @@ interface TourOption {
 }
 
 const TOUR_OPTIONS: TourOption[] = [
-  { code: 'all', label: 'All Tours', description: 'Show players from every tour' },
   { code: 'pga', label: 'PGA Tour', description: 'PGA Tour players' },
   { code: 'EURO', label: 'DP World Tour', description: 'DP World Tour players' },
   { code: 'LPGA', label: 'LPGA', description: 'LPGA Tour players' },
@@ -40,7 +39,6 @@ export function PlayersTourFilterSheet({
   const [open, setOpen] = useState(false);
 
   const activeTourOption = TOUR_OPTIONS.find((t) => t.code === activeTour) || TOUR_OPTIONS[0];
-  const totalCount = Object.values(tourCounts).reduce((sum, c) => sum + c, 0);
 
   const handleSelect = useCallback(
     (code: PlayerTourCode) => {
@@ -66,24 +64,18 @@ export function PlayersTourFilterSheet({
         aria-expanded={open}
       >
         <div className="flex items-center gap-2.5">
-          {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase()) ? (
+          {hasTourLogo(activeTour.toLowerCase()) ? (
             <img
               src={getTourLogo(activeTour.toLowerCase())}
               alt={activeTourOption.label}
               className="object-contain flex-shrink-0"
               style={{ width: 28, height: 20 }}
             />
-          ) : (
-            <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
-              All Tours
-            </span>
-          )}
+          ) : null}
           <span className="text-sm font-semibold text-foreground">{activeTourOption.label}</span>
-          {activeTour !== 'all' && (
-            <span className="text-[11px] font-bold tabular-nums text-muted-foreground">
-              · {tourCounts[activeTour] ?? 0}
-            </span>
-          )}
+          <span className="text-[11px] font-bold tabular-nums text-muted-foreground">
+            · {tourCounts[activeTour] ?? 0}
+          </span>
         </div>
         <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
       </button>
@@ -103,12 +95,10 @@ export function PlayersTourFilterSheet({
         {/* Flat option rows */}
         <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           {TOUR_OPTIONS.filter(tour =>
-            tour.code === 'all' || (tourCounts[tour.code] ?? 0) > 0
+            (tourCounts[tour.code] ?? 0) > 0
           ).map((tour) => {
             const isActive = activeTour === tour.code;
-            const count = tour.code === 'all'
-              ? totalCount
-              : (tourCounts[tour.code] || 0);
+            const count = tourCounts[tour.code] || 0;
 
             return (
               <button
@@ -127,9 +117,9 @@ export function PlayersTourFilterSheet({
               >
                 {/* Tour logo chip */}
                 <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {tour.code === 'all'
-                    ? <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
-                    : <img src={getTourLogo(tour.code.toLowerCase())} alt="" style={{ width: 28, height: 18, objectFit: 'contain' }} />
+                  {hasTourLogo(tour.code.toLowerCase())
+                    ? <img src={getTourLogo(tour.code.toLowerCase())} alt="" style={{ width: 28, height: 18, objectFit: 'contain' }} />
+                    : null
                   }
                 </div>
 
