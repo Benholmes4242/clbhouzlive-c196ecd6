@@ -636,7 +636,7 @@ export function PlayersTab() {
                         : null;
                       const owgrPts = champion.totalPoints ?? champion.avgPoints;
                       const displayPts = tourPts ?? owgrPts;
-                      const label = (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') ? 'pnts' : 'pts';
+                      const label = 'pts';
                       return displayPts != null ? (
                         <div>
                           <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
