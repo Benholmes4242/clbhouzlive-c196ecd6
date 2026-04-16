@@ -891,6 +891,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               WebkitBackdropFilter: 'none',
               boxShadow: 'none',
               padding: 0,
+              paddingBottom: isExpanded ? 0 : 86,
               overflow: 'hidden',
               zIndex: 20,
               pointerEvents: 'auto' as const,
