@@ -2037,7 +2037,6 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
                   {/* Left — two lines: tour name + tournament name */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, overflow: 'hidden' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: isLive ? '#22C55E' : 'rgba(247,147,30,0.5)', flexShrink: 0 }} />
                       <span style={{
                         fontSize: '8px', fontWeight: 900,
                         color: isActive ? '#ffffff' : 'rgba(255,255,255,0.45)',
@@ -2064,9 +2063,9 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
                   ) : isLive ? (
                     <span style={{ fontSize: '7px', fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>LIVE</span>
                   ) : slide.type === 'upcoming' ? (
-                    <span style={{ fontSize: '7px', color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>Soon</span>
+                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>SOON</span>
                   ) : (
-                    <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>Final</span>
+                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>FINAL</span>
                   )}
                 </button>
               );
