@@ -148,9 +148,9 @@ export function LeadersTab() {
 
   // World rank overrides
   const worldFormatOverride = isWorldCategory
-    ? (v: number) => v.toFixed(2)
+    ? (v: number) => `${v.toFixed(2)}pts`
     : undefined;
-  const worldUnitOverride = isWorldCategory ? 'avg pts' : undefined;
+  const worldUnitOverride = isWorldCategory ? '' : undefined;
 
   // Leader value for active pill preview
   const leaderValue = rankedPlayers.length > 0
