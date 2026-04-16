@@ -91,6 +91,11 @@ export function PlayerCardV2({
     }
     // PGA OWGR: only total points shown (handled separately below), no earnings here
     if (isPgaOwgr) return null;
+    if (activeSort === 'fedex-points') {
+      return points != null && points > 0
+        ? { main: points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }), label: 'pts' }
+        : null;
+    }
     if (activeSort === 'highest-earnings') {
       return earnings != null ? { main: formatEarnings(earnings), label: '' } : null;
     }

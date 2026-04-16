@@ -704,6 +704,12 @@ export function PlayersTab() {
                                 {earn >= 1_000_000 ? `$${(earn / 1_000_000).toFixed(1)}M` : `$${(earn / 1_000).toFixed(0)}K`}
                               </div>;
                             }
+                            if (sort === 'fedex-points') {
+                              const pts = runnerStats?.points;
+                              if (!pts || pts <= 0) return null;
+                              return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} pts
+                              </div>;
                             if (sort === 'most-wins') {
                               const wins = runnerStats?.wins;
                               if (!wins || wins <= 0) return null;
@@ -887,8 +893,8 @@ export function PlayersTab() {
             : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isPGA  ? [{ value: 'world-rank-desc', label: 'Highest World Ranking' }, { value: 'highest-earnings', label: 'Highest Earnings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : [{ value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }];
+            : isPGA  ? [{ value: 'world-rank-desc', label: 'World Ranking' }, { value: 'fedex-points', label: 'FedEx Cup Points' }, { value: 'highest-earnings', label: 'Earnings' }, { value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }]
+            : [{ value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }];
           return opts.map(opt => (
             <button
               key={opt.value}
