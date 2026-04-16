@@ -848,8 +848,7 @@ export function PlayersTab() {
           {[
                 { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: activeTour === 'pga' ? 'World Ranking' : getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
                 ...(activeTour === 'pga' ? [{ value: 'fedex-points' as PlayerSortType, label: 'FedEx' }] : []),
-                
-                { value: 'highest-earnings' as PlayerSortType, label: 'Earnings' },
+                ...(activeTour === 'pga' ? [{ value: 'highest-earnings' as PlayerSortType, label: 'Earnings' }] : []),
                 { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
               ].filter((tab, i, arr) => i === arr.findIndex(t => t.value === tab.value))
           .map(tab => {
