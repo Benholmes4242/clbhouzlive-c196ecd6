@@ -170,7 +170,7 @@ export function CollegeGolfHubPage() {
         >
           {/* Collapsible search bar */}
           <div
-            className="overflow-hidden transition-all duration-250 ease-in-out px-5"
+            className="overflow-hidden transition-all duration-250 ease-in-out px-4"
             style={{
               maxHeight: searchExpanded ? 60 : 0,
               opacity: searchExpanded ? 1 : 0,
@@ -202,7 +202,7 @@ export function CollegeGolfHubPage() {
           </div>
 
           {/* Back link + search icon */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 16px 0' }}>
             <Link
               to="/tourhub?tab=overview"
               replace
