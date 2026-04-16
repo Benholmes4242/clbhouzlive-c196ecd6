@@ -231,8 +231,15 @@ export function PlayersTab() {
         switch (sort) {
           case 'alpha-az':
           case 'alpha-za': {
-            // Hero always frozen to world rank — tourRank intentionally excluded
-            // to prevent FedEx/tour standings overriding OWGR on PGA
+            // For non-PGA tours, freeze hero to tour ranking order
+            const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+            if (isNonPgaTour) {
+              const aRank = aStats?.tourRank ?? Infinity;
+              const bRank = bStats?.tourRank ?? Infinity;
+              if (aRank !== bRank) return aRank - bRank;
+              return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+            }
+            // PGA: freeze to world rank
             const aWR = a.worldRank ?? Infinity;
             const bWR = b.worldRank ?? Infinity;
             return aWR - bWR;
