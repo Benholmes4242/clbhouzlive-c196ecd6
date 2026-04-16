@@ -88,7 +88,7 @@ export function CollegeMasthead({
 
         {/* No.1 Cover Story */}
         <Link to={`/tourhub/college-golf/${slug}`} style={{ textDecoration: 'none', display: 'block' }} className="active:opacity-80 transition-opacity">
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', padding: '14px 0 0' }}>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '12px', padding: '14px 0 0' }}>
             {/* Left — faded rank + identity + value */}
             <div style={{ flex: 1, minWidth: 0, paddingBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -111,8 +111,8 @@ export function CollegeMasthead({
               </div>
             </div>
 
-            {/* Right — alumni headshot strip + college logo */}
-            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '8px', paddingBottom: '14px' }}>
+            {/* Right — alumni headshot strip + college logo (logo is absolutely centered in dead space) */}
+            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '8px', paddingBottom: '14px', position: 'relative' }}>
               {visibleAlumni.length > 0 && (
                 <div>
                   <div style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px', textAlign: 'center' as const }}>
@@ -159,22 +159,22 @@ export function CollegeMasthead({
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* College logo */}
-              <div style={{ width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '8px' }}>
-                {logoUrl ? (
-                  <img
-                    src={logoUrl}
-                    alt={displayName}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                  />
-                ) : (
-                  <span style={{ fontSize: '24px', fontWeight: 900, color: 'rgba(255,255,255,0.15)' }}>
-                    {displayName.charAt(0)}
-                  </span>
-                )}
-              </div>
+            {/* College logo — centered in dead space */}
+            <div style={{ position: 'absolute', top: '50%', right: 0, transform: 'translateY(-50%)', width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={displayName}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <span style={{ fontSize: '24px', fontWeight: 900, color: 'rgba(255,255,255,0.15)' }}>
+                  {displayName.charAt(0)}
+                </span>
+              )}
             </div>
           </div>
         </Link>
