@@ -175,6 +175,7 @@ export function ScheduleTab() {
   }, [tournaments]);
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
+  const { data: liveTournaments } = useLiveRightNow();
 
 
   const filterStats = useMemo(() => {
