@@ -40,21 +40,18 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       transition={{ duration: 0.4, delay: isCompleted ? 0.9 : 0.1 }}
       style={{ paddingTop: 24, paddingBottom: 24 }}
     >
-      {/* Live header — compact pill (matches Schedule live pill) */}
+      {/* Live header — dispatch style */}
       {!isCompleted && (
-        <div style={{ padding: '0 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <span
-              className="animate-live-pulse"
-              style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }}
-            />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#16A34A', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-              Live Now
+        <div style={{ padding: '0 16px 8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', flex: 1 }}>
+              TOURNAMENT PICKS · LIVE POSITIONS
+            </span>
+            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em' }}>
+              POS / OFF LEAD
             </span>
           </div>
-          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.12em' }}>
-            POS / OFF LEAD
-          </span>
         </div>
       )}
 
