@@ -88,9 +88,9 @@ export function CollegeMasthead({
 
         {/* No.1 Cover Story */}
         <Link to={`/tourhub/college-golf/${slug}`} style={{ textDecoration: 'none', display: 'block' }} className="active:opacity-80 transition-opacity">
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '12px', padding: '14px 0 0' }}>
+          <div style={{ position: 'relative', padding: '14px 0 0' }}>
             {/* Left — faded rank + identity + value */}
-            <div style={{ flex: 1, minWidth: 0, paddingBottom: '14px' }}>
+            <div style={{ maxWidth: '60%', paddingBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>
@@ -111,53 +111,19 @@ export function CollegeMasthead({
               </div>
             </div>
 
-            {/* Right — alumni headshot strip + college logo (logo is absolutely centered in dead space) */}
-            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '8px', paddingBottom: '14px', position: 'relative' }}>
-              {visibleAlumni.length > 0 && (
-                <div>
-                  <div style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px', textAlign: 'center' as const }}>
-                    TOP ALUMNI
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {visibleAlumni.map((alum, i) => {
-                      const photoUrl = getPlayerHeadshotUrl(alum.full_name, alum.tour_codes?.[0] ?? 'pga');
-                      return (
-                        <div
-                          key={alum.id}
-                          style={{
-                            width: 26, height: 26, borderRadius: '34%', overflow: 'hidden',
-                            border: '1.5px solid rgba(255,255,255,0.1)',
-                            marginLeft: i === 0 ? 0 : -6,
-                            zIndex: visibleAlumni.length - i,
-                            position: 'relative',
-                            background: 'rgba(255,255,255,0.06)',
-                          }}
-                        >
-                          <img
-                            src={photoUrl}
-                            alt={alum.full_name}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
-                            loading="lazy"
-                            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                          />
-                        </div>
-                      );
-                    })}
-                    {overflowCount > 0 && (
-                      <div style={{
-                        width: 26, height: 26, borderRadius: '34%',
-                        border: '1.5px solid rgba(255,255,255,0.1)',
-                        marginLeft: -6, position: 'relative',
-                        background: 'rgba(255,255,255,0.06)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>
-                          +{overflowCount}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+            {/* College logo — centered in the right dead space */}
+            <div style={{ position: 'absolute', top: '50%', left: '75%', transform: 'translate(-50%, -50%)', width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={displayName}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <span style={{ fontSize: '24px', fontWeight: 900, color: 'rgba(255,255,255,0.15)' }}>
+                  {displayName.charAt(0)}
+                </span>
               )}
             </div>
 
