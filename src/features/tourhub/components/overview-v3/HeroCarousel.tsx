@@ -2037,7 +2037,6 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
                   {/* Left — two lines: tour name + tournament name */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, overflow: 'hidden' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: isLive ? '#22C55E' : 'rgba(247,147,30,0.5)', flexShrink: 0 }} />
                       <span style={{
                         fontSize: '8px', fontWeight: 900,
                         color: isActive ? '#ffffff' : 'rgba(255,255,255,0.45)',
