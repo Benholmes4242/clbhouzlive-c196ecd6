@@ -78,6 +78,8 @@ export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
+  const [isTabsSticky, setIsTabsSticky] = useState(false);
+  const stickysentinelRef = useRef<HTMLDivElement>(null);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
   
