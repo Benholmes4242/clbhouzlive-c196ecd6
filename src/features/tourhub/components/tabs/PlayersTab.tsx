@@ -713,7 +713,7 @@ export function PlayersTab() {
                                 {wins} {wins === 1 ? 'win' : 'wins'}
                               </div>;
                             }
-                            const pts = runnerStats?.points;
+                            const pts = runnerStats?.points ?? player.totalPoints ?? player.avgPoints;
                             if (!pts || pts <= 0) return null;
                             return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                               {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
