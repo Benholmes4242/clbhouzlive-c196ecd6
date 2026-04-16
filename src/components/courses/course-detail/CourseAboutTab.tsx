@@ -130,9 +130,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
-      {/* 2. Community Rating */}
-      <div style={{ padding: '22px 16px 0' }}>
-        <SectionLabel text="Community Rating" />
+      {/* 2. Community Rating — CommunityScoreCard renders its own header internally, no SectionLabel */}
+      <div style={{ padding: '20px 0 0' }}>
         <div style={{ padding: '0 16px' }}>
           <CommunityScoreCard
             courseId={course.id}
@@ -143,34 +142,31 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             onRateClick={handleRateClick}
             onSeeAllReviews={() => onTabChange?.('reviews')}
           />
-          <div style={{ marginTop: 12 }}>
-            {userRating ? (
-              <button
-                onClick={handleRateClick}
-                style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', border: '1.5px solid rgba(15,23,42,0.1)', fontSize: 13, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
-              >
-                ✏️ Edit Your Rating
-              </button>
-            ) : (
-              <button
-                onClick={handleRateClick}
-                style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
-              >
-                ⭐ Rate this course
-              </button>
-            )}
-          </div>
+        </div>
+        <div style={{ padding: '12px 32px 0' }}>
+          {userRating ? (
+            <button
+              onClick={handleRateClick}
+              style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', border: '1.5px solid rgba(15,23,42,0.1)', fontSize: 13, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
+            >
+              ✏️ Edit Your Rating
+            </button>
+          ) : (
+            <button
+              onClick={handleRateClick}
+              style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
+            >
+              ⭐ Rate this course
+            </button>
+          )}
         </div>
       </div>
 
       <div style={{ margin: '24px 0' }}><Divider /></div>
 
-      {/* 3. Your Journey */}
+      {/* 3. Your Journey — PersonalSection renders its own "Your Journey" heading, no SectionLabel */}
       {user && (
         <>
-          <div style={{ padding: '0 16px' }}>
-            <SectionLabel text="Your Journey" />
-          </div>
           <section style={{ padding: '0 16px' }}>
             <PersonalSection courseId={course.id} courseName={course.name} />
           </section>
@@ -231,46 +227,48 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         />
       )}
 
-      {/* 6. Top 100 Spotlight */}
+      {/* 6. Top 100 Spotlight — CourseTop100Spotlight renders its own header internally, no SectionLabel */}
       {course.id && (
         <>
-          <div style={{ padding: '0 16px' }}>
-            <SectionLabel text="Top 100 Spotlight" accent />
-            <div style={{ margin: '0 0 0 0' }}>
-              <CourseTop100Spotlight courseId={course.id} courseName={course.name} />
-            </div>
+          <div style={{ margin: '0 16px' }}>
+            <CourseTop100Spotlight courseId={course.id} courseName={course.name} />
           </div>
           <CourseTop100Summary />
           <div style={{ margin: '24px 0' }}><Divider /></div>
         </>
       )}
 
-      {/* 7. Course stats grid */}
-      {(course.global_rank || course.usa_rank || course.country_rank) && (
-        <>
-          <div style={{ padding: '0 16px' }}>
-            <SectionLabel text="Course Details" />
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${[course.global_rank, course.usa_rank, course.country_rank].filter(Boolean).length}, 1fr)`, padding: '0 8px' }}>
-              {[
-                course.global_rank && { label: 'Global Rank', value: `#${course.global_rank}` },
-                course.usa_rank && { label: 'USA Rank', value: `#${course.usa_rank}` },
-                course.country_rank && { label: 'Country Rank', value: `#${course.country_rank}` },
-              ].filter(Boolean).map((s: any, i, arr) => (
-                <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.08)' : 'none' }}>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.04em' }}>{s.value}</div>
-                  <div style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
-                </div>
-              ))}
+      {/* 7. Course stats grid — only shown if rank data exists */}
+      {(course.global_rank || course.usa_rank || course.country_rank || course.regional_rank) && (() => {
+        const stats = [
+          course.global_rank ? { label: 'Global Rank', value: `#${course.global_rank}` } : null,
+          course.usa_rank ? { label: 'USA Rank', value: `#${course.usa_rank}` } : null,
+          course.regional_rank ? { label: 'Regional Rank', value: `#${course.regional_rank}` } : null,
+          course.country_rank ? { label: 'Country Rank', value: `#${course.country_rank}` } : null,
+        ].filter(Boolean) as { label: string; value: string }[];
+
+        return (
+          <>
+            <div style={{ padding: '0 16px' }}>
+              <SectionLabel text="Course Details" />
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 8px' }}>
+                {stats.slice(0, 4).map((s, i, arr) => (
+                  <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.08)' : 'none' }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.04em' }}>{s.value}</div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          <div style={{ margin: '24px 0' }}><Divider /></div>
-        </>
-      )}
+            <div style={{ margin: '24px 0' }}><Divider /></div>
+          </>
+        );
+      })()}
 
       {/* 8. Location */}
       <section style={{ padding: '0 16px' }}>
         <SectionLabel text="Location" />
-        {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl mx-auto" />}
+        {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
         {coords && (
           <LocationMapCard
             lat={coords.lat}
@@ -287,7 +285,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       <div style={{ margin: '24px 0' }}><Divider /></div>
 
-      {/* 9. Claim Course */}
+      {/* 9. Claim Course — single instance, minimal design, no card */}
       {!courseClaim && course.club_id && (
         <>
           <div style={{ padding: '8px 16px', textAlign: 'center' }}>
@@ -302,34 +300,29 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </>
       )}
 
-      {/* 10. Media */}
+      {/* 10. Media — AboutMediaStrip renders its own "Media" heading internally, no SectionLabel */}
       <section style={{ padding: '0 16px' }}>
-        <SectionLabel text="Media" />
         <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
       </section>
 
       <div style={{ margin: '24px 0' }}><Divider /></div>
 
-      {/* 11. Explore More + Website */}
-      <div>
-        <div style={{ padding: '0 16px' }}>
-          <SectionLabel text="Explore More" accent />
-        </div>
-        <CourseExploreLinks course={course} />
-        {course.website_url && (
-          <div style={{ padding: '12px 16px 4px' }}>
-            <button
-              onClick={handleWebsiteClick}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
-            >
-              <ExternalLink className="h-4 w-4" />
-              Official Course Website
-            </button>
-          </div>
-        )}
-      </div>
+      {/* 11. Explore More — CourseExploreLinks renders its own heading internally, no SectionLabel */}
+      <CourseExploreLinks course={course} />
 
-      {/* External Website Sheet */}
+      {/* 12. Official Website — amber ghost button, part of the explore section */}
+      {course.website_url && (
+        <div style={{ padding: '12px 16px 4px' }}>
+          <button
+            onClick={handleWebsiteClick}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
+          >
+            <ExternalLink className="h-4 w-4" />
+            Official Course Website
+          </button>
+        </div>
+      )}
+
       {course.website_url && (
         <ExternalLinkSheet
           isOpen={showWebsiteSheet}
