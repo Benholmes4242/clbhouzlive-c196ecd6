@@ -452,20 +452,9 @@ export function ScheduleTab() {
 
       {/* Content below hero */}
       <div
-        className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10 [position:sticky]"
-        style={{ paddingTop: 0 }}
-        ref={(el) => {
-          if (!el) return;
-          const observer = new IntersectionObserver(
-            ([entry]) => {
-              el.style.paddingTop = entry.intersectionRatio < 1
-                ? 'max(env(safe-area-inset-top, 0px), 47px)'
-                : '0px';
-            },
-            { threshold: [1], rootMargin: '-1px 0px 0px 0px' }
-          );
-          observer.observe(el);
-        }}
+        ref={stickyRef}
+        className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
+        style={{ paddingTop: isStuck ? 'max(env(safe-area-inset-top, 0px), 47px)' : '0px' }}
       >
       >
         {/* ── ROW 1: Filter underline tabs ── */}
