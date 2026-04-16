@@ -185,7 +185,7 @@ export function FranchiseCard({
         )}
 
         {/* Primary value + proportion bar OR delta for movers */}
-        <div style={{ textAlign: 'right' as const, flexShrink: 0, minWidth: '72px' }}>
+        <div style={{ textAlign: 'center' as const, flexShrink: 0, minWidth: '72px' }}>
           {isDelta && deltas ? (
             <>
               {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (

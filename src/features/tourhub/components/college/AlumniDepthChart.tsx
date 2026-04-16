@@ -91,17 +91,17 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
         </div>
 
         {/* OWGR number */}
-        <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '12px', color: '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '12px', color: '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {hasWorldRank ? `#${alumnus.world_ranking}` : '—'}
         </span>
 
         {/* Earnings */}
-        <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '13px', fontWeight: 700, color: '#F7931E', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ width: '56px', textAlign: 'center' as const, fontSize: '13px', fontWeight: 700, color: '#F7931E', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {hasEarnings ? formatCurrency(alumnus.earnings ?? 0) : '—'}
         </span>
 
         {/* Wins */}
-        <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {alumnus.wins ?? 0}
         </span>
       </Link>
@@ -148,9 +148,9 @@ function Section({ title, subtitle, alumni, defaultExpanded = true, tierAccent }
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '4px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
             <span style={{ flex: 1, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
-            <span style={{ width: '48px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>OWGR</span>
-            <span style={{ width: '56px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
-            <span style={{ width: '28px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>W</span>
+            <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>OWGR</span>
+            <span style={{ width: '56px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
+            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>W</span>
           </div>
 
           {displayedAlumni.map((alumnus, index) => (
