@@ -81,7 +81,7 @@ export function LeaderboardCard({
     >
       {/* Section rule marker */}
       {showHeader && (
-        <div style={{ padding: '14px 20px 0' }}>
+        <div style={{ padding: '0 20px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
             <span style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
