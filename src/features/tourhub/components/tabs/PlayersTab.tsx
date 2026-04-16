@@ -367,6 +367,11 @@ export function PlayersTab() {
       });
     }
 
+    // FedEx tab: only show players with FedEx points
+    if (sort === 'fedex-points') {
+      filtered = filtered.filter(p => (statsMap.get(p.id)?.points ?? 0) > 0);
+    }
+
     filtered = [...filtered].sort((a, b) => {
       const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
       const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
@@ -409,6 +414,12 @@ export function PlayersTab() {
           const aEarn = statsMap.get(a.id)?.earnings ?? 0;
           const bEarn = statsMap.get(b.id)?.earnings ?? 0;
           return bEarn - aEarn || aRank - bRank;
+        }
+        case 'fedex-points': {
+          const apts = statsMap.get(a.id)?.points ?? 0;
+          const bpts = statsMap.get(b.id)?.points ?? 0;
+          if (bpts !== apts) return bpts - apts;
+          return (rankMap.get(a.id)?.worldRank ?? Infinity) - (rankMap.get(b.id)?.worldRank ?? Infinity);
         }
         case 'race-to-dubai':
         case 'race-to-cme':
@@ -639,6 +650,7 @@ export function PlayersTab() {
                   <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                     {sort === 'highest-earnings' ? 'Top Earners · 2–5'
                       : sort === 'most-wins' ? 'Most Wins · 2–5'
+                      : sort === 'fedex-points' ? 'FedEx Cup · 2–5'
                       : 'Tour Rankings · 2–5'}
                   </span>
                 </div>
@@ -809,8 +821,9 @@ export function PlayersTab() {
         {/* Underline sort tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
           {[
-                { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
-                { value: 'most-wins' as PlayerSortType, label: 'Wins' },
+                { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: activeTour === 'pga' ? 'World Ranking' : getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
+                ...(activeTour === 'pga' ? [{ value: 'fedex-points' as PlayerSortType, label: 'FedEx' }] : []),
+                ...(activeTour === 'pga' ? [] : [{ value: 'most-wins' as PlayerSortType, label: 'Wins' }]),
                 { value: 'highest-earnings' as PlayerSortType, label: 'Earnings' },
                 { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
               ].filter((tab, i, arr) => i === arr.findIndex(t => t.value === tab.value))
