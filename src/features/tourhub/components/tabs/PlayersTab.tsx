@@ -627,14 +627,14 @@ export function PlayersTab() {
                       </div>
                     )
                   )}
-                  {sort !== 'highest-earnings' && champStats?.earnings != null && champStats.earnings > 0 && (
+                  {sort === 'most-wins' && champStats?.earnings != null && champStats.earnings > 0 && (
                     <span style={{ fontSize: '12px', color: '#64748B' }}>
                       {champStats.earnings >= 1_000_000
                         ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
                         : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
                     </span>
                   )}
-                  {sort !== 'most-wins' && (champStats?.wins ?? 0) > 0 && (
+                  {sort === 'highest-earnings' && (champStats?.wins ?? 0) > 0 && (
                     <span style={{ fontSize: '12px', color: '#16A34A', fontWeight: 700 }}>
                       {champStats!.wins} {champStats!.wins === 1 ? 'win' : 'wins'}
                     </span>
