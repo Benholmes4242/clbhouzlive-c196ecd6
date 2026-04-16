@@ -95,12 +95,12 @@ function getScoreClass(score: number): string {
 }
 
 const TOUR_SHORT: Record<string, string> = {
-  pga: 'PGA',
+  pga: 'PGA Tour',
   euro: 'DP World',
   lpga: 'LPGA',
-  liv: 'LIV',
-  pgad: 'KFT',
-  champ: 'CHAMP',
+  liv: 'LIV Golf',
+  pgad: 'Korn Ferry',
+  champ: 'Champions',
 };
 
 // Skeleton rows for loading state
@@ -1996,7 +1996,15 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
             {safeSlides.map((slide, i) => {
               const isActive = i === currentIndex;
               const isLive = slide.type === 'live';
-              const tourShort = TOUR_SHORT[slide.tournament.tourSlug] ?? slide.tournament.tourSlug.toUpperCase();
+              const tourLabel = TOUR_SHORT[slide.tournament.tourSlug] ?? slide.tournament.tourSlug.toUpperCase();
+              // Score from leadersWinnersMap for this tournament
+              const leaderData = leadersWinnersMap?.get(slide.tournament.id);
+              const rawScore = leaderData?.score;
+              const scoreStr = rawScore !== null && rawScore !== undefined
+                ? (rawScore === 0 ? 'E' : rawScore < 0 ? String(rawScore) : `+${rawScore}`)
+                : leaderData?.displayScore ?? null;
+              const scoreColor = !scoreStr || scoreStr === 'E' ? '#ffffff'
+                : scoreStr.startsWith('+') ? '#EF4444' : '#22C55E';
               return (
                 <button
                   key={slide.tournament.id}
@@ -2006,75 +2014,59 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
                     setIsPaused(true);
                     scheduleResume();
                   }}
+                  className="active:opacity-70 transition-opacity"
                   style={{
                     flexShrink: 0,
-                    width: isActive ? 155 : 72,
-                    height: 36,
+                    width: isActive ? 160 : 80,
+                    height: 44,
                     background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.3)',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
-                    border: `1px solid ${isActive ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.07)'}`,
-                    borderRadius: 18,
-                    padding: '0 10px',
+                    border: `1px solid ${isActive ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)'}`,
+                    borderRadius: 22,
+                    padding: '0 11px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     transition: 'all 0.3s ease',
                     gap: 6,
+                    overflow: 'hidden',
                   }}
-                  className="active:opacity-70 transition-opacity"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, overflow: 'hidden' }}>
-                    <span style={{
-                      width: 4, height: 4, borderRadius: '50%',
-                      background: isLive ? '#22C55E' : 'rgba(247,147,30,0.5)',
-                      flexShrink: 0,
-                    }} />
-                    <span style={{
-                      fontSize: '7.5px', fontWeight: 900,
-                      color: isActive ? '#ffffff' : 'rgba(255,255,255,0.4)',
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase' as const,
-                      whiteSpace: 'nowrap' as const,
-                    }}>
-                      {tourShort}
-                    </span>
-                    {isActive && (
+                  {/* Left — two lines: tour name + tournament name */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: isLive ? '#22C55E' : 'rgba(247,147,30,0.5)', flexShrink: 0 }} />
                       <span style={{
-                        fontSize: '8.5px', fontWeight: 600,
-                        color: 'rgba(255,255,255,0.55)',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        fontSize: '8px', fontWeight: 900,
+                        color: isActive ? '#ffffff' : 'rgba(255,255,255,0.45)',
+                        letterSpacing: '0.06em', textTransform: 'uppercase' as const,
                         whiteSpace: 'nowrap' as const,
                       }}>
-                        {slide.tournament.name}
+                        {tourLabel}
                       </span>
-                    )}
+                    </div>
+                    <span style={{
+                      fontSize: '8.5px', fontWeight: 600,
+                      color: isActive ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.25)',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                      paddingLeft: 8,
+                    }}>
+                      {slide.tournament.name}
+                    </span>
                   </div>
-                  {/* Score for completed, status for upcoming */}
-                  {isLive ? (() => {
-                    const leaderData = leadersWinnersMap?.get(slide.tournament.id);
-                    const score = leaderData?.displayScore ?? leaderData?.score;
-                    const scoreStr = score !== undefined && score !== null
-                      ? (typeof score === 'number'
-                          ? (score === 0 ? 'E' : score < 0 ? String(score) : `+${score}`)
-                          : String(score))
-                      : null;
-                    return scoreStr ? (
-                      <span style={{
-                        fontSize: '11px', fontWeight: 900, flexShrink: 0, letterSpacing: '-0.02em',
-                        color: scoreStr === 'E' ? '#ffffff' : scoreStr.startsWith('+') ? '#EF4444' : '#22C55E',
-                      }}>
-                        {scoreStr}
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: '7.5px', fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>LIVE</span>
-                    );
-                  })() : slide.type === 'upcoming' ? (
-                    <span style={{ fontSize: 7, color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>Soon</span>
+                  {/* Right — score or status */}
+                  {isLive && scoreStr ? (
+                    <span style={{ fontSize: '12px', fontWeight: 900, color: scoreColor, flexShrink: 0, letterSpacing: '-0.02em' }}>
+                      {scoreStr}
+                    </span>
+                  ) : isLive ? (
+                    <span style={{ fontSize: '7px', fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>LIVE</span>
+                  ) : slide.type === 'upcoming' ? (
+                    <span style={{ fontSize: '7px', color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>Soon</span>
                   ) : (
-                    <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>Final</span>
+                    <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>Final</span>
                   )}
                 </button>
               );
