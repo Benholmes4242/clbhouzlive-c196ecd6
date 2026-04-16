@@ -95,12 +95,12 @@ function getScoreClass(score: number): string {
 }
 
 const TOUR_SHORT: Record<string, string> = {
-  pga: 'PGA',
+  pga: 'PGA Tour',
   euro: 'DP World',
   lpga: 'LPGA',
-  liv: 'LIV',
-  pgad: 'KFT',
-  champ: 'CHAMP',
+  liv: 'LIV Golf',
+  pgad: 'Korn Ferry',
+  champ: 'Champions',
 };
 
 // Skeleton rows for loading state
