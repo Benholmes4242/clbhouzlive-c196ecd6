@@ -198,7 +198,7 @@ export function FullLeaderboard({
       </div>
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <span style={{ width: '34px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
         <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
         {showRoundColumns && (
@@ -212,7 +212,7 @@ export function FullLeaderboard({
         <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
           {selectedRound === 'Overall' ? 'TOT' : 'SCORE'}
         </span>
-        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
@@ -245,7 +245,7 @@ export function FullLeaderboard({
                 onClick={onPlayerTap}
                 aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{
-                  display: 'flex', alignItems: 'center',
+                  display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '9px 20px',
                   borderBottom: '0.5px solid rgba(15,23,42,0.07)',
                   borderLeft: entry.position === 1 && !isMissedCut && !isWD ? '3px solid #F7931E' : '3px solid transparent',
@@ -292,7 +292,7 @@ export function FullLeaderboard({
                   )}
                 </div>
 
-                <div style={{ width: '36px', textAlign: 'center' as const, flexShrink: 0 }}>
+                <div style={{ width: '44px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {(() => {
                     if (isRoundView && liveRoundThru != null && liveRoundThru > 0) {
                       if (liveRoundThru >= 18) return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
