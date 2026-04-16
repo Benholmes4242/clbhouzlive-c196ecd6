@@ -73,6 +73,7 @@ export function PlayerCardV2({
   const isTourRanking = isEuro || isLPGA || isPGAD || isLIV;
   const isPgaOwgr = activeTour === 'pga' && activeSort === 'world-rank-desc';
   const isPgaEarnings = activeTour === 'pga' && activeSort === 'highest-earnings';
+  const isPgaFedex = activeTour === 'pga' && activeSort === 'fedex-points';
   const winCount = wins ?? 0;
 
   const ariaLabel = [
@@ -91,7 +92,7 @@ export function PlayerCardV2({
     }
     // PGA OWGR: only total points shown (handled separately below), no earnings here
     if (isPgaOwgr) return null;
-    if (activeSort === 'fedex-points') {
+    if (isPgaFedex) {
       return points != null && points > 0
         ? { main: points.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }), label: 'pts' }
         : null;
@@ -176,11 +177,11 @@ export function PlayerCardV2({
 
         {/* Right value */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px 12px 0', flexShrink: 0 }}>
-          {/* Total points — shown for OWGR/default sorts when available, hidden for earnings sort */}
-          {!isTourRanking && !isPgaEarnings && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-            <span style={{ fontSize: '11px', fontWeight: 600, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+          {/* Total points — shown for OWGR/default sorts when available, hidden for earnings/fedex sort */}
+          {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
               {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-              <span style={{ fontSize: '8px', marginLeft: '1px' }}>pts</span>
+              <span style={{ fontSize: '8px', marginLeft: '1px', color: '#94A3B8' }}>pts</span>
             </span>
           )}
           {rightValue && (
@@ -193,8 +194,8 @@ export function PlayerCardV2({
               )}
             </span>
           )}
-          {/* Win count — bold green, hidden for OWGR and earnings sorts */}
-          {!isTourRanking && !isPgaOwgr && !isPgaEarnings && winCount > 0 && activeSort !== 'most-wins' && (
+          {/* Win count — bold green, hidden for OWGR, earnings, and FedEx sorts */}
+          {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
             <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
               {winCount} {winCount === 1 ? 'win' : 'wins'}
             </span>
