@@ -709,32 +709,39 @@ export function PlayersTab() {
                             <CountryFlag country={player.country} size="sm" />
                             {(() => {
                               const runnerStats = statsMap.get(player.playerId);
-                              if (sort === 'highest-earnings') {
-                                const earn = runnerStats?.earnings;
-                                if (!earn || earn <= 0) return null;
-                                return <span style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E' }}>
-                                  {earn >= 1_000_000 ? `$${(earn / 1_000_000).toFixed(1)}M` : `$${(earn / 1_000).toFixed(0)}K`}
-                                </span>;
-                              }
                               if (sort === 'fedex-points') {
                                 const pts = runnerStats?.points;
                                 if (!pts || pts <= 0) return null;
-                                return <span style={{ fontSize: '10px' }}>
-                                  <span style={{ fontWeight: 800, color: '#F7931E' }}>{pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                                </span>;
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                  {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} pts
+                                </div>;
+                              }
+                              if (sort === 'highest-earnings') {
+                                const earn = runnerStats?.earnings;
+                                if (!earn || earn <= 0) return null;
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                  {earn >= 1_000_000 ? `$${(earn / 1_000_000).toFixed(1)}M` : `$${(earn / 1_000).toFixed(0)}K`}
+                                </div>;
                               }
                               if (sort === 'most-wins') {
                                 const wins = runnerStats?.wins;
                                 if (!wins || wins <= 0) return null;
-                                return <span style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E' }}>
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
                                   {wins} {wins === 1 ? 'win' : 'wins'}
-                                </span>;
+                                </div>;
                               }
-                              const pts = runnerStats?.points ?? player.totalPoints ?? player.avgPoints;
+                              if (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') {
+                                const pts = player.avgPoints;
+                                if (!pts || pts <= 0) return null;
+                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                  {pts.toFixed(2)}pts
+                                </div>;
+                              }
+                              const pts = runnerStats?.points ?? player.avgPoints;
                               if (!pts || pts <= 0) return null;
-                              return <span style={{ fontSize: '10px' }}>
-                                <span style={{ fontWeight: 800, color: '#F7931E' }}>{pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                              </span>;
+                              return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
+                                {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
+                              </div>;
                             })()}
                           </div>
                         </div>
