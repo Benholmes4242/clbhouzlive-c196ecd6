@@ -203,7 +203,7 @@ export function CollegeComparePage() {
 
         {/* ── STICKY HEADER ── */}
         <div
-          className="-mx-5 sticky top-0 z-20"
+          className="sticky top-0 z-20"
           style={{
             background: 'rgba(248,250,252,0.97)',
             backdropFilter: 'blur(20px)',
