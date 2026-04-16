@@ -24,12 +24,6 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
     ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
     : null;
 
-  const isLive = tournament.status === 'inprogress';
-  const isUpcoming = tournament.status === 'scheduled' || tournament.status === 'created';
-  const isCompleted = tournament.status === 'closed' || tournament.status === 'complete';
-  const statusLabel = isLive ? 'LIVE' : isUpcoming ? 'UPCOMING' : 'FINAL';
-  const badgeColor = isLive ? '#22C55E' : isUpcoming ? '#F7931E' : '#94A3B8';
-  const badgeBg = isLive ? 'rgba(34,197,94,0.15)' : isUpcoming ? 'rgba(247,147,30,0.15)' : 'rgba(148,163,184,0.15)';
 
   const dateRange = tournament.start_date && tournament.end_date
     ? formatDateRange(tournament.start_date, tournament.end_date)
@@ -70,21 +64,10 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.0) 35%, rgba(15,23,42,0.75) 70%, rgba(15,23,42,1) 100%)' }} />
 
         {/* Top — eyebrow + live badge */}
-        <div style={{ position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 14px)', left: 16, right: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              ⚡ {tournament.tour_full_name?.toUpperCase() ?? 'PGA TOUR'}
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 8px', borderRadius: 6, background: badgeBg, border: `1px solid ${badgeColor}44`, backdropFilter: 'blur(8px)' }}>
-            {isLive && (
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-            )}
-            <span style={{ fontSize: 9, fontWeight: 900, color: badgeColor, letterSpacing: '0.12em' }}>
-              {statusLabel}
-            </span>
-          </div>
+        <div style={{ position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 14px)', left: 16, right: 16 }}>
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            ⚡ {tournament.tour_full_name?.toUpperCase() ?? 'PGA TOUR'}
+          </span>
         </div>
 
         {/* Bottom — location + tournament name */}
