@@ -21,170 +21,82 @@ function formatPurse(purse: number | null): string | null {
   return `$${(purse / 1_000_000).toFixed(1)}M`;
 }
 
-const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
+const LiveEventRow: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boolean }> = ({ tournament, isLast }) => {
   const navigate = useNavigate();
 
   const tourLabel = (() => {
     switch (tournament.tourSlug?.toLowerCase()) {
-      case 'pga': return 'PGA TOUR';
-      case 'euro': return 'PGA TOUR';
+      case 'pga': return 'PGA Tour';
+      case 'euro': return 'DP World Tour';
       case 'lpga': return 'LPGA';
-      case 'liv': return 'LIV';
-      case 'champ': return 'CHAMPIONS';
-      case 'pgad': return 'KORN FERRY';
-      case 'masters': return 'PGA TOUR';
+      case 'liv': return 'LIV Golf';
+      case 'champ': return 'Champions';
+      case 'pgad': return 'Korn Ferry';
       default: return tournament.tourSlug?.toUpperCase() ?? '';
     }
   })();
 
-  const purseStr = formatPurse(tournament.purse);
+  const roundLabel = tournament.currentRound === 4
+    ? 'Final Round'
+    : tournament.currentRound > 0
+    ? `Round ${tournament.currentRound}`
+    : 'Starting Soon';
+
+  const venue = [tournament.venueName, tournament.venueCity].filter(Boolean).join(' · ');
 
   return (
-    <button
+    <div
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="flex-shrink-0 text-left active:scale-[0.97] transition-transform"
+      className="active:opacity-70 transition-opacity"
       style={{
-        width: 286,
-        background: '#ffffff',
-        borderRadius: 14,
-        border: '1px solid rgba(15,23,42,0.09)',
-        boxShadow: '0 2px 12px rgba(15,23,42,0.06)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
+        flexShrink: 0,
+        width: 200,
+        paddingRight: 20,
+        marginRight: isLast ? 0 : 20,
+        borderRight: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)',
+        cursor: 'pointer',
       }}
-      aria-label={`${tournament.name} — live now`}
     >
-      {/* Top accent bar */}
-      <div style={{ height: 3, background: '#141d2e', flexShrink: 0 }} />
-
-      {/* Card body */}
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        {/* Score column */}
-        <div
-          style={{
-            width: 79,
-            flexShrink: 0,
-            padding: '14px 12px 14px 14px',
-            borderRight: '1px solid rgba(15,23,42,0.06)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 40,
-              fontWeight: 900,
-              letterSpacing: '-0.05em',
-              lineHeight: 1,
-              color: '#141d2e',
-            }}
-          >
-            {tournament.leader?.scoreDisplay ?? '—'}
-          </div>
-          <div
-            style={{
-              fontSize: 8,
-              fontWeight: 800,
-              color: '#94A3B8',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              marginTop: 3,
-            }}
-          >
-            TOTAL
-          </div>
-        </div>
-
-        {/* Main info column */}
-        <div style={{ flex: 1, padding: '12px 0 12px 14px', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          {/* Tour + Round */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#141d2e', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              {tourLabel}
-            </span>
-            <span style={{ fontSize: '8.5px', color: '#94A3B8' }}>·</span>
-            <span style={{ fontSize: '8.5px', color: '#94A3B8', letterSpacing: '0.04em' }}>
-              {tournament.currentRound === 4 ? 'Final Round' : `Round ${tournament.currentRound}`}
-            </span>
-          </div>
-
-          {/* Tournament name */}
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 800,
-              color: '#141d2e',
-              lineHeight: 1.2,
-              marginBottom: 4,
-              letterSpacing: '-0.025em',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {tournament.name}
-          </div>
-
-          {/* Venue + city */}
-          {(tournament.venueName || tournament.venueCity) && (
-            <div
-              style={{
-                fontSize: 10,
-                color: '#64748B',
-                marginBottom: 8,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {[tournament.venueName, tournament.venueCity].filter(Boolean).join(', ')}
-            </div>
-          )}
-
-          {/* Hairline */}
-          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', marginBottom: 8 }} />
-
-          {/* Leader row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#1E293B' }}>
-              {tournament.leader ? abbreviateName(tournament.leader.name) : 'Starting soon'}
-            </span>
-            {purseStr && (
-              <>
-                <span style={{ fontSize: 9, color: '#94A3B8' }}>·</span>
-                <span style={{ fontSize: 9, color: '#94A3B8' }}>{purseStr}</span>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Right column */}
-        <div
-          style={{
-            flexShrink: 0,
-            padding: '12px 14px 12px 8px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div
-              className="animate-live-pulse"
-              style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }}
-            />
-            <span style={{ fontSize: '8.5px', fontWeight: 700, color: '#16A34A', letterSpacing: '0.06em' }}>
-              LIVE
-            </span>
-          </div>
-          <ChevronRight style={{ width: 16, height: 16, color: '#CBD5E1' }} />
-        </div>
+      {/* Tour · Round */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
+        <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>
+          {tourLabel}
+        </span>
+        <span style={{ fontSize: 9, color: 'rgba(15,23,42,0.2)' }}>·</span>
+        <span style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em' }}>
+          {roundLabel}
+        </span>
       </div>
-    </button>
+
+      {/* Tournament name */}
+      <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+        {tournament.name}
+      </div>
+
+      {/* Course + city */}
+      {venue && (
+        <div style={{ fontSize: 10, color: '#94A3B8', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+          {venue}
+        </div>
+      )}
+
+      {/* Hairline */}
+      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', marginBottom: 8 }} />
+
+      {/* Leader */}
+      {tournament.leader ? (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
+            {abbreviateName(tournament.leader.name)}
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: '#16A34A', letterSpacing: '-0.03em' }}>
+            {tournament.leader.scoreDisplay}
+          </span>
+        </div>
+      ) : (
+        <div style={{ fontSize: 10, color: '#94A3B8' }}>Starting soon</div>
+      )}
+    </div>
   );
 };
 
