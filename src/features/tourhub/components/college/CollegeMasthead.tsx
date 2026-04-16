@@ -92,9 +92,6 @@ export function CollegeMasthead({
             {/* Left — faded rank + identity + value */}
             <div style={{ flex: 1, minWidth: 0, paddingBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ fontSize: '28px', fontWeight: 900, color: 'rgba(247,147,30,0.15)', lineHeight: 1, letterSpacing: '-0.03em' }}>
-                  1
-                </span>
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>
                     {METRIC_LABEL[activeMetric]}
