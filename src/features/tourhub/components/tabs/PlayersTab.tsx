@@ -604,7 +604,7 @@ export function PlayersTab() {
                         <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
                           {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
-                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>FedEx pts</span>
+                        <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E' }}>pts</span>
                       </div>
                     )
                   ) : sort === 'highest-earnings' ? (
@@ -720,7 +720,7 @@ export function PlayersTab() {
                                 const pts = runnerStats?.points;
                                 if (!pts || pts <= 0) return null;
                                 return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                  {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} pts
+                                  {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}pts
                                 </div>;
                               }
                               if (sort === 'highest-earnings') {
