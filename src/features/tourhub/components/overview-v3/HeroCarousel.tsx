@@ -1702,7 +1702,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
                   </div>
                   {/* ── FOOTER — View Tournament pill only, right-aligned ── */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 18px 16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 18px 90px' }}>
                     <Link
                       to={`/tourhub/tournament/${tournament.id}`}
                       style={{
@@ -1964,9 +1964,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
             zIndex: 30,
             paddingTop: 12,
             paddingBottom: 14,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0) 100%)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: '#141d2e',
             borderTop: '0.5px solid rgba(255,255,255,0.07)',
           }}
         >
