@@ -38,6 +38,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, delay: isCompleted ? 0.9 : 0.1 }}
+      style={{ paddingTop: 24, paddingBottom: 24 }}
     >
       {/* Live header — dispatch style */}
       {!isCompleted && (
