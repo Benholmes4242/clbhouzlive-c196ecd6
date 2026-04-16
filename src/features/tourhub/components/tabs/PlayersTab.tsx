@@ -231,11 +231,11 @@ export function PlayersTab() {
         switch (sort) {
           case 'alpha-az':
           case 'alpha-za': {
-            // Hero frozen to tour's primary ranking in A-Z view
-            const aRank = aStats?.tourRank ?? a.worldRank ?? Infinity;
-            const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
-            if (aRank !== bRank) return aRank - bRank;
-            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+            // Hero always frozen to world rank — tourRank intentionally excluded
+            // to prevent FedEx/tour standings overriding OWGR on PGA
+            const aWR = a.worldRank ?? Infinity;
+            const bWR = b.worldRank ?? Infinity;
+            return aWR - bWR;
           }
           case 'highest-earnings': {
             // Hero shows top earners
