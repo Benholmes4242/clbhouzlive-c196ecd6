@@ -159,22 +159,22 @@ export function CollegeMasthead({
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* College logo */}
-              <div style={{ width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', top: '50%', right: 0, transform: 'translateY(-50%)' }}>
-                {logoUrl ? (
-                  <img
-                    src={logoUrl}
-                    alt={displayName}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                  />
-                ) : (
-                  <span style={{ fontSize: '24px', fontWeight: 900, color: 'rgba(255,255,255,0.15)' }}>
-                    {displayName.charAt(0)}
-                  </span>
-                )}
-              </div>
+            {/* College logo — centered in dead space */}
+            <div style={{ position: 'absolute', top: '50%', right: 0, transform: 'translateY(-50%)', width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={displayName}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <span style={{ fontSize: '24px', fontWeight: 900, color: 'rgba(255,255,255,0.15)' }}>
+                  {displayName.charAt(0)}
+                </span>
+              )}
             </div>
           </div>
         </Link>
