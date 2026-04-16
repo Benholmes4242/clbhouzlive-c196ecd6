@@ -60,18 +60,18 @@ export function CollegeMasthead({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}
+        style={{ background: '#0F172A', padding: '0 16px 0' }}
       >
         {/* Amber eyebrow */}
-        <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
-          ⚡ CLBHOUZ · COLLEGE FRANCHISE RANKINGS
+        <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+          ⚡ CLBHOUZ · COLLEGE RANKINGS
         </div>
 
         {/* Masthead double-rule band */}
         <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
-              College Franchises
+              College Rankings
             </h1>
             <span style={{ fontSize: '9px', fontWeight: 600, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>
               Season 2025–26
@@ -164,12 +164,12 @@ export function CollegeMasthead({
               )}
 
               {/* College logo */}
-              <div style={{ width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '8px' }}>
                 {logoUrl ? (
                   <img
                     src={logoUrl}
                     alt={displayName}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 ) : (
