@@ -85,34 +85,61 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col px-4 pt-8 pb-8">
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-            <Camera className="w-8 h-8 text-muted-foreground/40" />
+      <div style={{ paddingBottom: 40 }}>
+        {/* Hero empty */}
+        <div style={{ padding: '44px 24px 28px', textAlign: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', fontSize: 30 }}>
+            📸
           </div>
-          <div>
-            <p className="text-lg font-bold text-foreground">No photos or videos yet</p>
-            <p className="mt-1.5 text-sm text-muted-foreground max-w-[260px] mx-auto leading-relaxed">
-              Help other golfers discover {courseName || 'this course'} — be the first to share your experience.
-            </p>
-          </div>
-        </div>
-        {/* Supporting tips card */}
-        <div className="mt-8 rounded-2xl border border-border bg-card p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/60 mb-4">
-            What to share
+          <div style={{ fontSize: 19, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', marginBottom: 6 }}>No media yet</div>
+          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
+            Be the first to capture {courseName || 'this course'} — photos and videos from your round help fellow golfers discover it.
           </p>
-          <div className="flex flex-col gap-4">
-            {[
-              { icon: '📸', label: 'Course views and signature holes' },
-              { icon: '🎬', label: 'Short videos from your round' },
-              { icon: '🏠', label: 'Clubhouse, facilities and atmosphere' },
-            ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-3">
-                <span className="text-base">{icon}</span>
-                <p className="text-sm text-muted-foreground">{label}</p>
+          <button
+            type="button"
+            onClick={() => {}}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
+          >
+            📷 Share your experience
+          </button>
+        </div>
+
+        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px 24px' }} />
+
+        {/* What to share guide */}
+        <div style={{ padding: '0 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to share</span>
+          </div>
+          {[
+            { icon: '⛳', label: 'Signature holes', sub: 'Show the world what makes this course special' },
+            { icon: '🎬', label: 'Shots from your round', sub: 'Short clips of your best moments on the course' },
+            { icon: '🌅', label: 'Views & atmosphere', sub: 'Sunsets, landscapes, the feeling of being there' },
+            { icon: '🏠', label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
+          ].map(({ icon, label, sub }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(15,23,42,0.02)', border: '0.5px solid rgba(15,23,42,0.06)' }}>
+              <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.4 }}>{sub}</div>
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Ghost grid preview */}
+        <div style={{ padding: '24px 16px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Your gallery awaits</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, opacity: 0.3, pointerEvents: 'none' }}>
+            <div style={{ height: 160, borderRadius: 6, background: 'linear-gradient(135deg,#0f172a,#1e293b)' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <div style={{ aspectRatio: '3/4', borderRadius: 6, background: 'linear-gradient(135deg,#1e293b,#334155)' }} />
+              <div style={{ aspectRatio: '3/4', borderRadius: 6, background: 'linear-gradient(135deg,#334155,#475569)' }} />
+            </div>
           </div>
         </div>
       </div>
@@ -120,15 +147,67 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   }
 
   let tileIndex = 0;
+  const [firstPost, ...restPosts] = posts;
+  const firstMediaKey = firstPost?.mediaItems[0]?.id || firstPost?.id;
+  const firstIsLandscape = firstPost ? isLandscape(firstPost) : false;
 
   return (
-    <div ref={ref} className="grid grid-cols-2 gap-[2px] grid-flow-dense">
-      {posts.map((post) => {
-        const mediaKey = post.mediaItems[0]?.id || post.id;
-        if (isLandscape(post)) {
+    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* Hero tile — first post, full width, taller */}
+      {firstPost && (
+        <div style={{ position: 'relative' }}>
+          {firstIsLandscape ? (
+            <CourseMediaLandscapeCard
+              key={firstMediaKey}
+              post={firstPost}
+              index={tileIndex++}
+              allPosts={posts}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          ) : (
+            <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden' }}>
+              <CourseMediaTile
+                key={firstMediaKey}
+                post={firstPost}
+                index={tileIndex++}
+                allPosts={posts}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+              />
+            </div>
+          )}
+          {/* Featured badge */}
+          <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(247,147,30,0.92)', backdropFilter: 'blur(4px)', borderRadius: 6, padding: '3px 8px', fontSize: 8, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', pointerEvents: 'none', zIndex: 2 }}>
+            Featured
+          </div>
+        </div>
+      )}
+
+      {/* Rest of posts — 2-col grid, landscape cards span full width */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, gridAutoFlow: 'dense' }}>
+        {restPosts.map((post) => {
+          const mediaKey = post.mediaItems[0]?.id || post.id;
+          if (isLandscape(post)) {
+            const idx = tileIndex++;
+            return (
+              <div key={mediaKey} style={{ gridColumn: '1 / -1' }}>
+                <CourseMediaLandscapeCard
+                  post={post}
+                  index={idx}
+                  allPosts={posts}
+                  fetchNextPage={fetchNextPage}
+                  hasNextPage={hasNextPage}
+                  isFetchingNextPage={isFetchingNextPage}
+                />
+              </div>
+            );
+          }
           const idx = tileIndex++;
           return (
-            <CourseMediaLandscapeCard
+            <CourseMediaTile
               key={mediaKey}
               post={post}
               index={idx}
@@ -138,30 +217,18 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
               isFetchingNextPage={isFetchingNextPage}
             />
           );
-        }
-        const idx = tileIndex++;
-        return (
-          <CourseMediaTile
-            key={mediaKey}
-            post={post}
-            index={idx}
-            allPosts={posts}
-            fetchNextPage={fetchNextPage}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-          />
-        );
-      })}
+        })}
 
-      {/* Infinite scroll sentinel */}
-      <div ref={sentinelRef} className="col-span-2 h-1" />
+        {/* Infinite scroll sentinel */}
+        <div ref={sentinelRef} style={{ gridColumn: '1 / -1', height: 1 }} />
 
-      {/* Loading indicator */}
-      {isFetchingNextPage && (
-        <div className="col-span-2 flex items-center justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
-        </div>
-      )}
+        {/* Loading indicator */}
+        {isFetchingNextPage && (
+          <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+            <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+          </div>
+        )}
+      </div>
     </div>
   );
 });
