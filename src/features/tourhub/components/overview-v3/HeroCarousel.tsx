@@ -1976,8 +1976,8 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
             <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
               All Tours
             </span>
-            <span style={{ fontSize: '7.5px', color: 'rgba(255,255,255,0.18)' }}>
-              {safeSlides.filter(s => s.type === 'live').length} live now
+            <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
+              {safeSlides.filter(s => s.type === 'live').length} Live Now
             </span>
           </div>
 
