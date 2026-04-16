@@ -206,11 +206,11 @@ export function PlayerProfilePage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            paddingTop: 0,
           }}
         >
           {/* Back link */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '0 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '8px 20px 0' }}>
             <button
               onClick={handleBack}
               style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
