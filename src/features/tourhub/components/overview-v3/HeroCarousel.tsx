@@ -94,15 +94,6 @@ function getScoreClass(score: number): string {
   return 'score-even';
 }
 
-const TOUR_SHORT: Record<string, string> = {
-  pga: 'PGA',
-  euro: 'DP World',
-  lpga: 'LPGA',
-  liv: 'LIV',
-  pgad: 'KFT',
-  champ: 'CHAMP',
-};
-
 // Skeleton rows for loading state
 function LeaderboardSkeleton() {
   return (
@@ -898,7 +889,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               flexDirection: 'column' as const,
             } : {
               position: 'absolute',
-              bottom: isExpanded ? 16 : 90,
+              bottom: isExpanded ? 16 : 20,
               left: isExpanded ? 12 : 16,
               ...(isExpanded
                 ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 120px)' }
@@ -1765,7 +1756,6 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
   const touchMoveRef = React.useRef<number>(0);
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const isScorecardOpenRef = React.useRef(false);
-  const railRef = React.useRef<HTMLDivElement>(null);
 
   const scheduleResume = useCallback(() => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
@@ -1831,13 +1821,6 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
       setCurrentIndex(0);
     }
   }, [safeSlides.length, currentIndex]);
-
-  // Auto-scroll the tour pill rail so the active pill is centered
-  useEffect(() => {
-    if (!railRef.current) return;
-    const card = railRef.current.children[currentIndex] as HTMLElement | undefined;
-    if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  }, [currentIndex]);
 
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
@@ -1953,118 +1936,10 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
         ))}
       </AnimatePresence>
 
-      {/* ── TOUR PILL RAIL — fixed footer band at bottom of hero ── */}
-      {!isExpanded && safeSlides.length > 1 && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 30,
-            paddingTop: 12,
-            paddingBottom: 14,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0) 100%)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            borderTop: '0.5px solid rgba(255,255,255,0.07)',
-          }}
-        >
-          {/* Rail label */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 6px' }}>
-            <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
-              All Tours
-            </span>
-            <span style={{ fontSize: '7.5px', color: 'rgba(255,255,255,0.18)' }}>
-              {safeSlides.filter(s => s.type === 'live').length} live now
-            </span>
-          </div>
 
-          {/* Scrollable pill strip */}
-          <div
-            ref={railRef}
-            style={{
-              display: 'flex',
-              gap: 5,
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-              padding: '0 16px',
-            }}
-            className="[&::-webkit-scrollbar]:hidden"
-          >
-            {safeSlides.map((slide, i) => {
-              const isActive = i === currentIndex;
-              const isLive = slide.type === 'live';
-              const tourShort = TOUR_SHORT[slide.tournament.tourSlug] ?? slide.tournament.tourSlug.toUpperCase();
-              return (
-                <button
-                  key={slide.tournament.id}
-                  onClick={() => {
-                    setCurrentIndex(i);
-                    resetAutoAdvance();
-                    setIsPaused(true);
-                    scheduleResume();
-                  }}
-                  style={{
-                    flexShrink: 0,
-                    width: isActive ? 155 : 72,
-                    height: 36,
-                    background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.3)',
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    border: `1px solid ${isActive ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.07)'}`,
-                    borderRadius: 18,
-                    padding: '0 10px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    transition: 'all 0.3s ease',
-                    gap: 6,
-                  }}
-                  className="active:opacity-70 transition-opacity"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, overflow: 'hidden' }}>
-                    <span style={{
-                      width: 4, height: 4, borderRadius: '50%',
-                      background: isLive ? '#22C55E' : 'rgba(247,147,30,0.5)',
-                      flexShrink: 0,
-                    }} />
-                    <span style={{
-                      fontSize: '7.5px', fontWeight: 900,
-                      color: isActive ? '#ffffff' : 'rgba(255,255,255,0.4)',
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase' as const,
-                      whiteSpace: 'nowrap' as const,
-                    }}>
-                      {tourShort}
-                    </span>
-                    {isActive && (
-                      <span style={{
-                        fontSize: '8.5px', fontWeight: 600,
-                        color: 'rgba(255,255,255,0.55)',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap' as const,
-                      }}>
-                        {slide.tournament.name}
-                      </span>
-                    )}
-                  </div>
-                  {/* Score for completed, status for upcoming */}
-                  {isLive ? (
-                    <span style={{ fontSize: '7.5px', fontWeight: 700, color: '#22C55E', flexShrink: 0, letterSpacing: '0.04em' }}>LIVE</span>
-                  ) : slide.type === 'upcoming' ? (
-                    <span style={{ fontSize: 7, color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>Soon</span>
-                  ) : (
-                    <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>Final</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+
+
+
     </div>
   );
 }
