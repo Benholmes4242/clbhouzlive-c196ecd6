@@ -34,7 +34,9 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   fetchNextPage,
   refetch,
   courseName,
+  courseId,
 }, ref) => {
+  const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Infinite scroll sentinel
