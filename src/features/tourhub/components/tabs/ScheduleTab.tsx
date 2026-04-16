@@ -130,6 +130,19 @@ export function ScheduleTab() {
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const [isStuck, setIsStuck] = useState(false);
+
+  useEffect(() => {
+    const el = stickyRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsStuck(entry.intersectionRatio < 1),
+      { threshold: [1], rootMargin: '-1px 0px 0px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
