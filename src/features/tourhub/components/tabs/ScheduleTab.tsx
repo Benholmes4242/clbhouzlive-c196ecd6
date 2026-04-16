@@ -190,6 +190,23 @@ export function ScheduleTab() {
     };
   }, [tournaments, activeTour]);
 
+  const nextUpTournament = useMemo(() => {
+    if (!tournaments) return null;
+    return [...tournaments]
+      .filter(t => t.status === 'scheduled' || t.status === 'created')
+      .sort((a, b) => {
+        const dateDiff = new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        if (dateDiff !== 0) return dateDiff;
+        return (b.purse ?? 0) - (a.purse ?? 0);
+      })[0] ?? null;
+  }, [tournaments]);
+
+  const daysUntilNext = useMemo(() => {
+    if (!nextUpTournament) return null;
+    const diff = new Date(nextUpTournament.start_date).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / 86400000));
+  }, [nextUpTournament]);
+
   const tourCounts = useMemo(() => {
     if (!tournaments) return {} as Record<string, number>;
     let statusFiltered = [...tournaments];
