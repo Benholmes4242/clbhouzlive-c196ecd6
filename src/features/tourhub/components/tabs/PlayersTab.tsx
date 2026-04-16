@@ -615,7 +615,7 @@ export function PlayersTab() {
                             ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
                             : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
                         </span>
-                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>earnings</span>
+                        
                       </div>
                     )
                   ) : sort === 'most-wins' ? (
