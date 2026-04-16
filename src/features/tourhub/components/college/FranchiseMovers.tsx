@@ -66,7 +66,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
       </div>
 
       {/* Rising / Falling toggle */}
-      <div style={{ padding: '0 16px 8px', background: '#ffffff' }}>
+      <div style={{ padding: '8px 16px 10px', background: '#0F172A' }}>
         <div style={{ display: 'flex', gap: '6px' }}>
           {[
             { value: 'up' as Direction, label: '📈 Rising' },
@@ -81,9 +81,9 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                 style={{
                   padding: '7px 0', borderRadius: '8px',
                   fontSize: '11px', fontWeight: isSelected ? 800 : 600,
-                  color: isSelected ? '#ffffff' : '#94A3B8',
-                  background: isSelected ? '#0F172A' : 'transparent',
-                  border: isSelected ? 'none' : '0.5px solid rgba(15,23,42,0.12)',
+                  color: isSelected ? '#ffffff' : 'rgba(148,163,184,0.7)',
+                  background: isSelected ? 'rgba(255,255,255,0.12)' : 'transparent',
+                  border: isSelected ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(255,255,255,0.08)',
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}
               >
