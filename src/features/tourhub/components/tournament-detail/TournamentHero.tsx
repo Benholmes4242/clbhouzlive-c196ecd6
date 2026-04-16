@@ -109,7 +109,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           </h1>
           {(tournament.venue_city || tournament.venue_country) && (
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginBottom: 2 }}>
-              📍 {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
+              {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
             </div>
           )}
           {dateRange && (
@@ -121,7 +121,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
       </div>
 
       {/* 4-col stat grid on slate */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1.4fr', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
         {[
           { label: 'PURSE', value: formattedPurse ?? '—' },
           { label: 'PAR', value: tournament.venue_par ? `Par ${tournament.venue_par}` : '—' },
