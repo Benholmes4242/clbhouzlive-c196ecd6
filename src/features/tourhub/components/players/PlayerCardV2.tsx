@@ -132,7 +132,7 @@ export function PlayerCardV2({
         className="active:bg-black/[0.02] transition-colors"
       >
         {/* Large faded rank number */}
-        <div style={{ width: '44px', padding: '13px 0 13px 14px', flexShrink: 0 }}>
+        <div style={{ width: '52px', padding: '13px 0 13px 14px', flexShrink: 0 }}>
           {worldRank != null && worldRank > 0 ? (
             <span style={{
               fontSize: '18px', fontWeight: 900,
