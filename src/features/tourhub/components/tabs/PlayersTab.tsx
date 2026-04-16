@@ -276,7 +276,7 @@ export function PlayersTab() {
       return false;
     });
 
-    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings' || sort === 'alpha-az' || sort === 'alpha-za';
+    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings';
     
     const toEliteShape = (p: TourPlayer): ElitePlayer => ({
       id: p.id,
@@ -312,7 +312,7 @@ export function PlayersTab() {
     
     if (!tourFilteredPlayers || tourFilteredPlayers.length === 0) return [];
     
-    return sortCandidates(tourFilteredPlayers.map(toEliteShape)).slice(0, 5);
+    return tourFilteredPlayers.slice(0, 5).map(toEliteShape);
   }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap, sort]);
 
   // Search filter
