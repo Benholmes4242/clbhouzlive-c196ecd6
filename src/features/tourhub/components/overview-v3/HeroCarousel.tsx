@@ -1953,7 +1953,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
         ))}
       </AnimatePresence>
 
-      {/* ── TOUR PILL RAIL ── */}
+      {/* ── TOUR PILL RAIL — fixed footer band at bottom of hero ── */}
       {!isExpanded && safeSlides.length > 1 && (
         <div
           style={{
@@ -1962,11 +1962,16 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
             left: 0,
             right: 0,
             zIndex: 30,
+            paddingTop: 12,
             paddingBottom: 14,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0) 100%)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderTop: '0.5px solid rgba(255,255,255,0.07)',
           }}
         >
           {/* Rail label */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 5px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 6px' }}>
             <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
               All Tours
             </span>
