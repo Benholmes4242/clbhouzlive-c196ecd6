@@ -2,7 +2,6 @@
  * PlayerRecentForm - Stat strip showing form label + avg finish + dot sparkline.
  */
 
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 
 interface PlayerRecentFormProps {
@@ -29,7 +28,7 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
         background: '#F8FAFC',
         borderBottom: '0.5px solid rgba(15,23,42,0.07)',
       }}>
-        <TrendingDown style={{ width: 16, height: 16, color: '#94A3B8', flexShrink: 0 }} />
+        <span style={{ fontSize: '16px', flexShrink: 0 }}>📉</span>
         <div>
           <div style={{ fontSize: '14px', fontWeight: 900, color: '#94A3B8', letterSpacing: '-0.02em' }}>Out of form</div>
           <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: 1 }}>
@@ -46,28 +45,28 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
 
   let formLabel: string;
   let textColor: string;
-  let Icon: React.ElementType;
+  let emoji: string;
   let bgChip: string;
 
   if (avgPosition <= 10) {
     formLabel = 'On fire';
     textColor = '#F7931E';
-    Icon = TrendingUp;
+    emoji = '🔥';
     bgChip = 'rgba(247,147,30,0.1)';
   } else if (avgPosition <= 20) {
     formLabel = 'In form';
     textColor = '#F7931E';
-    Icon = TrendingUp;
+    emoji = '📈';
     bgChip = 'rgba(247,147,30,0.1)';
   } else if (avgPosition <= 30) {
     formLabel = 'Steady';
     textColor = '#94A3B8';
-    Icon = Minus;
+    emoji = '➖';
     bgChip = 'rgba(15,23,42,0.06)';
   } else {
     formLabel = 'Out of form';
     textColor = '#DC2626';
-    Icon = TrendingDown;
+    emoji = '📉';
     bgChip = 'rgba(220,38,38,0.08)';
   }
 
@@ -86,7 +85,7 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Left — icon + label + avg */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Icon style={{ width: 16, height: 16, color: textColor, flexShrink: 0 }} />
+          <span style={{ fontSize: '16px', flexShrink: 0 }}>{emoji}</span>
           <div>
             <div style={{ fontSize: '14px', fontWeight: 900, color: textColor, letterSpacing: '-0.02em' }}>
               {formLabel}
