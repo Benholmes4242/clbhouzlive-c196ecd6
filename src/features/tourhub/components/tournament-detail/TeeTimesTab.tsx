@@ -190,7 +190,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Round selector */}
       {showRoundTabs && (
-        <div style={{ padding: '8px 20px' }}>
+        <div style={{ padding: '8px 20px 4px' }}>
           <RoundSelector rounds={availableRounds} activeRound={selectedRound} onRoundChange={setSelectedRound} />
         </div>
       )}
