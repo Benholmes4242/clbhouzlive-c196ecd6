@@ -126,7 +126,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80 }}>
+    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80, background: '#F8FAFC' }}>
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
@@ -143,7 +143,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             onSeeAllReviews={() => onTabChange?.('reviews')}
           />
         </div>
-        <div style={{ padding: '12px 32px 0' }}>
+        <div style={{ padding: '12px 16px 0' }}>
           {userRating ? (
             <button
               onClick={handleRateClick}
@@ -167,7 +167,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 3. Your Journey — PersonalSection renders its own "Your Journey" heading, no SectionLabel */}
       {user && (
         <>
-          <section style={{ padding: '0 16px' }}>
+          <section>
             <PersonalSection courseId={course.id} courseName={course.name} />
           </section>
           <div style={{ margin: '24px 0' }}><Divider /></div>
@@ -186,7 +186,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <>
           <div style={{ padding: '0 16px' }}>
             <SectionLabel text="About" />
-            <div style={{ padding: '0 16px' }}>
+            <div>
               <div style={{ fontSize: 14, color: '#475569', lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
                 {!showFullDescription && shouldShowReadMore && (
@@ -288,20 +288,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 9. Claim Course — single instance, minimal design, no card */}
       {!courseClaim && course.club_id && (
         <>
-          <div style={{ padding: '8px 16px', textAlign: 'center' }}>
-            <div style={{ fontSize: 20, marginBottom: 8 }}>🏌️</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Own or manage this course?</div>
-            <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 0 14px', lineHeight: 1.5 }}>
-              Claim this listing to respond to reviews and update information.
-            </p>
-            <ClaimCourseCTA clubId={course.club_id} clubName={course.name} />
-          </div>
+          <ClaimCourseCTA clubId={course.club_id} clubName={course.name} />
           <div style={{ margin: '24px 0' }}><Divider /></div>
         </>
       )}
 
       {/* 10. Media — AboutMediaStrip renders its own "Media" heading internally, no SectionLabel */}
-      <section style={{ padding: '0 16px' }}>
+      <section>
         <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
       </section>
 
