@@ -196,7 +196,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
       )}
 
       {/* Section rule marker */}
-      <div style={{ padding: '6px 20px 0' }}>
+      <div style={{ padding: '0 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
           <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
