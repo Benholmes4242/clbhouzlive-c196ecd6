@@ -113,7 +113,7 @@ export function LeadersTab() {
       return worldRankings.map((wr) => ({
         player: wr.player,
         playerId: wr.playerId,
-        value: wr.avgPoints,
+        value: wr.totalPoints,
         rank: wr.rank,
       }));
     }
