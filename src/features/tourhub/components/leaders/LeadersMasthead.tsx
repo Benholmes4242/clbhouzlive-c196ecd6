@@ -45,7 +45,6 @@ interface LeadersMastheadProps {
   formatOverride?: (v: number) => string;
   unitOverride?: string;
   leaderValue?: string;
-  onChangeCategoryTap: () => void;
 }
 
 export function LeadersMasthead({
@@ -55,7 +54,6 @@ export function LeadersMasthead({
   formatOverride,
   unitOverride,
   leaderValue,
-  onChangeCategoryTap,
 }: LeadersMastheadProps) {
   if (!leader) return null;
 
@@ -85,30 +83,10 @@ export function LeadersMasthead({
 
         {/* Masthead double-rule band */}
         <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: '14px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {/* Category name as headline */}
+          <div>
             <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>
               {category.label}
             </h1>
-
-            {/* Change category pill */}
-            <button
-              onClick={onChangeCategoryTap}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '5px',
-                padding: '5px 10px', borderRadius: '8px',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                cursor: 'pointer',
-              }}
-              className="active:scale-[0.97] transition-transform"
-            >
-              <span style={{ fontSize: '15px' }}>{(category as any).emoji}</span>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
-                Change
-              </span>
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>▾</span>
-            </button>
           </div>
 
           {/* Stat context inline — tour avg + leader value */}

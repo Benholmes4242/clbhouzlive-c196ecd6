@@ -264,7 +264,6 @@ export function LeadersTab() {
         formatOverride={worldFormatOverride}
         unitOverride={worldUnitOverride}
         leaderValue={leaderValue}
-        onChangeCategoryTap={() => setCategorySheetOpen(true)}
       />
 
       {/* Sticky header — back link + category pill + group tabs + category chips */}
@@ -275,11 +274,10 @@ export function LeadersTab() {
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         }}
       >
-        {/* Back link + category pill */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: '6px' }}>
+        {/* Back link */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0' }}>
           <Link
             to="/tourhub?tab=overview"
             replace
@@ -289,22 +287,6 @@ export function LeadersTab() {
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
           </Link>
-          <div style={{ flex: 1 }} />
-          <button
-            onClick={() => setCategorySheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '5px',
-              padding: '5px 9px', borderRadius: '8px',
-              background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)',
-              boxShadow: '0 1px 3px rgba(15,23,42,0.05)',
-              cursor: 'pointer', flexShrink: 0,
-            }}
-            className="active:scale-[0.97] transition-transform"
-          >
-            <span style={{ fontSize: '13px' }}>{(category as any).emoji}</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>{category.shortLabel}</span>
-            <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
-          </button>
         </div>
 
         {/* Group underline tabs */}
