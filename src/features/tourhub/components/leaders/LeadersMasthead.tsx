@@ -121,13 +121,14 @@ export function LeadersMasthead({
         >
           {/* Left — faded rank + identity + value */}
           <div style={{ flex: 1, minWidth: 0, paddingBottom: '14px' }}>
-            {/* Rank eyebrow */}
+            {/* Large ghost rank number */}
+            <div style={{ fontSize: '72px', fontWeight: 900, color: 'rgba(247,147,30,0.12)', lineHeight: 0.85, letterSpacing: '-0.05em', marginBottom: '2px' }}>
+              1
+            </div>
+            {/* SEASON LEADER eyebrow + country */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: 'rgba(247,147,30,0.2)', lineHeight: 1, letterSpacing: '-0.04em' }}>
-                1
-              </span>
               <div>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>SEASON LEADER</div>
+                <div style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>SEASON LEADER</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
                   <CountryFlag country={leader.player.country_code || leader.player.country} size="sm" />
                   {countryName && (
@@ -182,7 +183,7 @@ export function LeadersMasthead({
                   className="active:opacity-70 transition-opacity"
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                    <span style={{ fontSize: '12px', fontWeight: 900, color: 'rgba(255,255,255,0.15)', width: '14px', flexShrink: 0 }}>
+                    <span style={{ fontSize: '20px', fontWeight: 900, color: 'rgba(255,255,255,0.1)', width: '22px', flexShrink: 0, letterSpacing: '-0.03em' }}>
                       {runner.rank}
                     </span>
                     <div style={{ width: '20px', height: '20px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.06)' }}>
