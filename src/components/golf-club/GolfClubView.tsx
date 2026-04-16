@@ -126,7 +126,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute left-4 flex h-[28px] w-[28px] items-center justify-center active:scale-95 transition-all z-10"
+            className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10"
             style={{
               top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
               borderRadius: '12px',
@@ -138,7 +138,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-[16px] w-[16px] text-white" strokeWidth={2.5} />
+            <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
           </button>
         )}
 
@@ -146,7 +146,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {!isInModal && (
           <button
             onClick={() => safeGoBack(navigate, '/courses')}
-            className="absolute left-4 flex h-[28px] w-[28px] items-center justify-center active:scale-95 transition-all z-10"
+            className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10"
             style={{
               top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
               borderRadius: '12px',
@@ -158,7 +158,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             }}
             aria-label="Go back"
           >
-            <ChevronLeft className="h-[16px] w-[16px] text-white" strokeWidth={2.5} />
+            <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
           </button>
         )}
 
