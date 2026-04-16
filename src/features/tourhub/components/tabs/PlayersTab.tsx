@@ -32,6 +32,7 @@ function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
     'alpha-za': 'Z–A',
     'most-wins': 'Wins',
     'highest-earnings': 'Earnings',
+    'fedex-points': 'FedEx',
     'race-to-dubai': 'Race to Dubai',
     'race-to-cme': 'Race to CME Globe',
     'points-list': 'Points List',
@@ -172,8 +173,8 @@ export function PlayersTab() {
         map.set(ps.player_id, { 
           earnings: ps.earnings, 
           wins: ps.wins,
-          tourRank: ps.earnings_rank ?? ps.fedex_rank ?? null,
-          points: null,
+          tourRank: ps.fedex_rank ?? ps.earnings_rank ?? null,
+          points: ps.fedex_points ?? null,
           tournamentsPlayed: null,
         });
       });
@@ -249,6 +250,12 @@ export function PlayersTab() {
             const bRank = bStats?.tourRank ?? b.worldRank ?? Infinity;
             return aRank - bRank;
           }
+          case 'fedex-points': {
+            const aPts = aStats?.points ?? 0;
+            const bPts = bStats?.points ?? 0;
+            if (bPts !== aPts) return bPts - aPts;
+            return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity);
+          }
           case 'race-to-dubai':
           case 'race-to-cme':
           case 'points-list':
@@ -278,7 +285,7 @@ export function PlayersTab() {
       return false;
     });
 
-    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings';
+    const needsFullPool = sort === 'most-wins' || sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings';
     
     const toEliteShape = (p: TourPlayer): ElitePlayer => ({
       id: p.id,

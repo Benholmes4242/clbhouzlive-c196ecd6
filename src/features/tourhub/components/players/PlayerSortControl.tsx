@@ -19,6 +19,7 @@ export type PlayerSortType =
   | 'alpha-za'
   | 'most-wins'
   | 'highest-earnings'
+  | 'fedex-points'
   | 'race-to-dubai'
   | 'race-to-cme'
   | 'points-list'
@@ -49,11 +50,10 @@ const ALL_TOURS_OPTIONS: { value: PlayerSortType; label: string; shortLabel: str
 ];
 
 const PGA_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
-  { value: 'world-rank-desc', label: 'Highest World Ranking', shortLabel: 'World Ranking' },
-  { value: 'highest-earnings', label: 'Highest Earnings', shortLabel: 'Earnings' },
-  { value: 'most-wins', label: 'Most Wins', shortLabel: 'Wins' },
-  { value: 'alpha-az', label: 'Alphabetical A-Z', shortLabel: 'A-Z' },
-  { value: 'alpha-za', label: 'Alphabetical Z-A', shortLabel: 'Z-A' },
+  { value: 'world-rank-desc', label: 'World Ranking', shortLabel: 'World Ranking' },
+  { value: 'fedex-points', label: 'FedEx Cup Points', shortLabel: 'FedEx' },
+  { value: 'highest-earnings', label: 'Earnings', shortLabel: 'Earnings' },
+  { value: 'alpha-az', label: 'A–Z', shortLabel: 'A–Z' },
 ];
 
 const TOUR_SPECIFIC_OPTIONS: { value: PlayerSortType; label: string; shortLabel: string }[] = [
