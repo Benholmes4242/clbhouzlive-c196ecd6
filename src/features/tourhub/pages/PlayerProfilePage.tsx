@@ -210,7 +210,7 @@ export function PlayerProfilePage() {
           }}
         >
           {/* Back link */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '0 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '4px 20px 0' }}>
             <button
               onClick={handleBack}
               style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
