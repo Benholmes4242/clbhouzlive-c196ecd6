@@ -5,7 +5,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { PredictionScorecardRow } from './PredictionScorecardRow';
-import LiveStatusBar from './components/LiveStatusBar';
 import type { TrackedPrediction } from './types';
 
 interface PredictionLeaderboardProps {
@@ -54,9 +53,6 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
           </div>
         </div>
       )}
-
-      {/* Live status bar */}
-      {!isCompleted && <LiveStatusBar allPicks={allPicks} />}
 
       {/* Player rows */}
       <div>
