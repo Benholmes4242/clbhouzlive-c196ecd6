@@ -37,7 +37,7 @@ import {
 const TOUR_LABELS: Record<string, string> = {
   pga: 'PGA Tour', EURO: 'DP World Tour', LPGA: 'LPGA', CHAMP: 'Champions Tour', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
 };
-
+import { useLiveRightNow } from '../../hooks/useOverviewModules';
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
