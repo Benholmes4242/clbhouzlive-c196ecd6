@@ -78,6 +78,8 @@ export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
+  const [isTabsSticky, setIsTabsSticky] = useState(false);
+  const stickysentinelRef = useRef<HTMLDivElement>(null);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
   
@@ -91,6 +93,18 @@ export function ScheduleTab() {
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
     });
+  }, []);
+
+  // Detect when tabs become sticky
+  useEffect(() => {
+    const sentinel = stickysentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsTabsSticky(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
   // Default to upcoming tab on fresh mount (no filter param in URL)
@@ -446,14 +460,13 @@ export function ScheduleTab() {
 
         </div>
       )}
-
-
-
+      {/* Sentinel for sticky detection */}
+      <div ref={stickysentinelRef} style={{ height: 1, marginTop: -1 }} />
 
       {/* Content below hero */}
       <div
         className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+        style={{ paddingTop: isTabsSticky ? 'calc(16px + env(safe-area-inset-top, 0px))' : '0px', transition: 'padding-top 0.15s ease' }}
       >
         {/* ── ROW 1: Filter underline tabs ── */}
         <div style={{ padding: '0' }}>
