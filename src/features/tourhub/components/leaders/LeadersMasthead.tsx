@@ -200,10 +200,11 @@ export function LeadersMasthead({
                     padding: '10px 12px',
                     borderRight: i === 0 ? '0.5px solid rgba(255,255,255,0.06)' : 'none',
                     textDecoration: 'none',
+                    overflow: 'hidden',
                   }}
                   className="active:opacity-70 transition-opacity"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, overflow: 'hidden' }}>
                     <span style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(255,255,255,0.15)', width: '16px', flexShrink: 0 }}>
                       {runner.rank}
                     </span>
@@ -216,11 +217,11 @@ export function LeadersMasthead({
                         onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
                       />
                     </div>
-                    <span style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    <span style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, minWidth: 0 }}>
                       {runnersLastName}
                     </span>
                   </div>
-                  <span style={{ fontSize: '15px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginLeft: '6px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginLeft: '6px' }}>
                     {fmtRunner(runner.value)}{unitRunner ? ` ${unitRunner}` : ''}
                   </span>
                 </Link>
