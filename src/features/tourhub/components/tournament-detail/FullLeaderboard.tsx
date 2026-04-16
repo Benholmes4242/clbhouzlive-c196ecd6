@@ -209,7 +209,7 @@ export function FullLeaderboard({
             <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R4</span>
           </>
         )}
-        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
           {selectedRound === 'Overall' ? 'TOT' : 'SCORE'}
         </span>
         <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
@@ -280,7 +280,7 @@ export function FullLeaderboard({
                   </>
                 )}
 
-                <div style={{ width: '44px', textAlign: 'right' as const, flexShrink: 0 }}>
+                <div style={{ width: '44px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {selectedRound === 'Overall' ? (
                     <ScoreToPar score={entry.score} className="text-sm" />
                   ) : completedRoundScore != null ? (

@@ -101,7 +101,7 @@ export function LeaderboardCard({
         <span style={{ width: '36px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
         <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
         <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
-        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>SCORE</span>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>SCORE</span>
       </div>
 
       {/* Rows */}
@@ -148,7 +148,7 @@ export function LeaderboardCard({
                 </div>
 
                 {/* Score to par */}
-                <div style={{ width: '44px', textAlign: 'right' as const, flexShrink: 0 }}>
+                <div style={{ width: '44px', textAlign: 'center' as const, flexShrink: 0 }}>
                   <ScoreToPar score={entry.score} className="text-[14px]" />
                 </div>
               </Link>
