@@ -86,9 +86,9 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PROGRAM</span>
-        <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
-        <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
-        <span style={{ width: '80px', textAlign: 'right' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>HEAD-TO-HEAD</span>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
+        <span style={{ width: '52px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
+        <span style={{ width: '80px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>HEAD-TO-HEAD</span>
       </div>
 
       {enrichedRivalries.map((rivalry, i) => {
@@ -134,18 +134,18 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
             </div>
 
             {/* Wins */}
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {rivalStats?.wins_total ?? '—'}
             </span>
 
             {/* Earnings compact */}
-            <span style={{ width: '52px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ width: '52px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {rivalStats ? `$${(rivalStats.earnings_total / 1_000_000).toFixed(0)}M` : '—'}
             </span>
 
             {/* H2H chip */}
             {h2hLabel && (
-              <div style={{ width: '80px', display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
+              <div style={{ width: '80px', display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: h2hColor, background: h2hBg, padding: '3px 7px', borderRadius: '5px', whiteSpace: 'nowrap' as const }}>
                   {h2hLabel}
                 </span>
