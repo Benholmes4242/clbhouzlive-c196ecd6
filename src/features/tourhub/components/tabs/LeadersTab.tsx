@@ -148,7 +148,7 @@ export function LeadersTab() {
 
   // World rank overrides
   const worldFormatOverride = isWorldCategory
-    ? (v: number) => `${v.toFixed(2)}pts`
+    ? (v: number) => `${Math.round(v)}pts`
     : undefined;
   const worldUnitOverride = isWorldCategory ? '' : undefined;
 
