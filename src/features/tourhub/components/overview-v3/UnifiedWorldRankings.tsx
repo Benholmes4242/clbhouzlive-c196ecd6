@@ -322,12 +322,12 @@ export function UnifiedWorldRankings() {
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                 <span style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>
-                  {top.avg_points?.toFixed(2) ?? '—'}
+                  {top.avg_points ? Math.round(top.avg_points) : '—'}
                 </span>
                 <span style={{ fontSize: 8.5, color: '#94A3B8', letterSpacing: '0.06em' }}>AVG PTS</span>
                 <span style={{ fontSize: 11, color: '#E2E8F0', margin: '0 2px' }}>·</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#475569', fontVariantNumeric: 'tabular-nums' }}>
-                  {top.total_points?.toLocaleString(undefined, { maximumFractionDigits: 1 }) ?? '—'}
+                  {top.total_points ? Math.round(top.total_points).toLocaleString() : '—'}
                 </span>
                 <span style={{ fontSize: 8.5, color: '#94A3B8', letterSpacing: '0.06em' }}>TOTAL</span>
               </div>
@@ -468,7 +468,7 @@ export function UnifiedWorldRankings() {
                     borderBottom: '0.5px solid rgba(15,23,42,0.06)',
                     background: isHighlighted ? 'rgba(247,147,30,0.03)' : 'transparent',
                   }}
-                  aria-label={`${fullName}, rank ${entry.rank}, average ${entry.avg_points?.toFixed(2) ?? 'N/A'} points`}
+                  aria-label={`${fullName}, rank ${entry.rank}, ${entry.avg_points ? Math.round(entry.avg_points) : 'N/A'} points`}
                 >
                   {/* Large grey rank number */}
                   <div style={{ width: 48, flexShrink: 0 }}>
@@ -512,7 +512,7 @@ export function UnifiedWorldRankings() {
                   {/* Avg points */}
                   <div style={{ width: 52, textAlign: 'right' as const, flexShrink: 0 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: isCrown ? '#F7931E' : '#334155', fontVariantNumeric: 'tabular-nums' }}>
-                      {entry.avg_points?.toFixed(2) ?? '—'}
+                      {entry.avg_points ? Math.round(entry.avg_points) : '—'}
                     </span>
                   </div>
 
@@ -520,7 +520,7 @@ export function UnifiedWorldRankings() {
                   <div style={{ width: 52, textAlign: 'right' as const, flexShrink: 0 }}>
                     <span style={{ fontSize: 11, color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
                       {entry.total_points
-                        ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                        ? Math.round(entry.total_points).toLocaleString()
                         : '—'}
                     </span>
                   </div>

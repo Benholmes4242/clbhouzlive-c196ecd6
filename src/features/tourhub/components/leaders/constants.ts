@@ -52,7 +52,7 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     tourAverage: '',
     accentColor: '#B8860B',
     accessor: (s) => s.world_rank,
-    format: (v) => `${v.toFixed(2)}pts`,
+    format: (v) => `${Math.round(v)}pts`,
   },
   {
     key: 'events_played',

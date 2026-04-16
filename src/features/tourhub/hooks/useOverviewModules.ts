@@ -785,8 +785,8 @@ export function usePlayerSpotlight() {
           pgaTourId: player.pga_tour_id || null,
           tourCode: player.tour_codes?.[0] ?? 'pga',
           label: 'World No. 1',
-          statLabel: 'Avg Points',
-          statValue: worldNo1.avg_points?.toFixed(2) || 'N/A',
+          statLabel: 'Total Points',
+          statValue: worldNo1.avg_points ? Math.round(worldNo1.avg_points).toLocaleString() : 'N/A',
           rank: 1,
         } as SpotlightPlayer;
       }
