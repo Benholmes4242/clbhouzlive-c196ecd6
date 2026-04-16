@@ -20,6 +20,14 @@ export interface PickHistoryEntry {
   year: string;
 }
 
+/** Major tournament name matching (sr_tournaments has no is_major column) */
+const MAJOR_NAMES = ['masters tournament', 'u.s. open', 'pga championship', 'the open championship'];
+
+function isMajor(name: string): boolean {
+  const lower = name.toLowerCase();
+  return MAJOR_NAMES.some(k => lower.includes(k));
+}
+
 /** Extract a short display name from a full tournament name */
 function getShortName(name: string): string {
   const skipWords = new Set(['open', 'classic', 'invitational', 'championship', 'tournament', 'the', 'at']);
@@ -63,7 +71,7 @@ export function usePickHistory() {
           tournament_id,
           predictions,
           sr_tournaments!inner(
-            id, name, status, start_date, season_id, is_major
+            id, name, status, start_date, season_id
           )
         `)
         .in('sr_tournaments.status', ['closed', 'complete'])
@@ -113,7 +121,7 @@ export function usePickHistory() {
         if (!tournament) continue;
 
         // For EURO season tournaments, only include majors (e.g. The Masters)
-        if (euroSeasonIds.includes(tournament.season_id) && !tournament.is_major) continue;
+        if (euroSeasonIds.includes(tournament.season_id) && !isMajor(tournament.name || '')) continue;
 
         const rawPredictions = (row.predictions as any[]) || [];
         const maps = lbByTournament.get(row.tournament_id);
