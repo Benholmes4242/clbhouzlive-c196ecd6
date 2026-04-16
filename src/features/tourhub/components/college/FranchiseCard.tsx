@@ -126,7 +126,7 @@ export function FranchiseCard({
         className="active:bg-black/[0.02] transition-colors"
       >
         {/* Faded rank number */}
-        {rank !== undefined && (
+        {rank !== undefined && !isDelta && (
           <div style={{ width: '32px', flexShrink: 0, textAlign: 'center' as const }}>
             <span style={{
               fontSize: '16px', fontWeight: 900,
