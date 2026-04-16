@@ -74,6 +74,7 @@ export function PlayerCardV2({
   const isPgaOwgr = activeTour === 'pga' && activeSort === 'world-rank-desc';
   const isPgaEarnings = activeTour === 'pga' && activeSort === 'highest-earnings';
   const isPgaFedex = activeTour === 'pga' && activeSort === 'fedex-points';
+  const isAlpha = activeSort === 'alpha-az' || activeSort === 'alpha-za';
   const winCount = wins ?? 0;
 
   const ariaLabel = [
@@ -131,23 +132,25 @@ export function PlayerCardV2({
         }}
         className="active:bg-black/[0.02] transition-colors"
       >
-        {/* Large faded rank number */}
-        <div style={{ width: '52px', padding: '13px 0 13px 14px', flexShrink: 0 }}>
-          {worldRank != null && worldRank > 0 ? (
-            <span style={{
-              fontSize: '18px', fontWeight: 900,
-              color: isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)',
-              lineHeight: 1, letterSpacing: '-0.03em', display: 'block',
-            }}>
-              {worldRank}
-            </span>
-          ) : (
-            <span style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(15,23,42,0.12)' }}>—</span>
-          )}
-        </div>
+        {/* Large faded rank number — hidden for A-Z sorts */}
+        {!isAlpha && (
+          <div style={{ width: '52px', padding: '13px 0 13px 14px', flexShrink: 0 }}>
+            {worldRank != null && worldRank > 0 ? (
+              <span style={{
+                fontSize: '18px', fontWeight: 900,
+                color: isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)',
+                lineHeight: 1, letterSpacing: '-0.03em', display: 'block',
+              }}>
+                {worldRank}
+              </span>
+            ) : (
+              <span style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(15,23,42,0.12)' }}>—</span>
+            )}
+          </div>
+        )}
 
         {/* Avatar */}
-        <div style={{ width: '34px', height: '34px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', marginRight: '10px' }}>
+        <div style={{ width: '34px', height: '34px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', marginLeft: isAlpha ? '14px' : '0', marginRight: '10px' }}>
           <img
             src={photoUrl}
             alt={player.fullName}
@@ -175,31 +178,31 @@ export function PlayerCardV2({
           </div>
         </div>
 
-        {/* Right value */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px 12px 0', flexShrink: 0 }}>
-          {/* Total points — shown for OWGR/default sorts when available, hidden for earnings/fedex sort */}
-          {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-              {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-            </span>
-          )}
-          {rightValue && (
-            <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-              {rightValue.main}
-              {rightValue.label && (
-                <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
-                  {rightValue.label}
-                </span>
-              )}
-            </span>
-          )}
-          {/* Win count — bold green, hidden for OWGR, earnings, and FedEx sorts */}
-          {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
-              {winCount} {winCount === 1 ? 'win' : 'wins'}
-            </span>
-          )}
-        </div>
+        {/* Right value — hidden for A-Z sorts */}
+        {!isAlpha && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px 12px 0', flexShrink: 0 }}>
+            {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+              </span>
+            )}
+            {rightValue && (
+              <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                {rightValue.main}
+                {rightValue.label && (
+                  <span style={{ fontSize: '9px', fontWeight: 500, color: '#94A3B8', marginLeft: '2px' }}>
+                    {rightValue.label}
+                  </span>
+                )}
+              </span>
+            )}
+            {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
+                {winCount} {winCount === 1 ? 'win' : 'wins'}
+              </span>
+            )}
+          </div>
+        )}
       </Link>
     </motion.div>
   );
