@@ -426,6 +426,23 @@ export function PlayersTab() {
   const displayRows = rows.slice(0, visibleCount);
   const hasMore = visibleCount < totalCount;
 
+  // Auto-load more players when sentinel scrolls into view
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingRef.current) {
+          isFetchingRef.current = true;
+          setVisibleCount(c => c + PAGE_SIZE);
+          setTimeout(() => { isFetchingRef.current = false; }, 300);
+        }
+      },
+      { rootMargin: '400px', threshold: 0 },
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, visibleCount]);
+
   const contentKey = `${activeTour}-${debouncedSearch}-${sort}`;
 
   // Loading skeleton
