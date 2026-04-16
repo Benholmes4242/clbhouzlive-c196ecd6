@@ -112,6 +112,9 @@ export function usePickHistory() {
         const tournament = (row as any).sr_tournaments;
         if (!tournament) continue;
 
+        // For EURO season tournaments, only include majors (e.g. The Masters)
+        if (euroSeasonIds.includes(tournament.season_id) && !tournament.is_major) continue;
+
         const rawPredictions = (row.predictions as any[]) || [];
         const maps = lbByTournament.get(row.tournament_id);
         if (!maps) continue;
