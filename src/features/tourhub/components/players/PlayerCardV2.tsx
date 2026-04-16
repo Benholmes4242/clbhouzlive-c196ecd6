@@ -184,6 +184,12 @@ export function PlayerCardV2({
               )}
             </span>
           )}
+          {/* Win count — bold green, next to earnings */}
+          {!isTourRanking && winCount > 0 && activeSort !== 'most-wins' && (
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
+              {winCount} {winCount === 1 ? 'win' : 'wins'}
+            </span>
+          )}
         </div>
       </Link>
     </motion.div>
