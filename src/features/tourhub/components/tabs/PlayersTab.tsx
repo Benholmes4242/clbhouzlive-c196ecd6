@@ -927,7 +927,7 @@ export function PlayersTab() {
           const isPGAD = activeTour === 'PGAD';
           const isLIV = activeTour === 'LIV';
           const opts: { value: PlayerSortType; label: string }[] =
-            isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'most-wins', label: 'Most Wins' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
+            isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isPGAD ? [{ value: 'points-list', label: 'Points List' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
             : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
