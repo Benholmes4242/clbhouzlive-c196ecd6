@@ -38,6 +38,7 @@ const TOUR_LABELS: Record<string, string> = {
   pga: 'PGA Tour', EURO: 'DP World Tour', LPGA: 'LPGA', CHAMP: 'Champions Tour', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
 };
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
+import { LiveRightNow } from '../overview-v3/LiveRightNow';
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
@@ -438,101 +439,8 @@ export function ScheduleTab() {
             </div>
           )}
 
-          {/* Live Now — carousel matching Tour Overview */}
-          {liveTournaments && liveTournaments.length > 0 && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: '#16A34A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                  Live Now
-                </span>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  overflowX: 'auto',
-                  scrollbarWidth: 'none',
-                  WebkitOverflowScrolling: 'touch' as any,
-                  marginLeft: -20,
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                }}
-                className="[&::-webkit-scrollbar]:hidden"
-              >
-                {liveTournaments.map((tournament, i) => {
-                  const isLast = i === liveTournaments.length - 1;
-                  const tourLabel = (() => {
-                    switch (tournament.tourSlug?.toLowerCase()) {
-                      case 'pga': return 'PGA Tour';
-                      case 'euro': return 'DP World Tour';
-                      case 'lpga': return 'LPGA';
-                      case 'liv': return 'LIV Golf';
-                      case 'champ': return 'Champions';
-                      case 'pgad': return 'Korn Ferry';
-                      default: return tournament.tourSlug?.toUpperCase() ?? '';
-                    }
-                  })();
-                  const roundLabel = tournament.currentRound === 4
-                    ? 'Final Round'
-                    : tournament.currentRound > 0
-                    ? `Round ${tournament.currentRound}`
-                    : 'Starting Soon';
-                  const venue = [tournament.venueName, tournament.venueCity].filter(Boolean).join(' · ');
-                  const abbreviateName = (name: string) => {
-                    const parts = name.trim().split(' ');
-                    if (parts.length < 2) return name;
-                    return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
-                  };
-                  return (
-                    <div
-                      key={tournament.id}
-                      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-                      className="active:opacity-70 transition-opacity"
-                      style={{
-                        flexShrink: 0,
-                        width: 200,
-                        paddingRight: 20,
-                        marginRight: isLast ? 0 : 20,
-                        borderRight: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
-                        <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>
-                          {tourLabel}
-                        </span>
-                        <span style={{ fontSize: 9, color: 'rgba(15,23,42,0.2)' }}>·</span>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8' }}>
-                          {roundLabel}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                        {tournament.name}
-                      </div>
-                      {venue && (
-                        <div style={{ fontSize: 10, color: '#94A3B8', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                          {venue}
-                        </div>
-                      )}
-                      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', marginBottom: 8 }} />
-                      {tournament.leader ? (
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                          <span style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
-                            {abbreviateName(tournament.leader.name)}
-                          </span>
-                          <span style={{ fontSize: 14, fontWeight: 900, color: '#16A34A', letterSpacing: '-0.03em' }}>
-                            {tournament.leader.scoreDisplay}
-                          </span>
-                        </div>
-                      ) : (
-                        <div style={{ fontSize: 10, color: '#94A3B8' }}>Starting soon</div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {/* Live Now — reuse the Tour Overview component */}
+          <LiveRightNow />
 
         </div>
       )}
