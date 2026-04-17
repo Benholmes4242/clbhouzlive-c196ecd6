@@ -70,6 +70,14 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
+const FALLBACK_PALETTE = ['#1F2937', '#334155', '#475569', '#5B6470', '#3F4A55', '#2C3540', '#404B58', '#525E6B'];
+function getAvatarFallbackColor(userId: string | null | undefined): string {
+  if (!userId) return FALLBACK_PALETTE[0];
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) hash = (hash * 31 + userId.charCodeAt(i)) | 0;
+  return FALLBACK_PALETTE[Math.abs(hash) % FALLBACK_PALETTE.length];
+}
+
 function selectGlobalEyebrow(args: {
   isLoggedIn: boolean;
   hasData: boolean;
@@ -1166,12 +1174,48 @@ function PlayerStandings({
             </span>
 
             {/* Avatar */}
-            <SquircleAvatar
-              src={p.avatar_url}
-              alt={p.display_name ?? ''}
-              size={30}
-              fallback={getInitials(p.display_name ?? p.username ?? '')}
-            />
+            {p.avatar_url ? (
+              <div
+                style={{
+                  width: 30,
+                  aspectRatio: '1 / 1.05',
+                  borderRadius: '34%',
+                  overflow: 'hidden',
+                  border: isYou
+                    ? '0.5px solid #9F1D1D'
+                    : '0.5px solid rgba(15,23,42,0.18)',
+                  background: '#fff',
+                }}
+              >
+                <SquircleAvatar
+                  src={p.avatar_url}
+                  alt={p.display_name ?? ''}
+                  size={30}
+                  fallback={getInitials(p.display_name ?? p.username ?? '')}
+                  hideRing
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  width: 30,
+                  aspectRatio: '1 / 1.05',
+                  borderRadius: '34%',
+                  background: getAvatarFallbackColor(p.user_id),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  border: isYou
+                    ? '0.5px solid #9F1D1D'
+                    : '0.5px solid rgba(15,23,42,0.18)',
+                }}
+              >
+                {getInitials(p.display_name ?? p.username ?? '')}
+              </div>
+            )}
 
             {/* Name + caption */}
             <div style={{ minWidth: 0, paddingLeft: 4 }}>
