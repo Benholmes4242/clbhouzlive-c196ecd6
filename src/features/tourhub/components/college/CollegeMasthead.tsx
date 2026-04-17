@@ -60,17 +60,17 @@ export function CollegeMasthead({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        style={{ background: '#0F172A', padding: '0 16px 0' }}
+        style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}
       >
         {/* Amber eyebrow */}
-        <div style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+        <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
           ⚡ CLBHOUZ · COLLEGE RANKINGS
         </div>
 
         {/* Masthead double-rule band */}
-        <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0' }}>
+        <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, margin: 0 }}>
               College Rankings
             </h1>
             <span style={{ fontSize: '9px', fontWeight: 600, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>
@@ -102,11 +102,11 @@ export function CollegeMasthead({
                 </div>
               </div>
 
-              <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.05, margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.05, margin: '0 0 8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {displayName}
               </h2>
 
-              <div style={{ fontSize: '18px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em' }}>
+              <div style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em' }}>
                 {primaryValue}
               </div>
             </div>

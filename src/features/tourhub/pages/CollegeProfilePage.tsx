@@ -140,42 +140,50 @@ export function CollegeProfilePage() {
       {/* ── SLATE EDITORIAL MASTHEAD ── */}
       <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
         {/* Amber eyebrow */}
-        <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '8px' }}>
+        <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
           ⚡ CLBHOUZ · COLLEGE FRANCHISE
         </div>
 
-        {/* College name + rank chip */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px', marginBottom: '8px' }}>
-          <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0, flex: 1 }}>
-            {displayName}
-          </h1>
-          {collegeRank && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', borderRadius: '6px', background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.27)', flexShrink: 0, marginTop: '2px' }}>
-              <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.1em' }}>
-                #{collegeRank}
-              </span>
-              <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>EARNINGS</span>
-            </div>
-          )}
+        {/* Masthead double-rule band */}
+        <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, margin: 0, flex: 1 }}>
+              {displayName}
+            </h1>
+            {collegeRank && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', borderRadius: '6px', background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.27)', flexShrink: 0 }}>
+                <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.1em' }}>
+                  #{collegeRank}
+                </span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>EARNINGS</span>
+              </div>
+            )}
+          </div>
+
+          {/* Stat context row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+            {subtitleText && (
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{subtitleText}</span>
+            )}
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.15)' }}>·</span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', fontWeight: 800 }}>Season {seasonYear}</span>
+          </div>
         </div>
 
-        {/* Subtitle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          {subtitleText && (
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>{subtitleText}</span>
-          )}
-          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)' }}>·</span>
-          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>Season {seasonYear}</span>
-        </div>
-
-        {/* Cover story — earnings dominant left, logo chip right */}
+        {/* Cover story — ghost rank + earnings, logo right */}
         {stats && (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '14px', marginBottom: 0 }}>
             <div style={{ flex: 1, paddingBottom: '14px' }}>
-              <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
+              {/* Large ghost rank number */}
+              {collegeRank && (
+                <div style={{ fontSize: '72px', fontWeight: 900, color: 'rgba(247,147,30,0.12)', lineHeight: 0.85, letterSpacing: '-0.05em', marginBottom: '2px' }}>
+                  {collegeRank}
+                </div>
+              )}
+              <div style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
                 Season Earnings
               </div>
-              <div style={{ fontSize: '34px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.05em', lineHeight: 1 }}>
+              <div style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', lineHeight: 1 }}>
                 {formatCurrency(stats.earnings_total)}
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
@@ -222,10 +230,10 @@ export function CollegeProfilePage() {
               { label: 'ALUMNI', value: String(stats.player_count), accent: false },
             ] as const).map((s, i) => (
               <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
-                <div style={{ fontSize: '8px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>
+                <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>
                   {s.label}
                 </div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: s.accent ? '#F7931E' : '#ffffff' }}>
+                <div style={{ fontSize: '14px', fontWeight: 900, color: s.accent ? '#F7931E' : '#ffffff', letterSpacing: '-0.02em' }}>
                   {s.value}
                 </div>
               </div>

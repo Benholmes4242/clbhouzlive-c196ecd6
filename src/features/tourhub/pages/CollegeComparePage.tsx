@@ -26,8 +26,20 @@ export function CollegeComparePage() {
         {/* ── SLATE EDITORIAL MASTHEAD ── */}
         <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
           {/* Amber eyebrow */}
-          <div style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '8px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
             ⚡ CLBHOUZ · COLLEGE HEAD-TO-HEAD
+          </div>
+
+          {/* Masthead double-rule band */}
+          <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, margin: 0 }}>
+                Head-to-Head
+              </h1>
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', fontWeight: 800 }}>
+                Season 2025–26
+              </span>
+            </div>
           </div>
 
           {!hasValidParams ? (
@@ -129,7 +141,7 @@ export function CollegeComparePage() {
                           </div>
                         </div>
                       </div>
-                      <div style={{ fontSize: '22px', fontWeight: 900, color: c1Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                      <div style={{ fontSize: '24px', fontWeight: 900, color: c1Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
                         {formatEarnings(c1Earnings)}
                       </div>
                       {c1Overall && (
@@ -170,7 +182,7 @@ export function CollegeComparePage() {
                           )}
                         </div>
                       </div>
-                      <div style={{ fontSize: '22px', fontWeight: 900, color: c2Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                      <div style={{ fontSize: '24px', fontWeight: 900, color: c2Overall ? '#F7931E' : 'rgba(255,255,255,0.5)', letterSpacing: '-0.04em', lineHeight: 1 }}>
                         {formatEarnings(c2Earnings)}
                       </div>
                       {c2Overall && (
@@ -191,7 +203,7 @@ export function CollegeComparePage() {
                     ] as const).map((s, i) => (
                       <div key={s.l} style={{ padding: '8px 0 10px', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
                         <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', marginBottom: '3px' }}>{s.l}</div>
-                        <div style={{ fontSize: '13px', fontWeight: 800, color: i === 0 ? '#F7931E' : '#ffffff' }}>{s.v}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 900, color: i === 0 ? '#F7931E' : '#ffffff', letterSpacing: '-0.02em' }}>{s.v}</div>
                       </div>
                     ))}
                   </div>
