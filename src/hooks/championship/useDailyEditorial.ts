@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UseDailyEditorialArgs {
+  /** Which surface this editorial is for. Defaults to 'top100' for back-compat. */
+  surface?: 'top100' | 'global';
   seasonId: string | null;
   timeFilter: 'seasonal' | 'all_time';
   enabled?: boolean;
@@ -29,6 +31,7 @@ function todayUtc(): string {
  * fired), returns `null` and the caller should fall back to a baseline template.
  */
 export function useDailyEditorial({
+  surface = 'top100',
   seasonId,
   timeFilter,
   enabled = true,
@@ -36,13 +39,14 @@ export function useDailyEditorial({
   const today = todayUtc();
 
   return useQuery({
-    queryKey: ['championship-editorial-daily', seasonId, timeFilter, today],
+    queryKey: ['championship-editorial-daily', surface, seasonId, timeFilter, today],
     enabled: enabled && (timeFilter === 'all_time' || !!seasonId),
     staleTime: 1000 * 60 * 30, // 30 minutes
     queryFn: async (): Promise<EditorialCopy | null> => {
       let query = supabase
         .from('championship_editorial_daily')
         .select('eyebrow, headline, headline_two, standfirst, story_type, generated_by, date')
+        .eq('surface', surface)
         .eq('time_filter', timeFilter)
         .lte('date', today)
         .order('date', { ascending: false })
