@@ -128,23 +128,11 @@ function selectHandicapEyebrow(args: {
   return args.defaultEyebrow;
 }
 
-// ── TrendArrow ───────────────────────────────────────────────────────────
-// Semantic direction props prevent colour-inversion regressions. See header.
-function TrendArrow({
-  direction,
-  size = 9,
-}: {
-  direction: 'improving' | 'drifting' | 'steady';
-  size?: number;
-}) {
-  if (direction === 'improving') {
-    return <span style={{ color: SUCCESS, fontSize: size, fontWeight: 800 }}>↓</span>;
-  }
-  if (direction === 'drifting') {
-    return <span style={{ color: CRIMSON, fontSize: size, fontWeight: 800 }}>↑</span>;
-  }
-  return <span style={{ color: HAIRLINE, fontSize: size }}>—</span>;
-}
+// (TrendArrow removed — per-row trend caption replaced with home club name.
+//  The inverted-colour convention documented at the top of this file still
+//  applies to the box-score SEASON cell and the trajectory year-on-year value,
+//  which compute their colours inline.)
+
 
 // ── TrajectorySparkline ──────────────────────────────────────────────────
 function TrajectorySparkline({
@@ -289,8 +277,13 @@ export function LowestHandicapLeaderboard({
   }, [peerGroup, allEntries]);
 
   // ── User rank in current peer group ────────────────────────────────────
+  // For top100, fall back to the user's true global rank when they sit
+  // outside the first 100 returned rows. For other scopes, absence from
+  // the returned list genuinely means "not in this peer group".
   const meEntry = displayEntries.find((e) => e.user_id === user?.id);
-  const peerRank = meEntry?.rank ?? null;
+  const peerRank =
+    meEntry?.rank ??
+    (peerGroup === 'top100' ? userStatus?.handicap_rank ?? null : null);
 
   // ── Personalised eyebrow ───────────────────────────────────────────────
   const personalisedEyebrow = useMemo(() => {
@@ -704,6 +697,9 @@ export function LowestHandicapLeaderboard({
 
             {/* Sparkline */}
             <div style={{ marginBottom: 12 }}>
+              {/* viewBox is the coordinate space; preserveAspectRatio="none" + width:100%
+                  stretches to the container; vectorEffect="non-scaling-stroke" keeps the
+                  1.5px line weight constant regardless of stretch. */}
               <TrajectorySparkline data={trajectoryPoints} width={320} height={56} />
               <div
                 style={{
@@ -998,9 +994,9 @@ export function LowestHandicapLeaderboard({
             {displayEntries.map((p, i) => {
               const isLast = i === displayEntries.length - 1;
               const isYou = p.user_id === user?.id;
-              const tier = getHandicapTier(p.handicap_index);
-              // Per-row trend not yet available from RPC — render 'steady' for now (Phase 2)
-              const trend: 'improving' | 'drifting' | 'steady' = 'steady' as 'improving' | 'drifting' | 'steady';
+              const rawTier = getHandicapTier(p.handicap_index);
+              // Hacker rolls into Weekend per brief — never render "HKR" or "Happy Hacker".
+              const tier: HandicapTier = rawTier === 'hacker' ? 'weekend' : rawTier;
 
               return (
                 <div
@@ -1057,7 +1053,7 @@ export function LowestHandicapLeaderboard({
                     fallback={getInitials(p.display_name ?? p.username ?? '')}
                   />
 
-                  {/* Name + trend */}
+                  {/* Name + home club */}
                   <div style={{ minWidth: 0, paddingLeft: 4 }}>
                     <div
                       style={{
@@ -1090,19 +1086,12 @@ export function LowestHandicapLeaderboard({
                         fontSize: 10,
                         color: INK_FAINT,
                         marginTop: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 4,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
                       }}
                     >
-                      <TrendArrow direction={trend} size={9} />
-                      <span>
-                        {trend === 'improving'
-                          ? 'improving'
-                          : trend === 'drifting'
-                          ? 'drifting'
-                          : 'steady'}
-                      </span>
+                      {p.home_club || 'Independent'}
                     </div>
                   </div>
 
