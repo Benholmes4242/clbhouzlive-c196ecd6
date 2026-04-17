@@ -29,17 +29,27 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/messages/', // Chat view has its own header
   '/profile/', // User profile pages - immersive full-bleed hero
   '/top100/', // Individual region top 100 pages - immersive layout
-  '/tourhub', // Tour Hub - all tabs & sub-pages are fully immersive
-  '/tour', // Tour Hub alias
   '/discover/explore/region/', // Individual region pages - immersive hero
   '/achievements/', // Other user's quest page - has own back nav
 ] as const;
 
 /**
- * Special routes that are conditionally excluded based on query params
- * Currently no conditional exclusions — Tour Hub is fully excluded via prefix.
+ * Special routes that are conditionally excluded based on query params.
+ * Tour Hub: show CompactHeader ONLY on Schedule and Players tabs.
+ * Overview, Leaderboards, and all sub-pages remain immersive.
  */
-export function isConditionallyExcluded(_pathname: string, _searchParams: URLSearchParams): boolean {
+export function isConditionallyExcluded(pathname: string, searchParams: URLSearchParams): boolean {
+  // Tour Hub overview routes — only Schedule & Players get the header.
+  if (pathname === '/tourhub' || pathname === '/tour') {
+    const tab = searchParams.get('tab');
+    return tab !== 'schedule' && tab !== 'players';
+  }
+
+  // All sub-pages under /tourhub/... or /tour/... stay immersive.
+  if (pathname.startsWith('/tourhub/') || pathname.startsWith('/tour/')) {
+    return true;
+  }
+
   return false;
 }
 
