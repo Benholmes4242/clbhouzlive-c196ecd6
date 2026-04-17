@@ -454,7 +454,7 @@ export function ExplorationTab() {
       {editorialPending ? (
         <EditorialLedeSkeleton />
       ) : (
-        <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
           <div
             style={{
               fontSize: 10,
@@ -746,7 +746,7 @@ export function ExplorationTab() {
       {userStatus?.country_list && userStatus.country_list.length > 0 && (
         <div style={{ padding: '22px 20px 0' }}>
           <SectionLabel>{`COUNTRIES PLAYED · ${countriesPlayed}`}</SectionLabel>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
             {userStatus.country_list.map((country) => (
               <div
                 key={country}
@@ -950,11 +950,13 @@ function ProgressTrack({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-      <div style={{ width: 18, height: 1, background: INK }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+      <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+      <div style={{ width: 12, height: 1, background: INK }} />
       <span style={{ fontSize: 10, fontWeight: 800, color: INK, letterSpacing: '0.22em' }}>
         {children}
       </span>
+      <div style={{ width: 12, height: 1, background: INK }} />
       <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
     </div>
   );
@@ -994,7 +996,7 @@ function PlayerStandings({
   return (
     <>
       {/* Scope tabs */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8, justifyContent: 'center' }}>
         {[
           { key: 'global' as const, label: 'Global' },
           { key: 'friends' as const, label: 'Friends' },

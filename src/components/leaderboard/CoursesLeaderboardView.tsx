@@ -413,7 +413,7 @@ export function CoursesLeaderboardView() {
       {editorialPending ? (
         <EditorialLedeSkeleton />
       ) : (
-        <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
             {personalisedEyebrow}
           </div>
@@ -544,12 +544,14 @@ export function CoursesLeaderboardView() {
 
       {/* ── BY REGION ────────────────────────────────────────────── */}
       <div style={{ padding: '22px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
           <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>BY REGION</span>
+          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
-        <div style={{ display: 'flex', gap: 5, overflowX: 'auto', paddingBottom: 2, WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ display: 'flex', gap: 5, overflowX: 'auto', paddingBottom: 2, WebkitOverflowScrolling: 'touch', justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
             { key: 'global' as const, label: 'Global' },
             { key: 'gb-i' as const, label: 'GB&I' },
@@ -578,9 +580,11 @@ export function CoursesLeaderboardView() {
       {/* ── FROM YOUR CIRCLE ────────────────────────────────────── */}
       {circleRecentRounds && circleRecentRounds.length > 0 && (
         <div style={{ padding: '22px 20px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
             <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
             <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           </div>
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
@@ -638,11 +642,13 @@ export function CoursesLeaderboardView() {
 
       {/* ── THE FULL LIST ───────────────────────────────────────── */}
       <div style={{ padding: '26px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
           <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>
             THE FULL LIST
           </span>
+          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
 
