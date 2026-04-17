@@ -38,7 +38,7 @@ const INK_BODY = '#475569';
 const INK_MUTED = '#64748B';
 const INK_FAINT = '#94A3B8';
 const HAIRLINE = '#CBD5E1';
-const BG = '#FAFAF6';
+const BG = '#F8FAFC';
 const AMBER = '#F7931E';
 const AMBER_DARK = '#F59E0B';
 
