@@ -155,7 +155,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 gap: 4,
                 background: 'none',
                 border: 'none',
-                color: '#F7931E',
+                color: '#94A3B8',
                 fontSize: 11,
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -240,9 +240,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                padding: '4px 8px',
+                padding: '3px 8px',
                 borderRadius: 6,
-                background: 'rgba(15,23,42,0.04)',
+                background: 'rgba(15,23,42,0.03)',
+                border: '0.5px solid rgba(15,23,42,0.08)',
               }}
             >
               <span style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -292,7 +293,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
       {/* Helpful row — only for other reviews */}
       {!isMine && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
           <span style={{ fontSize: 11, color: '#94A3B8', marginRight: 2 }}>Helpful?</span>
           <button
             type="button"
@@ -302,18 +303,18 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              padding: '4px 10px',
-              borderRadius: 999,
-              background: isHelpful ? 'rgba(247,147,30,0.1)' : 'transparent',
-              border: `1px solid ${isHelpful ? 'rgba(247,147,30,0.3)' : 'rgba(15,23,42,0.1)'}`,
+              padding: '5px 10px',
+              borderRadius: 8,
+              background: isHelpful ? 'rgba(15,23,42,0.06)' : 'transparent',
+              border: `1px solid ${isHelpful ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.07)'}`,
               fontSize: 11,
-              fontWeight: 700,
-              color: isHelpful ? '#F7931E' : '#64748B',
+              fontWeight: isHelpful ? 700 : 500,
+              color: isHelpful ? '#0F172A' : '#94A3B8',
               cursor: votingDisabled ? 'default' : 'pointer',
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            👍 {helpfulCount > 0 ? helpfulCount : ''}
+            👍 {helpfulCount}
           </button>
           <button
             type="button"
@@ -323,18 +324,18 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              padding: '4px 10px',
-              borderRadius: 999,
+              padding: '5px 10px',
+              borderRadius: 8,
               background: isUnhelpful ? 'rgba(15,23,42,0.06)' : 'transparent',
-              border: `1px solid ${isUnhelpful ? 'rgba(15,23,42,0.2)' : 'rgba(15,23,42,0.1)'}`,
+              border: `1px solid ${isUnhelpful ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.07)'}`,
               fontSize: 11,
-              fontWeight: 700,
-              color: isUnhelpful ? '#0F172A' : '#64748B',
+              fontWeight: isUnhelpful ? 700 : 500,
+              color: isUnhelpful ? '#0F172A' : '#94A3B8',
               cursor: votingDisabled ? 'default' : 'pointer',
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            👎
+            👎 {review.unhelpfulCount}
           </button>
         </div>
       )}
