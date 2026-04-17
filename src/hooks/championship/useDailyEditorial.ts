@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UseDailyEditorialArgs {
@@ -42,6 +42,7 @@ export function useDailyEditorial({
     queryKey: ['championship-editorial-daily', surface, seasonId, timeFilter, today],
     enabled: enabled && (timeFilter === 'all_time' || !!seasonId),
     staleTime: 1000 * 60 * 30, // 30 minutes
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<EditorialCopy | null> => {
       let query = supabase
         .from('championship_editorial_daily')
