@@ -707,7 +707,7 @@ export function ExplorationTab() {
                     color: isCurrent ? CRIMSON : isUnlocked ? INK_FAINT : HAIRLINE,
                   }}
                 >
-                  {isCurrent ? '● NOW' : isUnlocked ? '✓' : getTierAbbr(t.id)}
+                  {isCurrent ? '● NOW' : isUnlocked ? 'DONE' : getTierAbbr(t.id)}
                 </div>
                 <div
                   style={{
@@ -1053,16 +1053,19 @@ function PlayerStandings({
             <div
               key={i}
               style={{
-                display: 'flex',
+                display: 'grid',
+                gridTemplateColumns: '26px 38px 1fr 28px 38px',
                 alignItems: 'center',
-                gap: 10,
+                gap: 4,
                 padding: '12px 0',
                 borderBottom: '1px solid rgba(15,23,42,0.07)',
               }}
             >
-              <div style={{ width: 26, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
               <div style={{ width: 30, height: 30, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
-              <div style={{ flex: 1, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2, width: '60%' }} />
+              <div style={{ height: 12, background: 'rgba(15,23,42,0.06)', borderRadius: 2, justifySelf: 'end', width: 20 }} />
+              <div style={{ height: 18, background: 'rgba(15,23,42,0.06)', borderRadius: 2, justifySelf: 'end', width: 32 }} />
             </div>
           ))}
         </div>
@@ -1263,16 +1266,18 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
             <div
               key={i}
               style={{
-                display: 'flex',
+                display: 'grid',
+                gridTemplateColumns: '26px 28px 1fr 60px',
                 alignItems: 'center',
-                gap: 10,
+                gap: 4,
                 padding: '12px 0',
                 borderBottom: '1px solid rgba(15,23,42,0.07)',
               }}
             >
-              <div style={{ width: 26, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
-              <div style={{ width: 20, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
-              <div style={{ flex: 1, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ width: 22, height: 16, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2, width: '60%' }} />
+              <div style={{ height: 18, background: 'rgba(15,23,42,0.06)', borderRadius: 2, justifySelf: 'end', width: 36 }} />
             </div>
           ))}
         </div>
