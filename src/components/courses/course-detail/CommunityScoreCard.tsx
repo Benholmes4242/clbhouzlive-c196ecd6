@@ -283,19 +283,20 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         })}
       </div>
 
-      {/* Category breakdown — 4 col */}
+      {/* Category breakdown — score rings */}
       {categories.length > 0 && (
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateColumns: `repeat(${categories.length}, 1fr)`,
             gap: 8,
-            paddingTop: 14,
+            paddingTop: 16,
             borderTop: '0.5px solid rgba(15,23,42,0.07)',
           }}
         >
           {categories.map((cat) => (
             <div key={cat.id} style={{ textAlign: 'center' as const }}>
+              <ScoreRing score={cat.score || 0} size={50} />
               <div
                 style={{
                   fontSize: 8,
@@ -303,13 +304,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   color: '#94A3B8',
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase' as const,
-                  marginBottom: 3,
+                  marginTop: 6,
                 }}
               >
                 {cat.label}
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 900, color: '#0F172A' }}>
-                {formatScore(cat.score || 0)}
               </div>
             </div>
           ))}
