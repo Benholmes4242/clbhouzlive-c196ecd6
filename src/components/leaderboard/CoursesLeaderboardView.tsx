@@ -161,12 +161,47 @@ export function CoursesLeaderboardView() {
 
   const allCourses = useMemo(() => data?.pages.flatMap(p => p.entries) ?? [], [data?.pages]);
 
-  // ─── Editorial ─────────────────────────────────────────────────────
-  const { data: editorial, isPending: editorialPending } = useDailyEditorial({
-    surface: 'courses',
-    seasonId: null,
-    timeFilter: 'all_time',
-  });
+  // ─── Sort-aware masthead derived from the list (single source of truth) ─
+  const masthead = allCourses[0] ?? null;
+
+  const mastheadCopy = useMemo(() => {
+    if (!masthead) return null;
+
+    const name = masthead.course_name;
+    const ratingValue = masthead.avg_rating;
+    const rating = ratingValue != null ? ratingValue.toFixed(1) : null;
+    const plays = masthead.times_played ?? 0;
+    const ratingCount = masthead.rating_count ?? 0;
+    const ratingsLabel = ratingCount === 1 ? 'rating' : 'ratings';
+
+    if (sort === 'highest_rated') {
+      return {
+        eyebrow: 'HIGHEST RATED',
+        headline: name,
+        headlineTwo: rating ? `sits at ${rating}` : 'leads the list',
+        standfirst: rating
+          ? `${name} leads the Clbhouz list, averaging ${rating} out of ten across ${ratingCount} ${ratingsLabel}.`
+          : `${name} leads the Clbhouz list.`,
+      };
+    }
+
+    if (sort === 'most_played') {
+      return {
+        eyebrow: 'MOST PLAYED',
+        headline: name,
+        headlineTwo: `played ${plays} times`,
+        standfirst: `${name} is the community's most-logged course, with ${plays} rounds on record.`,
+      };
+    }
+
+    // sort === 'rising' (labelled "Trending" in the UI)
+    return {
+      eyebrow: 'TRENDING NOW',
+      headline: name,
+      headlineTwo: 'is climbing',
+      standfirst: `${name} is picking up momentum, with ${ratingCount} ${ratingsLabel} from the Clbhouz community.`,
+    };
+  }, [masthead, sort]);
 
   // ─── Spotlight ─────────────────────────────────────────────────────
   const { data: spotlight, isLoading: spotlightLoading } = useSpotlightCourse();
