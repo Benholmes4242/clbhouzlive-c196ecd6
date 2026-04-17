@@ -382,14 +382,23 @@ async function writeEditorial(
     },
   };
 
-  // Upsert keyed on the partial unique indexes
-  const conflictTarget = snapshot.seasonId
-    ? 'season_id,time_filter,date'
-    : 'time_filter,date';
+  // Postgrest upsert can't target partial unique indexes, so do a
+  // delete-then-insert scoped to today's row for this (season, time_filter).
+  let deleteQuery = supabase
+    .from('championship_editorial_daily')
+    .delete()
+    .eq('time_filter', snapshot.timeFilter)
+    .eq('date', today);
+  deleteQuery = snapshot.seasonId
+    ? deleteQuery.eq('season_id', snapshot.seasonId)
+    : deleteQuery.is('season_id', null);
+
+  const { error: deleteErr } = await deleteQuery;
+  if (deleteErr) throw deleteErr;
 
   const { error } = await supabase
     .from('championship_editorial_daily')
-    .upsert(row, { onConflict: conflictTarget });
+    .insert(row);
 
   if (error) throw error;
 
