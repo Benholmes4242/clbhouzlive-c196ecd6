@@ -1016,11 +1016,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 <>
                   <div style={{
                     flexShrink: 0,
-                    paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
+                    // Header sits below status bar + global header. Tighter on short screens.
+                    paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + clamp(36px, 8vh, 65px))',
                   }}>
                     <div style={{ padding: '0 16px' }}>
                       {/* ZONE A — Tour + Dates row */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.18)', marginBottom: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 'clamp(6px, 1.2vh, 10px)', borderBottom: '1px solid rgba(255,255,255,0.18)', marginBottom: 'clamp(8px, 1.6vh, 12px)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ background: '#fff', borderRadius: 4, padding: '2px 7px', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
                             {getTourDisplayName(tournament.tourSlug)}
@@ -1043,11 +1044,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         )}
                       </div>
 
-                      {/* ZONE B — Tournament name + venue */}
+                      {/* ZONE B — Tournament name + venue (fluid by viewport height) */}
                       <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
                         <h2 style={{
-                          fontSize: 40, fontWeight: 900, color: '#fff',
-                          letterSpacing: '-0.03em', lineHeight: 0.95, margin: 0, marginBottom: 10,
+                          fontSize: 'clamp(26px, 4.8vh, 40px)', fontWeight: 900, color: '#fff',
+                          letterSpacing: '-0.03em', lineHeight: 0.95, margin: 0, marginBottom: 'clamp(6px, 1.2vh, 10px)',
                           display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical' as const,
@@ -1059,7 +1060,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
                         className="active:opacity-70 transition-opacity cursor-pointer"
-                        style={{ fontSize: 15, fontWeight: 600, color: '#fff', background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                        style={{ fontSize: 'clamp(13px, 1.8vh, 15px)', fontWeight: 600, color: '#fff', background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
                       >
                         {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </button>
@@ -1611,12 +1612,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const }}
+                  style={{ overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
                 >
-                  {/* Main content — grows to fill */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end', padding: '0 18px' }}>
+                  {/* Main content — grows to fill, scales fluidly with viewport height */}
+                  <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end', padding: '0 18px', gap: 'clamp(6px, 1.2vh, 10px)' }}>
                   {/* ── COURSE FACT CHIPS ── */}
-                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10 }}>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 'clamp(4px, 0.8vh, 6px)' }}>
                     {[
                       tournament.purse      && { value: formatPurse(tournament.purse),                          label: 'Purse'  },
                       tournament.venuePar   && { value: `Par ${tournament.venuePar}`,                           label: 'Course' },
@@ -1624,12 +1625,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     ].filter(Boolean).map((chip: any) => (
                       <div key={chip.label} style={{
                         flex: 1, textAlign: 'center',
-                        padding: '8px 4px 6px',
+                        padding: 'clamp(5px, 1vh, 8px) 4px clamp(4px, 0.8vh, 6px)',
                         borderRadius: 10,
                         background: 'rgba(255,255,255,0.06)',
                         border: '1px solid rgba(255,255,255,0.08)',
                       }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+                        <div style={{ fontSize: 'clamp(12px, 1.7vh, 14px)', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
                           {chip.value}
                         </div>
                         <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
@@ -1655,8 +1656,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         background: 'rgba(255,255,255,0.06)',
                         border: '1px solid rgba(255,255,255,0.09)',
                         borderRadius: 12,
-                        padding: '10px 12px',
-                        marginTop: 8, marginBottom: 10,
+                        padding: 'clamp(7px, 1.2vh, 10px) 12px',
                       }}
                     >
                       {/* Avatar */}
@@ -1677,7 +1677,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   )}
 
                   {/* Echo — tour hub contextual */}
-                  <div style={{ paddingBottom: 10 }}>
+                  <div style={{ paddingBottom: 'clamp(2px, 0.6vh, 8px)' }}>
                     <EchoContextualButton
                       prompt={
                         isLive
@@ -1701,8 +1701,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   </div>
 
                   </div>
-                  {/* ── FOOTER — View Tournament pill only, right-aligned ── */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 18px 90px' }}>
+                  {/* ── FOOTER — View Tournament pill only, right-aligned. paddingBottom reserves space for absolute pill rail (~80px) ── */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 18px 90px' }}>
                     <Link
                       to={`/tourhub/tournament/${tournament.id}`}
                       style={{

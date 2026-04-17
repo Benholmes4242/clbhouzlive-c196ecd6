@@ -94,14 +94,14 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
   ];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, margin: '12px 0' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, margin: 'clamp(4px, 1vh, 12px) 0' }}>
       {cells.map((cell, i) => (
         <div key={cell.label} style={{ display: 'contents' }}>
           {/* Cell */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, padding: '8px 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, padding: 'clamp(4px, 1vh, 8px) 0' }}>
             <span style={{
               fontFamily: "'JetBrains Mono','SF Mono',monospace",
-              fontSize: 'clamp(36px, 13vw, 52px)', fontWeight: 900,
+              fontSize: 'clamp(28px, min(13vw, 6.5vh), 52px)', fontWeight: 900,
               color: cell.isAccent ? '#4ade80' : '#FFFFFF',
               lineHeight: 1,
               letterSpacing: -3,
@@ -114,7 +114,7 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
               color: 'rgba(255,255,255,0.30)',
               textTransform: 'uppercase',
               letterSpacing: '1.5px',
-              marginTop: 6,
+              marginTop: 'clamp(3px, 0.6vh, 6px)',
             }}>
               {cell.label}
             </span>
@@ -123,10 +123,10 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
           {/* Colon separator — between cells only */}
           {i < cells.length - 1 && (
             <span style={{
-              fontSize: 'clamp(28px, 10vw, 40px)', fontWeight: 300,
+              fontSize: 'clamp(22px, min(10vw, 5vh), 40px)', fontWeight: 300,
               color: 'rgba(255,255,255,0.20)',
               lineHeight: 1,
-              marginBottom: 16,
+              marginBottom: 'clamp(10px, 2vh, 16px)',
             }}>:</span>
           )}
         </div>
