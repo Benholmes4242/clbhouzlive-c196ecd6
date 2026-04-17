@@ -20,7 +20,15 @@ const corsHeaders = {
 };
 
 type TimeFilter = 'seasonal' | 'all_time';
-type Surface = 'top100' | 'global';
+type Surface = 'top100' | 'global' | 'courses';
+
+type CoursesStoryType =
+  | 'personal_pick'
+  | 'circle_activity'
+  | 'region_trending'
+  | 'course_top'
+  | 'course_new_entry'
+  | 'courses_quiet';
 
 type StoryType =
   | 'leader_change'
@@ -528,6 +536,175 @@ function generateGlobalEditorial(
 }
 
 // ----------------------------------------------------------------------------
+// Courses snapshot, story selection, templates
+// ----------------------------------------------------------------------------
+
+interface CoursesLeaderRow {
+  course_id: string;
+  course_name: string;
+  country: string | null;
+  city: string | null;
+  region: string | null;
+  image_url: string | null;
+  avg_rating: number;
+  rating_count: number;
+  total_rounds: number;
+  rank: number;
+  rank_change: number;
+}
+
+interface CoursesSnapshot {
+  leader: CoursesLeaderRow | null;
+  movers: CoursesLeaderRow[];
+  newEntryInTop10: CoursesLeaderRow | null;
+  regionTrending: { country: string; count: number } | null;
+  topThirty: CoursesLeaderRow[];
+}
+
+async function buildCoursesSnapshot(
+  supabase: ReturnType<typeof createClient>,
+): Promise<CoursesSnapshot> {
+  const { data: rows, error } = await supabase.rpc('get_course_leaderboard', {
+    p_sort_by: 'rating',
+    p_sort_order: 'desc',
+    p_time_period: 'all_time',
+    p_current_user_id: null,
+    p_limit: 30,
+    p_offset: 0,
+    p_country: null,
+    p_sub_country: null,
+    p_exclude_countries: null,
+  });
+  if (error) throw error;
+
+  const list = ((rows ?? []) as Array<Record<string, unknown>>).map((r) => ({
+    course_id: String(r.course_id ?? ''),
+    course_name: String(r.course_name ?? 'A course'),
+    country: (r.country as string | null) ?? null,
+    city: (r.city as string | null) ?? null,
+    region: (r.region as string | null) ?? null,
+    image_url: (r.image_url as string | null) ?? null,
+    avg_rating: Number(r.avg_rating ?? 0),
+    rating_count: Number(r.rating_count ?? 0),
+    total_rounds: Number(r.total_rounds ?? 0),
+    rank: Number(r.rank ?? 0),
+    rank_change: Number(r.rank_change ?? 0),
+  })) as CoursesLeaderRow[];
+
+  const movers = list.filter((r) => r.rank_change > 0).slice(0, 5);
+  const newEntries = list.filter((r) => r.rank <= 10 && r.rank_change >= 5);
+
+  const regionCounts: Record<string, number> = {};
+  for (const m of movers) {
+    if (m.country) regionCounts[m.country] = (regionCounts[m.country] ?? 0) + 1;
+  }
+  const topRegion = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])[0];
+  const regionTrending =
+    topRegion && topRegion[1] >= 3
+      ? { country: topRegion[0], count: topRegion[1] }
+      : null;
+
+  return {
+    leader: list[0] ?? null,
+    movers,
+    newEntryInTop10: newEntries[0] ?? null,
+    regionTrending,
+    topThirty: list,
+  };
+}
+
+function selectCoursesStory(snap: CoursesSnapshot): CoursesStoryType {
+  if (snap.newEntryInTop10) return 'course_new_entry';
+  if (snap.regionTrending) return 'region_trending';
+  if (snap.leader) return 'course_top';
+  return 'courses_quiet';
+}
+
+function ordinalCourse(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
+}
+
+function spellCourseNumber(n: number): string {
+  const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+  return words[n] ?? String(n);
+}
+
+function generateCoursesEditorial(
+  snap: CoursesSnapshot,
+  storyType: CoursesStoryType,
+): EditorialOutput {
+  switch (storyType) {
+    case 'course_top': {
+      const l = snap.leader!;
+      return {
+        storyType,
+        eyebrow: 'THE COURSE OF THE DAY',
+        headline: l.course_name,
+        headlineTwo: `sits at ${l.avg_rating.toFixed(1)}.`,
+        standfirst: `${l.course_name} leads the Clbhouz list, with ${l.rating_count} ${l.rating_count === 1 ? 'rating' : 'ratings'} from the community averaging ${l.avg_rating.toFixed(1)} out of ten.`,
+      };
+    }
+    case 'course_new_entry': {
+      const e = snap.newEntryInTop10!;
+      const where = e.country ? ` in ${e.country}` : '';
+      return {
+        storyType,
+        eyebrow: 'NEW IN THE TOP TEN',
+        headline: e.course_name,
+        headlineTwo: 'enters the top ten.',
+        standfirst: `${e.course_name}${where} has climbed ${e.rank_change} ${e.rank_change === 1 ? 'place' : 'places'} to rank ${ordinalCourse(e.rank)}, rated ${e.avg_rating.toFixed(1)} across the community.`,
+      };
+    }
+    case 'region_trending': {
+      const r = snap.regionTrending!;
+      const names = snap.movers
+        .filter((m) => m.country === r.country)
+        .slice(0, 2)
+        .map((m) => m.course_name);
+      const namesText = names.length === 2 ? `${names[0]} and ${names[1]}` : names[0] ?? '';
+      return {
+        storyType,
+        eyebrow: `THIS WEEK IN ${r.country.toUpperCase()}`,
+        headline: r.country,
+        headlineTwo: 'rises on the board.',
+        standfirst: `${spellCourseNumber(r.count)} courses from ${r.country} have climbed the rankings this week${namesText ? `, including ${namesText}` : ''}.`,
+      };
+    }
+    case 'circle_activity':
+      return {
+        storyType,
+        eyebrow: 'FROM YOUR CIRCLE',
+        headline: 'Your friends played',
+        headlineTwo: 'notable courses this week.',
+        standfirst:
+          'Scroll down to see where your circle has been logging rounds across the Clbhouz list.',
+      };
+    case 'personal_pick':
+      // Phase 2 — per-user. Falls back to quiet copy in the shared editorial.
+      return {
+        storyType: 'courses_quiet',
+        eyebrow: 'THE CLBHOUZ LIST',
+        headline: 'The world\u2019s greatest',
+        headlineTwo: 'courses, ranked.',
+        standfirst:
+          'The Clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
+      };
+    case 'courses_quiet':
+    default:
+      return {
+        storyType: 'courses_quiet',
+        eyebrow: 'THE CLBHOUZ LIST',
+        headline: 'The world\u2019s greatest',
+        headlineTwo: 'courses, ranked.',
+        standfirst:
+          'The Clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
+      };
+  }
+}
+
+// ----------------------------------------------------------------------------
 // Persist
 // ----------------------------------------------------------------------------
 
@@ -701,6 +878,43 @@ serve(async (req) => {
     } catch (err) {
       console.error('Global editorial generation failed', err);
       // Don't throw — let the seasonal editorial still succeed
+    }
+
+    // 4. Courses editorial — daily, all_time / no season
+    try {
+      const coursesSnapshot = await buildCoursesSnapshot(supabase);
+      const coursesStoryType = selectCoursesStory(coursesSnapshot);
+      const coursesEditorial = generateCoursesEditorial(coursesSnapshot, coursesStoryType);
+      await writeEditorial(supabase, {
+        surface: 'courses',
+        seasonId: null,
+        timeFilter: 'all_time',
+        editorial: coursesEditorial,
+        snapshotData: {
+          leader: coursesSnapshot.leader,
+          movers: coursesSnapshot.movers,
+          newEntryInTop10: coursesSnapshot.newEntryInTop10,
+          regionTrending: coursesSnapshot.regionTrending,
+        },
+      });
+      results.push({
+        surface: 'courses',
+        timeFilter: 'all_time',
+        seasonId: null,
+        storyType: coursesEditorial.storyType,
+        headline: coursesEditorial.headline,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Courses editorial generation failed', msg);
+      results.push({
+        surface: 'courses' as Surface,
+        timeFilter: 'all_time',
+        seasonId: null,
+        storyType: 'error',
+        headline: `__error: ${msg}`,
+      });
+      // Don't throw — let seasonal + global editorials still succeed
     }
 
     return new Response(
