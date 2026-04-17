@@ -203,3 +203,6 @@ verify_jwt = false
 
 [functions.select-review-of-week]
 verify_jwt = false
+
+[functions.daily-editorial-generation]
+verify_jwt = false

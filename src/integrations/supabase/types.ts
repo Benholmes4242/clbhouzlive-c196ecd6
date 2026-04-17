@@ -1659,6 +1659,59 @@ export type Database = {
           },
         ]
       }
+      championship_editorial_daily: {
+        Row: {
+          created_at: string
+          date: string
+          eyebrow: string
+          generated_by: string
+          headline: string
+          headline_two: string
+          id: string
+          season_id: string | null
+          snapshot_data: Json | null
+          standfirst: string
+          story_type: string
+          time_filter: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          eyebrow: string
+          generated_by?: string
+          headline: string
+          headline_two?: string
+          id?: string
+          season_id?: string | null
+          snapshot_data?: Json | null
+          standfirst: string
+          story_type: string
+          time_filter: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          eyebrow?: string
+          generated_by?: string
+          headline?: string
+          headline_two?: string
+          id?: string
+          season_id?: string | null
+          snapshot_data?: Json | null
+          standfirst?: string
+          story_type?: string
+          time_filter?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "championship_editorial_daily_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       championship_seasons: {
         Row: {
           color: string | null

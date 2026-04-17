@@ -21,6 +21,12 @@ export interface ChampionshipSeason {
   end_date: string;
   status: 'upcoming' | 'active' | 'completed';
   days_remaining: number;
+  /** Editorial: prize copy shown in the dark sponsor card (e.g. "£750 voucher"). */
+  prize_description?: string | null;
+  /** Editorial: sponsor display name shown beside the prize. */
+  sponsor_name?: string | null;
+  /** Editorial: sponsor link target (opens externally). */
+  sponsor_url?: string | null;
 }
 
 export interface DivisionConfig {
