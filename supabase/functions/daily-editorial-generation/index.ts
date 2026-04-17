@@ -20,7 +20,15 @@ const corsHeaders = {
 };
 
 type TimeFilter = 'seasonal' | 'all_time';
-type Surface = 'top100' | 'global';
+type Surface = 'top100' | 'global' | 'courses';
+
+type CoursesStoryType =
+  | 'personal_pick'
+  | 'circle_activity'
+  | 'region_trending'
+  | 'course_top'
+  | 'course_new_entry'
+  | 'courses_quiet';
 
 type StoryType =
   | 'leader_change'
