@@ -13,3 +13,6 @@ export { useHandicapImprovementLeaderboard } from './useHandicapImprovementLeade
 export { useLowestHandicapLeaderboard } from './useLowestHandicapLeaderboard';
 export { useSeasonImprovementLeaderboard } from './useSeasonImprovementLeaderboard';
 export { useUserHandicapStatus } from './useUserHandicapStatus';
+export { useUserHandicapTrajectory } from './useUserHandicapTrajectory';
+export type { HandicapTrajectoryPoint, UserHandicapTrajectory } from './useUserHandicapTrajectory';
+export { useSimilarHandicapLeaderboard } from './useSimilarHandicapLeaderboard';

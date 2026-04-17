@@ -1,646 +1,1164 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+/**
+ * LowestHandicapLeaderboard — Front Page composition.
+ *
+ * ⚠️ INVERTED TREND COLOURS ON THIS SURFACE ⚠️
+ * Lower handicap is better. The TrendArrow component below uses semantic
+ * direction props ('improving' | 'drifting' | 'steady') — never 'up'/'down'
+ * — to prevent accidental colour inversion regressions:
+ *   - improving → ↓ green  (#15803D)  (handicap decreased)
+ *   - drifting  → ↑ crimson (#9F1D1D) (handicap increased)
+ *   - steady    → — grey
+ * This is the OPPOSITE of every other leaderboard surface. Do not "fix" it.
+ */
 
-import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { formatHcp, getHandicapStatusLabel, getHandicapStatusColor, getHandicapBadgeStyle } from '@/lib/formatHcp';
-import { HandicapPodium } from './HandicapPodium';
-import { HandicapInsightBanner } from './HandicapInsightBanner';
-import { HandicapMoverStrip } from './HandicapMoverStrip';
-import { Skeleton } from '@/components/ui/skeleton';
+import {
+  useLowestHandicapLeaderboard,
+  useUserHandicapStatus,
+  useUserHandicapTrajectory,
+  useSimilarHandicapLeaderboard,
+} from '@/hooks/leaderboards';
+import { useDailyEditorial } from '@/hooks/championship';
+import {
+  formatHcp,
+  getHandicapTier,
+  getHandicapStatusLabel,
+  getTierAbbr,
+  getTierShortName,
+  isTierSharper,
+  type HandicapTier,
+} from '@/lib/formatHcp';
+import { getProfilePathById } from '@/lib/profileRoutes';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { cn } from '@/lib/utils';
-import { ClubSearchBar } from '../exploration/ClubSearchBar';
-import { CountrySelector } from '../shared/CountrySelector';
-import type { LeaderboardScope } from '@/types/leaderboards';
-import { useSeasonCalendar } from '@/hooks/championship';
-import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { PeerGroup } from './HandicapTab';
+import type { LowestHandicapEntry } from '@/types/leaderboards';
 
-// --- Constants ---
-const ROW_HEIGHT = 72;
-const VIRTUALIZATION_THRESHOLD = 50;
-const OVERSCAN = 8;
-const STORAGE_KEY_SCROLL = 'handicap-leaderboard-scroll';
+// ── Editorial palette ────────────────────────────────────────────────────
+const BG = '#FAFAF6';
+const INK = '#0F172A';
+const INK_BODY = '#475569';
+const INK_MUTED = '#64748B';
+const INK_FAINT = '#94A3B8';
+const HAIRLINE = '#CBD5E1';
+const CRIMSON = '#9F1D1D';
+const AMBER = '#F7931E';
+const SUCCESS = '#15803D';
+const DARK = '#0F172A';
 
-const SCOPE_OPTIONS = [
-  { id: 'global' as const, label: '🌍 Global' },
-  { id: 'country' as const, label: 'Country' },
-  { id: 'club' as const, label: 'Club' },
-  { id: 'friends' as const, label: '👥 Friends' },
-] satisfies { id: LeaderboardScope; label: string }[];
+// ── Helpers ──────────────────────────────────────────────────────────────
 
-// --- Helper components ---
-function HandicapLeaderboardSkeleton() {
-  return (
-    <div className="space-y-2">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 p-3">
-          <Skeleton className="h-5 w-6 rounded" />
-          <Skeleton className="h-11 w-11 rounded-lg" />
-          <div className="flex-1 min-w-0 space-y-1.5">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-          <Skeleton className="h-6 w-16" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/** Full-page skeleton matching dark header layout */
-function HandicapPageSkeleton() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', background: '#F8FAFC', minHeight: '100%' }}>
-      {/* Dark header skeleton */}
-      <div style={{ background: 'linear-gradient(160deg, #1a1a2e, #2d1f3d, #1f1535)', padding: '16px 16px 0' }}>
-        <Skeleton className="h-3 w-52 rounded mb-4" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
-          <Skeleton className="w-[52px] h-[52px] rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.15)' }} />
-          <div style={{ flex: 1 }}>
-            <Skeleton className="h-3 w-28 rounded mb-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Skeleton className="h-9 w-20 rounded" style={{ background: 'rgba(255,255,255,0.2)' }} />
-              <Skeleton className="h-5 w-20 rounded" style={{ background: 'rgba(255,255,255,0.12)' }} />
-            </div>
-          </div>
-          <Skeleton className="h-10 w-12 rounded" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        </div>
-        <div style={{ display: 'flex', gap: 2 }}>
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-10 flex-1 rounded-t-[8px]" style={{ background: i === 0 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)' }} />
-          ))}
-        </div>
-      </div>
-
-      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {/* Insight banner skeleton */}
-        <Skeleton className="h-12 w-full rounded-[14px]" />
-
-        {/* Band legend skeleton */}
-        <div style={{ display: 'flex', gap: 6, overflow: 'hidden' }}>
-          {[48, 60, 72, 52, 80].map((w, i) => (
-            <Skeleton key={i} className="h-6 rounded" style={{ width: w }} />
-          ))}
-        </div>
-
-        {/* Rankings label */}
-        <Skeleton className="h-3 w-20 rounded" />
-
-        {/* Row skeletons */}
-        {[...Array(6)].map((_, i) => (
-          <div key={i} style={{
-            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-            background: '#FFFFFF', borderRadius: 14, border: '1px solid rgba(15,23,42,0.07)',
-            borderLeft: '3px solid #e5e7eb',
-          }}>
-            <Skeleton className="w-5 h-4 rounded" />
-            <Skeleton className="w-11 h-11 rounded-lg" />
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <Skeleton className="h-4 rounded" style={{ width: `${[70, 55, 65, 50, 60, 55][i]}%` }} />
-              <Skeleton className="h-3 rounded" style={{ width: `${[45, 40, 50, 35, 45, 40][i]}%` }} />
-            </div>
-            <Skeleton className="h-6 w-14 rounded" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="py-4 px-3">
-      <button
-        onClick={onRetry}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm active:scale-[0.98] active:opacity-70 transition-all"
-        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
-      >
-        Couldn't load more entries · Tap to retry
-      </button>
-    </div>
-  );
-}
-
-function InitialErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-12 px-3 text-center space-y-4">
-      <p className="text-muted-foreground text-sm">Something went wrong loading the leaderboard.</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
-      >
-        Try again
-      </button>
-    </div>
-  );
-}
-
-// --- Empty State ---
-function EmptyState({ scope, clubName, country }: { scope: string; clubName?: string | null; country?: string | null }) {
-  const message = (() => {
-    if (scope === 'club' && clubName) return `No handicaps from ${clubName} yet — invite your club mates`;
-    if (scope === 'country' && country) return `No ${country} players yet`;
-    if (scope === 'friends') return 'None of your friends have a handicap yet';
-    return 'No handicaps recorded yet. Add your handicap to appear here!';
-  })();
-
-  return (
-    <div className="flex flex-col items-center justify-center py-16 px-3 text-center space-y-4">
-      <p className="text-base text-muted-foreground">{message}</p>
-      <Link
-        to="/profile/edit"
-        className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.97]"
-        style={{ backgroundColor: '#F7931E' }}
-      >
-        Add Handicap
-      </Link>
-    </div>
-  );
-}
-
-// --- Handicap Row — Band border design ---
-function HandicapRow({ entry, userId }: { entry: any; userId?: string }) {
-  const isMe = entry.user_id === userId;
-  const rank = entry.rank;
-  const handicap = entry.handicap_index;
-  const statusLabel = getHandicapStatusLabel(handicap);
-  const bandColor = getHandicapStatusColor(handicap);
-  const badgeStyle = getHandicapBadgeStyle(handicap);
-
-  const initials = (entry.display_name || '?')
+function getInitials(name: string): string {
+  if (!name) return '?';
+  return name
     .split(' ')
-    .map((n: string) => n[0])
+    .filter(Boolean)
+    .map((n) => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
+}
+
+function getMastheadSubtitle(peerGroup: PeerGroup, clubName: string | null): string {
+  switch (peerGroup) {
+    case 'club': {
+      if (!clubName) return 'AT YOUR CLUB';
+      const upper = clubName.toUpperCase();
+      if (upper.length > 24) return 'AT YOUR CLUB';
+      if (upper.length > 20) return `AT ${upper.slice(0, 20).trimEnd()}…`;
+      return `AT ${upper}`;
+    }
+    case 'friends':
+      return 'AMONG YOUR FRIENDS';
+    case 'similar':
+      return 'YOUR PEER GROUP';
+    case 'top100':
+      return 'THE GLOBAL TOP ONE HUNDRED';
+  }
+}
+
+function rankLabel(peerGroup: PeerGroup): string {
+  switch (peerGroup) {
+    case 'club':
+      return 'CLUB RANK';
+    case 'friends':
+      return 'FRIENDS RANK';
+    case 'similar':
+      return 'IN PEER GROUP';
+    case 'top100':
+      return 'GLOBAL RANK';
+  }
+}
+
+function selectHandicapEyebrow(args: {
+  isLoggedIn: boolean;
+  hasHandicap: boolean;
+  peerGroup: PeerGroup;
+  clubName: string | null;
+  improvementSeason: number | null;
+  improvement30d: number | null;
+  defaultEyebrow: string;
+  userTierShort: string | null;
+}): string {
+  if (!args.isLoggedIn || !args.hasHandicap) return 'ADD YOUR HANDICAP TO ENTER';
+
+  // Priority 1: sharp recent improvement
+  if (args.improvement30d !== null && args.improvement30d >= 0.5) {
+    return `DOWN ${Math.abs(args.improvement30d).toFixed(1)} IN THIRTY DAYS`;
+  }
+  // Priority 2: strong season improvement
+  if (args.improvementSeason !== null && args.improvementSeason >= 1.0) {
+    return `DOWN ${Math.abs(args.improvementSeason).toFixed(1)} THIS SEASON`;
+  }
+  // Priority 3: peer-group context
+  switch (args.peerGroup) {
+    case 'club':
+      return args.clubName ? `AT ${args.clubName.toUpperCase()}` : 'AT YOUR CLUB';
+    case 'friends':
+      return 'AMONG YOUR FRIENDS';
+    case 'similar':
+      return args.userTierShort
+        ? `YOUR PEER GROUP · ${args.userTierShort.toUpperCase()} TIER`
+        : 'YOUR PEER GROUP';
+    case 'top100':
+      return 'THE GLOBAL TOP ONE HUNDRED';
+  }
+  return args.defaultEyebrow;
+}
+
+// ── TrendArrow ───────────────────────────────────────────────────────────
+// Semantic direction props prevent colour-inversion regressions. See header.
+function TrendArrow({
+  direction,
+  size = 9,
+}: {
+  direction: 'improving' | 'drifting' | 'steady';
+  size?: number;
+}) {
+  if (direction === 'improving') {
+    return <span style={{ color: SUCCESS, fontSize: size, fontWeight: 800 }}>↓</span>;
+  }
+  if (direction === 'drifting') {
+    return <span style={{ color: CRIMSON, fontSize: size, fontWeight: 800 }}>↑</span>;
+  }
+  return <span style={{ color: HAIRLINE, fontSize: size }}>—</span>;
+}
+
+// ── TrajectorySparkline ──────────────────────────────────────────────────
+function TrajectorySparkline({
+  data,
+  width = 320,
+  height = 56,
+}: {
+  data: Array<{ label: string; value: number }>;
+  width?: number;
+  height?: number;
+}) {
+  if (!data || data.length === 0) return null;
+
+  // Single-point case — render a centred dot
+  if (data.length === 1) {
+    return (
+      <svg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        style={{ display: 'block', width: '100%', height }}
+      >
+        <circle cx={width / 2} cy={height / 2} r="3" fill={AMBER} />
+      </svg>
+    );
+  }
+
+  const vals = data.map((d) => d.value);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const range = max - min || 1;
+  // Lower handicap = better → render higher on chart. Invert Y.
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((d.value - min) / range) * height;
+    return [x, y] as const;
+  });
+  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ');
+  const last = points[points.length - 1];
 
   return (
-    <Link
-      to={`/profile/${entry.user_id}`}
-      className="flex items-center gap-3 active:scale-[0.98] transition-transform"
-      style={{
-        background: isMe ? '#FFFBF0' : '#FFFFFF',
-        border: isMe ? '1px solid rgba(247,147,30,0.27)' : '1px solid rgba(15,23,42,0.07)',
-        borderLeft: `3px solid ${isMe ? '#F7931E' : bandColor}`,
-        borderRadius: 14,
-        padding: 'clamp(10px,2.5vw,12px) clamp(12px,3vw,14px)',
-        marginBottom: 6,
-        minHeight: 44,
-      }}
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      style={{ display: 'block', width: '100%', height }}
     >
-      {/* Rank */}
-      <span style={{
-        width: 20, fontSize: 'clamp(12px,3.2vw,13px)', fontWeight: 700,
-        fontVariantNumeric: 'tabular-nums', textAlign: 'center', flexShrink: 0,
-        color: rank <= 3 ? '#F7931E' : '#64748B',
-      }}>
-        {rank}
-      </span>
-
-      {/* Avatar */}
-      <SquircleAvatar
-        size={44}
-        src={entry.avatar_url}
-        alt={entry.display_name || ''}
-        fallback={initials}
-        thinRing
-        className="flex-shrink-0"
+      <path
+        d={path}
+        stroke={AMBER}
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
       />
-
-      {/* Name + YOU badge + Location + Club */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <p className="font-bold truncate" style={{ fontSize: 'clamp(13px,3.5vw,14px)', color: '#0F172A' }}>
-            {entry.display_name || 'Unknown'}
-          </p>
-          {isMe && (
-            <span style={{
-              fontSize: 9, fontWeight: 800, color: '#F7931E',
-              background: 'rgba(247,147,30,0.12)', borderRadius: 4,
-              padding: '1px 5px', letterSpacing: '0.5px', flexShrink: 0,
-            }}>
-              YOU
-            </span>
-          )}
-        </div>
-        {(entry.city || entry.country) && (
-          <p className="truncate" style={{ fontSize: 11, color: '#94A3B8' }}>
-            {[entry.city, entry.country].filter(Boolean).join(', ')}
-          </p>
-        )}
-        {entry.club_name && (
-          <p className="truncate" style={{ fontSize: 11, color: '#94A3B8' }}>
-            {entry.club_name}
-          </p>
-        )}
-      </div>
-
-      {/* Handicap number + band pill */}
-      <div className="flex-shrink-0 flex flex-col items-center justify-center" style={{ width: 72 }}>
-        <span style={{ color: bandColor, fontSize: 'clamp(18px,4.8vw,21px)', fontWeight: 800, lineHeight: 1 }}>
-          {formatHcp(handicap)}
-        </span>
-        {statusLabel && (
-          <span
-            className="font-semibold uppercase tracking-wide mt-1 text-center leading-tight"
-            style={{
-              fontSize: 8, background: badgeStyle.bg, color: badgeStyle.text,
-              borderRadius: 6, padding: '2px 6px', maxWidth: 68,
-            }}
-          >
-            {statusLabel}
-          </span>
-        )}
-      </div>
-    </Link>
+      <circle cx={last[0]} cy={last[1]} r="3" fill={AMBER} />
+    </svg>
   );
 }
 
-// --- Scope label helper ---
-function getScopeLabel(scope: string, country?: string | null, clubName?: string | null): string {
-  switch (scope) {
-    case 'country': return country ? `in ${country}` : 'in your country';
-    case 'club': return clubName ? `at ${clubName}` : 'at your club';
-    case 'friends': return 'among friends';
-    default: return 'globally';
-  }
-}
+// ── Tier Ladder constants ────────────────────────────────────────────────
+const DISPLAY_TIERS: Array<{ id: HandicapTier; abbr: string; shortLabel: string }> = [
+  { id: 'elite', abbr: 'ELT', shortLabel: 'Elite' },
+  { id: 'scratch', abbr: 'SCR', shortLabel: 'Scratch' },
+  { id: 'player', abbr: 'PLR', shortLabel: 'Player' },
+  { id: 'single', abbr: 'SF', shortLabel: 'Single' },
+  { id: 'midfielder', abbr: 'MID', shortLabel: 'Mid' },
+  { id: 'weekend', abbr: 'WKD', shortLabel: 'Weekend' },
+];
 
-function getScopeContext(scope: string, country?: string | null, clubName?: string | null): string {
-  switch (scope) {
-    case 'country': return country ? `${country} · Country leaderboard` : 'Country leaderboard';
-    case 'club': return clubName ? `${clubName} · Club leaderboard` : 'Club leaderboard';
-    case 'friends': return 'Friends · People you follow';
-    default: return 'Global · All clbhouz members';
-  }
-}
-
-// --- Main component ---
+// ── Props ────────────────────────────────────────────────────────────────
 interface LowestHandicapLeaderboardProps {
-  scope: LeaderboardScope;
-  onScopeChange: (scope: LeaderboardScope) => void;
-  clubId?: string | null;
-  clubName?: string | null;
-  country?: string | null;
-  scopeSelector?: React.ReactNode;
-  seasonColor?: string;
-  selectedClubId?: string | null;
-  selectedClubName?: string | null;
-  onClubSelect?: (id: string | null, name: string | null) => void;
-  selectedCountry?: string | null;
-  onCountrySelect?: (country: string | null) => void;
-  userHomeClubId?: string | null;
-  userHomeClubName?: string | null;
+  peerGroup: PeerGroup;
+  onPeerGroupChange: (next: PeerGroup) => void;
+  userHomeClubId: string | null;
+  userHomeClubName: string | null;
+  clubMemberCount: number | null;
+  friendsCount: number;
 }
 
 export function LowestHandicapLeaderboard({
-  scope, onScopeChange, clubId, clubName, country,
-  scopeSelector, seasonColor,
-  selectedClubId, selectedClubName, onClubSelect,
-  selectedCountry, onCountrySelect,
-  userHomeClubId, userHomeClubName,
+  peerGroup,
+  onPeerGroupChange,
+  userHomeClubId,
+  userHomeClubName,
+  clubMemberCount,
+  friendsCount,
 }: LowestHandicapLeaderboardProps) {
   const { user } = useSupabaseSession();
-  const [scrollTop, setScrollTop] = useState(0);
+  const navigate = useNavigate();
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const listContainerRef = useRef<HTMLDivElement>(null);
-  const hasRestoredScroll = useRef(false);
+  // ── User status (box score, eyebrow, similar window) ───────────────────
+  const { data: userStatus } = useUserHandicapStatus({ userId: user?.id, enabled: !!user?.id });
+  const userHandicap = userStatus?.current_handicap ?? null;
+  const userTier = userHandicap !== null ? getHandicapTier(userHandicap) : null;
+  // Roll Hacker into Weekend for ladder display
+  const displayTierId: HandicapTier = userTier === 'hacker' ? 'weekend' : (userTier ?? 'weekend');
 
-  // Season config for header label
-  const { data: seasonCalendar } = useSeasonCalendar();
-  const currentSeasonId = useMemo(() => {
-    const current = seasonCalendar?.find(s => s.is_current);
-    if (!current) return 'major' as SeasonId;
-    const lower = current.name.toLowerCase();
-    if (lower.includes('pre')) return 'preseason' as SeasonId;
-    if (lower.includes('summer')) return 'summer' as SeasonId;
-    if (lower.includes('off')) return 'offseason' as SeasonId;
-    return 'major' as SeasonId;
-  }, [seasonCalendar]);
-
-  const {
-    data,
-    isLoading,
-    isError,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-    refetch,
-  } = useLowestHandicapLeaderboard({
-    scope,
-    clubId: scope === 'club' ? clubId : undefined,
-    country: scope === 'country' ? country : undefined,
+  // ── Editorial copy ─────────────────────────────────────────────────────
+  const { data: editorial } = useDailyEditorial({
+    surface: 'handicap',
+    seasonId: null,
+    timeFilter: 'all_time',
   });
 
-  const allEntries = useMemo(
-    () => data?.pages.flatMap(page => page.entries) ?? [],
-    [data?.pages]
-  );
+  // ── Trajectory ─────────────────────────────────────────────────────────
+  const { data: trajectory } = useUserHandicapTrajectory({ userId: user?.id, enabled: !!user?.id });
 
-  // Scroll tracking for virtualization
+  // ── Standings data ─────────────────────────────────────────────────────
+  // Map peer group → underlying scope for useLowestHandicapLeaderboard
+  const lowestScope: 'global' | 'friends' | 'club' | 'country' | null = useMemo(() => {
+    if (peerGroup === 'top100') return 'global';
+    if (peerGroup === 'friends') return 'friends';
+    if (peerGroup === 'club') return 'club';
+    return null; // 'similar' uses the dedicated RPC
+  }, [peerGroup]);
+
+  const lowestQuery = useLowestHandicapLeaderboard({
+    scope: lowestScope ?? 'global',
+    clubId: peerGroup === 'club' ? userHomeClubId : undefined,
+    enabled: lowestScope !== null && (peerGroup !== 'club' || !!userHomeClubId),
+  });
+
+  const similarQuery = useSimilarHandicapLeaderboard({
+    userHandicap,
+    windowSize: 3,
+    enabled: peerGroup === 'similar',
+  });
+
+  const allEntries: LowestHandicapEntry[] = useMemo(() => {
+    if (peerGroup === 'similar') return similarQuery.data ?? [];
+    return lowestQuery.data?.pages.flatMap((p) => p.entries) ?? [];
+  }, [peerGroup, similarQuery.data, lowestQuery.data]);
+
+  // For top100, cap to 100 rows
+  const displayEntries = useMemo(() => {
+    if (peerGroup === 'top100') return allEntries.slice(0, 100);
+    return allEntries;
+  }, [peerGroup, allEntries]);
+
+  // ── User rank in current peer group ────────────────────────────────────
+  const meEntry = displayEntries.find((e) => e.user_id === user?.id);
+  const peerRank = meEntry?.rank ?? null;
+
+  // ── Personalised eyebrow ───────────────────────────────────────────────
+  const personalisedEyebrow = useMemo(() => {
+    return selectHandicapEyebrow({
+      isLoggedIn: !!user,
+      hasHandicap: userHandicap !== null,
+      peerGroup,
+      clubName: userHomeClubName,
+      improvementSeason: userStatus?.improvement_season ?? null,
+      improvement30d: userStatus?.improvement_30d ?? null,
+      defaultEyebrow: editorial?.eyebrow ?? 'THE HANDICAP RECORD',
+      userTierShort: userTier ? getTierShortName(userTier) : null,
+    });
+  }, [user, userHandicap, peerGroup, userHomeClubName, userStatus, editorial, userTier]);
+
+  // ── Box score season trend ─────────────────────────────────────────────
+  const seasonImprovement = userStatus?.improvement_season ?? 0;
+  const seasonHasData = userStatus?.improvement_season !== null && userStatus?.improvement_season !== undefined;
+  // improvement_season > 0 means handicap dropped → improving (green ↓)
+  // improvement_season < 0 means handicap rose → drifting (crimson ↑)
+  const seasonColour =
+    !seasonHasData || seasonImprovement === 0
+      ? INK
+      : seasonImprovement > 0
+      ? SUCCESS
+      : CRIMSON;
+  const seasonArrow = !seasonHasData || seasonImprovement === 0 ? '—' : seasonImprovement > 0 ? '↓' : '↑';
+
+  // ── Trajectory derived stats ───────────────────────────────────────────
+  const trajectoryPoints = trajectory?.points ?? [];
+  const yoyImprovement = trajectory?.yoy_improvement ?? 0;
+  const bestHcp = trajectory?.best ?? null;
+  const worstHcp = trajectory?.worst ?? null;
+  const showTrajectory =
+    !!trajectory && trajectoryPoints.length >= 2 && userHandicap !== null;
+
+  // ── Infinite scroll for top100 ─────────────────────────────────────────
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef(false);
+  isFetchingRef.current = lowestQuery.isFetchingNextPage;
+
   useEffect(() => {
-    const handleScroll = () => {
-      const rootEl = document.getElementById('root');
-      const currentScroll = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
-      setScrollTop(currentScroll);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    const rootEl = document.getElementById('root');
-    rootEl?.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      rootEl?.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  // Scroll restore
-  useEffect(() => {
-    if (hasRestoredScroll.current || allEntries.length === 0) return;
-    const savedScroll = sessionStorage.getItem(STORAGE_KEY_SCROLL);
-    if (savedScroll) {
-      hasRestoredScroll.current = true;
-      requestAnimationFrame(() => {
-        const rootEl = document.getElementById('root');
-        const scrollTarget = parseInt(savedScroll);
-        if (rootEl) rootEl.scrollTop = scrollTarget;
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
-        sessionStorage.removeItem(STORAGE_KEY_SCROLL);
-      });
-    }
-  }, [allEntries.length]);
-
-  // Infinite scroll observer
-  const isFetchingRef = useRef(isFetchingNextPage);
-  isFetchingRef.current = isFetchingNextPage;
-
-  useEffect(() => {
-    if (!sentinelRef.current || !hasNextPage) return;
+    if (peerGroup !== 'top100') return;
+    if (!sentinelRef.current || !lowestQuery.hasNextPage) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
-          fetchNextPage();
+        if (entry.isIntersecting && lowestQuery.hasNextPage && !isFetchingRef.current) {
+          lowestQuery.fetchNextPage();
         }
       },
       { rootMargin: '600px', threshold: 0 },
     );
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [hasNextPage, fetchNextPage]);
+  }, [peerGroup, lowestQuery.hasNextPage, lowestQuery.fetchNextPage]);
 
-  // Save scroll on entry click
-  const handleEntryClick = useCallback(() => {
-    const rootEl = document.getElementById('root');
-    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
-    sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
-  }, []);
+  // ── Row click handler ──────────────────────────────────────────────────
+  const handleRowClick = useCallback(
+    (userId: string) => {
+      navigate(getProfilePathById(userId));
+    },
+    [navigate],
+  );
 
-  // Find current user's rank
-  const currentUserEntry = allEntries.find(e => e.user_id === user?.id);
-  const userRank = currentUserEntry?.rank;
-  const topHandicap = allEntries.length > 0 ? (allEntries[0] as any).handicap_index : null;
-  const userHandicap = currentUserEntry ? (currentUserEntry as any).handicap_index : null;
+  // ── Loading state (initial) ────────────────────────────────────────────
+  const isInitialLoading =
+    (peerGroup === 'similar' ? similarQuery.isLoading : lowestQuery.isLoading) &&
+    displayEntries.length === 0;
 
-  // Scope label
-  const scopeLabel = getScopeLabel(scope, country, clubName);
-  const scopeContext = getScopeContext(scope, country, clubName);
+  // ── Section label ──────────────────────────────────────────────────────
+  const sectionLabel = useMemo(() => {
+    if (peerGroup === 'club') {
+      const clubLabel = userHomeClubName?.toUpperCase() ?? 'YOUR CLUB';
+      const count = clubMemberCount ?? displayEntries.length;
+      return `${clubLabel} · ${count} MEMBERS`;
+    }
+    if (peerGroup === 'friends') return `FRIENDS · ${friendsCount || displayEntries.length} MEMBERS`;
+    if (peerGroup === 'similar') return 'PLAYERS NEAR YOUR INDEX';
+    return 'THE GLOBAL TOP ONE HUNDRED';
+  }, [peerGroup, userHomeClubName, clubMemberCount, friendsCount, displayEntries.length]);
 
-  // Virtualization
-  const virtualizedContent = useMemo(() => {
-    if (allEntries.length <= VIRTUALIZATION_THRESHOLD) return null;
-    const containerOffset = listContainerRef.current?.offsetTop ?? 0;
-    const relativeScroll = Math.max(0, scrollTop - containerOffset);
-    const viewportHeight = window.innerHeight;
-    const startIndex = Math.max(0, Math.floor(relativeScroll / ROW_HEIGHT) - OVERSCAN);
-    const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + OVERSCAN * 2;
-    const endIndex = Math.min(allEntries.length, startIndex + visibleCount);
-    const totalHeight = allEntries.length * ROW_HEIGHT;
-    const offsetY = startIndex * ROW_HEIGHT;
-    return { startIndex, endIndex, totalHeight, offsetY };
-  }, [allEntries.length, scrollTop]);
-
-  // Initial error
-  if (isError && allEntries.length === 0 && !isLoading) {
-    return <InitialErrorState onRetry={() => refetch()} />;
-  }
-
-  if (isLoading && allEntries.length === 0) {
-    return <HandicapPageSkeleton />;
-  }
-
-  if (!isError && allEntries.length === 0) {
-    return <EmptyState scope={scope} clubName={clubName} country={country} />;
-  }
+  // ── Peer group toggle config ───────────────────────────────────────────
+  const toggleOpts: Array<{ key: PeerGroup; label: string; available: boolean }> = [
+    { key: 'club', label: 'My Club', available: !!userHomeClubId },
+    { key: 'friends', label: 'Friends', available: true },
+    { key: 'similar', label: 'Similar (±3)', available: userHandicap !== null },
+    { key: 'top100', label: 'Top 100', available: true },
+  ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-
-      {/* ── DARK HERO HEADER ── */}
-      <div style={{
-        background: 'linear-gradient(160deg, #1a1a2e 0%, #2d1f3d 60%, #1f1535 100%)',
-        padding: 'clamp(14px,3vw,18px) clamp(14px,4vw,18px) 0',
-        position: 'relative', overflow: 'hidden', flexShrink: 0,
-      }}>
-        {/* Decorative glows */}
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(247,147,30,0.06)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: 20, right: -10, width: 100, height: 100, borderRadius: '50%', background: 'rgba(247,147,30,0.04)', pointerEvents: 'none' }} />
-
-        {/* Season label */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 'clamp(8px,2vw,12px)' }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }} />
-          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(9px,2.5vw,11px)', fontWeight: 600, fontFamily: 'DM Sans, system-ui, sans-serif', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-            Handicap Rankings · {getSeasonConfig(currentSeasonId).title}
-          </span>
+    <div style={{ background: BG, minHeight: '100%', fontFamily: 'Geist, system-ui, sans-serif' }}>
+      {/* ── MASTHEAD ── */}
+      <div
+        style={{
+          padding: '20px 20px 14px',
+          borderBottom: `3px double ${INK}`,
+          textAlign: 'center',
+          background: BG,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: 9,
+            fontWeight: 700,
+            color: INK_MUTED,
+            letterSpacing: '0.14em',
+            marginBottom: 12,
+          }}
+        >
+          <span>VOL · MMXXVI</span>
+          <span style={{ color: CRIMSON }}>● LIVE</span>
+          <span>{getMastheadSubtitle(peerGroup, userHomeClubName)}</span>
         </div>
-
-        {/* User handicap row */}
-        {currentUserEntry && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'clamp(14px,3.5vw,20px)' }}>
-            {/* Avatar */}
-            {currentUserEntry.avatar_url ? (
-              <img
-                src={currentUserEntry.avatar_url}
-                alt=""
-                style={{ width: 52, height: 52, borderRadius: '34%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
-              />
-            ) : (
-              <div style={{
-                width: 52, height: 52, borderRadius: '34%', background: 'rgba(255,255,255,0.12)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 700, flexShrink: 0,
-              }}>
-                {(currentUserEntry.display_name || '?').charAt(0).toUpperCase()}
-              </div>
-            )}
-
-            {/* Handicap + band label */}
-            <div style={{ flex: 1 }}>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(10px,2.8vw,12px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif', marginBottom: 2 }}>
-                Your Handicap Index
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ color: '#F7931E', fontSize: 'clamp(30px,8vw,38px)', fontWeight: 800, fontFamily: 'DM Sans, system-ui, sans-serif', lineHeight: 1 }}>
-                  {formatHcp((currentUserEntry as any).handicap_index)}
-                </span>
-                {getHandicapStatusLabel((currentUserEntry as any).handicap_index) && (
-                  <span style={{
-                    ...(() => {
-                      const bs = getHandicapBadgeStyle((currentUserEntry as any).handicap_index);
-                      return { background: bs.bg, color: bs.text };
-                    })(),
-                    fontSize: 'clamp(10px,2.8vw,12px)', fontWeight: 700, borderRadius: 8,
-                    padding: '3px 10px', textTransform: 'uppercase' as const, letterSpacing: '0.5px',
-                  }}>
-                    {getHandicapStatusLabel((currentUserEntry as any).handicap_index)}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Rank */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 'clamp(9px,2.4vw,10px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif' }}>
-                {scope === 'global' ? 'Global rank' : scope === 'club' ? 'Club rank' : scope === 'country' ? 'Country rank' : 'Friend rank'}
-              </span>
-              <span style={{ color: '#fff', fontSize: 'clamp(22px,6vw,28px)', fontWeight: 800, fontFamily: 'DM Sans, system-ui, sans-serif', lineHeight: 1 }}>
-                #{userRank ?? '—'}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Scope tabs — flush to bottom */}
-        <div style={{ display: 'flex', gap: 2 }}>
-          {SCOPE_OPTIONS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => onScopeChange(t.id)}
-              style={{
-                flex: 1, padding: 'clamp(8px,2vw,10px) 0', borderRadius: '8px 8px 0 0',
-                border: 'none', cursor: 'pointer',
-                fontSize: 'clamp(9px,2.5vw,11px)',
-                fontWeight: scope === t.id ? 800 : 500,
-                fontFamily: 'DM Sans, system-ui, sans-serif',
-                background: scope === t.id ? '#F8FAFC' : 'rgba(255,255,255,0.07)',
-                color: scope === t.id ? '#0C0C0E' : 'rgba(255,255,255,0.55)',
-                transition: 'all 0.2s',
-              }}
-              className="active:scale-[0.97] transition-all"
-            >
-              {t.label}
-            </button>
-          ))}
+        <h1
+          style={{
+            fontSize: 38,
+            fontWeight: 900,
+            letterSpacing: '-0.035em',
+            margin: 0,
+            lineHeight: 0.95,
+            color: INK,
+          }}
+        >
+          The Handicap Record
+        </h1>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: '0.32em',
+            color: INK_MUTED,
+            marginTop: 6,
+          }}
+        >
+          INDEX · TIER · TRAJECTORY
         </div>
       </div>
 
-      {/* ── LIGHT BODY ZONE ── */}
-      <div style={{ background: '#F8FAFC', flex: 1, padding: 'clamp(12px,3vw,16px)' }}>
+      {/* ── PEER GROUP TOGGLE ── */}
+      <div style={{ padding: '14px 20px 0', display: 'flex', gap: 5 }}>
+        {toggleOpts.map((opt) => {
+          const isActive = peerGroup === opt.key;
+          return (
+            <button
+              key={opt.key}
+              onClick={() => opt.available && onPeerGroupChange(opt.key)}
+              disabled={!opt.available}
+              style={{
+                flex: 1,
+                padding: '10px 8px',
+                borderRadius: 4,
+                background: isActive ? INK : 'transparent',
+                color: isActive ? '#fff' : opt.available ? INK_MUTED : HAIRLINE,
+                border: isActive ? 'none' : '1px solid rgba(15,23,42,0.15)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.03em',
+                cursor: opt.available ? 'pointer' : 'not-allowed',
+                opacity: opt.available ? 1 : 0.5,
+                transition: 'all 0.15s',
+                fontFamily: 'inherit',
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
 
-        {/* Club/Country selectors */}
-        {scope === 'club' && (
-          <div style={{ marginBottom: 12 }}>
-            <ClubSearchBar
-              selectedClubId={selectedClubId ?? null}
-              selectedClubName={selectedClubName ?? null}
-              userHomeClubId={userHomeClubId ?? null}
-              userHomeClubName={userHomeClubName ?? null}
-              onClubSelect={onClubSelect ?? (() => {})}
-            />
-          </div>
-        )}
-        {scope === 'country' && (
-          <div style={{ marginBottom: 12 }}>
-            <CountrySelector
-              selectedCountry={selectedCountry ?? null}
-              onCountrySelect={onCountrySelect ?? (() => {})}
-            />
-          </div>
-        )}
-
-        {/* Context label */}
-        <p className="text-center" style={{ fontSize: 11, color: '#94A3B8', marginBottom: 12 }}>
-          {scopeContext}
+      {/* ── FRONT-PAGE LEDE ── */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.28em',
+            color: CRIMSON,
+            marginBottom: 10,
+          }}
+        >
+          {personalisedEyebrow}
+        </div>
+        <h2
+          style={{
+            fontSize: 28,
+            fontWeight: 900,
+            letterSpacing: '-0.03em',
+            margin: 0,
+            lineHeight: 1.05,
+            color: INK,
+          }}
+        >
+          {editorial?.headline ?? 'Index · Tier'}
+          {editorial?.headlineTwo && (
+            <>
+              <br />
+              <span style={{ fontStyle: 'italic', fontWeight: 900, color: INK_BODY }}>
+                {editorial.headlineTwo}
+              </span>
+            </>
+          )}
+        </h2>
+        <p
+          style={{
+            fontSize: 12,
+            color: INK_MUTED,
+            lineHeight: 1.55,
+            marginTop: 12,
+            marginBottom: 0,
+            fontStyle: 'italic',
+          }}
+        >
+          {editorial?.standfirst ??
+            'The Clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.'}
         </p>
+      </div>
 
-        {/* Insight Banner */}
-        <div style={{ marginBottom: 12 }}>
-          <HandicapInsightBanner
-            userRank={userRank}
-            topHandicap={topHandicap}
-            userHandicap={userHandicap}
-            userId={user?.id}
-            scope={scope}
-            scopeLabel={scopeLabel}
-            mode="lowest"
-          />
-        </div>
-
-        {/* Band Legend Strip */}
-        {allEntries.length > 0 && (
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, marginBottom: 14 }} className="scrollbar-hide">
-            {allEntries
-              .map(e => getHandicapStatusLabel((e as any).handicap_index))
-              .filter((v, i, arr) => v && arr.indexOf(v) === i)
-              .map(label => {
-                const rep = allEntries.find(e => getHandicapStatusLabel((e as any).handicap_index) === label);
-                if (!rep) return null;
-                const hcp = (rep as any).handicap_index;
-                const badgeStyle = getHandicapBadgeStyle(hcp);
-                return (
-                  <span key={label} style={{
-                    fontSize: 10, fontWeight: 700, borderRadius: 10,
-                    padding: '4px 10px', whiteSpace: 'nowrap', flexShrink: 0,
-                    background: badgeStyle.bg, color: badgeStyle.text,
-                    textTransform: 'uppercase', letterSpacing: '0.3px',
-                  }}>
-                    {label}
-                  </span>
-                );
-              })}
+      {/* ── BOX SCORE ── */}
+      <div style={{ padding: '20px 20px 0' }}>
+        <div
+          style={{
+            borderTop: `1px solid ${INK}`,
+            borderBottom: `1px solid ${INK}`,
+            padding: '16px 0',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
+            alignItems: 'center',
+          }}
+        >
+          {/* INDEX */}
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: INK_FAINT,
+                letterSpacing: '0.18em',
+                marginBottom: 4,
+              }}
+            >
+              YOUR INDEX
+            </div>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 900,
+                letterSpacing: '-0.04em',
+                lineHeight: 1,
+                color: userHandicap !== null ? CRIMSON : INK_FAINT,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {userHandicap !== null ? formatHcp(userHandicap) : '—'}
+            </div>
           </div>
-        )}
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
 
-        {/* Rankings eyebrow */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Rankings</span>
+          {/* RANK */}
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: INK_FAINT,
+                letterSpacing: '0.18em',
+                marginBottom: 4,
+              }}
+            >
+              {rankLabel(peerGroup)}
+            </div>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 900,
+                letterSpacing: '-0.04em',
+                lineHeight: 1,
+                color: peerRank !== null ? CRIMSON : INK_FAINT,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {peerRank !== null ? `#${peerRank}` : '—'}
+            </div>
+          </div>
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
+
+          {/* SEASON */}
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: INK_FAINT,
+                letterSpacing: '0.18em',
+                marginBottom: 4,
+              }}
+            >
+              SEASON
+            </div>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 900,
+                letterSpacing: '-0.04em',
+                lineHeight: 1,
+                color: seasonColour,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              {!seasonHasData
+                ? '—'
+                : seasonImprovement === 0
+                ? '—'
+                : `${seasonArrow}${Math.abs(seasonImprovement).toFixed(1)}`}
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Rankings List */}
-        {allEntries.length > 0 && (
-          <div ref={listContainerRef} onClick={handleEntryClick}>
-            {virtualizedContent ? (
-              <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
-                <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
-                  {allEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map(entry => (
-                    <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
-                  ))}
+      {/* ── TRAJECTORY CARD ── */}
+      {showTrajectory && (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div
+            style={{
+              background: DARK,
+              color: '#fff',
+              borderRadius: 4,
+              overflow: 'hidden',
+              padding: '16px 18px',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: 100,
+                height: 100,
+                background: 'radial-gradient(circle at top right, rgba(247,147,30,0.15), transparent 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: 14,
+                position: 'relative',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    color: 'rgba(255,255,255,0.5)',
+                    letterSpacing: '0.22em',
+                    marginBottom: 4,
+                  }}
+                >
+                  YOUR TRAJECTORY
+                </div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 900,
+                    color: '#fff',
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1.05,
+                  }}
+                >
+                  Twelve-month view
                 </div>
               </div>
-            ) : (
-              allEntries.map(entry => (
-                <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
-              ))
+              <div style={{ textAlign: 'right' }}>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    color: 'rgba(255,255,255,0.5)',
+                    letterSpacing: '0.22em',
+                    marginBottom: 4,
+                  }}
+                >
+                  YEAR-ON-YEAR
+                </div>
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 900,
+                    letterSpacing: '-0.02em',
+                    color:
+                      yoyImprovement > 0 ? SUCCESS : yoyImprovement < 0 ? CRIMSON : '#fff',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}
+                >
+                  {yoyImprovement === 0
+                    ? '—'
+                    : `${yoyImprovement > 0 ? '↓' : '↑'}${Math.abs(yoyImprovement).toFixed(1)}`}
+                </div>
+              </div>
+            </div>
+
+            {/* Sparkline */}
+            <div style={{ marginBottom: 12 }}>
+              <TrajectorySparkline data={trajectoryPoints} width={320} height={56} />
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: 8,
+                  color: 'rgba(255,255,255,0.4)',
+                  letterSpacing: '0.04em',
+                  marginTop: 4,
+                }}
+              >
+                <span>{trajectoryPoints[0]?.label ?? ''}</span>
+                <span>{trajectoryPoints[Math.floor(trajectoryPoints.length / 2)]?.label ?? ''}</span>
+                <span>{trajectoryPoints[trajectoryPoints.length - 1]?.label ?? ''}</span>
+              </div>
+            </div>
+
+            {/* Best / Now / Worst */}
+            <div
+              style={{
+                paddingTop: 12,
+                borderTop: '1px solid rgba(255,255,255,0.12)',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
+                alignItems: 'center',
+              }}
+            >
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.4)',
+                    letterSpacing: '0.22em',
+                    marginBottom: 2,
+                  }}
+                >
+                  BEST
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 900,
+                    color: AMBER,
+                    letterSpacing: '-0.02em',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}
+                >
+                  {bestHcp !== null ? formatHcp(bestHcp) : '—'}
+                </div>
+              </div>
+              <div style={{ height: 20, background: 'rgba(255,255,255,0.1)' }} />
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.4)',
+                    letterSpacing: '0.22em',
+                    marginBottom: 2,
+                  }}
+                >
+                  NOW
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 900,
+                    color: '#fff',
+                    letterSpacing: '-0.02em',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}
+                >
+                  {userHandicap !== null ? formatHcp(userHandicap) : '—'}
+                </div>
+              </div>
+              <div style={{ height: 20, background: 'rgba(255,255,255,0.1)' }} />
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.4)',
+                    letterSpacing: '0.22em',
+                    marginBottom: 2,
+                  }}
+                >
+                  WORST
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 900,
+                    color: 'rgba(255,255,255,0.7)',
+                    letterSpacing: '-0.02em',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}
+                >
+                  {worstHcp !== null ? formatHcp(worstHcp) : '—'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TIER LADDER ── */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 18, height: 1, background: INK }} />
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '0.22em',
+            }}
+          >
+            TIER LADDER
+          </span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)' }}>
+          {DISPLAY_TIERS.map((t, i) => {
+            const isCurrent = userTier !== null && t.id === displayTierId;
+            const sharperThanYou = userTier !== null && isTierSharper(t.id, displayTierId);
+            return (
+              <div
+                key={t.id}
+                style={{
+                  borderRight:
+                    i < DISPLAY_TIERS.length - 1 ? '1px solid rgba(15,23,42,0.1)' : 'none',
+                  padding: '10px 2px',
+                  textAlign: 'center',
+                  background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    marginBottom: 4,
+                    color: isCurrent ? CRIMSON : sharperThanYou ? INK_FAINT : HAIRLINE,
+                  }}
+                >
+                  {isCurrent ? '● NOW' : t.abbr}
+                </div>
+                <div
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    color: isCurrent ? INK : INK_MUTED,
+                  }}
+                >
+                  {t.shortLabel}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── FULL STANDINGS ── */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 18, height: 1, background: INK }} />
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '0.22em',
+            }}
+          >
+            {sectionLabel}
+          </span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+        </div>
+
+        {/* Empty: club without home club */}
+        {peerGroup === 'club' && !userHomeClubId && (
+          <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+            <p
+              style={{
+                fontSize: 13,
+                color: INK_FAINT,
+                fontStyle: 'italic',
+                marginBottom: 14,
+              }}
+            >
+              Set a home club to see your club board.
+            </p>
+            <button
+              onClick={() => navigate('/profile/edit')}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 11,
+                fontWeight: 800,
+                color: CRIMSON,
+                letterSpacing: '0.18em',
+                fontFamily: 'inherit',
+              }}
+            >
+              EDIT PROFILE →
+            </button>
+          </div>
+        )}
+
+        {/* Empty: friends with none */}
+        {peerGroup === 'friends' && !isInitialLoading && displayEntries.length === 0 && (
+          <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+            <p
+              style={{
+                fontSize: 13,
+                color: INK_FAINT,
+                fontStyle: 'italic',
+                marginBottom: 14,
+              }}
+            >
+              No friends on Clbhouz with handicaps yet.
+            </p>
+            <button
+              onClick={() => navigate('/find-friends')}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 11,
+                fontWeight: 800,
+                color: CRIMSON,
+                letterSpacing: '0.18em',
+                fontFamily: 'inherit',
+              }}
+            >
+              FIND FRIENDS →
+            </button>
+          </div>
+        )}
+
+        {/* Loading skeleton */}
+        {isInitialLoading && (
+          <div style={{ marginTop: 8 }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '28px 38px 1fr 60px 44px',
+                  alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: '1px solid rgba(15,23,42,0.07)',
+                }}
+              >
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="h-7 w-7 rounded" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-12 ml-auto" />
+                <Skeleton className="h-5 w-10 ml-auto" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* List */}
+        {displayEntries.length > 0 && (
+          <>
+            {/* Column headers */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '28px 38px 1fr 60px 44px',
+                padding: '10px 0 8px',
+                borderBottom: `1px solid ${INK}`,
+                fontSize: 8,
+                fontWeight: 800,
+                color: INK_FAINT,
+                letterSpacing: '0.18em',
+                alignItems: 'center',
+              }}
+            >
+              <span>POS</span>
+              <span />
+              <span>PLAYER</span>
+              <span style={{ textAlign: 'right' }}>TIER</span>
+              <span style={{ textAlign: 'right' }}>HCP</span>
+            </div>
+
+            {displayEntries.map((p, i) => {
+              const isLast = i === displayEntries.length - 1;
+              const isYou = p.user_id === user?.id;
+              const tier = getHandicapTier(p.handicap_index);
+              // Per-row trend not yet available from RPC — render 'steady' for now (Phase 2)
+              const trend: 'improving' | 'drifting' | 'steady' = 'steady' as 'improving' | 'drifting' | 'steady';
+
+              return (
+                <div
+                  key={p.user_id}
+                  onClick={() => handleRowClick(p.user_id)}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '28px 38px 1fr 60px 44px',
+                    alignItems: 'center',
+                    padding: '12px 0',
+                    borderBottom: isLast
+                      ? `1px solid ${INK}`
+                      : '1px solid rgba(15,23,42,0.07)',
+                    background: isYou ? 'rgba(159,29,29,0.04)' : 'transparent',
+                    marginLeft: isYou ? -10 : 0,
+                    marginRight: isYou ? -10 : 0,
+                    paddingLeft: isYou ? 10 : 0,
+                    paddingRight: isYou ? 10 : 0,
+                    position: 'relative',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {isYou && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 3,
+                        background: CRIMSON,
+                      }}
+                    />
+                  )}
+
+                  {/* POS */}
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 900,
+                      color: p.rank <= 3 ? INK : INK_FAINT,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {p.rank}
+                  </span>
+
+                  {/* Avatar */}
+                  <SquircleAvatar
+                    src={p.avatar_url}
+                    alt={p.display_name ?? ''}
+                    size={30}
+                    fallback={getInitials(p.display_name ?? p.username ?? '')}
+                  />
+
+                  {/* Name + trend */}
+                  <div style={{ minWidth: 0, paddingLeft: 4 }}>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: INK,
+                        letterSpacing: '-0.005em',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {p.display_name || p.username || 'Unknown'}
+                      {isYou && (
+                        <span
+                          style={{
+                            fontSize: 8,
+                            fontWeight: 800,
+                            color: CRIMSON,
+                            letterSpacing: '0.18em',
+                            marginLeft: 6,
+                          }}
+                        >
+                          YOU
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        color: INK_FAINT,
+                        marginTop: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <TrendArrow direction={trend} size={9} />
+                      <span>
+                        {trend === 'improving'
+                          ? 'improving'
+                          : trend === 'drifting'
+                          ? 'drifting'
+                          : 'steady'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* TIER */}
+                  <span
+                    style={{
+                      textAlign: 'right',
+                      fontSize: 8,
+                      fontWeight: 800,
+                      color: INK_MUTED,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {getTierAbbr(tier)}
+                  </span>
+
+                  {/* HCP */}
+                  <span
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 900,
+                      textAlign: 'right',
+                      color: INK,
+                      letterSpacing: '-0.03em',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {formatHcp(p.handicap_index)}
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Sentinel for top100 infinite scroll */}
+            {peerGroup === 'top100' && lowestQuery.hasNextPage && (
+              <div ref={sentinelRef} style={{ height: 40 }} />
             )}
-          </div>
+          </>
         )}
+      </div>
 
-        {/* Sentinel + loading */}
-        {hasNextPage && !isError && (
-          <div ref={sentinelRef}>
-            {isFetchingNextPage && <HandicapLeaderboardSkeleton />}
-          </div>
-        )}
-
-        {/* Inline retry */}
-        {isError && !isFetchingNextPage && allEntries.length > 0 && (
-          <InlineRetryCard onRetry={() => fetchNextPage()} />
-        )}
-
-        {isError && isFetchingNextPage && allEntries.length > 0 && (
-          <HandicapLeaderboardSkeleton />
-        )}
+      {/* ── FOOTER CAPTION ── */}
+      <div style={{ padding: '20px 20px 28px', textAlign: 'center' }}>
+        <div
+          style={{
+            fontSize: 9,
+            color: INK_FAINT,
+            letterSpacing: '0.06em',
+            fontStyle: 'italic',
+          }}
+        >
+          {peerGroup === 'similar'
+            ? 'Centred on your index · Showing three above and three below'
+            : 'Ranked by handicap index · Lowest first · Updated daily'}
+        </div>
       </div>
     </div>
   );

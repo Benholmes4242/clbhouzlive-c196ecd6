@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface UseDailyEditorialArgs {
   /** Which surface this editorial is for. Defaults to 'top100' for back-compat. */
-  surface?: 'top100' | 'global' | 'courses';
+  surface?: 'top100' | 'global' | 'courses' | 'handicap';
   seasonId: string | null;
   timeFilter: 'seasonal' | 'all_time';
   enabled?: boolean;
