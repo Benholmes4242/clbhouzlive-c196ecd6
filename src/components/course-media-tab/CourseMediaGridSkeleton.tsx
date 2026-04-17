@@ -2,28 +2,37 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const CourseMediaGridSkeleton: React.FC = () => (
-  <div className="flex flex-col gap-3">
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
     {/* Header skeleton */}
-    <div className="px-4 pt-3 pb-2 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Skeleton className="w-4 h-4 rounded" />
-          <Skeleton className="h-4 w-28 rounded" />
+    <div style={{ padding: '12px 16px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Skeleton className="h-4 w-4" />
+          <Skeleton className="h-4 w-28" />
         </div>
-        <Skeleton className="h-8 w-24 rounded-full" />
+        <Skeleton className="h-8 w-24 rounded-lg" />
       </div>
-      <div className="flex items-center justify-center gap-2">
-        <Skeleton className="h-10 w-16 rounded-full" />
-        <Skeleton className="h-10 w-20 rounded-full" />
-        <Skeleton className="h-10 w-20 rounded-full" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+        <Skeleton className="h-8 w-16" style={{ borderRadius: 8 }} />
+        <Skeleton className="h-8 w-20" style={{ borderRadius: 8 }} />
+        <Skeleton className="h-8 w-20" style={{ borderRadius: 8 }} />
       </div>
     </div>
-    {/* Grid skeleton */}
-    <div className="grid grid-cols-2 gap-[2px]">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <Skeleton key={`tile-${i}`} className="aspect-[4/5] rounded-[4px]" />
+
+    {/* Hero skeleton */}
+    <Skeleton className="w-full" style={{ height: 240, borderRadius: 0 }} />
+
+    {/* Grid skeleton — 2-col portraits, gap 2 */}
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Skeleton key={`tile-${i}`} className="w-full" style={{ aspectRatio: '3/4', borderRadius: 0 }} />
       ))}
-      <Skeleton className="col-span-2 aspect-video rounded-[4px]" />
+      {/* Landscape band */}
+      <Skeleton className="w-full" style={{ gridColumn: '1 / -1', aspectRatio: '16/9', borderRadius: 0 }} />
+      {/* Two more portraits */}
+      {Array.from({ length: 2 }).map((_, i) => (
+        <Skeleton key={`tile-b-${i}`} className="w-full" style={{ aspectRatio: '3/4', borderRadius: 0 }} />
+      ))}
     </div>
   </div>
 );

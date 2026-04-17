@@ -178,7 +178,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
               isFetchingNextPage={isFetchingNextPage}
             />
           ) : (
-            <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden' }}>
+            <div style={{ position: 'relative', height: 240, overflow: 'hidden' }}>
               <CourseMediaTile
                 key={firstMediaKey}
                 post={firstPost}
