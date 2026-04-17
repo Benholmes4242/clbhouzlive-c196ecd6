@@ -922,6 +922,42 @@ serve(async (req) => {
       // Don't throw — let seasonal + global editorials still succeed
     }
 
+    // 5. Handicap editorial — daily, all_time / no season
+    try {
+      const handicapSnapshot = await buildHandicapSnapshot(supabase);
+      const handicapStoryType = selectHandicapStory(handicapSnapshot);
+      const handicapEditorial = HANDICAP_TEMPLATES[handicapStoryType](handicapSnapshot);
+      await writeEditorial(supabase, {
+        surface: 'handicap',
+        seasonId: null,
+        timeFilter: 'all_time',
+        editorial: { ...handicapEditorial, storyType: handicapStoryType },
+        snapshotData: {
+          leader: handicapSnapshot.leader,
+          second: handicapSnapshot.second,
+          biggestImprover: handicapSnapshot.biggestImprover,
+        },
+      });
+      results.push({
+        surface: 'handicap',
+        timeFilter: 'all_time',
+        seasonId: null,
+        storyType: handicapStoryType,
+        headline: handicapEditorial.headline,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Handicap editorial generation failed', msg);
+      results.push({
+        surface: 'handicap' as Surface,
+        timeFilter: 'all_time',
+        seasonId: null,
+        storyType: 'error',
+        headline: `__error: ${msg}`,
+      });
+      // Don't throw — let other surfaces still succeed
+    }
+
     return new Response(
       JSON.stringify({ ok: true, generated: results }),
       {
