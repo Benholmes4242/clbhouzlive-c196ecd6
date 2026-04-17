@@ -480,11 +480,14 @@ serve(async (req) => {
     );
   } catch (err) {
     console.error('daily-editorial-generation error', err);
+    const message =
+      err instanceof Error
+        ? err.message
+        : typeof err === 'object' && err !== null
+          ? JSON.stringify(err)
+          : String(err);
     return new Response(
-      JSON.stringify({
-        ok: false,
-        error: err instanceof Error ? err.message : String(err),
-      }),
+      JSON.stringify({ ok: false, error: message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
