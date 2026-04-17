@@ -1656,8 +1656,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         background: 'rgba(255,255,255,0.06)',
                         border: '1px solid rgba(255,255,255,0.09)',
                         borderRadius: 12,
-                        padding: '10px 12px',
-                        marginTop: 8, marginBottom: 10,
+                        padding: 'clamp(7px, 1.2vh, 10px) 12px',
                       }}
                     >
                       {/* Avatar */}
