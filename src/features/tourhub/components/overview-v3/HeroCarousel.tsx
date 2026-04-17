@@ -1612,12 +1612,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const }}
+                  style={{ overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
                 >
-                  {/* Main content — grows to fill */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end', padding: '0 18px' }}>
+                  {/* Main content — grows to fill, scales fluidly with viewport height */}
+                  <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end', padding: '0 18px', gap: 'clamp(6px, 1.2vh, 10px)' }}>
                   {/* ── COURSE FACT CHIPS ── */}
-                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10 }}>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 'clamp(4px, 0.8vh, 6px)' }}>
                     {[
                       tournament.purse      && { value: formatPurse(tournament.purse),                          label: 'Purse'  },
                       tournament.venuePar   && { value: `Par ${tournament.venuePar}`,                           label: 'Course' },
@@ -1625,12 +1625,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     ].filter(Boolean).map((chip: any) => (
                       <div key={chip.label} style={{
                         flex: 1, textAlign: 'center',
-                        padding: '8px 4px 6px',
+                        padding: 'clamp(5px, 1vh, 8px) 4px clamp(4px, 0.8vh, 6px)',
                         borderRadius: 10,
                         background: 'rgba(255,255,255,0.06)',
                         border: '1px solid rgba(255,255,255,0.08)',
                       }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+                        <div style={{ fontSize: 'clamp(12px, 1.7vh, 14px)', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
                           {chip.value}
                         </div>
                         <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
