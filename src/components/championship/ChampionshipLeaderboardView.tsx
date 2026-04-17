@@ -564,7 +564,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       {editorialPending ? (
         <EditorialLedeSkeleton />
       ) : (
-        <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
           <div style={{
             fontSize: 10, fontWeight: 800, letterSpacing: '0.28em',
             color: '#9F1D1D', marginBottom: 10,
@@ -732,11 +732,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       {/* ── 6. SEASON SCHEDULE (Seasonal only) ── */}
       {timeFilter === 'seasonal' && (
         <div style={{ padding: '22px 20px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
             <span style={{
               fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em',
             }}>SCHEDULE</span>
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
             <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
@@ -779,18 +781,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* ── 7. FULL STANDINGS ── */}
       <div style={{ padding: '26px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
           <span style={{
             fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em',
           }}>
             {timeFilter === 'all_time' ? 'ALL-TIME STANDINGS' : 'FULL STANDINGS'}
           </span>
+          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
 
         {/* Arena tabs */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8, justifyContent: 'center' }}>
           {arenas.map((a) => (
             <button
               key={a.key}
@@ -811,7 +815,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {/* Division sub-filter */}
         {arenaMode === 'division' && (
           <div style={{
-            display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10, marginTop: 8,
+            display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10, marginTop: 8, justifyContent: 'center',
           }}>
             {divisionChips.map((d) => (
               <button
