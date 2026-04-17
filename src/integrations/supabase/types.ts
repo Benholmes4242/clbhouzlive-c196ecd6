@@ -6062,6 +6062,42 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard_snapshots: {
+        Row: {
+          captured_at: string
+          created_at: string
+          entity_id: string
+          id: number
+          metric_value: number | null
+          rank: number
+          scope: string
+          season_id: string | null
+          surface: string
+        }
+        Insert: {
+          captured_at?: string
+          created_at?: string
+          entity_id: string
+          id?: number
+          metric_value?: number | null
+          rank: number
+          scope: string
+          season_id?: string | null
+          surface: string
+        }
+        Update: {
+          captured_at?: string
+          created_at?: string
+          entity_id?: string
+          id?: number
+          metric_value?: number | null
+          rank?: number
+          scope?: string
+          season_id?: string | null
+          surface?: string
+        }
+        Relationships: []
+      }
       logos: {
         Row: {
           category: string
@@ -14679,7 +14715,19 @@ export type Database = {
         Returns: boolean
       }
       canonical_club_name_v2: { Args: { p_name: string }; Returns: string }
+      capture_all_leaderboard_snapshots: { Args: never; Returns: undefined }
+      capture_courses_snapshot: { Args: { p_sort: string }; Returns: undefined }
+      capture_global_snapshot: {
+        Args: { p_metric: string }
+        Returns: undefined
+      }
+      capture_handicap_snapshot: { Args: never; Returns: undefined }
       capture_leaderboard_snapshot: { Args: never; Returns: undefined }
+      capture_top100_alltime_snapshot: { Args: never; Returns: undefined }
+      capture_top100_snapshot: {
+        Args: { p_season_id: string }
+        Returns: undefined
+      }
       check_and_award_badges: {
         Args: { user_id_param: string }
         Returns: {
@@ -15351,12 +15399,12 @@ export type Database = {
       }
       get_championship_leaderboard: {
         Args: {
-          p_club_id?: string
-          p_country?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
+          p_club_id: string
+          p_country: string
+          p_current_user_id: string
+          p_limit: number
+          p_offset: number
+          p_scope: string
         }
         Returns: {
           courses_logged: number
@@ -15451,62 +15499,34 @@ export type Database = {
           thumbnail_url: string
         }[]
       }
-      get_course_leaderboard:
-        | {
-            Args: {
-              p_country?: string
-              p_current_user_id?: string
-              p_limit?: number
-              p_offset?: number
-              p_sort_by?: string
-              p_sort_order?: string
-              p_sub_country?: string
-              p_time_period?: string
-            }
-            Returns: {
-              avg_rating: number
-              city: string
-              club_name: string
-              country: string
-              course_id: string
-              course_name: string
-              has_played: boolean
-              image_url: string
-              rank: number
-              rank_change: number
-              rating_count: number
-              region: string
-              total_rounds: number
-            }[]
-          }
-        | {
-            Args: {
-              p_country?: string
-              p_current_user_id?: string
-              p_exclude_countries?: string[]
-              p_limit?: number
-              p_offset?: number
-              p_sort_by?: string
-              p_sort_order?: string
-              p_sub_country?: string
-              p_time_period?: string
-            }
-            Returns: {
-              avg_rating: number
-              city: string
-              club_name: string
-              country: string
-              course_id: string
-              course_name: string
-              has_played: boolean
-              image_url: string
-              rank: number
-              rank_change: number
-              rating_count: number
-              region: string
-              total_rounds: number
-            }[]
-          }
+      get_course_leaderboard: {
+        Args: {
+          p_country: string
+          p_current_user_id: string
+          p_exclude_countries: string[]
+          p_limit: number
+          p_offset: number
+          p_sort_by: string
+          p_sort_order: string
+          p_sub_country: string
+          p_time_period: string
+        }
+        Returns: {
+          avg_rating: number
+          city: string
+          club_name: string
+          country: string
+          course_id: string
+          course_name: string
+          has_played: boolean
+          image_url: string
+          rank: number
+          rank_change: number
+          rating_count: number
+          region: string
+          total_rounds: number
+        }[]
+      }
       get_course_media: {
         Args: {
           p_course_id: string
@@ -16759,6 +16779,7 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      prune_leaderboard_snapshots: { Args: never; Returns: undefined }
       publish_scheduled_posts: { Args: never; Returns: undefined }
       queue_push_notification: {
         Args: {
