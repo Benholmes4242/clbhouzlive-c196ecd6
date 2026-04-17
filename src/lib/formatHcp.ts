@@ -36,6 +36,46 @@ export function formatHcp(value: unknown): string {
  */
 export type HandicapTier = 'elite' | 'scratch' | 'player' | 'single' | 'midfielder' | 'weekend' | 'hacker';
 
+/**
+ * Three-letter abbreviation per tier, used in compact tier ladders.
+ * Hacker rolls up into Weekend (WKD) for display per the Handicap front-page brief.
+ */
+export function getTierAbbr(id: HandicapTier): string {
+  switch (id) {
+    case 'elite': return 'ELT';
+    case 'scratch': return 'SCR';
+    case 'player': return 'PLR';
+    case 'single': return 'SF';
+    case 'midfielder': return 'MID';
+    case 'weekend': return 'WKD';
+    case 'hacker': return 'WKD';
+  }
+}
+
+/**
+ * Short, capitalised tier name. Hacker rolls into Weekend.
+ */
+export function getTierShortName(id: HandicapTier): string {
+  switch (id) {
+    case 'elite': return 'Elite';
+    case 'scratch': return 'Scratch';
+    case 'player': return 'Player';
+    case 'single': return 'Single';
+    case 'midfielder': return 'Mid';
+    case 'weekend': return 'Weekend';
+    case 'hacker': return 'Weekend';
+  }
+}
+
+/**
+ * Returns true if `tierA` is a sharper (lower handicap) tier than `tierB`.
+ * Order: elite < scratch < player < single < midfielder < weekend < hacker.
+ */
+export function isTierSharper(tierA: HandicapTier, tierB: HandicapTier): boolean {
+  const order: HandicapTier[] = ['elite', 'scratch', 'player', 'single', 'midfielder', 'weekend', 'hacker'];
+  return order.indexOf(tierA) < order.indexOf(tierB);
+}
+
 export function getHandicapTier(handicap: number): HandicapTier {
   if (handicap <= -0.6) return 'elite';
   if (handicap <= 0.5) return 'scratch';

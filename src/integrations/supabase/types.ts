@@ -16061,6 +16061,22 @@ export type Database = {
         }
         Returns: Json
       }
+      get_similar_handicap_leaderboard: {
+        Args: {
+          p_current_user_id?: string
+          p_target_handicap: number
+          p_window_size?: number
+        }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          handicap_index: number
+          is_current_user: boolean
+          rank: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_suggested_creators: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
