@@ -25,7 +25,7 @@ const getTierLabel = (score: number): string => {
 };
 
 const SectionHeader: React.FC = () => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
     <div style={{ width: 3, height: 13, background: '#F7931E', borderRadius: 1 }} />
     <span
       style={{
@@ -194,7 +194,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       <SectionHeader />
 
       {/* Score row — flat */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
         <span
           style={{
             fontSize: 40,
@@ -212,7 +212,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </span>
       </div>
 
-      <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 14 }}>
+      <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 14, textAlign: 'center' as const }}>
         Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
         {onlyUserHasRated ? ' · Only you have rated this course so far.' : ''}
       </div>
