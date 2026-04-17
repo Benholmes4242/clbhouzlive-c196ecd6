@@ -16069,6 +16069,7 @@ export type Database = {
         }
         Returns: {
           avatar_url: string
+          club_name: string
           display_name: string
           handicap_index: number
           is_current_user: boolean

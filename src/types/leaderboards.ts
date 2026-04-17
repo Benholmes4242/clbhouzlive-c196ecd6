@@ -58,6 +58,7 @@ export interface LowestHandicapEntry {
   display_name: string | null;
   avatar_url: string | null;
   handicap_index: number;
+  home_club: string | null;
   is_current_user: boolean;
 }
 

@@ -38,7 +38,18 @@ export function useLowestHandicapLeaderboard(options: UseLowestHandicapLeaderboa
         throw error;
       }
 
-      return { entries: (data ?? []) as unknown as LowestHandicapEntry[] };
+      const entries: LowestHandicapEntry[] = (data ?? []).map((row: any) => ({
+        rank: Number(row.rank),
+        user_id: row.user_id,
+        username: row.username ?? null,
+        display_name: row.display_name ?? null,
+        avatar_url: row.profile_photo_url ?? row.avatar_url ?? null,
+        handicap_index: Number(row.eg_handicap_index ?? row.handicap_index),
+        home_club: row.club_name ?? null,
+        is_current_user: row.is_current_user ?? (row.user_id === user?.id),
+      }));
+
+      return { entries };
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
