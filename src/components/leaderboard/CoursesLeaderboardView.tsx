@@ -64,11 +64,11 @@ function selectCoursesEyebrow(args: {
   return args.defaultEyebrow;
 }
 
-function TrendArrow({ change }: { change: number }) {
-  if (change > 0) return <span style={{ color: '#15803D', fontSize: 11, fontWeight: 800 }}>↑</span>;
-  if (change < 0) return <span style={{ color: '#9F1D1D', fontSize: 11, fontWeight: 800 }}>↓</span>;
-  return <span style={{ color: '#CBD5E1', fontSize: 11 }}>—</span>;
-}
+// NOTE: TrendArrow removed in audit fix — `rank_change` is hardcoded to 0 in the
+// `get_course_leaderboard` RPC, so the trend column was permanently inert. Hide
+// the column until snapshot infrastructure lands (Phase 2 backend work).
+// See CoursesAuditBrief FIX 1.
+
 
 const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 16px', textAlign: 'center' }}>
