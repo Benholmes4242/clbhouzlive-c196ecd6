@@ -73,8 +73,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   
   const hookRatingFilter = ratingFilter === 'outstanding' ? '10-9' 
     : ratingFilter === 'excellent' ? '8-7'
-    : ratingFilter === 'veryGood' ? '6-5'
-    : ratingFilter === 'good' || ratingFilter === 'fair' ? '<5'
+    : ratingFilter === 'good' ? '6-5'
     : 'all';
   
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
@@ -316,41 +315,48 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col">
-        <section className="px-4 py-4 flex flex-col items-center gap-2">
-          <Skeleton className="h-10 w-16 rounded-lg" />
-          <Skeleton className="h-4 w-24" />
+      <div style={{ background: '#F8FAFC', minHeight: '100%', paddingBottom: 40 }}>
+        {/* Community score skeleton */}
+        <div style={{ padding: '18px 16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <Skeleton className="h-3 w-28" />
+          <Skeleton className="h-9 w-24" />
           <Skeleton className="h-3 w-20" />
-        </section>
-        <section className="px-4 pb-4">
-          <Skeleton className="h-11 w-full rounded-xl" />
-        </section>
-        <section className="px-4 pb-4 flex gap-2 justify-center">
-          <Skeleton className="h-8 w-24 rounded-full" />
-          <Skeleton className="h-8 w-28 rounded-full" />
-          <Skeleton className="h-8 w-24 rounded-full" />
-        </section>
-        <section className="px-4 space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl bg-card border border-border p-5">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="w-10 h-10 rounded-lg" />
-                  <div className="space-y-1.5">
-                    <Skeleton className="h-4 w-28" />
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                </div>
-                <Skeleton className="h-8 w-12 rounded-lg" />
+        </div>
+        <Divider />
+        {/* Search skeleton */}
+        <div style={{ padding: '10px 16px 0' }}>
+          <Skeleton className="h-10 w-full rounded-[10px]" />
+        </div>
+        {/* Sort skeleton */}
+        <div style={{ display: 'flex', gap: 6, padding: '10px 16px 8px' }}>
+          <Skeleton className="h-7 w-24 rounded-lg" />
+          <Skeleton className="h-7 w-28 rounded-lg" />
+          <Skeleton className="h-7 w-24 rounded-lg" />
+        </div>
+        {/* Filter skeleton */}
+        <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px' }}>
+          <Skeleton className="h-7 w-32 rounded-full" />
+          <Skeleton className="h-7 w-28 rounded-full" />
+          <Skeleton className="h-7 w-24 rounded-full" />
+        </div>
+        <Divider />
+        {/* Review row skeletons */}
+        {[1, 2, 3].map((i) => (
+          <div key={i} style={{ padding: '14px 16px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
+              <Skeleton className="w-10 h-10 rounded-[10px]" />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <Skeleton className="h-3.5 w-28" />
+                <Skeleton className="h-3 w-16" />
               </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-4/5" />
-                <Skeleton className="h-3 w-3/5" />
-              </div>
+              <Skeleton className="h-[46px] w-[46px] rounded-full" />
             </div>
-          ))}
-        </section>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-4/5" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -475,7 +481,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </div>
 
       {/* Sort buttons */}
-      <div style={{ display: 'flex', gap: 6, padding: '10px 16px 8px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <div className="scrollbar-hide" style={{ display: 'flex', gap: 6, padding: '12px 16px 8px', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {sortOptions.map((option) => {
           const isActive = sortBy === option.value;
           return (
@@ -491,7 +497,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </div>
 
       {/* Rating filter chips */}
-      <div style={{ padding: '0 16px 10px' }}>
+      <div style={{ padding: '2px 16px 12px' }}>
         <RatingFilterChips value={ratingFilter} onChange={setRatingFilter} />
       </div>
 
@@ -499,7 +505,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Your review — pinned first */}
       {filteredMyReview && (
-        <div style={{ padding: '0 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+        <div style={{ padding: '6px 16px 0', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
           <ReviewBlockFlat
             review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
             isMine
@@ -540,7 +546,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           const canReply = businessClaim?.isVerified && !response;
           return (
             <div key={review.id} style={{ borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
-              <div style={{ padding: '0 16px' }}>
+              <div style={{ padding: '2px 16px 0' }}>
                 <ReviewBlockFlat
                   review={transformReview(review, isDeepLinked)}
                   isHighlighted={isDeepLinked}

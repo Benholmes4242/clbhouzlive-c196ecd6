@@ -1,7 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
-import { getScoreTier, ScoreTier } from '@/utils/getScoreTier';
-import { cn } from '@/lib/utils';
+import { ScoreTier } from '@/utils/getScoreTier';
 
 export type RatingFilterValue = ScoreTier | null;
 
@@ -10,12 +8,10 @@ interface RatingFilterChipsProps {
   onChange: (value: RatingFilterValue) => void;
 }
 
-const FILTER_OPTIONS: { key: ScoreTier; label: string; sampleScore: number }[] = [
-  { key: 'outstanding', label: 'Outstanding', sampleScore: 9.5 },
-  { key: 'excellent', label: 'Excellent', sampleScore: 8.5 },
-  { key: 'veryGood', label: 'Very Good', sampleScore: 7.5 },
-  { key: 'good', label: 'Good', sampleScore: 6.5 },
-  { key: 'fair', label: 'Fair', sampleScore: 5.0 },
+const FILTER_OPTIONS: { key: ScoreTier; label: string }[] = [
+  { key: 'outstanding', label: 'Outstanding 9–10' },
+  { key: 'excellent', label: 'Excellent 7–8' },
+  { key: 'good', label: 'Good 5–6' },
 ];
 
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
@@ -23,10 +19,16 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
   onChange,
 }) => {
   return (
-    <div 
-      className="flex flex-wrap items-center justify-center gap-2" 
-      role="group" 
+    <div
+      role="group"
       aria-label="Filter reviews by rating"
+      className="scrollbar-hide"
+      style={{
+        display: 'flex',
+        gap: 6,
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }}
     >
       {FILTER_OPTIONS.map((option) => {
         const isActive = value === option.key;
@@ -35,32 +37,23 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
             key={option.key}
             type="button"
             onClick={() => onChange(isActive ? null : option.key)}
-            className="shrink-0 whitespace-nowrap min-h-[28px] px-2.5 text-xs font-medium transition-colors active:scale-[0.97] flex items-center gap-1"
             style={{
+              padding: '5px 12px',
               borderRadius: 20,
-              background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-              border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-              color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+              fontSize: 11,
+              fontWeight: isActive ? 800 : 600,
+              background: isActive ? 'rgba(247,147,30,0.1)' : 'transparent',
+              color: isActive ? '#F7931E' : '#94A3B8',
+              border: `1px solid ${isActive ? 'rgba(247,147,30,0.3)' : 'rgba(15,23,42,0.08)'}`,
+              cursor: 'pointer',
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
             }}
           >
             {option.label}
           </button>
         );
       })}
-      
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange(null)}
-          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium
-            whitespace-nowrap min-h-[32px] bg-muted text-muted-foreground 
-            border border-border hover:bg-muted/80 active:scale-[0.97] transition-all"
-          style={{ borderRadius: 8 }}
-        >
-          <X className="w-3 h-3" />
-          Clear
-        </button>
-      )}
     </div>
   );
 };

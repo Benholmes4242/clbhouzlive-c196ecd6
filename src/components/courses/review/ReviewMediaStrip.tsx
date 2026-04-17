@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Play, Camera } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 export interface ReviewMediaItem {
   id: string;
@@ -12,7 +11,7 @@ export interface ReviewMediaItem {
 interface ReviewMediaStripProps {
   media: ReviewMediaItem[];
   onMediaClick: (index: number) => void;
-  /** 'default' = 96px thumbnails, 'compact' = 64px thumbnails for inline review cards */
+  /** 'default' = 96px thumbnails, 'compact' = 70px thumbnails for inline review cards */
   variant?: 'default' | 'compact';
 }
 
@@ -21,36 +20,40 @@ const ReviewMediaThumb: React.FC<{
   item: ReviewMediaItem;
   index: number;
   onMediaClick: (index: number) => void;
-  thumbSize: string;
-  playBtnSize: string;
-  playIconSize: string;
-  isCompact: boolean;
-}> = ({ item, index, onMediaClick, thumbSize, playBtnSize, playIconSize, isCompact }) => {
+  dim: number;
+  radius: number;
+}> = ({ item, index, onMediaClick, dim, radius }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isBroken, setIsBroken] = useState(false);
   const isVideo = item.media_type === 'video';
   const src = isVideo ? (item.poster_url || item.media_url) : item.media_url;
-  const fallbackIconSize = isCompact ? 'h-5 w-5' : 'h-6 w-6';
 
   return (
     <button
       type="button"
       onClick={() => onMediaClick(index)}
-      className={cn(
-        "relative flex-shrink-0 rounded-lg overflow-hidden bg-muted",
-        "hover:opacity-90 transition active:scale-[0.97]",
-        thumbSize
-      )}
+      style={{
+        position: 'relative',
+        flexShrink: 0,
+        width: dim,
+        height: dim,
+        borderRadius: radius,
+        overflow: 'hidden',
+        background: 'rgba(15,23,42,0.04)',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
     >
       {/* Shimmer placeholder */}
       {!isLoaded && !isBroken && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.06)' }} />
       )}
 
       {/* Broken image fallback */}
       {isBroken && (
-        <div className="absolute inset-0 bg-muted flex items-center justify-center">
-          <Camera className={cn("text-muted-foreground/40", fallbackIconSize)} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Camera style={{ width: 18, height: 18, color: 'rgba(15,23,42,0.3)' }} />
         </div>
       )}
 
@@ -59,10 +62,13 @@ const ReviewMediaThumb: React.FC<{
         <img
           src={src}
           alt={isVideo ? 'Video thumbnail' : 'Review media'}
-          className={cn(
-            "w-full h-full object-cover transition-opacity duration-200",
-            isLoaded ? 'opacity-100' : 'opacity-0'
-          )}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 200ms',
+          }}
           loading="lazy"
           decoding="async"
           onLoad={() => setIsLoaded(true)}
@@ -70,11 +76,21 @@ const ReviewMediaThumb: React.FC<{
         />
       )}
 
-      {/* Video play icon overlay — canonical dark glass, matches CourseMoments */}
+      {/* Video play overlay — simple dark circle */}
       {isVideo && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-5 h-5 rounded-full liquid-glass flex items-center justify-center">
-            <Play className="w-2.5 h-2.5 text-white fill-white translate-x-[1px]" />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.55)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Play style={{ width: 10, height: 10, color: '#fff', fill: '#fff', transform: 'translateX(1px)' }} />
           </div>
         </div>
       )}
@@ -82,33 +98,28 @@ const ReviewMediaThumb: React.FC<{
   );
 };
 
-export const ReviewMediaStrip: React.FC<ReviewMediaStripProps> = ({ 
-  media, 
+export const ReviewMediaStrip: React.FC<ReviewMediaStripProps> = ({
+  media,
   onMediaClick,
   variant = 'default',
 }) => {
   if (!media || media.length === 0) return null;
 
   const isCompact = variant === 'compact';
-  const thumbSize = isCompact ? 'w-16 h-16' : 'w-24 h-24';
-  const playBtnSize = isCompact ? 'w-6 h-6' : 'w-8 h-8';
-  const playIconSize = isCompact ? 'w-3 h-3' : 'w-4 h-4';
+  const thumbDim = isCompact ? 70 : 96;
+  const radius = isCompact ? 9 : 12;
+  const gap = isCompact ? 5 : 8;
 
   return (
-    <div className={cn(
-      "flex gap-2 overflow-x-auto no-scrollbar",
-      isCompact ? "-mx-5 px-5 pb-2" : "mt-3 -mx-1 px-1"
-    )}>
+    <div style={{ display: 'flex', gap, flexWrap: 'wrap' }}>
       {media.map((item, index) => (
         <ReviewMediaThumb
           key={item.id}
           item={item}
           index={index}
           onMediaClick={onMediaClick}
-          thumbSize={thumbSize}
-          playBtnSize={playBtnSize}
-          playIconSize={playIconSize}
-          isCompact={isCompact}
+          dim={thumbDim}
+          radius={radius}
         />
       ))}
     </div>
