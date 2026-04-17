@@ -1,135 +1,51 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
-import { supabase } from '@/integrations/supabase/client';
-
-import { Skeleton } from '@/components/ui/skeleton';
 import {
-  LeaderboardRow,
-  LeaderboardStat,
-  LeaderboardScopeSelector,
-  LeaderboardEmpty,
-} from '../shared';
-import { CountrySelector } from '../shared/CountrySelector';
-import { ExplorationPodium } from './ExplorationPodium';
-import { MiniGlobePreview } from './MiniGlobePreview';
-import { GlobalGolfersMapStatsRow } from './GlobalGolfersMapStatsRow';
-import { ClubSearchBar } from './ClubSearchBar';
-import { usePlayedCourseCoordinates } from '@/hooks/usePlayedCourseCoordinates';
-import { ContinentBreakdownGrid } from './ContinentBreakdownGrid';
-import { ExplorerTierCard } from './ExplorerTierCard';
-import { CountryLeaderboard } from './CountryLeaderboard';
-import CountryFlag from '@/components/ui/country-flag';
-import { getUserTier, getNextTier } from '@/config/explorerTiers';
-import { useSeasonCalendar } from '@/hooks/championship';
-import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
-import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
+  useExplorationLeaderboard,
+  useUserExplorationStatus,
+  useCountriesByMemberCount,
+} from '@/hooks/leaderboards';
+import { useDailyEditorial } from '@/hooks/championship';
+import { supabase } from '@/integrations/supabase/client';
+import { getProfilePathById } from '@/lib/profileRoutes';
+import { continentForCountry } from '@/lib/countryContinent';
+import {
+  EXPLORER_TIERS,
+  getUserTier,
+  getNextTier,
+  getTierAbbr,
+  getTierShortName,
+} from '@/config/explorerTiers';
 
-// --- Constants ---
-const ROW_HEIGHT = 72;
-const VIRTUALIZATION_THRESHOLD = 50;
-const OVERSCAN = 8;
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import CountryFlag from '@/components/ui/country-flag';
+import { ClubSearchBar } from './ClubSearchBar';
+import { CountrySelector } from '../shared/CountrySelector';
+import type { LeaderboardScope, ExplorationLeaderboardEntry } from '@/types/leaderboards';
+
+// ----------------------------------------------------------------------------
+// Constants
+// ----------------------------------------------------------------------------
+
 const STORAGE_KEY_SCROLL = 'exploration-leaderboard-scroll';
 const STORAGE_KEY_FILTERS = 'exploration-leaderboard-filters';
 
-// --- Skeletons ---
-function ExplorationLeaderboardSkeleton() {
-  return (
-    <div className="space-y-2">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 p-3">
-          <Skeleton className="h-5 w-6 rounded" />
-          <Skeleton className="h-11 w-11 rounded-lg" />
-          <div className="flex-1 min-w-0 space-y-1.5">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-          <Skeleton className="h-6 w-16" />
-        </div>
-      ))}
-    </div>
-  );
-}
+// Editorial palette — reserved for live pip, YOU indicator, eyebrow.
+const CRIMSON = '#9F1D1D';
+const INK = '#0F172A';
+const INK_BODY = '#475569';
+const INK_MUTED = '#64748B';
+const INK_FAINT = '#94A3B8';
+const HAIRLINE = '#CBD5E1';
+const BG = '#FAFAF6';
+const AMBER = '#F7931E';
+const AMBER_DARK = '#F59E0B';
 
-function ExplorationPageSkeleton() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', background: '#F8FAFC', minHeight: '100%' }}>
-      <div style={{ background: 'linear-gradient(160deg, #1a1a2e, #2d1f3d, #1f1535)', padding: '16px 16px 0' }}>
-        <Skeleton className="h-3 w-52 rounded mb-4" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-          <Skeleton className="w-[52px] h-[52px] rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.15)' }} />
-          <div style={{ flex: 1 }}>
-            <Skeleton className="h-3 w-28 rounded mb-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Skeleton className="h-6 w-24 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
-              <Skeleton className="h-5 w-28 rounded" style={{ background: 'rgba(255,255,255,0.12)' }} />
-            </div>
-          </div>
-          <Skeleton className="h-10 w-12 rounded" style={{ background: 'rgba(255,255,255,0.12)' }} />
-        </div>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-14 flex-1 rounded-[10px]" style={{ background: 'rgba(255,255,255,0.08)' }} />
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 2 }}>
-          {[...Array(2)].map((_, i) => (
-            <Skeleton key={i} className="h-10 flex-1 rounded-t-[8px]" style={{ background: i === 0 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)' }} />
-          ))}
-        </div>
-      </div>
-      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <Skeleton className="h-16 w-full rounded-[14px]" />
-        <Skeleton className="h-20 w-full rounded-[14px]" />
-        {[...Array(5)].map((_, i) => (
-          <div key={i} style={{
-            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-            background: '#FFFFFF', borderRadius: 14, border: '1px solid rgba(15,23,42,0.07)',
-          }}>
-            <Skeleton className="w-5 h-4 rounded" />
-            <Skeleton className="w-11 h-11 rounded-lg" />
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <Skeleton className="h-4 rounded" style={{ width: `${[70, 55, 65, 50, 60][i]}%` }} />
-              <Skeleton className="h-3 rounded" style={{ width: `${[45, 40, 50, 35, 45][i]}%` }} />
-            </div>
-            <Skeleton className="h-6 w-14 rounded" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+// ----------------------------------------------------------------------------
+// Filter persistence
+// ----------------------------------------------------------------------------
 
-function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="py-4 px-3">
-      <button
-        onClick={onRetry}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm active:scale-[0.98] active:opacity-70 transition-all"
-        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
-      >
-        Couldn't load more golfers · Tap to retry
-      </button>
-    </div>
-  );
-}
-
-function InitialErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-12 px-3 text-center space-y-4">
-      <p className="text-muted-foreground text-sm">Something went wrong loading the leaderboard.</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
-      >
-        Try again
-      </button>
-    </div>
-  );
-}
-
-// --- Filter persistence ---
 function loadSavedFilters() {
   try {
     const saved = sessionStorage.getItem(STORAGE_KEY_FILTERS);
@@ -138,55 +54,118 @@ function loadSavedFilters() {
   return null;
 }
 
-const MAX_FLAGS = 7;
+// ----------------------------------------------------------------------------
+// Helpers
+// ----------------------------------------------------------------------------
+
+function getInitials(name: string): string {
+  if (!name) return '?';
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function selectGlobalEyebrow(args: {
+  isLoggedIn: boolean;
+  hasData: boolean;
+  userTierId: string;
+  userRank: number | null;
+  countriesNeeded: number;
+  continentsNeeded: number;
+  isMaxTier: boolean;
+  defaultEyebrow: string;
+}): string {
+  if (!args.isLoggedIn || !args.hasData || args.userRank === null) {
+    return 'LOG A ROUND TO ENTER';
+  }
+  if (args.isMaxTier) return "YOU'VE REACHED THE SUMMIT";
+  if (args.countriesNeeded === 0 && args.continentsNeeded === 0) {
+    return 'TIER PROMOTION INCOMING';
+  }
+  if (args.countriesNeeded <= 1 || args.continentsNeeded === 1) {
+    return 'ONE STEP FROM PROMOTION';
+  }
+  if (args.userRank <= 10) return 'THE GLOBAL TOP TEN · YOUR JOURNEY';
+  if (args.userRank <= 30) return 'THE GLOBAL FIELD · YOUR JOURNEY';
+  return args.defaultEyebrow;
+}
+
+function generateTierCaption(
+  countries: number,
+  continents: number,
+  currentTierName: string,
+  nextTier: { name: string; minCountries: number; minContinents: number } | null,
+): React.ReactNode {
+  if (!nextTier) {
+    return `You've reached ${currentTierName}, the highest tier on Clbhouz. Keep exploring.`;
+  }
+  const countriesNeeded = Math.max(0, nextTier.minCountries - countries);
+  const continentsNeeded = Math.max(0, nextTier.minContinents - continents);
+  if (countriesNeeded === 0 && continentsNeeded === 0) {
+    return (
+      <>
+        You've met the criteria for{' '}
+        <span style={{ color: AMBER, fontWeight: 700 }}>{nextTier.name}</span> —
+        your tier will update on the next refresh.
+      </>
+    );
+  }
+  const parts: string[] = [];
+  if (countriesNeeded > 0) {
+    parts.push(`${countriesNeeded} more ${countriesNeeded === 1 ? 'country' : 'countries'}`);
+  }
+  if (continentsNeeded > 0) {
+    parts.push(`${continentsNeeded} more ${continentsNeeded === 1 ? 'continent' : 'continents'}`);
+  }
+  return (
+    <>
+      {parts.join(' and ')} to unlock{' '}
+      <span style={{ color: AMBER, fontWeight: 700 }}>{nextTier.name}</span>.
+    </>
+  );
+}
+
+// ----------------------------------------------------------------------------
+// Component
+// ----------------------------------------------------------------------------
 
 export function ExplorationTab() {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const savedFilters = useRef(loadSavedFilters()).current;
 
-  const seasonThemeColor = '#f59e0b';
-
+  // Player view filters
   const [scope, setScope] = useState<LeaderboardScope>(() => savedFilters?.scope ?? 'global');
-  const [metric, setMetric] = useState<ExplorationMetric>(() => savedFilters?.metric ?? 'countries');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => savedFilters?.selectedClubId ?? null);
   const [selectedClubName, setSelectedClubName] = useState<string | null>(() => savedFilters?.selectedClubName ?? null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(() => savedFilters?.selectedCountry ?? null);
+  const [viewMode, setViewMode] = useState<'player' | 'country'>(() => savedFilters?.viewMode ?? 'player');
+
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'player' | 'country'>(() => savedFilters?.viewMode ?? 'player');
-  const [activeContinent, setActiveContinent] = useState<string | null>(null);
-  const [scrollTop, setScrollTop] = useState(0);
+  const [userCountry, setUserCountry] = useState<string | null>(null);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const listContainerRef = useRef<HTMLDivElement>(null);
   const hasRestoredScroll = useRef(false);
   const scrollPositionRef = useRef(0);
   const isFilterChangeRef = useRef(false);
 
-  // Season config
-  const { data: seasonCalendar } = useSeasonCalendar();
-  const currentSeasonId = useMemo(() => {
-    const current = seasonCalendar?.find(s => s.is_current);
-    if (!current) return 'major' as SeasonId;
-    const lower = current.name.toLowerCase();
-    if (lower.includes('pre')) return 'preseason' as SeasonId;
-    if (lower.includes('summer')) return 'summer' as SeasonId;
-    if (lower.includes('off')) return 'offseason' as SeasonId;
-    return 'major' as SeasonId;
-  }, [seasonCalendar]);
-
-  // Save filters
+  // Persist filters
   useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY_FILTERS, JSON.stringify({
-      scope, metric, selectedClubId, selectedClubName, selectedCountry, viewMode,
-    }));
+    sessionStorage.setItem(
+      STORAGE_KEY_FILTERS,
+      JSON.stringify({ scope, selectedClubId, selectedClubName, selectedCountry, viewMode }),
+    );
     isFilterChangeRef.current = true;
     scrollPositionRef.current = (() => {
       const rootEl = document.getElementById('root');
       return (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
     })();
-  }, [scope, metric, selectedClubId, selectedClubName, selectedCountry, viewMode]);
+  }, [scope, selectedClubId, selectedClubName, selectedCountry, viewMode]);
 
   // Preserve scroll on filter change
   useLayoutEffect(() => {
@@ -201,28 +180,11 @@ export function ExplorationTab() {
     }
   });
 
-  // Scroll tracking
-  useEffect(() => {
-    const handleScroll = () => {
-      const rootEl = document.getElementById('root');
-      const currentScroll = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
-      setScrollTop(currentScroll);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    const rootEl = document.getElementById('root');
-    rootEl?.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      rootEl?.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   useEffect(() => {
     if (scope !== 'country') setSelectedCountry(null);
   }, [scope]);
 
   // Fetch user's home club + country
-  const [userCountry, setUserCountry] = useState<string | null>(null);
   useEffect(() => {
     async function fetchUserHomeClub() {
       if (!user?.id) return;
@@ -234,10 +196,6 @@ export function ExplorationTab() {
       if (data?.primary_club_id) {
         setUserHomeClubId(data.primary_club_id);
         setUserHomeClubName((data.golf_clubs as any)?.name || null);
-        if (!selectedClubId) {
-          setSelectedClubId(data.primary_club_id);
-          setSelectedClubName((data.golf_clubs as any)?.name || null);
-        }
       }
       const clubCountry = (data?.golf_clubs as any)?.country;
       setUserCountry(clubCountry || data?.country || null);
@@ -258,64 +216,89 @@ export function ExplorationTab() {
     }
   }, [scope, selectedCountry, userCountry]);
 
+  // ---- Data ----
   const {
-    data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage, refetch,
+    data,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   } = useExplorationLeaderboard({
-    scope, metric,
+    scope,
+    metric: 'countries',
     clubId: scope === 'club' ? selectedClubId : null,
     country: scope === 'country' ? selectedCountry : null,
+    enabled: viewMode === 'player',
   });
 
   const allEntries = useMemo(
-    () => data?.pages.flatMap(page => page.entries) ?? [],
-    [data?.pages]
+    () => data?.pages.flatMap((p) => p.entries) ?? [],
+    [data?.pages],
   );
 
   const { data: userStatus } = useUserExplorationStatus({ userId: user?.id });
-  const { data: playedCoordinates } = usePlayedCourseCoordinates(user?.id);
 
-  const handleExploreMap = useCallback(() => {
-    navigate('/top100?view=map');
-  }, [navigate]);
+  const {
+    data: countryData,
+    hasNextPage: countryHasNext,
+    fetchNextPage: countryFetchNext,
+    isFetchingNextPage: countryIsFetchingNext,
+    isLoading: countryIsLoading,
+  } = useCountriesByMemberCount({ enabled: viewMode === 'country' });
 
-  const currentUserEntry = useMemo(
-    () => allEntries.find(e => e.user_id === user?.id) ?? null,
-    [allEntries, user?.id]
+  const allCountries = useMemo(
+    () => countryData?.pages.flatMap((p) => p.entries) ?? [],
+    [countryData?.pages],
   );
 
-  const [currentUserProfile, setCurrentUserProfile] = useState<{
-    display_name: string | null;
-    profile_photo_url: string | null;
-  } | null>(null);
+  // Editorial (Global surface)
+  const { data: editorial } = useDailyEditorial({
+    surface: 'global',
+    seasonId: null,
+    timeFilter: 'all_time',
+  });
 
-  useEffect(() => {
-    async function fetchProfile() {
-      if (!user?.id) return;
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('display_name, profile_photo_url')
-        .eq('id', user.id)
-        .maybeSingle();
-      if (data) setCurrentUserProfile(data);
-    }
-    fetchProfile();
-  }, [user?.id]);
-
-  const filteredEntries = useMemo(() => {
-    if (!activeContinent) return allEntries;
-    return allEntries.filter(e => e.continent_list?.includes(activeContinent));
-  }, [allEntries, activeContinent]);
-
-  const continentsPlayed = userStatus?.continent_list?.filter(c => c !== 'Antarctica').length ?? 0;
+  // ---- Derived user stats ----
   const countriesPlayed = userStatus?.countries_count ?? 0;
-  const coursesPlayed = currentUserEntry?.courses_count ?? 0;
-  const userTier = useMemo(() => getUserTier(countriesPlayed, continentsPlayed), [countriesPlayed, continentsPlayed]);
-  const nextTier = useMemo(() => getNextTier(userTier.id), [userTier.id]);
-  const userRank = currentUserEntry?.rank ?? userStatus?.global_rank ?? null;
+  const continentsPlayed = userStatus?.continents_count ?? 0;
+  const userGlobalRank = userStatus?.global_rank ?? null;
+  const userFriendsRank = userStatus?.friends_rank ?? null;
+  const userVisibleRank = scope === 'friends' ? userFriendsRank : userGlobalRank;
 
-  // Scroll restore
+  const currentTier = useMemo(
+    () => getUserTier(countriesPlayed, continentsPlayed),
+    [countriesPlayed, continentsPlayed],
+  );
+  const nextTier = useMemo(() => getNextTier(currentTier.id), [currentTier.id]);
+  const isMaxTier = !nextTier;
+
+  const countriesNeeded = nextTier ? Math.max(0, nextTier.minCountries - countriesPlayed) : 0;
+  const continentsNeeded = nextTier ? Math.max(0, nextTier.minContinents - continentsPlayed) : 0;
+
+  // ---- Editorial eyebrow (personalised) ----
+  const personalisedEyebrow = useMemo(() => {
+    return selectGlobalEyebrow({
+      isLoggedIn: !!user,
+      hasData: countriesPlayed > 0,
+      userTierId: currentTier.id,
+      userRank: userVisibleRank,
+      countriesNeeded,
+      continentsNeeded,
+      isMaxTier,
+      defaultEyebrow: editorial?.eyebrow ?? 'THE GLOBAL FIELD',
+    });
+  }, [user, countriesPlayed, currentTier.id, userVisibleRank, countriesNeeded, continentsNeeded, isMaxTier, editorial?.eyebrow]);
+
+  // ---- Editorial fallback ----
+  const headline = editorial?.headline ?? 'The map';
+  const headlineTwo = editorial?.headlineTwo ?? 'is open.';
+  const standfirst =
+    editorial?.standfirst ??
+    'The global standings are just getting started. Every new country logged is one closer to the top of the explorer\u2019s board.';
+
+  // ---- Scroll restore ----
   useEffect(() => {
-    if (hasRestoredScroll.current || allEntries.length === 0) return;
+    if (hasRestoredScroll.current || (allEntries.length === 0 && allCountries.length === 0)) return;
     const savedScroll = sessionStorage.getItem(STORAGE_KEY_SCROLL);
     if (savedScroll) {
       hasRestoredScroll.current = true;
@@ -327,23 +310,29 @@ export function ExplorationTab() {
         sessionStorage.removeItem(STORAGE_KEY_SCROLL);
       });
     }
-  }, [allEntries.length]);
+  }, [allEntries.length, allCountries.length]);
 
-  // Infinite scroll
-  const isFetchingRef = useRef(isFetchingNextPage);
-  isFetchingRef.current = isFetchingNextPage;
+  // ---- Infinite scroll ----
+  const isFetchingRef = useRef(isFetchingNextPage || countryIsFetchingNext);
+  isFetchingRef.current = isFetchingNextPage || countryIsFetchingNext;
 
   useEffect(() => {
-    if (!sentinelRef.current || !hasNextPage) return;
+    if (!sentinelRef.current) return;
+    const hasMore = viewMode === 'player' ? hasNextPage : countryHasNext;
+    if (!hasMore) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) fetchNextPage();
+        if (entry.isIntersecting && !isFetchingRef.current) {
+          if (viewMode === 'player') fetchNextPage();
+          else countryFetchNext();
+        }
       },
       { rootMargin: '600px', threshold: 0 },
     );
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [hasNextPage, fetchNextPage]);
+  }, [viewMode, hasNextPage, countryHasNext, fetchNextPage, countryFetchNext]);
 
   const handleEntryClick = useCallback(() => {
     const rootEl = document.getElementById('root');
@@ -356,345 +345,1046 @@ export function ExplorationTab() {
     setSelectedClubName(clubName);
   };
 
-  const getMetricValue = (entry: any) => {
-    switch (metric) {
-      case 'continents': return entry.continents_count;
-      case 'courses': return entry.courses_count;
-      default: return entry.countries_count;
-    }
-  };
-
-  const getPodiumRingColor = (rank: number): string | null => {
-    switch (rank) {
-      case 1: return '#F7931E';
-      case 2: return '#B8C6C9';
-      case 3: return '#C4956A';
-      default: return null;
-    }
-  };
-
-  const podiumEntries = filteredEntries.slice(0, 3);
-
-  // Virtualization
-  const virtualizedContent = useMemo(() => {
-    if (filteredEntries.length <= VIRTUALIZATION_THRESHOLD) return null;
-    const containerOffset = listContainerRef.current?.offsetTop ?? 0;
-    const relativeScroll = Math.max(0, scrollTop - containerOffset);
-    const viewportHeight = window.innerHeight;
-    const startIndex = Math.max(0, Math.floor(relativeScroll / ROW_HEIGHT) - OVERSCAN);
-    const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + OVERSCAN * 2;
-    const endIndex = Math.min(filteredEntries.length, startIndex + visibleCount);
-    const totalHeight = filteredEntries.length * ROW_HEIGHT;
-    const offsetY = startIndex * ROW_HEIGHT;
-    return { startIndex, endIndex, totalHeight, offsetY };
-  }, [filteredEntries.length, scrollTop]);
-
-  const renderEntry = (entry: any, index: number) => (
-    <div key={entry.user_id} onClick={handleEntryClick}>
-      <LeaderboardRow
-        rank={entry.rank}
-        userId={entry.user_id}
-        displayName={entry.display_name || 'Golfer'}
-        profilePhotoUrl={entry.avatar_url}
-        homeClub={entry.home_club}
-        coursesCount={entry.courses_count}
-        ringColor={getPodiumRingColor(entry.rank)}
-        isCurrentUser={entry.user_id === user?.id}
-        isFriend={entry.is_friend && scope !== 'friends'}
-        seasonColor={seasonThemeColor}
-      >
-        <div>
-          <LeaderboardStat value={getMetricValue(entry)} seasonColor={seasonThemeColor} />
-        </div>
-      </LeaderboardRow>
-    </div>
-  );
-
-  // Tier progress
-  const tierProgress = nextTier
-    ? Math.min((countriesPlayed / nextTier.minCountries) * 100, 100)
-    : 100;
-
-  // Country list for flag passport
-  const countryList = userStatus?.country_list ?? [];
-  const flagsToShow = countryList.slice(0, MAX_FLAGS);
-
-  // Initial loading
-  if (isLoading && allEntries.length === 0) {
-    return <ExplorationPageSkeleton />;
-  }
-
-  // Initial error
-  if (isError && allEntries.length === 0 && !isLoading) {
-    return <InitialErrorState onRetry={() => refetch()} />;
-  }
-
-  const hasUserData = user && userStatus && (countriesPlayed > 0 || coursesPlayed > 0);
-
+  // ---- Render ----
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-
-      {/* ── DARK HERO HEADER ── */}
-      <div style={{
-        background: 'linear-gradient(160deg, #1a1a2e 0%, #2d1f3d 60%, #1f1535 100%)',
-        padding: 'clamp(14px,3vw,18px) clamp(14px,4vw,18px) 0',
-        position: 'relative', overflow: 'hidden', flexShrink: 0,
-      }}>
-        {/* Decorative glows */}
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(247,147,30,0.06)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: 20, right: -10, width: 100, height: 100, borderRadius: '50%', background: 'rgba(247,147,30,0.04)', pointerEvents: 'none' }} />
-
-        {/* Season label */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 'clamp(8px,2vw,12px)' }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }} />
-          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(9px,2.5vw,11px)', fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-            Explorer Rankings · {getSeasonConfig(currentSeasonId).title}
+    <div
+      style={{
+        background: BG,
+        minHeight: '100%',
+        fontFamily: '"Geist", system-ui, -apple-system, sans-serif',
+        color: INK,
+      }}
+    >
+      {/* 2. MASTHEAD */}
+      <div
+        style={{
+          padding: '20px 20px 14px',
+          borderBottom: `3px double ${INK}`,
+          textAlign: 'center',
+          background: BG,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: 9,
+            fontWeight: 700,
+            color: INK_MUTED,
+            letterSpacing: '0.14em',
+            marginBottom: 12,
+          }}
+        >
+          <span>VOL · MMXXVI</span>
+          <span style={{ color: CRIMSON, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: CRIMSON, display: 'inline-block' }} />
+            LIVE
           </span>
+          <span>THE GLOBAL FIELD</span>
         </div>
+        <h1
+          style={{
+            fontSize: 38,
+            fontWeight: 900,
+            letterSpacing: '-0.035em',
+            margin: 0,
+            lineHeight: 0.95,
+            color: INK,
+          }}
+        >
+          The Global Field
+        </h1>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: '0.32em',
+            color: INK_MUTED,
+            marginTop: 6,
+          }}
+        >
+          GOLF&rsquo;S GREAT EXPLORERS
+        </div>
+      </div>
 
-        {/* Identity band — avatar, tier pill, progress bar, rank */}
-        {hasUserData && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'clamp(12px,3vw,16px)' }}>
-            {/* Avatar */}
-            {currentUserProfile?.profile_photo_url ? (
-              <img
-                src={currentUserProfile.profile_photo_url}
-                alt=""
-                style={{ width: 52, height: 52, borderRadius: '34%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
-              />
-            ) : (
-              <div style={{
-                width: 52, height: 52, borderRadius: '34%', background: 'rgba(255,255,255,0.12)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 700, flexShrink: 0,
-              }}>
-                {(currentUserProfile?.display_name || '?').charAt(0).toUpperCase()}
+      {/* 3. VIEW TOGGLE */}
+      <div style={{ padding: '14px 20px 0', display: 'flex', gap: 8 }}>
+        {[
+          { key: 'player' as const, label: 'By Player' },
+          { key: 'country' as const, label: 'By Country' },
+        ].map((opt) => (
+          <button
+            key={opt.key}
+            onClick={() => setViewMode(opt.key)}
+            style={{
+              flex: 1,
+              padding: '10px 0',
+              borderRadius: 4,
+              background: viewMode === opt.key ? INK : 'transparent',
+              color: viewMode === opt.key ? '#fff' : INK_MUTED,
+              border: viewMode === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              fontFamily: 'inherit',
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 4. FRONT-PAGE LEDE */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.28em',
+            color: CRIMSON,
+            marginBottom: 10,
+          }}
+        >
+          {personalisedEyebrow}
+        </div>
+        <h2
+          style={{
+            fontSize: 28,
+            fontWeight: 900,
+            letterSpacing: '-0.03em',
+            margin: 0,
+            lineHeight: 1.05,
+            color: INK,
+          }}
+        >
+          {headline}
+          <br />
+          <span style={{ fontStyle: 'italic', fontWeight: 900, color: INK_BODY }}>
+            {headlineTwo}
+          </span>
+        </h2>
+        <p
+          style={{
+            fontSize: 12,
+            color: INK_MUTED,
+            lineHeight: 1.55,
+            marginTop: 12,
+            marginBottom: 0,
+            fontStyle: 'italic',
+          }}
+        >
+          {standfirst}
+        </p>
+      </div>
+
+      {/* 5. THE BOX SCORE */}
+      <div style={{ padding: '20px 20px 0' }}>
+        <div
+          style={{
+            borderTop: `1px solid ${INK}`,
+            borderBottom: `1px solid ${INK}`,
+            padding: '16px 0',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
+            alignItems: 'center',
+          }}
+        >
+          {/* Countries */}
+          <BoxStat
+            label="COUNTRIES"
+            value={countriesPlayed > 0 ? String(countriesPlayed) : '—'}
+            color={CRIMSON}
+          />
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
+          {/* Continents */}
+          <BoxStat
+            label="CONTINENTS"
+            value={continentsPlayed > 0 ? String(continentsPlayed) : '—'}
+            color={CRIMSON}
+          />
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
+          {/* Rank */}
+          <BoxStat
+            label={scope === 'friends' ? 'FRIENDS RANK' : 'GLOBAL RANK'}
+            value={userVisibleRank ? `#${userVisibleRank}` : '—'}
+            color={isMaxTier && countriesPlayed > 0 ? CRIMSON : INK}
+          />
+        </div>
+      </div>
+
+      {/* 6. YOUR TIER CARD or CTA */}
+      {countriesPlayed > 0 ? (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div
+            style={{
+              background: INK,
+              color: '#fff',
+              borderRadius: 4,
+              overflow: 'hidden',
+              padding: '16px 18px',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: 100,
+                height: 100,
+                background: 'radial-gradient(circle at top right, rgba(247,147,30,0.18), transparent 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            {/* Tier row */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 14,
+                position: 'relative',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    color: 'rgba(255,255,255,0.5)',
+                    letterSpacing: '0.22em',
+                    marginBottom: 4,
+                  }}
+                >
+                  YOUR TIER
+                </div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 900,
+                    color: '#fff',
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1.05,
+                  }}
+                >
+                  {currentTier.name}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    color: 'rgba(255,255,255,0.5)',
+                    letterSpacing: '0.22em',
+                    marginBottom: 4,
+                  }}
+                >
+                  {nextTier ? 'NEXT' : 'STATUS'}
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: AMBER,
+                    letterSpacing: '-0.005em',
+                  }}
+                >
+                  {nextTier?.name ?? 'MAX TIER'}
+                </div>
+              </div>
+            </div>
+
+            {/* Progress tracks */}
+            {nextTier && (
+              <div
+                style={{
+                  paddingTop: 14,
+                  borderTop: '1px solid rgba(255,255,255,0.12)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12,
+                }}
+              >
+                <ProgressTrack
+                  label="Countries"
+                  current={countriesPlayed}
+                  target={nextTier.minCountries}
+                />
+                <ProgressTrack
+                  label="Continents"
+                  current={continentsPlayed}
+                  target={nextTier.minContinents}
+                />
               </div>
             )}
 
-            {/* Tier status + progress */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(10px,2.8vw,12px)', fontWeight: 500, fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>
-                Your Explorer Status
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                {/* Tier pill */}
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: `${userTier.color}22`, borderRadius: 8, padding: '3px 10px' }}>
-                  <span style={{ fontSize: 13 }}>{userTier.icon}</span>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: userTier.color }}>{userTier.name}</span>
-                </div>
-              </div>
-              {/* Progress bar to next tier */}
-              {nextTier && (
-                <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 999, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${tierProgress}%`, background: userTier.color, borderRadius: 999, transition: 'width 0.3s ease' }} />
-                  </div>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap' }}>
-                    {countriesPlayed}/{nextTier.minCountries} → {nextTier.icon}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Rank */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 'clamp(9px,2.4vw,10px)', fontWeight: 500, fontFamily: "'DM Sans', system-ui, sans-serif", textTransform: 'uppercase' }}>
-                Global rank
-              </span>
-              <span style={{ color: '#fff', fontSize: 'clamp(22px,6vw,28px)', fontWeight: 900, fontFamily: "'DM Sans', system-ui, sans-serif", lineHeight: 1 }}>
-                #{userRank ?? '—'}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Stat pills row */}
-        {hasUserData && (
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-            {[
-              { val: coursesPlayed, label: 'Courses', icon: '⛳' },
-              { val: countriesPlayed, label: 'Countries', icon: '🌍' },
-              { val: continentsPlayed, label: 'Continents', icon: '🗺️' },
-            ].map(s => (
-              <div key={s.label} style={{
-                flex: 1, textAlign: 'center', padding: '8px 4px',
-                background: 'rgba(255,255,255,0.08)', borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}>
-                <div style={{ fontSize: 12 }}>{s.icon}</div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E', lineHeight: 1.2 }}>{s.val}</div>
-                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 500, textTransform: 'uppercase' }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* By Player / By Country tabs — flush to bottom */}
-        <div style={{ display: 'flex', gap: 2 }}>
-          {[
-            { id: 'player' as const, label: '👤 By Player' },
-            { id: 'country' as const, label: '🌍 By Country' },
-          ].map(t => (
-            <button
-              key={t.id}
-              onClick={() => setViewMode(t.id)}
+            {/* Caption */}
+            <div
               style={{
-                flex: 1, padding: 'clamp(8px,2vw,10px) 0', borderRadius: '8px 8px 0 0',
-                border: 'none', cursor: 'pointer',
-                fontSize: 'clamp(11px,3vw,13px)',
-                fontWeight: viewMode === t.id ? 800 : 500,
-                fontFamily: "'DM Sans', system-ui, sans-serif",
-                background: viewMode === t.id ? '#F8FAFC' : 'rgba(255,255,255,0.07)',
-                color: viewMode === t.id ? '#0C0C0E' : 'rgba(255,255,255,0.55)',
-                transition: 'all 0.2s',
+                marginTop: 14,
+                paddingTop: 12,
+                borderTop: '1px solid rgba(255,255,255,0.12)',
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.7)',
+                lineHeight: 1.4,
               }}
-              className="active:scale-[0.97] transition-all"
             >
-              {t.label}
+              {generateTierCaption(countriesPlayed, continentsPlayed, currentTier.name, nextTier)}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div
+            style={{
+              background: INK,
+              color: '#fff',
+              borderRadius: 4,
+              padding: '20px 18px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 13,
+                color: 'rgba(255,255,255,0.7)',
+                marginBottom: 12,
+                lineHeight: 1.4,
+              }}
+            >
+              Log your first round to begin your explorer journey.
+            </div>
+            <button
+              onClick={() => navigate('/courses')}
+              style={{
+                background: AMBER,
+                color: '#fff',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: 4,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.06em',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              RATE A COURSE →
             </button>
-          ))}
+          </div>
+        </div>
+      )}
+
+      {/* 7. TIER LADDER */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <SectionLabel>TIER LADDER</SectionLabel>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)' }}>
+          {EXPLORER_TIERS.map((t, i) => {
+            const isUnlocked =
+              countriesPlayed >= t.minCountries && continentsPlayed >= t.minContinents;
+            const isCurrent = t.id === currentTier.id && countriesPlayed > 0;
+            return (
+              <div
+                key={t.id}
+                style={{
+                  borderRight: i < 4 ? '1px solid rgba(15,23,42,0.1)' : 'none',
+                  padding: '10px 4px',
+                  textAlign: 'center',
+                  background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    marginBottom: 4,
+                    color: isCurrent ? CRIMSON : isUnlocked ? INK_FAINT : HAIRLINE,
+                  }}
+                >
+                  {isCurrent ? '● NOW' : isUnlocked ? '✓' : getTierAbbr(t.id)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    color: isCurrent ? INK : isUnlocked ? INK_FAINT : INK_MUTED,
+                  }}
+                >
+                  {getTierShortName(t.id)}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* ── LIGHT BODY ZONE ── */}
-      <div style={{ background: '#F8FAFC', flex: 1, padding: 'clamp(12px,3vw,16px)' }}>
-
-        {/* Scope selector (player mode only) */}
-        {viewMode === 'player' && (
-          <div style={{ display: 'flex', gap: 3, background: 'rgba(15,23,42,0.05)', borderRadius: 10, padding: 3, marginBottom: 12 }}>
-            {[
-              { id: 'global' as const, label: '🌍 Global' },
-              { id: 'friends' as const, label: '👥 Friends' },
-            ].map(t => (
-              <button
-                key={t.id}
-                onClick={() => setScope(t.id)}
+      {/* 8. COUNTRIES PLAYED */}
+      {userStatus?.country_list && userStatus.country_list.length > 0 && (
+        <div style={{ padding: '22px 20px 0' }}>
+          <SectionLabel>{`COUNTRIES PLAYED · ${countriesPlayed}`}</SectionLabel>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+            {userStatus.country_list.map((country) => (
+              <div
+                key={country}
                 style={{
-                  flex: 1, padding: '8px 4px', borderRadius: 9, border: 'none', cursor: 'pointer',
-                  fontSize: 13, fontWeight: scope === t.id ? 800 : 500,
-                  fontFamily: "'DM Sans', system-ui, sans-serif",
-                  background: scope === t.id ? '#FFFFFF' : 'none',
-                  color: scope === t.id ? '#0C0C0E' : '#6B7280',
-                  boxShadow: scope === t.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                  transition: 'all 0.2s',
+                  width: 22,
+                  height: 16,
+                  borderRadius: 2,
+                  border: '0.5px solid rgba(15,23,42,0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  background: 'rgba(15,23,42,0.03)',
                 }}
+                title={country}
               >
-                {t.label}
-              </button>
+                <CountryFlag country={country} size="sm" />
+              </div>
             ))}
+            {nextTier && (
+              <div
+                style={{
+                  width: 22,
+                  height: 16,
+                  borderRadius: 2,
+                  background: 'rgba(15,23,42,0.03)',
+                  border: '0.5px dashed rgba(15,23,42,0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 9,
+                  color: HAIRLINE,
+                  fontWeight: 700,
+                }}
+                aria-label="Room to grow"
+              >
+                +
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Countries Played — Flag passport card */}
-        {hasUserData && countryList.length > 0 && (
-          <div style={{
-            background: '#FFFFFF', borderRadius: 14, padding: '12px 14px', marginBottom: 12,
-            border: '1px solid rgba(15,23,42,0.07)',
-          }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>
-              Countries Played
-            </div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {flagsToShow.map(country => (
-                <div
-                  key={country}
-                  style={{
-                    width: 34, height: 24, borderRadius: 5,
-                    background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <CountryFlag country={country} size="sm" />
-                </div>
-              ))}
-              {countryList.length > MAX_FLAGS && (
-                <div style={{
-                  width: 34, height: 24, borderRadius: 5,
-                  border: '1.5px dashed rgba(247,147,30,0.30)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, color: '#F7931E',
-                }}>
-                  +{countryList.length - MAX_FLAGS}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+      {/* 9. FULL STANDINGS */}
+      <div style={{ padding: '26px 20px 0' }}>
+        <SectionLabel>
+          {viewMode === 'player' ? 'FULL STANDINGS' : 'COUNTRIES BY MEMBER COUNT'}
+        </SectionLabel>
 
-        {/* Tier progress — compact ladder + milestone card */}
-        {hasUserData && (
-          <div style={{ marginBottom: 14 }}>
-            <ExplorerTierCard
-              tier={userTier}
-              nextTier={nextTier}
-              countriesCount={countriesPlayed}
-              continentsCount={continentsPlayed}
-            />
-          </div>
-        )}
-
-        {/* Empty state */}
-        {!isError && allEntries.length === 0 && !isLoading && (
-          <LeaderboardEmpty
-            title="No explorers yet"
-            description={
-              scope === 'friends'
-                ? "None of your friends have explored yet"
-                : "Rate courses in different countries to appear here!"
-            }
+        {viewMode === 'player' ? (
+          <PlayerStandings
+            entries={allEntries}
+            isLoading={isLoading && allEntries.length === 0}
+            scope={scope}
+            setScope={setScope}
+            selectedClubId={selectedClubId}
+            selectedClubName={selectedClubName}
+            userHomeClubId={userHomeClubId}
+            userHomeClubName={userHomeClubName}
+            onClubSelect={handleClubSelect}
+            selectedCountry={selectedCountry}
+            onCountrySelect={setSelectedCountry}
+            onRowClick={handleEntryClick}
+            navigate={navigate}
+          />
+        ) : (
+          <CountryStandings
+            countries={allCountries}
+            isLoading={countryIsLoading && allCountries.length === 0}
+            userPlayed={userStatus?.country_list ?? []}
+            navigate={navigate}
           />
         )}
 
-        {/* Content based on view mode */}
-        {allEntries.length > 0 && (
-          viewMode === 'player' ? (
-            <div>
-              {/* Podium */}
-              <ExplorationPodium
-                entries={podiumEntries}
-                metric={metric}
-                currentUserId={user?.id}
-                seasonColor={seasonThemeColor}
-              />
-
-              {/* Rankings List */}
-              <div ref={listContainerRef} className="flex flex-col">
-                {virtualizedContent ? (
-                  <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
-                    <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
-                      {filteredEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map((entry, i) =>
-                        renderEntry(entry, virtualizedContent.startIndex + i)
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  filteredEntries.map((entry, i) => renderEntry(entry, i))
-                )}
-              </div>
-
-              {hasNextPage && !isError && (
-                <div ref={sentinelRef}>
-                  {isFetchingNextPage && <ExplorationLeaderboardSkeleton />}
-                </div>
-              )}
-
-              {isError && !isFetchingNextPage && allEntries.length > 0 && (
-                <InlineRetryCard onRetry={() => fetchNextPage()} />
-              )}
-
-              {isError && isFetchingNextPage && allEntries.length > 0 && (
-                <ExplorationLeaderboardSkeleton />
-              )}
-            </div>
-          ) : (
-            <CountryLeaderboard
-              entries={allEntries}
-              seasonColor={seasonThemeColor}
-            />
-          )
+        {/* Infinite scroll sentinel */}
+        {((viewMode === 'player' && hasNextPage) || (viewMode === 'country' && countryHasNext)) && (
+          <div ref={sentinelRef} style={{ height: 1, marginTop: 16 }} />
+        )}
+        {(isFetchingNextPage || countryIsFetchingNext) && (
+          <div style={{ textAlign: 'center', padding: '12px 0', fontSize: 11, color: INK_FAINT }}>
+            Loading…
+          </div>
         )}
       </div>
+
+      {/* 10. FOOTER CAPTION */}
+      <div style={{ padding: '20px 20px 28px', textAlign: 'center' }}>
+        <div
+          style={{
+            fontSize: 9,
+            color: INK_FAINT,
+            letterSpacing: '0.06em',
+            fontStyle: 'italic',
+          }}
+        >
+          {viewMode === 'player'
+            ? 'Ranked by countries explored, then continents, then courses · Updated daily'
+            : 'Ranked by member count · Updated daily'}
+        </div>
+      </div>
     </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+// Sub-components
+// ----------------------------------------------------------------------------
+
+function BoxStat({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <div
+        style={{
+          fontSize: 8,
+          fontWeight: 800,
+          color: INK_FAINT,
+          letterSpacing: '0.18em',
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 28,
+          fontWeight: 900,
+          letterSpacing: '-0.04em',
+          lineHeight: 1,
+          color,
+          fontVariantNumeric: 'tabular-nums lining-nums',
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function ProgressTrack({
+  label,
+  current,
+  target,
+}: {
+  label: string;
+  current: number;
+  target: number;
+}) {
+  const pct = Math.min(100, target > 0 ? (current / target) * 100 : 0);
+  return (
+    <div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          marginBottom: 4,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.65)',
+            letterSpacing: '0.02em',
+          }}
+        >
+          {label}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: '#fff',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {current} <span style={{ color: 'rgba(255,255,255,0.4)' }}>/ {target}</span>
+        </span>
+      </div>
+      <div
+        style={{
+          height: 4,
+          background: 'rgba(255,255,255,0.08)',
+          borderRadius: 2,
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            width: `${pct}%`,
+            background: `linear-gradient(90deg, ${AMBER_DARK}, ${AMBER})`,
+            borderRadius: 2,
+            transition: 'width 0.5s ease',
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+      <div style={{ width: 18, height: 1, background: INK }} />
+      <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.22em' }}>
+        {children}
+      </span>
+      <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+    </div>
+  );
+}
+
+interface PlayerStandingsProps {
+  entries: ExplorationLeaderboardEntry[];
+  isLoading: boolean;
+  scope: LeaderboardScope;
+  setScope: (s: LeaderboardScope) => void;
+  selectedClubId: string | null;
+  selectedClubName: string | null;
+  userHomeClubId: string | null;
+  userHomeClubName: string | null;
+  onClubSelect: (id: string | null, name: string | null) => void;
+  selectedCountry: string | null;
+  onCountrySelect: (c: string | null) => void;
+  onRowClick: () => void;
+  navigate: ReturnType<typeof useNavigate>;
+}
+
+function PlayerStandings({
+  entries,
+  isLoading,
+  scope,
+  setScope,
+  selectedClubId,
+  selectedClubName,
+  userHomeClubId,
+  userHomeClubName,
+  onClubSelect,
+  selectedCountry,
+  onCountrySelect,
+  onRowClick,
+  navigate,
+}: PlayerStandingsProps) {
+  return (
+    <>
+      {/* Scope tabs */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+        {[
+          { key: 'global' as const, label: 'Global' },
+          { key: 'friends' as const, label: 'Friends' },
+          { key: 'club' as const, label: 'Club' },
+          { key: 'country' as const, label: 'Country' },
+        ].map((s) => (
+          <button
+            key={s.key}
+            onClick={() => setScope(s.key)}
+            style={{
+              padding: '5px 10px',
+              borderRadius: 3,
+              background: scope === s.key ? INK : 'transparent',
+              color: scope === s.key ? '#fff' : INK_MUTED,
+              border: scope === s.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
+              fontSize: 10,
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Conditional sub-controls */}
+      {scope === 'club' && (
+        <div style={{ marginBottom: 10 }}>
+          <ClubSearchBar
+            selectedClubId={selectedClubId}
+            selectedClubName={selectedClubName}
+            userHomeClubId={userHomeClubId}
+            userHomeClubName={userHomeClubName}
+            onClubSelect={onClubSelect}
+          />
+        </div>
+      )}
+      {scope === 'country' && (
+        <div style={{ marginBottom: 10 }}>
+          <CountrySelector
+            selectedCountry={selectedCountry}
+            onCountrySelect={onCountrySelect}
+          />
+        </div>
+      )}
+
+      {/* Column headers */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '26px 38px 1fr 28px 38px',
+          padding: '10px 0 8px',
+          borderBottom: `1px solid ${INK}`,
+          fontSize: 8,
+          fontWeight: 800,
+          color: INK_FAINT,
+          letterSpacing: '0.18em',
+          alignItems: 'center',
+        }}
+      >
+        <span>POS</span>
+        <span />
+        <span>PLAYER</span>
+        <span style={{ textAlign: 'right' }}>CON</span>
+        <span style={{ textAlign: 'right' }}>CTY</span>
+      </div>
+
+      {/* Loading skeleton */}
+      {isLoading && (
+        <div style={{ padding: '20px 0' }}>
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '12px 0',
+                borderBottom: '1px solid rgba(15,23,42,0.07)',
+              }}
+            >
+              <div style={{ width: 26, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ width: 30, height: 30, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
+              <div style={{ flex: 1, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!isLoading && entries.length === 0 && scope === 'friends' && (
+        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, color: INK_FAINT, fontStyle: 'italic', marginBottom: 14 }}>
+            No friends explored yet.
+          </p>
+          <button
+            onClick={() => navigate('/find-friends')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 11,
+              fontWeight: 800,
+              color: CRIMSON,
+              letterSpacing: '0.18em',
+              fontFamily: 'inherit',
+            }}
+          >
+            FIND FRIENDS →
+          </button>
+        </div>
+      )}
+      {!isLoading && entries.length === 0 && scope !== 'friends' && (
+        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, color: INK_FAINT, fontStyle: 'italic' }}>
+            No explorers found here yet.
+          </p>
+        </div>
+      )}
+
+      {/* Player rows */}
+      {entries.map((p, i) => {
+        const isLast = i === entries.length - 1;
+        const isYou = p.is_current_user;
+        return (
+          <div
+            key={p.user_id}
+            onClick={() => {
+              onRowClick();
+              navigate(getProfilePathById(p.user_id));
+            }}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '26px 38px 1fr 28px 38px',
+              alignItems: 'center',
+              padding: '12px 0',
+              borderBottom: isLast
+                ? `1px solid ${INK}`
+                : '1px solid rgba(15,23,42,0.07)',
+              background: isYou ? 'rgba(159,29,29,0.04)' : 'transparent',
+              marginLeft: isYou ? -10 : 0,
+              marginRight: isYou ? -10 : 0,
+              paddingLeft: isYou ? 10 : 0,
+              paddingRight: isYou ? 10 : 0,
+              position: 'relative',
+              cursor: 'pointer',
+            }}
+          >
+            {isYou && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 3,
+                  background: CRIMSON,
+                }}
+              />
+            )}
+
+            {/* Rank */}
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 900,
+                color: p.rank <= 3 ? INK : INK_FAINT,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {p.rank}
+            </span>
+
+            {/* Avatar */}
+            <SquircleAvatar
+              src={p.avatar_url}
+              alt={p.display_name ?? ''}
+              size={30}
+              fallback={getInitials(p.display_name ?? p.username ?? '')}
+            />
+
+            {/* Name + caption */}
+            <div style={{ minWidth: 0, paddingLeft: 4 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: INK,
+                  letterSpacing: '-0.005em',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {p.display_name || p.username}
+                {isYou && (
+                  <span
+                    style={{
+                      fontSize: 8,
+                      fontWeight: 800,
+                      color: CRIMSON,
+                      letterSpacing: '0.18em',
+                      marginLeft: 6,
+                    }}
+                  >
+                    YOU
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 10, color: INK_FAINT, marginTop: 1 }}>
+                {p.home_club || 'Independent'}
+              </div>
+            </div>
+
+            {/* Continents */}
+            <span
+              style={{
+                textAlign: 'right',
+                fontSize: 13,
+                fontWeight: 800,
+                color: INK_MUTED,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {p.continents_count}
+            </span>
+
+            {/* Countries */}
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 900,
+                textAlign: 'right',
+                color: INK,
+                letterSpacing: '-0.03em',
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {p.countries_count}
+            </span>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+interface CountryStandingsProps {
+  countries: Array<{ country: string; member_count: number }>;
+  isLoading: boolean;
+  userPlayed: string[];
+  navigate: ReturnType<typeof useNavigate>;
+}
+
+function CountryStandings({ countries, isLoading, userPlayed, navigate }: CountryStandingsProps) {
+  return (
+    <>
+      {/* Column headers */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '26px 28px 1fr 60px',
+          padding: '10px 0 8px',
+          borderBottom: `1px solid ${INK}`,
+          fontSize: 8,
+          fontWeight: 800,
+          color: INK_FAINT,
+          letterSpacing: '0.18em',
+          alignItems: 'center',
+        }}
+      >
+        <span>POS</span>
+        <span />
+        <span>COUNTRY</span>
+        <span style={{ textAlign: 'right' }}>MEMBERS</span>
+      </div>
+
+      {isLoading && (
+        <div style={{ padding: '20px 0' }}>
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '12px 0',
+                borderBottom: '1px solid rgba(15,23,42,0.07)',
+              }}
+            >
+              <div style={{ width: 26, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ width: 20, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+              <div style={{ flex: 1, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && countries.length === 0 && (
+        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, color: INK_FAINT, fontStyle: 'italic' }}>
+            No countries have been explored yet.
+          </p>
+        </div>
+      )}
+
+      {countries.map((c, i) => {
+        const isLast = i === countries.length - 1;
+        const userPlayedHere = userPlayed.includes(c.country);
+        const continent = continentForCountry(c.country);
+
+        return (
+          <div
+            key={c.country}
+            onClick={() =>
+              navigate(`/leaderboards?view=exploration&country=${encodeURIComponent(c.country)}`)
+            }
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '26px 28px 1fr 60px',
+              alignItems: 'center',
+              padding: '12px 0',
+              borderBottom: isLast
+                ? `1px solid ${INK}`
+                : '1px solid rgba(15,23,42,0.07)',
+              cursor: 'pointer',
+              position: 'relative',
+              background: userPlayedHere ? 'rgba(247,147,30,0.03)' : 'transparent',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 900,
+                color: i < 3 ? INK : INK_FAINT,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {i + 1}
+            </span>
+
+            <div
+              style={{
+                width: 22,
+                height: 16,
+                borderRadius: 2,
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(15,23,42,0.03)',
+                border: '0.5px solid rgba(15,23,42,0.08)',
+              }}
+            >
+              <CountryFlag country={c.country} size="sm" />
+            </div>
+
+            <div style={{ paddingLeft: 4, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: INK,
+                  letterSpacing: '-0.005em',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {c.country}
+                {userPlayedHere && (
+                  <span
+                    style={{
+                      fontSize: 8,
+                      fontWeight: 800,
+                      color: AMBER,
+                      letterSpacing: '0.14em',
+                      marginLeft: 6,
+                    }}
+                  >
+                    PLAYED
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 10, color: INK_FAINT, marginTop: 1 }}>
+                {continent}
+              </div>
+            </div>
+
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 900,
+                textAlign: 'right',
+                color: INK,
+                letterSpacing: '-0.03em',
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {c.member_count}
+            </span>
+          </div>
+        );
+      })}
+    </>
   );
 }
