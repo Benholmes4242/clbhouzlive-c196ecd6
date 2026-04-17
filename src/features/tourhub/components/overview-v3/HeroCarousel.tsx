@@ -1701,8 +1701,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   </div>
 
                   </div>
-                  {/* ── FOOTER — View Tournament pill only, right-aligned ── */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 18px 90px' }}>
+                  {/* ── FOOTER — View Tournament pill only, right-aligned. paddingBottom reserves space for absolute pill rail (~80px) ── */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 18px 90px' }}>
                     <Link
                       to={`/tourhub/tournament/${tournament.id}`}
                       style={{
