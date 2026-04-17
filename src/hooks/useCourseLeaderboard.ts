@@ -118,6 +118,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
           list_slug: scope,
           times_played: row.total_rounds,
           avg_rating: row.avg_rating,
+          rating_count: row.rating_count ?? 0,
           global_rank: row.rank,
           regional_rank: null,
           usa_rank: null,
