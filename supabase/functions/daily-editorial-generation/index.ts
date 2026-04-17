@@ -876,6 +876,35 @@ serve(async (req) => {
       // Don't throw — let the seasonal editorial still succeed
     }
 
+    // 4. Courses editorial — daily, all_time / no season
+    try {
+      const coursesSnapshot = await buildCoursesSnapshot(supabase);
+      const coursesStoryType = selectCoursesStory(coursesSnapshot);
+      const coursesEditorial = generateCoursesEditorial(coursesSnapshot, coursesStoryType);
+      await writeEditorial(supabase, {
+        surface: 'courses',
+        seasonId: null,
+        timeFilter: 'all_time',
+        editorial: coursesEditorial,
+        snapshotData: {
+          leader: coursesSnapshot.leader,
+          movers: coursesSnapshot.movers,
+          newEntryInTop10: coursesSnapshot.newEntryInTop10,
+          regionTrending: coursesSnapshot.regionTrending,
+        },
+      });
+      results.push({
+        surface: 'courses',
+        timeFilter: 'all_time',
+        seasonId: null,
+        storyType: coursesEditorial.storyType,
+        headline: coursesEditorial.headline,
+      });
+    } catch (err) {
+      console.error('Courses editorial generation failed', err);
+      // Don't throw — let seasonal + global editorials still succeed
+    }
+
     return new Response(
       JSON.stringify({ ok: true, generated: results }),
       {
