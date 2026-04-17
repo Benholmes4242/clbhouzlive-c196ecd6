@@ -865,6 +865,9 @@ const HANDICAP_TEMPLATES: Record<HandicapStoryType, (s: HandicapSnapshot) => Han
   }),
 };
 
+// ----------------------------------------------------------------------------
+// Persist
+// ----------------------------------------------------------------------------
 
 
 async function writeEditorial(
