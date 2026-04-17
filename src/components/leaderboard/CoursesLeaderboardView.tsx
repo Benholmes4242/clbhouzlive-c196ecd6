@@ -388,13 +388,7 @@ export function CoursesLeaderboardView() {
     }
   }, [allCourses.length]);
 
-  // ─── Editorial fallback (deterministic) ────────────────────────────
-  const editorialDisplay: Pick<EditorialCopy, 'eyebrow' | 'headline' | 'headlineTwo' | 'standfirst'> = editorial ?? {
-    eyebrow: 'THE CLBHOUZ LIST',
-    headline: "The world's greatest",
-    headlineTwo: 'courses, ranked.',
-    standfirst: 'The Clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
-  };
+  // ─── (Editorial fallback removed — masthead now derives from list data) ──
 
   // ─── Render ────────────────────────────────────────────────────────
   return (
