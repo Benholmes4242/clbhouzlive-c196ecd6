@@ -439,29 +439,29 @@ export function CoursesLeaderboardView() {
       </div>
 
       {/* ── FRONT-PAGE LEDE ──────────────────────────────────────── */}
-      {editorialPending ? (
+      {isLoading && !masthead ? (
         <EditorialLedeSkeleton />
-      ) : (
+      ) : mastheadCopy ? (
         <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
             {personalisedEyebrow}
           </div>
           <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
-            {editorialDisplay.headline}
-            {editorialDisplay.headlineTwo && (
+            {mastheadCopy.headline}
+            {mastheadCopy.headlineTwo && (
               <>
                 <br />
                 <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
-                  {editorialDisplay.headlineTwo}
+                  {mastheadCopy.headlineTwo}
                 </span>
               </>
             )}
           </h2>
           <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
-            {editorialDisplay.standfirst}
+            {mastheadCopy.standfirst}
           </p>
         </div>
-      )}
+      ) : null}
 
       {/* ── BOX SCORE ────────────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 0' }}>
