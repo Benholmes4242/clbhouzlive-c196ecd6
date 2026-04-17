@@ -1,43 +1,31 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCourseLeaderboard, CourseSortType } from '@/hooks/useCourseLeaderboard';
+import { useSpotlightCourse } from '@/hooks/useSpotlightCourse';
+import { useDailyEditorial } from '@/hooks/championship/useDailyEditorial';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LeaderboardEmptyState } from './LeaderboardEmptyState';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Star, RefreshCw, WifiOff } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
-import { cn } from '@/lib/utils';
-import { CourseLocationSelector } from '@/components/leaderboards/shared/CourseLocationSelector';
-import { useSeasonCalendar } from '@/hooks/championship';
-import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
-
-// New course components
-import { 
-  CourseFilters, 
-  CoursePodium, 
-  CourseRankingRow, 
-  type CourseTimeRange,
-  type CourseScope 
-} from './courses';
-import { CourseRegionPills, type QuickRegion } from './courses/CourseRegionPills';
-import { BucketListStrip } from './courses/BucketListStrip';
-import { CourseSeasonSpotlight } from './courses/CourseSeasonSpotlight';
+import { RefreshCw, WifiOff } from 'lucide-react';
 
 const PAGE_SIZE = 20;
-
-// ─── Persistence helpers ────────────────────────────────────────────
 const STORAGE_KEY_FILTERS = 'courses-leaderboard-filters';
 const STORAGE_KEY_SCROLL = 'courses-leaderboard-scroll';
 
+type QuickRegion = 'global' | 'gb-i' | 'usa' | 'europe' | 'row';
+
+const QUICK_REGION_TO_COUNTRY: Record<QuickRegion, string | null> = {
+  'global': null,
+  'gb-i': 'Britain & Ireland',
+  'usa': 'USA',
+  'europe': 'Continental Europe',
+  'row': null,
+};
+const ROW_EXCLUDE_COUNTRIES = ['Britain & Ireland', 'USA', 'Continental Europe'];
+
 interface SavedFilters {
   sort: CourseSortType;
-  timeRange: CourseTimeRange;
-  scope: CourseScope;
-  region: string | null;
-  subRegion: string | null;
+  quickRegion: QuickRegion;
 }
 
 function readSavedFilters(): SavedFilters | null {
@@ -50,210 +38,176 @@ function readSavedFilters(): SavedFilters | null {
   }
 }
 
-// ─── Inline sub-components ──────────────────────────────────────────
+// ─── Tier 2 personalised eyebrow ─────────────────────────────────────
+function selectCoursesEyebrow(args: {
+  isLoggedIn: boolean;
+  userPlayedCount: number;
+  totalInList: number;
+  bucketListMoved: { course: string; positions: number } | null;
+  circleActivity: { player: string; course: string; rating: number } | null;
+  defaultEyebrow: string;
+}): string {
+  if (!args.isLoggedIn) return args.defaultEyebrow;
 
-const CourseLeaderboardSkeleton = () => (
-  <div className="flex flex-col">
-    {[1, 2, 3].map((i) => (
-      <div key={i} className="flex items-center gap-3 py-3 px-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <Skeleton className="w-6 h-5 rounded" />
-        <Skeleton className="w-14 h-14 rounded-xl" />
-        <div className="flex-1 space-y-1.5">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-3 w-1/2" />
-          <Skeleton className="h-3 w-2/3" />
-        </div>
-        <Skeleton className="w-6 h-10" />
-      </div>
-    ))}
-  </div>
-);
+  if (args.bucketListMoved) {
+    return `ON YOUR RADAR · ${args.bucketListMoved.course.toUpperCase()}`;
+  }
 
-const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="max-w-md mx-auto mt-4 px-4">
-    <button
-      onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm text-sm transition-colors active:scale-[0.98] active:opacity-70"
-      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
-    >
-      <RefreshCw className="w-3.5 h-3.5" />
-      Couldn't load more courses · Tap to retry
-    </button>
-  </div>
-);
+  if (args.circleActivity && args.circleActivity.rating >= 8.0) {
+    return `FROM YOUR CIRCLE · ${args.circleActivity.player.toUpperCase()}`;
+  }
+
+  if (args.userPlayedCount === 0) return 'LOG A ROUND TO ENTER THE LIST';
+  if (args.totalInList > 0 && args.userPlayedCount >= args.totalInList) return "YOU'VE COMPLETED THE LIST";
+  if (args.userPlayedCount >= 50) return `YOU'VE PLAYED ${args.userPlayedCount} OF THE LIST`;
+
+  return args.defaultEyebrow;
+}
+
+function TrendArrow({ change }: { change: number }) {
+  if (change > 0) return <span style={{ color: '#15803D', fontSize: 11, fontWeight: 800 }}>↑</span>;
+  if (change < 0) return <span style={{ color: '#9F1D1D', fontSize: 11, fontWeight: 800 }}>↓</span>;
+  return <span style={{ color: '#CBD5E1', fontSize: 11 }}>—</span>;
+}
 
 const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-    <WifiOff className="w-12 h-12 text-muted-foreground/40 mb-4" />
-    <p className="text-foreground font-semibold mb-1">Unable to load course rankings</p>
-    <p className="text-sm text-muted-foreground mb-4">Check your connection and try again</p>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 16px', textAlign: 'center' }}>
+    <WifiOff style={{ width: 48, height: 48, color: '#94A3B8', marginBottom: 16 }} />
+    <p style={{ color: '#0F172A', fontWeight: 600, marginBottom: 4 }}>Unable to load course rankings</p>
+    <p style={{ fontSize: 14, color: '#64748B', marginBottom: 16 }}>Check your connection and try again</p>
     <button
       onClick={onRetry}
-      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
+      style={{
+        padding: '10px 24px', borderRadius: 4, background: '#0F172A',
+        color: '#fff', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
+      }}
     >
       Retry
     </button>
   </div>
 );
 
-// ─── Virtualization constants ───────────────────────────────────────
-const ROW_HEIGHT = 81;
-const VIRTUALIZATION_THRESHOLD = 50;
-const OVERSCAN = 8;
+const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
+  <div style={{ maxWidth: 480, margin: '16px auto 0', padding: '0 16px' }}>
+    <button
+      onClick={onRetry}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '14px', borderRadius: 4, background: '#fff', border: '1px solid rgba(15,23,42,0.10)',
+        color: '#64748B', fontSize: 13, cursor: 'pointer',
+      }}
+    >
+      <RefreshCw style={{ width: 14, height: 14 }} />
+      Couldn't load more courses · Tap to retry
+    </button>
+  </div>
+);
+
+const RowSkeleton = () => (
+  <div style={{ padding: '12px 0', display: 'grid', gridTemplateColumns: '26px 48px 1fr 18px 44px', gap: 4, alignItems: 'center', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+    <Skeleton style={{ height: 16, width: 20 }} />
+    <Skeleton style={{ height: 40, width: 40, borderRadius: 3 }} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <Skeleton style={{ height: 14, width: '70%' }} />
+      <Skeleton style={{ height: 10, width: '40%' }} />
+    </div>
+    <Skeleton style={{ height: 12, width: 12 }} />
+    <Skeleton style={{ height: 18, width: 36, marginLeft: 'auto' }} />
+  </div>
+);
 
 export function CoursesLeaderboardView() {
   const navigate = useNavigate();
 
-  // Season color derivation
-  const { data: seasonCalendar } = useSeasonCalendar();
-  const seasonThemeColor = useMemo(() => {
-    const currentSeason = seasonCalendar?.find(s => s.is_current);
-    if (!currentSeason) return 'hsl(var(--accent-amber))';
-    const lower = currentSeason.name.toLowerCase();
-    let id: SeasonId = 'major';
-    if (lower.includes('pre-season') || lower.includes('preseason')) id = 'preseason';
-    else if (lower.includes('summer')) id = 'summer';
-    else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
-    return getSeasonConfig(id).themeColor;
-  }, [seasonCalendar]);
+  // ─── Filter state ──────────────────────────────────────────────────
+  const [sort, setSort] = useState<CourseSortType>(() => readSavedFilters()?.sort ?? 'highest_rated');
+  const [quickRegion, setQuickRegion] = useState<QuickRegion>(() => readSavedFilters()?.quickRegion ?? 'global');
 
-  // ─── Filter state with persistence ───────────────────────────────
-  const [sort, setSort] = useState<CourseSortType>(() => {
-    const saved = readSavedFilters();
-    return saved?.sort ?? 'highest_rated';
-  });
-  const [timeRange, setTimeRange] = useState<CourseTimeRange>(() => {
-    const saved = readSavedFilters();
-    return saved?.timeRange ?? 'all_time';
-  });
-  const [scope, setScope] = useState<CourseScope>(() => {
-    const saved = readSavedFilters();
-    return saved?.scope ?? 'global';
-  });
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(() => {
-    const saved = readSavedFilters();
-    return saved?.region ?? null;
-  });
-  const [selectedSubRegion, setSelectedSubRegion] = useState<string | null>(() => {
-    const saved = readSavedFilters();
-    return saved?.subRegion ?? null;
-  });
-  const [quickRegion, setQuickRegion] = useState<QuickRegion>('global');
-  const [gamesHubOpen, setGamesHubOpen] = useState(false);
-
-  const QUICK_REGION_TO_COUNTRY: Record<QuickRegion, string | null> = {
-    'global': null,
-    'gb-i': 'Britain & Ireland',
-    'usa': 'USA',
-    'europe': 'Continental Europe',
-    'row': null,
-  };
-  const quickRegionCountry = QUICK_REGION_TO_COUNTRY[quickRegion];
-
-  const ROW_EXCLUDE_COUNTRIES = ['Britain & Ireland', 'USA', 'Continental Europe'];
-
-  // Scroll position preservation refs for filter changes
-  const scrollPositionRef = useRef<number>(0);
-  const isFilterChangeRef = useRef<boolean>(false);
-
-  // Infinite scroll refs
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const hasRestoredScroll = useRef(false);
-
-  // Virtualization state
-  const [scrollTop, setScrollTop] = useState(0);
-  const listContainerRef = useRef<HTMLDivElement>(null);
-
-  // ─── Filter persistence effect ────────────────────────────────────
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORAGE_KEY_FILTERS, JSON.stringify({
-        sort,
-        timeRange,
-        scope,
-        region: selectedRegion,
-        subRegion: selectedSubRegion,
-      }));
+      sessionStorage.setItem(STORAGE_KEY_FILTERS, JSON.stringify({ sort, quickRegion }));
     } catch { /* ignore */ }
-  }, [sort, timeRange, scope, selectedRegion, selectedSubRegion]);
+  }, [sort, quickRegion]);
 
-  // Clear region/sub-region when scope changes away from 'country'
-  useEffect(() => {
-    if (scope !== 'country') {
-      setSelectedRegion(null);
-      setSelectedSubRegion(null);
-    }
-  }, [scope]);
+  const quickRegionCountry = QUICK_REGION_TO_COUNTRY[quickRegion];
 
-  // Fetch course leaderboard data
-  const { 
-    data, 
-    isLoading, 
-    isFetching,
+  // ─── Current user ──────────────────────────────────────────────────
+  const { data: authUser } = useQuery({
+    queryKey: ['courses-tab-auth-user'],
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
+
+  // ─── Course leaderboard ────────────────────────────────────────────
+  const {
+    data,
+    isLoading,
     isError,
-    hasNextPage, 
+    hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
     refetch,
   } = useCourseLeaderboard({
-    scope: quickRegion === 'global'
-      ? (scope === 'country' ? 'country' : 'worldwide')
-      : 'worldwide',
-    timeRange,
+    scope: 'worldwide',
+    timeRange: 'all_time',
     sort,
     pageSize: PAGE_SIZE,
-    region: quickRegion === 'global'
-      ? (scope === 'country' ? selectedRegion : null)
-      : quickRegion === 'row'
-        ? null
-        : quickRegionCountry,
-    subRegion: quickRegion === 'global'
-      ? (scope === 'country' ? selectedSubRegion : null)
-      : null,
+    region: quickRegion === 'row' ? null : quickRegionCountry,
     excludeCountries: quickRegion === 'row' ? ROW_EXCLUDE_COUNTRIES : null,
   });
 
-  // Flatten pages — memoized for stable reference
-  const allCourses = useMemo(() => {
-    return data?.pages.flatMap(page => page.entries) ?? [];
-  }, [data?.pages]);
+  const allCourses = useMemo(() => data?.pages.flatMap(p => p.entries) ?? [], [data?.pages]);
 
-  // Fetch user's played count for the active region — independent of pagination
-  const { data: userPlayedCount = 0 } = useQuery({
-    queryKey: ['courses-tab-played-count', quickRegion],
+  // ─── Editorial ─────────────────────────────────────────────────────
+  const { data: editorial } = useDailyEditorial({
+    surface: 'courses',
+    seasonId: null,
+    timeFilter: 'all_time',
+  });
+
+  // ─── Spotlight ─────────────────────────────────────────────────────
+  const { data: spotlight, isLoading: spotlightLoading } = useSpotlightCourse();
+
+  // ─── User played count + total in list ─────────────────────────────
+  const { data: playedStats = { played: 0, total: 0 } } = useQuery<{ played: number; total: number }>({
+    queryKey: ['courses-tab-played-stats', quickRegion, authUser?.id],
     staleTime: 60_000,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return 0;
+      const country = quickRegionCountry;
 
-      const { data: ratedData, error } = await supabase
+      // Total in list (unique courses with ratings in scope)
+      let totalQuery = supabase
+        .from('course_ratings')
+        .select('course_id, golf_courses!inner(country)')
+        .eq('is_mock', false);
+      if (country) {
+        totalQuery = totalQuery.eq('golf_courses.country', country);
+      } else if (quickRegion === 'row') {
+        totalQuery = totalQuery
+          .neq('golf_courses.country', 'Britain & Ireland')
+          .neq('golf_courses.country', 'USA')
+          .neq('golf_courses.country', 'Continental Europe');
+      }
+      const { data: totalRows } = await totalQuery;
+      const total = new Set((totalRows ?? []).map((r: any) => r.course_id)).size;
+
+      if (!authUser?.id) return { played: 0, total };
+
+      const { data: ratedData } = await supabase
         .from('course_ratings')
         .select('course_id')
-        .eq('user_id', user.id)
+        .eq('user_id', authUser.id)
         .eq('is_mock', false);
 
-      if (error || !ratedData) return 0;
+      const ratedIds = [...new Set((ratedData ?? []).map(r => r.course_id))];
+      if (ratedIds.length === 0) return { played: 0, total };
 
-      const ratedIds = [...new Set(ratedData.map(r => r.course_id))];
-      if (ratedIds.length === 0) return 0;
+      if (!country && quickRegion !== 'row') return { played: ratedIds.length, total };
 
-      const countryFilter: Record<string, string | null> = {
-        'global': null,
-        'gb-i':   'Britain & Ireland',
-        'usa':    'USA',
-        'europe': 'Continental Europe',
-        'row':    null,
-      };
-
-      const country = countryFilter[quickRegion] ?? null;
-
-      if (!country && quickRegion !== 'row') return ratedIds.length;
-
-      let courseQuery = supabase
-        .from('golf_courses')
-        .select('id')
-        .in('id', ratedIds);
-
+      let courseQuery = supabase.from('golf_courses').select('id').in('id', ratedIds);
       if (country) {
         courseQuery = courseQuery.eq('country', country);
       } else {
@@ -262,160 +216,32 @@ export function CoursesLeaderboardView() {
           .neq('country', 'USA')
           .neq('country', 'Continental Europe');
       }
-
-      const { data: filtered, error: filterError } = await courseQuery;
-      if (filterError) return 0;
-      return filtered?.length ?? 0;
+      const { data: filtered } = await courseQuery;
+      return { played: filtered?.length ?? 0, total };
     },
   });
 
-  // Fetch current user profile for header avatar
-  const { data: currentUserProfile } = useQuery({
-    queryKey: ['courses-tab-user-profile'],
-    staleTime: 120_000,
+  const userPlayedCount = playedStats.played;
+  const totalInList = playedStats.total;
+  const pctOfList = totalInList > 0 ? Math.round((userPlayedCount / totalInList) * 100) : 0;
+  const toGoCount = Math.max(0, totalInList - userPlayedCount);
+
+  // ─── Circle recent rounds ──────────────────────────────────────────
+  const { data: circleRecentRounds } = useQuery({
+    queryKey: ['circle-recent-top100-rounds', authUser?.id],
+    enabled: !!authUser?.id,
+    staleTime: 60_000,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('display_name, profile_photo_url')
-        .eq('id', user.id)
-        .maybeSingle();
-      return data;
-    },
-  });
+      if (!authUser?.id) return [];
 
-  // Fetch total courses in region for accurate percentage
-  const { data: totalCoursesInRegion = 0 } = useQuery({
-    queryKey: ['courses-tab-total-count', quickRegion],
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const countryFilter: Record<string, string | null> = {
-        'global': null,
-        'gb-i':   'Britain & Ireland',
-        'usa':    'USA',
-        'europe': 'Continental Europe',
-        'row':    null,
-      };
-      const country = countryFilter[quickRegion] ?? null;
-
-      let query = supabase
-        .from('course_ratings')
-        .select('course_id, golf_courses!inner(country)', { count: 'exact', head: false })
-        .eq('is_mock', false);
-
-      if (country) {
-        query = query.eq('golf_courses.country', country);
-      } else if (quickRegion === 'row') {
-        query = query
-          .neq('golf_courses.country', 'Britain & Ireland')
-          .neq('golf_courses.country', 'USA')
-          .neq('golf_courses.country', 'Continental Europe');
-      }
-
-      const { data, error } = await query;
-      if (error) return 0;
-      const unique = new Set((data ?? []).map((r: any) => r.course_id));
-      return unique.size;
-    },
-  });
-
-  // ─── Computed stats for header ────────────────────────────────────
-  const userPlayedPct = useMemo(() => {
-    if (totalCoursesInRegion === 0) return 0;
-    return Math.min(99, Math.round((userPlayedCount / totalCoursesInRegion) * 100));
-  }, [userPlayedCount, totalCoursesInRegion]);
-
-  const clubRankLabel = '—';
-
-  const currentSeasonId = useMemo(() => {
-    const current = seasonCalendar?.find(s => s.is_current);
-    if (!current) return 'major' as SeasonId;
-    const lower = current.name.toLowerCase();
-    if (lower.includes('pre')) return 'preseason' as SeasonId;
-    if (lower.includes('summer')) return 'summer' as SeasonId;
-    if (lower.includes('off')) return 'offseason' as SeasonId;
-    return 'major' as SeasonId;
-  }, [seasonCalendar]);
-
-  // ─── Infinite scroll via IntersectionObserver ─────────────────────
-  const isFetchingRef = useRef(isFetchingNextPage);
-  isFetchingRef.current = isFetchingNextPage;
-
-  useEffect(() => {
-    if (!sentinelRef.current || !hasNextPage) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: '600px', threshold: 0 },
-    );
-
-    observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [hasNextPage, fetchNextPage]);
-
-  // ─── Virtualization scroll tracking ───────────────────────────────
-  useEffect(() => {
-    if (allCourses.length < VIRTUALIZATION_THRESHOLD) return;
-
-    const handleScroll = () => {
-      const rootEl = document.getElementById('root');
-      const y = rootEl && rootEl.scrollTop > 0 ? rootEl.scrollTop : window.scrollY;
-      setScrollTop(y);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    const rootEl = document.getElementById('root');
-    rootEl?.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      rootEl?.removeEventListener('scroll', handleScroll);
-    };
-  }, [allCourses.length]);
-
-  // ─── Scroll position save/restore ─────────────────────────────────
-  const handleCourseClick = useCallback((courseId: string) => {
-    const rootEl = document.getElementById('root');
-    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
-    sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
-    navigate(`/courses/${courseId}`);
-  }, [navigate]);
-
-  useEffect(() => {
-    if (hasRestoredScroll.current || allCourses.length === 0) return;
-    const savedScroll = sessionStorage.getItem(STORAGE_KEY_SCROLL);
-    if (savedScroll) {
-      hasRestoredScroll.current = true;
-      requestAnimationFrame(() => {
-        const rootEl = document.getElementById('root');
-        const scrollTarget = parseInt(savedScroll, 10);
-        if (rootEl) rootEl.scrollTop = scrollTarget;
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
-        sessionStorage.removeItem(STORAGE_KEY_SCROLL);
-      });
-    }
-  }, [allCourses.length]);
-
-  // Fetch recent Top 100 rounds by circle
-  const { data: circleRecentRounds, isLoading: circleLoading } = useQuery({
-    queryKey: ['circle-recent-top100-rounds'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-      
       const { data: followingRows } = await supabase
         .from('user_follows')
         .select('following_id')
-        .eq('follower_id', user.id);
-      
+        .eq('follower_id', authUser.id);
+
       const followingIds = (followingRows ?? []).map(r => r.following_id).slice(0, 500);
       if (followingIds.length === 0) return [];
-      
+
       const { data } = await supabase
         .from('course_ratings')
         .select(`
@@ -424,19 +250,8 @@ export function CoursesLeaderboardView() {
           created_at,
           course_id,
           user_id,
-          golf_courses!inner (
-            id,
-            name,
-            thumbnail_image,
-            global_rank,
-            regional_rank,
-            usa_rank
-          ),
-          user_profiles!inner (
-            id,
-            display_name,
-            profile_photo_url
-          )
+          golf_courses!inner (id, name, thumbnail_image, global_rank, regional_rank, usa_rank),
+          user_profiles!inner (id, display_name, profile_photo_url)
         `)
         .in('user_id', followingIds)
         .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null', { foreignTable: 'golf_courses' })
@@ -445,510 +260,506 @@ export function CoursesLeaderboardView() {
 
       return data || [];
     },
-    staleTime: 60_000,
   });
 
-
-  // Only show podium for Most Played and Highest Rated (not Trending)
-  const showPodium = useMemo(() => {
-    const podiumSorts: CourseSortType[] = ['most_played', 'highest_rated'];
-    return podiumSorts.includes(sort) && allCourses.length >= 3;
-  }, [sort, allCourses.length]);
-
-  const podiumCourses = useMemo(() => {
-    if (!showPodium) return [];
-    return allCourses.slice(0, 3);
-  }, [showPodium, allCourses]);
-
-  const listCourses = useMemo(() => {
-    return allCourses;
-  }, [allCourses]);
-
-  const handleSortChange = useCallback((newSort: CourseSortType) => {
-    const rootEl = document.getElementById('root');
-    if (rootEl) {
-      scrollPositionRef.current = rootEl.scrollTop;
-      isFilterChangeRef.current = true;
-    }
-    setSort(newSort);
-  }, []);
-
-  const handleTimeRangeChange = useCallback((newTimeRange: CourseTimeRange) => {
-    const rootEl = document.getElementById('root');
-    if (rootEl) {
-      scrollPositionRef.current = rootEl.scrollTop;
-      isFilterChangeRef.current = true;
-    }
-    setTimeRange(newTimeRange);
-  }, []);
-
-  const handleScopeChange = useCallback((newScope: CourseScope) => {
-    const rootEl = document.getElementById('root');
-    if (rootEl) {
-      scrollPositionRef.current = rootEl.scrollTop;
-      isFilterChangeRef.current = true;
-    }
-    setScope(newScope);
-  }, []);
-
-  // Restore scroll position after filter change and re-render
-  useLayoutEffect(() => {
-    if (isFilterChangeRef.current) {
-      const rootEl = document.getElementById('root');
-      if (rootEl) {
-        requestAnimationFrame(() => {
-          rootEl.scrollTop = scrollPositionRef.current;
-        });
+  // ─── Bucket list moved (defensive) ─────────────────────────────────
+  const { data: bucketListMoved } = useQuery<{ course: string; positions: number } | null>({
+    queryKey: ['courses-tab-bucket-moved', authUser?.id],
+    enabled: !!authUser?.id,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      try {
+        if (!authUser?.id) return null;
+        const { data: shortlistRows, error } = await supabase
+          .from('course_shortlists')
+          .select('course_id')
+          .eq('user_id', authUser.id);
+        if (error || !shortlistRows || shortlistRows.length === 0) return null;
+        const ids = new Set(shortlistRows.map(r => r.course_id));
+        // Find the largest positive mover among shortlisted courses currently in scope
+        const candidates = allCourses
+          .filter(c => ids.has(c.course_id) && c.rank_change > 0)
+          .sort((a, b) => b.rank_change - a.rank_change);
+        if (candidates.length === 0) return null;
+        return { course: candidates[0].course_name, positions: candidates[0].rank_change };
+      } catch {
+        return null;
       }
-      isFilterChangeRef.current = false;
+    },
+  });
+
+  // ─── Personalised eyebrow ──────────────────────────────────────────
+  const personalisedEyebrow = useMemo(() => {
+    const fallback = editorial?.eyebrow ?? 'THE CLBHOUZ LIST';
+    const topCircle = circleRecentRounds?.[0] as any;
+    const circleActivity = topCircle
+      ? {
+          player: topCircle.user_profiles?.display_name ?? 'A friend',
+          course: topCircle.golf_courses?.name ?? '',
+          rating: Number(topCircle.rating ?? 0),
+        }
+      : null;
+
+    return selectCoursesEyebrow({
+      isLoggedIn: !!authUser?.id,
+      userPlayedCount,
+      totalInList,
+      bucketListMoved: bucketListMoved ?? null,
+      circleActivity,
+      defaultEyebrow: fallback,
+    });
+  }, [editorial?.eyebrow, circleRecentRounds, authUser?.id, userPlayedCount, totalInList, bucketListMoved]);
+
+  // ─── Infinite scroll ───────────────────────────────────────────────
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef(isFetchingNextPage);
+  isFetchingRef.current = isFetchingNextPage;
+
+  useEffect(() => {
+    if (!sentinelRef.current || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '600px', threshold: 0 },
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
+  // ─── Scroll save/restore ───────────────────────────────────────────
+  const handleCourseClick = useCallback((courseId: string) => {
+    const rootEl = document.getElementById('root');
+    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
+    navigate(`/courses/${courseId}`);
+  }, [navigate]);
+
+  const hasRestoredScroll = useRef(false);
+  useEffect(() => {
+    if (hasRestoredScroll.current || allCourses.length === 0) return;
+    const saved = sessionStorage.getItem(STORAGE_KEY_SCROLL);
+    if (saved) {
+      hasRestoredScroll.current = true;
+      requestAnimationFrame(() => {
+        const rootEl = document.getElementById('root');
+        const target = parseInt(saved, 10);
+        if (rootEl) rootEl.scrollTop = target;
+        window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior });
+        sessionStorage.removeItem(STORAGE_KEY_SCROLL);
+      });
     }
-  }, [sort, timeRange, scope, allCourses]);
+  }, [allCourses.length]);
 
-  // ─── Virtualized list rendering ───────────────────────────────────
-  const useVirtualization = listCourses.length >= VIRTUALIZATION_THRESHOLD;
+  // ─── Editorial fallback (deterministic) ────────────────────────────
+  const editorialDisplay = editorial ?? {
+    eyebrow: 'THE CLBHOUZ LIST',
+    headline: "The world's greatest",
+    headlineTwo: 'courses, ranked.',
+    standfirst: 'The Clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
+  };
 
-  const virtualizedContent = useMemo(() => {
-    if (!useVirtualization) return null;
+  // ─── Render ────────────────────────────────────────────────────────
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#FAFAF6', fontFamily: 'Geist, system-ui, sans-serif' }}>
 
-    const containerOffset = listContainerRef.current?.offsetTop ?? 0;
-    const relativeScroll = Math.max(0, scrollTop - containerOffset);
-
-    const totalHeight = listCourses.length * ROW_HEIGHT;
-    const startIndex = Math.max(0, Math.floor(relativeScroll / ROW_HEIGHT) - OVERSCAN);
-    const visibleCount = Math.ceil(window.innerHeight / ROW_HEIGHT) + OVERSCAN * 2;
-    const endIndex = Math.min(listCourses.length, startIndex + visibleCount);
-
-    const visibleEntries = listCourses.slice(startIndex, endIndex);
-    const offsetY = startIndex * ROW_HEIGHT;
-
-    return { totalHeight, visibleEntries, offsetY, startIndex };
-  }, [useVirtualization, listCourses, scrollTop]);
-
-  // Loading skeleton for initial load
-  if (isLoading && allCourses.length === 0 && !isError) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', background: '#F8FAFC', minHeight: '100%' }}>
-        {/* Dark header skeleton */}
-        <div style={{ background: 'linear-gradient(160deg, #1a1a2e, #2d1f3d, #1f1535)', padding: '16px 16px 0' }}>
-          <Skeleton className="h-3 w-52 rounded mb-4" style={{ background: 'rgba(255,255,255,0.12)' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
-            <div style={{ flex: 1 }}>
-              <Skeleton className="h-3 w-24 rounded mb-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
-              <Skeleton className="h-9 w-32 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Skeleton className="h-14 w-16 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }} />
-              <Skeleton className="h-14 w-16 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }} />
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 2 }}>
-            <Skeleton className="h-10 flex-1 rounded-t-[8px]" style={{ background: 'rgba(255,255,255,0.12)' }} />
-            <Skeleton className="h-10 flex-1 rounded-t-[8px]" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <Skeleton className="h-10 flex-1 rounded-t-[8px]" style={{ background: 'rgba(255,255,255,0.07)' }} />
-          </div>
+      {/* ── MASTHEAD ─────────────────────────────────────────────── */}
+      <div style={{ padding: '20px 20px 14px', borderBottom: '3px double #0F172A', textAlign: 'center', background: '#FAFAF6' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 9, fontWeight: 700, color: '#64748B', letterSpacing: '0.14em', marginBottom: 12 }}>
+          <span>VOL · MMXXVI</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#9F1D1D' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9F1D1D' }} />
+            LIVE
+          </span>
+          <span>THE CLBHOUZ LIST</span>
         </div>
+        <h1 style={{ fontSize: 38, fontWeight: 900, letterSpacing: '-0.035em', margin: 0, lineHeight: 0.95, color: '#0F172A' }}>
+          The Course Record
+        </h1>
+        <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.32em', color: '#64748B', marginTop: 6 }}>
+          THE WORLD'S GREATEST COURSES
+        </div>
+      </div>
 
-        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Region pills */}
-          <div style={{ display: 'flex', gap: 6 }}>
-            {[60, 56, 52, 60, 80].map((w, i) => <Skeleton key={i} className="h-8 rounded-full" style={{ width: w }} />)}
+      {/* ── SORT TOGGLE ──────────────────────────────────────────── */}
+      <div style={{ padding: '14px 20px 0', display: 'flex', gap: 8 }}>
+        {[
+          { key: 'highest_rated' as const, label: 'Highest Rated' },
+          { key: 'most_played' as const, label: 'Most Played' },
+          { key: 'rising' as const, label: 'Trending' },
+        ].map(opt => (
+          <button
+            key={opt.key}
+            onClick={() => setSort(opt.key)}
+            style={{
+              flex: 1,
+              padding: '10px 0',
+              borderRadius: 4,
+              background: sort === opt.key ? '#0F172A' : 'transparent',
+              color: sort === opt.key ? '#fff' : '#64748B',
+              border: sort === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
+              fontSize: 11, fontWeight: 800, letterSpacing: '0.04em',
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── FRONT-PAGE LEDE ──────────────────────────────────────── */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
+          {personalisedEyebrow}
+        </div>
+        <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
+          {editorialDisplay.headline}
+          {editorialDisplay.headlineTwo && (
+            <>
+              <br />
+              <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
+                {editorialDisplay.headlineTwo}
+              </span>
+            </>
+          )}
+        </h2>
+        <p style={{ fontSize: 12, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
+          {editorialDisplay.standfirst}
+        </p>
+      </div>
+
+      {/* ── BOX SCORE ────────────────────────────────────────────── */}
+      <div style={{ padding: '20px 20px 0' }}>
+        <div style={{
+          borderTop: '1px solid #0F172A', borderBottom: '1px solid #0F172A',
+          padding: '16px 0',
+          display: 'grid', gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
+          alignItems: 'center',
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>PLAYED</div>
+            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              {userPlayedCount}
+            </div>
           </div>
-
-          {/* Circle rounds */}
-          <Skeleton className="h-4 w-48 rounded mb-1" />
-          <div style={{ display: 'flex', gap: 10 }}>
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-[70px] w-[180px] rounded-xl flex-shrink-0" />
-            ))}
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>OF LIST</div>
+            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              {pctOfList}<span style={{ fontSize: 18, color: '#475569' }}>%</span>
+            </div>
           </div>
-
-          {/* Season spotlight */}
-          <Skeleton className="h-[168px] w-full rounded-2xl" />
-
-          {/* Rankings header */}
-          <div>
-            <Skeleton className="h-6 w-48 rounded mb-2" />
-            <Skeleton className="h-4 w-64 rounded" />
-          </div>
-
-          {/* Podium */}
-          <Skeleton className="h-[200px] w-full rounded-2xl" />
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Skeleton className="h-[148px] flex-1 rounded-2xl" />
-            <Skeleton className="h-[148px] flex-1 rounded-2xl" />
-          </div>
-
-          {/* Row list */}
-          <div style={{ background: '#FFFFFF', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(15,23,42,0.07)' }}>
-            {[...Array(5)].map((_, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px',
-                borderBottom: i < 4 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
-              }}>
-                <Skeleton className="w-6 h-5 rounded" />
-                <Skeleton className="w-[60px] h-[44px] rounded-[10px]" />
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <Skeleton className="h-4 rounded" style={{ width: `${[75, 60, 70, 55, 65][i]}%` }} />
-                  <Skeleton className="h-3 rounded" style={{ width: `${[55, 45, 50, 40, 55][i]}%` }} />
-                </div>
-                <Skeleton className="h-4 w-16 rounded" />
-              </div>
-            ))}
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>TO GO</div>
+            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#0F172A', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              {totalInList === 0 ? '—' : (toGoCount === 0 ? '—' : toGoCount)}
+            </div>
           </div>
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-
-      {/* ── DARK HERO HEADER ── */}
-      <div style={{
-        background: 'linear-gradient(160deg, #1a1a2e 0%, #2d1f3d 60%, #1f1535 100%)',
-        padding: 'clamp(14px,3vw,18px) clamp(14px,4vw,18px) 0',
-        position: 'relative', overflow: 'hidden', flexShrink: 0,
-      }}>
-        {/* Decorative ambient glows */}
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(247,147,30,0.06)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: 20, right: -10, width: 100, height: 100, borderRadius: '50%', background: 'rgba(247,147,30,0.04)', pointerEvents: 'none' }} />
-
-        {/* Season label */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 'clamp(8px,2vw,12px)' }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }} />
-          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(9px,2.5vw,11px)', fontWeight: 600, fontFamily: 'DM Sans, system-ui, sans-serif', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-            Course Rankings · {getSeasonConfig(currentSeasonId ?? 'major').title}
-          </span>
-        </div>
-
-        {/* Stats row with avatar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'clamp(14px,3.5vw,20px)' }}>
-          {/* Squircle avatar */}
-          {currentUserProfile?.profile_photo_url ? (
-            <img
-              src={currentUserProfile.profile_photo_url}
-              alt=""
-              style={{ width: 52, height: 52, borderRadius: '34%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.15)', flexShrink: 0 }}
-            />
-          ) : currentUserProfile ? (
+      {/* ── THIS SEASON'S HOTTEST ───────────────────────────────── */}
+      {!spotlightLoading && spotlight && (
+        <div style={{ padding: '20px 20px 0' }}>
+          <button
+            onClick={() => handleCourseClick(spotlight.course_id)}
+            style={{
+              width: '100%',
+              background: '#0F172A', color: '#fff', borderRadius: 4,
+              overflow: 'hidden', position: 'relative',
+              border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0,
+            }}
+          >
             <div style={{
-              width: 52, height: 52, borderRadius: '34%', background: 'rgba(255,255,255,0.12)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 700, flexShrink: 0,
+              height: 160,
+              background: spotlight.image_url
+                ? `linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.7) 100%), url(${spotlight.image_url}) center/cover`
+                : 'linear-gradient(180deg, #2d5a3d, #1a3d2e)',
+              position: 'relative',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}>
-              {(currentUserProfile.display_name || '?').charAt(0).toUpperCase()}
+              <div style={{
+                position: 'absolute', top: 10, left: 10,
+                fontSize: 8, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
+                background: 'rgba(0,0,0,0.4)',
+                padding: '4px 8px', borderRadius: 2,
+                backdropFilter: 'blur(6px)',
+                WebkitBackdropFilter: 'blur(6px)',
+              }}>
+                THIS SEASON'S HOTTEST
+              </div>
             </div>
-          ) : null}
-          <div style={{ flex: 1 }}>
-            <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(10px,2.8vw,12px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif', marginBottom: 2 }}>
-              You've played
+            <div style={{ padding: '14px 18px' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 4 }}>
+                {spotlight.course_name}
+              </div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginBottom: 14 }}>
+                {[spotlight.city, spotlight.country].filter(Boolean).join(', ')}
+              </div>
+              <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+                <div>
+                  <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                    RATING
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {spotlight.avg_rating ? spotlight.avg_rating.toFixed(1) : '—'}
+                  </div>
+                </div>
+                <div style={{ width: 1, background: 'rgba(255,255,255,0.12)' }} />
+                <div>
+                  <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                    PLAYS
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {spotlight.total_rounds ?? 0}
+                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: 700, marginLeft: 4 }}>this season</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              <span style={{ color: '#F7931E', fontSize: 'clamp(28px,7.5vw,36px)', fontWeight: 800, fontFamily: 'DM Sans, system-ui, sans-serif', lineHeight: 1 }}>
-                {userPlayedCount}
-              </span>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(12px,3.2vw,14px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif' }}>
-                courses
-              </span>
-            </div>
-          </div>
-
-          {/* Stat pills */}
-          {[
-            { val: `${userPlayedPct}%`, label: 'of list' },
-          ].map((s, i) => (
-            <div key={i} style={{
-              background: 'rgba(255,255,255,0.06)', borderRadius: 12,
-              padding: 'clamp(8px,2vw,10px) clamp(10px,2.5vw,14px)',
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-              minWidth: 56,
-            }}>
-              <span style={{ color: '#fff', fontSize: 'clamp(15px,4vw,19px)', fontWeight: 800, fontFamily: 'DM Sans, system-ui, sans-serif', lineHeight: 1 }}>
-                {s.val}
-              </span>
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 'clamp(9px,2.4vw,11px)', fontWeight: 500, fontFamily: 'DM Sans, system-ui, sans-serif', marginTop: 2 }}>
-                {s.label}
-              </span>
-            </div>
-          ))}
+          </button>
         </div>
+      )}
 
-        {/* Sort tabs — flush to bottom */}
-        <div style={{ display: 'flex', gap: 2 }}>
+      {/* ── BY REGION ────────────────────────────────────────────── */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+          <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>BY REGION</span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 5, overflowX: 'auto', paddingBottom: 2, WebkitOverflowScrolling: 'touch' }}>
           {[
-            { id: 'highest_rated', label: 'Highest Rated' },
-            { id: 'most_played', label: 'Most Played' },
-            { id: 'rising', label: 'Trending' },
-          ].map(t => (
+            { key: 'global' as const, label: 'Global' },
+            { key: 'gb-i' as const, label: 'GB&I' },
+            { key: 'usa' as const, label: 'USA' },
+            { key: 'europe' as const, label: 'Europe' },
+            { key: 'row' as const, label: 'Rest of World' },
+          ].map(r => (
             <button
-              key={t.id}
-              onClick={() => handleSortChange(t.id as CourseSortType)}
+              key={r.key}
+              onClick={() => setQuickRegion(r.key)}
               style={{
-                flex: 1, padding: 'clamp(8px,2vw,10px) 0', borderRadius: '8px 8px 0 0',
-                border: 'none', cursor: 'pointer',
-                fontSize: 'clamp(10px,2.8vw,12px)',
-                fontWeight: sort === t.id ? 800 : 500,
-                fontFamily: 'DM Sans, system-ui, sans-serif',
-                background: sort === t.id ? '#F8FAFC' : 'rgba(255,255,255,0.07)',
-                color: sort === t.id ? '#0C0C0E' : 'rgba(255,255,255,0.55)',
-                transition: 'all 0.2s',
+                padding: '6px 12px', borderRadius: 3, whiteSpace: 'nowrap',
+                background: quickRegion === r.key ? '#0F172A' : 'transparent',
+                color: quickRegion === r.key ? '#fff' : '#64748B',
+                border: quickRegion === r.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
+                fontSize: 10, fontWeight: 700, cursor: 'pointer',
+                flexShrink: 0,
               }}
-              className="active:scale-[0.97] transition-all"
             >
-              {t.label}
+              {r.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── LIGHT BODY ZONE ── */}
-      <div style={{ background: '#F8FAFC', flex: 1, padding: 'clamp(12px,3vw,16px) 0' }}>
-
-        {/* Region pills */}
-        <div style={{ padding: '0 clamp(12px,3vw,16px)', marginBottom: 14 }}>
-          <CourseRegionPills
-            value={quickRegion}
-            onChange={(r) => {
-              handleScopeChange(r === 'global' || r === 'row' ? 'global' : 'country');
-              setQuickRegion(r);
-              if (r !== 'global') {
-                setSelectedRegion(null);
-                setSelectedSubRegion(null);
-              }
-            }}
-          />
-        </div>
-
-        {/* Circle Rounds — compact pill format */}
-        <div style={{ padding: '0 clamp(12px,3vw,16px)', marginBottom: 14 }}>
-          {circleLoading ? (
-            <div>
-              <Skeleton className="h-4 w-48 rounded mb-3" />
-              <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
-                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[70px] rounded-xl flex-shrink-0" style={{ width: 180 }} />)}
-              </div>
-            </div>
-          ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-            <div>
-              <h3 style={{ fontSize: 'clamp(14px,3.8vw,16px)', fontWeight: 800, color: '#0C0C0E', fontFamily: 'DM Sans, system-ui, sans-serif', marginBottom: 10, letterSpacing: '-0.3px' }}>
-                Your Circle's Recent Rounds
-              </h3>
-              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }} className="scrollbar-hide">
-                {circleRecentRounds.slice(0, 8).map((round: any) => (
-                  <button
-                    key={round.id}
-                    onClick={() => handleCourseClick(round.course_id)}
-                    style={{
-                      flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
-                      background: '#FFFFFF', borderRadius: 12,
-                      padding: '8px 10px',
-                      border: '1px solid rgba(15,23,42,0.07)',
-                      cursor: 'pointer', textAlign: 'left' as const,
-                      maxWidth: 220,
-                    }}
-                    className="active:scale-[0.97] transition-all"
-                  >
-                    {/* Course thumbnail */}
-                    {round.golf_courses?.thumbnail_image ? (
-                      <img
-                        src={round.golf_courses.thumbnail_image}
-                        alt={round.golf_courses?.name}
-                        style={{ width: 52, height: 52, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div style={{ width: 52, height: 52, borderRadius: 10, background: '#e5e7eb', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 9, color: '#9ca3af' }}>No img</span>
-                      </div>
-                    )}
-
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0C0C0E', fontFamily: 'DM Sans, system-ui, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {round.golf_courses?.name}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3 }}>
-                        <SquircleAvatar
-                          size={14}
-                          src={round.user_profiles?.profile_photo_url}
-                          alt={round.user_profiles?.display_name}
-                          fallback={(round.user_profiles?.display_name?.[0] ?? '?').toUpperCase()}
-                          hideRing
-                        />
-                        <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'DM Sans, system-ui, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {round.user_profiles?.display_name}
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                        <span style={{ fontSize: 10, color: '#9CA3AF', fontFamily: 'DM Sans, system-ui, sans-serif' }}>
-                          {formatDistanceToNow(new Date(round.created_at), { addSuffix: true })}
-                        </span>
-                        {round.rating && (
-                          <>
-                            <span style={{ fontSize: 10, color: '#d1d5db' }}>·</span>
-                            <span style={{ fontSize: 12, fontWeight: 800, color: '#F7931E', fontFamily: 'DM Sans, system-ui, sans-serif' }}>
-                              {round.rating.toFixed(1)}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
-
-        {/* Season Spotlight */}
-        <div style={{ padding: '0 clamp(12px,3vw,16px)', marginBottom: 14 }}>
-          <CourseSeasonSpotlight onCourseClick={handleCourseClick} />
-        </div>
-
-        {/* Bucket List Strip */}
-        <div style={{ marginBottom: 14 }}>
-          <BucketListStrip onCourseClick={handleCourseClick} />
-        </div>
-
-        {/* Course Rankings Section */}
-        <div style={{ padding: '0 clamp(12px,3vw,16px)' }}>
-          {/* Rankings header */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-              <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Rankings</span>
-            </div>
-            <h2 style={{ fontSize: 'clamp(20px,5.5vw,24px)', fontWeight: 900, color: '#0F172A', fontFamily: 'DM Sans, system-ui, sans-serif', letterSpacing: '-0.03em', margin: 0 }}>
-              Course Rankings
-            </h2>
-            <p style={{ fontSize: 'clamp(12px,3.2vw,14px)', color: '#6B7280', fontFamily: 'DM Sans, system-ui, sans-serif', marginTop: 4, margin: 0 }}>
-              {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-              {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-              {sort === 'rising' && `The world's greatest courses trending right now${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-            </p>
+      {/* ── FROM YOUR CIRCLE ────────────────────────────────────── */}
+      {circleRecentRounds && circleRecentRounds.length > 0 && (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           </div>
-
-          {/* Initial error state */}
-          {isError && allCourses.length === 0 ? (
-            <InitialErrorState onRetry={() => refetch()} />
-          ) : (
-            <>
-              {/* Updating overlay */}
-              <div className={isFetching && !isFetchingNextPage ? 'opacity-60' : ''}>
-                {/* Podium (conditional) */}
-                {showPodium && (
-                  <CoursePodium 
-                    courses={podiumCourses.map(c => ({
-                      course_id: c.course_id,
-                      course_name: c.course_name,
-                      country: c.country,
-                      sub_country: c.sub_country,
-                      thumbnail_url: c.thumbnail_url,
-                      avg_rating: c.avg_rating,
-                      times_played: c.times_played,
-                      rank_change: c.rank_change,
-                    }))}
-                    sort={sort === 'rising' ? 'rising' : sort === 'highest_rated' ? 'highest_rated' : 'most_played'}
-                    seasonColor={seasonThemeColor}
-                    onCourseClick={handleCourseClick}
-                  />
-                )}
-
-                {/* Rankings List — white card container */}
-                <div
-                  ref={listContainerRef}
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
+            {circleRecentRounds.slice(0, 10).map((round: any) => {
+              const daysAgo = Math.max(0, Math.floor((Date.now() - new Date(round.created_at).getTime()) / 86400000));
+              const course = round.golf_courses;
+              const player = round.user_profiles;
+              if (!course || !player) return null;
+              return (
+                <button
+                  key={round.id}
+                  onClick={() => handleCourseClick(course.id)}
                   style={{
-                    background: '#FFFFFF', borderRadius: 16, overflow: 'hidden',
-                    border: '1px solid rgba(15,23,42,0.07)',
-                    marginTop: showPodium ? 16 : 0,
+                    flexShrink: 0, width: 200,
+                    border: '1px solid rgba(15,23,42,0.08)', borderRadius: 4,
+                    background: '#fff', overflow: 'hidden',
+                    cursor: 'pointer', padding: 0, textAlign: 'left',
                   }}
                 >
-                  {listCourses.length === 0 && allCourses.length === 0 && !isLoading ? (
-                    <div className="py-8">
-                      <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
+                  <div style={{
+                    height: 80,
+                    background: course.thumbnail_image
+                      ? `url(${course.thumbnail_image}) center/cover`
+                      : 'linear-gradient(135deg, #2d5a3d, #1a3d2e)',
+                  }} />
+                  <div style={{ padding: '10px 12px' }}>
+                    <div style={{
+                      fontSize: 12, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.005em',
+                      marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {course.name}
                     </div>
-                  ) : useVirtualization && virtualizedContent ? (
-                    // Virtualized list for large entry counts
-                    <div
-                      className="relative"
-                      style={{ height: virtualizedContent.totalHeight }}
-                    >
-                      <div
-                        className="absolute inset-x-0"
-                        style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
-                      >
-                        {virtualizedContent.visibleEntries.map((course, i) => (
-                          <CourseRankingRow
-                            key={course.course_id}
-                            course={{
-                              ...course,
-                              unique_players: course.unique_players || course.times_played,
-                              rank_change: course.rank_change || 0,
-                              is_trending: course.is_trending || false,
-                              is_hall_of_fame: course.is_hall_of_fame || false,
-                              prestige_tags: course.prestige_tags || [],
-                              current_user_played: course.current_user_played || false,
-                              current_user_play_count: course.current_user_play_count || 0,
-                            }}
-                            rank={(virtualizedContent.startIndex + i) + 1}
-                            sort={sort}
-                            seasonColor={seasonThemeColor}
-                            onClick={() => handleCourseClick(course.course_id)}
-                          />
-                        ))}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: 10, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                        {player.display_name}
+                      </div>
+                      <div style={{
+                        fontSize: 11, fontWeight: 900, color: '#F7931E',
+                        fontVariantNumeric: 'tabular-nums lining-nums',
+                        letterSpacing: '-0.02em', marginLeft: 6, flexShrink: 0,
+                      }}>
+                        {round.rating?.toFixed(1) ?? '—'}
                       </div>
                     </div>
-                  ) : (
-                    // Non-virtualized list
-                    listCourses.map((course, index) => (
-                      <CourseRankingRow
-                        key={course.course_id}
-                        course={{
-                          ...course,
-                          unique_players: course.unique_players || course.times_played,
-                          rank_change: course.rank_change || 0,
-                          is_trending: course.is_trending || false,
-                          is_hall_of_fame: course.is_hall_of_fame || false,
-                          prestige_tags: course.prestige_tags || [],
-                          current_user_played: course.current_user_played || false,
-                          current_user_play_count: course.current_user_play_count || 0,
-                        }}
-                        rank={index + 1}
-                        sort={sort}
-                        seasonColor={seasonThemeColor}
-                        onClick={() => handleCourseClick(course.course_id)}
-                      />
-                    ))
+                    <div style={{ fontSize: 9, color: '#94A3B8', marginTop: 3 }}>
+                      {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── THE FULL LIST ───────────────────────────────────────── */}
+      <div style={{ padding: '26px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+          <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>
+            THE FULL LIST
+          </span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+        </div>
+
+        {/* Column headers */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '26px 48px 1fr 18px 44px',
+          padding: '10px 0 8px',
+          borderBottom: '1px solid #0F172A',
+          fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em',
+          alignItems: 'center',
+        }}>
+          <span>POS</span>
+          <span />
+          <span>COURSE</span>
+          <span />
+          <span style={{ textAlign: 'right' }}>RATING</span>
+        </div>
+
+        {/* Initial error */}
+        {isError && allCourses.length === 0 ? (
+          <InitialErrorState onRetry={() => refetch()} />
+        ) : isLoading && allCourses.length === 0 ? (
+          <>{[...Array(8)].map((_, i) => <RowSkeleton key={i} />)}</>
+        ) : allCourses.length === 0 ? (
+          <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+            <p style={{ fontSize: 13, color: '#94A3B8', fontStyle: 'italic' }}>
+              No courses match this view yet.
+            </p>
+          </div>
+        ) : (
+          allCourses.map((c, i) => {
+            const isLast = i === allCourses.length - 1;
+            const isTop3 = c.rank <= 3;
+            return (
+              <div
+                key={c.course_id}
+                onClick={() => handleCourseClick(c.course_id)}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '26px 48px 1fr 18px 44px',
+                  alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: isLast ? '1px solid #0F172A' : '1px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer',
+                }}
+              >
+                {/* Rank */}
+                <span style={{
+                  fontSize: 16, fontWeight: 900,
+                  color: isTop3 ? '#0F172A' : '#94A3B8',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  letterSpacing: '-0.02em',
+                }}>
+                  {c.rank}
+                </span>
+
+                {/* Thumbnail */}
+                <div style={{
+                  width: 40, height: 40, borderRadius: 3,
+                  background: c.thumbnail_url
+                    ? `url(${c.thumbnail_url}) center/cover`
+                    : 'linear-gradient(135deg, #2d5a3d, #1a3d2e)',
+                  border: '1px solid rgba(15,23,42,0.08)',
+                  position: 'relative',
+                  overflow: 'visible',
+                }}>
+                  {c.current_user_played && (
+                    <div style={{
+                      position: 'absolute', top: -3, right: -3,
+                      width: 14, height: 14, borderRadius: '50%',
+                      background: '#F7931E',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 8, color: '#fff', fontWeight: 900,
+                      border: '1.5px solid #FAFAF6',
+                    }}>✓</div>
                   )}
                 </div>
-              </div>
 
-              {/* Sentinel + loading skeleton for infinite scroll */}
-              {hasNextPage && !isError && (
-                <div ref={sentinelRef}>
-                  {isFetchingNextPage && <CourseLeaderboardSkeleton />}
+                {/* Name + location */}
+                <div style={{ minWidth: 0, paddingLeft: 4 }}>
+                  <div style={{
+                    fontSize: 13, fontWeight: 700, color: '#0F172A',
+                    letterSpacing: '-0.005em',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {c.course_name}
+                    {c.current_user_played && (
+                      <span style={{
+                        fontSize: 8, fontWeight: 800, color: '#F7931E',
+                        letterSpacing: '0.18em', marginLeft: 6,
+                      }}>PLAYED</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>
+                    {[c.sub_country, c.country].filter(Boolean).join(' · ')}
+                    {' · '}{c.times_played} {c.times_played === 1 ? 'play' : 'plays'}
+                  </div>
                 </div>
-              )}
 
-              {/* Inline retry on pagination error */}
-              {isError && !isFetchingNextPage && allCourses.length > 0 && (
-                <InlineRetryCard onRetry={() => fetchNextPage()} />
-              )}
+                {/* Trend */}
+                <span style={{ textAlign: 'center' }}>
+                  <TrendArrow change={c.rank_change} />
+                </span>
 
-              {/* Loading indicator during retry */}
-              {isError && isFetchingNextPage && allCourses.length > 0 && (
-                <CourseLeaderboardSkeleton />
-              )}
-            </>
-          )}
-        </div>
+                {/* Rating */}
+                <span style={{
+                  fontSize: 20, fontWeight: 900, textAlign: 'right',
+                  color: '#0F172A', letterSpacing: '-0.03em',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                }}>
+                  {c.avg_rating?.toFixed(1) ?? '—'}
+                </span>
+              </div>
+            );
+          })
+        )}
+
+        {/* Sentinel for infinite scroll */}
+        {hasNextPage && !isError && (
+          <div ref={sentinelRef}>
+            {isFetchingNextPage && <>{[...Array(3)].map((_, i) => <RowSkeleton key={i} />)}</>}
+          </div>
+        )}
+
+        {isError && !isFetchingNextPage && allCourses.length > 0 && (
+          <InlineRetryCard onRetry={() => fetchNextPage()} />
+        )}
       </div>
 
-      {/* Create Game Sheet */}
-      <CreateGameTripSheetV2
-        isOpen={gamesHubOpen}
-        onClose={() => setGamesHubOpen(false)}
-      />
+      {/* ── FOOTER CAPTION ──────────────────────────────────────── */}
+      <div style={{ padding: '20px 20px 32px', textAlign: 'center' }}>
+        <div style={{ fontSize: 9, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic' }}>
+          Ranked by community rating across verified rounds · Updated daily
+        </div>
+      </div>
     </div>
   );
 }
