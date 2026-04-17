@@ -13,6 +13,7 @@ export type CourseLeaderboardEntry = {
   list_slug: LeaderboardScope | string;
   times_played: number;
   avg_rating: number | null;
+  rating_count: number;
   global_rank: number | null;
   regional_rank: number | null;
   usa_rank: number | null;
@@ -117,6 +118,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
           list_slug: scope,
           times_played: row.total_rounds,
           avg_rating: row.avg_rating,
+          rating_count: row.rating_count ?? 0,
           global_rank: row.rank,
           regional_rank: null,
           usa_rank: null,

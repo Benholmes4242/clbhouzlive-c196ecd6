@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useCourseLeaderboard, CourseSortType } from '@/hooks/useCourseLeaderboard';
 import { useSpotlightCourse } from '@/hooks/useSpotlightCourse';
-import { useDailyEditorial, type EditorialCopy } from '@/hooks/championship/useDailyEditorial';
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -161,12 +161,47 @@ export function CoursesLeaderboardView() {
 
   const allCourses = useMemo(() => data?.pages.flatMap(p => p.entries) ?? [], [data?.pages]);
 
-  // ─── Editorial ─────────────────────────────────────────────────────
-  const { data: editorial, isPending: editorialPending } = useDailyEditorial({
-    surface: 'courses',
-    seasonId: null,
-    timeFilter: 'all_time',
-  });
+  // ─── Sort-aware masthead derived from the list (single source of truth) ─
+  const masthead = allCourses[0] ?? null;
+
+  const mastheadCopy = useMemo(() => {
+    if (!masthead) return null;
+
+    const name = masthead.course_name;
+    const ratingValue = masthead.avg_rating;
+    const rating = ratingValue != null ? ratingValue.toFixed(1) : null;
+    const plays = masthead.times_played ?? 0;
+    const ratingCount = masthead.rating_count ?? 0;
+    const ratingsLabel = ratingCount === 1 ? 'rating' : 'ratings';
+
+    if (sort === 'highest_rated') {
+      return {
+        eyebrow: 'HIGHEST RATED',
+        headline: name,
+        headlineTwo: rating ? `sits at ${rating}` : 'leads the list',
+        standfirst: rating
+          ? `${name} leads the Clbhouz list, averaging ${rating} out of ten across ${ratingCount} ${ratingsLabel}.`
+          : `${name} leads the Clbhouz list.`,
+      };
+    }
+
+    if (sort === 'most_played') {
+      return {
+        eyebrow: 'MOST PLAYED',
+        headline: name,
+        headlineTwo: `played ${plays} times`,
+        standfirst: `${name} is the community's most-logged course, with ${plays} rounds on record.`,
+      };
+    }
+
+    // sort === 'rising' (labelled "Trending" in the UI)
+    return {
+      eyebrow: 'TRENDING NOW',
+      headline: name,
+      headlineTwo: 'is climbing',
+      standfirst: `${name} is picking up momentum, with ${ratingCount} ${ratingsLabel} from the Clbhouz community.`,
+    };
+  }, [masthead, sort]);
 
   // ─── Spotlight ─────────────────────────────────────────────────────
   const { data: spotlight, isLoading: spotlightLoading } = useSpotlightCourse();
@@ -290,7 +325,7 @@ export function CoursesLeaderboardView() {
 
   // ─── Personalised eyebrow ──────────────────────────────────────────
   const personalisedEyebrow = useMemo(() => {
-    const fallback = editorial?.eyebrow ?? 'THE CLBHOUZ LIST';
+    const fallback = mastheadCopy?.eyebrow ?? 'THE CLBHOUZ LIST';
     const topCircle = circleRecentRounds?.[0] as any;
     const circleActivity = topCircle
       ? {
@@ -308,7 +343,7 @@ export function CoursesLeaderboardView() {
       circleActivity,
       defaultEyebrow: fallback,
     });
-  }, [editorial?.eyebrow, circleRecentRounds, authUser?.id, userPlayedCount, totalInList, bucketListMoved]);
+  }, [mastheadCopy?.eyebrow, circleRecentRounds, authUser?.id, userPlayedCount, totalInList, bucketListMoved]);
 
   // ─── Infinite scroll ───────────────────────────────────────────────
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -353,13 +388,7 @@ export function CoursesLeaderboardView() {
     }
   }, [allCourses.length]);
 
-  // ─── Editorial fallback (deterministic) ────────────────────────────
-  const editorialDisplay: Pick<EditorialCopy, 'eyebrow' | 'headline' | 'headlineTwo' | 'standfirst'> = editorial ?? {
-    eyebrow: 'THE CLBHOUZ LIST',
-    headline: "The world's greatest",
-    headlineTwo: 'courses, ranked.',
-    standfirst: 'The Clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
-  };
+  // ─── (Editorial fallback removed — masthead now derives from list data) ──
 
   // ─── Render ────────────────────────────────────────────────────────
   return (
@@ -410,29 +439,29 @@ export function CoursesLeaderboardView() {
       </div>
 
       {/* ── FRONT-PAGE LEDE ──────────────────────────────────────── */}
-      {editorialPending ? (
+      {isLoading && !masthead ? (
         <EditorialLedeSkeleton />
-      ) : (
+      ) : mastheadCopy ? (
         <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
             {personalisedEyebrow}
           </div>
           <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
-            {editorialDisplay.headline}
-            {editorialDisplay.headlineTwo && (
+            {mastheadCopy.headline}
+            {mastheadCopy.headlineTwo && (
               <>
                 <br />
                 <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
-                  {editorialDisplay.headlineTwo}
+                  {mastheadCopy.headlineTwo}
                 </span>
               </>
             )}
           </h2>
           <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
-            {editorialDisplay.standfirst}
+            {mastheadCopy.standfirst}
           </p>
         </div>
-      )}
+      ) : null}
 
       {/* ── BOX SCORE ────────────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 0' }}>
