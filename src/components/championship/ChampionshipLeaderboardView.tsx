@@ -17,6 +17,7 @@ import {
 import type { EditorialCopy } from '@/hooks/championship/useDailyEditorial';
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
+import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEASON_ORDER, getSeasonConfig, getChipStatus, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
@@ -71,7 +72,14 @@ function getAvatarFallbackColor(userId: string | null | undefined): string {
   return FALLBACK_PALETTE[Math.abs(hash) % FALLBACK_PALETTE.length];
 }
 
-const ROMAN_YEAR = 'MMXXVI';
+function formatSeasonName(id: SeasonId): string {
+  switch (id) {
+    case 'major':     return 'MAJOR SEASON';
+    case 'summer':    return 'SUMMER SEASON';
+    case 'preseason': return 'PRE-SEASON';
+    case 'offseason': return 'OFF-SEASON';
+  }
+}
 
 function getDayOfSeason(startDate: string | null | undefined): number {
   if (!startDate) return 1;
@@ -331,7 +339,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [season]);
 
   // ─── Editorial ───────────────────────────────────────────────────
-  const { data: editorialData } = useDailyEditorial({
+  const { data: editorialData, isPending: editorialPending } = useDailyEditorial({
     seasonId: timeFilter === 'seasonal' ? season?.id ?? null : null,
     timeFilter,
     enabled: timeFilter === 'all_time' || !!season?.id,
@@ -490,18 +498,28 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         textAlign: 'center',
         background: '#F8FAFC',
       }}>
+        {/* TOP STRIP: single line, countdown-driven */}
         <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          fontSize: 10, fontWeight: 700, color: '#64748B', letterSpacing: '0.14em',
+          display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6,
+          fontSize: 11, fontWeight: 800, color: '#64748B', letterSpacing: '0.18em',
           marginBottom: 12, fontVariantNumeric: 'tabular-nums lining-nums',
+          minHeight: 14,
         }}>
-          <span>VOL · {ROMAN_YEAR}</span>
-          {timeFilter === 'seasonal' ? (
-            <span style={{ color: '#9F1D1D' }}>● {daysRemaining}D LIVE</span>
+          {timeFilter === 'all_time' ? (
+            <span>ALL-TIME RECORD</span>
+          ) : !season ? (
+            <span style={{ visibility: 'hidden' }}>PLACEHOLDER</span>
+          ) : daysRemaining > 0 ? (
+            <>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9F1D1D', display: 'inline-block' }} />
+              <span style={{ color: '#9F1D1D' }}>{daysRemaining} DAYS LEFT IN {formatSeasonName(currentSeasonId)}</span>
+            </>
           ) : (
-            <span>EST · 2026</span>
+            <>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9F1D1D', display: 'inline-block' }} />
+              <span style={{ color: '#9F1D1D' }}>{formatSeasonName(currentSeasonId)} · FINAL DAY</span>
+            </>
           )}
-          <span>{timeFilter === 'all_time' ? 'ALL-TIME' : `NO. ${currentSeasonId.toUpperCase()}`}</span>
         </div>
 
         <h1 style={{
@@ -543,34 +561,38 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       </div>
 
       {/* ── 3. FRONT-PAGE LEDE ── */}
-      <div style={{ padding: '22px 20px 0' }}>
-        <div style={{
-          fontSize: 10, fontWeight: 800, letterSpacing: '0.28em',
-          color: '#9F1D1D', marginBottom: 10,
-        }}>
-          {personalisedEyebrow}
+      {editorialPending ? (
+        <EditorialLedeSkeleton />
+      ) : (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div style={{
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.28em',
+            color: '#9F1D1D', marginBottom: 10,
+          }}>
+            {personalisedEyebrow}
+          </div>
+          <h2 style={{
+            fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em',
+            margin: 0, lineHeight: 1.05, color: '#0F172A',
+          }}>
+            {finalEditorial.headline}
+            {finalEditorial.headlineTwo && (
+              <>
+                <br />
+                <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
+                  {finalEditorial.headlineTwo}
+                </span>
+              </>
+            )}
+          </h2>
+          <p style={{
+            fontSize: 13, color: '#64748B', lineHeight: 1.55,
+            marginTop: 12, marginBottom: 0, fontStyle: 'italic',
+          }}>
+            {finalEditorial.standfirst}
+          </p>
         </div>
-        <h2 style={{
-          fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em',
-          margin: 0, lineHeight: 1.05, color: '#0F172A',
-        }}>
-          {finalEditorial.headline}
-          {finalEditorial.headlineTwo && (
-            <>
-              <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
-                {finalEditorial.headlineTwo}
-              </span>
-            </>
-          )}
-        </h2>
-        <p style={{
-          fontSize: 13, color: '#64748B', lineHeight: 1.55,
-          marginTop: 12, marginBottom: 0, fontStyle: 'italic',
-        }}>
-          {finalEditorial.standfirst}
-        </p>
-      </div>
+      )}
 
       {/* ── 4. THE BOX SCORE ── */}
       <div style={{ padding: '20px 20px 0' }}>
