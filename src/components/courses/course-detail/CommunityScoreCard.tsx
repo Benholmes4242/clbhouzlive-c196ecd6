@@ -49,6 +49,58 @@ const TIERS: { key: keyof RatingTierDistributionData; label: string }[] = [
   { key: 'fair', label: 'Fair' },
 ];
 
+const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 50 }) => {
+  const r = (size / 2) - 4;
+  const circ = 2 * Math.PI * r;
+  const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
+  return (
+    <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ transform: 'rotate(-90deg)' }}
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="rgba(15,23,42,0.06)"
+          strokeWidth={3.5}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="#F7931E"
+          strokeWidth={3.5}
+          strokeLinecap="round"
+          strokeDasharray={`${fill} ${circ}`}
+          style={{ transition: 'stroke-dasharray 0.5s ease' }}
+        />
+      </svg>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 13,
+          fontWeight: 900,
+          color: '#0F172A',
+          letterSpacing: '-0.02em',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {score.toFixed(1)}
+      </div>
+    </div>
+  );
+};
+
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   courseName,
   ratingAggregates,
