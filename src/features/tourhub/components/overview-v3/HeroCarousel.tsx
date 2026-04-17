@@ -1677,7 +1677,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   )}
 
                   {/* Echo — tour hub contextual */}
-                  <div style={{ paddingBottom: 10 }}>
+                  <div style={{ paddingBottom: 'clamp(2px, 0.6vh, 8px)' }}>
                     <EchoContextualButton
                       prompt={
                         isLive
