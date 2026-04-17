@@ -5,6 +5,8 @@ export { useClubSearch } from './useClubSearch';
 
 // Legacy countries leaderboard (separate useQuery-based hook)
 export { useCountriesLeaderboard } from './useCountriesLeaderboard';
+export { useCountriesByMemberCount } from './useCountriesByMemberCount';
+export type { CountryByMemberCountRow } from './useCountriesByMemberCount';
 
 // Handicap Leaderboards
 export { useHandicapImprovementLeaderboard } from './useHandicapImprovementLeaderboard';
