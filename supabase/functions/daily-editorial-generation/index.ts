@@ -905,7 +905,15 @@ serve(async (req) => {
         headline: coursesEditorial.headline,
       });
     } catch (err) {
-      console.error('Courses editorial generation failed', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Courses editorial generation failed', msg);
+      results.push({
+        surface: 'courses' as Surface,
+        timeFilter: 'all_time',
+        seasonId: null,
+        storyType: 'error',
+        headline: `__error: ${msg}`,
+      });
       // Don't throw — let seasonal + global editorials still succeed
     }
 
