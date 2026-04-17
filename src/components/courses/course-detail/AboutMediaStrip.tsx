@@ -48,7 +48,7 @@ const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () =
           cursor: 'pointer',
           fontSize: 12,
           fontWeight: 700,
-          color: '#0F172A',
+          color: '#64748B',
           display: 'flex',
           alignItems: 'center',
           gap: 4,
@@ -199,7 +199,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 4,
+            gap: 6,
             padding: '0 16px',
             marginBottom: 12,
           }}
@@ -210,21 +210,25 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               style={{
                 aspectRatio: '1',
                 borderRadius: 10,
-                background: 'rgba(15,23,42,0.04)',
-                border: '1px dashed rgba(15,23,42,0.08)',
+                background: i === 0 ? 'rgba(247,147,30,0.06)' : 'rgba(15,23,42,0.04)',
+                border: i === 0
+                  ? '1.5px dashed rgba(247,147,30,0.35)'
+                  : '1.5px dashed rgba(15,23,42,0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 22,
+                fontSize: 24,
+                color: i === 0 ? '#F7931E' : '#94A3B8',
+                fontWeight: 700,
               }}
             >
-              {i === 0 ? '📷' : i === 1 ? '🎬' : '⛳'}
+              {i === 0 ? '📸' : '+'}
             </div>
           ))}
         </div>
 
         <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 14px', lineHeight: 1.5 }}>
-          No photos or videos yet — be the first to share your experience.
+          Help fellow golfers discover this course — share your experience.
         </p>
 
         <div style={{ padding: '0 16px' }}>
@@ -235,15 +239,15 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               width: '100%',
               padding: '12px 0',
               borderRadius: 12,
-              background: 'transparent',
-              border: '1.5px solid rgba(15,23,42,0.1)',
+              background: '#0F172A',
+              color: '#fff',
               fontSize: 13,
               fontWeight: 700,
-              color: '#0F172A',
+              border: 'none',
               cursor: 'pointer',
             }}
           >
-            Share your experience
+            📷 Share Your Experience
           </button>
         </div>
       </div>

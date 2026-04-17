@@ -1,18 +1,13 @@
 /**
  * PersonalSection - Container for all Phase 5 personal components
- * Unified section for the course detail page
  */
 import React from 'react';
-import { User } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
-import PlanningSignals from './PlanningSignals';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface PersonalSectionProps {
   courseId: string;
@@ -29,51 +24,40 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   const { data: userRating, isLoading: ratingLoading } = useUserCourseRating(courseId, user?.id);
   const { status, isLoading: statusLoading } = useCoursePersonalStatus(courseId);
 
-  // Show nothing if no user
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   const isLoading = ratingLoading || statusLoading;
   const hasPlayed = status.status === 'played';
-  const hasIntent = status.status === 'want_to_play';
 
   if (isLoading) {
     return (
-      <section className={cn("px-4 py-5 space-y-4", className)}>
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-4 w-4" />
-          <Skeleton className="h-5 w-32" />
-        </div>
-        <Skeleton className="h-24 w-full rounded-xl" />
+      <section style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ height: 18, width: 120, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
+        <div style={{ height: 96, width: '100%', background: 'rgba(15,23,42,0.06)', borderRadius: 12 }} />
       </section>
     );
   }
 
   return (
-    <section className={cn("px-4 py-5 space-y-5", className)}>
-      {/* Section header */}
-      <div className="flex items-center gap-2">
-        <User className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-base font-semibold text-foreground">Your Journey</h3>
+    <section style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Section header — plain bold, no icon */}
+      <div>
+        <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', margin: 0 }}>
+          Your Journey
+        </h3>
       </div>
 
-      {/* Status toggle - always show */}
+      {/* Status toggle */}
       <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
 
-      {/* Personal review card - only if played */}
+      {/* Personal review card — only if played */}
       {hasPlayed && userRating && (
         <PersonalReviewCard courseId={courseId} rating={userRating} />
       )}
 
-      {/* Course moments - only if played */}
+      {/* Course moments — only if played */}
       {hasPlayed && (
         <CourseMoments courseId={courseId} courseName={courseName} />
-      )}
-
-      {/* Planning signals - only if NOT played */}
-      {!hasPlayed && (
-        <PlanningSignals courseId={courseId} courseName={courseName} />
       )}
     </section>
   );

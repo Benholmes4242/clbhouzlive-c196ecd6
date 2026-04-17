@@ -39,20 +39,23 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
       type="button"
       onClick={() => navigate('/golferssharedcourses')}
       style={{
-        width: '100%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 16px',
-        background: 'transparent',
-        border: 'none',
+        padding: '14px 16px',
+        background: '#ffffff',
+        border: '1px solid rgba(15,23,42,0.07)',
+        borderRadius: 12,
+        margin: '0 16px',
+        boxShadow: '0 1px 4px rgba(15,23,42,0.04)',
         cursor: 'pointer',
         textAlign: 'left',
+        width: 'calc(100% - 32px)',
       }}
     >
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
-          Friends who've played
+          Friends who've played here
         </div>
         <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{subtitle}</div>
       </div>
