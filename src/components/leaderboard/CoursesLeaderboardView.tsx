@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useCourseLeaderboard, CourseSortType } from '@/hooks/useCourseLeaderboard';
 import { useSpotlightCourse } from '@/hooks/useSpotlightCourse';
-import { useDailyEditorial, type EditorialCopy } from '@/hooks/championship/useDailyEditorial';
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
