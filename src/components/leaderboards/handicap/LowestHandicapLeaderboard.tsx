@@ -2,11 +2,11 @@
  * LowestHandicapLeaderboard — Front Page composition.
  *
  * ⚠️ INVERTED TREND COLOURS ON THIS SURFACE ⚠️
- * Lower handicap is better. The TrendArrow component below uses semantic
- * direction props ('improving' | 'drifting' | 'steady') — never 'up'/'down'
- * — to prevent accidental colour inversion regressions:
- *   - improving → ↓ green  (#15803D)  (handicap decreased)
- *   - drifting  → ↑ crimson (#9F1D1D) (handicap increased)
+ * Lower handicap is better. Anywhere we render a handicap delta we use the
+ * semantic direction ('improving' | 'drifting' | 'steady') — never 'up'/'down' —
+ * to prevent accidental colour-inversion regressions:
+ *   - improving → ↓ green   (#15803D)  (handicap decreased)
+ *   - drifting  → ↑ crimson (#9F1D1D)  (handicap increased)
  *   - steady    → — grey
  * This is the OPPOSITE of every other leaderboard surface. Do not "fix" it.
  */

@@ -166,10 +166,19 @@ export function HandicapTab() {
     } catch {}
   };
 
+  // First-paint fallback: bias toward the most common landing spot rather
+  // than the alphabetic 'top100', so the brief flash before resolution
+  // settles is a near-match instead of a jarring jump.
+  // - has home club  → 'club' (most users land here once club has ≥5 members)
+  // - has handicap   → 'similar' (universal fallback)
+  // - otherwise      → 'top100'
+  const fallbackPeerGroup: PeerGroup =
+    userHomeClubId ? 'club' : userHandicap !== null ? 'similar' : 'top100';
+
   return (
     <div>
       <LowestHandicapLeaderboard
-        peerGroup={peerGroup ?? 'top100'}
+        peerGroup={peerGroup ?? fallbackPeerGroup}
         onPeerGroupChange={setPeerGroup}
         userHomeClubId={userHomeClubId}
         userHomeClubName={userHomeClubName}
