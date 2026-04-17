@@ -1000,7 +1000,7 @@ export function LowestHandicapLeaderboard({
               const isYou = p.user_id === user?.id;
               const tier = getHandicapTier(p.handicap_index);
               // Per-row trend not yet available from RPC — render 'steady' for now (Phase 2)
-              const trend: 'improving' | 'drifting' | 'steady' = 'steady';
+              const trend: 'improving' | 'drifting' | 'steady' = 'steady' as 'improving' | 'drifting' | 'steady';
 
               return (
                 <div
