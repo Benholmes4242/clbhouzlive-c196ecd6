@@ -97,23 +97,23 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
 
         {/* Top — eyebrow + live badge */}
         <div style={{ position: 'absolute', top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 14px)', left: 16, right: 16 }}>
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: 15, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             ⚡ {tournament.tour_full_name?.toUpperCase() ?? 'PGA TOUR'}
           </span>
         </div>
 
         {/* Bottom — location + tournament name */}
         <div style={{ position: 'absolute', bottom: 0, left: 16, right: 16, paddingBottom: 14 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: '0 0 6px' }}>
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: '0 0 6px' }}>
             {tournament.name}
           </h1>
           {(tournament.venue_city || tournament.venue_country) && (
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginBottom: 2 }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginBottom: 2 }}>
               {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
             </div>
           )}
           {dateRange && (
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>
               {dateRange}
             </div>
           )}
@@ -130,7 +130,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         ].map((s, i) => (
           <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
             <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>{s.label}</div>
-            <div style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, padding: '0 4px' }}>{s.value}</div>
+            <div style={{ fontSize: '14px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, padding: '0 4px' }}>{s.value}</div>
           </div>
         ))}
       </div>
