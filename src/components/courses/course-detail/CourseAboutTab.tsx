@@ -162,6 +162,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
       </div>
 
+      <div style={{ margin: '24px 0' }}><Divider /></div>
+
       {/* 3. Your Journey — PersonalSection renders its own "Your Journey" heading, no SectionLabel */}
       {user && (
         <>
@@ -173,11 +175,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {/* 4. Friends Who've Played */}
-      <section>
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
-      </section>
+      <CourseFriendsStrip courseId={course.id} courseName={course.name} />
 
-      <div style={{ margin: '24px 0' }}><Divider /></div>
 
       {/* 5. About */}
       {course.description && (
