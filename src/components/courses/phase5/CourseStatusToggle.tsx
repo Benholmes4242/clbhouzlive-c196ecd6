@@ -1,10 +1,8 @@
 /**
- * CourseStatusToggle - Pinpoint CTA buttons
- * Mark Played: Primary Dark (orange gradient when played)
- * Want to Play: Secondary Outline (orange tint when active)
+ * CourseStatusToggle - Equal-width pill buttons for course status
  */
 import React from 'react';
-import { Check, Bookmark, Loader2, Sparkles } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
@@ -67,28 +65,28 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   return (
     <div className={cn("space-y-3", className)}>
-      <div className="flex flex-wrap gap-2">
-        {/* Mark Played — Primary Dark; orange gradient when already played */}
+      <div style={{ display: 'flex', gap: 8 }}>
+        {/* Mark Played — white/dark border by default; amber gradient when played */}
         <button
           onClick={handlePlayedClick}
           disabled={isUpdating}
           style={{
-            height: 42,
-            paddingLeft: 20,
-            paddingRight: 20,
-            borderRadius: 10,
-            fontSize: 14,
+            flex: 1,
+            padding: '12px 0',
+            borderRadius: 12,
+            fontSize: 13,
             fontWeight: 700,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
+            justifyContent: 'center',
+            gap: 6,
             background: isPlayed
               ? 'linear-gradient(90deg, #F59E0B, #F7931E)'
-              : 'linear-gradient(90deg, #F59E0B, #F7931E)',
-            color: '#fff',
-            border: 'none',
-            boxShadow: '0 3px 12px rgba(247,147,30,0.28)',
+              : '#ffffff',
+            color: isPlayed ? '#fff' : '#0F172A',
+            border: isPlayed ? 'none' : '1.5px solid rgba(15,23,42,0.12)',
+            boxShadow: isPlayed ? '0 3px 12px rgba(247,147,30,0.28)' : 'none',
             transition: 'all 0.18s ease',
           }}
         >
@@ -96,45 +94,43 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
           {isPlayed ? 'Played' : 'Mark as Played'}
         </button>
 
-        {/* Want to Play — Outline with orange tint when active */}
+        {/* Want to Play — dark when active */}
         <button
           onClick={handleWantToPlayClick}
           disabled={isUpdating || isPlayed}
           style={{
-            height: 42,
-            paddingLeft: 20,
-            paddingRight: 20,
-            borderRadius: 10,
-            fontSize: 14,
-            fontWeight: 600,
+            flex: 1,
+            padding: '12px 0',
+            borderRadius: 12,
+            fontSize: 13,
+            fontWeight: 700,
             cursor: isPlayed ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
-            background: isWantToPlay ? 'rgba(245,158,11,0.06)' : 'transparent',
-            color: isWantToPlay ? '#F7931E' : 'hsl(var(--foreground))',
-            border: isWantToPlay ? '1.5px solid #F59E0B' : '1.5px solid hsl(var(--border))',
+            justifyContent: 'center',
+            gap: 6,
+            background: isWantToPlay ? '#0F172A' : '#ffffff',
+            color: isWantToPlay ? '#ffffff' : '#0F172A',
+            border: isWantToPlay ? 'none' : '1.5px solid rgba(15,23,42,0.12)',
             opacity: isPlayed ? 0.35 : 1,
             transition: 'all 0.18s ease',
           }}
         >
-          {isUpdating
-            ? <Loader2 className="h-4 w-4 animate-spin" />
-            : <Bookmark className={cn('h-4 w-4', isWantToPlay && 'fill-[#F7931E]')} />}
-          Want to Play
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            isWantToPlay ? '🔖 Saved' : 'Want to Play'
+          )}
         </button>
       </div>
 
       {hasNoSelection && (
-        <div className="flex items-start gap-2 text-xs text-muted-foreground">
-          <Sparkles className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
-          <p>
-            Every course you mark becomes part of your journey — view them anytime on your{' '}
-            <Link to="/map" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
-              map
-            </Link>.
-          </p>
-        </div>
+        <p style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5, margin: 0 }}>
+          Every course you mark becomes part of your journey — view them anytime on your{' '}
+          <Link to="/map" style={{ color: '#64748B', textDecoration: 'underline', textUnderlineOffset: 2 }}>
+            map
+          </Link>.
+        </p>
       )}
     </div>
   );

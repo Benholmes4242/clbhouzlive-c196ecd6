@@ -1,32 +1,48 @@
 /**
- * PersonalReviewCard - User's own review display with premium styling
- * Features circular score ring and mini progress bars for categories
+ * PersonalReviewCard - User's own review display, flat white card
  */
 import React, { useState } from 'react';
 import { Pencil, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { getScoreRingColors, getTierKeyFromScore } from '@/hooks/useTierStyles';
+import { getScoreRingColors } from '@/hooks/useTierStyles';
 
-// ReviewText component with line clamping and "Read more"
+// ReviewText component with line clamping
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
   const [expanded, setExpanded] = useState(false);
   const needsClamp = text.length > 180;
-  
+
   return (
-    <div className="pt-4 border-t border-border">
-      <p className={cn(
-        "text-sm text-muted-foreground leading-relaxed italic whitespace-pre-wrap",
-        !expanded && needsClamp && "line-clamp-4"
-      )}>
+    <div style={{ paddingTop: 14, borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <p
+        style={{
+          fontSize: 13,
+          lineHeight: 1.55,
+          color: '#475569',
+          fontStyle: 'italic',
+          margin: 0,
+          whiteSpace: 'pre-wrap',
+          display: !expanded && needsClamp ? '-webkit-box' : 'block',
+          WebkitLineClamp: !expanded && needsClamp ? 4 : 'unset',
+          WebkitBoxOrient: 'vertical',
+          overflow: !expanded && needsClamp ? 'hidden' : 'visible',
+        }}
+      >
         "{text}"
       </p>
       {needsClamp && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98] min-h-[44px] flex items-center"
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#94A3B8',
+            padding: '6px 0 0',
+          }}
         >
           {expanded ? 'Show less' : 'Read more'}
         </button>
@@ -42,20 +58,16 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 10) * circumference;
   const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
-  
+
   return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg className="w-full h-full -rotate-90">
-        <circle 
-          cx={size / 2} cy={size / 2} r={radius} 
-          fill="none" stroke="rgba(245,158,11,0.06)" strokeWidth="6" 
-        />
-        <circle 
-          cx={size / 2} cy={size / 2} r={radius} 
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(245,158,11,0.08)" strokeWidth="6" />
+        <circle
+          cx={size / 2} cy={size / 2} r={radius}
           fill="none" stroke={`url(#${gradientId})`}
           strokeWidth="6" strokeLinecap="round"
           strokeDasharray={`${progress} ${circumference}`}
-          className="transition-all duration-700 ease-out"
         />
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
@@ -64,8 +76,10 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
           </linearGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-2xl font-bold text-foreground">{score.toFixed(1)}</span>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+          {score.toFixed(1)}
+        </span>
       </div>
     </div>
   );
@@ -80,7 +94,6 @@ interface PersonalReviewCardProps {
 export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   courseId,
   rating,
-  className,
 }) => {
   const navigate = useNavigate();
 
@@ -98,48 +111,69 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
     { label: 'Facilities', score: rating.facilities_score },
   ].filter((c): c is { label: string; score: number } => c.score !== null);
 
+  const highlightCategories = categories
+    .filter(c => c.score >= 9.0)
+    .map(c => c.label);
+
   return (
-    <div className={cn(
-      "bg-gradient-to-br from-card to-muted/50 rounded-2xl border border-border overflow-hidden",
-      className
-    )}>
-      {/* Header with date */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+    <div
+      style={{
+        background: '#ffffff',
+        border: '1px solid rgba(15,23,42,0.07)',
+        borderRadius: 14,
+        boxShadow: '0 1px 6px rgba(15,23,42,0.05)',
+        padding: 18,
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
-          <h3 className="text-base font-semibold text-foreground">Your Rating</h3>
-          <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5" />
+          <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', margin: 0 }}>Your Rating</h3>
+          <p style={{ fontSize: 11, color: '#94A3B8', margin: '3px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Calendar style={{ width: 12, height: 12 }} />
             Played on {dateLabel}
           </p>
         </div>
-        <button 
+        <button
           onClick={handleEditClick}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors active:scale-[0.98] min-h-[44px] min-w-[44px] justify-center"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 12,
+            fontWeight: 600,
+            color: '#64748B',
+            padding: 4,
+          }}
         >
-          <Pencil className="w-4 h-4" />
+          <Pencil style={{ width: 12, height: 12 }} />
           Edit
         </button>
       </div>
-      
-      {/* Large score with ring + category breakdown */}
-      <div className="flex items-center gap-6 px-5 pb-4">
+
+      {/* Score ring + category breakdown */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: highlightCategories.length > 0 || rating.review ? 14 : 0 }}>
         <ScoreRing score={rating.rating} size={80} />
-        
-        {/* Category breakdown as mini bars */}
         {categories.length > 0 && (
-          <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 14, rowGap: 8 }}>
             {categories.map(cat => (
-              <div key={cat.label} className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{cat.label}</span>
-                  <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
+              <div key={cat.label}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                  <span style={{ color: '#94A3B8' }}>{cat.label}</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                    {cat.score.toFixed(1)}
+                  </span>
                 </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
-                  <div 
-                    className="h-full rounded-full transition-all duration-500"
+                <div style={{ height: 4, borderRadius: 999, overflow: 'hidden', background: 'rgba(245,158,11,0.08)' }}>
+                  <div
                     style={{
+                      height: '100%',
+                      borderRadius: 999,
                       width: `${(cat.score / 10) * 100}%`,
-                      background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                      background: 'linear-gradient(to right, #F59E0B, #F7931E)',
                     }}
                   />
                 </div>
@@ -148,13 +182,33 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
           </div>
         )}
       </div>
-      
-      {/* Review text */}
-      {rating.review && (
-        <div className="px-5 pb-5">
-          <ReviewText text={rating.review} />
+
+      {/* Highlight pills */}
+      {highlightCategories.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: rating.review ? 14 : 0 }}>
+          {highlightCategories.map(label => (
+            <span
+              key={label}
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: '#F7931E',
+                background: 'rgba(247,147,30,0.08)',
+                border: '1px solid rgba(247,147,30,0.2)',
+                padding: '4px 10px',
+                borderRadius: 999,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+              }}
+            >
+              ★ {label}
+            </span>
+          ))}
         </div>
       )}
+
+      {/* Review text */}
+      {rating.review && <ReviewText text={rating.review} />}
     </div>
   );
 };

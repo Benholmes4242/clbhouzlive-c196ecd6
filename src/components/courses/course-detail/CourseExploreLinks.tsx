@@ -90,22 +90,6 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
 
   return (
     <div>
-      {/* Section header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', marginBottom: 6 }}>
-        <div style={{ width: 3, height: 13, background: '#0F172A', borderRadius: 1 }} />
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 900,
-            color: '#0F172A',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase' as const,
-          }}
-        >
-          Explore More
-        </span>
-      </div>
-
       {links.map((l, i) => (
         <div key={i}>
           <button
@@ -116,7 +100,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '14px 16px',
+              padding: '14px 28px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
@@ -126,9 +110,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
             <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>{l.label}</span>
             <span style={{ fontSize: 16, color: '#CBD5E1' }}>›</span>
           </button>
-          {i < links.length - 1 && (
-            <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px' }} />
-          )}
+          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px' }} />
         </div>
       ))}
     </div>
