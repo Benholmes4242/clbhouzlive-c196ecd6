@@ -568,8 +568,12 @@ async function buildCoursesSnapshot(
     p_sort_by: 'rating',
     p_sort_order: 'desc',
     p_time_period: 'all_time',
+    p_current_user_id: null,
     p_limit: 30,
     p_offset: 0,
+    p_country: null,
+    p_sub_country: null,
+    p_exclude_countries: null,
   });
   if (error) throw error;
 
