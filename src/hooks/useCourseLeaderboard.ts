@@ -13,6 +13,7 @@ export type CourseLeaderboardEntry = {
   list_slug: LeaderboardScope | string;
   times_played: number;
   avg_rating: number | null;
+  rating_count: number;
   global_rank: number | null;
   regional_rank: number | null;
   usa_rank: number | null;
