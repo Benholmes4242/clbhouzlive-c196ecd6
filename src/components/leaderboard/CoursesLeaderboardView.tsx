@@ -325,7 +325,7 @@ export function CoursesLeaderboardView() {
 
   // ─── Personalised eyebrow ──────────────────────────────────────────
   const personalisedEyebrow = useMemo(() => {
-    const fallback = editorial?.eyebrow ?? 'THE CLBHOUZ LIST';
+    const fallback = mastheadCopy?.eyebrow ?? 'THE CLBHOUZ LIST';
     const topCircle = circleRecentRounds?.[0] as any;
     const circleActivity = topCircle
       ? {
@@ -343,7 +343,7 @@ export function CoursesLeaderboardView() {
       circleActivity,
       defaultEyebrow: fallback,
     });
-  }, [editorial?.eyebrow, circleRecentRounds, authUser?.id, userPlayedCount, totalInList, bucketListMoved]);
+  }, [mastheadCopy?.eyebrow, circleRecentRounds, authUser?.id, userPlayedCount, totalInList, bucketListMoved]);
 
   // ─── Infinite scroll ───────────────────────────────────────────────
   const sentinelRef = useRef<HTMLDivElement>(null);
