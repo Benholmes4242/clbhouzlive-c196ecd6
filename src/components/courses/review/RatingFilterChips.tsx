@@ -28,6 +28,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
         gap: 6,
         overflowX: 'auto',
         WebkitOverflowScrolling: 'touch',
+        justifyContent: 'center',
       }}
     >
       {FILTER_OPTIONS.map((option) => {
