@@ -969,7 +969,7 @@ export function LowestHandicapLeaderboard({
                 key={i}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '28px 38px 1fr 60px 44px',
+                  gridTemplateColumns: '28px 38px 1fr 56px 64px',
                   alignItems: 'center',
                   padding: '12px 0',
                   borderBottom: '1px solid rgba(15,23,42,0.07)',
@@ -992,7 +992,7 @@ export function LowestHandicapLeaderboard({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '28px 38px 1fr 60px 44px',
+                gridTemplateColumns: '28px 38px 1fr 56px 64px',
                 padding: '10px 0 8px',
                 borderBottom: `1px solid ${INK}`,
                 fontSize: 9,
@@ -1022,7 +1022,7 @@ export function LowestHandicapLeaderboard({
                   onClick={() => handleRowClick(p.user_id)}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '28px 38px 1fr 60px 44px',
+                    gridTemplateColumns: '28px 38px 1fr 56px 64px',
                     alignItems: 'center',
                     padding: '12px 0',
                     borderBottom: isLast
