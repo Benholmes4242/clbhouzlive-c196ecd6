@@ -94,9 +94,9 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
           p_scope: arenaMode,
           p_limit: pageSize,
           p_offset: pageParam as number,
-          p_current_user_id: currentUserId || undefined,
-          p_club_id: arenaMode === 'club' ? clubId : undefined,
-          p_country: arenaMode === 'country' ? country : undefined,
+          p_current_user_id: currentUserId ?? null,
+          p_club_id: arenaMode === 'club' ? clubId ?? null : null,
+          p_country: arenaMode === 'country' ? country ?? null : null,
         });
 
         if (error) throw error;
@@ -143,9 +143,9 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
         p_scope: arenaMode,
         p_limit: pageSize,
         p_offset: pageParam as number,
-        p_current_user_id: currentUserId || undefined,
-        p_club_id: arenaMode === 'club' ? clubId : undefined,
-        p_country: arenaMode === 'country' ? country : undefined,
+        p_current_user_id: currentUserId ?? null,
+        p_club_id: arenaMode === 'club' ? clubId ?? null : null,
+        p_country: arenaMode === 'country' ? country ?? null : null,
       });
 
       if (error) throw error;
