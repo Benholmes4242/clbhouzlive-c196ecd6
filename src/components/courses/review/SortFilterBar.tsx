@@ -23,6 +23,7 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({
   return (
     <section className="px-4 py-3 bg-slate-50">
       <PillTabs
+        className="justify-center"
         options={sortOptions}
         activeId={sortBy}
         onChange={(id) => onSortChange(id as SortOption)}
