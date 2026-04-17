@@ -369,7 +369,7 @@ export function ExplorationTab() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 700,
             color: INK_MUTED,
             letterSpacing: '0.14em',
@@ -397,7 +397,7 @@ export function ExplorationTab() {
         </h1>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 600,
             letterSpacing: '0.32em',
             color: INK_MUTED,
@@ -424,7 +424,7 @@ export function ExplorationTab() {
               background: viewMode === opt.key ? INK : 'transparent',
               color: viewMode === opt.key ? '#fff' : INK_MUTED,
               border: viewMode === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 800,
               letterSpacing: '0.04em',
               cursor: 'pointer',
@@ -441,7 +441,7 @@ export function ExplorationTab() {
       <div style={{ padding: '22px 20px 0' }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 800,
             letterSpacing: '0.28em',
             color: CRIMSON,
@@ -468,7 +468,7 @@ export function ExplorationTab() {
         </h2>
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: INK_MUTED,
             lineHeight: 1.55,
             marginTop: 12,
@@ -553,7 +553,7 @@ export function ExplorationTab() {
               <div>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 800,
                     color: 'rgba(255,255,255,0.5)',
                     letterSpacing: '0.22em',
@@ -564,7 +564,7 @@ export function ExplorationTab() {
                 </div>
                 <div
                   style={{
-                    fontSize: 22,
+                    fontSize: 24,
                     fontWeight: 900,
                     color: '#fff',
                     letterSpacing: '-0.03em',
@@ -577,7 +577,7 @@ export function ExplorationTab() {
               <div style={{ textAlign: 'right' }}>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 800,
                     color: 'rgba(255,255,255,0.5)',
                     letterSpacing: '0.22em',
@@ -588,7 +588,7 @@ export function ExplorationTab() {
                 </div>
                 <div
                   style={{
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: 700,
                     color: AMBER,
                     letterSpacing: '-0.005em',
@@ -629,7 +629,7 @@ export function ExplorationTab() {
                 marginTop: 14,
                 paddingTop: 12,
                 borderTop: '1px solid rgba(255,255,255,0.12)',
-                fontSize: 11,
+                fontSize: 12,
                 color: 'rgba(255,255,255,0.7)',
                 lineHeight: 1.4,
               }}
@@ -651,7 +651,7 @@ export function ExplorationTab() {
           >
             <div
               style={{
-                fontSize: 13,
+                fontSize: 15,
                 color: 'rgba(255,255,255,0.7)',
                 marginBottom: 12,
                 lineHeight: 1.4,
@@ -667,7 +667,7 @@ export function ExplorationTab() {
                 border: 'none',
                 padding: '10px 20px',
                 borderRadius: 4,
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: 800,
                 letterSpacing: '0.06em',
                 cursor: 'pointer',
@@ -700,7 +700,7 @@ export function ExplorationTab() {
               >
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 800,
                     letterSpacing: '0.14em',
                     marginBottom: 4,
@@ -711,7 +711,7 @@ export function ExplorationTab() {
                 </div>
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 700,
                     lineHeight: 1.2,
                     color: isCurrent ? INK : isUnlocked ? INK_FAINT : INK_MUTED,
@@ -760,7 +760,7 @@ export function ExplorationTab() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 9,
+                  fontSize: 10,
                   color: HAIRLINE,
                   fontWeight: 700,
                 }}
@@ -809,7 +809,7 @@ export function ExplorationTab() {
           <div ref={sentinelRef} style={{ height: 1, marginTop: 16 }} />
         )}
         {(isFetchingNextPage || countryIsFetchingNext) && (
-          <div style={{ textAlign: 'center', padding: '12px 0', fontSize: 11, color: INK_FAINT }}>
+          <div style={{ textAlign: 'center', padding: '12px 0', fontSize: 12, color: INK_FAINT }}>
             Loading…
           </div>
         )}
@@ -819,7 +819,7 @@ export function ExplorationTab() {
       <div style={{ padding: '20px 20px 28px', textAlign: 'center' }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             color: INK_FAINT,
             letterSpacing: '0.06em',
             fontStyle: 'italic',
@@ -843,7 +843,7 @@ function BoxStat({ label, value, color }: { label: string; value: string; color:
     <div style={{ textAlign: 'center' }}>
       <div
         style={{
-          fontSize: 8,
+          fontSize: 9,
           fontWeight: 800,
           color: INK_FAINT,
           letterSpacing: '0.18em',
@@ -890,7 +890,7 @@ function ProgressTrack({
       >
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             color: 'rgba(255,255,255,0.65)',
             letterSpacing: '0.02em',
@@ -900,7 +900,7 @@ function ProgressTrack({
         </span>
         <span
           style={{
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 800,
             color: '#fff',
             fontVariantNumeric: 'tabular-nums',
@@ -935,7 +935,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
       <div style={{ width: 18, height: 1, background: INK }} />
-      <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.22em' }}>
+      <span style={{ fontSize: 10, fontWeight: 800, color: INK, letterSpacing: '0.22em' }}>
         {children}
       </span>
       <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
@@ -993,7 +993,7 @@ function PlayerStandings({
               background: scope === s.key ? INK : 'transparent',
               color: scope === s.key ? '#fff' : INK_MUTED,
               border: scope === s.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               cursor: 'pointer',
               fontFamily: 'inherit',
@@ -1032,7 +1032,7 @@ function PlayerStandings({
           gridTemplateColumns: '26px 38px 1fr 28px 38px',
           padding: '10px 0 8px',
           borderBottom: `1px solid ${INK}`,
-          fontSize: 8,
+          fontSize: 9,
           fontWeight: 800,
           color: INK_FAINT,
           letterSpacing: '0.18em',
@@ -1074,7 +1074,7 @@ function PlayerStandings({
       {/* Empty state */}
       {!isLoading && entries.length === 0 && scope === 'friends' && (
         <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-          <p style={{ fontSize: 13, color: INK_FAINT, fontStyle: 'italic', marginBottom: 14 }}>
+          <p style={{ fontSize: 15, color: INK_FAINT, fontStyle: 'italic', marginBottom: 14 }}>
             No friends explored yet.
           </p>
           <button
@@ -1083,7 +1083,7 @@ function PlayerStandings({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 800,
               color: CRIMSON,
               letterSpacing: '0.18em',
@@ -1096,7 +1096,7 @@ function PlayerStandings({
       )}
       {!isLoading && entries.length === 0 && scope !== 'friends' && (
         <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-          <p style={{ fontSize: 13, color: INK_FAINT, fontStyle: 'italic' }}>
+          <p style={{ fontSize: 15, color: INK_FAINT, fontStyle: 'italic' }}>
             No explorers found here yet.
           </p>
         </div>
@@ -1146,7 +1146,7 @@ function PlayerStandings({
             {/* Rank */}
             <span
               style={{
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: 900,
                 color: p.rank <= 3 ? INK : INK_FAINT,
                 fontVariantNumeric: 'tabular-nums lining-nums',
@@ -1168,7 +1168,7 @@ function PlayerStandings({
             <div style={{ minWidth: 0, paddingLeft: 4 }}>
               <div
                 style={{
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: 700,
                   color: INK,
                   letterSpacing: '-0.005em',
@@ -1181,7 +1181,7 @@ function PlayerStandings({
                 {isYou && (
                   <span
                     style={{
-                      fontSize: 8,
+                      fontSize: 9,
                       fontWeight: 800,
                       color: CRIMSON,
                       letterSpacing: '0.18em',
@@ -1192,7 +1192,7 @@ function PlayerStandings({
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 10, color: INK_FAINT, marginTop: 1 }}>
+              <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 1 }}>
                 {p.home_club || 'Independent'}
               </div>
             </div>
@@ -1201,7 +1201,7 @@ function PlayerStandings({
             <span
               style={{
                 textAlign: 'right',
-                fontSize: 13,
+                fontSize: 15,
                 fontWeight: 800,
                 color: INK_MUTED,
                 fontVariantNumeric: 'tabular-nums lining-nums',
@@ -1213,7 +1213,7 @@ function PlayerStandings({
             {/* Countries */}
             <span
               style={{
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: 900,
                 textAlign: 'right',
                 color: INK,
@@ -1247,7 +1247,7 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
           gridTemplateColumns: '26px 28px 1fr 60px',
           padding: '10px 0 8px',
           borderBottom: `1px solid ${INK}`,
-          fontSize: 8,
+          fontSize: 9,
           fontWeight: 800,
           color: INK_FAINT,
           letterSpacing: '0.18em',
@@ -1285,7 +1285,7 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
 
       {!isLoading && countries.length === 0 && (
         <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-          <p style={{ fontSize: 13, color: INK_FAINT, fontStyle: 'italic' }}>
+          <p style={{ fontSize: 15, color: INK_FAINT, fontStyle: 'italic' }}>
             No countries have been explored yet.
           </p>
         </div>
@@ -1317,7 +1317,7 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
           >
             <span
               style={{
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: 900,
                 color: i < 3 ? INK : INK_FAINT,
                 fontVariantNumeric: 'tabular-nums lining-nums',
@@ -1346,7 +1346,7 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
             <div style={{ paddingLeft: 4, minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: 700,
                   color: INK,
                   letterSpacing: '-0.005em',
@@ -1359,7 +1359,7 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
                 {userPlayedHere && (
                   <span
                     style={{
-                      fontSize: 8,
+                      fontSize: 9,
                       fontWeight: 800,
                       color: AMBER,
                       letterSpacing: '0.14em',
@@ -1370,14 +1370,14 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 10, color: INK_FAINT, marginTop: 1 }}>
+              <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 1 }}>
                 {continent}
               </div>
             </div>
 
             <span
               style={{
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: 900,
                 textAlign: 'right',
                 color: INK,

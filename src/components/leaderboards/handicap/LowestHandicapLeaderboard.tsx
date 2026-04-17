@@ -389,7 +389,7 @@ export function LowestHandicapLeaderboard({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 700,
             color: INK_MUTED,
             letterSpacing: '0.14em',
@@ -414,7 +414,7 @@ export function LowestHandicapLeaderboard({
         </h1>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 600,
             letterSpacing: '0.32em',
             color: INK_MUTED,
@@ -441,7 +441,7 @@ export function LowestHandicapLeaderboard({
                 background: isActive ? INK : 'transparent',
                 color: isActive ? '#fff' : opt.available ? INK_MUTED : HAIRLINE,
                 border: isActive ? 'none' : '1px solid rgba(15,23,42,0.15)',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 800,
                 letterSpacing: '0.03em',
                 cursor: opt.available ? 'pointer' : 'not-allowed',
@@ -460,7 +460,7 @@ export function LowestHandicapLeaderboard({
       <div style={{ padding: '22px 20px 0' }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 800,
             letterSpacing: '0.28em',
             color: CRIMSON,
@@ -491,7 +491,7 @@ export function LowestHandicapLeaderboard({
         </h2>
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: INK_MUTED,
             lineHeight: 1.55,
             marginTop: 12,
@@ -520,7 +520,7 @@ export function LowestHandicapLeaderboard({
           <div style={{ textAlign: 'center' }}>
             <div
               style={{
-                fontSize: 8,
+                fontSize: 9,
                 fontWeight: 800,
                 color: INK_FAINT,
                 letterSpacing: '0.18em',
@@ -548,7 +548,7 @@ export function LowestHandicapLeaderboard({
           <div style={{ textAlign: 'center' }}>
             <div
               style={{
-                fontSize: 8,
+                fontSize: 9,
                 fontWeight: 800,
                 color: INK_FAINT,
                 letterSpacing: '0.18em',
@@ -576,7 +576,7 @@ export function LowestHandicapLeaderboard({
           <div style={{ textAlign: 'center' }}>
             <div
               style={{
-                fontSize: 8,
+                fontSize: 9,
                 fontWeight: 800,
                 color: INK_FAINT,
                 letterSpacing: '0.18em',
@@ -645,7 +645,7 @@ export function LowestHandicapLeaderboard({
               <div>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 800,
                     color: 'rgba(255,255,255,0.5)',
                     letterSpacing: '0.22em',
@@ -656,7 +656,7 @@ export function LowestHandicapLeaderboard({
                 </div>
                 <div
                   style={{
-                    fontSize: 22,
+                    fontSize: 24,
                     fontWeight: 900,
                     color: '#fff',
                     letterSpacing: '-0.03em',
@@ -669,7 +669,7 @@ export function LowestHandicapLeaderboard({
               <div style={{ textAlign: 'right' }}>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 800,
                     color: 'rgba(255,255,255,0.5)',
                     letterSpacing: '0.22em',
@@ -680,7 +680,7 @@ export function LowestHandicapLeaderboard({
                 </div>
                 <div
                   style={{
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: 900,
                     letterSpacing: '-0.02em',
                     color:
@@ -705,7 +705,7 @@ export function LowestHandicapLeaderboard({
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  fontSize: 8,
+                  fontSize: 9,
                   color: 'rgba(255,255,255,0.4)',
                   letterSpacing: '0.04em',
                   marginTop: 4,
@@ -730,7 +730,7 @@ export function LowestHandicapLeaderboard({
               <div style={{ textAlign: 'center' }}>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 700,
                     color: 'rgba(255,255,255,0.4)',
                     letterSpacing: '0.22em',
@@ -741,7 +741,7 @@ export function LowestHandicapLeaderboard({
                 </div>
                 <div
                   style={{
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: 900,
                     color: AMBER,
                     letterSpacing: '-0.02em',
@@ -755,7 +755,7 @@ export function LowestHandicapLeaderboard({
               <div style={{ textAlign: 'center' }}>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 700,
                     color: 'rgba(255,255,255,0.4)',
                     letterSpacing: '0.22em',
@@ -766,7 +766,7 @@ export function LowestHandicapLeaderboard({
                 </div>
                 <div
                   style={{
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: 900,
                     color: '#fff',
                     letterSpacing: '-0.02em',
@@ -780,7 +780,7 @@ export function LowestHandicapLeaderboard({
               <div style={{ textAlign: 'center' }}>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 700,
                     color: 'rgba(255,255,255,0.4)',
                     letterSpacing: '0.22em',
@@ -791,7 +791,7 @@ export function LowestHandicapLeaderboard({
                 </div>
                 <div
                   style={{
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: 900,
                     color: 'rgba(255,255,255,0.7)',
                     letterSpacing: '-0.02em',
@@ -812,7 +812,7 @@ export function LowestHandicapLeaderboard({
           <div style={{ width: 18, height: 1, background: INK }} />
           <span
             style={{
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: 800,
               color: INK,
               letterSpacing: '0.22em',
@@ -839,7 +839,7 @@ export function LowestHandicapLeaderboard({
               >
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: 800,
                     letterSpacing: '0.12em',
                     marginBottom: 4,
@@ -850,7 +850,7 @@ export function LowestHandicapLeaderboard({
                 </div>
                 <div
                   style={{
-                    fontSize: 9,
+                    fontSize: 10,
                     fontWeight: 700,
                     lineHeight: 1.2,
                     color: isCurrent ? INK : INK_MUTED,
@@ -870,7 +870,7 @@ export function LowestHandicapLeaderboard({
           <div style={{ width: 18, height: 1, background: INK }} />
           <span
             style={{
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: 800,
               color: INK,
               letterSpacing: '0.22em',
@@ -886,7 +886,7 @@ export function LowestHandicapLeaderboard({
           <div style={{ padding: '40px 20px', textAlign: 'center' }}>
             <p
               style={{
-                fontSize: 13,
+                fontSize: 15,
                 color: INK_FAINT,
                 fontStyle: 'italic',
                 marginBottom: 14,
@@ -900,7 +900,7 @@ export function LowestHandicapLeaderboard({
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: 800,
                 color: CRIMSON,
                 letterSpacing: '0.18em',
@@ -917,7 +917,7 @@ export function LowestHandicapLeaderboard({
           <div style={{ padding: '40px 20px', textAlign: 'center' }}>
             <p
               style={{
-                fontSize: 13,
+                fontSize: 15,
                 color: INK_FAINT,
                 fontStyle: 'italic',
                 marginBottom: 14,
@@ -931,7 +931,7 @@ export function LowestHandicapLeaderboard({
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: 800,
                 color: CRIMSON,
                 letterSpacing: '0.18em',
@@ -977,7 +977,7 @@ export function LowestHandicapLeaderboard({
                 gridTemplateColumns: '28px 38px 1fr 60px 44px',
                 padding: '10px 0 8px',
                 borderBottom: `1px solid ${INK}`,
-                fontSize: 8,
+                fontSize: 9,
                 fontWeight: 800,
                 color: INK_FAINT,
                 letterSpacing: '0.18em',
@@ -1035,7 +1035,7 @@ export function LowestHandicapLeaderboard({
                   {/* POS */}
                   <span
                     style={{
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: 900,
                       color: p.rank <= 3 ? INK : INK_FAINT,
                       fontVariantNumeric: 'tabular-nums lining-nums',
@@ -1057,7 +1057,7 @@ export function LowestHandicapLeaderboard({
                   <div style={{ minWidth: 0, paddingLeft: 4 }}>
                     <div
                       style={{
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: 700,
                         color: INK,
                         letterSpacing: '-0.005em',
@@ -1070,7 +1070,7 @@ export function LowestHandicapLeaderboard({
                       {isYou && (
                         <span
                           style={{
-                            fontSize: 8,
+                            fontSize: 9,
                             fontWeight: 800,
                             color: CRIMSON,
                             letterSpacing: '0.18em',
@@ -1083,7 +1083,7 @@ export function LowestHandicapLeaderboard({
                     </div>
                     <div
                       style={{
-                        fontSize: 10,
+                        fontSize: 11,
                         color: INK_FAINT,
                         marginTop: 1,
                         overflow: 'hidden',
@@ -1099,7 +1099,7 @@ export function LowestHandicapLeaderboard({
                   <span
                     style={{
                       textAlign: 'right',
-                      fontSize: 8,
+                      fontSize: 9,
                       fontWeight: 800,
                       color: INK_MUTED,
                       letterSpacing: '0.12em',
@@ -1112,7 +1112,7 @@ export function LowestHandicapLeaderboard({
                   {/* HCP */}
                   <span
                     style={{
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: 900,
                       textAlign: 'right',
                       color: INK,
@@ -1138,7 +1138,7 @@ export function LowestHandicapLeaderboard({
       <div style={{ padding: '20px 20px 28px', textAlign: 'center' }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             color: INK_FAINT,
             letterSpacing: '0.06em',
             fontStyle: 'italic',
