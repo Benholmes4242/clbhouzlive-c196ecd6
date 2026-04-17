@@ -104,14 +104,13 @@ const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 const RowSkeleton = () => (
-  <div style={{ padding: '12px 0', display: 'grid', gridTemplateColumns: '26px 48px 1fr 18px 44px', gap: 4, alignItems: 'center', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+  <div style={{ padding: '12px 0', display: 'grid', gridTemplateColumns: '26px 48px 1fr 44px', gap: 4, alignItems: 'center', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
     <Skeleton style={{ height: 16, width: 20 }} />
     <Skeleton style={{ height: 40, width: 40, borderRadius: 3 }} />
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <Skeleton style={{ height: 14, width: '70%' }} />
       <Skeleton style={{ height: 10, width: '40%' }} />
     </div>
-    <Skeleton style={{ height: 12, width: 12 }} />
     <Skeleton style={{ height: 18, width: 36, marginLeft: 'auto' }} />
   </div>
 );
@@ -354,7 +353,7 @@ export function CoursesLeaderboardView() {
   }, [allCourses.length]);
 
   // ─── Editorial fallback (deterministic) ────────────────────────────
-  const editorialDisplay = editorial ?? {
+  const editorialDisplay: Pick<EditorialCopy, 'eyebrow' | 'headline' | 'headlineTwo' | 'standfirst'> = editorial ?? {
     eyebrow: 'THE CLBHOUZ LIST',
     headline: "The world's greatest",
     headlineTwo: 'courses, ranked.',
@@ -462,8 +461,22 @@ export function CoursesLeaderboardView() {
       </div>
 
       {/* ── THIS SEASON'S HOTTEST ───────────────────────────────── */}
-      {!spotlightLoading && spotlight && (
-        <div style={{ padding: '20px 20px 0' }}>
+      <div style={{ padding: '20px 20px 0' }}>
+        {spotlightLoading ? (
+          <div style={{
+            width: '100%', height: 260, background: '#0F172A', borderRadius: 4,
+            position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: 160,
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+            }} />
+            <div style={{ padding: '180px 18px 14px' }}>
+              <Skeleton style={{ height: 22, width: '65%', marginBottom: 6 }} />
+              <Skeleton style={{ height: 11, width: '40%' }} />
+            </div>
+          </div>
+        ) : spotlight ? (
           <button
             onClick={() => handleCourseClick(spotlight.course_id)}
             style={{
@@ -521,8 +534,8 @@ export function CoursesLeaderboardView() {
               </div>
             </div>
           </button>
-        </div>
-      )}
+        ) : null}
+      </div>
 
       {/* ── BY REGION ────────────────────────────────────────────── */}
       <div style={{ padding: '22px 20px 0' }}>
@@ -628,9 +641,9 @@ export function CoursesLeaderboardView() {
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
 
-        {/* Column headers */}
+        {/* Column headers — trend column hidden until snapshot infra lands (FIX 1) */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '26px 48px 1fr 18px 44px',
+          display: 'grid', gridTemplateColumns: '26px 48px 1fr 44px',
           padding: '10px 0 8px',
           borderBottom: '1px solid #0F172A',
           fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em',
@@ -639,7 +652,6 @@ export function CoursesLeaderboardView() {
           <span>POS</span>
           <span />
           <span>COURSE</span>
-          <span />
           <span style={{ textAlign: 'right' }}>RATING</span>
         </div>
 
@@ -664,7 +676,7 @@ export function CoursesLeaderboardView() {
                 onClick={() => handleCourseClick(c.course_id)}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '26px 48px 1fr 18px 44px',
+                  gridTemplateColumns: '26px 48px 1fr 44px',
                   alignItems: 'center',
                   padding: '12px 0',
                   borderBottom: isLast ? '1px solid #0F172A' : '1px solid rgba(15,23,42,0.07)',
@@ -681,27 +693,14 @@ export function CoursesLeaderboardView() {
                   {c.rank}
                 </span>
 
-                {/* Thumbnail */}
+                {/* Thumbnail (FIX 5: removed redundant played badge — amber PLAYED text below carries the signal) */}
                 <div style={{
                   width: 40, height: 40, borderRadius: 3,
                   background: c.thumbnail_url
                     ? `url(${c.thumbnail_url}) center/cover`
                     : 'linear-gradient(135deg, #2d5a3d, #1a3d2e)',
                   border: '1px solid rgba(15,23,42,0.08)',
-                  position: 'relative',
-                  overflow: 'visible',
-                }}>
-                  {c.current_user_played && (
-                    <div style={{
-                      position: 'absolute', top: -3, right: -3,
-                      width: 14, height: 14, borderRadius: '50%',
-                      background: '#F7931E',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 8, color: '#fff', fontWeight: 900,
-                      border: '1.5px solid #FAFAF6',
-                    }}>✓</div>
-                  )}
-                </div>
+                }} />
 
                 {/* Name + location */}
                 <div style={{ minWidth: 0, paddingLeft: 4 }}>
@@ -723,11 +722,6 @@ export function CoursesLeaderboardView() {
                     {' · '}{c.times_played} {c.times_played === 1 ? 'play' : 'plays'}
                   </div>
                 </div>
-
-                {/* Trend */}
-                <span style={{ textAlign: 'center' }}>
-                  <TrendArrow change={c.rank_change} />
-                </span>
 
                 {/* Rating */}
                 <span style={{
