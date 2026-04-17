@@ -539,7 +539,7 @@ export function PlayersTab() {
         const champPhotoUrl = getPlayerHeadshotUrl(champion.playerName, champion.tourCode ?? 'pga');
 
         return (
-          <div style={{ padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0', background: '#F8FAFC' }}>
+          <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
             {/* ── MASTHEAD ── */}
             <div style={{ borderBottom: '2px solid #0F172A', paddingBottom: '10px', marginBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
