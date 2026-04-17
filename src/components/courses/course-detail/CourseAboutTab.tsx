@@ -162,6 +162,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
       </div>
 
+      <div style={{ margin: '24px 0' }}><Divider /></div>
+
       {/* 3. Your Journey — PersonalSection renders its own "Your Journey" heading, no SectionLabel */}
       {user && (
         <>
