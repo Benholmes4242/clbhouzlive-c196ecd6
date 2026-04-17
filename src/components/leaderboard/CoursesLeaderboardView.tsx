@@ -74,12 +74,12 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 16px', textAlign: 'center' }}>
     <WifiOff style={{ width: 48, height: 48, color: '#94A3B8', marginBottom: 16 }} />
     <p style={{ color: '#0F172A', fontWeight: 600, marginBottom: 4 }}>Unable to load course rankings</p>
-    <p style={{ fontSize: 14, color: '#64748B', marginBottom: 16 }}>Check your connection and try again</p>
+    <p style={{ fontSize: 16, color: '#64748B', marginBottom: 16 }}>Check your connection and try again</p>
     <button
       onClick={onRetry}
       style={{
         padding: '10px 24px', borderRadius: 4, background: '#0F172A',
-        color: '#fff', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
+        color: '#fff', fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
       }}
     >
       Retry
@@ -94,7 +94,7 @@ const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
       style={{
         width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         padding: '14px', borderRadius: 4, background: '#fff', border: '1px solid rgba(15,23,42,0.10)',
-        color: '#64748B', fontSize: 13, cursor: 'pointer',
+        color: '#64748B', fontSize: 15, cursor: 'pointer',
       }}
     >
       <RefreshCw style={{ width: 14, height: 14 }} />
@@ -366,7 +366,7 @@ export function CoursesLeaderboardView() {
 
       {/* ── MASTHEAD ─────────────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 14px', borderBottom: '3px double #0F172A', textAlign: 'center', background: '#F8FAFC' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 9, fontWeight: 700, color: '#64748B', letterSpacing: '0.14em', marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, fontWeight: 700, color: '#64748B', letterSpacing: '0.14em', marginBottom: 12 }}>
           <span>VOL · MMXXVI</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#9F1D1D' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9F1D1D' }} />
@@ -377,7 +377,7 @@ export function CoursesLeaderboardView() {
         <h1 style={{ fontSize: 38, fontWeight: 900, letterSpacing: '-0.035em', margin: 0, lineHeight: 0.95, color: '#0F172A' }}>
           The Course Record
         </h1>
-        <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.32em', color: '#64748B', marginTop: 6 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.32em', color: '#64748B', marginTop: 6 }}>
           THE WORLD'S GREATEST COURSES
         </div>
       </div>
@@ -399,7 +399,7 @@ export function CoursesLeaderboardView() {
               background: sort === opt.key ? '#0F172A' : 'transparent',
               color: sort === opt.key ? '#fff' : '#64748B',
               border: sort === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-              fontSize: 11, fontWeight: 800, letterSpacing: '0.04em',
+              fontSize: 12, fontWeight: 800, letterSpacing: '0.04em',
               cursor: 'pointer', transition: 'all 0.15s',
             }}
           >
@@ -410,7 +410,7 @@ export function CoursesLeaderboardView() {
 
       {/* ── FRONT-PAGE LEDE ──────────────────────────────────────── */}
       <div style={{ padding: '22px 20px 0' }}>
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
           {personalisedEyebrow}
         </div>
         <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
@@ -424,7 +424,7 @@ export function CoursesLeaderboardView() {
             </>
           )}
         </h2>
-        <p style={{ fontSize: 12, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
           {editorialDisplay.standfirst}
         </p>
       </div>
@@ -438,21 +438,21 @@ export function CoursesLeaderboardView() {
           alignItems: 'center',
         }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>PLAYED</div>
+            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>PLAYED</div>
             <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
               {userPlayedCount}
             </div>
           </div>
           <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>OF LIST</div>
+            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>OF LIST</div>
             <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
               {pctOfList}<span style={{ fontSize: 18, color: '#475569' }}>%</span>
             </div>
           </div>
           <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>TO GO</div>
+            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>TO GO</div>
             <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#0F172A', fontVariantNumeric: 'tabular-nums lining-nums' }}>
               {totalInList === 0 ? '—' : (toGoCount === 0 ? '—' : toGoCount)}
             </div>
@@ -496,7 +496,7 @@ export function CoursesLeaderboardView() {
             }}>
               <div style={{
                 position: 'absolute', top: 10, left: 10,
-                fontSize: 8, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
+                fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
                 background: 'rgba(0,0,0,0.4)',
                 padding: '4px 8px', borderRadius: 2,
                 backdropFilter: 'blur(6px)',
@@ -506,29 +506,29 @@ export function CoursesLeaderboardView() {
               </div>
             </div>
             <div style={{ padding: '14px 18px' }}>
-              <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 4 }}>
+              <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 4 }}>
                 {spotlight.course_name}
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginBottom: 14 }}>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginBottom: 14 }}>
                 {[spotlight.city, spotlight.country].filter(Boolean).join(', ')}
               </div>
               <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
                     RATING
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {spotlight.avg_rating ? spotlight.avg_rating.toFixed(1) : '—'}
                   </div>
                 </div>
                 <div style={{ width: 1, background: 'rgba(255,255,255,0.12)' }} />
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
                     PLAYS
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {spotlight.total_rounds ?? 0}
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: 700, marginLeft: 4 }}>this season</span>
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, marginLeft: 4 }}>this season</span>
                   </div>
                 </div>
               </div>
@@ -541,7 +541,7 @@ export function CoursesLeaderboardView() {
       <div style={{ padding: '22px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ width: 18, height: 1, background: '#0F172A' }} />
-          <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>BY REGION</span>
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>BY REGION</span>
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
         <div style={{ display: 'flex', gap: 5, overflowX: 'auto', paddingBottom: 2, WebkitOverflowScrolling: 'touch' }}>
@@ -560,7 +560,7 @@ export function CoursesLeaderboardView() {
                 background: quickRegion === r.key ? '#0F172A' : 'transparent',
                 color: quickRegion === r.key ? '#fff' : '#64748B',
                 border: quickRegion === r.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-                fontSize: 10, fontWeight: 700, cursor: 'pointer',
+                fontSize: 11, fontWeight: 700, cursor: 'pointer',
                 flexShrink: 0,
               }}
             >
@@ -575,7 +575,7 @@ export function CoursesLeaderboardView() {
         <div style={{ padding: '22px 20px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <div style={{ width: 18, height: 1, background: '#0F172A' }} />
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
             <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           </div>
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
@@ -603,24 +603,24 @@ export function CoursesLeaderboardView() {
                   }} />
                   <div style={{ padding: '10px 12px' }}>
                     <div style={{
-                      fontSize: 12, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.005em',
+                      fontSize: 13, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.005em',
                       marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
                       {course.name}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ fontSize: 10, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 11, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
                         {player.display_name}
                       </div>
                       <div style={{
-                        fontSize: 11, fontWeight: 900, color: '#F7931E',
+                        fontSize: 12, fontWeight: 900, color: '#F7931E',
                         fontVariantNumeric: 'tabular-nums lining-nums',
                         letterSpacing: '-0.02em', marginLeft: 6, flexShrink: 0,
                       }}>
                         {round.rating?.toFixed(1) ?? '—'}
                       </div>
                     </div>
-                    <div style={{ fontSize: 9, color: '#94A3B8', marginTop: 3 }}>
+                    <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 3 }}>
                       {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`}
                     </div>
                   </div>
@@ -635,7 +635,7 @@ export function CoursesLeaderboardView() {
       <div style={{ padding: '26px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div style={{ width: 18, height: 1, background: '#0F172A' }} />
-          <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>
             THE FULL LIST
           </span>
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
@@ -646,7 +646,7 @@ export function CoursesLeaderboardView() {
           display: 'grid', gridTemplateColumns: '26px 48px 1fr 44px',
           padding: '10px 0 8px',
           borderBottom: '1px solid #0F172A',
-          fontSize: 8, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em',
+          fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em',
           alignItems: 'center',
         }}>
           <span>POS</span>
@@ -662,7 +662,7 @@ export function CoursesLeaderboardView() {
           <>{[...Array(8)].map((_, i) => <RowSkeleton key={i} />)}</>
         ) : allCourses.length === 0 ? (
           <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-            <p style={{ fontSize: 13, color: '#94A3B8', fontStyle: 'italic' }}>
+            <p style={{ fontSize: 15, color: '#94A3B8', fontStyle: 'italic' }}>
               No courses match this view yet.
             </p>
           </div>
@@ -685,7 +685,7 @@ export function CoursesLeaderboardView() {
               >
                 {/* Rank */}
                 <span style={{
-                  fontSize: 16, fontWeight: 900,
+                  fontSize: 18, fontWeight: 900,
                   color: isTop3 ? '#0F172A' : '#94A3B8',
                   fontVariantNumeric: 'tabular-nums lining-nums',
                   letterSpacing: '-0.02em',
@@ -705,19 +705,19 @@ export function CoursesLeaderboardView() {
                 {/* Name + location */}
                 <div style={{ minWidth: 0, paddingLeft: 4 }}>
                   <div style={{
-                    fontSize: 13, fontWeight: 700, color: '#0F172A',
+                    fontSize: 15, fontWeight: 700, color: '#0F172A',
                     letterSpacing: '-0.005em',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {c.course_name}
                     {c.current_user_played && (
                       <span style={{
-                        fontSize: 8, fontWeight: 800, color: '#F7931E',
+                        fontSize: 9, fontWeight: 800, color: '#F7931E',
                         letterSpacing: '0.18em', marginLeft: 6,
                       }}>PLAYED</span>
                     )}
                   </div>
-                  <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 1 }}>
                     {[c.sub_country, c.country].filter(Boolean).join(' · ')}
                     {' · '}{c.times_played} {c.times_played === 1 ? 'play' : 'plays'}
                   </div>
@@ -725,7 +725,7 @@ export function CoursesLeaderboardView() {
 
                 {/* Rating */}
                 <span style={{
-                  fontSize: 20, fontWeight: 900, textAlign: 'right',
+                  fontSize: 22, fontWeight: 900, textAlign: 'right',
                   color: '#0F172A', letterSpacing: '-0.03em',
                   fontVariantNumeric: 'tabular-nums lining-nums',
                 }}>
@@ -750,7 +750,7 @@ export function CoursesLeaderboardView() {
 
       {/* ── FOOTER CAPTION ──────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 32px', textAlign: 'center' }}>
-        <div style={{ fontSize: 9, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic' }}>
+        <div style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic' }}>
           Ranked by community rating across verified rounds · Updated daily
         </div>
       </div>
