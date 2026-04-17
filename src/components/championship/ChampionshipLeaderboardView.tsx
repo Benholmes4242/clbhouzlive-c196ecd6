@@ -968,21 +968,37 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               </span>
 
               {p.avatar_url ? (
-                <SquircleAvatar
-                  src={p.avatar_url}
-                  alt={p.display_name}
-                  size={30}
-                  fallback={initials}
-                />
+                <div
+                  style={{
+                    width: 30,
+                    aspectRatio: '1 / 1.05',
+                    borderRadius: '34%',
+                    overflow: 'hidden',
+                    border: p.is_current_user
+                      ? '0.5px solid #9F1D1D'
+                      : '0.5px solid rgba(15,23,42,0.18)',
+                    background: '#fff',
+                  }}
+                >
+                  <SquircleAvatar
+                    src={p.avatar_url}
+                    alt={p.display_name}
+                    size={30}
+                    fallback={initials}
+                    hideRing
+                  />
+                </div>
               ) : (
                 <div style={{
-                  width: 30, height: 30, borderRadius: 3,
+                  width: 30,
+                  aspectRatio: '1 / 1.05',
+                  borderRadius: '34%',
                   background: getAvatarFallbackColor(p.user_id),
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontSize: 12, fontWeight: 800,
                   border: p.is_current_user
-                    ? '1.5px solid #9F1D1D'
-                    : '1px solid rgba(15,23,42,0.08)',
+                    ? '0.5px solid #9F1D1D'
+                    : '0.5px solid rgba(15,23,42,0.18)',
                 }}>
                   {initials}
                 </div>
