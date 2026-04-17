@@ -1672,6 +1672,7 @@ export type Database = {
           snapshot_data: Json | null
           standfirst: string
           story_type: string
+          surface: string
           time_filter: string
         }
         Insert: {
@@ -1686,6 +1687,7 @@ export type Database = {
           snapshot_data?: Json | null
           standfirst: string
           story_type: string
+          surface?: string
           time_filter: string
         }
         Update: {
@@ -1700,6 +1702,7 @@ export type Database = {
           snapshot_data?: Json | null
           standfirst?: string
           story_type?: string
+          surface?: string
           time_filter?: string
         }
         Relationships: [
@@ -15759,6 +15762,13 @@ export type Database = {
         Returns: {
           is_friend: boolean
           post_id: string
+        }[]
+      }
+      get_global_country_breakdown: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          country: string
+          member_count: number
         }[]
       }
       get_handicap_improvement_leaderboard: {
