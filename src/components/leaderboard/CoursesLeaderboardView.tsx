@@ -6,6 +6,7 @@ import { useDailyEditorial, type EditorialCopy } from '@/hooks/championship/useD
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
 import { RefreshCw, WifiOff } from 'lucide-react';
 
 const PAGE_SIZE = 20;
@@ -161,7 +162,7 @@ export function CoursesLeaderboardView() {
   const allCourses = useMemo(() => data?.pages.flatMap(p => p.entries) ?? [], [data?.pages]);
 
   // ─── Editorial ─────────────────────────────────────────────────────
-  const { data: editorial } = useDailyEditorial({
+  const { data: editorial, isPending: editorialPending } = useDailyEditorial({
     surface: 'courses',
     seasonId: null,
     timeFilter: 'all_time',
@@ -366,13 +367,13 @@ export function CoursesLeaderboardView() {
 
       {/* ── MASTHEAD ─────────────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 14px', borderBottom: '3px double #0F172A', textAlign: 'center', background: '#F8FAFC' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, fontWeight: 700, color: '#64748B', letterSpacing: '0.14em', marginBottom: 12 }}>
-          <span>VOL · MMXXVI</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#9F1D1D' }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9F1D1D' }} />
-            LIVE
-          </span>
-          <span>THE CLBHOUZ LIST</span>
+        <div style={{
+          display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6,
+          fontSize: 11, fontWeight: 800, color: '#9F1D1D', letterSpacing: '0.18em',
+          marginBottom: 12, minHeight: 14,
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9F1D1D' }} />
+          <span>RANKINGS REFRESHED DAILY</span>
         </div>
         <h1 style={{ fontSize: 38, fontWeight: 900, letterSpacing: '-0.035em', margin: 0, lineHeight: 0.95, color: '#0F172A' }}>
           The Course Record
@@ -409,25 +410,29 @@ export function CoursesLeaderboardView() {
       </div>
 
       {/* ── FRONT-PAGE LEDE ──────────────────────────────────────── */}
-      <div style={{ padding: '22px 20px 0' }}>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
-          {personalisedEyebrow}
+      {editorialPending ? (
+        <EditorialLedeSkeleton />
+      ) : (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
+            {personalisedEyebrow}
+          </div>
+          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
+            {editorialDisplay.headline}
+            {editorialDisplay.headlineTwo && (
+              <>
+                <br />
+                <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
+                  {editorialDisplay.headlineTwo}
+                </span>
+              </>
+            )}
+          </h2>
+          <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
+            {editorialDisplay.standfirst}
+          </p>
         </div>
-        <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
-          {editorialDisplay.headline}
-          {editorialDisplay.headlineTwo && (
-            <>
-              <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
-                {editorialDisplay.headlineTwo}
-              </span>
-            </>
-          )}
-        </h2>
-        <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
-          {editorialDisplay.standfirst}
-        </p>
-      </div>
+      )}
 
       {/* ── BOX SCORE ────────────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 0' }}>

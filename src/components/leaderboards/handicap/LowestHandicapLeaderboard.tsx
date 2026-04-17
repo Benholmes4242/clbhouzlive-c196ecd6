@@ -33,6 +33,7 @@ import {
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
 import type { PeerGroup } from './HandicapTab';
 import type { LowestHandicapEntry } from '@/types/leaderboards';
 
