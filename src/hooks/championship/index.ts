@@ -20,3 +20,7 @@ export { usePodiumProximity } from './usePodiumProximity';
 // Season Calendar
 export { useSeasonCalendar } from './useSeasonCalendar';
 export type { Season } from './useSeasonCalendar';
+
+// Daily editorial (Top 100 front page)
+export { useDailyEditorial } from './useDailyEditorial';
+export type { EditorialCopy } from './useDailyEditorial';
