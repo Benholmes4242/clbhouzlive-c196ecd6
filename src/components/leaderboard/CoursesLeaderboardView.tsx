@@ -395,7 +395,7 @@ export function CoursesLeaderboardView() {
             style={{
               flex: 1,
               padding: '10px 0',
-              borderRadius: 4,
+              borderRadius: 8,
               background: sort === opt.key ? '#0F172A' : 'transparent',
               color: sort === opt.key ? '#fff' : '#64748B',
               border: sort === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
@@ -556,7 +556,7 @@ export function CoursesLeaderboardView() {
               key={r.key}
               onClick={() => setQuickRegion(r.key)}
               style={{
-                padding: '6px 12px', borderRadius: 3, whiteSpace: 'nowrap',
+                padding: '6px 12px', borderRadius: 8, whiteSpace: 'nowrap',
                 background: quickRegion === r.key ? '#0F172A' : 'transparent',
                 color: quickRegion === r.key ? '#fff' : '#64748B',
                 border: quickRegion === r.key ? 'none' : '1px solid rgba(15,23,42,0.15)',

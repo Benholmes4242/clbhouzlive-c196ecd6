@@ -529,7 +529,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             key={opt.key}
             onClick={() => setTimeFilter(opt.key)}
             style={{
-              flex: 1, padding: '10px 0', borderRadius: 4,
+              flex: 1, padding: '10px 0', borderRadius: 8,
               background: timeFilter === opt.key ? '#0F172A' : 'transparent',
               color: timeFilter === opt.key ? '#fff' : '#64748B',
               border: timeFilter === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
@@ -774,7 +774,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               key={a.key}
               onClick={() => handleArenaModeChange(a.key)}
               style={{
-                padding: '5px 10px', borderRadius: 3,
+                padding: '5px 10px', borderRadius: 8,
                 background: arenaMode === a.key ? '#0F172A' : 'transparent',
                 color: arenaMode === a.key ? '#fff' : '#64748B',
                 border: arenaMode === a.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
@@ -796,7 +796,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 key={d.key}
                 onClick={() => handleDivisionFilterChange(d.key)}
                 style={{
-                  padding: '4px 9px', borderRadius: 3,
+                  padding: '4px 9px', borderRadius: 8,
                   background: divisionFilter === d.key ? 'rgba(15,23,42,0.08)' : 'transparent',
                   color: divisionFilter === d.key ? '#0F172A' : '#94A3B8',
                   border: '1px solid rgba(15,23,42,0.1)',

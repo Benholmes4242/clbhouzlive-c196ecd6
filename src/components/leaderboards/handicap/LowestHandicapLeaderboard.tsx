@@ -437,7 +437,7 @@ export function LowestHandicapLeaderboard({
               style={{
                 flex: 1,
                 padding: '10px 8px',
-                borderRadius: 4,
+                borderRadius: 8,
                 background: isActive ? INK : 'transparent',
                 color: isActive ? '#fff' : opt.available ? INK_MUTED : HAIRLINE,
                 border: isActive ? 'none' : '1px solid rgba(15,23,42,0.15)',
