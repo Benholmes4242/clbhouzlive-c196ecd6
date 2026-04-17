@@ -190,16 +190,32 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
         season_number: number;
         start_date: string;
       }>;
-      
-      const seasonInfo = seasons && seasons.length > 0 ? {
-        id: seasons[0].id,
-        name: seasons[0].name,
-        season_number: seasons[0].season_number,
-        start_date: seasons[0].start_date,
-        end_date: seasons[0].end_date,
-        status: 'active' as const,
-        days_remaining: seasons[0].days_remaining,
-      } : null;
+
+      let seasonInfo: ChampionshipLeaderboardResponse['season'] = null;
+      if (seasons && seasons.length > 0) {
+        const base = seasons[0];
+
+        // Fetch prize/sponsor columns from championship_seasons (the
+        // `get_active_season` RPC doesn't expose them).
+        const { data: sponsorRow } = await supabase
+          .from('championship_seasons')
+          .select('prize_description, sponsor_name, sponsor_url')
+          .eq('id', base.id)
+          .maybeSingle();
+
+        seasonInfo = {
+          id: base.id,
+          name: base.name,
+          season_number: base.season_number,
+          start_date: base.start_date,
+          end_date: base.end_date,
+          status: 'active' as const,
+          days_remaining: base.days_remaining,
+          prize_description: sponsorRow?.prize_description ?? null,
+          sponsor_name: sponsorRow?.sponsor_name ?? null,
+          sponsor_url: sponsorRow?.sponsor_url ?? null,
+        };
+      }
 
       return {
         entries: filteredRows.map(mapEntry),
