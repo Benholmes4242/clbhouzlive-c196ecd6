@@ -33,6 +33,7 @@ import {
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
 import type { PeerGroup } from './HandicapTab';
 import type { LowestHandicapEntry } from '@/types/leaderboards';
 
@@ -235,7 +236,7 @@ export function LowestHandicapLeaderboard({
   const displayTierId: HandicapTier = userTier === 'hacker' ? 'weekend' : (userTier ?? 'weekend');
 
   // ── Editorial copy ─────────────────────────────────────────────────────
-  const { data: editorial } = useDailyEditorial({
+  const { data: editorial, isPending: editorialPending } = useDailyEditorial({
     surface: 'handicap',
     seasonId: null,
     timeFilter: 'all_time',
@@ -387,18 +388,19 @@ export function LowestHandicapLeaderboard({
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             alignItems: 'center',
-            fontSize: 10,
-            fontWeight: 700,
-            color: INK_MUTED,
-            letterSpacing: '0.14em',
+            gap: 6,
+            fontSize: 11,
+            fontWeight: 800,
+            color: CRIMSON,
+            letterSpacing: '0.18em',
             marginBottom: 12,
+            minHeight: 14,
           }}
         >
-          <span>VOL · MMXXVI</span>
-          <span style={{ color: CRIMSON }}>● LIVE</span>
-          <span>{getMastheadSubtitle(peerGroup, userHomeClubName)}</span>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: CRIMSON, display: 'inline-block' }} />
+          <span>LIVE · {getMastheadSubtitle(peerGroup, userHomeClubName)}</span>
         </div>
         <h1
           style={{
@@ -457,52 +459,56 @@ export function LowestHandicapLeaderboard({
       </div>
 
       {/* ── FRONT-PAGE LEDE ── */}
-      <div style={{ padding: '22px 20px 0' }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.28em',
-            color: CRIMSON,
-            marginBottom: 10,
-          }}
-        >
-          {personalisedEyebrow}
+      {editorialPending ? (
+        <EditorialLedeSkeleton />
+      ) : (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.28em',
+              color: CRIMSON,
+              marginBottom: 10,
+            }}
+          >
+            {personalisedEyebrow}
+          </div>
+          <h2
+            style={{
+              fontSize: 28,
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              margin: 0,
+              lineHeight: 1.05,
+              color: INK,
+            }}
+          >
+            {editorial?.headline ?? 'Index · Tier'}
+            {editorial?.headlineTwo && (
+              <>
+                <br />
+                <span style={{ fontStyle: 'italic', fontWeight: 900, color: INK_BODY }}>
+                  {editorial.headlineTwo}
+                </span>
+              </>
+            )}
+          </h2>
+          <p
+            style={{
+              fontSize: 13,
+              color: INK_MUTED,
+              lineHeight: 1.55,
+              marginTop: 12,
+              marginBottom: 0,
+              fontStyle: 'italic',
+            }}
+          >
+            {editorial?.standfirst ??
+              'The Clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.'}
+          </p>
         </div>
-        <h2
-          style={{
-            fontSize: 28,
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-            margin: 0,
-            lineHeight: 1.05,
-            color: INK,
-          }}
-        >
-          {editorial?.headline ?? 'Index · Tier'}
-          {editorial?.headlineTwo && (
-            <>
-              <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 900, color: INK_BODY }}>
-                {editorial.headlineTwo}
-              </span>
-            </>
-          )}
-        </h2>
-        <p
-          style={{
-            fontSize: 13,
-            color: INK_MUTED,
-            lineHeight: 1.55,
-            marginTop: 12,
-            marginBottom: 0,
-            fontStyle: 'italic',
-          }}
-        >
-          {editorial?.standfirst ??
-            'The Clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.'}
-        </p>
-      </div>
+      )}
 
       {/* ── BOX SCORE ── */}
       <div style={{ padding: '20px 20px 0' }}>

@@ -22,6 +22,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { ClubSearchBar } from './ClubSearchBar';
 import { CountrySelector } from '../shared/CountrySelector';
+import { EditorialLedeSkeleton } from '../shared/EditorialLedeSkeleton';
 import type { LeaderboardScope, ExplorationLeaderboardEntry } from '@/types/leaderboards';
 
 // ----------------------------------------------------------------------------
@@ -252,7 +253,7 @@ export function ExplorationTab() {
   );
 
   // Editorial (Global surface)
-  const { data: editorial } = useDailyEditorial({
+  const { data: editorial, isPending: editorialPending } = useDailyEditorial({
     surface: 'global',
     seasonId: null,
     timeFilter: 'all_time',
@@ -367,21 +368,25 @@ export function ExplorationTab() {
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             alignItems: 'center',
-            fontSize: 10,
-            fontWeight: 700,
+            gap: 6,
+            fontSize: 11,
+            fontWeight: 800,
             color: INK_MUTED,
-            letterSpacing: '0.14em',
+            letterSpacing: '0.18em',
             marginBottom: 12,
+            minHeight: 14,
           }}
         >
-          <span>VOL · MMXXVI</span>
-          <span style={{ color: CRIMSON, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: CRIMSON, display: 'inline-block' }} />
-            LIVE
-          </span>
-          <span>THE GLOBAL FIELD</span>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: CRIMSON, display: 'inline-block' }} />
+          {!user || countriesPlayed === 0 ? (
+            <span style={{ color: CRIMSON }}>THE WORLD IS OPEN</span>
+          ) : (
+            <span style={{ color: CRIMSON }}>
+              {countriesPlayed} {countriesPlayed === 1 ? 'COUNTRY' : 'COUNTRIES'} ON YOUR JOURNEY
+            </span>
+          )}
         </div>
         <h1
           style={{
@@ -438,47 +443,51 @@ export function ExplorationTab() {
       </div>
 
       {/* 4. FRONT-PAGE LEDE */}
-      <div style={{ padding: '22px 20px 0' }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.28em',
-            color: CRIMSON,
-            marginBottom: 10,
-          }}
-        >
-          {personalisedEyebrow}
+      {editorialPending ? (
+        <EditorialLedeSkeleton />
+      ) : (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.28em',
+              color: CRIMSON,
+              marginBottom: 10,
+            }}
+          >
+            {personalisedEyebrow}
+          </div>
+          <h2
+            style={{
+              fontSize: 28,
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              margin: 0,
+              lineHeight: 1.05,
+              color: INK,
+            }}
+          >
+            {headline}
+            <br />
+            <span style={{ fontStyle: 'italic', fontWeight: 900, color: INK_BODY }}>
+              {headlineTwo}
+            </span>
+          </h2>
+          <p
+            style={{
+              fontSize: 13,
+              color: INK_MUTED,
+              lineHeight: 1.55,
+              marginTop: 12,
+              marginBottom: 0,
+              fontStyle: 'italic',
+            }}
+          >
+            {standfirst}
+          </p>
         </div>
-        <h2
-          style={{
-            fontSize: 28,
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-            margin: 0,
-            lineHeight: 1.05,
-            color: INK,
-          }}
-        >
-          {headline}
-          <br />
-          <span style={{ fontStyle: 'italic', fontWeight: 900, color: INK_BODY }}>
-            {headlineTwo}
-          </span>
-        </h2>
-        <p
-          style={{
-            fontSize: 13,
-            color: INK_MUTED,
-            lineHeight: 1.55,
-            marginTop: 12,
-            marginBottom: 0,
-            fontStyle: 'italic',
-          }}
-        >
-          {standfirst}
-        </p>
-      </div>
+      )}
 
       {/* 5. THE BOX SCORE */}
       <div style={{ padding: '20px 20px 0' }}>
