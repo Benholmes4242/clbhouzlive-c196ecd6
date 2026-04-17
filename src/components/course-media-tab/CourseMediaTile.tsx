@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -20,14 +19,11 @@ interface CourseMediaTileProps {
   isFetchingNextPage?: boolean;
 }
 
-
-export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }) => {
+export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
   const duration = media?.duration;
-  const reviewRating = post.review?.rating;
-  const avatarUrl = post.avatarUrl;
   const tileRef = useRef<HTMLDivElement>(null);
   const hlsUrl = media?.hlsUrl;
 
@@ -37,7 +33,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          // TODO Brief 3: onViewPreload
+          // preload hook
         }
       },
       { threshold: 0.5 }
@@ -50,71 +46,136 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
     <div
       ref={tileRef}
       data-course-media-index={index}
-      className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
-      style={{ transition: 'transform 100ms ease' }}
-      
       onClick={() => {
         useFullscreenFeedStore.getState().open(allPosts ?? [post], index);
       }}
+      style={{
+        position: 'relative',
+        aspectRatio: '3/4',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'transform 100ms ease',
+        background: 'rgba(15,23,42,0.04)',
+      }}
+      className="active:scale-[0.97]"
     >
-      {/* Poster or placeholder */}
+      {/* Poster or fallback */}
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           loading="lazy"
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted">
-          <Film className="w-8 h-8 text-muted-foreground" />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,23,42,0.06)' }}>
+          <Film style={{ width: 28, height: 28, color: 'rgba(15,23,42,0.3)' }} />
         </div>
       )}
 
+      {/* Bottom gradient overlay — 50% height */}
       <div
-        className="absolute bottom-0 left-0 right-0 pointer-events-none"
         style={{
-          height: '40%',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '50%',
           background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)',
+          pointerEvents: 'none',
         }}
       />
 
+      {/* Centered play button for videos */}
+      {isVideo && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="#fff">
+              <path d="M3 1.5 L10 6 L3 10.5 Z" />
+            </svg>
+          </div>
+        </div>
+      )}
+
+      {/* Duration badge — top right */}
       {isVideo && duration != null && duration > 0 && (
         <div
-          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] liquid-glass flex items-center"
-          style={{ padding: '2px 5px' }}
+          style={{
+            position: 'absolute',
+            top: 6,
+            right: 6,
+            background: 'rgba(0,0,0,0.55)',
+            borderRadius: 4,
+            padding: '2px 5px',
+            fontSize: 10,
+            fontWeight: 700,
+            color: '#fff',
+            letterSpacing: '0.02em',
+            zIndex: 2,
+          }}
         >
-          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
-            {formatDuration(duration)}
-          </span>
+          {formatDuration(duration)}
         </div>
       )}
 
-      {reviewRating != null && reviewRating > 0 && (
+      {/* Caption + likes — bottom overlay */}
+      {(post.caption || post.likeCount > 0) && (
         <div
-          className="absolute top-1.5 right-1.5 z-10 rounded-full flex items-center gap-[3px]"
-          style={{ padding: '2px 6px', background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}
+          style={{
+            position: 'absolute',
+            left: 8,
+            right: 8,
+            bottom: 6,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: 6,
+            zIndex: 2,
+            pointerEvents: 'none',
+          }}
         >
-          <img
-            src="/images/brand/clubhouz-mark-white.svg"
-            alt=""
-            className="w-[10px] h-[10px] flex-shrink-0"
-          />
-          <span className="text-[11px] font-semibold text-white">
-            {reviewRating.toFixed(1)}
-          </span>
-        </div>
-      )}
-
-      {avatarUrl && (
-        <div className="absolute bottom-1.5 left-1.5 z-10">
-          <SquircleAvatar
-            src={avatarUrl}
-            alt=""
-            size={20}
-            fallback=""
-            hideRing
-          />
+          {post.caption ? (
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#fff',
+                lineHeight: 1.3,
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              {post.caption}
+            </div>
+          ) : (
+            <div style={{ flex: 1 }} />
+          )}
+          {post.likeCount > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff">
+                <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
+              </svg>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
+                {post.likeCount}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
