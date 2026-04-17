@@ -20,7 +20,12 @@ const corsHeaders = {
 };
 
 type TimeFilter = 'seasonal' | 'all_time';
-type Surface = 'top100' | 'global' | 'courses';
+type Surface = 'top100' | 'global' | 'courses' | 'handicap';
+
+type HandicapStoryType =
+  | 'global_summit'        // who sits at the top of the global handicap board
+  | 'biggest_improver'     // someone in the top 30 has cut 1.0+ in 30 days
+  | 'handicap_quiet';      // fallback
 
 type CoursesStoryType =
   | 'personal_pick'
