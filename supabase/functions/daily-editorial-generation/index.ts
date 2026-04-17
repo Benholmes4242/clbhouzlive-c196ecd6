@@ -710,8 +710,162 @@ function generateCoursesEditorial(
 }
 
 // ----------------------------------------------------------------------------
-// Persist
+// Handicap snapshot + templates
 // ----------------------------------------------------------------------------
+
+// Internal copy of formatHcp for the edge runtime (no shared TS imports here).
+function formatHcpEdge(value: unknown): string {
+  const n = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(n)) return '—';
+  if (n < 0) return `+${Math.abs(n).toFixed(1)}`;
+  if (n === 0) return '0.0';
+  return n.toFixed(1);
+}
+
+interface HandicapPlayer {
+  user_id: string;
+  display_name: string;
+  handicap_index: number;
+}
+
+interface HandicapImprover extends HandicapPlayer {
+  improvement_30d: number; // positive = improved (handicap dropped)
+}
+
+interface HandicapSnapshot {
+  leader: HandicapPlayer | null;
+  second: HandicapPlayer | null;
+  topThirty: HandicapPlayer[];
+  biggestImprover: HandicapImprover | null;
+}
+
+async function buildHandicapSnapshot(
+  supabase: ReturnType<typeof createClient>,
+): Promise<HandicapSnapshot> {
+  const { data, error } = await supabase.rpc('get_lowest_handicap_leaderboard', {
+    p_scope: 'global',
+    p_current_user_id: null,
+    p_club_id: null,
+    p_country: null,
+    p_limit: 30,
+    p_offset: 0,
+  });
+  if (error) throw error;
+
+  const rows = (data ?? []) as Array<{
+    user_id: string;
+    display_name: string | null;
+    handicap_index: number | null;
+  }>;
+
+  const topThirty: HandicapPlayer[] = rows
+    .filter((r) => r.handicap_index !== null && r.display_name)
+    .map((r) => ({
+      user_id: r.user_id,
+      display_name: r.display_name as string,
+      handicap_index: Number(r.handicap_index),
+    }));
+
+  const leader = topThirty[0] ?? null;
+  const second = topThirty[1] ?? null;
+  const biggestImprover = await findBiggestImprover(supabase, topThirty);
+
+  return { leader, second, topThirty, biggestImprover };
+}
+
+async function findBiggestImprover(
+  supabase: ReturnType<typeof createClient>,
+  candidates: HandicapPlayer[],
+): Promise<HandicapImprover | null> {
+  if (candidates.length === 0) return null;
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const cutoff = thirtyDaysAgo.toISOString();
+
+  const userIds = candidates.map((c) => c.user_id);
+
+  const { data, error } = await supabase
+    .from('user_handicap_history')
+    .select('user_id, handicap_value, recorded_at')
+    .in('user_id', userIds)
+    .lte('recorded_at', cutoff)
+    .order('recorded_at', { ascending: false });
+
+  if (error) {
+    console.error('[handicap] history fetch failed', error);
+    return null;
+  }
+
+  // Newest reading per user from before the cutoff = baseline 30d ago.
+  const baseline = new Map<string, number>();
+  (data ?? []).forEach((row) => {
+    if (!baseline.has(row.user_id)) {
+      baseline.set(row.user_id, Number(row.handicap_value));
+    }
+  });
+
+  let best: HandicapImprover | null = null;
+  for (const c of candidates) {
+    const prev = baseline.get(c.user_id);
+    if (prev === undefined) continue;
+    const delta = prev - c.handicap_index; // positive = improvement
+    if (delta < 1.0) continue;
+    if (!best || delta > best.improvement_30d) {
+      best = { ...c, improvement_30d: delta };
+    }
+  }
+  return best;
+}
+
+function selectHandicapStory(snapshot: HandicapSnapshot): HandicapStoryType {
+  if (snapshot.biggestImprover) return 'biggest_improver';
+  if (snapshot.leader) return 'global_summit';
+  return 'handicap_quiet';
+}
+
+interface HandicapEditorialBase {
+  eyebrow: string;
+  headline: string;
+  headlineTwo: string;
+  standfirst: string;
+}
+
+const HANDICAP_TEMPLATES: Record<HandicapStoryType, (s: HandicapSnapshot) => HandicapEditorialBase> = {
+  global_summit: (s) => {
+    const leader = s.leader!;
+    const second = s.second;
+    const standfirst = second
+      ? `${leader.display_name} sits at the top of the Clbhouz handicap board on ${formatHcpEdge(leader.handicap_index)}, with ${second.display_name} on ${formatHcpEdge(second.handicap_index)} in second.`
+      : `${leader.display_name} sits at the top of the Clbhouz handicap board on ${formatHcpEdge(leader.handicap_index)}.`;
+    return {
+      eyebrow: 'THE HANDICAP RECORD',
+      headline: `${leader.display_name} leads`,
+      headlineTwo: `on ${formatHcpEdge(leader.handicap_index)}.`,
+      standfirst,
+    };
+  },
+
+  biggest_improver: (s) => {
+    const i = s.biggestImprover!;
+    return {
+      eyebrow: 'SHARPEST OF THE MONTH',
+      headline: `${i.display_name}`,
+      headlineTwo: `drops ${i.improvement_30d.toFixed(1)}.`,
+      standfirst: `${i.display_name} has cut ${i.improvement_30d.toFixed(1)} from their index over the past thirty days, now playing off ${formatHcpEdge(i.handicap_index)}.`,
+    };
+  },
+
+  handicap_quiet: () => ({
+    eyebrow: 'THE HANDICAP RECORD',
+    headline: 'Index · Tier',
+    headlineTwo: 'Trajectory.',
+    standfirst:
+      'The Clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.',
+  }),
+};
+
+
 
 async function writeEditorial(
   supabase: ReturnType<typeof createClient>,
