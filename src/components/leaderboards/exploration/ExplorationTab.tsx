@@ -420,7 +420,7 @@ export function ExplorationTab() {
             style={{
               flex: 1,
               padding: '10px 0',
-              borderRadius: 4,
+              borderRadius: 8,
               background: viewMode === opt.key ? INK : 'transparent',
               color: viewMode === opt.key ? '#fff' : INK_MUTED,
               border: viewMode === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
@@ -989,7 +989,7 @@ function PlayerStandings({
             onClick={() => setScope(s.key)}
             style={{
               padding: '5px 10px',
-              borderRadius: 3,
+              borderRadius: 8,
               background: scope === s.key ? INK : 'transparent',
               color: scope === s.key ? '#fff' : INK_MUTED,
               border: scope === s.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
