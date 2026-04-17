@@ -750,16 +750,27 @@ export function CoursesLeaderboardView() {
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {c.course_name}
+                  </div>
+                  <div style={{
+                    fontSize: 11, color: '#94A3B8', marginTop: 1,
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    overflow: 'hidden', whiteSpace: 'nowrap',
+                  }}>
                     {c.current_user_played && (
                       <span style={{
                         fontSize: 9, fontWeight: 800, color: '#F7931E',
-                        letterSpacing: '0.18em', marginLeft: 6,
-                      }}>PLAYED</span>
+                        letterSpacing: '0.18em',
+                        flexShrink: 0,
+                      }}>
+                        PLAYED
+                      </span>
                     )}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 1 }}>
-                    {[c.sub_country, c.country].filter(Boolean).join(' · ')}
-                    {' · '}{c.times_played} {c.times_played === 1 ? 'play' : 'plays'}
+                    <span style={{
+                      overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
+                      {[c.sub_country, c.country].filter(Boolean).join(' · ')}
+                      {' · '}{c.times_played} {c.times_played === 1 ? 'play' : 'plays'}
+                    </span>
                   </div>
                 </div>
 
