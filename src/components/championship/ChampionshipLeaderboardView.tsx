@@ -3,46 +3,24 @@ import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, Users, Building2, RefreshCw, WifiOff } from 'lucide-react';
+import { Loader2, RefreshCw, WifiOff } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 import {
   useChampionshipLeaderboard,
   useUserChampionshipStatus,
-  useUserRivals,
-  useDivisionConfig,
   useSeasonCalendar,
+  useDailyEditorial,
 } from '@/hooks/championship';
-import { useArenaRanks } from '@/hooks/championship/useArenaRanks';
-import {
-  ChampionshipFilters,
-  BeatRivalCTA,
-  RivalVersusPanel,
-} from './modules';
-import { TrophyPodium } from './podium/TrophyPodium';
-import { HallOfFamePodium } from './podium/HallOfFamePodium';
-import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
-import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
-
-import { TimeModeToggle } from './TimeModeToggle';
-import { DivisionLadderPanel } from './DivisionLadderPanel';
-import { DivisionProgressPreview } from './DivisionProgressPreview';
-import { LeaderboardRowV3 } from './LeaderboardRowV3';
-import { RankCelebration } from './RankCelebration';
-import { MotivationalCarousel } from './MotivationalCarousel';
-
-import { ArenasStrip } from './ArenasStrip';
-import { SeasonWinnerCard } from './SeasonWinnerCard';
-// HallOfFameHeader is now integrated into HallOfFamePodium
+import type { EditorialCopy } from '@/hooks/championship/useDailyEditorial';
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
-import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
-import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
-import type { TimeFilter, PodiumScope } from '@/types/podium';
-import { TIER_CONFIG } from '@/lib/clbhouzAchievementPalette';
+import { SEASON_ORDER, getSeasonConfig, getChipStatus, type SeasonId } from '@/lib/seasonConfig';
+import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
+import { abbreviateDivision } from '@/types/championship';
 import { supabase } from '@/integrations/supabase/client';
 
 // ─── Persistence helpers ────────────────────────────────────────────
@@ -67,112 +45,6 @@ function readSavedFilters(): SavedFilters | null {
   }
 }
 
-// ─── Inline sub-components ──────────────────────────────────────────
-
-const LeaderboardLoadingSkeleton = () => (
-  <div className="space-y-2">
-    {[1, 2, 3].map((i) => (
-      <div key={i} className="flex items-center gap-3 p-3 rounded-xl">
-        <Skeleton className="w-7 h-7 rounded" />
-        <Skeleton className="w-10 h-10 rounded-lg" />
-        <div className="flex-1 space-y-1.5">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-24" />
-        </div>
-        <Skeleton className="w-10 h-8 rounded" />
-      </div>
-    ))}
-  </div>
-);
-
-/** Full-page skeleton for initial Championship tab load — matches Augusta layout */
-const ChampionshipPageSkeleton = () => (
-  <div className="flex flex-col" style={{ background: '#F8FAFC', minHeight: '100%', marginLeft: '-16px', marginRight: '-16px' }}>
-    {/* Green hero header skeleton — full bleed, matches real header */}
-    <div style={{
-      background: 'linear-gradient(160deg, #003D28 0%, #006747 55%, #005238 100%)',
-      padding: '18px 16px 0',
-    }}>
-      {/* Active label */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-        <Skeleton className="h-2.5 w-48 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
-      </div>
-      {/* Position band */}
-      <div style={{
-        background: 'rgba(255,255,255,0.1)',
-        borderRadius: 14,
-        padding: '12px 14px',
-        marginBottom: 20,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-      }}>
-        <Skeleton className="w-[38px] h-[38px] rounded-xl flex-shrink-0" style={{ background: 'rgba(255,255,255,0.18)' }} />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, gap: 6 }}>
-          <Skeleton className="h-2.5 w-24 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
-          <Skeleton className="h-5 w-36 rounded" style={{ background: 'rgba(255,255,255,0.2)' }} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 6, alignItems: 'flex-end' }}>
-          <Skeleton className="h-2.5 w-20 rounded" style={{ background: 'rgba(255,255,255,0.15)' }} />
-          <Skeleton className="h-5 w-10 rounded" style={{ background: 'rgba(255,255,255,0.2)' }} />
-        </div>
-      </div>
-      {/* Time toggle tabs */}
-      <div style={{ display: 'flex', gap: 3 }}>
-        <div style={{ flex: 1, height: 40, borderRadius: '10px 10px 0 0', background: '#F8FAFC' }} />
-        <div style={{ flex: 1, height: 40, borderRadius: '10px 10px 0 0', background: 'rgba(255,255,255,0.08)' }} />
-      </div>
-    </div>
-    {/* Body skeleton */}
-    <div style={{ padding: '16px 16px 40px', display: 'flex', flexDirection: 'column' as const, gap: 12 }}>
-      {/* Sponsor card skeleton */}
-      <Skeleton className="h-[190px] w-full rounded-[18px]" />
-      {/* Scope selector skeleton */}
-      <Skeleton className="h-10 w-full rounded-xl" />
-      {/* Leaderboard rows */}
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3">
-          <Skeleton className="w-7 h-5 rounded" />
-          <Skeleton className="w-11 h-11 rounded-xl" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 rounded" style={{ width: `${[55,70,60,75,50][i]}%` }} />
-            <Skeleton className="h-3 rounded" style={{ width: `${[40,55,45,60,35][i]}%` }} />
-          </div>
-          <Skeleton className="w-10 h-7 rounded" />
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="max-w-md mx-auto mt-4">
-    <button
-      onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm text-sm transition-colors active:scale-[0.98] active:opacity-70"
-      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#64748B' }}
-    >
-      <RefreshCw className="w-3.5 h-3.5" />
-      Couldn't load more entries · Tap to retry
-    </button>
-  </div>
-);
-
-const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-    <WifiOff className="w-12 h-12 text-muted-foreground/40 mb-4" />
-    <p className="text-foreground font-semibold mb-1">Unable to load leaderboard</p>
-    <p className="text-sm text-muted-foreground mb-4">Check your connection and try again</p>
-    <button
-      onClick={onRetry}
-      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
-    >
-      Retry
-    </button>
-  </div>
-);
-
 // ─── Helpers ────────────────────────────────────────────────────────
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
@@ -180,18 +52,137 @@ function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-// ─── Virtualization constants ───────────────────────────────────────
-const ROW_HEIGHT = 72; // 64px row (p-3 + h-10 avatar) + 8px gap (space-y-2)
-const VIRTUALIZATION_THRESHOLD = 50;
-const OVERSCAN = 8; // Buffer rows above/below viewport
+function getInitials(name: string | null | undefined): string {
+  if (!name) return '?';
+  return name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .filter(Boolean)
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+const FALLBACK_PALETTE = ['#1F2937', '#334155', '#475569', '#5B6470', '#3F4A55', '#2C3540', '#404B58', '#525E6B'];
+function getAvatarFallbackColor(userId: string | null | undefined): string {
+  if (!userId) return FALLBACK_PALETTE[0];
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) hash = (hash * 31 + userId.charCodeAt(i)) | 0;
+  return FALLBACK_PALETTE[Math.abs(hash) % FALLBACK_PALETTE.length];
+}
+
+const ROMAN_YEAR = 'MMXXVI';
+
+function getDayOfSeason(startDate: string | null | undefined): number {
+  if (!startDate) return 1;
+  const start = new Date(startDate).getTime();
+  const now = Date.now();
+  return Math.max(1, Math.floor((now - start) / 86_400_000) + 1);
+}
+
+interface SelectEyebrowArgs {
+  userRank: number | null;
+  rankMovementWeekly: number;
+  daysRemaining: number;
+  seasonLabel: string;
+  isSeasonClosing: boolean;
+  defaultEyebrow: string;
+  dayOfSeason: number;
+}
+
+function selectEyebrow(args: SelectEyebrowArgs): string {
+  if (args.userRank === null) {
+    return `RATE A COURSE TO ENTER · ${args.seasonLabel.toUpperCase()}`;
+  }
+  if (args.isSeasonClosing) {
+    return `FINAL DAYS · ${args.daysRemaining}D REMAINING`;
+  }
+  if (args.userRank <= 10 && args.rankMovementWeekly > 0) {
+    return `YOU CLIMBED · ${args.seasonLabel.toUpperCase()} DAY ${args.dayOfSeason}`;
+  }
+  if (args.userRank <= 10 && args.rankMovementWeekly < 0) {
+    return `DEFEND YOUR PLACE · ${args.seasonLabel.toUpperCase()}`;
+  }
+  if (args.userRank <= 30) {
+    return `YOUR RACE · ${args.seasonLabel.toUpperCase()}`;
+  }
+  return args.defaultEyebrow;
+}
+
+function buildBaselineEditorial(args: {
+  timeFilter: 'seasonal' | 'all_time';
+  seasonLabel: string;
+  leaderName: string | null;
+  leaderCourses: number;
+}): EditorialCopy {
+  const firstName = (args.leaderName || 'The leader').split(' ')[0];
+  if (args.timeFilter === 'all_time') {
+    return {
+      eyebrow: 'THE ALL-TIME RECORD',
+      headline: `${firstName} leads`,
+      headlineTwo: 'the all-time standings.',
+      standfirst: `${args.leaderName || 'The leader'} sits atop the Clbhouz record with ${args.leaderCourses} courses played to date.`,
+      storyType: 'all_time_steady',
+      generatedBy: 'template',
+      date: new Date().toISOString().slice(0, 10),
+    };
+  }
+  return {
+    eyebrow: `${args.seasonLabel.toUpperCase()} · LIVE`,
+    headline: `${firstName} holds the lead`,
+    headlineTwo: `at ${args.leaderCourses} courses.`,
+    standfirst: `${args.leaderName || 'The leader'} continues to set the pace in the ${args.seasonLabel.toLowerCase()}.`,
+    storyType: 'mid_season_quiet',
+    generatedBy: 'template',
+    date: new Date().toISOString().slice(0, 10),
+  };
+}
+
+// ─── Sub-components ─────────────────────────────────────────────────
+const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+    <WifiOff className="w-12 h-12" style={{ color: '#94A3B8' }} />
+    <p style={{ marginTop: 12, fontWeight: 800, color: '#0F172A', fontSize: 14 }}>Unable to load standings</p>
+    <p style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>Check your connection and try again</p>
+    <button
+      onClick={onRetry}
+      style={{
+        marginTop: 14, padding: '8px 18px', borderRadius: 4,
+        background: '#0F172A', color: '#fff', fontSize: 11, fontWeight: 800,
+        letterSpacing: '0.18em', border: 'none', cursor: 'pointer',
+      }}
+    >
+      RETRY
+    </button>
+  </div>
+);
+
+const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
+  <div style={{ padding: '14px 0' }}>
+    <button
+      onClick={onRetry}
+      style={{
+        width: '100%', padding: '12px 16px', borderRadius: 4,
+        background: 'transparent', border: '1px solid rgba(15,23,42,0.15)',
+        color: '#64748B', fontSize: 11, fontWeight: 700,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        cursor: 'pointer',
+      }}
+    >
+      <RefreshCw style={{ width: 13, height: 13 }} />
+      Couldn't load more · Tap to retry
+    </button>
+  </div>
+);
 
 interface ChampionshipLeaderboardViewProps {
   className?: string;
 }
 
 /**
- * ChampionshipLeaderboardView - Main orchestrator for Championship Mode.
- * Simplified version with SeasonHubBanner, SimplePodium, and LeaderboardRowV3.
+ * ChampionshipLeaderboardView — Front Page edition.
+ * Editorial newspaper layout with masthead, lede, box score, prize/sponsor card,
+ * schedule strip, and full standings. All "serif moments" use Geist 900.
  */
 export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboardViewProps) {
   const { user } = useSupabaseSession();
@@ -199,7 +190,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const queryClient = useQueryClient();
   const userId = user?.id;
 
-  // Invalidate stale caches on mount so users see fresh data immediately
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['championship-leaderboard'] });
     queryClient.invalidateQueries({ queryKey: ['season-calendar'] });
@@ -218,18 +208,10 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     const saved = readSavedFilters();
     return saved?.timeFilter ?? 'seasonal';
   });
-  
-  // UI state
-  const [showDivisionLadder, setShowDivisionLadder] = useState(false);
-  const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [previousRank, setPreviousRank] = useState<number | null>(null);
-  const [userHandicap, setUserHandicap] = useState<number | null>(null);
+
   const [showSponsorSheet, setShowSponsorSheet] = useState(false);
   const [userCountry, setUserCountry] = useState<string | null>(null);
-  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
-  // Club-related state (restored from persistence)
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
     const saved = readSavedFilters();
     return saved?.clubId ?? null;
@@ -237,26 +219,17 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
-  
-  // Country-related state (restored from persistence)
+
   const [selectedCountry, setSelectedCountry] = useState<string | null>(() => {
     const saved = readSavedFilters();
     return saved?.country ?? null;
   });
 
-  // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
   const isFilterChangeRef = useRef<boolean>(false);
-
-  // Infinite scroll refs
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasRestoredScroll = useRef(false);
 
-  // ─── Virtualization state ─────────────────────────────────────────
-  const [scrollTop, setScrollTop] = useState(0);
-  const listContainerRef = useRef<HTMLDivElement>(null);
-
-  // ─── Filter persistence effect ────────────────────────────────────
   useEffect(() => {
     try {
       sessionStorage.setItem(STORAGE_KEY_FILTERS, JSON.stringify({
@@ -269,40 +242,29 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     } catch { /* ignore */ }
   }, [arenaMode, timeFilter, divisionFilter, selectedClubId, selectedCountry]);
 
-  // Fetch user's home club, handicap, and country
+  // Fetch user's home club + country (used by Club / Country arenas)
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!userId) return;
-
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('primary_club_id, country, eg_handicap_index, profile_photo_url, golf_clubs!user_profiles_primary_club_id_fkey(id, name, country)')
+        .select('primary_club_id, country, golf_clubs!user_profiles_primary_club_id_fkey(id, name, country)')
         .eq('id', userId)
         .single();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return;
-      }
+      if (error) return;
 
       const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
       if (data?.primary_club_id) {
         setUserHomeClubId(data.primary_club_id);
         setUserHomeClubName(clubData?.name || null);
       }
-      // Country: prefer home club's country (matches gc.country in RPC filter).
-      // Fall back to user_profiles.country for users without a home club.
       const clubCountry = (clubData as any)?.country ?? null;
       const profileCountry = (data as any)?.country ?? null;
       setUserCountry(clubCountry || profileCountry || null);
-      setUserHandicap((data as any)?.eg_handicap_index ?? null);
-      setUserPhotoUrl((data as any)?.profile_photo_url ?? null);
     };
-
     fetchUserProfile();
   }, [userId]);
 
-  // Auto-select home club when switching to club mode
   useEffect(() => {
     if (arenaMode === 'club' && !selectedClubId && userHomeClubId) {
       setSelectedClubId(userHomeClubId);
@@ -310,34 +272,23 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     }
   }, [arenaMode, selectedClubId, userHomeClubId, userHomeClubName]);
 
-  // Clear country when switching away from country mode
   useEffect(() => {
-    if (arenaMode !== 'country') {
-      setSelectedCountry(null);
-    }
+    if (arenaMode !== 'country') setSelectedCountry(null);
   }, [arenaMode]);
 
-  // Handle club selection
   const handleClubSelect = useCallback((clubId: string | null, clubName: string | null) => {
     setSelectedClubId(clubId);
     setSelectedClubName(clubName);
   }, []);
 
-  // Convert arenaMode to PodiumScope
-  const podiumScope: PodiumScope = arenaMode;
-  const podiumMode = timeFilter === 'seasonal' ? 'seasonal' : 'all_time';
-
-  // Compute clubId for queries - only pass when in club mode
   const queryClubId = arenaMode === 'club' ? selectedClubId : null;
-  // Compute country for queries - only pass when in country mode
   const queryCountry = arenaMode === 'country' ? selectedCountry : null;
 
-  // Data fetching
+  // ─── Data fetching ────────────────────────────────────────────────
   const {
     data: leaderboardData,
     isLoading: leaderboardLoading,
     isError,
-    error: leaderboardError,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
@@ -351,94 +302,90 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     pageSize: 50,
   });
 
-  const { data: userStatus, isLoading: statusLoading } = useUserChampionshipStatus(userId);
-  const { data: rivals, isLoading: rivalsLoading } = useUserRivals(userId, 5);
-  const { data: divisions } = useDivisionConfig();
+  const { data: userStatus } = useUserChampionshipStatus(userId);
   const { data: seasonCalendar } = useSeasonCalendar();
 
-  // Arena ranks for the ArenasStrip
-  const { data: arenaRanks } = useArenaRanks(
-    userId,
-    userCountry,
-    userHomeClubId,
-    userHandicap,
+  const allEntries = useMemo(
+    () => leaderboardData?.pages.flatMap((p) => p.entries) ?? [],
+    [leaderboardData?.pages],
   );
 
-  // Podium data fetching
-  const { data: seasonalPodiumData } = usePodiumSeasonal({
-    scope: podiumScope,
-    divisionId: divisionFilter !== 'all' ? divisionFilter : undefined,
-    clubId: queryClubId,
-    country: queryCountry,
-    currentUserId: userId,
-    enabled: timeFilter === 'seasonal',
+  const season = leaderboardData?.pages[0]?.season ?? null;
+  const seasonYear = season?.start_date ? new Date(season.start_date).getFullYear() : new Date().getFullYear();
+  const seasonLabel = `${seasonYear} Season`;
+  const daysRemaining = season?.days_remaining ?? 0;
+  const dayOfSeason = useMemo(() => getDayOfSeason(season?.start_date), [season?.start_date]);
+
+  // Map current season → SeasonId for schedule strip
+  const mapToSeasonId = (name: string): SeasonId => {
+    const lower = name.toLowerCase();
+    if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) return 'preseason';
+    if (lower.includes('major')) return 'major';
+    if (lower.includes('summer')) return 'summer';
+    if (lower.includes('off-season') || lower.includes('offseason')) return 'offseason';
+    return 'preseason';
+  };
+  const currentSeasonId = useMemo<SeasonId>(() => {
+    if (!season) return 'preseason';
+    return mapToSeasonId(season.name);
+  }, [season]);
+
+  // ─── Editorial ───────────────────────────────────────────────────
+  const { data: editorialData } = useDailyEditorial({
+    seasonId: timeFilter === 'seasonal' ? season?.id ?? null : null,
+    timeFilter,
+    enabled: timeFilter === 'all_time' || !!season?.id,
   });
 
-  const { data: allTimePodiumData } = usePodiumAllTime({
-    scope: podiumScope,
-    clubId: queryClubId,
-    country: queryCountry,
-    currentUserId: userId,
-    enabled: timeFilter === 'all_time',
-  });
+  const leader = allEntries[0] ?? null;
+  const leaderCoursesValue = leader
+    ? (timeFilter === 'all_time' ? leader.courses_this_season : leader.courses_this_season)
+    : 0;
 
-  // Transform podium data for TrophyPodium
-  const podiumEntries = useMemo(() => {
-    if (timeFilter !== 'seasonal' || !seasonalPodiumData) return [];
-    return seasonalPodiumData;
-  }, [timeFilter, seasonalPodiumData]);
+  const finalEditorial: EditorialCopy = useMemo(() => {
+    return editorialData ?? buildBaselineEditorial({
+      timeFilter,
+      seasonLabel,
+      leaderName: leader?.display_name ?? null,
+      leaderCourses: leaderCoursesValue,
+    });
+  }, [editorialData, timeFilter, seasonLabel, leader?.display_name, leaderCoursesValue]);
 
-  // Flatten paginated entries — memoized for stable reference
-  const allEntries = useMemo(() => {
-    return leaderboardData?.pages.flatMap((page) => page.entries) ?? [];
-  }, [leaderboardData?.pages]);
+  const personalisedEyebrow = useMemo(() => {
+    if (timeFilter === 'all_time') return finalEditorial.eyebrow || 'THE ALL-TIME RECORD';
+    return selectEyebrow({
+      userRank: userStatus?.current_rank ?? null,
+      rankMovementWeekly: userStatus?.rank_movement_weekly ?? 0,
+      daysRemaining,
+      seasonLabel,
+      isSeasonClosing: daysRemaining > 0 && daysRemaining <= 7,
+      defaultEyebrow: finalEditorial.eyebrow,
+      dayOfSeason,
+    });
+  }, [timeFilter, finalEditorial.eyebrow, userStatus, daysRemaining, seasonLabel, dayOfSeason]);
 
-  // ─── Infinite scroll via IntersectionObserver ─────────────────────
-  const isFetchingRef = useRef(isFetchingNextPage);
-  isFetchingRef.current = isFetchingNextPage;
+  // ─── Box score values ────────────────────────────────────────────
+  const currentUserEntry = useMemo(
+    () => allEntries.find((e) => e.is_current_user) ?? null,
+    [allEntries],
+  );
 
-  useEffect(() => {
-    if (!sentinelRef.current || !hasNextPage) return;
+  const userIsLeader = !!currentUserEntry && currentUserEntry.current_rank === 1;
+  const youCourses: number | null = currentUserEntry?.courses_this_season ?? null;
+  const leaderCourses = leader?.courses_this_season ?? 0;
+  const second = allEntries[1] ?? null;
+  const gap = userIsLeader
+    ? Math.max(0, leaderCourses - (second?.courses_this_season ?? 0))
+    : youCourses !== null
+      ? Math.max(0, leaderCourses - youCourses)
+      : null;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: '600px', threshold: 0 },
-    );
-
-    observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [hasNextPage, fetchNextPage]);
-
-  // ─── Virtualization scroll tracking ───────────────────────────────
-  useEffect(() => {
-    if (allEntries.length < VIRTUALIZATION_THRESHOLD) return;
-
-    const handleScroll = () => {
-      const rootEl = document.getElementById('root');
-      const y = rootEl && rootEl.scrollTop > 0 ? rootEl.scrollTop : window.scrollY;
-      setScrollTop(y);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    const rootEl = document.getElementById('root');
-    rootEl?.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      rootEl?.removeEventListener('scroll', handleScroll);
-    };
-  }, [allEntries.length]);
-
-  // ─── Scroll position save/restore ─────────────────────────────────
+  // ─── Scroll save/restore ─────────────────────────────────────────
   const handleEntryClick = useCallback((clickedUserId: string) => {
     const rootEl = document.getElementById('root');
     const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
     sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
-    navigate(`/profile/${clickedUserId}?tab=top100`);
+    navigate(getProfilePathById(clickedUserId) + '?tab=top100');
   }, [navigate]);
 
   useEffect(() => {
@@ -456,157 +403,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     }
   }, [allEntries.length]);
 
-  // Get current season from calendar
-  const currentSeason = useMemo(() => {
-    return seasonCalendar?.find(s => s.is_current) ?? null;
-  }, [seasonCalendar]);
-
-  // Map season name to SeasonId for the new SeasonStatusPanel
-  const mapToSeasonId = (name: string): SeasonId => {
-    const lower = name.toLowerCase();
-    if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) return 'preseason';
-    if (lower.includes('major')) return 'major';
-    if (lower.includes('summer')) return 'summer';
-    if (lower.includes('off-season') || lower.includes('offseason')) return 'offseason';
-    return 'preseason';
-  };
-
-  // Prepare data for SeasonStatusPanel
-  const currentSeasonId = useMemo<SeasonId>(() => {
-    if (!currentSeason) return 'preseason';
-    return mapToSeasonId(currentSeason.name);
-  }, [currentSeason]);
-
-  // Get current season theme color for podium (must be after currentSeasonId)
-  const seasonThemeColor = useMemo(() => {
-    const config = getSeasonConfig(currentSeasonId);
-    return config.themeColor;
-  }, [currentSeasonId]);
-
-  // Calculate progress percentage
-  const progressPercent = useMemo(() => {
-    if (!currentSeason) return 0;
-    const startDate = new Date(currentSeason.start_date);
-    const endDate = new Date(currentSeason.end_date);
-    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const daysRemaining = currentSeason.days_remaining ?? 0;
-    return daysRemaining > 0 ? ((totalDays - daysRemaining) / totalDays) * 100 : 100;
-  }, [currentSeason]);
-
-  // Build seasonData for chips (days until available for locked seasons)
-  const seasonData = useMemo<Record<SeasonId, { daysUntilAvailable?: number }>>(() => {
-    const data: Record<SeasonId, { daysUntilAvailable?: number }> = {
-      preseason: {},
-      major: {},
-      summer: {},
-      offseason: {},
-    };
-    
-    if (!seasonCalendar) return data;
-    
-    seasonCalendar.forEach(s => {
-      const id = mapToSeasonId(s.name);
-      if (s.days_until_start && s.days_until_start > 0) {
-        data[id].daysUntilAvailable = s.days_until_start;
-      }
-    });
-    
-    return data;
-  }, [seasonCalendar]);
-
-  // Completed seasons with winners (for SeasonWinnerCard in all-time mode)
-  const completedSeasonsWithWinners = useMemo(() => {
-    if (!seasonCalendar) return [];
-    return seasonCalendar
-      .filter(s => s.status === 'completed' && s.season_winner_user_id)
-      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
-  }, [seasonCalendar]);
-
-  // Fetch winner profiles for completed seasons
-  const [winnerProfiles, setWinnerProfiles] = useState<Record<string, { display_name: string; avatar_url: string | null; club_name: string | null }>>({});
-
-  useEffect(() => {
-    const fetchWinnerProfiles = async () => {
-      const winnerIds = completedSeasonsWithWinners
-        .map(s => s.season_winner_user_id)
-        .filter((id): id is string => !!id);
-      
-      if (winnerIds.length === 0) return;
-
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, profile_photo_url, golf_clubs!user_profiles_primary_club_id_fkey(name)')
-        .in('id', winnerIds);
-
-      if (data) {
-        const profiles: typeof winnerProfiles = {};
-        data.forEach((p: any) => {
-          const clubData = Array.isArray(p.golf_clubs) ? p.golf_clubs[0] : p.golf_clubs;
-          profiles[p.id] = {
-            display_name: p.display_name || 'Champion',
-            avatar_url: p.profile_photo_url,
-            club_name: clubData?.name || null,
-          };
-        });
-        setWinnerProfiles(profiles);
-      }
-    };
-
-    fetchWinnerProfiles();
-  }, [completedSeasonsWithWinners]);
-
-
-  const currentUserEntry = useMemo(() => {
-    return allEntries.find(e => e.is_current_user) || null;
-  }, [allEntries]);
-
-  const currentRank = currentUserEntry?.current_rank || null;
-  const isInTop10 = currentRank !== null && currentRank <= 10;
-  const isInTop3 = currentRank !== null && currentRank <= 3;
-
-  const friendAhead = null;
-  const friendBehind = null;
-
-  // Get closest rival who is ahead
-  const closestRivalAhead = useMemo(() => {
-    if (!rivals?.length) return null;
-    return rivals.find(r => r.gap > 0) || null;
-  }, [rivals]);
-
-  // Derive handicap from currentUserEntry if available
-  // userHandicap is now set from profile fetch (eg_handicap_index) — more reliable than leaderboard entry
-
-  // Helper: country flag emoji
-  const getCountryFlag = (country: string): string => {
-    const flags: Record<string, string> = {
-      'england': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'wales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
-      'ireland': '🇮🇪', 'united states': '🇺🇸', 'usa': '🇺🇸', 'canada': '🇨🇦',
-      'australia': '🇦🇺', 'france': '🇫🇷', 'germany': '🇩🇪', 'spain': '🇪🇸',
-      'portugal': '🇵🇹', 'italy': '🇮🇹', 'japan': '🇯🇵', 'south korea': '🇰🇷',
-      'sweden': '🇸🇪', 'norway': '🇳🇴', 'denmark': '🇩🇰', 'netherlands': '🇳🇱',
-      'south africa': '🇿🇦', 'new zealand': '🇳🇿', 'united kingdom': '🇬🇧',
-      'britain & ireland': '🇬🇧', 'great britain': '🇬🇧', 'northern ireland': '🏴󠁧󠁢󠁮󠁩󠁲󠁿',
-    };
-    return flags[country.toLowerCase()] || '🏳️';
-  };
-
-  // Helper: handicap band label
-  const getHandicapBandLabel = (hcp: number | null): string => {
-    if (hcp === null) return 'Handicap';
-    const low = Math.floor(hcp - 1.5);
-    const high = Math.ceil(hcp + 1.5);
-    return `Hdcp ${low}–${high}`;
-  };
-
-  const handleLogCourse = () => {
-    navigate('/courses');
-  };
-
-  const handleUserClick = (clickedUserId: string) => {
-    navigate(`/golfer/${clickedUserId}`);
-  };
-
-  // Scroll-preserving filter handlers - capture scroll before state change
+  // ─── Filter handlers (preserve scroll) ───────────────────────────
   const handleArenaModeChange = useCallback((mode: ChampionshipArenaMode) => {
     const rootEl = document.getElementById('root');
     if (rootEl) {
@@ -625,7 +422,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     setDivisionFilter(filter);
   }, []);
 
-  // Restore scroll position after filter change and re-render
   useLayoutEffect(() => {
     if (isFilterChangeRef.current) {
       const rootEl = document.getElementById('root');
@@ -638,640 +434,641 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     }
   }, [arenaMode, divisionFilter, allEntries]);
 
+  // ─── Infinite scroll ─────────────────────────────────────────────
+  const isFetchingRef = useRef(isFetchingNextPage);
+  isFetchingRef.current = isFetchingNextPage;
 
-  // Build division ladder data
-  const divisionLadderData = useMemo(() => {
-    if (!divisions || !userStatus) return [];
-    
-    const currentIndex = getDivisionIndex(userStatus.division_slug);
-    
-    return divisions
-      .sort((a, b) => a.tier_order - b.tier_order)
-      .map((div, index) => {
-        let status: 'locked' | 'current' | 'next' | 'completed' = 'locked';
-        if (index < currentIndex) status = 'completed';
-        else if (index === currentIndex) status = 'current';
-        else if (index === currentIndex + 1) status = 'next';
-        
-        return {
-          id: div.id,
-          name: div.name,
-          threshold: div.min_courses,
-          color: div.color_hex,
-          status,
-        };
-      });
-  }, [divisions, userStatus]);
+  useEffect(() => {
+    if (!sentinelRef.current || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingRef.current) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '600px', threshold: 0 },
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
 
-  // Get next division info
-  const nextDivision = useMemo(() => {
-    if (!userStatus) return { name: 'Next Division', coursesToNext: 0 };
-    const currentIndex = getDivisionIndex(userStatus.division_slug);
-    const nextSlug = DIVISION_ORDER[currentIndex + 1];
-    const tierValues = Object.values(TIER_CONFIG);
-    const nextConfig = nextSlug 
-      ? tierValues.find(t => t.name?.toLowerCase().includes(nextSlug.replace('-club', '').replace('_', ' ')))
-      : null;
-    return {
-      name: nextConfig?.name || 'Max Division',
-      coursesToNext: userStatus.courses_to_next_division || 0,
-    };
-  }, [userStatus]);
+  // ─── Arena tabs config ───────────────────────────────────────────
+  const arenas: { key: ChampionshipArenaMode; label: string }[] = [
+    { key: 'global', label: 'Global' },
+    { key: 'division', label: 'Division' },
+    { key: 'friends', label: 'Friends' },
+    { key: 'club', label: 'Club' },
+    { key: 'country', label: 'Country' },
+  ];
 
-  // ─── Virtualized list rendering ───────────────────────────────────
-  const useVirtualization = allEntries.length >= VIRTUALIZATION_THRESHOLD;
+  const divisionChips: { key: DivisionSlug | 'all'; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'rookie', label: 'Rookie' },
+    { key: 'fairway', label: 'Fairway' },
+    { key: 'founders', label: 'Founders' },
+    { key: 'heritage', label: 'Heritage' },
+    { key: 'century', label: 'Century' },
+    { key: 'elite', label: 'Elite' },
+    { key: 'legendary', label: 'Legendary' },
+    { key: 'grandslam', label: 'Grand Slam' },
+  ];
 
-  const virtualizedContent = useMemo(() => {
-    if (!useVirtualization) return null;
-
-    // Calculate the offset of the list container from the top of the page
-    // We approximate — the list starts after podium, filters, etc.
-    const containerOffset = listContainerRef.current?.offsetTop ?? 0;
-    const relativeScroll = Math.max(0, scrollTop - containerOffset);
-
-    const totalHeight = allEntries.length * ROW_HEIGHT;
-    const startIndex = Math.max(0, Math.floor(relativeScroll / ROW_HEIGHT) - OVERSCAN);
-    const visibleCount = Math.ceil(window.innerHeight / ROW_HEIGHT) + OVERSCAN * 2;
-    const endIndex = Math.min(allEntries.length, startIndex + visibleCount);
-
-    const visibleEntries = allEntries.slice(startIndex, endIndex);
-    const offsetY = startIndex * ROW_HEIGHT;
-
-    return { totalHeight, visibleEntries, offsetY, startIndex };
-  }, [useVirtualization, allEntries, scrollTop]);
-
-  // Get user's profile data for position band
-  const activeProfile = useMemo(() => {
-    if (!currentUserEntry) return null;
-    return {
-      avatarUrl: currentUserEntry.avatar_url,
-      name: currentUserEntry.display_name,
-    };
-  }, [currentUserEntry]);
-
-  // Full-page skeleton for initial load
-  if (leaderboardLoading && allEntries.length === 0) {
-    return <ChampionshipPageSkeleton />;
-  }
-
+  // ─── Render ──────────────────────────────────────────────────────
   return (
-    <div className={cn('flex flex-col', className)} style={{ background: '#F8FAFC', minHeight: '100%' }}>
-
-      {/* ── BODY CONTENT (below hero) ── */}
-      <div style={{ padding: 'clamp(12px,3vw,16px)', display: 'flex', flexDirection: 'column', gap: 16, marginLeft: '-16px', marginRight: '-16px' }}>
-
-      {/* Merged season hero header */}
-      {timeFilter === 'seasonal' && currentSeason && (
-        <div style={{ margin: '0 calc(-1 * clamp(12px,3vw,16px))' }}>
-          <div style={{
-            background: 'linear-gradient(160deg, #0a2a1a, #0f3d20, #0a2a1a)',
-            padding: '14px 16px 0',
-          }}>
-            {/* Top row — season name + days left */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
-                  {getSeasonConfig(currentSeasonId).title}
-                </span>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 99, padding: '3px 10px' }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
-                  {currentSeason.days_remaining ?? 0} days left
-                </span>
-              </div>
-            </div>
-
-            {/* ── PRIZE HERO ── */}
-            {currentSeason.prize_description && (
-              <div style={{
-                margin: '12px 16px',
-                background: 'linear-gradient(135deg, rgba(247,147,30,0.22), rgba(247,147,30,0.08))',
-                border: '1.5px solid rgba(247,147,30,0.45)',
-                borderRadius: 14, padding: '14px 16px',
-              }}>
-                {/* Win label */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
-                  <span style={{ fontSize: 18 }}>🏆</span>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
-                    1st Place Prize
-                  </span>
-                </div>
-                {/* Prize value */}
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 4 }}>
-                  {currentSeason.prize_description}
-                </div>
-                {/* Sponsor */}
-                {currentSeason.sponsor_name && (
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
-                    Sponsored by{' '}
-                    {currentSeason.sponsor_url ? (
-                      <button
-                        onClick={() => setShowSponsorSheet(true)}
-                        style={{
-                          background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                          color: '#F7931E', fontWeight: 600,
-                          textDecoration: 'underline',
-                          textDecorationColor: 'rgba(247,147,30,0.4)',
-                          fontSize: 'inherit',
-                        }}
-                      >
-                        {currentSeason.sponsor_name}
-                      </button>
-                    ) : (
-                      <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{currentSeason.sponsor_name}</span>
-                    )}
-                  </div>
-                )}
-                {/* CTA */}
-                <div style={{
-                  background: '#F7931E', borderRadius: 10, padding: '10px 14px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>
-                    Rate courses to climb the rankings
-                  </span>
-                  <span style={{ fontSize: 16 }}>⛳</span>
-                </div>
-              </div>
-            )}
-
-            {/* ── LIVE RACE ── */}
-            {currentUserEntry && allEntries.length > 0 && (
-              <div style={{ padding: '0 16px 14px' }}>
-                {/* Live race label */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }} />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
-                    Live Race
-                  </span>
-                </div>
-
-                {/* Leader bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div style={{ position: 'relative', width: 32, height: 32, flexShrink: 0 }}>
-                    {allEntries[0]?.avatar_url ? (
-                      <img
-                        src={allEntries[0].avatar_url}
-                        alt=""
-                        style={{ width: 32, height: 32, borderRadius: '34%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div style={{
-                        width: 32, height: 32, borderRadius: '34%',
-                        background: 'rgba(255,255,255,0.12)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 12, color: '#fff', fontWeight: 700,
-                      }}>
-                        {(allEntries[0]?.display_name || '?').charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div style={{
-                      position: 'absolute', bottom: -3, right: -3,
-                      background: '#4ade80', borderRadius: 99, width: 14, height: 14,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 7, fontWeight: 900, color: '#fff', border: '1.5px solid #0a2a1a',
-                    }}>1</div>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Leader</span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80' }}>
-                        {allEntries[0]?.courses_this_season ?? 0} courses 🏆
-                      </span>
-                    </div>
-                    <div style={{ height: 8, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: '100%', background: 'linear-gradient(90deg, #4ade80, #22c55e)', borderRadius: 99 }} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Your bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <div style={{ position: 'relative', width: 32, height: 32, flexShrink: 0 }}>
-                    {userPhotoUrl ? (
-                      <img
-                        src={userPhotoUrl}
-                        alt=""
-                        style={{ width: 32, height: 32, borderRadius: '34%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div style={{
-                        width: 32, height: 32, borderRadius: '34%',
-                        background: 'rgba(255,255,255,0.15)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 12, color: '#fff', fontWeight: 700,
-                      }}>
-                        {(currentUserEntry.display_name || '?').charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div style={{
-                      position: 'absolute', bottom: -3, right: -3,
-                      background: '#F7931E', borderRadius: 99, width: 14, height: 14,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 7, fontWeight: 900, color: '#fff', border: '1.5px solid #0a2a1a',
-                    }}>
-                      {currentUserEntry.current_rank}
-                    </div>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
-                        You — <strong style={{ color: '#fff' }}>{ordinal(currentUserEntry.current_rank)} of {allEntries.length}</strong>
-                      </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>
-                        {currentUserEntry.courses_this_season} courses
-                      </span>
-                    </div>
-                    <div style={{ height: 8, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
-                      <div style={{
-                        height: '100%',
-                        width: `${Math.min((currentUserEntry.courses_this_season / Math.max(allEntries[0]?.courses_this_season ?? 1, 1)) * 100, 100)}%`,
-                        background: 'linear-gradient(90deg, #F7931E, #f59e0b)',
-                        borderRadius: 99,
-                      }} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Gap CTA */}
-                <div style={{
-                  background: 'rgba(255,255,255,0.07)', borderRadius: 10,
-                  padding: '10px 14px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                }}>
-                  <div>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-                      Rate <strong style={{ color: '#fff' }}>
-                        {Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)} more courses
-                      </strong> to lead
-                    </div>
-                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>
-                      Every review moves you up the rankings ⛳
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.5px' }}>
-                    +{Math.max(0, (allEntries[0]?.courses_this_season ?? 0) - currentUserEntry.courses_this_season)}
-                  </div>
-                </div>
-              </div>
-            )}
-            {/* Season cycle pills */}
-            <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              {(['pre-season', 'major', 'summer', 'off-season'] as const).map((s, i) => {
-                const label = s === 'pre-season' ? 'Pre-Season' : s === 'major' ? 'Major' : s === 'summer' ? 'Summer' : 'Off-Season';
-                const isActive = currentSeasonId === s;
-                return (
-                  <div key={s} style={{
-                    flex: 1, textAlign: 'center', padding: '9px 4px',
-                    borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none',
-                    background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
-                  }}>
-                    <div style={{ fontSize: 11, fontWeight: isActive ? 800 : 400, color: isActive ? '#fff' : 'rgba(255,255,255,0.35)' }}>{label}</div>
-                    {isActive && <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#F7931E', margin: '3px auto 0' }} />}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+    <div
+      className={cn('flex flex-col', className)}
+      style={{
+        background: '#FAFAF6',
+        minHeight: '100%',
+        marginLeft: '-16px',
+        marginRight: '-16px',
+      }}
+    >
+      {/* ── 1. MASTHEAD ── */}
+      <div style={{
+        padding: '20px 20px 14px',
+        borderBottom: '3px double #0F172A',
+        textAlign: 'center',
+        background: '#FAFAF6',
+      }}>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          fontSize: 9, fontWeight: 700, color: '#64748B', letterSpacing: '0.14em',
+          marginBottom: 12, fontVariantNumeric: 'tabular-nums lining-nums',
+        }}>
+          <span>VOL · {ROMAN_YEAR}</span>
+          {timeFilter === 'seasonal' ? (
+            <span style={{ color: '#9F1D1D' }}>● {daysRemaining}D LIVE</span>
+          ) : (
+            <span>EST · 2026</span>
+          )}
+          <span>{timeFilter === 'all_time' ? 'ALL-TIME' : `NO. ${currentSeasonId.toUpperCase()}`}</span>
         </div>
-      )}
 
-      {/* Time Toggle — primary tab pills */}
-      <div style={{ display: 'flex', gap: 8, padding: '12px 4px 4px', justifyContent: 'center' }}>
+        <h1 style={{
+          fontSize: 38, fontWeight: 900, letterSpacing: '-0.035em',
+          margin: 0, lineHeight: 0.95, color: '#0F172A',
+        }}>
+          The Top 100
+        </h1>
+
+        <div style={{
+          fontSize: 10, fontWeight: 600, letterSpacing: '0.32em',
+          color: '#64748B', marginTop: 6,
+        }}>
+          A CHAMPIONSHIP RECORD
+        </div>
+      </div>
+
+      {/* ── 2. TIME MODE TOGGLE ── */}
+      <div style={{ padding: '14px 20px 0', display: 'flex', gap: 8 }}>
         {([
-          { id: 'seasonal' as const, label: `${currentSeason ? new Date(currentSeason.start_date).getFullYear() : new Date().getFullYear()} Season` },
-          { id: 'all_time' as const, label: 'All-Time' },
-        ] as const).map((t) => (
+          { key: 'seasonal' as const, label: seasonLabel },
+          { key: 'all_time' as const, label: 'All-Time' },
+        ]).map((opt) => (
           <button
-            key={t.id}
-            onClick={() => setTimeFilter(t.id)}
-            className="active:scale-[0.97] transition-all"
+            key={opt.key}
+            onClick={() => setTimeFilter(opt.key)}
             style={{
-              padding: '8px 20px',
-              borderRadius: 8,
-              border: timeFilter === t.id ? 'none' : '1px solid rgba(15,23,42,0.10)',
-              background: timeFilter === t.id ? '#0F172A' : 'transparent',
-              color: timeFilter === t.id ? '#fff' : '#64748B',
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
-              minHeight: 36,
+              flex: 1, padding: '10px 0', borderRadius: 4,
+              background: timeFilter === opt.key ? '#0F172A' : 'transparent',
+              color: timeFilter === opt.key ? '#fff' : '#64748B',
+              border: timeFilter === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
+              fontSize: 11, fontWeight: 800, letterSpacing: '0.04em',
+              cursor: 'pointer', transition: 'all 0.15s',
             }}
           >
-            {t.label}
+            {opt.label}
           </button>
         ))}
       </div>
 
-      <div className="overflow-visible">
-        {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
-          <TrophyPodium
-            entries={podiumEntries}
-            seasonThemeColor={seasonThemeColor}
-            currentUserId={userId}
-            onUserClick={handleUserClick}
-          />
-        )}
-        {completedSeasonsWithWinners.length > 0 && (
-          <div className="space-y-4 mb-4">
-            {completedSeasonsWithWinners.map(season => {
-              const winnerId = season.season_winner_user_id!;
-              const profile = winnerProfiles[winnerId];
-              const seasonId = mapToSeasonId(season.name);
-              const config = getSeasonConfig(seasonId);
-              return (
-                <SeasonWinnerCard
-                  key={season.season_id}
-                  seasonLabel={config.title}
-                  winnerName={profile?.display_name || 'Champion'}
-                  winnerAvatarUrl={profile?.avatar_url}
-                  winnerClubName={profile?.club_name}
-                  winnerCourses={season.name?.toLowerCase().includes('pre-season') ? 24 : (season.season_winner_courses ?? 0)}
-                  sponsorName={season.sponsor_name}
-                  prizeDescription={season.prize_description}
-                  prizeClaimed={season.prize_claimed}
-                  endDate={season.end_date}
-                />
-              );
-            })}
+      {/* ── 3. FRONT-PAGE LEDE ── */}
+      <div style={{ padding: '22px 20px 0' }}>
+        <div style={{
+          fontSize: 9, fontWeight: 800, letterSpacing: '0.28em',
+          color: '#9F1D1D', marginBottom: 10,
+        }}>
+          {personalisedEyebrow}
+        </div>
+        <h2 style={{
+          fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em',
+          margin: 0, lineHeight: 1.05, color: '#0F172A',
+        }}>
+          {finalEditorial.headline}
+          {finalEditorial.headlineTwo && (
+            <>
+              <br />
+              <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
+                {finalEditorial.headlineTwo}
+              </span>
+            </>
+          )}
+        </h2>
+        <p style={{
+          fontSize: 12, color: '#64748B', lineHeight: 1.55,
+          marginTop: 12, marginBottom: 0, fontStyle: 'italic',
+        }}>
+          {finalEditorial.standfirst}
+        </p>
+      </div>
+
+      {/* ── 4. THE BOX SCORE ── */}
+      <div style={{ padding: '20px 20px 0' }}>
+        <div style={{
+          borderTop: '1px solid #0F172A',
+          borderBottom: '1px solid #0F172A',
+          padding: '16px 0',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
+          alignItems: 'center',
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              fontSize: 8, fontWeight: 800, color: '#94A3B8',
+              letterSpacing: '0.18em', marginBottom: 4,
+            }}>
+              LEADER
+            </div>
+            <div style={{
+              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              lineHeight: 1, color: '#0F172A',
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}>
+              {leaderCourses || '—'}
+            </div>
           </div>
-        )}
-        {timeFilter === 'all_time' && allTimePodiumData && allTimePodiumData.length > 0 && (
-          <HallOfFamePodium
-            entries={allTimePodiumData}
-            currentUserId={userId}
-            onUserClick={handleUserClick}
-          />
-        )}
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              fontSize: 8, fontWeight: 800, color: '#9F1D1D',
+              letterSpacing: '0.18em', marginBottom: 4,
+            }}>
+              YOU
+            </div>
+            <div style={{
+              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              lineHeight: 1, color: '#9F1D1D',
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}>
+              {youCourses ?? '—'}
+            </div>
+          </div>
+          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              fontSize: 8, fontWeight: 800, color: '#94A3B8',
+              letterSpacing: '0.18em', marginBottom: 4,
+            }}>
+              GAP
+            </div>
+            <div style={{
+              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              lineHeight: 1, color: '#0F172A',
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}>
+              {gap === null ? '—' : userIsLeader ? `+${gap}` : `−${gap}`}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* 4. Beat Rival CTA */}
-      {closestRivalAhead && (
-        <BeatRivalCTA 
-          rival={closestRivalAhead} 
-          onLogCourse={handleLogCourse} 
-        />
-      )}
-
-
-
-      {/* 6b. Arenas Strip — rank pills */}
-      {timeFilter === 'seasonal' && currentUserEntry && (
-        <ArenasStrip
-          activeArena={arenaMode}
-          onArenaChange={handleArenaModeChange}
-          globalRank={currentUserEntry.current_rank ?? null}
-          globalTotal={allEntries.length}
-          countryRank={arenaRanks?.countryRank ?? null}
-          countryLabel={userCountry || 'Country'}
-          countryFlag={userCountry ? getCountryFlag(userCountry) : '🏳️'}
-          countryTotal={arenaRanks?.countryTotal ?? 0}
-          clubRank={arenaRanks?.clubRank ?? null}
-          clubLabel={userHomeClubName || 'My Club'}
-          clubTotal={arenaRanks?.clubTotal ?? 0}
-          handicapRank={arenaRanks?.handicapRank ?? null}
-          handicapLabel={getHandicapBandLabel(userHandicap)}
-          handicapTotal={arenaRanks?.handicapTotal ?? 0}
-          seasonLabel={getSeasonConfig(currentSeasonId).title}
-        />
-      )}
-
-      {/* 7. Filters - Scope Toggle */}
-      <div className="w-full">
-        <ChampionshipFilters
-          arenaMode={arenaMode}
-          divisionFilter={divisionFilter}
-          onArenaModeChange={handleArenaModeChange}
-          onDivisionFilterChange={handleDivisionFilterChange}
-        />
-      </div>
-
-      {/* 8. Club Search Bar (only when club mode is active) */}
-      {arenaMode === 'club' && (
-        <ClubSearchBar
-          selectedClubId={selectedClubId}
-          selectedClubName={selectedClubName}
-          userHomeClubId={userHomeClubId}
-          userHomeClubName={userHomeClubName}
-          onClubSelect={handleClubSelect}
-        />
-      )}
-
-      {/* 8b. Country Selector (only when country mode is active) */}
-      {arenaMode === 'country' && (
-        <CountrySelector
-          selectedCountry={selectedCountry}
-          onCountrySelect={setSelectedCountry}
-        />
-      )}
-
-      {/* Empty state — season just started */}
-      {timeFilter === 'seasonal' && !leaderboardLoading && allEntries.length === 0 && (
-        <div
-          className="flex flex-col items-center justify-center py-12 px-4 text-center"
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 18,
-            border: '1px solid rgba(15,23,42,0.07)',
-          }}
-        >
-          <span style={{ fontSize: 36 }}>⛳</span>
-          <p style={{
-            fontSize: 16,
-            fontWeight: 700,
-            color: '#0C0C0E',
-            fontFamily: 'DM Sans,system-ui,sans-serif',
-            marginTop: 12,
+      {/* ── 5. PRIZE & SPONSOR CARD (Seasonal only) ── */}
+      {timeFilter === 'seasonal' && season?.prize_description && (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div style={{
+            background: '#0F172A', color: '#fff', borderRadius: 4,
+            padding: '16px 18px', position: 'relative', overflow: 'hidden',
           }}>
-            {getSeasonConfig(currentSeasonId).title} has begun
-          </p>
-          <p style={{
-            fontSize: 13,
-            color: '#6B7280',
-            fontFamily: 'DM Sans,system-ui,sans-serif',
-            marginTop: 6,
-            maxWidth: 260,
-          }}>
-            Log your first Top 100 course to appear on the leaderboard. Everyone starts from zero.
-          </p>
+            <div style={{
+              position: 'absolute', top: 0, right: 0, width: 80, height: 80,
+              background: 'radial-gradient(circle at top right, rgba(247,147,30,0.18), transparent 70%)',
+              pointerEvents: 'none',
+            }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 4,
+                background: 'rgba(247,147,30,0.12)',
+                border: '1px solid rgba(247,147,30,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, flexShrink: 0, color: '#F7931E',
+              }}>♛</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.5)',
+                  letterSpacing: '0.22em', marginBottom: 4,
+                }}>
+                  CHAMPIONSHIP PRIZE
+                </div>
+                <div style={{
+                  fontSize: 22, fontWeight: 900, color: '#fff',
+                  letterSpacing: '-0.03em', lineHeight: 1.05,
+                }}>
+                  {season.prize_description}
+                </div>
+              </div>
+            </div>
+
+            {season.sponsor_name && (
+              <div style={{
+                marginTop: 12, paddingTop: 12,
+                borderTop: '1px solid rgba(255,255,255,0.12)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{
+                    fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                    letterSpacing: '0.22em', marginBottom: 2,
+                  }}>
+                    PRESENTED BY
+                  </div>
+                  <div style={{
+                    fontSize: 12, fontWeight: 700, color: '#F7931E',
+                    letterSpacing: '-0.005em',
+                  }}>
+                    {season.sponsor_name}
+                  </div>
+                </div>
+                {season.sponsor_url && (
+                  <button
+                    type="button"
+                    onClick={() => setShowSponsorSheet(true)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
+                      letterSpacing: '0.04em', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {season.sponsor_url.replace(/^https?:\/\//, '').replace(/\/$/, '')} →
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* 9. Leaderboard List — wrapped in card */}
-      {(allEntries.length > 0 || leaderboardLoading || isError) && (
-      <div
-        ref={listContainerRef}
-        className="min-h-[200px] relative"
-        style={{
-          background: '#FFFFFF',
-          borderRadius: 'clamp(14px,4vw,18px)',
-          border: '1px solid rgba(15,23,42,0.07)',
-          overflow: 'hidden',
-          overflowAnchor: 'auto',
-        }}
-      >
-        {/* Loading overlay */}
-        {leaderboardLoading && allEntries.length > 0 && (
-          <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
-            <div className="flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-full" style={{ background: 'rgba(248,250,252,0.85)', border: '0.5px solid rgba(15,23,42,0.10)', boxShadow: '0 1px 6px rgba(0,0,0,0.08)' }}>
-              <Loader2 className="w-4 h-4 animate-spin text-primary" />
-              <span className="text-xs text-muted-foreground">Updating...</span>
-            </div>
+      {/* ── 6. SEASON SCHEDULE (Seasonal only) ── */}
+      {timeFilter === 'seasonal' && (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+            <span style={{
+              fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em',
+            }}>SCHEDULE</span>
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
+            {SEASON_ORDER.map((sid, i) => {
+              const config = getSeasonConfig(sid);
+              const status = getChipStatus(sid, currentSeasonId);
+              const labelTop = status === 'completed'
+                ? '✓'
+                : status === 'active'
+                  ? '● LIVE'
+                  : `RD ${i + 1}`;
+              return (
+                <div
+                  key={sid}
+                  style={{
+                    borderRight: i < 3 ? '1px solid rgba(15,23,42,0.1)' : 'none',
+                    padding: '10px 8px', textAlign: 'center',
+                  }}
+                >
+                  <div style={{
+                    fontSize: 8, fontWeight: 800, letterSpacing: '0.18em', marginBottom: 4,
+                    color: status === 'active' ? '#9F1D1D' : '#94A3B8',
+                  }}>
+                    {labelTop}
+                  </div>
+                  <div style={{
+                    fontSize: 11, fontWeight: 700,
+                    color: status === 'active' ? '#0F172A'
+                      : status === 'completed' ? '#94A3B8'
+                      : '#64748B',
+                  }}>
+                    {config.label}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── 7. FULL STANDINGS ── */}
+      <div style={{ padding: '26px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div style={{ width: 18, height: 1, background: '#0F172A' }} />
+          <span style={{
+            fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em',
+          }}>
+            {timeFilter === 'all_time' ? 'ALL-TIME STANDINGS' : 'FULL STANDINGS'}
+          </span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+        </div>
+
+        {/* Arena tabs */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+          {arenas.map((a) => (
+            <button
+              key={a.key}
+              onClick={() => handleArenaModeChange(a.key)}
+              style={{
+                padding: '5px 10px', borderRadius: 3,
+                background: arenaMode === a.key ? '#0F172A' : 'transparent',
+                color: arenaMode === a.key ? '#fff' : '#64748B',
+                border: arenaMode === a.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
+                fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em',
+              }}
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Division sub-filter */}
+        {arenaMode === 'division' && (
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10, marginTop: 8,
+          }}>
+            {divisionChips.map((d) => (
+              <button
+                key={d.key}
+                onClick={() => handleDivisionFilterChange(d.key)}
+                style={{
+                  padding: '4px 9px', borderRadius: 3,
+                  background: divisionFilter === d.key ? 'rgba(15,23,42,0.08)' : 'transparent',
+                  color: divisionFilter === d.key ? '#0F172A' : '#94A3B8',
+                  border: '1px solid rgba(15,23,42,0.1)',
+                  fontSize: 9, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em',
+                }}
+              >
+                {d.label}
+              </button>
+            ))}
           </div>
         )}
-        
-        {/* Initial error state */}
-        {isError && allEntries.length === 0 ? (
-          <InitialErrorState onRetry={() => refetch()} />
-        ) : leaderboardLoading && allEntries.length === 0 ? (
-          <div className="space-y-2 p-2">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="py-3 px-4 flex items-center gap-3">
-                <Skeleton className="w-8 h-8 rounded" />
-                <Skeleton className="w-11 h-11 rounded-lg" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-24" />
-                </div>
-                <Skeleton className="w-8 h-8 rounded" />
+
+        {/* Club search bar */}
+        {arenaMode === 'club' && (
+          <div style={{ marginTop: 8, marginBottom: 8 }}>
+            <ClubSearchBar
+              selectedClubId={selectedClubId}
+              selectedClubName={selectedClubName}
+              userHomeClubId={userHomeClubId}
+              userHomeClubName={userHomeClubName}
+              onClubSelect={handleClubSelect}
+            />
+          </div>
+        )}
+
+        {/* Country selector */}
+        {arenaMode === 'country' && (
+          <div style={{ marginTop: 8, marginBottom: 8 }}>
+            <CountrySelector
+              selectedCountry={selectedCountry}
+              onCountrySelect={setSelectedCountry}
+            />
+          </div>
+        )}
+
+        {/* Column headers */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '26px 38px 1fr 36px 50px',
+          padding: '10px 0 8px',
+          borderBottom: '1px solid #0F172A',
+          fontSize: 8, fontWeight: 800, color: '#94A3B8',
+          letterSpacing: '0.18em', alignItems: 'center',
+        }}>
+          <span>POS</span>
+          <span />
+          <span>PLAYER</span>
+          <span style={{ textAlign: 'right' }}>{timeFilter === 'all_time' ? 'DIV' : 'WK'}</span>
+          <span style={{ textAlign: 'right' }}>CRS</span>
+        </div>
+
+        {/* Loading state (initial) */}
+        {leaderboardLoading && allEntries.length === 0 && (
+          <div>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '26px 38px 1fr 36px 50px',
+                  alignItems: 'center', padding: '12px 0',
+                  borderBottom: '1px solid rgba(15,23,42,0.07)',
+                }}
+              >
+                <Skeleton style={{ height: 14, width: 18 }} />
+                <Skeleton style={{ height: 30, width: 30, borderRadius: 3 }} />
+                <Skeleton style={{ height: 14, width: '60%' }} />
+                <Skeleton style={{ height: 12, width: 24, marginLeft: 'auto' }} />
+                <Skeleton style={{ height: 18, width: 32, marginLeft: 'auto' }} />
               </div>
             ))}
           </div>
-        ) : allEntries.length === 0 && !leaderboardLoading ? (
-          arenaMode === 'friends' ? (
-            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <Users className="w-12 h-12 text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground font-medium">No friends yet</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">
-                Follow golfers to see them on your friends leaderboard
-              </p>
-            </div>
-          ) : arenaMode === 'club' ? (
-            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <Building2 className="w-12 h-12 text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground font-medium">No club members found</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">
-                No members from this club have joined the championship yet
-              </p>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-[300px]">
-              <p className="text-muted-foreground">No players found</p>
-            </div>
-          )
-        ) : useVirtualization && virtualizedContent ? (
-          <div
-            className={cn('relative transition-opacity duration-150', leaderboardLoading && 'opacity-60')}
-            style={{ height: virtualizedContent.totalHeight }}
-          >
-            <div
-              className="absolute inset-x-0"
-              style={{ transform: `translateY(${virtualizedContent.offsetY}px)` }}
-            >
-              {virtualizedContent.visibleEntries.map((entry) => (
-                <LeaderboardRowV3
-                  key={entry.user_id}
-                  rank={entry.current_rank}
-                  name={entry.display_name}
-                  avatarUrl={entry.avatar_url}
-                  homeClubName={entry.home_club}
-                  courses={entry.courses_this_season}
-                  isCurrentUser={entry.is_current_user}
-                  leaderCourses={allEntries[0]?.courses_this_season ?? 0}
-                  onClick={() => handleEntryClick(entry.user_id)}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className={cn('transition-opacity duration-150', leaderboardLoading && 'opacity-60')}>
-            {allEntries.map((entry) => (
-              <LeaderboardRowV3
-                key={entry.user_id}
-                rank={entry.current_rank}
-                name={entry.display_name}
-                avatarUrl={entry.avatar_url}
-                homeClubName={entry.home_club}
-                courses={entry.courses_this_season}
-                isCurrentUser={entry.is_current_user}
-                leaderCourses={allEntries[0]?.courses_this_season ?? 0}
-                onClick={() => handleEntryClick(entry.user_id)}
-              />
-            ))}
+        )}
+
+        {/* Initial error */}
+        {isError && allEntries.length === 0 && !leaderboardLoading && (
+          <InitialErrorState onRetry={() => refetch()} />
+        )}
+
+        {/* Empty state */}
+        {!leaderboardLoading && !isError && allEntries.length === 0 && (
+          <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+            <p style={{ fontSize: 13, color: '#94A3B8', fontStyle: 'italic', marginBottom: 14 }}>
+              {arenaMode === 'friends'
+                ? 'No friends on the leaderboard yet.'
+                : arenaMode === 'club'
+                  ? 'No members from this club have entered yet.'
+                  : 'No entrants in this view yet.'}
+            </p>
+            {arenaMode === 'friends' && (
+              <button
+                onClick={() => navigate('/golfers-to-follow')}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: 11, fontWeight: 800, color: '#9F1D1D',
+                  letterSpacing: '0.18em',
+                }}
+              >
+                FIND FRIENDS →
+              </button>
+            )}
           </div>
         )}
-        
-        {/* Short list invite CTA */}
-        {allEntries.length > 0 && allEntries.length < 10 && !hasNextPage && !leaderboardLoading && (
-          <div className="mt-2 mx-4 mb-4 py-5 px-4 rounded-2xl flex flex-col items-center gap-2 text-center"
-            style={{ border: '1.5px dashed rgba(0,0,0,0.1)' }}
-          >
-            <p style={{ fontSize: 14, color: '#6B7280', fontFamily: 'DM Sans,system-ui,sans-serif' }}>
-              Invite friends to climb the leaderboard
-            </p>
-            <button
-              className="transition-opacity active:scale-[0.97] active:opacity-70"
-              style={{ fontSize: 14, fontWeight: 600, color: '#006747', fontFamily: 'DM Sans,system-ui,sans-serif' }}
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({ title: 'Join me on Clbhouz', url: window.location.origin });
-                }
+
+        {/* Player rows */}
+        {allEntries.map((p, i) => {
+          const isLast = i === allEntries.length - 1;
+          const showStreak = timeFilter === 'seasonal' && p.streak_current >= 3;
+          const initials = getInitials(p.display_name);
+
+          return (
+            <div
+              key={p.user_id}
+              onClick={() => handleEntryClick(p.user_id)}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '26px 38px 1fr 36px 50px',
+                alignItems: 'center',
+                gap: 4,
+                padding: '12px 0',
+                borderBottom: isLast
+                  ? '1px solid #0F172A'
+                  : '1px solid rgba(15,23,42,0.07)',
+                background: p.is_current_user ? 'rgba(159,29,29,0.04)' : 'transparent',
+                marginLeft: p.is_current_user ? -10 : 0,
+                marginRight: p.is_current_user ? -10 : 0,
+                paddingLeft: p.is_current_user ? 10 : 0,
+                paddingRight: p.is_current_user ? 10 : 0,
+                position: 'relative',
+                cursor: 'pointer',
               }}
             >
-              Share Invite Link
-            </button>
-          </div>
-        )}
+              {p.is_current_user && (
+                <div style={{
+                  position: 'absolute', left: 0, top: 0, bottom: 0,
+                  width: 3, background: '#9F1D1D',
+                }} />
+              )}
 
-        {/* Sentinel + loading skeleton for infinite scroll */}
+              <span style={{
+                fontSize: 16, fontWeight: 900,
+                color: p.current_rank <= 3 ? '#0F172A' : '#94A3B8',
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                letterSpacing: '-0.02em',
+              }}>
+                {p.current_rank}
+              </span>
+
+              {p.avatar_url ? (
+                <SquircleAvatar
+                  src={p.avatar_url}
+                  alt={p.display_name}
+                  size={30}
+                  fallback={initials}
+                />
+              ) : (
+                <div style={{
+                  width: 30, height: 30, borderRadius: 3,
+                  background: getAvatarFallbackColor(p.user_id),
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: 11, fontWeight: 800,
+                  border: p.is_current_user
+                    ? '1.5px solid #9F1D1D'
+                    : '1px solid rgba(15,23,42,0.08)',
+                }}>
+                  {initials}
+                </div>
+              )}
+
+              <div style={{ minWidth: 0, paddingLeft: 4 }}>
+                <div style={{
+                  fontSize: 13, fontWeight: 700, color: '#0F172A',
+                  letterSpacing: '-0.005em',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {p.display_name}
+                  {p.is_current_user && (
+                    <span style={{
+                      fontSize: 8, fontWeight: 800, color: '#9F1D1D',
+                      letterSpacing: '0.18em', marginLeft: 6,
+                    }}>YOU</span>
+                  )}
+                </div>
+                <div style={{
+                  fontSize: 10, color: '#94A3B8', marginTop: 1,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {p.home_club || 'Independent'}
+                  {showStreak && (
+                    <span style={{ color: '#9F1D1D', fontWeight: 700, marginLeft: 4 }}>
+                      · {p.streak_current}w streak
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {timeFilter === 'seasonal' ? (
+                <span style={{
+                  textAlign: 'right', fontSize: 10, fontWeight: 700, letterSpacing: '0.04em',
+                  color: p.rank_movement > 0
+                    ? '#15803D'
+                    : p.rank_movement < 0
+                      ? '#9F1D1D'
+                      : '#CBD5E1',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                }}>
+                  {p.rank_movement > 0
+                    ? `↑${p.rank_movement}`
+                    : p.rank_movement < 0
+                      ? `↓${Math.abs(p.rank_movement)}`
+                      : '—'}
+                </span>
+              ) : (
+                <span style={{
+                  textAlign: 'right', fontSize: 9, fontWeight: 800,
+                  color: '#64748B', letterSpacing: '0.06em',
+                  textTransform: 'uppercase' as const,
+                }}>
+                  {abbreviateDivision(p.division_slug)}
+                </span>
+              )}
+
+              <span style={{
+                fontSize: 20, fontWeight: 900, textAlign: 'right',
+                color: '#0F172A', letterSpacing: '-0.03em',
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}>
+                {p.courses_this_season}
+              </span>
+            </div>
+          );
+        })}
+
+        {/* Sentinel + footer feedback */}
         {hasNextPage && !isError && (
-          <div ref={sentinelRef}>
-            {isFetchingNextPage && <LeaderboardLoadingSkeleton />}
+          <div ref={sentinelRef} style={{ padding: '12px 0' }}>
+            {isFetchingNextPage && (
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 8, color: '#94A3B8', fontSize: 11,
+              }}>
+                <Loader2 className="animate-spin" style={{ width: 14, height: 14 }} />
+                <span style={{ letterSpacing: '0.12em', fontWeight: 700 }}>LOADING</span>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Inline retry on pagination error */}
-        {isError && !isFetchingNextPage && allEntries.length > 0 && (
+        {isError && allEntries.length > 0 && !isFetchingNextPage && (
           <InlineRetryCard onRetry={() => fetchNextPage()} />
         )}
-
-        {/* Loading indicator during retry */}
-        {isError && isFetchingNextPage && allEntries.length > 0 && (
-          <LeaderboardLoadingSkeleton />
-        )}
       </div>
-      )}
 
-      {/* Rival Versus Panel (drawer) */}
-      {userStatus && selectedRival && (
-        <RivalVersusPanel
-          isOpen={!!selectedRival}
-          onClose={() => setSelectedRival(null)}
-          rival={selectedRival}
-          userStatus={userStatus}
+      {/* ── 8. FOOTER CAPTION ── */}
+      <div style={{ padding: '20px 20px 28px', textAlign: 'center' }}>
+        <div style={{
+          fontSize: 9, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic',
+        }}>
+          Compiled from members' verified rounds · Updated daily
+        </div>
+      </div>
+
+      {/* Sponsor link sheet */}
+      {season?.sponsor_url && (
+        <ExternalLinkSheet
+          isOpen={showSponsorSheet}
+          onClose={() => setShowSponsorSheet(false)}
+          url={season.sponsor_url}
+          title={season.sponsor_name || 'Sponsor'}
         />
       )}
-
-      {/* Rank Celebration */}
-      {previousRank && userStatus && (
-        <RankCelebration 
-          previousRank={previousRank}
-          currentRank={userStatus.current_rank}
-          show={showCelebration}
-          onComplete={() => {
-            setShowCelebration(false);
-            setPreviousRank(null);
-          }}
-        />
-      )}
-      <ExternalLinkSheet
-        isOpen={showSponsorSheet}
-        onClose={() => setShowSponsorSheet(false)}
-        url={currentSeason?.sponsor_url ?? ''}
-        title={`${currentSeason?.sponsor_name ?? 'Sponsor'} Website`}
-      />
-      </div>{/* end body content */}
     </div>
   );
 }

@@ -153,3 +153,21 @@ export function getDivisionIndex(slug: DivisionSlug): number {
 export function isHigherDivision(a: DivisionSlug, b: DivisionSlug): boolean {
   return getDivisionIndex(a) > getDivisionIndex(b);
 }
+
+// Two-letter abbreviation for division (used in All-Time standings DIV column)
+const DIVISION_ABBREVIATIONS: Record<string, string> = {
+  rookie: 'RK',
+  fairway: 'FW',
+  founders: 'FD',
+  heritage: 'HG',
+  century: 'CN',
+  elite: 'EL',
+  legendary: 'LG',
+  grandslam: 'GS',
+};
+
+export function abbreviateDivision(slug: string | null | undefined): string {
+  if (!slug) return '—';
+  const base = slug.toLowerCase().replace(/-?club$/, '').replace(/[-_\s]/g, '');
+  return DIVISION_ABBREVIATIONS[base] ?? base.slice(0, 2).toUpperCase();
+}
