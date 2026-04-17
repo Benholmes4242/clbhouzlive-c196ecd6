@@ -177,11 +177,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 4. Friends Who've Played */}
       <CourseFriendsStrip courseId={course.id} courseName={course.name} />
 
-
       {/* 5. About */}
       {course.description && (
         <>
-          <div style={{ padding: '0 16px' }}>
+          <div style={{ marginTop: 24, padding: '0 16px' }}>
             <SectionLabel text="About" />
             <div>
               <div style={{ fontSize: 14, color: '#475569', lineHeight: 1.7, position: 'relative' }}>
