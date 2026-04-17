@@ -470,7 +470,7 @@ export function LowestHandicapLeaderboard({
       {editorialPending ? (
         <EditorialLedeSkeleton />
       ) : (
-        <div style={{ padding: '22px 20px 0' }}>
+        <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
           <div
             style={{
               fontSize: 10,
@@ -822,8 +822,9 @@ export function LowestHandicapLeaderboard({
 
       {/* ── TIER LADDER ── */}
       <div style={{ padding: '22px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 18, height: 1, background: INK }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          <div style={{ width: 12, height: 1, background: INK }} />
           <span
             style={{
               fontSize: 10,
@@ -834,6 +835,7 @@ export function LowestHandicapLeaderboard({
           >
             TIER LADDER
           </span>
+          <div style={{ width: 12, height: 1, background: INK }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)' }}>
@@ -880,8 +882,9 @@ export function LowestHandicapLeaderboard({
 
       {/* ── FULL STANDINGS ── */}
       <div style={{ padding: '22px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 18, height: 1, background: INK }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          <div style={{ width: 12, height: 1, background: INK }} />
           <span
             style={{
               fontSize: 10,
@@ -892,6 +895,7 @@ export function LowestHandicapLeaderboard({
           >
             {sectionLabel}
           </span>
+          <div style={{ width: 12, height: 1, background: INK }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
 
