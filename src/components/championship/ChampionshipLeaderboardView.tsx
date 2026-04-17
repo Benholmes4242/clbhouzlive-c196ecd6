@@ -477,7 +477,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     <div
       className={cn('flex flex-col', className)}
       style={{
-        background: '#FAFAF6',
+        background: '#F8FAFC',
         minHeight: '100%',
         marginLeft: '-16px',
         marginRight: '-16px',
@@ -488,7 +488,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         padding: '20px 20px 14px',
         borderBottom: '3px double #0F172A',
         textAlign: 'center',
-        background: '#FAFAF6',
+        background: '#F8FAFC',
       }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',

@@ -37,7 +37,7 @@ import type { PeerGroup } from './HandicapTab';
 import type { LowestHandicapEntry } from '@/types/leaderboards';
 
 // ── Editorial palette ────────────────────────────────────────────────────
-const BG = '#FAFAF6';
+const BG = '#F8FAFC';
 const INK = '#0F172A';
 const INK_BODY = '#475569';
 const INK_MUTED = '#64748B';

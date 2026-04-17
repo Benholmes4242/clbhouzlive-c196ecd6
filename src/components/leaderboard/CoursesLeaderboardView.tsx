@@ -362,10 +362,10 @@ export function CoursesLeaderboardView() {
 
   // ─── Render ────────────────────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#FAFAF6', fontFamily: 'Geist, system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#F8FAFC', fontFamily: 'Geist, system-ui, sans-serif' }}>
 
       {/* ── MASTHEAD ─────────────────────────────────────────────── */}
-      <div style={{ padding: '20px 20px 14px', borderBottom: '3px double #0F172A', textAlign: 'center', background: '#FAFAF6' }}>
+      <div style={{ padding: '20px 20px 14px', borderBottom: '3px double #0F172A', textAlign: 'center', background: '#F8FAFC' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 9, fontWeight: 700, color: '#64748B', letterSpacing: '0.14em', marginBottom: 12 }}>
           <span>VOL · MMXXVI</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#9F1D1D' }}>
