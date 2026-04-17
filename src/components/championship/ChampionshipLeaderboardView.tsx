@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
+import { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
@@ -338,18 +338,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   });
 
   const leader = allEntries[0] ?? null;
-  const leaderCoursesValue = leader
-    ? (timeFilter === 'all_time' ? leader.courses_this_season : leader.courses_this_season)
-    : 0;
+  const leaderCourses = leader?.courses_this_season ?? 0;
 
   const finalEditorial: EditorialCopy = useMemo(() => {
     return editorialData ?? buildBaselineEditorial({
       timeFilter,
       seasonLabel,
       leaderName: leader?.display_name ?? null,
-      leaderCourses: leaderCoursesValue,
+      leaderCourses,
     });
-  }, [editorialData, timeFilter, seasonLabel, leader?.display_name, leaderCoursesValue]);
+  }, [editorialData, timeFilter, seasonLabel, leader?.display_name, leaderCourses]);
 
   const personalisedEyebrow = useMemo(() => {
     if (timeFilter === 'all_time') return finalEditorial.eyebrow || 'THE ALL-TIME RECORD';
@@ -372,10 +370,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   const userIsLeader = !!currentUserEntry && currentUserEntry.current_rank === 1;
   const youCourses: number | null = currentUserEntry?.courses_this_season ?? null;
-  const leaderCourses = leader?.courses_this_season ?? 0;
   const second = allEntries[1] ?? null;
-  const gap = userIsLeader
-    ? Math.max(0, leaderCourses - (second?.courses_this_season ?? 0))
+  const gap: number | null = userIsLeader
+    ? second
+      ? Math.max(0, leaderCourses - (second.courses_this_season ?? 0))
+      : null // No second player to lead — surface as em-dash
     : youCourses !== null
       ? Math.max(0, leaderCourses - youCourses)
       : null;
@@ -723,7 +722,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               const config = getSeasonConfig(sid);
               const status = getChipStatus(sid, currentSeasonId);
               const labelTop = status === 'completed'
-                ? '✓'
+                ? 'DONE'
                 : status === 'active'
                   ? '● LIVE'
                   : `RD ${i + 1}`;
@@ -1016,7 +1015,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   color: '#64748B', letterSpacing: '0.06em',
                   textTransform: 'uppercase' as const,
                 }}>
-                  {abbreviateDivision(p.division_slug)}
+                  {abbreviateDivision(p.division_slug) || '—'}
                 </span>
               )}
 
