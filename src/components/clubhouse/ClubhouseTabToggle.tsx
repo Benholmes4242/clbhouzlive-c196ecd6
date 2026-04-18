@@ -34,7 +34,6 @@ export const ClubhouseTabToggle = ({
       className={cn("inline-flex items-center gap-4 sm:gap-7 relative z-[45]", className)}
       role="tablist"
       aria-label="Feed filter"
-      style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
     >
       {(['foryou', 'friends'] as const).map((id) => {
         const label = id === 'foryou' ? 'Suggested' : 'Friends';
@@ -54,7 +53,7 @@ export const ClubhouseTabToggle = ({
               border: 'none',
               cursor: 'pointer',
               padding: '10px 4px 8px',
-              fontSize: 'clamp(14px, 4vw, 17px)',
+              fontSize: 'clamp(13px, 3.6vw, 15px)',
               fontWeight: isActive ? 700 : 500,
               color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
               letterSpacing: isActive ? '-0.025em' : '0',
@@ -72,7 +71,7 @@ export const ClubhouseTabToggle = ({
                 bottom: 0,
                 left: 0,
                 right: 0,
-                height: 2.5,
+                height: 1.5,
                 borderRadius: 2,
                 background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
               }} />
