@@ -45,6 +45,8 @@ interface ClubhouseTopBarProps {
   hideTabs?: boolean;
   hideSearch?: boolean;
   hideProfilePill?: boolean;
+  /** Left edge offset in px — lets a close button coexist to the left of the bar */
+  leftInset?: number;
 }
 
 const TABS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
@@ -61,6 +63,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   hideTabs = false,
   hideSearch = false,
   hideProfilePill = false,
+  leftInset = 0,
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -96,9 +99,11 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
 
       {/* ── ROW 2: Combined identity + actions bar ── */}
       <div
-        className="fixed left-3 right-3 z-40 flex items-center min-w-0"
+        className="fixed z-40 flex items-center min-w-0"
         style={{
           top: BAR_TOP,
+          left: leftInset > 0 ? leftInset : 12,
+          right: 12,
           opacity: hidden ? 0 : 1,
           pointerEvents: hidden ? 'none' : 'auto',
           transition: 'opacity 0.2s ease',
