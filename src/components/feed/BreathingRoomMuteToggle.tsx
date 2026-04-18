@@ -46,8 +46,8 @@ export const BreathingRoomMuteToggle: React.FC<BreathingRoomMuteToggleProps> = (
         position: 'fixed',
         bottom: 'calc(var(--bottom-nav-height, 88px) + 170px)',
         left: 16,
-        width: 32,
-        height: 32,
+        width: 44,
+        height: 44,
         borderRadius: 14,
         background: 'rgba(0, 0, 0, 0.50)',
         border: '1px solid rgba(255, 255, 255, 0.10)',
@@ -64,9 +64,9 @@ export const BreathingRoomMuteToggle: React.FC<BreathingRoomMuteToggleProps> = (
       }}
     >
       {isMuted ? (
-        <VolumeX size={16} stroke="#fff" strokeWidth={2} />
+        <VolumeX size={20} stroke="#fff" strokeWidth={2} />
       ) : (
-        <Volume2 size={16} stroke="#fff" strokeWidth={2} />
+        <Volume2 size={20} stroke="#fff" strokeWidth={2} />
       )}
     </motion.button>
   );
