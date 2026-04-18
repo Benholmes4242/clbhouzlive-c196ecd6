@@ -144,13 +144,13 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           icon={
             <Heart
               size={22}
-              fill={hasLiked ? '#9F1D1D' : 'transparent'}
-              stroke={hasLiked ? '#9F1D1D' : '#fff'}
+              fill={hasLiked ? '#F7931E' : 'transparent'}
+              stroke={hasLiked ? '#F7931E' : '#fff'}
               strokeWidth={2}
             />
           }
           count={formatCount(likesCount)}
-          accent={hasLiked ? '#9F1D1D' : '#fff'}
+          accent={hasLiked ? '#F7931E' : '#fff'}
           onClick={onLike}
           ariaLabel={hasLiked ? 'Unlike' : 'Like'}
           animateKey={likeAnimKey}
