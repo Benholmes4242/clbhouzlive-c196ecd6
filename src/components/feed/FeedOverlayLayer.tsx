@@ -38,6 +38,8 @@ interface FeedOverlayLayerProps {
   } | null;
   isActiveReview?: boolean;
   activeIndexOverride?: number;
+  /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
+  bottomOffset?: number;
 }
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
@@ -56,6 +58,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   golfCourse,
   onBeforeNavigate,
   activeIndexOverride,
+  bottomOffset,
 }: FeedOverlayLayerProps) {
   const navigate = useNavigate();
   const clubhouseActiveIndex = useClubhouseStore(s => s.activeIndex);
@@ -148,7 +151,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
       )}
 
       {/* Mute toggle — only on video posts */}
-      {isVideo && <BreathingRoomMuteToggle isVisible={overlayVisible} />}
+      {isVideo && <BreathingRoomMuteToggle isVisible={overlayVisible} bottomOffset={bottomOffset} />}
 
       {/* Review Header Panel — only on review posts, sits above the bottom bar */}
       {activePost.isReview && activePost.review && (
@@ -157,7 +160,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             position: 'fixed',
             left: 0,
             right: 0,
-            bottom: 'calc(var(--bottom-nav-height, 88px) + 140px)',
+            bottom: bottomOffset !== undefined
+              ? `${bottomOffset + 140}px`
+              : 'calc(var(--bottom-nav-height, 88px) + 140px)',
             zIndex: Z.echo,
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
@@ -194,6 +199,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         onFollow={() => onFollow(activePost)}
         activeVideoElement={isVideo ? activeVideoElement : null}
         postId={activePost.id}
+        bottomOffset={bottomOffset}
       />
     </div>
   );

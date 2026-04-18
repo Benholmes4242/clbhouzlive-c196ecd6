@@ -16,10 +16,13 @@ import { Z } from '@/config/zIndex';
 
 interface BreathingRoomMuteToggleProps {
   isVisible: boolean;
+  /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
+  bottomOffset?: number;
 }
 
 export const BreathingRoomMuteToggle: React.FC<BreathingRoomMuteToggleProps> = ({
   isVisible,
+  bottomOffset,
 }) => {
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
@@ -44,7 +47,9 @@ export const BreathingRoomMuteToggle: React.FC<BreathingRoomMuteToggleProps> = (
       transition={{ duration: 0.18, ease: 'easeOut' }}
       style={{
         position: 'fixed',
-        bottom: 'calc(var(--bottom-nav-height, 88px) + 170px)',
+        bottom: bottomOffset !== undefined
+          ? `${bottomOffset + 170}px`
+          : 'calc(var(--bottom-nav-height, 88px) + 170px)',
         left: 16,
         width: 44,
         height: 44,

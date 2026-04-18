@@ -155,18 +155,19 @@ export function CourseMediaViewer() {
             <button
               onClick={close}
               aria-label="Close"
-              className="absolute left-4 z-[9020] rounded-full flex items-center justify-center"
+              className="absolute left-4 z-[9020] flex items-center justify-center active:scale-95 transition-all"
               style={{
                 top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-                width: 44,
-                height: 44,
+                width: 34,
+                height: 34,
+                borderRadius: 12,
                 background: 'rgba(0, 0, 0, 0.50)',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
                 border: '1px solid rgba(255, 255, 255, 0.10)',
               }}
             >
-              <X className="w-5 h-5 text-white" />
+              <X className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
             </button>
 
             {/* SnapFeed — drives the actual media playback */}
@@ -249,14 +250,14 @@ export function CourseMediaViewer() {
             )}
 
             {/* Mute toggle — video posts only */}
-            {isVideo && <BreathingRoomMuteToggle isVisible={true} />}
+            {isVideo && <BreathingRoomMuteToggle isVisible={true} bottomOffset={0} />}
 
             {/* Review header panel — review posts only */}
             {isReview && activePost?.review && (
               <div
                 style={{
                   position: 'fixed',
-                  bottom: 'calc(var(--bottom-nav-height, 88px) + 140px)',
+                  bottom: 140,
                   left: 0,
                   right: 0,
                   zIndex: Z.echo,
@@ -302,6 +303,7 @@ export function CourseMediaViewer() {
                 activeVideoElement={activeVideoElement}
                 postId={activePost.id}
                 readOnly={true}
+                bottomOffset={0}
               />
             )}
 
@@ -310,7 +312,7 @@ export function CourseMediaViewer() {
               <div
                 style={{
                   position: 'fixed',
-                  bottom: 'calc(var(--bottom-nav-height, 88px) + 56px)',
+                  bottom: 56,
                   left: 0,
                   right: 0,
                   pointerEvents: 'auto',

@@ -48,6 +48,8 @@ interface BreathingRoomBottomBarProps {
   postId?: string;
   /** When true, suppress the entire interactive action strip (read-only viewers) */
   readOnly?: boolean;
+  /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
+  bottomOffset?: number;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -75,6 +77,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   activeVideoElement,
   postId,
   readOnly = false,
+  bottomOffset,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
@@ -101,7 +104,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       transition={{ duration: 0.18, ease: 'easeOut' }}
       style={{
         position: 'fixed',
-        bottom: 'var(--bottom-nav-height, 88px)',
+        bottom: bottomOffset !== undefined ? bottomOffset : 'var(--bottom-nav-height, 88px)',
         left: 0,
         right: 0,
         padding: '90px 16px 20px',
