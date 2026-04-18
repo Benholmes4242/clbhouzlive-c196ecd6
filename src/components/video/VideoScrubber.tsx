@@ -16,7 +16,7 @@ import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
-type ScrubberVariant = 'default' | 'wizard' | 'fullscreen';
+type ScrubberVariant = 'default' | 'wizard' | 'fullscreen' | 'amber';
 
 interface VideoScrubberProps {
   videoEl: HTMLVideoElement | null;
@@ -57,6 +57,14 @@ const COLORS = {
     glow: '0 0 8px rgba(255, 255, 255, 0.45)',
     ghostShimmer: 'rgba(255,255,255,0.1)',
     bufferShimmer: 'rgba(255,255,255,0.2)',
+  },
+  amber: {
+    track: 'rgba(255, 255, 255, 0.16)',
+    buffered: 'rgba(247, 147, 30, 0.30)',
+    fill: '#F7931E',
+    glow: 'none',
+    ghostShimmer: 'rgba(247, 147, 30, 0.10)',
+    bufferShimmer: 'rgba(247, 147, 30, 0.22)',
   },
 } as const;
 

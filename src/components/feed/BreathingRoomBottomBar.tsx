@@ -16,6 +16,7 @@ import { Heart, MessageSquare, Send, MoreHorizontal } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 interface TaggedFriend {
   id: string;
@@ -41,6 +42,10 @@ interface BreathingRoomBottomBarProps {
   isFollowing: boolean;
   isOwnPost: boolean;
   onFollow: () => void;
+  /** NEW: the active video element, used for the scrubber rendered as action-strip border */
+  activeVideoElement?: HTMLVideoElement | null;
+  /** NEW: stable identifier for the active post — used to reset caption expansion on post change */
+  postId?: string;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
