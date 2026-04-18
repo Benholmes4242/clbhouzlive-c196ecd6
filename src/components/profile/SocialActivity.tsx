@@ -1,18 +1,10 @@
-
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost, SocialActivityProps } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
 import ActivityPostCard from './components/ActivityPostCard';
-import BadgeCarousel from '../badges/BadgeCarousel';
-import { ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
-import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
-import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
-import { isReviewPost as checkIsReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
-
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
   userId,
@@ -23,39 +15,23 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   userType = 'individual'
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
-  const [selectedReviewPost, setSelectedReviewPost] = useState<ActivityPost | null>(null);
-
-  const { openViewer } = useMediaViewer();
 
   // Filter to only media posts for the unified player
-  const mediaPosts = useMemo(() => 
-    posts.filter(p => p.post_media && p.post_media.length > 0),
+  const mediaPosts = useMemo(
+    () => posts.filter(p => p.post_media && p.post_media.length > 0),
     [posts]
   );
 
   const handlePostClick = useCallback((post: ActivityPost) => {
-    // Check if this is a review post
-    const isReview = checkIsReviewPost(post);
-    
-    if (isReview) {
-      // Review posts use the dedicated ReviewPostViewer
-      setSelectedReviewPost(post);
-    } else {
-      // Regular posts use the unified fullscreen player
-      const postIndex = mediaPosts.findIndex(p => p.id === post.id);
-      if (postIndex >= 0) {
-        openViewer(mediaPosts, postIndex);
-      }
-    }
-  }, [mediaPosts, openViewer]);
+    const postIndex = mediaPosts.findIndex(p => p.id === post.id);
+    if (postIndex < 0) return;
 
-  const handlePostUpdated = () => {
-    fetchUserPosts();
-  };
+    // Map all media posts to FeedPost shape (handles both regular and review posts)
+    const feedPosts = mediaPosts.map(mapActivityPostToFeedPost);
 
-  const handlePostDeleted = () => {
-    fetchUserPosts();
-  };
+    // Open the unified fullscreen viewer
+    useFullscreenFeedStore.getState().open(feedPosts, postIndex);
+  }, [mediaPosts]);
 
   // Get the correct attribution text
   const getPostAttribution = () => {
@@ -71,11 +47,11 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   if (loading) {
     return (
       <div className="mt-10 px-0">
-        <ActivityHeader 
+        <ActivityHeader
           postsCount={0}
           isOwnProfile={isOwnProfile}
           onPostCreated={fetchUserPosts}
-          onAchievementsClick={() => {}} // Empty function for loading state
+          onAchievementsClick={() => {}}
         />
         <div className="text-center py-8">
           <p className="text-muted-foreground">Loading posts...</p>
@@ -86,21 +62,19 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
   return (
     <div className="mt-10 px-0">
-      <ActivityHeader 
+      <ActivityHeader
         postsCount={posts.length}
         isOwnProfile={isOwnProfile}
         onPostCreated={fetchUserPosts}
-        onAchievementsClick={() => {}} // Empty function as SocialActivity doesn't handle tab switching
+        onAchievementsClick={() => {}}
       />
-
 
       {/* Grid layout for square posts - straight edge corners with thin border gutter */}
       <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] px-1 mt-4">
         <div className="grid grid-cols-3 gap-[2px]">
           {posts.map((post, index) => {
-            // Check if this is the first video post
             const isFirstVideo = index === 0 && post.post_media?.[0]?.media_type === 'video';
-            
+
             return (
               <ActivityPostCard
                 key={post.id}
@@ -119,59 +93,6 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           <p className="text-muted-foreground">No posts yet.</p>
         </div>
       )}
-
-      {/* Review post viewer - only for review posts */}
-      {selectedReviewPost && (() => {
-        const reviewData = extractReviewData(selectedReviewPost);
-        const userData = extractUserData(selectedReviewPost);
-        
-        const reviewMedia: ReviewMediaItem[] = (selectedReviewPost.post_media || []).map(media => ({
-          id: media.id,
-          media_type: media.media_type,
-          media_url: media.media_url,
-          poster_url: media.poster_url,
-        }));
-
-        return (
-          <Dialog open={!!selectedReviewPost} onOpenChange={() => setSelectedReviewPost(null)}>
-            <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden" aria-describedby={undefined}>
-              <VisuallyHidden.Root><DialogTitle>Review Post</DialogTitle></VisuallyHidden.Root>
-              <ReviewPostViewer
-                mode="live"
-                courseId={reviewData?.courseId || ''}
-                courseName={reviewData?.courseName || 'Course'}
-                heroSubtitle={reviewData?.courseLocation}
-                rating={reviewData?.rating ?? 0}
-                reviewText={selectedReviewPost.content}
-                media={reviewMedia}
-                initialIndex={0}
-                onBack={() => setSelectedReviewPost(null)}
-                sourceReviewId={reviewData?.sourceReviewId || ''}
-                creator={{
-                  id: userData.id,
-                  name: userData.name,
-                  username: userData.username,
-                  avatar: userData.avatar,
-                }}
-                showReviewCapsule={false}
-                renderMedia={true}
-              >
-                <ReviewBottomPanel
-                  user={{
-                    id: userData.id,
-                    name: userData.name,
-                    username: userData.username,
-                    avatar: userData.avatar,
-                  }}
-                  courseId={reviewData?.courseId || ''}
-                  rating={reviewData?.rating ?? 0}
-                />
-              </ReviewPostViewer>
-
-            </DialogContent>
-          </Dialog>
-        );
-      })()}
     </div>
   );
 };
