@@ -173,7 +173,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
               ? `${bottomOffset + 140}px`
               : 'calc(var(--bottom-nav-height, 88px) + 140px)',
             zIndex: Z.echo,
-            pointerEvents: overlayVisible ? 'auto' : 'none',
+            pointerEvents: 'none',
           }}
         >
           <ReviewHeaderPanel
