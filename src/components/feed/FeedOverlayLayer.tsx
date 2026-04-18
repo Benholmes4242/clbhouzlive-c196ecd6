@@ -120,7 +120,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             gap: 6,
             maxWidth: 'calc(100% - 32px)',
             padding: '6px 10px',
-            borderRadius: 14,
+            borderRadius: 999,
             background: 'rgba(0, 0, 0, 0.50)',
             border: '1px solid rgba(255, 255, 255, 0.10)',
             backdropFilter: 'blur(14px)',
