@@ -38,7 +38,9 @@ function formatTimeAgoShort(date: Date): string {
   if (diffMinutes < 60) return `${diffMinutes}m`;
   if (diffHours < 24) return `${diffHours}h`;
   if (diffDays < 7) return `${diffDays}d`;
-  if (diffWeeks < 4) return `${diffWeeks}w`;
+  // Weeks bucket extends through the "0 months" gap — show weeks until we have
+  // at least 1 whole month (30+ days). Prevents "0mo" for 4-week-old posts.
+  if (diffMonths < 1) return `${diffWeeks}w`;
   if (diffMonths < 12) return `${diffMonths}mo`;
   return `${diffYears}y`;
 }

@@ -118,18 +118,19 @@ export function FullscreenFeedOverlay() {
             <button
               onClick={close}
               aria-label="Close"
-              className="absolute left-4 z-[9030] rounded-full flex items-center justify-center"
+              className="absolute left-4 z-[9030] flex items-center justify-center active:scale-95 transition-all"
               style={{
                 top: "calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)",
-                width: 44,
-                height: 44,
+                width: 34,
+                height: 34,
+                borderRadius: 12,
                 background: 'rgba(0, 0, 0, 0.50)',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
                 border: '1px solid rgba(255, 255, 255, 0.10)',
               }}
             >
-              <X className="w-5 h-5 text-white" />
+              <X className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
             </button>
 
             {/* Identity bar — author info without feed tabs, search, or profile pill */}
@@ -145,7 +146,7 @@ export function FullscreenFeedOverlay() {
                 hideTabs={true}
                 hideSearch={true}
                 hideProfilePill={true}
-                leftInset={72}
+                leftInset={62}
               />
             )}
 
@@ -182,6 +183,7 @@ export function FullscreenFeedOverlay() {
               golfCourse={golfCourse}
               activeReview={activeReview}
               isActiveReview={isActiveReview}
+              bottomOffset={0}
             />
           </motion.div>
         )}
