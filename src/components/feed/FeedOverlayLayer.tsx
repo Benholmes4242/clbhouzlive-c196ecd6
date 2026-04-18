@@ -6,6 +6,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { Z } from '@/config/zIndex';
 import { BreathingRoomMuteToggle } from './BreathingRoomMuteToggle';
+import { ReviewHeaderPanel } from './ReviewHeaderPanel';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface FeedOverlayLayerProps {
@@ -49,6 +50,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   getCommentCount,
   getFollowState,
   onFollow,
+  onReviewTap,
   overlayVisible,
   isOwnPost,
   golfCourse,
@@ -95,8 +97,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         transition: 'opacity 0.18s ease',
       }}
     >
-      {/* Course chip — anchored below the combined top bar */}
-      {golfCourse && (
+      {/* Course chip — hidden on review posts (review panel shows the course instead) */}
+      {golfCourse && !activePost.isReview && (
         <motion.button
           type="button"
           onClick={() => {
@@ -147,6 +149,31 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
       {/* Mute toggle — only on video posts */}
       {isVideo && <BreathingRoomMuteToggle isVisible={overlayVisible} />}
+
+      {/* Review Header Panel — only on review posts, sits above the bottom bar */}
+      {activePost.isReview && activePost.review && (
+        <div
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 'calc(var(--bottom-nav-height, 88px) + 140px)',
+            zIndex: Z.echo,
+            pointerEvents: overlayVisible ? 'auto' : 'none',
+          }}
+        >
+          <ReviewHeaderPanel
+            courseName={activePost.review.courseName}
+            courseImageUrl={activePost.review.courseImageUrl}
+            courseRegion={activePost.review.courseRegion}
+            courseCountry={activePost.review.courseCountry}
+            courseSubCountry={activePost.review.courseSubCountry}
+            rating={activePost.review.rating}
+            isVisible={overlayVisible}
+            onTap={() => onReviewTap?.()}
+          />
+        </div>
+      )}
 
       {/* Bottom bar (caption + horizontal actions + FOLLOW) — scrubber rendered internally on videos */}
       <BreathingRoomBottomBar
