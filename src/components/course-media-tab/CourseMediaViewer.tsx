@@ -214,7 +214,7 @@ export function CourseMediaViewer() {
                 transition={{ duration: 0.18, ease: 'easeOut' }}
                 style={{
                   position: 'fixed',
-                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)',
+                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 68px)',
                   left: 16,
                   zIndex: Z.echo,
                   pointerEvents: 'auto',
