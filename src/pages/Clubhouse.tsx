@@ -48,6 +48,7 @@ import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { formatTimeAgo } from '@/utils/formatTime';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 // ── Decomposed hooks ──
@@ -281,6 +282,29 @@ const ClubhouseContent = () => {
   
   const isOwnPost = user?.id === activePost?.userId;
 
+  // Compute the active author for the merged top bar
+  const activeAuthor = useMemo(() => {
+    if (!activePost) return null;
+    if (
+      activePost.postType === 'tournament_result' ||
+      activePost.postType === 'pga_card' ||
+      activePost.postType === 'course_of_week_card'
+    ) {
+      return null;
+    }
+    return {
+      id: activePost.userId,
+      displayName: activePost.displayName,
+      username: activePost.username,
+      avatarUrl: activePost.avatarUrl,
+      handicapIndex: activePost.handicapIndex ?? null,
+      homeClub: activePost.homeClub ?? null,
+      timeAgoLabel: activePost.createdAt
+        ? formatTimeAgo(activePost.createdAt, 'short')
+        : '',
+    };
+  }, [activePost]);
+
   // ── Review tap handler ──
   const handleReviewTap = useCallback(() => {
     if (!activeReview) return;
@@ -329,6 +353,8 @@ const ClubhouseContent = () => {
         carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
         carouselIndex={currentMediaIndex}
         hidden={isTournamentCardActive}
+        activeAuthor={activeAuthor}
+        onAuthorTap={handleViewProfile}
       />
 
       {/* Offline indicator */}

@@ -37,6 +37,10 @@ interface BreathingRoomBottomBarProps {
   onMore: () => void;
   /** Reserved for future mute integration on video posts. */
   isVideo: boolean;
+  /** FOLLOW button — moved here from the identity pill */
+  isFollowing: boolean;
+  isOwnPost: boolean;
+  onFollow: () => void;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -58,6 +62,9 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   onComment,
   onShare,
   onMore,
+  isFollowing,
+  isOwnPost,
+  onFollow,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
@@ -170,6 +177,33 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           onClick={onShare}
           ariaLabel="Share"
         />
+
+        {/* FOLLOW — text pill, sits between Share and the spacer */}
+        {!isOwnPost && (
+          <motion.button
+            type="button"
+            onClick={onFollow}
+            whileTap={{ scale: 0.94 }}
+            aria-label={isFollowing ? 'Unfollow' : 'Follow'}
+            style={{
+              flexShrink: 0,
+              border: 'none',
+              cursor: 'pointer',
+              padding: '6px 12px',
+              borderRadius: 999,
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              fontFamily: 'Geist, system-ui, sans-serif',
+              background: isFollowing ? 'rgba(255, 255, 255, 0.14)' : '#F7931E',
+              color: isFollowing ? 'rgba(255, 255, 255, 0.85)' : '#0F172A',
+              transition: 'background 0.15s ease, color 0.15s ease',
+            }}
+          >
+            {isFollowing ? 'FOLLOWING' : 'FOLLOW'}
+          </motion.button>
+        )}
 
         <div style={{ flex: 1 }} />
 
