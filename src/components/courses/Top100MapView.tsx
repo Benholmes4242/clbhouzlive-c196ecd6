@@ -600,19 +600,22 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Back button — canonical glass, one size smaller */}
+        {/* Back button — matches Course Details style */}
         <button
           onClick={() => onClose ? onClose() : navigate(-1)}
-          className="glass-card fixed left-4 z-40 w-9 h-9 flex items-center justify-center active:scale-[0.92] active:bg-white/20 transition-all duration-150"
+          className="fixed left-4 z-40 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all"
           style={{
-            borderRadius: '50%',
-            overflow: 'visible',
-            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-            position: 'fixed',
+            top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
+            borderRadius: '12px',
+            background: 'rgba(0, 0, 0, 0.28)',
+            backdropFilter: 'blur(22px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
           }}
           aria-label="Go back"
         >
-          <svg className="w-4 h-4 text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="h-[18px] w-[18px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
