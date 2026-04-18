@@ -205,6 +205,24 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           borderTop: activeVideoElement ? 'none' : '1px solid rgba(255, 255, 255, 0.16)',
         }}
       >
+        {/* Scrubber-as-border: only rendered when there's an active video element */}
+        {activeVideoElement && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 2,
+              pointerEvents: 'auto',
+              zIndex: 1,
+            }}
+          >
+            <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
+          </div>
+        )}
+
+
         <ActionButton
           icon={
             <Heart
