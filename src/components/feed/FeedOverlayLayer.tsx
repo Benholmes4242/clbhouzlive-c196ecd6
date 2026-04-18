@@ -1,10 +1,12 @@
 import React, { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
-import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
+import { BreathingRoomIdentityPill } from './BreathingRoomIdentityPill';
+import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { formatTimeAgo } from '@/utils/formatTime';
 
 interface FeedOverlayLayerProps {
   posts: FeedPost[];
@@ -57,12 +59,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   isActiveReview,
   activeIndexOverride,
 }: FeedOverlayLayerProps) {
+  const navigate = useNavigate();
   const clubhouseActiveIndex = useClubhouseStore(s => s.activeIndex);
   const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
-  const isMuted = useClubhouseStore(s => s.isMuted);
-  const toggleMute = useClubhouseStore(s => s.toggleMute);
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
-  const setCarouselPosition = useClubhouseStore(s => s.setCarouselPosition);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
 
   const activePost = posts[activeIndex] ?? null;
@@ -80,8 +80,19 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const commentCount = getCommentCount(activePost);
   const isFollowed = getFollowState(activePost);
   const isVideo = activePost.mediaItems?.[0]?.type === 'video';
-  const mediaCount = activePost.mediaItems?.length ?? 0;
-  const currentMediaIdx = carouselPositions.get(activeIndex) ?? 0;
+
+  const tags = activePost.tags ?? [];
+  const taggedFriends = tags
+    .filter(t => t.entity_type === 'user')
+    .map(t => ({
+      id: t.entity_id,
+      username: t.username ?? '',
+      displayName: t.name,
+    }));
+
+  const timeAgoLabel = activePost.createdAt
+    ? formatTimeAgo(activePost.createdAt, 'short')
+    : '';
 
   return (
     <div
@@ -93,73 +104,48 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         transition: 'opacity 0.18s ease',
       }}
     >
-      {/* Action Rail */}
-      <div style={{ pointerEvents: 'auto' }}>
-        <CinematicActionRail
-          postId={activePost.id}
-          likesCount={likeState.count}
-          commentsCount={commentCount}
-          hasLiked={likeState.isLiked}
-          isMuted={isMuted}
-          isVisible={overlayVisible}
-          onLike={() => onLike(activePost)}
-          onComment={onComment}
-          onShare={() => onShare(activePost)}
-          onMuteToggle={toggleMute}
-          onMore={onMore}
-          isVideo={isVideo}
-          isReviewPost={isActiveReview}
-        />
-      </div>
+      {/* Identity pill (top-anchored) + course chip */}
+      <BreathingRoomIdentityPill
+        user={{
+          id: activePost.userId,
+          displayName: activePost.displayName,
+          username: activePost.username,
+          avatarUrl: activePost.avatarUrl,
+          // TODO: surface user_profiles.eg_handicap_index in FeedPost builders
+          handicapIndex: null,
+        }}
+        course={golfCourse ? { id: golfCourse.id, name: golfCourse.name } : null}
+        timeAgoLabel={timeAgoLabel}
+        isFollowing={isFollowed}
+        isOwnPost={isOwnPost}
+        isVisible={overlayVisible}
+        onFollow={() => onFollow(activePost)}
+        onViewProfile={onViewProfile}
+        onCourseTap={
+          golfCourse
+            ? () => {
+                onBeforeNavigate?.();
+                navigate(`/courses/${golfCourse.id}`);
+              }
+            : undefined
+        }
+      />
 
-
-
-
-      {/* Creator Capsule */}
-      <div style={{ pointerEvents: 'auto' }}>
-        <CreatorCapsule
-          user={{
-            id: activePost.userId,
-            name: activePost.displayName,
-            username: activePost.username,
-            avatar: activePost.avatarUrl,
-          }}
-          caption={activePost.caption}
-          tags={activePost.tags}
-          golfCourse={golfCourse ? { 
-            id: golfCourse.id, 
-            name: golfCourse.name, 
-            country: (golfCourse as any).courseCountry ?? (golfCourse as any).country ?? null,
-            thumbnailImage: (golfCourse as any).thumbnailImage ?? null,
-            latitude: (golfCourse as any).latitude ?? null,
-            longitude: (golfCourse as any).longitude ?? null,
-            globalRank: (golfCourse as any).globalRank ?? null,
-          } : null}
-          isFollowing={isFollowed}
-          isOwnPost={isOwnPost}
-          isVisible={overlayVisible}
-          onFollow={() => onFollow(activePost)}
-          onViewProfile={onViewProfile}
-          isReview={isActiveReview}
-          reviewData={activeReview ? {
-            courseId: activeReview.courseId,
-            courseName: activeReview.courseName,
-            courseLocation: undefined,
-            rating: activeReview.rating,
-            tierLabel: '',
-            sourceReviewId: activeReview.reviewId,
-            courseCountry: activeReview.courseCountry,
-            courseRegion: activeReview.courseRegion,
-            courseSubCountry: activeReview.courseSubCountry,
-            reviewText: activeReview.reviewText,
-          } : undefined}
-          onReviewTap={onReviewTap}
-          onBeforeNavigate={onBeforeNavigate}
-          postId={activePost.id}
-          carouselCount={mediaCount}
-          carouselActiveIndex={currentMediaIdx}
-        />
-      </div>
+      {/* Bottom bar (caption + horizontal actions) */}
+      <BreathingRoomBottomBar
+        caption={activePost.caption ?? ''}
+        tags={tags}
+        taggedFriends={taggedFriends}
+        likesCount={likeState.count}
+        commentsCount={commentCount}
+        hasLiked={likeState.isLiked}
+        isVisible={overlayVisible}
+        onLike={() => onLike(activePost)}
+        onComment={onComment}
+        onShare={() => onShare(activePost)}
+        onMore={onMore}
+        isVideo={isVideo}
+      />
 
       {/* Video Scrubber — anchored to the top edge of the bottom nav bar */}
       {isVideo && activeVideoElement && (
