@@ -45,6 +45,8 @@ interface ClubhouseTopBarProps {
   hideTabs?: boolean;
   hideSearch?: boolean;
   hideProfilePill?: boolean;
+  /** Left edge offset in px — lets a close button coexist to the left of the bar */
+  leftInset?: number;
 }
 
 const TABS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
@@ -61,6 +63,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   hideTabs = false,
   hideSearch = false,
   hideProfilePill = false,
+  leftInset = 0,
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
