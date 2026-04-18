@@ -5,7 +5,7 @@ import { MapPin } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { Z } from '@/config/zIndex';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { BreathingRoomMuteToggle } from './BreathingRoomMuteToggle';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface FeedOverlayLayerProps {
@@ -145,7 +145,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         </motion.button>
       )}
 
-      {/* Bottom bar (caption + horizontal actions + FOLLOW) */}
+      {/* Mute toggle — only on video posts */}
+      {isVideo && <BreathingRoomMuteToggle isVisible={overlayVisible} />}
+
+      {/* Bottom bar (caption + horizontal actions + FOLLOW) — scrubber rendered internally on videos */}
       <BreathingRoomBottomBar
         caption={activePost.caption ?? ''}
         tags={tags}
@@ -162,27 +165,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         isFollowing={isFollowed}
         isOwnPost={isOwnPost}
         onFollow={() => onFollow(activePost)}
+        activeVideoElement={isVideo ? activeVideoElement : null}
+        postId={activePost.id}
       />
-
-      {/* Video Scrubber — anchored to the top edge of the bottom nav bar */}
-      {isVideo && activeVideoElement && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 'var(--bottom-nav-height, 88px)',
-            left: 0,
-            right: 0,
-            pointerEvents: 'auto',
-            zIndex: 31,
-          }}
-        >
-          <VideoScrubber
-            videoEl={activeVideoElement}
-            height={3}
-            variant="fullscreen"
-          />
-        </div>
-      )}
     </div>
   );
 });
