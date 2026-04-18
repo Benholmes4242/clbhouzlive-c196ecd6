@@ -268,14 +268,16 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           />
         )}
 
-        {/* ── Row 2: Segmented feed toggle ── */}
+        {/* ── Row 2: Segmented feed toggle (half width, left-aligned) ── */}
         {!hideTabs && (
           <div style={{ padding: '8px 10px 10px' }}>
-            <SegmentedFeedToggle
-              activeTab={activeTab}
-              onTabChange={onTabChange}
-              isBusinessActor={isBusinessActor}
-            />
+            <div style={{ width: '50%' }}>
+              <SegmentedFeedToggle
+                activeTab={activeTab}
+                onTabChange={onTabChange}
+                isBusinessActor={isBusinessActor}
+              />
+            </div>
           </div>
         )}
       </div>
