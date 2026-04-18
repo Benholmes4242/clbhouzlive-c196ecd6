@@ -513,7 +513,7 @@ export function LowestHandicapLeaderboard({
             }}
           >
             {editorial?.standfirst ??
-              'The Clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.'}
+              'The clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.'}
           </p>
         </div>
       )}
@@ -941,7 +941,7 @@ export function LowestHandicapLeaderboard({
                 marginBottom: 14,
               }}
             >
-              No friends on Clbhouz with handicaps yet.
+              No friends on clbhouz with handicaps yet.
             </p>
             <button
               onClick={() => navigate('/find-friends')}

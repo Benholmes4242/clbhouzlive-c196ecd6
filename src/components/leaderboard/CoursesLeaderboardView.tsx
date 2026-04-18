@@ -180,8 +180,8 @@ export function CoursesLeaderboardView() {
         headline: name,
         headlineTwo: rating ? `sits at ${rating}` : 'leads the list',
         standfirst: rating
-          ? `${name} leads the Clbhouz list, averaging ${rating} out of ten across ${ratingCount} ${ratingsLabel}.`
-          : `${name} leads the Clbhouz list.`,
+          ? `${name} leads the clbhouz list, averaging ${rating} out of ten across ${ratingCount} ${ratingsLabel}.`
+          : `${name} leads the clbhouz list.`,
       };
     }
 
@@ -199,7 +199,7 @@ export function CoursesLeaderboardView() {
       eyebrow: 'TRENDING NOW',
       headline: name,
       headlineTwo: 'is climbing',
-      standfirst: `${name} is picking up momentum, with ${ratingCount} ${ratingsLabel} from the Clbhouz community.`,
+      standfirst: `${name} is picking up momentum, with ${ratingCount} ${ratingsLabel} from the clbhouz community.`,
     };
   }, [masthead, sort]);
 

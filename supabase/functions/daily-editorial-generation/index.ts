@@ -648,7 +648,7 @@ function generateCoursesEditorial(
         eyebrow: 'THE COURSE OF THE DAY',
         headline: l.course_name,
         headlineTwo: `sits at ${l.avg_rating.toFixed(1)}.`,
-        standfirst: `${l.course_name} leads the Clbhouz list, with ${l.rating_count} ${l.rating_count === 1 ? 'rating' : 'ratings'} from the community averaging ${l.avg_rating.toFixed(1)} out of ten.`,
+        standfirst: `${l.course_name} leads the clbhouz list, with ${l.rating_count} ${l.rating_count === 1 ? 'rating' : 'ratings'} from the community averaging ${l.avg_rating.toFixed(1)} out of ten.`,
       };
     }
     case 'course_new_entry': {
@@ -684,7 +684,7 @@ function generateCoursesEditorial(
         headline: 'Your friends played',
         headlineTwo: 'notable courses this week.',
         standfirst:
-          'Scroll down to see where your circle has been logging rounds across the Clbhouz list.',
+          'Scroll down to see where your circle has been logging rounds across the clbhouz list.',
       };
     case 'personal_pick':
       // Phase 2 — per-user. Falls back to quiet copy in the shared editorial.
@@ -694,7 +694,7 @@ function generateCoursesEditorial(
         headline: 'The world\u2019s greatest',
         headlineTwo: 'courses, ranked.',
         standfirst:
-          'The Clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
+          'The clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
       };
     case 'courses_quiet':
     default:
@@ -704,7 +704,7 @@ function generateCoursesEditorial(
         headline: 'The world\u2019s greatest',
         headlineTwo: 'courses, ranked.',
         standfirst:
-          'The Clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
+          'The clbhouz community continues to rate, play, and record rounds across the most prestigious courses on earth. The list refreshes every day.',
       };
   }
 }
@@ -836,8 +836,8 @@ const HANDICAP_TEMPLATES: Record<HandicapStoryType, (s: HandicapSnapshot) => Han
     const leader = s.leader!;
     const second = s.second;
     const standfirst = second
-      ? `${leader.display_name} sits at the top of the Clbhouz handicap board on ${formatHcpEdge(leader.handicap_index)}, with ${second.display_name} on ${formatHcpEdge(second.handicap_index)} in second.`
-      : `${leader.display_name} sits at the top of the Clbhouz handicap board on ${formatHcpEdge(leader.handicap_index)}.`;
+      ? `${leader.display_name} sits at the top of the clbhouz handicap board on ${formatHcpEdge(leader.handicap_index)}, with ${second.display_name} on ${formatHcpEdge(second.handicap_index)} in second.`
+      : `${leader.display_name} sits at the top of the clbhouz handicap board on ${formatHcpEdge(leader.handicap_index)}.`;
     return {
       eyebrow: 'THE HANDICAP RECORD',
       headline: `${leader.display_name} leads`,
@@ -861,7 +861,7 @@ const HANDICAP_TEMPLATES: Record<HandicapStoryType, (s: HandicapSnapshot) => Han
     headline: 'Index · Tier',
     headlineTwo: 'Trajectory.',
     standfirst:
-      'The Clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.',
+      'The clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.',
   }),
 };
 
