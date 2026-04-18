@@ -99,9 +99,11 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
 
       {/* ── ROW 2: Combined identity + actions bar ── */}
       <div
-        className="fixed left-3 right-3 z-40 flex items-center min-w-0"
+        className="fixed z-40 flex items-center min-w-0"
         style={{
           top: BAR_TOP,
+          left: leftInset > 0 ? leftInset : 12,
+          right: 12,
           opacity: hidden ? 0 : 1,
           pointerEvents: hidden ? 'none' : 'auto',
           transition: 'opacity 0.2s ease',
