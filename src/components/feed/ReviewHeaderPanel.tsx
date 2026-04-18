@@ -14,8 +14,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
 import { getRatingTierLabel } from '@/lib/ratingTier';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface ReviewHeaderPanelProps {
   courseName: string;
@@ -61,7 +61,7 @@ export const ReviewHeaderPanel: React.FC<ReviewHeaderPanelProps> = ({
         textAlign: 'left',
         padding: '12px 16px 12px',
         background:
-          'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.75) 100%)',
+          'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.45) 100%)',
         borderBottom: '1px solid rgba(247, 147, 30, 0.30)',
         border: 'none',
         borderTopWidth: 0,
@@ -135,7 +135,7 @@ export const ReviewHeaderPanel: React.FC<ReviewHeaderPanelProps> = ({
               lineHeight: 1,
             }}
           >
-            <Star size={9} fill="#F7931E" stroke="#F7931E" strokeWidth={1} />
+            <ClubhouseLogo size="xs" className="!h-[11px] !w-[11px]" />
             Course Review
           </div>
 
@@ -179,7 +179,7 @@ export const ReviewHeaderPanel: React.FC<ReviewHeaderPanelProps> = ({
             flexShrink: 0,
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'flex-end',
+            alignItems: 'center',
             gap: 2,
           }}
         >
@@ -187,7 +187,7 @@ export const ReviewHeaderPanel: React.FC<ReviewHeaderPanelProps> = ({
             style={{
               fontSize: 26,
               fontWeight: 900,
-              color: '#F7931E',
+              color: '#fff',
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
               fontFeatureSettings: '"kern" 1, "liga" 1',
@@ -202,7 +202,7 @@ export const ReviewHeaderPanel: React.FC<ReviewHeaderPanelProps> = ({
               fontWeight: 800,
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
-              color: '#F7931E',
+              color: '#fff',
               lineHeight: 1,
             }}
           >
