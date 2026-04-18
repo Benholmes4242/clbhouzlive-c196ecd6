@@ -114,6 +114,17 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     isLikedByMe: !!row.is_liked_by_me,
     isFollowedByMe: !!row.is_followed_by_me,
     engagementScore: Number(row.engagement_score) || 0,
+    // Privacy-aware identity surfacing
+    handicapIndex:
+      row.creator_show_handicap !== false &&
+      row.creator_handicap_index !== null &&
+      row.creator_handicap_index !== undefined
+        ? Number(row.creator_handicap_index)
+        : null,
+    homeClub:
+      row.creator_home_club_visibility === 'public' && row.creator_home_club
+        ? row.creator_home_club
+        : null,
   };
 }
 

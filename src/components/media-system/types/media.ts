@@ -69,6 +69,9 @@ export interface FeedPost {
   courseGlobalRank?: number | null;
   postType?: string;
   engagementScore?: number;
+  /** Surfaced from user_profiles (privacy-aware: null when hidden) */
+  handicapIndex?: number | null;
+  homeClub?: string | null;
 }
 
 
@@ -451,6 +454,11 @@ export interface FeedRpcRow {
   course_latitude?: number | null;
   course_longitude?: number | null;
   course_global_rank?: number | null;
+  // Author identity surfacing (with privacy flags)
+  creator_handicap_index?: number | null;
+  creator_show_handicap?: boolean | null;
+  creator_home_club?: string | null;
+  creator_home_club_visibility?: string | null;
 }
 
 /** Timing constants */
