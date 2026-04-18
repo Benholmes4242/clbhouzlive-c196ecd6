@@ -129,7 +129,7 @@ function buildBaselineEditorial(args: {
       eyebrow: 'THE ALL-TIME RECORD',
       headline: `${firstName} leads`,
       headlineTwo: 'the all-time standings.',
-      standfirst: `${args.leaderName || 'The leader'} sits atop the Clbhouz record with ${args.leaderCourses} courses played to date.`,
+      standfirst: `${args.leaderName || 'The leader'} sits atop the clbhouz record with ${args.leaderCourses} courses played to date.`,
       storyType: 'all_time_steady',
       generatedBy: 'template',
       date: new Date().toISOString().slice(0, 10),

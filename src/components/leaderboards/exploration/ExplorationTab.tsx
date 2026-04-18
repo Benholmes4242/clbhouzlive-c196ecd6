@@ -110,7 +110,7 @@ function generateTierCaption(
   nextTier: { name: string; minCountries: number; minContinents: number } | null,
 ): React.ReactNode {
   if (!nextTier) {
-    return `You've reached ${currentTierName}, the highest tier on Clbhouz. Keep exploring.`;
+    return `You've reached ${currentTierName}, the highest tier on clbhouz. Keep exploring.`;
   }
   const countriesNeeded = Math.max(0, nextTier.minCountries - countries);
   const continentsNeeded = Math.max(0, nextTier.minContinents - continents);
