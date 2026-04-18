@@ -214,7 +214,7 @@ export function CourseMediaViewer() {
                 transition={{ duration: 0.18, ease: 'easeOut' }}
                 style={{
                   position: 'fixed',
-                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 68px)',
+                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 132px)',
                   left: 16,
                   zIndex: Z.echo,
                   pointerEvents: 'auto',
@@ -319,7 +319,7 @@ export function CourseMediaViewer() {
                   zIndex: Z.echo + 1,
                 }}
               >
-                <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
+                <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
               </div>
             )}
           </motion.div>

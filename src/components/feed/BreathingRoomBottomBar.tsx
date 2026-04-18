@@ -125,12 +125,10 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
         background:
           'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.92) 55%)',
         zIndex: Z.echo,
-        pointerEvents: 'none',
+        pointerEvents: isVisible ? 'auto' : 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
-      {/* Inner interactive wrapper — only this captures touches; outer gradient runway passes swipes through to SnapFeed */}
-      <div style={{ pointerEvents: isVisible ? 'auto' : 'none' }}>
       {/* "with @friend" line */}
       {taggedFriends.length > 0 && (
         <div
@@ -241,7 +239,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                 zIndex: 1,
               }}
             >
-              <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
+              <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
             </div>
           )}
 
@@ -314,7 +312,6 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           />
         </div>
       )}
-      </div>
     </motion.div>
   );
 };

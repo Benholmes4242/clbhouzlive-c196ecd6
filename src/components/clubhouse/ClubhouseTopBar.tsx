@@ -1,8 +1,10 @@
 /**
  * ClubhouseTopBar - Combined top chrome for the Clubhouse feed
  *
- * Single-row layout: feed filter chip + author identity (avatar + name + HCP +
- * home club + time-ago) + vertical separator + search icon + profile pill.
+ * Layout (Option B):
+ *  Row 1: small centred Suggested · Friends tabs at the very top
+ *  Row 2: combined glass bar with author identity (avatar + name + HCP + home club + time-ago),
+ *         vertical separator, search icon, profile pill (current user)
  *
  * The author identity collapses to empty space when no activeAuthor (loading state, editorial cards).
  */
@@ -13,12 +15,9 @@ import { Button } from '@/components/ui/button';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
-import type { ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
-import { FeedFilterChip } from '@/components/clubhouse/FeedFilterChip';
-import { FeedFilterMenu } from '@/components/clubhouse/FeedFilterMenu';
+import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { analyticsEvents } from '@/utils/analyticsEvents';
 import { cn } from '@/lib/utils';
 import type { User } from '@supabase/supabase-js';
 
@@ -50,8 +49,8 @@ interface ClubhouseTopBarProps {
   leftInset?: number;
 }
 
-// Single-row chrome — identity pill sits where the old Row 2 was.
-const BAR_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)';
+const TABS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
+const BAR_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)';
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   activeTab,
@@ -68,9 +67,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [feedMenuOpen, setFeedMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
-  const feedChipRef = useRef<HTMLButtonElement>(null);
   const { hasUnread, unreadCount } = useUnreadNotifications();
 
   const showHcp =
@@ -79,16 +76,28 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
     activeAuthor.handicapIndex !== undefined &&
     Number.isFinite(activeAuthor.handicapIndex);
 
-  const handleTabChange = (tab: ClubhouseTab) => {
-    analyticsEvents.track('feed_tab_switch', {
-      tab: tab === 'foryou' ? 'suggested' : 'friends',
-    });
-    onTabChange(tab);
-  };
-
   return (
     <>
-      {/* ── Combined pill: feed chip + identity + actions ── */}
+      {/* ── ROW 1: Tabs (centred) ── */}
+      {!hideTabs && (
+        <div
+          className="fixed left-0 right-0 z-40 flex items-center justify-center"
+          style={{
+            top: TABS_TOP,
+            opacity: hidden ? 0 : 1,
+            pointerEvents: hidden ? 'none' : 'auto',
+            transition: 'opacity 0.2s ease',
+          }}
+        >
+          <ClubhouseTabToggle
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            isBusinessActor={isBusinessActor}
+          />
+        </div>
+      )}
+
+      {/* ── ROW 2: Combined identity + actions bar ── */}
       <div
         className="fixed z-40 flex items-center min-w-0"
         style={{
@@ -108,29 +117,6 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           fontFamily: 'Geist, system-ui, sans-serif',
         }}
       >
-        {/* Feed filter chip */}
-        {!hideTabs && (
-          <FeedFilterChip
-            ref={feedChipRef}
-            activeTab={activeTab}
-            isOpen={feedMenuOpen}
-            onClick={() => setFeedMenuOpen((v) => !v)}
-            isBusinessActor={isBusinessActor}
-          />
-        )}
-
-        {/* Subtle separator between chip and author */}
-        {!hideTabs && activeAuthor && (
-          <div
-            style={{
-              width: 1,
-              height: 20,
-              background: 'rgba(255, 255, 255, 0.10)',
-              flexShrink: 0,
-            }}
-          />
-        )}
-
         {/* Author avatar */}
         {activeAuthor && (
           <button
@@ -293,17 +279,6 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       {/* Search Overlay */}
       {!hideSearch && (
         <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-      )}
-
-      {/* Feed filter dropdown menu */}
-      {!hideTabs && (
-        <FeedFilterMenu
-          isOpen={feedMenuOpen}
-          activeTab={activeTab}
-          onSelect={handleTabChange}
-          onClose={() => setFeedMenuOpen(false)}
-          anchorRef={feedChipRef}
-        />
       )}
     </>
   );
