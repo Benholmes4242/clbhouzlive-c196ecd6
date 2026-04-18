@@ -16,8 +16,7 @@ import { Button } from '@/components/ui/button';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
-import type { ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
-import { SegmentedFeedToggle } from '@/components/clubhouse/SegmentedFeedToggle';
+import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -79,7 +78,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
 
   return (
     <>
-      {/* ── Stacked pill: identity row + segmented feed toggle ── */}
+      {/* ── Identity pill (single row) ── */}
       <div
         className="fixed z-40"
         style={{
@@ -98,7 +97,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           overflow: 'hidden',
         }}
       >
-        {/* ── Row 1: Identity ── */}
+        {/* ── Identity row ── */}
         <div
           className="flex items-center min-w-0"
           style={{
@@ -254,33 +253,28 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             </div>
           )}
         </div>
-
-        {/* ── Hairline divider ── */}
-        {!hideTabs && (
-          <div
-            aria-hidden
-            style={{
-              height: 1,
-              background: 'rgba(255, 255, 255, 0.08)',
-              marginLeft: 12,
-              marginRight: 12,
-            }}
-          />
-        )}
-
-        {/* ── Row 2: Segmented feed toggle (half width, centered, ~10% shorter) ── */}
-        {!hideTabs && (
-          <div style={{ padding: '7px 10px 9px', display: 'flex', justifyContent: 'center' }}>
-            <div style={{ width: '50%' }}>
-              <SegmentedFeedToggle
-                activeTab={activeTab}
-                onTabChange={onTabChange}
-                isBusinessActor={isBusinessActor}
-              />
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* ── Feed tab toggle (Suggested / Friends with amber underline) above the pill ── */}
+      {!hideTabs && !hidden && (
+        <div
+          className="fixed z-40"
+          style={{
+            top: `calc(${BAR_TOP} + 56px)`,
+            left: leftInset > 0 ? leftInset : 12,
+            right: 12,
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'auto',
+          }}
+        >
+          <ClubhouseTabToggle
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            isBusinessActor={isBusinessActor}
+          />
+        </div>
+      )}
 
       {/* PostingAs Menu */}
       {!hideProfilePill && user && (
