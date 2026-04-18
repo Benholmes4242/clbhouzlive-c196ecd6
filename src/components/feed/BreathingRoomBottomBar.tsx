@@ -70,9 +70,12 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isFollowing,
   isOwnPost,
   onFollow,
+  activeVideoElement,
+  postId,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
+  const [captionExpanded, setCaptionExpanded] = useState(false);
 
   useEffect(() => {
     if (hasLiked && !wasLiked.current) {
@@ -80,6 +83,10 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
     }
     wasLiked.current = hasLiked;
   }, [hasLiked]);
+
+  useEffect(() => {
+    setCaptionExpanded(false);
+  }, [postId]);
 
   const captionLength = caption?.length ?? 0;
   const captionFontSize = captionLength > 120 ? 13.5 : 14;
