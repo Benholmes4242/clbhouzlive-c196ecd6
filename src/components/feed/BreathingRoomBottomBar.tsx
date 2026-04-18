@@ -16,6 +16,7 @@ import { Heart, MessageSquare, Send, MoreHorizontal } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 interface TaggedFriend {
   id: string;
@@ -41,6 +42,10 @@ interface BreathingRoomBottomBarProps {
   isFollowing: boolean;
   isOwnPost: boolean;
   onFollow: () => void;
+  /** NEW: the active video element, used for the scrubber rendered as action-strip border */
+  activeVideoElement?: HTMLVideoElement | null;
+  /** NEW: stable identifier for the active post — used to reset caption expansion on post change */
+  postId?: string;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -65,9 +70,12 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isFollowing,
   isOwnPost,
   onFollow,
+  activeVideoElement,
+  postId,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
+  const [captionExpanded, setCaptionExpanded] = useState(false);
 
   useEffect(() => {
     if (hasLiked && !wasLiked.current) {
@@ -75,6 +83,10 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
     }
     wasLiked.current = hasLiked;
   }, [hasLiked]);
+
+  useEffect(() => {
+    setCaptionExpanded(false);
+  }, [postId]);
 
   const captionLength = caption?.length ?? 0;
   const captionFontSize = captionLength > 120 ? 13.5 : 14;
@@ -120,33 +132,97 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
         </div>
       )}
 
-      {/* Caption */}
-      {caption && (
-        <div
-          style={{
-            color: '#fff',
-            fontSize: captionFontSize,
-            fontWeight: 500,
-            lineHeight: 1.5,
-            textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-            marginBottom: 12,
-            wordBreak: 'break-word',
-          }}
-        >
-          <PostContentWithTags content={caption} tags={tags ?? []} />
-        </div>
-      )}
+      {/* Caption with truncation */}
+      {caption && (() => {
+        const TRUNCATE_AT = 120;
+        const isLong = caption.length > TRUNCATE_AT;
+        const showFull = captionExpanded || !isLong;
 
-      {/* Action strip */}
+        let displayText: string;
+        if (showFull) {
+          displayText = caption;
+        } else {
+          const hardCut = caption.slice(0, TRUNCATE_AT);
+          const lastSpace = hardCut.lastIndexOf(' ');
+          displayText = lastSpace > 80 ? hardCut.slice(0, lastSpace) : hardCut;
+        }
+
+        const displayTags = (tags ?? []).filter((t) => {
+          const end = t.end_index ?? 0;
+          return end <= displayText.length;
+        });
+
+        return (
+          <div
+            style={{
+              color: '#fff',
+              fontSize: captionFontSize,
+              fontWeight: 500,
+              lineHeight: 1.5,
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
+              marginBottom: 12,
+              wordBreak: 'break-word',
+            }}
+          >
+            <PostContentWithTags content={displayText} tags={displayTags} />
+            {isLong && (
+              <>
+                {showFull ? ' ' : '… '}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCaptionExpanded((v) => !v);
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    color: 'rgba(255, 255, 255, 0.55)',
+                    fontSize: captionFontSize,
+                    fontWeight: 600,
+                    fontFamily: 'inherit',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {showFull ? 'less' : 'more'}
+                </button>
+              </>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Action strip — scrubber renders as top border on video posts, static hairline on images */}
       <div
         style={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'center',
           gap: 22,
           paddingTop: 12,
-          borderTop: '1px solid rgba(255, 255, 255, 0.16)',
+          borderTop: activeVideoElement ? 'none' : '1px solid rgba(255, 255, 255, 0.16)',
         }}
       >
+        {/* Scrubber-as-border: only rendered when there's an active video element */}
+        {activeVideoElement && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 2,
+              pointerEvents: 'auto',
+              zIndex: 1,
+            }}
+          >
+            <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
+          </div>
+        )}
+
+
         <ActionButton
           icon={
             <Heart
