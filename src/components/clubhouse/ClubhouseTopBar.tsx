@@ -95,11 +95,11 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           transition: 'opacity 0.2s ease',
           gap: 8,
           padding: '6px 8px 6px 6px',
-          borderRadius: 14,
-          background: 'rgba(15, 23, 42, 0.55)',
-          border: '1px solid rgba(255, 255, 255, 0.14)',
-          backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
+          borderRadius: 999,
+          background: 'rgba(0, 0, 0, 0.50)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
           fontFamily: 'Geist, system-ui, sans-serif',
         }}
       >
