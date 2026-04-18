@@ -37,10 +37,9 @@ export const FeedFilterChip = forwardRef<HTMLButtonElement, FeedFilterChipProps>
         )}
         style={{
           padding: '5px 10px 5px 11px',
-          background:
-            'linear-gradient(90deg, rgba(245,158,11,0.18) 0%, rgba(247,147,30,0.22) 100%)',
-          borderColor: 'rgba(247, 147, 30, 0.38)',
-          color: '#F7931E',
+          background: 'rgba(255, 255, 255, 0.10)',
+          borderColor: 'rgba(255, 255, 255, 0.18)',
+          color: '#fff',
           fontFamily: 'Geist, system-ui, sans-serif',
           fontSize: 11,
           letterSpacing: '-0.01em',
@@ -53,8 +52,8 @@ export const FeedFilterChip = forwardRef<HTMLButtonElement, FeedFilterChipProps>
             size={11}
             strokeWidth={2.5}
             style={{
-              color: '#F7931E',
-              opacity: 0.85,
+              color: '#fff',
+              opacity: 0.75,
               marginLeft: 1,
               transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
               transition: 'transform 0.18s ease',
