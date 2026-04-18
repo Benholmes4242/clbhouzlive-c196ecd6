@@ -132,31 +132,77 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
         </div>
       )}
 
-      {/* Caption */}
-      {caption && (
-        <div
-          style={{
-            color: '#fff',
-            fontSize: captionFontSize,
-            fontWeight: 500,
-            lineHeight: 1.5,
-            textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-            marginBottom: 12,
-            wordBreak: 'break-word',
-          }}
-        >
-          <PostContentWithTags content={caption} tags={tags ?? []} />
-        </div>
-      )}
+      {/* Caption with truncation */}
+      {caption && (() => {
+        const TRUNCATE_AT = 120;
+        const isLong = caption.length > TRUNCATE_AT;
+        const showFull = captionExpanded || !isLong;
 
-      {/* Action strip */}
+        let displayText: string;
+        if (showFull) {
+          displayText = caption;
+        } else {
+          const hardCut = caption.slice(0, TRUNCATE_AT);
+          const lastSpace = hardCut.lastIndexOf(' ');
+          displayText = lastSpace > 80 ? hardCut.slice(0, lastSpace) : hardCut;
+        }
+
+        const displayTags = (tags ?? []).filter((t) => {
+          const end = t.end_index ?? 0;
+          return end <= displayText.length;
+        });
+
+        return (
+          <div
+            style={{
+              color: '#fff',
+              fontSize: captionFontSize,
+              fontWeight: 500,
+              lineHeight: 1.5,
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
+              marginBottom: 12,
+              wordBreak: 'break-word',
+            }}
+          >
+            <PostContentWithTags content={displayText} tags={displayTags} />
+            {isLong && (
+              <>
+                {showFull ? ' ' : '… '}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCaptionExpanded((v) => !v);
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    color: 'rgba(255, 255, 255, 0.55)',
+                    fontSize: captionFontSize,
+                    fontWeight: 600,
+                    fontFamily: 'inherit',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {showFull ? 'less' : 'more'}
+                </button>
+              </>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Action strip — scrubber renders as top border on video posts, static hairline on images */}
       <div
         style={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'center',
           gap: 22,
           paddingTop: 12,
-          borderTop: '1px solid rgba(255, 255, 255, 0.16)',
+          borderTop: activeVideoElement ? 'none' : '1px solid rgba(255, 255, 255, 0.16)',
         }}
       >
         <ActionButton
