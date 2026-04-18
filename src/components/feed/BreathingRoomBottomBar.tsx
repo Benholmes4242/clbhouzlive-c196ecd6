@@ -50,6 +50,9 @@ interface BreathingRoomBottomBarProps {
   readOnly?: boolean;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
+  /** Controlled caption expansion state (lifted to parent for review panel coordination) */
+  captionExpanded?: boolean;
+  onCaptionExpandedChange?: (expanded: boolean) => void;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -78,10 +81,20 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   postId,
   readOnly = false,
   bottomOffset,
+  captionExpanded: captionExpandedProp,
+  onCaptionExpandedChange,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
-  const [captionExpanded, setCaptionExpanded] = useState(false);
+  const [captionExpandedLocal, setCaptionExpandedLocal] = useState(false);
+  const captionExpanded = captionExpandedProp ?? captionExpandedLocal;
+  const setCaptionExpanded = (next: boolean) => {
+    if (onCaptionExpandedChange) {
+      onCaptionExpandedChange(next);
+    } else {
+      setCaptionExpandedLocal(next);
+    }
+  };
 
   useEffect(() => {
     if (hasLiked && !wasLiked.current) {
@@ -91,8 +104,9 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   }, [hasLiked]);
 
   useEffect(() => {
-    setCaptionExpanded(false);
-  }, [postId]);
+    setCaptionExpandedLocal(false);
+    onCaptionExpandedChange?.(false);
+  }, [postId, onCaptionExpandedChange]);
 
   const captionLength = caption?.length ?? 0;
   const captionFontSize = captionLength > 120 ? 13.5 : 14;
@@ -178,7 +192,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setCaptionExpanded((v) => !v);
+                    setCaptionExpanded(!captionExpanded);
                   }}
                   style={{
                     background: 'transparent',

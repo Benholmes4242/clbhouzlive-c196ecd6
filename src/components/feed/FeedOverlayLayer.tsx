@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
@@ -66,6 +66,12 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
 
   const activePost = posts[activeIndex] ?? null;
+
+  const [captionExpanded, setCaptionExpanded] = useState(false);
+
+  useEffect(() => {
+    setCaptionExpanded(false);
+  }, [activePost?.id]);
 
   if (!activePost) return null;
 
@@ -155,7 +161,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
       {/* Review Header Panel — only on review posts, sits above the bottom bar */}
       {activePost.isReview && activePost.review && (
-        <div
+        <motion.div
+          initial={false}
+          animate={{ y: captionExpanded ? -220 : 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
           style={{
             position: 'fixed',
             left: 0,
@@ -177,7 +186,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             isVisible={overlayVisible}
             onTap={() => onReviewTap?.()}
           />
-        </div>
+        </motion.div>
       )}
 
       {/* Bottom bar (caption + horizontal actions + FOLLOW) — scrubber rendered internally on videos */}
@@ -200,6 +209,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         activeVideoElement={isVideo ? activeVideoElement : null}
         postId={activePost.id}
         bottomOffset={bottomOffset}
+        captionExpanded={captionExpanded}
+        onCaptionExpandedChange={setCaptionExpanded}
       />
     </div>
   );
