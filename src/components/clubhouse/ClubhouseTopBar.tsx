@@ -1,13 +1,12 @@
 /**
  * ClubhouseTopBar - Combined top chrome for the Clubhouse feed
  *
- * Layout:
- *   Single rounded-rect pill containing two stacked rows:
- *     Row 1: author identity (avatar + name + HCP + home club + time-ago) | search | profile pill
- *     Row 2: segmented feed filter (Suggested / Friends) with white animated thumb
+ * Layout (Option B):
+ *  Row 1: small centred Suggested · Friends tabs at the very top
+ *  Row 2: combined glass bar with author identity (avatar + name + HCP + home club + time-ago),
+ *         vertical separator, search icon, profile pill (current user)
  *
  * The author identity collapses to empty space when no activeAuthor (loading state, editorial cards).
- * Row 2 + hairline divider are suppressed when hideTabs=true (e.g. CourseMediaViewer, FullscreenFeedOverlay).
  */
 
 import React, { useState, useRef } from 'react';
@@ -50,7 +49,8 @@ interface ClubhouseTopBarProps {
   leftInset?: number;
 }
 
-const BAR_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
+const TABS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
+const BAR_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)';
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   activeTab,
@@ -78,194 +78,15 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
 
   return (
     <>
-      {/* ── Identity pill (single row) ── */}
-      <div
-        className="fixed z-40"
-        style={{
-          top: BAR_TOP,
-          left: leftInset > 0 ? leftInset : 12,
-          right: 12,
-          opacity: hidden ? 0 : 1,
-          pointerEvents: hidden ? 'none' : 'auto',
-          transition: 'opacity 0.2s ease',
-          borderRadius: 22,
-          background: 'rgba(0, 0, 0, 0.50)',
-          border: '1px solid rgba(255, 255, 255, 0.10)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          fontFamily: 'Geist, system-ui, sans-serif',
-          overflow: 'hidden',
-        }}
-      >
-        {/* ── Identity row ── */}
+      {/* ── ROW 1: Tabs (centred) ── */}
+      {!hideTabs && (
         <div
-          className="flex items-center min-w-0"
+          className="fixed left-0 right-0 z-40 flex items-center justify-center"
           style={{
-            gap: 8,
-            padding: '6px 8px 6px 6px',
-          }}
-        >
-          {/* Author avatar */}
-          {activeAuthor && (
-            <button
-              type="button"
-              onClick={onAuthorTap}
-              aria-label={`View ${activeAuthor.displayName}'s profile`}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <SquircleAvatar
-                size={32}
-                src={activeAuthor.avatarUrl}
-                alt={activeAuthor.displayName}
-                fallback={activeAuthor.displayName?.[0] ?? '?'}
-                thinRing
-              />
-            </button>
-          )}
-
-          {/* Author identity (name + HCP, then home club · time-ago) */}
-          {activeAuthor ? (
-            <button
-              type="button"
-              onClick={onAuthorTap}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                flex: 1,
-                minWidth: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                gap: 1,
-                textAlign: 'left',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: 6,
-                  minWidth: 0,
-                  maxWidth: '100%',
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 800,
-                    letterSpacing: '-0.01em',
-                    color: '#fff',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    maxWidth: '100%',
-                  }}
-                >
-                  {activeAuthor.displayName}
-                </span>
-                {showHcp && (
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: '0.06em',
-                      fontVariantNumeric: 'tabular-nums',
-                      color: 'rgba(255, 255, 255, 0.6)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    HCP {activeAuthor.handicapIndex!.toFixed(1)}
-                  </span>
-                )}
-              </div>
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 400,
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '100%',
-                }}
-              >
-                {activeAuthor.homeClub
-                  ? `${activeAuthor.homeClub} · ${activeAuthor.timeAgoLabel}`
-                  : activeAuthor.timeAgoLabel}
-              </span>
-            </button>
-          ) : (
-            <div style={{ flex: 1 }} />
-          )}
-
-          {/* Vertical separator (only when author present and at least one trailing element) */}
-          {activeAuthor && (!hideSearch || (!hideProfilePill && user)) && (
-            <div
-              style={{
-                width: 1,
-                height: 24,
-                background: 'rgba(255, 255, 255, 0.12)',
-                flexShrink: 0,
-              }}
-            />
-          )}
-
-          {/* Search icon */}
-          {!hideSearch && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                'p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all',
-                'h-9 w-9 flex-shrink-0',
-                'bg-transparent hover:bg-transparent border-0 shadow-none',
-                'text-white/70'
-              )}
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-            >
-              <Search className="h-[18px] w-[18px]" />
-            </Button>
-          )}
-
-          {/* Profile pill (current user) */}
-          {!hideProfilePill && user && (
-            <div className="flex-shrink-0">
-              <PostingAsPill
-                ref={pillRef}
-                onClick={() => setMenuOpen((v) => !v)}
-                isOpen={menuOpen}
-                hasUnreadNotifications={hasUnread}
-                notificationCount={unreadCount}
-                useGlassTheme={true}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── Feed tab toggle (Suggested / Friends with amber underline) above the pill ── */}
-      {!hideTabs && !hidden && (
-        <div
-          className="fixed z-40"
-          style={{
-            top: `calc(${BAR_TOP} + 56px)`,
-            left: leftInset > 0 ? leftInset : 12,
-            right: 12,
-            display: 'flex',
-            justifyContent: 'center',
-            pointerEvents: 'auto',
+            top: TABS_TOP,
+            opacity: hidden ? 0 : 1,
+            pointerEvents: hidden ? 'none' : 'auto',
+            transition: 'opacity 0.2s ease',
           }}
         >
           <ClubhouseTabToggle
@@ -275,6 +96,175 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           />
         </div>
       )}
+
+      {/* ── ROW 2: Combined identity + actions bar ── */}
+      <div
+        className="fixed z-40 flex items-center min-w-0"
+        style={{
+          top: BAR_TOP,
+          left: leftInset > 0 ? leftInset : 12,
+          right: 12,
+          opacity: hidden ? 0 : 1,
+          pointerEvents: hidden ? 'none' : 'auto',
+          transition: 'opacity 0.2s ease',
+          gap: 8,
+          padding: '6px 8px 6px 6px',
+          borderRadius: 999,
+          background: 'rgba(0, 0, 0, 0.50)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          fontFamily: 'Geist, system-ui, sans-serif',
+        }}
+      >
+        {/* Author avatar */}
+        {activeAuthor && (
+          <button
+            type="button"
+            onClick={onAuthorTap}
+            aria-label={`View ${activeAuthor.displayName}'s profile`}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <SquircleAvatar
+              size={32}
+              src={activeAuthor.avatarUrl}
+              alt={activeAuthor.displayName}
+              fallback={activeAuthor.displayName?.[0] ?? '?'}
+              thinRing
+            />
+          </button>
+        )}
+
+        {/* Author identity (name + HCP, then home club · time-ago) */}
+        {activeAuthor ? (
+          <button
+            type="button"
+            onClick={onAuthorTap}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 1,
+              textAlign: 'left',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 6,
+                minWidth: 0,
+                maxWidth: '100%',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: '-0.01em',
+                  color: '#fff',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
+                }}
+              >
+                {activeAuthor.displayName}
+              </span>
+              {showHcp && (
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    fontVariantNumeric: 'tabular-nums',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    flexShrink: 0,
+                  }}
+                >
+                  HCP {activeAuthor.handicapIndex!.toFixed(1)}
+                </span>
+              )}
+            </div>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 400,
+                color: 'rgba(255, 255, 255, 0.6)',
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+              }}
+            >
+              {activeAuthor.homeClub
+                ? `${activeAuthor.homeClub} · ${activeAuthor.timeAgoLabel}`
+                : activeAuthor.timeAgoLabel}
+            </span>
+          </button>
+        ) : (
+          <div style={{ flex: 1 }} />
+        )}
+
+        {/* Vertical separator (only when author present and at least one trailing element) */}
+        {activeAuthor && (!hideSearch || (!hideProfilePill && user)) && (
+          <div
+            style={{
+              width: 1,
+              height: 24,
+              background: 'rgba(255, 255, 255, 0.12)',
+              flexShrink: 0,
+            }}
+          />
+        )}
+
+        {/* Search icon */}
+        {!hideSearch && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              'p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all',
+              'h-9 w-9 flex-shrink-0',
+              'bg-transparent hover:bg-transparent border-0 shadow-none',
+              'text-white/70'
+            )}
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search"
+          >
+            <Search className="h-[18px] w-[18px]" />
+          </Button>
+        )}
+
+        {/* Profile pill (current user) */}
+        {!hideProfilePill && user && (
+          <div className="flex-shrink-0">
+            <PostingAsPill
+              ref={pillRef}
+              onClick={() => setMenuOpen((v) => !v)}
+              isOpen={menuOpen}
+              hasUnreadNotifications={hasUnread}
+              notificationCount={unreadCount}
+              useGlassTheme={true}
+            />
+          </div>
+        )}
+      </div>
 
       {/* PostingAs Menu */}
       {!hideProfilePill && user && (

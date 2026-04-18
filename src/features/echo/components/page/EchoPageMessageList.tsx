@@ -1,5 +1,5 @@
 /**
- * EchoPageMessageList - Message list with bubble styling (Dispatch light theme #F8FAFC)
+ * EchoPageMessageList - Message list with bubble styling (dark theme)
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo, TouchEvent } from 'react';
@@ -127,7 +127,7 @@ export function EchoPageMessageList({
     <div
       ref={scrollRef}
       className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
-      style={{ background: '#F8FAFC', WebkitOverflowScrolling: 'touch' }}
+      style={{ background: '#0c0c0e', WebkitOverflowScrolling: 'touch' }}
       onScroll={handleScroll}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
