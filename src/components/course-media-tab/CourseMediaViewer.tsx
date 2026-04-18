@@ -1,18 +1,30 @@
 /**
- * CourseMediaViewer — Cinematic fullscreen viewer for About & Reviews tab media.
- * Uses SnapFeed (same engine as Media tab) but strips all social interaction.
+ * CourseMediaViewer — Modern fullscreen viewer for course media strips.
+ *
+ * Uses the Breathing Room chrome (ClubhouseTopBar + BreathingRoomBottomBar +
+ * BreathingRoomMuteToggle + ReviewHeaderPanel + scrubber) but with all social
+ * actions disabled. Reviews render with the dedicated review panel.
+ *
  * Powered by its own Zustand store so it never conflicts with FullscreenFeedOverlay.
+ * Reached from course detail About tab and Reviews tab media strips.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Volume2, VolumeX } from 'lucide-react';
+import { X, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
-import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
+import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
+import { BreathingRoomBottomBar } from '@/components/feed/BreathingRoomBottomBar';
+import { BreathingRoomMuteToggle } from '@/components/feed/BreathingRoomMuteToggle';
+import { ReviewHeaderPanel } from '@/components/feed/ReviewHeaderPanel';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { Z } from '@/config/zIndex';
+import { formatTimeAgo } from '@/utils/formatTime';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { getProfilePathById } from '@/lib/profileRoutes';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
@@ -49,17 +61,51 @@ export const useCourseMediaViewerStore = create<CourseMediaViewerState>((set) =>
 // ── Component ──
 
 export function CourseMediaViewer() {
-  const { isOpen, posts, startIndex, close, activeIndex, setActiveIndex, carouselPositions } = useCourseMediaViewerStore();
-  const isMuted = useClubhouseStore(s => s.isMuted);
-  const toggleMute = useClubhouseStore(s => s.toggleMute);
-  const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
+  const navigate = useNavigate();
+  const {
+    isOpen,
+    posts,
+    startIndex,
+    close,
+    activeIndex,
+    setActiveIndex,
+  } = useCourseMediaViewerStore();
 
-  const activePost = posts[activeIndex] ?? null;
+  const activeVideoElement = useClubhouseStore((s) => s.activeVideoElement);
+  const activePost: FeedPost | null = posts[activeIndex] ?? null;
   const isVideo = activePost?.mediaItems?.[0]?.type === 'video';
-  const mediaCount = activePost?.mediaItems?.length ?? 0;
-  const currentMediaIdx = carouselPositions.get(activeIndex) ?? 0;
+  const isReview = !!(activePost?.isReview && activePost?.review);
 
-  // Body scroll lock + status bar
+  // Identity bar author info (mirrors Clubhouse.tsx pattern)
+  const activeAuthor = useMemo(() => {
+    if (!activePost) return null;
+    return {
+      id: activePost.userId,
+      displayName: activePost.displayName,
+      username: activePost.username,
+      avatarUrl: activePost.avatarUrl,
+      handicapIndex: activePost.handicapIndex ?? null,
+      homeClub: activePost.homeClub ?? null,
+      timeAgoLabel: activePost.createdAt
+        ? formatTimeAgo(activePost.createdAt, 'short')
+        : '',
+    };
+  }, [activePost]);
+
+  // Course chip (hidden on review posts to avoid duplication with the review panel)
+  const golfCourse = useMemo(() => {
+    if (!activePost || isReview) return null;
+    if (!activePost.courseId || !activePost.courseName) return null;
+    return { id: activePost.courseId, name: activePost.courseName };
+  }, [activePost, isReview]);
+
+  const handleViewProfile = () => {
+    if (!activePost) return;
+    close();
+    navigate(getProfilePathById(activePost.userId));
+  };
+
+  // Body scroll lock + status bar (unchanged behaviour)
   useEffect(() => {
     if (!isOpen) return;
     pauseAllAudio();
@@ -91,6 +137,9 @@ export function CourseMediaViewer() {
     return () => window.removeEventListener('keydown', h);
   }, [isOpen, close]);
 
+  // No-op stubs for read-only social actions
+  const noop = () => {};
+
   return (
     <>
       <AnimatePresence>
@@ -102,43 +151,25 @@ export function CourseMediaViewer() {
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-[9000] bg-black flex flex-col"
           >
-            {/* Close — top left */}
+            {/* Close — top-left */}
             <button
               onClick={close}
-              className="absolute left-4 z-[9010] rounded-full flex items-center justify-center"
+              aria-label="Close"
+              className="absolute left-4 z-[9020] rounded-full flex items-center justify-center"
               style={{
                 top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
                 width: 44,
                 height: 44,
-                background: 'rgba(0, 0, 0, 0.35)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
+                background: 'rgba(0, 0, 0, 0.50)',
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
                 border: '1px solid rgba(255, 255, 255, 0.10)',
               }}
             >
               <X className="w-5 h-5 text-white" />
             </button>
 
-            {/* Mute — top right, video only */}
-            {isVideo && (
-              <button
-                onClick={toggleMute}
-                className="absolute right-4 z-[9010] rounded-full flex items-center justify-center"
-                style={{
-                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-                  width: 44,
-                  height: 44,
-                  background: 'rgba(0, 0, 0, 0.35)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.10)',
-                }}
-              >
-                {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
-              </button>
-            )}
-
-            {/* SnapFeed */}
+            {/* SnapFeed — drives the actual media playback */}
             <SnapFeed
               posts={posts}
               activeTab="foryou"
@@ -153,50 +184,140 @@ export function CourseMediaViewer() {
               activeIndexOverride={activeIndex}
             />
 
-            {/* Creator Capsule — no social actions */}
+            {/* Top bar — identity only (no tabs / search / profile pill) */}
             {activePost && (
-              <div style={{ pointerEvents: 'auto' }}>
-                <CreatorCapsule
-                  user={{
-                    id: activePost.userId,
-                    name: activePost.displayName,
-                    username: activePost.username,
-                    avatar: activePost.avatarUrl,
+              <ClubhouseTopBar
+                activeTab="foryou"
+                onTabChange={() => {}}
+                isBusinessActor={false}
+                user={null}
+                hidden={false}
+                activeAuthor={activeAuthor}
+                onAuthorTap={handleViewProfile}
+                hideTabs={true}
+                hideProfilePill={true}
+                hideSearch={true}
+              />
+            )}
+
+            {/* Course chip (non-review posts only) */}
+            {golfCourse && (
+              <motion.button
+                type="button"
+                onClick={() => {
+                  close();
+                  navigate(`/courses/${golfCourse.id}`);
+                }}
+                initial={false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                style={{
+                  position: 'fixed',
+                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 132px)',
+                  left: 16,
+                  zIndex: Z.echo,
+                  pointerEvents: 'auto',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  maxWidth: 'calc(100% - 32px)',
+                  padding: '6px 10px',
+                  borderRadius: 14,
+                  background: 'rgba(0, 0, 0, 0.50)',
+                  border: '1px solid rgba(255, 255, 255, 0.10)',
+                  backdropFilter: 'blur(14px)',
+                  WebkitBackdropFilter: 'blur(14px)',
+                  cursor: 'pointer',
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                }}
+              >
+                <MapPin size={12} stroke="#F7931E" strokeWidth={2.25} />
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    letterSpacing: '-0.005em',
+                    color: '#fff',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
-                  caption={activePost.caption}
-                  tags={activePost.tags}
-                  golfCourse={null}
-                  isFollowing={false}
-                  isOwnPost={false}
+                >
+                  {golfCourse.name}
+                </span>
+              </motion.button>
+            )}
+
+            {/* Mute toggle — video posts only */}
+            {isVideo && <BreathingRoomMuteToggle isVisible={true} />}
+
+            {/* Review header panel — review posts only */}
+            {isReview && activePost?.review && (
+              <div
+                style={{
+                  position: 'fixed',
+                  bottom: 'calc(var(--bottom-nav-height, 88px) + 140px)',
+                  left: 0,
+                  right: 0,
+                  zIndex: Z.echo,
+                  pointerEvents: 'auto',
+                }}
+              >
+                <ReviewHeaderPanel
+                  courseName={activePost.review.courseName}
+                  courseImageUrl={activePost.review.courseImageUrl ?? null}
+                  courseRegion={activePost.review.courseRegion ?? null}
+                  courseCountry={activePost.review.courseCountry ?? null}
+                  courseSubCountry={activePost.review.courseSubCountry ?? null}
+                  rating={activePost.review.rating}
                   isVisible={true}
-                  onFollow={() => {}}
-                  onViewProfile={() => {}}
-                  onBeforeNavigate={close}
-                  isReview={false}
-                  postId={activePost.id}
-                  carouselCount={mediaCount}
-                  carouselActiveIndex={currentMediaIdx}
+                  onTap={() => {
+                    if (!activePost.review) return;
+                    const review = activePost.review;
+                    close();
+                    navigate(`/courses/${review.courseId}?tab=reviews&review=${review.reviewId}`);
+                  }}
                 />
               </div>
             )}
 
-            {/* Video Scrubber */}
+            {/* Bottom bar — read-only caption only (no actions) */}
+            {activePost && (
+              <BreathingRoomBottomBar
+                caption={activePost.caption ?? ''}
+                tags={activePost.tags ?? []}
+                taggedFriends={[]}
+                likesCount={null}
+                commentsCount={null}
+                hasLiked={false}
+                isVisible={true}
+                onLike={noop}
+                onComment={noop}
+                onShare={noop}
+                onMore={noop}
+                isVideo={!!isVideo}
+                isFollowing={false}
+                isOwnPost={true}
+                onFollow={noop}
+                activeVideoElement={activeVideoElement}
+                postId={activePost.id}
+                readOnly={true}
+              />
+            )}
+
+            {/* Scrubber — rendered separately because readOnly hides the action strip */}
             {isVideo && activeVideoElement && (
               <div
                 style={{
                   position: 'fixed',
-                  bottom: 'var(--bottom-nav-height, 88px)',
+                  bottom: 'calc(var(--bottom-nav-height, 88px) + 56px)',
                   left: 0,
                   right: 0,
                   pointerEvents: 'auto',
-                  zIndex: 9011,
+                  zIndex: Z.echo + 1,
                 }}
               >
-                <VideoScrubber
-                  videoEl={activeVideoElement}
-                  height={3}
-                  variant="fullscreen"
-                />
+                <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
               </div>
             )}
           </motion.div>

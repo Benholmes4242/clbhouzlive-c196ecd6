@@ -46,6 +46,8 @@ interface BreathingRoomBottomBarProps {
   activeVideoElement?: HTMLVideoElement | null;
   /** NEW: stable identifier for the active post — used to reset caption expansion on post change */
   postId?: string;
+  /** When true, suppress the entire interactive action strip (read-only viewers) */
+  readOnly?: boolean;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -72,6 +74,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   onFollow,
   activeVideoElement,
   postId,
+  readOnly = false,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
@@ -195,101 +198,103 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       })()}
 
       {/* Action strip — scrubber renders as top border on video posts, static hairline on images */}
-      <div
-        style={{
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 22,
-          paddingTop: 12,
-          borderTop: activeVideoElement ? 'none' : '1px solid rgba(255, 255, 255, 0.16)',
-        }}
-      >
-        {/* Scrubber-as-border: only rendered when there's an active video element */}
-        {activeVideoElement && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 2,
-              pointerEvents: 'auto',
-              zIndex: 1,
-            }}
-          >
-            <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
-          </div>
-        )}
+      {!readOnly && (
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 22,
+            paddingTop: 12,
+            borderTop: activeVideoElement ? 'none' : '1px solid rgba(255, 255, 255, 0.16)',
+          }}
+        >
+          {/* Scrubber-as-border: only rendered when there's an active video element */}
+          {activeVideoElement && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                pointerEvents: 'auto',
+                zIndex: 1,
+              }}
+            >
+              <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
+            </div>
+          )}
 
 
-        <ActionButton
-          icon={
-            <Heart
-              size={22}
-              fill={hasLiked ? '#F7931E' : 'transparent'}
-              stroke={hasLiked ? '#F7931E' : '#fff'}
-              strokeWidth={2}
-            />
-          }
-          count={formatCount(likesCount)}
-          accent={hasLiked ? '#F7931E' : '#fff'}
-          onClick={onLike}
-          ariaLabel={hasLiked ? 'Unlike' : 'Like'}
-          animateKey={likeAnimKey}
-        />
+          <ActionButton
+            icon={
+              <Heart
+                size={22}
+                fill={hasLiked ? '#F7931E' : 'transparent'}
+                stroke={hasLiked ? '#F7931E' : '#fff'}
+                strokeWidth={2}
+              />
+            }
+            count={formatCount(likesCount)}
+            accent={hasLiked ? '#F7931E' : '#fff'}
+            onClick={onLike}
+            ariaLabel={hasLiked ? 'Unlike' : 'Like'}
+            animateKey={likeAnimKey}
+          />
 
-        <ActionButton
-          icon={<MessageSquare size={22} stroke="#fff" strokeWidth={2} />}
-          count={formatCount(commentsCount)}
-          accent="#fff"
-          onClick={onComment}
-          ariaLabel="Comments"
-        />
+          <ActionButton
+            icon={<MessageSquare size={22} stroke="#fff" strokeWidth={2} />}
+            count={formatCount(commentsCount)}
+            accent="#fff"
+            onClick={onComment}
+            ariaLabel="Comments"
+          />
 
-        <ActionButton
-          icon={<Send size={22} stroke="#fff" strokeWidth={2} />}
-          accent="#fff"
-          onClick={onShare}
-          ariaLabel="Share"
-        />
+          <ActionButton
+            icon={<Send size={22} stroke="#fff" strokeWidth={2} />}
+            accent="#fff"
+            onClick={onShare}
+            ariaLabel="Share"
+          />
 
-        {/* FOLLOW — text pill, sits between Share and the spacer */}
-        {!isOwnPost && (
-          <motion.button
-            type="button"
-            onClick={onFollow}
-            whileTap={{ scale: 0.94 }}
-            aria-label={isFollowing ? 'Unfollow' : 'Follow'}
-            style={{
-              flexShrink: 0,
-              border: 'none',
-              cursor: 'pointer',
-              padding: '6px 12px',
-              borderRadius: 999,
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              fontFamily: 'Geist, system-ui, sans-serif',
-              background: isFollowing ? 'rgba(255, 255, 255, 0.14)' : '#F7931E',
-              color: isFollowing ? 'rgba(255, 255, 255, 0.85)' : '#0F172A',
-              transition: 'background 0.15s ease, color 0.15s ease',
-            }}
-          >
-            {isFollowing ? 'FOLLOWING' : 'FOLLOW'}
-          </motion.button>
-        )}
+          {/* FOLLOW — text pill, sits between Share and the spacer */}
+          {!isOwnPost && (
+            <motion.button
+              type="button"
+              onClick={onFollow}
+              whileTap={{ scale: 0.94 }}
+              aria-label={isFollowing ? 'Unfollow' : 'Follow'}
+              style={{
+                flexShrink: 0,
+                border: 'none',
+                cursor: 'pointer',
+                padding: '6px 12px',
+                borderRadius: 999,
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                fontFamily: 'Geist, system-ui, sans-serif',
+                background: isFollowing ? 'rgba(255, 255, 255, 0.14)' : '#F7931E',
+                color: isFollowing ? 'rgba(255, 255, 255, 0.85)' : '#0F172A',
+                transition: 'background 0.15s ease, color 0.15s ease',
+              }}
+            >
+              {isFollowing ? 'FOLLOWING' : 'FOLLOW'}
+            </motion.button>
+          )}
 
-        <div style={{ flex: 1 }} />
+          <div style={{ flex: 1 }} />
 
-        <ActionButton
-          icon={<MoreHorizontal size={22} stroke="#fff" strokeWidth={2} />}
-          accent="#fff"
-          onClick={onMore}
-          ariaLabel="More options"
-        />
-      </div>
+          <ActionButton
+            icon={<MoreHorizontal size={22} stroke="#fff" strokeWidth={2} />}
+            accent="#fff"
+            onClick={onMore}
+            ariaLabel="More options"
+          />
+        </div>
+      )}
     </motion.div>
   );
 };
