@@ -125,10 +125,11 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
         background:
           'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.92) 55%)',
         zIndex: Z.echo,
-        pointerEvents: isVisible ? 'auto' : 'none',
+        pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
+      <div style={{ pointerEvents: isVisible ? 'auto' : 'none' }}>
       {/* "with @friend" line */}
       {taggedFriends.length > 0 && (
         <div
@@ -312,6 +313,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           />
         </div>
       )}
+      </div>
     </motion.div>
   );
 };
