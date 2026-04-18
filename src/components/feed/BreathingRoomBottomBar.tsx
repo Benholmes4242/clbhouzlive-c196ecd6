@@ -190,7 +190,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               border: 'none',
               cursor: 'pointer',
               padding: '6px 12px',
-              borderRadius: 999,
+              borderRadius: 14,
               fontSize: 10,
               fontWeight: 800,
               letterSpacing: '0.08em',
