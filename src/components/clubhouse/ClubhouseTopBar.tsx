@@ -41,6 +41,10 @@ interface ClubhouseTopBarProps {
     timeAgoLabel: string;
   } | null;
   onAuthorTap?: () => void;
+  /** Suppress subsections for read-only contexts (e.g. CourseMediaViewer) */
+  hideTabs?: boolean;
+  hideSearch?: boolean;
+  hideProfilePill?: boolean;
 }
 
 const TABS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
@@ -54,6 +58,9 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   hidden = false,
   activeAuthor = null,
   onAuthorTap,
+  hideTabs = false,
+  hideSearch = false,
+  hideProfilePill = false,
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -69,21 +76,23 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   return (
     <>
       {/* ── ROW 1: Tabs (centred) ── */}
-      <div
-        className="fixed left-0 right-0 z-40 flex items-center justify-center"
-        style={{
-          top: TABS_TOP,
-          opacity: hidden ? 0 : 1,
-          pointerEvents: hidden ? 'none' : 'auto',
-          transition: 'opacity 0.2s ease',
-        }}
-      >
-        <ClubhouseTabToggle
-          activeTab={activeTab}
-          onTabChange={onTabChange}
-          isBusinessActor={isBusinessActor}
-        />
-      </div>
+      {!hideTabs && (
+        <div
+          className="fixed left-0 right-0 z-40 flex items-center justify-center"
+          style={{
+            top: TABS_TOP,
+            opacity: hidden ? 0 : 1,
+            pointerEvents: hidden ? 'none' : 'auto',
+            transition: 'opacity 0.2s ease',
+          }}
+        >
+          <ClubhouseTabToggle
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            isBusinessActor={isBusinessActor}
+          />
+        </div>
+      )}
 
       {/* ── ROW 2: Combined identity + actions bar ── */}
       <div
@@ -207,8 +216,8 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           <div style={{ flex: 1 }} />
         )}
 
-        {/* Vertical separator (only when author present) */}
-        {activeAuthor && (
+        {/* Vertical separator (only when author present and at least one trailing element) */}
+        {activeAuthor && (!hideSearch || (!hideProfilePill && user)) && (
           <div
             style={{
               width: 1,
@@ -220,23 +229,25 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
         )}
 
         {/* Search icon */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(
-            'p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all',
-            'h-9 w-9 flex-shrink-0',
-            'bg-transparent hover:bg-transparent border-0 shadow-none',
-            'text-white/70'
-          )}
-          onClick={() => setSearchOpen(true)}
-          aria-label="Search"
-        >
-          <Search className="h-[18px] w-[18px]" />
-        </Button>
+        {!hideSearch && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              'p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all',
+              'h-9 w-9 flex-shrink-0',
+              'bg-transparent hover:bg-transparent border-0 shadow-none',
+              'text-white/70'
+            )}
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search"
+          >
+            <Search className="h-[18px] w-[18px]" />
+          </Button>
+        )}
 
         {/* Profile pill (current user) */}
-        {user && (
+        {!hideProfilePill && user && (
           <div className="flex-shrink-0">
             <PostingAsPill
               ref={pillRef}
@@ -251,7 +262,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       </div>
 
       {/* PostingAs Menu */}
-      {user && (
+      {!hideProfilePill && user && (
         <PostingAsMenu
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
@@ -261,7 +272,9 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       )}
 
       {/* Search Overlay */}
-      <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      {!hideSearch && (
+        <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      )}
     </>
   );
 };
