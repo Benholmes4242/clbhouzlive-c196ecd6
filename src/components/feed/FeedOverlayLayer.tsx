@@ -1,12 +1,12 @@
 import React, { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { MapPin } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { BreathingRoomIdentityPill } from './BreathingRoomIdentityPill';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
-
+import { Z } from '@/config/zIndex';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { formatTimeAgo } from '@/utils/formatTime';
 
 interface FeedOverlayLayerProps {
   posts: FeedPost[];
@@ -49,24 +49,19 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   getCommentCount,
   getFollowState,
   onFollow,
-  onViewProfile,
-  onReviewTap,
   overlayVisible,
   isOwnPost,
   golfCourse,
   onBeforeNavigate,
-  activeReview,
-  isActiveReview,
   activeIndexOverride,
 }: FeedOverlayLayerProps) {
   const navigate = useNavigate();
   const clubhouseActiveIndex = useClubhouseStore(s => s.activeIndex);
   const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
-  const carouselPositions = useClubhouseStore(s => s.carouselPositions);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
 
   const activePost = posts[activeIndex] ?? null;
-  
+
   if (!activePost) return null;
 
   // Hide overlays on editorial and tournament cards (they have their own chrome)
@@ -90,10 +85,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
       displayName: t.name,
     }));
 
-  const timeAgoLabel = activePost.createdAt
-    ? formatTimeAgo(activePost.createdAt, 'short')
-    : '';
-
   return (
     <div
       className="fixed inset-0"
@@ -104,34 +95,57 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         transition: 'opacity 0.18s ease',
       }}
     >
-      {/* Identity pill (top-anchored) + course chip */}
-      <BreathingRoomIdentityPill
-        user={{
-          id: activePost.userId,
-          displayName: activePost.displayName,
-          username: activePost.username,
-          avatarUrl: activePost.avatarUrl,
-          // TODO: surface user_profiles.eg_handicap_index in FeedPost builders
-          handicapIndex: null,
-        }}
-        course={golfCourse ? { id: golfCourse.id, name: golfCourse.name } : null}
-        timeAgoLabel={timeAgoLabel}
-        isFollowing={isFollowed}
-        isOwnPost={isOwnPost}
-        isVisible={overlayVisible}
-        onFollow={() => onFollow(activePost)}
-        onViewProfile={onViewProfile}
-        onCourseTap={
-          golfCourse
-            ? () => {
-                onBeforeNavigate?.();
-                navigate(`/courses/${golfCourse.id}`);
-              }
-            : undefined
-        }
-      />
+      {/* Course chip — anchored below the combined top bar */}
+      {golfCourse && (
+        <motion.button
+          type="button"
+          onClick={() => {
+            onBeforeNavigate?.();
+            navigate(`/courses/${golfCourse.id}`);
+          }}
+          initial={false}
+          animate={{
+            opacity: overlayVisible ? 1 : 0,
+            y: overlayVisible ? 0 : -4,
+          }}
+          transition={{ duration: 0.18, ease: 'easeOut', delay: overlayVisible ? 0.04 : 0 }}
+          style={{
+            position: 'fixed',
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 112px)',
+            left: 16,
+            zIndex: Z.echo,
+            pointerEvents: overlayVisible ? 'auto' : 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            maxWidth: 'calc(100% - 32px)',
+            padding: '6px 10px',
+            borderRadius: 999,
+            background: 'rgba(0, 0, 0, 0.50)',
+            border: '1px solid rgba(255, 255, 255, 0.10)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            cursor: 'pointer',
+            fontFamily: 'Geist, system-ui, sans-serif',
+          }}
+        >
+          <MapPin size={11} fill="#F7931E" stroke="#F7931E" strokeWidth={1} />
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: '#fff',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {golfCourse.name}
+          </span>
+        </motion.button>
+      )}
 
-      {/* Bottom bar (caption + horizontal actions) */}
+      {/* Bottom bar (caption + horizontal actions + FOLLOW) */}
       <BreathingRoomBottomBar
         caption={activePost.caption ?? ''}
         tags={tags}
@@ -145,6 +159,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         onShare={() => onShare(activePost)}
         onMore={onMore}
         isVideo={isVideo}
+        isFollowing={isFollowed}
+        isOwnPost={isOwnPost}
+        onFollow={() => onFollow(activePost)}
       />
 
       {/* Video Scrubber — anchored to the top edge of the bottom nav bar */}
@@ -153,8 +170,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           style={{
             position: 'fixed',
             bottom: 'var(--bottom-nav-height, 88px)',
-             left: 0,
-             right: 0,
+            left: 0,
+            right: 0,
             pointerEvents: 'auto',
             zIndex: 31,
           }}

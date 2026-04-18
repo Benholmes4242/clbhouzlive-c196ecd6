@@ -1,20 +1,25 @@
 /**
- * ClubhouseTopBar - Floating top bar for Clubhouse page
- * Contains: Tab Toggle (Suggested | Friends) + Search + Profile Pill + Carousel Dots
+ * ClubhouseTopBar - Combined top chrome for the Clubhouse feed
+ *
+ * Layout (Option B):
+ *  Row 1: small centred Suggested · Friends tabs at the very top
+ *  Row 2: combined glass bar with author identity (avatar + name + HCP + home club + time-ago),
+ *         vertical separator, search icon, profile pill (current user)
+ *
+ * The author identity collapses to empty space when no activeAuthor (loading state, editorial cards).
  */
 
 import React, { useState, useRef } from 'react';
 import { Search } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import type { User } from '@supabase/supabase-js';
-
 
 interface ClubhouseTopBarProps {
   activeTab: ClubhouseTab;
@@ -25,76 +30,225 @@ interface ClubhouseTopBarProps {
   carouselIndex?: number;
   /** When true, hides the entire top bar (PGA card active) */
   hidden?: boolean;
+  /** Active post's author for the merged identity bar */
+  activeAuthor?: {
+    id: string;
+    displayName: string;
+    username: string;
+    avatarUrl: string;
+    handicapIndex: number | null;
+    homeClub: string | null;
+    timeAgoLabel: string;
+  } | null;
+  onAuthorTap?: () => void;
 }
+
+const TABS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
+const BAR_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)';
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   activeTab,
   onTabChange,
   isBusinessActor = false,
   user,
-  carouselCount,
-  carouselIndex,
   hidden = false,
+  activeAuthor = null,
+  onAuthorTap,
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
   const { hasUnread, unreadCount } = useUnreadNotifications();
 
+  const showHcp =
+    !!activeAuthor &&
+    activeAuthor.handicapIndex !== null &&
+    activeAuthor.handicapIndex !== undefined &&
+    Number.isFinite(activeAuthor.handicapIndex);
+
   return (
     <>
-      {/* Floating bar - fixed position below the notch/safe area */}
+      {/* ── ROW 1: Tabs (centred) ── */}
       <div
-        className="fixed left-3 right-3 z-40 pointer-events-auto flex items-center justify-between gap-1 min-w-0"
+        className="fixed left-0 right-0 z-40 flex items-center justify-center"
         style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+          top: TABS_TOP,
           opacity: hidden ? 0 : 1,
           pointerEvents: hidden ? 'none' : 'auto',
           transition: 'opacity 0.2s ease',
         }}
       >
-        {/* Left: Tab Toggle */}
-        <div className="flex-1 min-w-0">
-          <ClubhouseTabToggle
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-            isBusinessActor={isBusinessActor}
-          />
-        </div>
-
-        {/* Right: Search + Profile Pill */}
-        <div className="flex items-center gap-1 flex-shrink-0 ml-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all",
-              "h-11 w-11 flex-shrink-0",
-              "bg-transparent hover:bg-transparent border-0 shadow-none",
-              "text-white/70"
-            )}
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search"
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-
-          {user && (
-            <div className="flex-shrink-1 min-w-0">
-              <PostingAsPill
-                ref={pillRef}
-                onClick={() => setMenuOpen((v) => !v)}
-                isOpen={menuOpen}
-                hasUnreadNotifications={hasUnread}
-                notificationCount={unreadCount}
-                useGlassTheme={true}
-                
-              />
-            </div>
-          )}
-        </div>
+        <ClubhouseTabToggle
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+          isBusinessActor={isBusinessActor}
+        />
       </div>
 
+      {/* ── ROW 2: Combined identity + actions bar ── */}
+      <div
+        className="fixed left-3 right-3 z-40 flex items-center min-w-0"
+        style={{
+          top: BAR_TOP,
+          opacity: hidden ? 0 : 1,
+          pointerEvents: hidden ? 'none' : 'auto',
+          transition: 'opacity 0.2s ease',
+          gap: 8,
+          padding: '6px 8px 6px 6px',
+          borderRadius: 14,
+          background: 'rgba(15, 23, 42, 0.55)',
+          border: '1px solid rgba(255, 255, 255, 0.14)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          fontFamily: 'Geist, system-ui, sans-serif',
+        }}
+      >
+        {/* Author avatar */}
+        {activeAuthor && (
+          <button
+            type="button"
+            onClick={onAuthorTap}
+            aria-label={`View ${activeAuthor.displayName}'s profile`}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <SquircleAvatar
+              size={32}
+              src={activeAuthor.avatarUrl}
+              alt={activeAuthor.displayName}
+              fallback={activeAuthor.displayName?.[0] ?? '?'}
+              thinRing
+            />
+          </button>
+        )}
+
+        {/* Author identity (name + HCP, then home club · time-ago) */}
+        {activeAuthor ? (
+          <button
+            type="button"
+            onClick={onAuthorTap}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 1,
+              textAlign: 'left',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 6,
+                minWidth: 0,
+                maxWidth: '100%',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: '-0.01em',
+                  color: '#fff',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
+                }}
+              >
+                {activeAuthor.displayName}
+              </span>
+              {showHcp && (
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    fontVariantNumeric: 'tabular-nums',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    flexShrink: 0,
+                  }}
+                >
+                  HCP {activeAuthor.handicapIndex!.toFixed(1)}
+                </span>
+              )}
+            </div>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 400,
+                color: 'rgba(255, 255, 255, 0.6)',
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+              }}
+            >
+              {activeAuthor.homeClub
+                ? `${activeAuthor.homeClub} · ${activeAuthor.timeAgoLabel}`
+                : activeAuthor.timeAgoLabel}
+            </span>
+          </button>
+        ) : (
+          <div style={{ flex: 1 }} />
+        )}
+
+        {/* Vertical separator (only when author present) */}
+        {activeAuthor && (
+          <div
+            style={{
+              width: 1,
+              height: 24,
+              background: 'rgba(255, 255, 255, 0.12)',
+              flexShrink: 0,
+            }}
+          />
+        )}
+
+        {/* Search icon */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            'p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all',
+            'h-9 w-9 flex-shrink-0',
+            'bg-transparent hover:bg-transparent border-0 shadow-none',
+            'text-white/70'
+          )}
+          onClick={() => setSearchOpen(true)}
+          aria-label="Search"
+        >
+          <Search className="h-[18px] w-[18px]" />
+        </Button>
+
+        {/* Profile pill (current user) */}
+        {user && (
+          <div className="flex-shrink-0">
+            <PostingAsPill
+              ref={pillRef}
+              onClick={() => setMenuOpen((v) => !v)}
+              isOpen={menuOpen}
+              hasUnreadNotifications={hasUnread}
+              notificationCount={unreadCount}
+              useGlassTheme={true}
+            />
+          </div>
+        )}
+      </div>
 
       {/* PostingAs Menu */}
       {user && (
@@ -107,10 +261,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       )}
 
       {/* Search Overlay */}
-      <GlobalSearchOverlay
-        isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
-      />
+      <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 };
