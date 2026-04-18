@@ -239,7 +239,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                 zIndex: 1,
               }}
             >
-              <VideoScrubber videoEl={activeVideoElement} height={2} variant="amber" />
+              <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
             </div>
           )}
 
