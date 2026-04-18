@@ -49,7 +49,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const pillRef = useRef<HTMLButtonElement>(null);
   
   // Live tournament data for Tour routes
-  const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  // Only the Overview tab shows the nine-dot tour menu icon. Sub-tabs (schedule,
+  // players, leaderboards) match the Discover compact header style with the clbhouz logo.
+  const isTourPath = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  const tourTabParam = searchParams.get('tab');
+  const isTourOverview = isTourPath && (!tourTabParam || tourTabParam === 'overview');
+  const isTourRoute = isTourOverview;
   const { data: liveCount } = useLiveTournamentCount();
   const prefetchNavMenu = usePrefetchNavMenu();
   const hasLiveTournaments = isTourRoute && (liveCount ?? 0) > 0;
