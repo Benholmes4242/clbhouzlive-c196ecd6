@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,6 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
-import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
@@ -18,7 +17,6 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { getProfilePathById } from '@/lib/profileRoutes';
-import { formatTimeAgo } from '@/utils/formatTime';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
@@ -45,30 +43,6 @@ export function FullscreenFeedOverlay() {
     if (!activeReview) return;
     setReviewSheetOpen(true);
   }, [activeReview]);
-
-  // Compute active author for the identity bar (mirrors Clubhouse.tsx pattern)
-  const activeAuthor = useMemo(() => {
-    if (!activePost) return null;
-    // Don't show author identity for editorial/tournament cards
-    if (
-      activePost.postType === 'tournament_result' ||
-      activePost.postType === 'pga_card' ||
-      activePost.postType === 'course_of_week_card'
-    ) {
-      return null;
-    }
-    return {
-      id: activePost.userId,
-      displayName: activePost.displayName,
-      username: activePost.username,
-      avatarUrl: activePost.avatarUrl,
-      handicapIndex: activePost.handicapIndex ?? null,
-      homeClub: activePost.homeClub ?? null,
-      timeAgoLabel: activePost.createdAt
-        ? formatTimeAgo(activePost.createdAt, 'short')
-        : '',
-    };
-  }, [activePost]);
 
   // ESC to close
   useEffect(() => {
