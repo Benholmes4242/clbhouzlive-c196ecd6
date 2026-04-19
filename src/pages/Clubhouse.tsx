@@ -334,6 +334,7 @@ const ClubhouseContent = () => {
       <ClubhouseSkeletonShimmer 
         isVisible={skeletonVisible} 
         isStatic={skeletonMode === 'static'} 
+        variant={posts[0]?.isReview ? 'review' : 'regular'}
       />
 
       {/* Floating top bar — hidden when PGA card active */}
