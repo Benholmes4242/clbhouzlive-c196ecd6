@@ -334,6 +334,7 @@ const ClubhouseContent = () => {
       <ClubhouseSkeletonShimmer 
         isVisible={skeletonVisible} 
         isStatic={skeletonMode === 'static'} 
+        variant={posts[0]?.isReview ? 'review' : 'regular'}
       />
 
       {/* Floating top bar — hidden when PGA card active */}
@@ -378,7 +379,7 @@ const ClubhouseContent = () => {
       <ProfileCompleteNudge />
 
       {/* Rehydration skeleton */}
-      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} />
+      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} />
 
       {/* ═══ MAIN FEED AREA ═══ */}
       {!isLoading && posts.length === 0 ? (
