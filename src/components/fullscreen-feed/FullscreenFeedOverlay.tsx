@@ -133,22 +133,7 @@ export function FullscreenFeedOverlay() {
               <X className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
             </button>
 
-            {/* Identity bar — author info without feed tabs, search, or profile pill */}
-            {activePost && (
-              <ClubhouseTopBar
-                activeTab="foryou"
-                onTabChange={() => {}}
-                isBusinessActor={false}
-                user={null}
-                hidden={false}
-                activeAuthor={activeAuthor}
-                onAuthorTap={handleViewProfile}
-                hideTabs={true}
-                hideSearch={true}
-                hideProfilePill={true}
-                leftInset={62}
-              />
-            )}
+            {/* Top chrome removed in fullscreen — author identity now lives in BreathingRoomBottomBar via FeedOverlayLayer */}
 
             <SnapFeed
               posts={posts}

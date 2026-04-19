@@ -41,7 +41,7 @@ const ClubTagPill = ({ course, className, positioning = 'fixed' }: ClubTagPillPr
       )}
       onClick={handleCourseClick}
       style={isFixed ? {
-        top: 'calc(var(--safe-top, 0px) + 64px + 2px)',
+        top: 'calc(var(--safe-top, 0px) + 52px + 2px)',
         maxWidth: isMobile ? '52vw' : '28vw'
       } : undefined}
     >
