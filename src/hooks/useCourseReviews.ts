@@ -37,7 +37,7 @@ export type CourseReview = {
     country: string | null;
     region: string | null;
     sub_country: string | null;
-    hero_image_url: string | null;
+    thumbnail_image: string | null;
   } | null;
   media?: ReviewMediaItem[];
 };
@@ -96,7 +96,7 @@ export function useCourseReviews(
             country,
             region,
             sub_country,
-            hero_image_url
+            thumbnail_image
           ),
           course_review_media (
             id,

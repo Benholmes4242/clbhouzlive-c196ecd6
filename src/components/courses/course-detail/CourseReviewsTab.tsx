@@ -240,7 +240,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           reviewId: review.id,
           courseId: review.course_id,
           courseName: review.course?.name ?? courseName ?? '',
-          courseImageUrl: review.course?.hero_image_url ?? null,
+          courseImageUrl: review.course?.thumbnail_image ?? null,
           rating: review.rating ?? 0,
           courseCountry: review.course?.country ?? null,
           courseRegion: review.course?.region ?? null,
