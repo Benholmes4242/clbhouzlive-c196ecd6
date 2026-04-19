@@ -6,7 +6,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { Z } from '@/config/zIndex';
 import { BreathingRoomMuteToggle } from './BreathingRoomMuteToggle';
-import { ReviewHeaderPanel } from './ReviewHeaderPanel';
+import { InlineReviewCard } from './InlineReviewCard';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface FeedOverlayLayerProps {
@@ -159,40 +159,41 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
       {/* Mute toggle — only on video posts */}
       {isVideo && <BreathingRoomMuteToggle isVisible={overlayVisible} bottomOffset={bottomOffset} />}
 
-      {/* Review Header Panel — only on review posts, sits above the bottom bar */}
+      {/* Inline Review Card — renders above the bottom bar action strip */}
       {activePost.isReview && activePost.review && (
-        <motion.div
-          initial={false}
-          animate={{ y: captionExpanded ? -220 : 0 }}
-          transition={{ duration: 0.22, ease: 'easeOut' }}
+        <div
           style={{
             position: 'fixed',
-            left: 0,
-            right: 0,
+            left: 16,
+            right: 16,
             bottom: bottomOffset !== undefined
-              ? `${bottomOffset + 140}px`
-              : 'calc(var(--bottom-nav-height, 88px) + 140px)',
+              ? `${bottomOffset + 88}px`
+              : 'calc(var(--bottom-nav-height, 88px) + 88px)',
             zIndex: Z.echo,
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
         >
-          <ReviewHeaderPanel
+          <InlineReviewCard
             courseName={activePost.review.courseName}
-            courseImageUrl={activePost.review.courseImageUrl}
+            rating={activePost.review.rating}
             courseRegion={activePost.review.courseRegion}
             courseCountry={activePost.review.courseCountry}
             courseSubCountry={activePost.review.courseSubCountry}
-            rating={activePost.review.rating}
+            reviewText={activePost.review.reviewText ?? activePost.caption ?? null}
+            reviewer={{
+              name: activePost.displayName,
+              avatar: activePost.avatarUrl,
+            }}
             isVisible={overlayVisible}
             onTap={() => onReviewTap?.()}
           />
-        </motion.div>
+        </div>
       )}
 
-      {/* Bottom bar (caption + horizontal actions + FOLLOW) — scrubber rendered internally on videos */}
+      {/* Bottom bar (caption + horizontal actions + FOLLOW) — caption hidden on reviews (shown inside InlineReviewCard) */}
       <BreathingRoomBottomBar
-        caption={activePost.caption ?? ''}
-        tags={tags}
+        caption={activePost.isReview ? '' : (activePost.caption ?? '')}
+        tags={activePost.isReview ? [] : tags}
         taggedFriends={taggedFriends}
         likesCount={likeState.count}
         commentsCount={commentCount}
