@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
+import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { CourseDNACard } from './CourseDNACard';

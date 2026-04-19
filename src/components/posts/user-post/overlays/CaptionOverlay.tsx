@@ -16,15 +16,19 @@ interface CaptionOverlayProps {
   content: string | null;
   postTags: PostTag[];
   truncatedContent: string;
+  isReview?: boolean;
 }
 
 export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
   content,
   postTags,
-  truncatedContent
+  truncatedContent,
+  isReview = false,
 }) => {
   const cleanContent = removeGolfCourseFromContent(content);
 
+  // Review posts render caption inline via CreatorCapsule — no overlay
+  if (isReview) return null;
   if (!truncatedContent) return null;
 
   const mappedTags = (postTags || []).map((tag) => ({
