@@ -49,6 +49,8 @@ export interface SquircleAvatarProps {
   hideRing?: boolean;
   /** Use a thin 1px ring instead of the standard 2px (for mini avatars) */
   thinRing?: boolean;
+  /** Use a 0.5px hairline ring (for ultra-minimal contexts like the Clubhouse feed) */
+  hairlineRing?: boolean;
   /** Fallback text (e.g., initials) */
   fallback?: string;
   /** Additional CSS classes */
