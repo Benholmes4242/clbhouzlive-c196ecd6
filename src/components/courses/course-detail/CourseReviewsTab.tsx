@@ -481,7 +481,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </div>
 
       {/* Sort buttons */}
-      <div className="scrollbar-hide" style={{ display: 'flex', gap: 6, padding: '12px 16px 8px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <div className="scrollbar-hide" style={{ display: 'flex', gap: 6, padding: '12px 16px 8px', overflowX: 'auto', scrollbarWidth: 'none', justifyContent: 'center' }}>
         {sortOptions.map((option) => {
           const isActive = sortBy === option.value;
           return (
