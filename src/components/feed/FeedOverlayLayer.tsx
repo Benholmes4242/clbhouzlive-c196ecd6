@@ -53,6 +53,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   getCommentCount,
   getFollowState,
   onFollow,
+  onViewProfile,
   onReviewTap,
   overlayVisible,
   isOwnPost,
