@@ -173,7 +173,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
             src={author.avatarUrl}
             alt={author.displayName}
             fallback={author.displayName?.[0] ?? '?'}
-            thinRing
+            hairlineRing
             ringColor="rgba(255,255,255,0.95)"
           />
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
