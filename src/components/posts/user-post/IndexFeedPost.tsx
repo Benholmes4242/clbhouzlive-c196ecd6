@@ -202,6 +202,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           content={post.content}
           postTags={post.post_tags || []}
           truncatedContent={truncatedContent}
+          isReview={(post as any).isReview ?? (post as any).is_review ?? false}
         />
 
         <InteractionIconsOverlay

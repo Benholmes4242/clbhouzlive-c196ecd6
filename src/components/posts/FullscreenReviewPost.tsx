@@ -357,65 +357,6 @@ export function FullscreenReviewPost({
           isOwnPost={true}
           bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 56px)"
         />
-      ) : mode === 'live' ? (
-        <motion.button
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0 }}
-          onClick={handleOpenReviewSheet}
-          className={cn(
-            "absolute left-4 right-4 z-20",
-            "rounded-xl border",
-            "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
-            "pointer-events-auto cursor-pointer transition-transform active:scale-[0.98]",
-            "text-left w-auto"
-          )}
-          style={{
-            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)',
-            background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
-            backdropFilter: 'blur(20px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-            borderColor: 'rgba(255, 255, 255, 0.08)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-            padding: '12px 16px',
-          }}
-        >
-          {/* ROW 1: Course Name + Rating (top-aligned, compact) */}
-          <div className="flex justify-between items-start gap-3">
-            {/* Left: Course Name + Location stacked */}
-            <div className="flex-1 min-w-0">
-              <h2 className="text-white font-semibold text-base sm:text-lg leading-tight line-clamp-2 drop-shadow-sm">
-                {courseName}
-              </h2>
-              {heroSubtitle && (
-                <p className="text-white/50 text-xs mt-0.5 font-normal truncate">
-                  {heroSubtitle}
-                </p>
-              )}
-            </div>
-            
-            {/* Right: Rating Number — all tiers use amber */}
-            <div className="flex flex-col items-center gap-0 flex-shrink-0">
-              <span 
-                className="font-bold tracking-tight leading-none"
-                style={{ 
-                  fontSize: 'clamp(1.5rem, 7vw, 2.25rem)',
-                  fontVariantNumeric: 'tabular-nums',
-                  color: '#f59e0b',
-                  textShadow: '0 0 16px rgba(245, 158, 11, 0.4)',
-                }}
-              >
-                {rating === 10 ? '10' : rating.toFixed(1)}
-              </span>
-              <span 
-                className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-                style={{ color: 'rgba(245, 158, 11, 0.7)' }}
-              >
-                {tierData.label}
-              </span>
-            </div>
-          </div>
-        </motion.button>
       ) : null}
       
       {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
