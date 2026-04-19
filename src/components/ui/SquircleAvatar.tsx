@@ -97,6 +97,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   top100Count,
   hideRing = false,
   thinRing = false,
+  hairlineRing = false,
   fallback,
   className,
   onLoad,
@@ -189,8 +190,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     </>
   );
 
-  // Ring thickness: 2px standard, 1px for thin
-  const ringThickness = thinRing ? 1 : 2;
+  // Ring thickness: 2px standard, 1px thin, 0.5px hairline
+  const ringThickness = hairlineRing ? 0.5 : thinRing ? 1 : 2;
   
   // Determine the border color
   const borderColor = hideRing 
