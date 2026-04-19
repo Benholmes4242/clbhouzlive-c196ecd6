@@ -1,10 +1,11 @@
 /**
  * ClubhouseSkeletonShimmer - Premium loading skeleton for Clubhouse
  * 
- * Matches the Clubhouse layout exactly:
+ * Matches the current Clubhouse layout:
  * - Same dark background
- * - Right-side action rail placeholders
- * - Bottom-left caption block placeholder
+ * - Top tabs row (centred, no background)
+ * - Top-right bare icons (search + profile)
+ * - Bottom bar with author row, caption, horizontal action strip
  * - Subtle dark-on-dark shimmer animation
  * 
  * Shows until first video frame is ready, then fades out smoothly.
@@ -37,103 +38,6 @@ const SkeletonBlock: React.FC<{
     )}
     style={style}
   />
-);
-
-// Match CinematicActionRail layout constants exactly
-const SLOT_HEIGHT = 64; // icon (44px) + gap (4px) + count container (16px)
-const ICON_SIZE = 44;
-const COUNT_HEIGHT = 16;
-const GAP = 12;
-const SLOT_COUNT = 5; // Mute, Like, Comment, Share, Save
-const TOTAL_RAIL_HEIGHT = SLOT_COUNT * SLOT_HEIGHT + (SLOT_COUNT - 1) * GAP;
-
-/**
- * Action rail skeleton - matches CinematicActionRail layout exactly
- * Uses same fixed slot heights and positioning as the real component
- */
-const ActionRailSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => {
-  // Match real rail: Mute (no count), Like (count), Comment (count), Share (no count), Save (no count)
-  const slots = [
-    { hasCount: false }, // Mute
-    { hasCount: true },  // Like
-    { hasCount: true },  // Comment
-    { hasCount: false }, // Share
-    { hasCount: false }, // Save
-  ];
-
-  return (
-    <div 
-      className="flex flex-col items-center"
-      style={{ gap: GAP, height: TOTAL_RAIL_HEIGHT }}
-    >
-      {slots.map((slot, i) => (
-        <div 
-          key={i} 
-          className="flex flex-col items-center"
-          style={{ height: SLOT_HEIGHT }}
-        >
-          {/* Icon circle - fixed 44px */}
-          <SkeletonBlock 
-            isStatic={isStatic}
-            className="rounded-full"
-            style={{ width: ICON_SIZE, height: ICON_SIZE }}
-          />
-          {/* Count container - ALWAYS in layout (matches real component) */}
-          <div 
-            className="flex items-center justify-center"
-            style={{ height: COUNT_HEIGHT, marginTop: 4 }}
-          >
-            {slot.hasCount && (
-              <SkeletonBlock 
-                isStatic={isStatic}
-                className="rounded-sm"
-                style={{ width: 20, height: 10 }}
-              />
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-/**
- * Creator capsule skeleton - matches CreatorCapsule layout exactly
- * Same positioning, sizing, and visual treatment
- */
-const CreatorCapsuleSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
-  <div 
-    className="flex flex-col gap-2.5 p-3 rounded-sq-lg bg-black/50 backdrop-blur-2xl border border-white/10"
-    style={{ maxWidth: '75vw', minWidth: 200 }}
-  >
-    {/* Top row: avatar + username (matches collapsed state) */}
-    <div className="flex items-center gap-3">
-      <SkeletonBlock 
-        isStatic={isStatic}
-        className="rounded-sq-md shrink-0"
-        style={{ width: 36, height: 36 }}
-      />
-      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-        <SkeletonBlock 
-          isStatic={isStatic}
-          className="rounded-sm"
-          style={{ width: 90, height: 12 }}
-        />
-        <SkeletonBlock 
-          isStatic={isStatic}
-          className="rounded-sm"
-          style={{ width: 130, height: 10 }}
-        />
-      </div>
-    </div>
-    
-    {/* Caption line placeholder */}
-    <SkeletonBlock 
-      isStatic={isStatic}
-      className="rounded-sm"
-      style={{ width: '85%', height: 10 }}
-    />
-  </div>
 );
 
 /**
@@ -170,40 +74,153 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
-          {/* Full screen container matching Clubhouse layout */}
           <div className="relative w-full h-full">
-            
-            {/* Hero media area skeleton - fills the viewport */}
+            {/* Hero media area — fills viewport */}
             <MediaAreaSkeleton isStatic={effectiveStatic} />
-            
-            {/* Right-side action rail - positioned exactly like CinematicActionRail */}
-            <div 
-              className="absolute right-4 flex flex-col items-center"
-              style={{ 
-                bottom: '97px',
-                maxHeight: 'calc(100dvh - 120px)',
-              }}
-            >
-              <ActionRailSkeleton isStatic={effectiveStatic} />
-            </div>
-            
-            {/* Bottom-left creator capsule - positioned exactly like CreatorCapsule */}
-            <div 
-              className="absolute left-4"
-              style={{ 
-                bottom: '97px',
-              }}
-            >
-              <CreatorCapsuleSkeleton isStatic={effectiveStatic} />
-            </div>
-            
-            {/* Subtle gradient at bottom for depth */}
-            <div 
-              className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
+
+            {/* ─── TOP CHROME ─── */}
+            {/* Row 1: Tabs (centred, no background) — mimics "Suggested · Friends" */}
+            <div
+              className="absolute left-0 right-0 flex items-center justify-center"
               style={{
-                background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)',
+                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
+                gap: 28,
+                height: 44,
+              }}
+            >
+              <SkeletonBlock
+                isStatic={effectiveStatic}
+                className="rounded-sm"
+                style={{ width: 70, height: 14 }}
+              />
+              <SkeletonBlock
+                isStatic={effectiveStatic}
+                className="rounded-sm"
+                style={{ width: 54, height: 14 }}
+              />
+            </div>
+
+            {/* Row 2: Top-right bare icons — search + profile avatar */}
+            <div
+              className="absolute flex items-center"
+              style={{
+                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
+                right: 14,
+                gap: 6,
+                height: 44,
+              }}
+            >
+              <SkeletonBlock
+                isStatic={effectiveStatic}
+                className="rounded-sm"
+                style={{ width: 22, height: 22 }}
+              />
+              <SkeletonBlock
+                isStatic={effectiveStatic}
+                className="rounded-full"
+                style={{ width: 32, height: 32 }}
+              />
+            </div>
+
+            {/* ─── BOTTOM CHROME ─── */}
+            {/* Gradient scrim — matches BreathingRoomBottomBar */}
+            <div
+              className="absolute inset-x-0 pointer-events-none"
+              style={{
+                bottom: 'var(--bottom-nav-height, 88px)',
+                height: 240,
+                background: 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.92) 55%)',
               }}
             />
+
+            {/* Bottom bar content */}
+            <div
+              className="absolute inset-x-0 flex flex-col gap-3"
+              style={{
+                bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
+                paddingLeft: 16,
+                paddingRight: 16,
+              }}
+            >
+              {/* Author row: avatar + name + HCP + sub-line */}
+              <div className="flex items-center gap-2.5">
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-full shrink-0"
+                  style={{ width: 34, height: 34 }}
+                />
+                <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <SkeletonBlock
+                      isStatic={effectiveStatic}
+                      className="rounded-sm"
+                      style={{ width: 100, height: 12 }}
+                    />
+                    <SkeletonBlock
+                      isStatic={effectiveStatic}
+                      className="rounded-sm"
+                      style={{ width: 44, height: 9 }}
+                    />
+                  </div>
+                  <SkeletonBlock
+                    isStatic={effectiveStatic}
+                    className="rounded-sm"
+                    style={{ width: 170, height: 10 }}
+                  />
+                </div>
+              </div>
+
+              {/* Caption lines (2 lines) */}
+              <div className="flex flex-col gap-1.5">
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-sm"
+                  style={{ width: '88%', height: 11 }}
+                />
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-sm"
+                  style={{ width: '62%', height: 11 }}
+                />
+              </div>
+
+              {/* Horizontal action strip: like · comment · share · FOLLOW · more */}
+              <div
+                className="flex items-center"
+                style={{
+                  gap: 22,
+                  paddingTop: 12,
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                }}
+              >
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-full"
+                  style={{ width: 28, height: 28 }}
+                />
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-full"
+                  style={{ width: 28, height: 28 }}
+                />
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-full"
+                  style={{ width: 28, height: 28 }}
+                />
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-full"
+                  style={{ width: 98, height: 32 }}
+                />
+                <div style={{ flex: 1 }} />
+                <SkeletonBlock
+                  isStatic={effectiveStatic}
+                  className="rounded-full"
+                  style={{ width: 28, height: 28 }}
+                />
+              </div>
+            </div>
           </div>
         </motion.div>
       )}
