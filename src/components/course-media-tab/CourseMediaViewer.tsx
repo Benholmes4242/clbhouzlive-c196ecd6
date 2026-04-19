@@ -19,7 +19,7 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import { BreathingRoomBottomBar } from '@/components/feed/BreathingRoomBottomBar';
 import { BreathingRoomMuteToggle } from '@/components/feed/BreathingRoomMuteToggle';
-import { ReviewHeaderPanel } from '@/components/feed/ReviewHeaderPanel';
+import { InlineReviewCard } from '@/components/feed/InlineReviewCard';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Z } from '@/config/zIndex';
 import { formatTimeAgo } from '@/utils/formatTime';
@@ -252,25 +252,29 @@ export function CourseMediaViewer() {
             {/* Mute toggle — video posts only */}
             {isVideo && <BreathingRoomMuteToggle isVisible={true} bottomOffset={0} />}
 
-            {/* Review header panel — review posts only */}
+            {/* Inline review card — review posts only */}
             {isReview && activePost?.review && (
               <div
                 style={{
                   position: 'fixed',
-                  bottom: 140,
-                  left: 0,
-                  right: 0,
+                  bottom: 88,
+                  left: 16,
+                  right: 16,
                   zIndex: Z.echo,
                   pointerEvents: 'auto',
                 }}
               >
-                <ReviewHeaderPanel
+                <InlineReviewCard
                   courseName={activePost.review.courseName}
-                  courseImageUrl={activePost.review.courseImageUrl ?? null}
+                  rating={activePost.review.rating}
                   courseRegion={activePost.review.courseRegion ?? null}
                   courseCountry={activePost.review.courseCountry ?? null}
                   courseSubCountry={activePost.review.courseSubCountry ?? null}
-                  rating={activePost.review.rating}
+                  reviewText={activePost.review.reviewText ?? activePost.caption ?? null}
+                  reviewer={{
+                    name: activePost.displayName,
+                    avatar: activePost.avatarUrl,
+                  }}
                   isVisible={true}
                   onTap={() => {
                     if (!activePost.review) return;
