@@ -289,8 +289,8 @@ export function CourseMediaViewer() {
             {/* Bottom bar — read-only caption only (no actions) */}
             {activePost && (
               <BreathingRoomBottomBar
-                caption={activePost.caption ?? ''}
-                tags={activePost.tags ?? []}
+                caption={isReview ? '' : (activePost.caption ?? '')}
+                tags={isReview ? [] : (activePost.tags ?? [])}
                 taggedFriends={[]}
                 likesCount={null}
                 commentsCount={null}
@@ -308,6 +308,20 @@ export function CourseMediaViewer() {
                 postId={activePost.id}
                 readOnly={true}
                 bottomOffset={0}
+                isReview={isReview}
+                author={
+                  !isReview && activeAuthor
+                    ? {
+                        id: activeAuthor.id,
+                        displayName: activeAuthor.displayName,
+                        avatarUrl: activeAuthor.avatarUrl,
+                        handicapIndex: activeAuthor.handicapIndex,
+                        homeClub: activeAuthor.homeClub,
+                        timeAgoLabel: activeAuthor.timeAgoLabel,
+                      }
+                    : null
+                }
+                onAuthorTap={handleViewProfile}
               />
             )}
 
