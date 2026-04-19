@@ -55,6 +55,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             alt={activeActor.name}
             fallback={initials}
             ringColor="rgba(255,255,255,0.95)"
+            thinRing
           />
 
           {hasUnreadNotifications && (
