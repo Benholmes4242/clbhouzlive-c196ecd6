@@ -17,6 +17,7 @@ import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface TaggedFriend {
   id: string;
@@ -167,32 +168,14 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
             width: '100%',
           }}
         >
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: '50%',
-              border: '1.5px solid rgba(255,255,255,0.95)',
-              overflow: 'hidden',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(255,255,255,0.08)',
-            }}
-          >
-            {author.avatarUrl ? (
-              <img
-                src={author.avatarUrl}
-                alt={author.displayName}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <span style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>
-                {author.displayName?.[0] ?? '?'}
-              </span>
-            )}
-          </div>
+          <SquircleAvatar
+            size={34}
+            src={author.avatarUrl}
+            alt={author.displayName}
+            fallback={author.displayName?.[0] ?? '?'}
+            thinRing
+            ringColor="rgba(255,255,255,0.95)"
+          />
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
               <span
