@@ -22,7 +22,15 @@ interface CourseMediaGridProps {
 function isLandscape(post: FeedPost): boolean {
   const firstMedia = post.mediaItems[0];
   if (!firstMedia) return false;
-  return firstMedia.width > firstMedia.height;
+  // Treat unknown/zero dimensions as landscape — safer default for the hero + grid layout.
+  // The mapper currently defaults missing dims to 1080x1920 (portrait), which mis-routes
+  // legacy media with NULL width/height in the DB. Detect that fabricated portrait here.
+  const w = firstMedia.width;
+  const h = firstMedia.height;
+  if (!w || !h) return true;
+  // 1080x1920 is the synthetic default from feedMapper for null dims — also treat as unknown.
+  if (w === 1080 && h === 1920) return true;
+  return w > h;
 }
 
 export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(({
@@ -160,36 +168,23 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   let tileIndex = 0;
   const [firstPost, ...restPosts] = posts;
   const firstMediaKey = firstPost?.mediaItems[0]?.id || firstPost?.id;
-  const firstIsLandscape = firstPost ? isLandscape(firstPost) : false;
 
   return (
     <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* Hero tile — first post, full width, taller */}
+      {/* Hero tile — first post always renders as 16:9 landscape card.
+          Portrait sources are cropped via objectFit: cover for a consistent hero shape across courses.
+          This sidesteps legacy media rows with NULL width/height that would otherwise mis-route to a broken portrait wrapper. */}
       {firstPost && (
         <div style={{ position: 'relative' }}>
-          {firstIsLandscape ? (
-            <CourseMediaLandscapeCard
-              key={firstMediaKey}
-              post={firstPost}
-              index={tileIndex++}
-              allPosts={posts}
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-            />
-          ) : (
-            <div style={{ position: 'relative', height: 240, overflow: 'hidden' }}>
-              <CourseMediaTile
-                key={firstMediaKey}
-                post={firstPost}
-                index={tileIndex++}
-                allPosts={posts}
-                fetchNextPage={fetchNextPage}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-              />
-            </div>
-          )}
+          <CourseMediaLandscapeCard
+            key={firstMediaKey}
+            post={firstPost}
+            index={tileIndex++}
+            allPosts={posts}
+            fetchNextPage={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+          />
           {/* Featured badge */}
           <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(247,147,30,0.92)', backdropFilter: 'blur(4px)', borderRadius: 6, padding: '3px 8px', fontSize: 8, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', pointerEvents: 'none', zIndex: 2 }}>
             Featured
