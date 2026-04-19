@@ -91,11 +91,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
       <div
         style={{
           position: 'absolute',
-          top: -14,
+          top: -18,
           right: -6,
           fontSize: 120,
           fontWeight: 900,
-          color: 'rgba(245,158,11,0.055)',
+          color: 'rgba(247,147,30,0.06)',
           lineHeight: 1,
           letterSpacing: '-0.05em',
           userSelect: 'none',
@@ -115,86 +115,66 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
       />
 
       <div style={{ padding: '12px 14px 14px', position: 'relative' }}>
-        {/* Row 1: COURSE REVIEW badge + score */}
+        {/* Rating — absolute top-right, overlaps course name padding */}
         <div
           style={{
+            position: 'absolute',
+            top: 8,
+            right: 12,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 10,
+            alignItems: 'baseline',
+            gap: 2,
+            fontFamily: 'Georgia, serif',
+            zIndex: 2,
           }}
         >
-          <div
+          <span
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              background: 'rgba(245,158,11,0.12)',
-              border: '0.5px solid rgba(245,158,11,0.35)',
-              borderRadius: 6,
-              padding: '4px 9px',
+              fontSize: 28,
+              fontWeight: 900,
+              color: '#ffffff',
+              lineHeight: 1,
+              letterSpacing: '-0.04em',
             }}
           >
-            <span
-              style={{
-                fontSize: 9,
-                fontWeight: 800,
-                color: AMBER,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-              }}
-            >
-              ★ Course Review
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-            <span
-              style={{
-                fontSize: 28,
-                fontWeight: 900,
-                color: '#ffffff',
-                lineHeight: 1,
-                letterSpacing: '-0.04em',
-                fontFamily: 'Georgia, serif',
-              }}
-            >
-              {formattedRating}
-            </span>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.38)',
-              }}
-            >
-              /10
-            </span>
-          </div>
+            {formattedRating}
+          </span>
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.38)',
+              fontFamily: 'inherit',
+            }}
+          >
+            /10
+          </span>
         </div>
 
-        {/* Row 2: Course name */}
+        {/* Row 1: Course name */}
         <div
           style={{
-            fontSize: 19,
+            fontSize: 22,
             fontWeight: 900,
             color: '#ffffff',
-            lineHeight: 1.15,
+            lineHeight: 1.12,
             letterSpacing: '-0.03em',
             fontFamily: 'Georgia, serif',
             marginBottom: 4,
+            paddingRight: 64,
           }}
         >
           {courseName}
         </div>
 
-        {/* Row 3: Location */}
+        {/* Row 2: Location */}
         {locationStr && (
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 5,
-              marginBottom: 11,
+              marginBottom: 10,
             }}
           >
             <MapPin size={12} color="rgba(255,255,255,0.35)" />
@@ -214,17 +194,18 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           style={{
             height: 0.5,
             background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 75%)`,
-            marginBottom: 11,
+            marginBottom: 10,
           }}
         />
 
-        {/* Row 4: Reviewer */}
+        {/* Row 3: Reviewer — avatar + (name + ★ COURSE REVIEW badge) / sub */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 10,
             marginBottom: reviewText ? 10 : 0,
+            position: 'relative',
           }}
         >
           <SquircleAvatar
@@ -234,28 +215,52 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             fallback={initials}
             hideRing
           />
-          <div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.85)',
-              }}
-            >
-              {reviewer.name}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.85)',
+                  lineHeight: 1.2,
+                }}
+              >
+                {reviewer.name || 'Golfer'}
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  background: 'rgba(245,158,11,0.12)',
+                  border: '0.5px solid rgba(245,158,11,0.35)',
+                  borderRadius: 6,
+                  padding: '3px 7px',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: '#f59e0b',
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase' as const,
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                ★ Course Review
+              </span>
             </div>
-            <div
+            <span
               style={{
                 fontSize: 11,
                 color: 'rgba(255,255,255,0.38)',
+                lineHeight: 1,
               }}
             >
               reviewed this course
-            </div>
+            </span>
           </div>
         </div>
 
-        {/* Row 5: Review excerpt */}
+        {/* Row 4: Review excerpt */}
         {reviewText && (
           <div
             style={{
