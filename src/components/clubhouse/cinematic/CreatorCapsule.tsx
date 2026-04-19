@@ -416,13 +416,13 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           background: `linear-gradient(90deg, ${accent}CC, transparent)`,
         }} />
 
-        <div style={{ padding: '10px 14px 13px', position: 'relative' }}>
+        <div style={{ padding: '12px 14px 14px', position: 'relative' }}>
           {/* Row 1: COURSE REVIEW badge + live score */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: 8,
+            marginBottom: 10,
           }}>
             <div style={{
               display: 'flex',
@@ -431,10 +431,10 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               background: 'rgba(245,158,11,0.12)',
               border: '0.5px solid rgba(245,158,11,0.35)',
               borderRadius: 6,
-              padding: '3px 8px',
+              padding: '4px 9px',
             }}>
               <span style={{
-                fontSize: 8,
+                fontSize: 9,
                 fontWeight: 800,
                 color: accent,
                 letterSpacing: '0.14em',
@@ -445,7 +445,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
               <span style={{
-                fontSize: 24,
+                fontSize: 28,
                 fontWeight: 900,
                 color: '#ffffff',
                 lineHeight: 1,
@@ -455,7 +455,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 {reviewData.rating.toFixed(1)}
               </span>
               <span style={{
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: 500,
                 color: 'rgba(255,255,255,0.38)',
               }}>
@@ -466,7 +466,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
           {/* Row 2: Course name — the headline */}
           <div style={{
-            fontSize: 18,
+            fontSize: 19,
             fontWeight: 900,
             color: '#ffffff',
             lineHeight: 1.15,
@@ -483,12 +483,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 5,
-              marginBottom: 10,
+              marginBottom: 11,
             }}>
-              <span style={{ fontSize: 11 }}>📍</span>
+              <MapPin size={12} color="rgba(255,255,255,0.35)" />
               <span style={{
                 fontSize: 11,
-                color: 'rgba(255,255,255,0.38)',
+                color: 'rgba(255,255,255,0.45)',
               }}>
                 {locationStr}
               </span>
@@ -498,8 +498,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           {/* Divider */}
           <div style={{
             height: 0.5,
-            background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 80%)`,
-            marginBottom: 10,
+            background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 75%)`,
+            marginBottom: 11,
           }} />
 
           {/* Row 4: Reviewer — tappable to navigate to profile */}
@@ -512,8 +512,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
-              marginBottom: 8,
+              gap: 10,
+              marginBottom: 10,
               background: 'transparent',
               border: 'none',
               padding: 0,
@@ -522,63 +522,45 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             }}
           >
             <SquircleAvatar
-              size={28}
+              size={32}
               src={user?.avatar}
               alt={user?.name ?? 'Creator'}
               fallback={initials}
               hideRing
             />
-            <span style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.7)',
-            }}>
-              {user?.name || 'Golfer'}
-            </span>
+            <div>
+              <div style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.85)',
+              }}>
+                {user?.name || 'Golfer'}
+              </div>
+              <div style={{
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.38)',
+              }}>
+                reviewed this course
+              </div>
+            </div>
           </button>
 
 
           {/* Row 5: Review text preview */}
           {captionText && (
             <div style={{
-              fontSize: 12,
-              color: 'rgba(255,255,255,0.42)',
-              lineHeight: 1.5,
+              fontSize: 13,
+              color: 'rgba(255,255,255,0.5)',
+              lineHeight: 1.55,
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical' as const,
               overflow: 'hidden',
-              marginBottom: 11,
               fontStyle: 'italic',
             }}>
               "{captionText}"
             </div>
           )}
-
-          {/* Row 6: Read review CTA */}
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onReviewTap?.();
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              color: accent,
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.02em' }}>
-              Read full review
-            </span>
-            <ChevronRight className="w-3 h-3" />
-          </motion.button>
         </div>
       </div>
     );
