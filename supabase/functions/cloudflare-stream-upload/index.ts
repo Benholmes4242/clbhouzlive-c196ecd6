@@ -16,7 +16,9 @@ serve(async (req) => {
 
   try {
     const accountId = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
-    const streamToken = Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN");
+    // Accept either CLOUDFLARE_STREAM_API_TOKEN (preferred) or CLOUDFLARE_API_TOKEN (fallback)
+    const streamToken =
+      Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN") ?? Deno.env.get("CLOUDFLARE_API_TOKEN");
 
     if (!accountId) {
       return new Response(JSON.stringify({ error: "Missing CLOUDFLARE_ACCOUNT_ID" }), {
@@ -26,7 +28,7 @@ serve(async (req) => {
     }
 
     if (!streamToken) {
-      return new Response(JSON.stringify({ error: "Missing CLOUDFLARE_STREAM_API_TOKEN" }), {
+      return new Response(JSON.stringify({ error: "Missing CLOUDFLARE_STREAM_API_TOKEN or CLOUDFLARE_API_TOKEN" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
