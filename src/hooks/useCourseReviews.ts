@@ -31,6 +31,14 @@ export type CourseReview = {
     display_name: string | null;
     profile_photo_url: string | null;
   } | null;
+  course?: {
+    id: string;
+    name: string | null;
+    country: string | null;
+    region: string | null;
+    sub_country: string | null;
+    hero_image_url: string | null;
+  } | null;
   media?: ReviewMediaItem[];
 };
 
@@ -81,6 +89,14 @@ export function useCourseReviews(
             username,
             display_name,
             profile_photo_url
+          ),
+          course:golf_courses!course_id (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            hero_image_url
           ),
           course_review_media (
             id,

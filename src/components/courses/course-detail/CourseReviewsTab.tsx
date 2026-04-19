@@ -236,15 +236,27 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         likeCount: 0,
         commentCount: 0,
         shareCount: 0,
-        review: null,
-        isReview: false,
+        review: {
+          reviewId: review.id,
+          courseId: review.course_id,
+          courseName: review.course?.name ?? courseName ?? '',
+          courseImageUrl: review.course?.hero_image_url ?? null,
+          rating: review.rating ?? 0,
+          courseCountry: review.course?.country ?? null,
+          courseRegion: review.course?.region ?? null,
+          courseSubCountry: review.course?.sub_country ?? null,
+          reviewText: review.review ?? null,
+        },
+        isReview: true,
+        courseId: review.course_id,
+        courseName: review.course?.name ?? courseName,
         isLikedByMe: false,
         isFollowedByMe: false,
         tags: [],
       };
     });
     useCourseMediaViewerStore.getState().open(posts, startIndex);
-  }, []);
+  }, [courseName]);
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
