@@ -65,17 +65,6 @@ export const ClubhouseTabToggle = ({
             }}
           >
             {label}
-            {isActive && (
-              <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: 1.5,
-                borderRadius: 2,
-                background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
-              }} />
-            )}
           </button>
         );
       })}
