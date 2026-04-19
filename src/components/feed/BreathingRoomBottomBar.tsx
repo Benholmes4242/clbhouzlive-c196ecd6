@@ -142,6 +142,104 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       }}
     >
       <div style={{ pointerEvents: isVisible ? 'auto' : 'none' }}>
+      {/* Author identity row — TikTok-style, above caption */}
+      {author && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAuthorTap?.();
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            marginBottom: 10,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: onAuthorTap ? 'pointer' : 'default',
+            textAlign: 'left',
+            width: '100%',
+          }}
+        >
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              border: '1.5px solid rgba(255,255,255,0.95)',
+              overflow: 'hidden',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(255,255,255,0.08)',
+            }}
+          >
+            {author.avatarUrl ? (
+              <img
+                src={author.avatarUrl}
+                alt={author.displayName}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>
+                {author.displayName?.[0] ?? '?'}
+              </span>
+            )}
+          </div>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: '#fff',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                  minWidth: 0,
+                }}
+              >
+                {author.displayName}
+              </span>
+              {author.handicapIndex !== null && Number.isFinite(author.handicapIndex) && (
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: 'rgba(255,255,255,0.7)',
+                    letterSpacing: '0.04em',
+                    fontVariantNumeric: 'tabular-nums',
+                    flexShrink: 0,
+                    textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  HCP {author.handicapIndex!.toFixed(1)}
+                </span>
+              )}
+            </div>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.75)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              }}
+            >
+              {author.homeClub
+                ? `${author.homeClub} · ${author.timeAgoLabel}`
+                : author.timeAgoLabel}
+            </span>
+          </div>
+        </button>
+      )}
+
       {/* "with @friend" line */}
       {taggedFriends.length > 0 && (
         <div
