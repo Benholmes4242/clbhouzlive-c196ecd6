@@ -2,9 +2,9 @@
  * Map ActivityPost (from useActivityPosts) → FeedPost (for FullscreenFeedOverlay).
  *
  * ActivityPost is the denormalised shape from the user's profile Activity query.
- * FeedPost is the normalised shape used by SnapFeed, FeedOverlayLayer, and
- * ReviewHeaderPanel. Review data is extracted from the post content/metadata
- * and surfaced on the FeedPost.review field.
+ * FeedPost is the normalised shape used by SnapFeed and FeedOverlayLayer.
+ * Review data is extracted from the post content/metadata and surfaced on the
+ * FeedPost.review field.
  */
 
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';

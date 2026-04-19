@@ -169,8 +169,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             left: 16,
             right: 16,
             bottom: bottomOffset !== undefined
-              ? `${bottomOffset + 88}px`
-              : 'calc(var(--bottom-nav-height, 88px) + 88px)',
+              ? `${bottomOffset + 72}px`
+              : 'calc(var(--bottom-nav-height, 88px) + 72px)',
             zIndex: Z.echo,
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
@@ -225,6 +225,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             : '',
         }}
         onAuthorTap={onViewProfile}
+        isReview={activePost.isReview}
       />
     </div>
   );

@@ -63,6 +63,8 @@ interface BreathingRoomBottomBarProps {
     timeAgoLabel: string;
   } | null;
   onAuthorTap?: () => void;
+  /** When true, suppress the author identity row and the gradient scrim (review posts have their own card). */
+  isReview?: boolean;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -95,6 +97,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   onCaptionExpandedChange,
   author,
   onAuthorTap,
+  isReview = false,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
@@ -133,17 +136,18 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
         bottom: bottomOffset !== undefined ? bottomOffset : 'var(--bottom-nav-height, 88px)',
         left: 0,
         right: 0,
-        padding: '90px 16px 20px',
-        background:
-          'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.92) 55%)',
+        padding: isReview ? '20px 16px 20px' : '90px 16px 20px',
+        background: isReview
+          ? 'transparent'
+          : 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.92) 55%)',
         zIndex: Z.echo,
         pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
       <div style={{ pointerEvents: isVisible ? 'auto' : 'none' }}>
-      {/* Author identity row — TikTok-style, above caption */}
-      {author && (
+      {/* Author identity row — TikTok-style, above caption. Hidden on reviews (InlineReviewCard shows reviewer). */}
+      {!isReview && author && (
         <button
           type="button"
           onClick={(e) => {

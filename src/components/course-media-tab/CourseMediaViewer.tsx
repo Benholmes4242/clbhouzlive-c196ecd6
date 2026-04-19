@@ -2,8 +2,8 @@
  * CourseMediaViewer — Modern fullscreen viewer for course media strips.
  *
  * Uses the Breathing Room chrome (ClubhouseTopBar + BreathingRoomBottomBar +
- * BreathingRoomMuteToggle + ReviewHeaderPanel + scrubber) but with all social
- * actions disabled. Reviews render with the dedicated review panel.
+ * BreathingRoomMuteToggle + InlineReviewCard + scrubber) but with all social
+ * actions disabled. Reviews render with the dedicated review card.
  *
  * Powered by its own Zustand store so it never conflicts with FullscreenFeedOverlay.
  * Reached from course detail About tab and Reviews tab media strips.
