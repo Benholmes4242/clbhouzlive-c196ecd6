@@ -174,44 +174,49 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
         });
 
         return (
-          <div
+          <button
+            type="button"
+            onClick={(e) => {
+              if (!isLong) return;
+              e.stopPropagation();
+              setCaptionExpanded(!captionExpanded);
+            }}
             style={{
+              display: 'block',
+              width: '100%',
+              textAlign: 'left',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              marginBottom: 12,
+              cursor: isLong ? 'pointer' : 'default',
               color: '#fff',
               fontSize: captionFontSize,
               fontWeight: 500,
               lineHeight: 1.5,
+              fontFamily: 'inherit',
               textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-              marginBottom: 12,
               wordBreak: 'break-word',
             }}
+            aria-expanded={captionExpanded}
+            aria-label={isLong ? (showFull ? 'Show less' : 'Show more') : undefined}
           >
             <PostContentWithTags content={displayText} tags={displayTags} />
             {isLong && (
               <>
                 {showFull ? ' ' : '… '}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCaptionExpanded(!captionExpanded);
-                  }}
+                <span
                   style={{
-                    background: 'transparent',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
                     color: 'rgba(255, 255, 255, 0.55)',
-                    fontSize: captionFontSize,
                     fontWeight: 600,
-                    fontFamily: 'inherit',
-                    lineHeight: 1.5,
                   }}
                 >
                   {showFull ? 'less' : 'more'}
-                </button>
+                </span>
               </>
             )}
-          </div>
+          </button>
         );
       })()}
 
