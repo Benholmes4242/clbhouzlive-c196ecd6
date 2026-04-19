@@ -53,6 +53,16 @@ interface BreathingRoomBottomBarProps {
   /** Controlled caption expansion state (lifted to parent for review panel coordination) */
   captionExpanded?: boolean;
   onCaptionExpandedChange?: (expanded: boolean) => void;
+  /** Author identity rendered above the caption (TikTok-style). Null on editorial cards. */
+  author?: {
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+    handicapIndex: number | null;
+    homeClub: string | null;
+    timeAgoLabel: string;
+  } | null;
+  onAuthorTap?: () => void;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -83,6 +93,8 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   bottomOffset,
   captionExpanded: captionExpandedProp,
   onCaptionExpandedChange,
+  author,
+  onAuthorTap,
 }) => {
   const [likeAnimKey, setLikeAnimKey] = useState(0);
   const wasLiked = useRef(hasLiked);
