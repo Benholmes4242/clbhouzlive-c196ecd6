@@ -168,12 +168,12 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   let tileIndex = 0;
   const [firstPost, ...restPosts] = posts;
   const firstMediaKey = firstPost?.mediaItems[0]?.id || firstPost?.id;
-  const firstIsLandscape = firstPost ? isLandscape(firstPost) : false;
 
   return (
     <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Hero tile — first post always renders as 16:9 landscape card.
-          Portrait sources are cropped via objectFit: cover for a consistent hero shape across courses. */}
+          Portrait sources are cropped via objectFit: cover for a consistent hero shape across courses.
+          This sidesteps legacy media rows with NULL width/height that would otherwise mis-route to a broken portrait wrapper. */}
       {firstPost && (
         <div style={{ position: 'relative' }}>
           <CourseMediaLandscapeCard
@@ -185,8 +185,6 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             hasNextPage={hasNextPage}
             isFetchingNextPage={isFetchingNextPage}
           />
-          {/* firstIsLandscape retained for potential future routing logic */}
-          {void firstIsLandscape}
           {/* Featured badge */}
           <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(247,147,30,0.92)', backdropFilter: 'blur(4px)', borderRadius: 6, padding: '3px 8px', fontSize: 8, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', pointerEvents: 'none', zIndex: 2 }}>
             Featured
