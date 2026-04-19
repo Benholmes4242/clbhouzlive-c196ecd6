@@ -164,52 +164,34 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
               {/* Content — above watermark */}
               <div style={{ position: 'relative' }}>
-                {/* COURSE REVIEW badge + live score */}
+                {/* Rating — absolute top-right */}
                 <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: 12,
+                  alignItems: 'baseline',
+                  gap: 2,
+                  fontFamily: 'Georgia, serif',
+                  zIndex: 2,
                 }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    background: 'rgba(245,158,11,0.12)',
-                    border: '0.5px solid rgba(245,158,11,0.35)',
-                    borderRadius: 6,
-                    padding: '3px 8px',
+                  <span style={{
+                    fontSize: 32,
+                    fontWeight: 900,
+                    color: '#ffffff',
+                    lineHeight: 1,
+                    letterSpacing: '-0.04em',
                   }}>
-                    <span style={{
-                      fontSize: 9,
-                      fontWeight: 800,
-                      color: AMBER,
-                      letterSpacing: '0.14em',
-                      textTransform: 'uppercase',
-                    }}>
-                      ★ Course Review
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-                    <span style={{
-                      fontSize: 28,
-                      fontWeight: 900,
-                      color: '#ffffff',
-                      lineHeight: 1,
-                      letterSpacing: '-0.04em',
-                      fontFamily: 'Georgia, serif',
-                    }}>
-                      {formattedRating}
-                    </span>
-                    <span style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: 'rgba(255,255,255,0.38)',
-                    }}>
-                      /10
-                    </span>
-                  </div>
+                    {formattedRating}
+                  </span>
+                  <span style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: 'rgba(255,255,255,0.38)',
+                    fontFamily: 'inherit',
+                  }}>
+                    /10
+                  </span>
                 </div>
 
                 {/* Course name — serif headline */}
@@ -221,6 +203,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   letterSpacing: '-0.03em',
                   fontFamily: 'Georgia, serif',
                   marginBottom: 6,
+                  paddingRight: 76,
                 }}>
                   {courseName}
                 </div>
@@ -250,7 +233,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   marginBottom: 14,
                 }} />
 
-                {/* Reviewer row */}
+                {/* Reviewer row — avatar + (name + ★ COURSE REVIEW badge) / sub */}
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -264,20 +247,42 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     fallback={initials}
                     hideRing
                   />
-                  <div>
-                    <div style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: 'rgba(255,255,255,0.85)',
-                    }}>
-                      {user.name}
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: 'rgba(255,255,255,0.85)',
+                        lineHeight: 1.2,
+                      }}>
+                        {user.name}
+                      </span>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        background: 'rgba(245,158,11,0.12)',
+                        border: '0.5px solid rgba(245,158,11,0.35)',
+                        borderRadius: 6,
+                        padding: '3px 7px',
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: AMBER,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase' as const,
+                        lineHeight: 1,
+                        whiteSpace: 'nowrap',
+                      }}>
+                        ★ Course Review
+                      </span>
                     </div>
-                    <div style={{
+                    <span style={{
                       fontSize: 11,
                       color: 'rgba(255,255,255,0.35)',
+                      lineHeight: 1,
                     }}>
                       reviewed this course
-                    </div>
+                    </span>
                   </div>
                 </div>
 
