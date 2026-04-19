@@ -1,7 +1,6 @@
 /**
- * InlineReviewCard — Single inline review card rendered above the action strip.
+ * InlineReviewCard — Compact review card shown at the bottom of review posts.
  *
- * Replaces the legacy ReviewHeaderPanel (small course pill).
  * Composition: amber accent bar, COURSE REVIEW badge + score, serif course name,
  * MapPin location, divider, reviewer (avatar + name + "reviewed this course"),
  * 2-line italic excerpt of the review text. Tap anywhere → opens ReviewBottomSheet.
