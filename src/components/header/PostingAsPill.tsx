@@ -12,6 +12,7 @@ interface PostingAsPillProps {
   notificationCount?: number;
   useLightTheme?: boolean;
   useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
+  useBareTheme?: boolean; // No background, no chevron — TikTok-style floating avatar
 }
 
 /**
@@ -19,12 +20,85 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
     
     // Get unread messages count from messaging system
     const { conversations } = useMessagingContext();
     const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
+
+    // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
+    if (!isLoading && activeActor && useBareTheme) {
+      const initials = activeActor.name.charAt(0).toUpperCase();
+      return (
+        <button
+          ref={ref}
+          onClick={onClick}
+          aria-label="Open profile menu"
+          style={{
+            position: 'relative',
+            width: 34,
+            height: 34,
+            padding: 0,
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
+          }}
+        >
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              border: '1.5px solid rgba(255,255,255,0.95)',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <SquircleAvatar
+              size={28}
+              src={activeActor.avatarUrl}
+              alt={activeActor.name}
+              fallback={initials}
+              hideRing
+            />
+          </div>
+
+          {hasUnreadNotifications && (
+            <span
+              className={cn(
+                "absolute -top-0.5 -right-0.5 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
+                notificationCount > 9
+                  ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
+                  : notificationCount > 0
+                  ? "h-[14px] w-[14px] text-[8px]"
+                  : "h-2.5 w-2.5"
+              )}
+              aria-label={`${notificationCount} unread notifications`}
+            >
+              {notificationCount > 0 && (
+                <span style={{ lineHeight: 1 }}>
+                  {notificationCount > 99 ? '99+' : notificationCount}
+                </span>
+              )}
+            </span>
+          )}
+
+          {hasUnreadMessages && (
+            <span
+              className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-[1.5px] ring-black"
+              aria-label="Unread messages"
+            />
+          )}
+        </button>
+      );
+    }
 
     if (isLoading || !activeActor) {
       return (

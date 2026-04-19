@@ -351,8 +351,6 @@ const ClubhouseContent = () => {
         carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
         carouselIndex={currentMediaIndex}
         hidden={isTournamentCardActive}
-        activeAuthor={activeAuthor}
-        onAuthorTap={handleViewProfile}
       />
 
       {/* Offline indicator */}

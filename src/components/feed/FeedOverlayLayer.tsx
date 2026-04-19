@@ -7,6 +7,7 @@ import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { Z } from '@/config/zIndex';
 import { BreathingRoomMuteToggle } from './BreathingRoomMuteToggle';
 import { InlineReviewCard } from './InlineReviewCard';
+import { formatTimeAgo } from '@/utils/formatTime';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface FeedOverlayLayerProps {
@@ -52,6 +53,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   getCommentCount,
   getFollowState,
   onFollow,
+  onViewProfile,
   onReviewTap,
   overlayVisible,
   isOwnPost,
@@ -122,7 +124,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           transition={{ duration: 0.18, ease: 'easeOut', delay: overlayVisible ? 0.04 : 0 }}
           style={{
             position: 'fixed',
-            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 132px)',
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 88px)',
             left: 16,
             zIndex: Z.echo,
             pointerEvents: overlayVisible ? 'auto' : 'none',
@@ -190,7 +192,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         </div>
       )}
 
-      {/* Bottom bar (caption + horizontal actions + FOLLOW) — caption hidden on reviews (shown inside InlineReviewCard) */}
+      {/* Bottom bar (author identity + caption + horizontal actions + FOLLOW) — caption hidden on reviews (shown inside InlineReviewCard) */}
       <BreathingRoomBottomBar
         caption={activePost.isReview ? '' : (activePost.caption ?? '')}
         tags={activePost.isReview ? [] : tags}
@@ -212,6 +214,17 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         bottomOffset={bottomOffset}
         captionExpanded={captionExpanded}
         onCaptionExpandedChange={setCaptionExpanded}
+        author={{
+          id: activePost.userId,
+          displayName: activePost.displayName,
+          avatarUrl: activePost.avatarUrl,
+          handicapIndex: activePost.handicapIndex ?? null,
+          homeClub: activePost.homeClub ?? null,
+          timeAgoLabel: activePost.createdAt
+            ? formatTimeAgo(activePost.createdAt, 'short')
+            : '',
+        }}
+        onAuthorTap={onViewProfile}
       />
     </div>
   );
