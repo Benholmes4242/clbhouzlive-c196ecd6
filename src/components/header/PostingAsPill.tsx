@@ -49,26 +49,13 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
           }}
         >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
-              border: '1.5px solid rgba(255,255,255,0.95)',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <SquircleAvatar
-              size={28}
-              src={activeActor.avatarUrl}
-              alt={activeActor.name}
-              fallback={initials}
-              hideRing
-            />
-          </div>
+          <SquircleAvatar
+            size={32}
+            src={activeActor.avatarUrl}
+            alt={activeActor.name}
+            fallback={initials}
+            ringColor="rgba(255,255,255,0.95)"
+          />
 
           {hasUnreadNotifications && (
             <span
