@@ -37,8 +37,8 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           aria-label="Open profile menu"
           style={{
             position: 'relative',
-            width: 34,
-            height: 34,
+            width: 30,
+            height: 30,
             padding: 0,
             background: 'transparent',
             border: 'none',
@@ -50,7 +50,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           }}
         >
           <SquircleAvatar
-            size={32}
+            size={30}
             src={activeActor.avatarUrl}
             alt={activeActor.name}
             fallback={initials}
@@ -63,9 +63,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               className={cn(
                 "absolute -top-0.5 -right-0.5 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
                 notificationCount > 9
-                  ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
+                  ? "h-[15px] min-w-[15px] px-[3px] text-[9px]"
                   : notificationCount > 0
-                  ? "h-[14px] w-[14px] text-[8px]"
+                  ? "h-[13px] w-[13px] text-[9px]"
                   : "h-2.5 w-2.5"
               )}
               aria-label={`${notificationCount} unread notifications`}

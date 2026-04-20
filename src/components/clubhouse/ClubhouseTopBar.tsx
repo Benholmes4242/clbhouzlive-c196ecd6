@@ -46,8 +46,7 @@ interface ClubhouseTopBarProps {
   leftInset?: number;
 }
 
-const TABS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)';
-const ICONS_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)';
+const TOP_STRIP_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)';
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   activeTab,
@@ -64,74 +63,79 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   const pillRef = useRef<HTMLButtonElement>(null);
   const { hasUnread, unreadCount } = useUnreadNotifications();
 
+  const showCluster = !hideTabs || !hideSearch || (!hideProfilePill && !!user);
+
   return (
     <>
-      {/* ── ROW 1: Tabs (centred, no background) ── */}
-      {!hideTabs && (
+      {/* Single centred cluster: tabs · divider · search · profile */}
+      {showCluster && (
         <div
           className="fixed left-0 right-0 z-40 flex items-center justify-center"
           style={{
-            top: TABS_TOP,
+            top: TOP_STRIP_TOP,
+            padding: '0 16px',
+            height: 44,
             opacity: hidden ? 0 : 1,
             pointerEvents: hidden ? 'none' : 'auto',
             transition: 'opacity 0.2s ease',
           }}
         >
-          <ClubhouseTabToggle
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-            isBusinessActor={isBusinessActor}
-          />
-        </div>
-      )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {!hideTabs && (
+              <ClubhouseTabToggle
+                activeTab={activeTab}
+                onTabChange={onTabChange}
+                isBusinessActor={isBusinessActor}
+              />
+            )}
 
-      {/* ── ROW 2: Floating icon cluster, top-right, no background pill ── */}
-      {(!hideSearch || (!hideProfilePill && user)) && (
-        <div
-          className="fixed z-40 flex items-center"
-          style={{
-            top: ICONS_TOP,
-            right: 12,
-            gap: 6,
-            opacity: hidden ? 0 : 1,
-            pointerEvents: hidden ? 'none' : 'auto',
-            transition: 'opacity 0.2s ease',
-          }}
-        >
-          {!hideSearch && (
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              style={{
-                width: 34,
-                height: 34,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                color: '#fff',
-                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
-              }}
-            >
-              <Search size={22} strokeWidth={2} />
-            </button>
-          )}
+            {!hideTabs && (!hideSearch || (!hideProfilePill && user)) && (
+              <div
+                aria-hidden="true"
+                style={{
+                  width: 1,
+                  height: 18,
+                  background: 'rgba(255,255,255,0.3)',
+                  flexShrink: 0,
+                  margin: '0 2px',
+                }}
+              />
+            )}
 
-          {!hideProfilePill && user && (
-            <PostingAsPill
-              ref={pillRef}
-              onClick={() => setMenuOpen((v) => !v)}
-              isOpen={menuOpen}
-              hasUnreadNotifications={hasUnread}
-              notificationCount={unreadCount}
-              useGlassTheme={false}
-              useBareTheme={true}
-            />
-          )}
+            {!hideSearch && (
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search"
+                style={{
+                  width: 30,
+                  height: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  color: '#fff',
+                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
+                }}
+              >
+                <Search size={20} strokeWidth={2.5} />
+              </button>
+            )}
+
+            {!hideProfilePill && user && (
+              <PostingAsPill
+                ref={pillRef}
+                onClick={() => setMenuOpen((v) => !v)}
+                isOpen={menuOpen}
+                hasUnreadNotifications={hasUnread}
+                notificationCount={unreadCount}
+                useBareTheme={true}
+              />
+            )}
+          </div>
         </div>
       )}
 
