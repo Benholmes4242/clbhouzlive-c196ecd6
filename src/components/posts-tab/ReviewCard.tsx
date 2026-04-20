@@ -134,8 +134,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </div>
       </div>
 
-      {/* Body — excerpt + chevron */}
-      <div className="px-3.5 pt-2.5 pb-3">
+      {/* Body — excerpt + read row */}
+      <div
+        className="px-3.5 pt-2.5 pb-3.5"
+        style={{
+          background: 'linear-gradient(180deg, #0F172A 0%, #0B1220 100%)',
+        }}
+      >
         {review.reviewText && (
           <div
             className="text-white/70 italic line-clamp-2"
@@ -145,26 +150,41 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           </div>
         )}
         <div
-          className="mt-1.5"
-          style={{ fontSize: 11, color: '#F7931E', fontWeight: 600 }}
+          className="flex items-center justify-between"
+          style={{ marginTop: 8 }}
         >
-          Read review →
+          <span
+            style={{ fontSize: 11, color: '#F7931E', fontWeight: 600 }}
+          >
+            Read review →
+          </span>
+          {isOwnPost && onDelete && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm('Delete this post?')) onDelete();
+              }}
+              aria-label="More options"
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.06)',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              <MoreHorizontal size={14} />
+            </button>
+          )}
         </div>
       </div>
-
-      {/* Own-post menu */}
-      {isOwnPost && onDelete && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (window.confirm('Delete this post?')) onDelete();
-          }}
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-full"
-          style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }}
-        >
-          <MoreHorizontal className="w-4 h-4 text-white" />
-        </button>
-      )}
     </div>
   );
 };
