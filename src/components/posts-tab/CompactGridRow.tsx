@@ -165,7 +165,7 @@ export const CompactGridRow: React.FC<CompactGridRowProps> = ({
   onDeletePost,
 }) => {
   return (
-    <div className="grid grid-cols-2 gap-px mb-px">
+    <div className="grid grid-cols-2 gap-px">
       {posts.map((post, i) => (
         <CompactTile
           key={post.id}
