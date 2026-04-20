@@ -64,7 +64,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
         className={cn(
-          "relative w-[245px] h-[315px] rounded-[24px] overflow-hidden flex-shrink-0 cursor-pointer",
+          "relative w-[233px] h-[299px] rounded-[24px] overflow-hidden flex-shrink-0 cursor-pointer",
           className
         )}
         style={{}}
