@@ -99,9 +99,9 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           bottomOffset !== undefined
             ? `${bottomOffset + 20}px`
             : 'calc(var(--bottom-nav-height, 88px) + 20px)',
-        left: 16,
+        left: 12,
         // Reserve space for the right-side action rail (rail width ~52px + gap)
-        right: 80,
+        right: 78,
         zIndex: Z.echo,
         pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
