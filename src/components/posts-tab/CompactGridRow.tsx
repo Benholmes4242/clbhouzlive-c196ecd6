@@ -47,7 +47,7 @@ const CompactTile: React.FC<{
   return (
     <div
       ref={tileRef}
-      className="relative aspect-[4/5] rounded-[12px] overflow-hidden bg-muted cursor-pointer"
+      className="relative aspect-[4/5] overflow-hidden bg-muted cursor-pointer"
       data-posts-tile-index={globalIndex}
       data-hls-url={firstMedia?.hlsUrl || ''}
       onClick={() => {
@@ -165,7 +165,7 @@ export const CompactGridRow: React.FC<CompactGridRowProps> = ({
   onDeletePost,
 }) => {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 gap-[2px]">
       {posts.map((post, i) => (
         <CompactTile
           key={post.id}

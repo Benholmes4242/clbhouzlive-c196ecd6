@@ -43,8 +43,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       className="relative overflow-hidden cursor-pointer"
       style={{
         background: '#0F172A',
-        borderRadius: 14,
-        border: '0.5px solid rgba(247,147,30,0.25)',
+        borderTop: '0.5px solid rgba(247,147,30,0.25)',
+        borderBottom: '0.5px solid rgba(247,147,30,0.25)',
       }}
       onClick={() => {
         if (allPosts && postIndex != null) {
