@@ -1,12 +1,12 @@
 import React, { memo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
+import { FeedActionRail } from './FeedActionRail';
 import { Z } from '@/config/zIndex';
 import { BreathingRoomMuteToggle } from './BreathingRoomMuteToggle';
 import { InlineReviewCard } from './InlineReviewCard';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -63,9 +63,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   bottomOffset,
 }: FeedOverlayLayerProps) {
   const navigate = useNavigate();
-  const clubhouseActiveIndex = useClubhouseStore(s => s.activeIndex);
+  const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
   const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
-  const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
+  const activeVideoElement = useClubhouseStore((s) => s.activeVideoElement);
 
   const activePost = posts[activeIndex] ?? null;
 
@@ -82,7 +82,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
     activePost.postType === 'tournament_result' ||
     activePost.postType === 'pga_card' ||
     activePost.postType === 'course_of_week_card'
-  ) return null;
+  )
+    return null;
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
@@ -90,13 +91,28 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const isVideo = activePost.mediaItems?.[0]?.type === 'video';
 
   const tags = activePost.tags ?? [];
-  const taggedFriends = tags
-    .filter(t => t.entity_type === 'user')
-    .map(t => ({
-      id: t.entity_id,
-      username: t.username ?? '',
-      displayName: t.name,
-    }));
+
+  // Action rail creator — same data as bottom-bar author, slightly different shape
+  const creator = {
+    id: activePost.userId,
+    avatarUrl: activePost.avatarUrl,
+    displayName: activePost.displayName,
+  };
+
+  const author = {
+    id: activePost.userId,
+    displayName: activePost.displayName,
+    avatarUrl: activePost.avatarUrl,
+    handicapIndex: activePost.handicapIndex ?? null,
+    homeClub: activePost.homeClub ?? null,
+    timeAgoLabel: activePost.createdAt ? formatTimeAgo(activePost.createdAt, 'short') : '',
+  };
+
+  const handleCourseTap = () => {
+    if (!golfCourse) return;
+    onBeforeNavigate?.();
+    navigate(`/courses/${golfCourse.id}`);
+  };
 
   return (
     <div
@@ -108,69 +124,20 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         transition: 'opacity 0.18s ease',
       }}
     >
-      {/* Course chip — hidden on review posts (review panel shows the course instead) */}
-      {golfCourse && !activePost.isReview && (
-        <motion.button
-          type="button"
-          onClick={() => {
-            onBeforeNavigate?.();
-            navigate(`/courses/${golfCourse.id}`);
-          }}
-          initial={false}
-          animate={{
-            opacity: overlayVisible ? 1 : 0,
-            y: overlayVisible ? 0 : -4,
-          }}
-          transition={{ duration: 0.18, ease: 'easeOut', delay: overlayVisible ? 0.04 : 0 }}
-          style={{
-            position: 'fixed',
-            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 88px)',
-            left: 16,
-            zIndex: Z.echo,
-            pointerEvents: overlayVisible ? 'auto' : 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            maxWidth: 'calc(100% - 32px)',
-            padding: '6px 10px',
-            borderRadius: 999,
-            background: 'rgba(0, 0, 0, 0.50)',
-            border: '1px solid rgba(255, 255, 255, 0.10)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            cursor: 'pointer',
-            fontFamily: 'Geist, system-ui, sans-serif',
-          }}
-        >
-          <MapPin size={11} fill="#F7931E" stroke="#F7931E" strokeWidth={1} />
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: '#fff',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {golfCourse.name}
-          </span>
-        </motion.button>
-      )}
-
       {/* Mute toggle — only on video posts */}
       {isVideo && <BreathingRoomMuteToggle isVisible={overlayVisible} bottomOffset={bottomOffset} />}
 
-      {/* Inline Review Card — renders above the bottom bar action strip */}
+      {/* Inline Review Card — renders in the bottom slot for review posts */}
       {activePost.isReview && activePost.review && (
         <div
           style={{
             position: 'fixed',
             left: 16,
-            right: 16,
-            bottom: bottomOffset !== undefined
-              ? `${bottomOffset + 72}px`
-              : 'calc(var(--bottom-nav-height, 88px) + 72px)',
+            right: 80, // leave room for action rail
+            bottom:
+              bottomOffset !== undefined
+                ? `${bottomOffset + 20}px`
+                : 'calc(var(--bottom-nav-height, 88px) + 20px)',
             zIndex: Z.echo,
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
@@ -192,41 +159,60 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         </div>
       )}
 
-      {/* Bottom bar (author identity + caption + horizontal actions + FOLLOW) — caption hidden on reviews (shown inside InlineReviewCard) */}
+      {/* Bottom-left content slot (regular posts) — author + caption + course pill.
+          Hidden for review posts via isReview. */}
       <BreathingRoomBottomBar
-        caption={activePost.isReview ? '' : (activePost.caption ?? '')}
+        caption={activePost.isReview ? '' : activePost.caption ?? ''}
         tags={activePost.isReview ? [] : tags}
-        taggedFriends={taggedFriends}
-        likesCount={likeState.count}
-        commentsCount={commentCount}
-        hasLiked={likeState.isLiked}
         isVisible={overlayVisible}
-        onLike={() => onLike(activePost)}
-        onComment={onComment}
-        onShare={() => onShare(activePost)}
-        onMore={onMore}
-        isVideo={isVideo}
-        isFollowing={isFollowed}
-        isOwnPost={isOwnPost}
-        onFollow={() => onFollow(activePost)}
-        activeVideoElement={isVideo ? activeVideoElement : null}
         postId={activePost.id}
         bottomOffset={bottomOffset}
         captionExpanded={captionExpanded}
         onCaptionExpandedChange={setCaptionExpanded}
-        author={{
-          id: activePost.userId,
-          displayName: activePost.displayName,
-          avatarUrl: activePost.avatarUrl,
-          handicapIndex: activePost.handicapIndex ?? null,
-          homeClub: activePost.homeClub ?? null,
-          timeAgoLabel: activePost.createdAt
-            ? formatTimeAgo(activePost.createdAt, 'short')
-            : '',
-        }}
+        author={activePost.isReview ? null : author}
         onAuthorTap={onViewProfile}
         isReview={activePost.isReview}
+        golfCourse={activePost.isReview ? null : golfCourse ?? null}
+        onCourseTap={golfCourse ? handleCourseTap : undefined}
       />
+
+      {/* Right-side vertical action rail */}
+      <FeedActionRail
+        creator={creator}
+        isFollowing={isFollowed}
+        isOwnPost={isOwnPost}
+        onCreatorTap={onViewProfile}
+        onFollow={() => onFollow(activePost)}
+        hasLiked={likeState.isLiked}
+        likesCount={likeState.count}
+        commentsCount={commentCount}
+        onLike={() => onLike(activePost)}
+        onComment={onComment}
+        onShare={() => onShare(activePost)}
+        onMore={onMore}
+        isVisible={overlayVisible}
+        bottomOffset={bottomOffset}
+      />
+
+      {/* Video scrubber — sits between bottom content and action rail on video posts */}
+      {isVideo && activeVideoElement && overlayVisible && (
+        <div
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom:
+              bottomOffset !== undefined
+                ? `${bottomOffset + 4}px`
+                : 'calc(var(--bottom-nav-height, 88px) + 4px)',
+            height: 2,
+            pointerEvents: 'auto',
+            zIndex: Z.echo + 1,
+          }}
+        >
+          <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
+        </div>
+      )}
     </div>
   );
 });
