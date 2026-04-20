@@ -207,8 +207,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             right: 0,
             bottom:
               bottomOffset !== undefined
-                ? `${bottomOffset + 4}px`
-                : 'calc(var(--bottom-nav-height, 88px) + 4px)',
+                ? `${bottomOffset}px`
+                : 'var(--bottom-nav-height, 88px)',
             height: 2,
             pointerEvents: 'auto',
             zIndex: Z.echo + 1,
