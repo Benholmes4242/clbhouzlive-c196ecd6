@@ -1,60 +1,42 @@
 /**
- * BreathingRoomBottomBar - Bottom-anchored caption + horizontal action strip
+ * BreathingRoomBottomBar — bottom-left content slot for regular posts.
  *
- * Replaces the right-side CinematicActionRail and the bottom CreatorCapsule with
- * a quieter inline composition: optional "with @friend" line, caption (with inline
- * tag highlighting via PostContentWithTags), and a horizontal action row separated
- * by a hairline.
+ * Renders, top → bottom:
+ *   1. Course tag pill (MapPin + course name) — if a course is tagged. Reads as
+ *      "posted at <course>".
+ *   2. Author identity row (avatar + name + HCP, sub-line: home club · time)
+ *   3. Caption — direct on the photo, 2-line clamp default, tap-anywhere to
+ *      expand when the caption is long.
  *
- * Anchored above the bottom nav. Fades together with the identity pill via
- * `isVisible` (driven by overlayVisible from the parent).
+ * The horizontal action strip and FOLLOW pill have moved to FeedActionRail.
+ * The dark gradient scrim has been removed — the photo breathes.
+ *
+ * Reviews: when isReview is true, this component renders nothing (the
+ * InlineReviewCard handles author + course + excerpt instead).
+ *
+ * The video scrubber is now mounted by FeedOverlayLayer outside this component.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageSquare, Send, MoreHorizontal } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
-interface TaggedFriend {
-  id: string;
-  username: string;
-  displayName: string;
-}
 
 interface BreathingRoomBottomBarProps {
   caption: string;
   tags: FeedPostTag[];
-  taggedFriends: TaggedFriend[];
-  likesCount: number | null;
-  commentsCount: number | null;
-  hasLiked: boolean;
   isVisible: boolean;
-  onLike: () => void;
-  onComment: () => void;
-  onShare: () => void;
-  onMore: () => void;
-  /** Reserved for future mute integration on video posts. */
-  isVideo: boolean;
-  /** FOLLOW button — moved here from the identity pill */
-  isFollowing: boolean;
-  isOwnPost: boolean;
-  onFollow: () => void;
-  /** NEW: the active video element, used for the scrubber rendered as action-strip border */
-  activeVideoElement?: HTMLVideoElement | null;
   /** NEW: stable identifier for the active post — used to reset caption expansion on post change */
   postId?: string;
-  /** When true, suppress the entire interactive action strip (read-only viewers) */
-  readOnly?: boolean;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
   /** Controlled caption expansion state (lifted to parent for review panel coordination) */
   captionExpanded?: boolean;
   onCaptionExpandedChange?: (expanded: boolean) => void;
-  /** Author identity rendered above the caption (TikTok-style). Null on editorial cards. */
+  /** Author identity rendered above the caption. Null on editorial cards. */
   author?: {
     id: string;
     displayName: string;
@@ -64,44 +46,27 @@ interface BreathingRoomBottomBarProps {
     timeAgoLabel: string;
   } | null;
   onAuthorTap?: () => void;
-  /** When true, suppress the author identity row and the gradient scrim (review posts have their own card). */
+  /** When true, suppress all bottom content (review posts have their own card). */
   isReview?: boolean;
+  /** Course tagged on the post. Renders the "posted at" pill above author. */
+  golfCourse?: { id: string; name: string } | null;
+  onCourseTap?: () => void;
 }
-
-const formatCount = (count: number | null | undefined): string | null => {
-  if (count === null || count === undefined) return null;
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`;
-  return count.toString();
-};
 
 export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   caption,
   tags,
-  taggedFriends,
-  likesCount,
-  commentsCount,
-  hasLiked,
   isVisible,
-  onLike,
-  onComment,
-  onShare,
-  onMore,
-  isFollowing,
-  isOwnPost,
-  onFollow,
-  activeVideoElement,
   postId,
-  readOnly = false,
   bottomOffset,
   captionExpanded: captionExpandedProp,
   onCaptionExpandedChange,
   author,
   onAuthorTap,
   isReview = false,
+  golfCourse,
+  onCourseTap,
 }) => {
-  const [likeAnimKey, setLikeAnimKey] = useState(0);
-  const wasLiked = useRef(hasLiked);
   const [captionExpandedLocal, setCaptionExpandedLocal] = useState(false);
   const captionExpanded = captionExpandedProp ?? captionExpandedLocal;
   const setCaptionExpanded = (next: boolean) => {
@@ -113,19 +78,15 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   };
 
   useEffect(() => {
-    if (hasLiked && !wasLiked.current) {
-      setLikeAnimKey((k) => k + 1);
-    }
-    wasLiked.current = hasLiked;
-  }, [hasLiked]);
-
-  useEffect(() => {
     setCaptionExpandedLocal(false);
     onCaptionExpandedChange?.(false);
   }, [postId, onCaptionExpandedChange]);
 
-  const captionLength = caption?.length ?? 0;
-  const captionFontSize = captionLength > 120 ? 13.5 : 14;
+  // Nothing renders for reviews — InlineReviewCard owns the bottom slot.
+  if (isReview) return null;
+
+  const hasContent = !!golfCourse || !!author || !!caption;
+  if (!hasContent) return null;
 
   return (
     <motion.div
@@ -134,357 +95,201 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       transition={{ duration: 0.18, ease: 'easeOut' }}
       style={{
         position: 'fixed',
-        bottom: bottomOffset !== undefined ? bottomOffset : 'var(--bottom-nav-height, 88px)',
-        left: 0,
-        right: 0,
-        padding: isReview ? '20px 16px 20px' : '90px 16px 20px',
-        background: isReview
-          ? 'transparent'
-          : 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.92) 55%)',
+        bottom:
+          bottomOffset !== undefined
+            ? `${bottomOffset + 20}px`
+            : 'calc(var(--bottom-nav-height, 88px) + 20px)',
+        left: 16,
+        // Reserve space for the right-side action rail (rail width ~52px + gap)
+        right: 80,
         zIndex: Z.echo,
         pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
-      <div style={{ pointerEvents: isVisible ? 'auto' : 'none' }}>
-      {/* Author identity row — TikTok-style, above caption. Hidden on reviews (InlineReviewCard shows reviewer). */}
-      {!isReview && author && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAuthorTap?.();
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            marginBottom: 10,
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: onAuthorTap ? 'pointer' : 'default',
-            textAlign: 'left',
-            width: '100%',
-          }}
-        >
-          <SquircleAvatar
-            size={34}
-            src={author.avatarUrl}
-            alt={author.displayName}
-            fallback={author.displayName?.[0] ?? '?'}
-            hairlineRing
-            ringColor="rgba(255,255,255,0.95)"
-          />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: '#fff',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                  minWidth: 0,
-                }}
-              >
-                {author.displayName}
-              </span>
-              {author.handicapIndex !== null && Number.isFinite(author.handicapIndex) && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 600,
-                    color: 'rgba(255,255,255,0.7)',
-                    letterSpacing: '0.04em',
-                    fontVariantNumeric: 'tabular-nums',
-                    flexShrink: 0,
-                    textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                  }}
-                >
-                  HCP {author.handicapIndex!.toFixed(1)}
-                </span>
-              )}
-            </div>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.75)',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-              }}
-            >
-              {author.homeClub
-                ? `${author.homeClub} · ${author.timeAgoLabel}`
-                : author.timeAgoLabel}
-            </span>
-          </div>
-        </button>
-      )}
-
-      {/* "with @friend" line */}
-      {taggedFriends.length > 0 && (
-        <div
-          style={{
-            fontSize: 11,
-            fontWeight: 400,
-            color: 'rgba(255, 255, 255, 0.65)',
-            marginBottom: 6,
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
-          }}
-        >
-          with{' '}
-          {taggedFriends.map((f, i) => (
-            <React.Fragment key={f.id}>
-              {i > 0 && ', '}
-              <strong style={{ color: '#fff', fontWeight: 700 }}>
-                @{f.username || f.displayName.toLowerCase().replace(/\s+/g, '')}
-              </strong>
-            </React.Fragment>
-          ))}
-        </div>
-      )}
-
-      {/* Caption with truncation */}
-      {caption && (() => {
-        const TRUNCATE_AT = 120;
-        const isLong = caption.length > TRUNCATE_AT;
-        const showFull = captionExpanded || !isLong;
-
-        let displayText: string;
-        if (showFull) {
-          displayText = caption;
-        } else {
-          const hardCut = caption.slice(0, TRUNCATE_AT);
-          const lastSpace = hardCut.lastIndexOf(' ');
-          displayText = lastSpace > 80 ? hardCut.slice(0, lastSpace) : hardCut;
-        }
-
-        const displayTags = (tags ?? []).filter((t) => {
-          const end = t.end_index ?? 0;
-          return end <= displayText.length;
-        });
-
-        return (
+      <div style={{ pointerEvents: isVisible ? 'auto' : 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {/* Course tag pill — sits ABOVE author, reads as "posted at" */}
+        {golfCourse && (
           <button
             type="button"
             onClick={(e) => {
-              if (!isLong) return;
               e.stopPropagation();
-              setCaptionExpanded(!captionExpanded);
+              onCourseTap?.();
             }}
             style={{
-              display: 'block',
-              width: '100%',
-              textAlign: 'left',
+              alignSelf: 'flex-start',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              maxWidth: '100%',
+              padding: '5px 10px',
+              borderRadius: 999,
+              background: 'rgba(0, 0, 0, 0.45)',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              cursor: onCourseTap ? 'pointer' : 'default',
+              fontFamily: 'inherit',
+            }}
+            aria-label={`View ${golfCourse.name}`}
+          >
+            <MapPin size={11} fill="#F7931E" stroke="#F7931E" strokeWidth={1} />
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#fff',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {golfCourse.name}
+            </span>
+          </button>
+        )}
+
+        {/* Author identity row */}
+        {author && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAuthorTap?.();
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
               background: 'transparent',
               border: 'none',
               padding: 0,
-              margin: 0,
-              marginBottom: 12,
-              cursor: isLong ? 'pointer' : 'default',
-              color: '#fff',
-              fontSize: captionFontSize,
-              fontWeight: 500,
-              lineHeight: 1.5,
-              fontFamily: 'inherit',
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-              wordBreak: 'break-word',
+              cursor: onAuthorTap ? 'pointer' : 'default',
+              textAlign: 'left',
+              width: '100%',
             }}
-            aria-expanded={captionExpanded}
-            aria-label={isLong ? (showFull ? 'Show less' : 'Show more') : undefined}
           >
-            <PostContentWithTags content={displayText} tags={displayTags} />
-            {isLong && (
-              <>
-                {showFull ? ' ' : '… '}
+            <SquircleAvatar
+              size={32}
+              src={author.avatarUrl}
+              alt={author.displayName}
+              fallback={author.displayName?.[0] ?? '?'}
+              hairlineRing
+              ringColor="rgba(255,255,255,0.95)"
+            />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
                 <span
                   style={{
-                    color: 'rgba(255, 255, 255, 0.55)',
-                    fontWeight: 600,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: '#fff',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                    minWidth: 0,
                   }}
                 >
-                  {showFull ? 'less' : 'more'}
+                  {author.displayName}
                 </span>
-              </>
-            )}
-          </button>
-        );
-      })()}
-
-      {/* Action strip — scrubber renders as top border on video posts, static hairline on images */}
-      {!readOnly && (
-        <div
-          style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 22,
-            paddingTop: 12,
-            borderTop: activeVideoElement ? 'none' : '1px solid rgba(255, 255, 255, 0.16)',
-          }}
-        >
-          {/* Scrubber-as-border: only rendered when there's an active video element */}
-          {activeVideoElement && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 2,
-                pointerEvents: 'auto',
-                zIndex: 1,
-              }}
-            >
-              <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
+                {author.handicapIndex !== null && Number.isFinite(author.handicapIndex) && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      color: 'rgba(255,255,255,0.7)',
+                      letterSpacing: '0.04em',
+                      fontVariantNumeric: 'tabular-nums',
+                      flexShrink: 0,
+                      textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                    }}
+                  >
+                    HCP {author.handicapIndex!.toFixed(1)}
+                  </span>
+                )}
+              </div>
+              {(author.homeClub || author.timeAgoLabel) && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'rgba(255,255,255,0.75)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                  }}
+                >
+                  {author.homeClub ? `${author.homeClub} · ${author.timeAgoLabel}` : author.timeAgoLabel}
+                </span>
+              )}
             </div>
-          )}
+          </button>
+        )}
 
+        {/* Caption — tap anywhere to expand */}
+        {caption &&
+          (() => {
+            const TRUNCATE_AT = 120;
+            const isLong = caption.length > TRUNCATE_AT;
+            const showFull = captionExpanded || !isLong;
 
-          <ActionButton
-            icon={
-              <Heart
-                size={22}
-                fill={hasLiked ? '#F7931E' : 'transparent'}
-                stroke={hasLiked ? '#F7931E' : '#fff'}
-                strokeWidth={2}
-              />
+            let displayText: string;
+            if (showFull) {
+              displayText = caption;
+            } else {
+              const hardCut = caption.slice(0, TRUNCATE_AT);
+              const lastSpace = hardCut.lastIndexOf(' ');
+              displayText = lastSpace > 80 ? hardCut.slice(0, lastSpace) : hardCut;
             }
-            count={formatCount(likesCount)}
-            accent={hasLiked ? '#F7931E' : '#fff'}
-            onClick={onLike}
-            ariaLabel={hasLiked ? 'Unlike' : 'Like'}
-            animateKey={likeAnimKey}
-          />
 
-          <ActionButton
-            icon={<MessageSquare size={22} stroke="#fff" strokeWidth={2} />}
-            count={formatCount(commentsCount)}
-            accent="#fff"
-            onClick={onComment}
-            ariaLabel="Comments"
-          />
+            const displayTags = (tags ?? []).filter(
+              (t) => (t.end_index ?? 0) <= displayText.length,
+            );
 
-          <ActionButton
-            icon={<Send size={22} stroke="#fff" strokeWidth={2} />}
-            accent="#fff"
-            onClick={onShare}
-            ariaLabel="Share"
-          />
-
-          {/* FOLLOW — text pill, sits between Share and the spacer */}
-          {!isOwnPost && (
-            <motion.button
-              type="button"
-              onClick={onFollow}
-              whileTap={{ scale: 0.94 }}
-              aria-label={isFollowing ? 'Unfollow' : 'Follow'}
-              style={{
-                flexShrink: 0,
-                border: 'none',
-                cursor: 'pointer',
-                padding: '6px 12px',
-                borderRadius: 999,
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                fontFamily: 'Geist, system-ui, sans-serif',
-                background: isFollowing ? 'rgba(255, 255, 255, 0.14)' : '#F7931E',
-                color: isFollowing ? 'rgba(255, 255, 255, 0.85)' : '#0F172A',
-                transition: 'background 0.15s ease, color 0.15s ease',
-              }}
-            >
-              {isFollowing ? 'FOLLOWING' : 'FOLLOW'}
-            </motion.button>
-          )}
-
-          <div style={{ flex: 1 }} />
-
-          <ActionButton
-            icon={<MoreHorizontal size={22} stroke="#fff" strokeWidth={2} />}
-            accent="#fff"
-            onClick={onMore}
-            ariaLabel="More options"
-          />
-        </div>
-      )}
+            return (
+              <button
+                type="button"
+                onClick={(e) => {
+                  if (!isLong) return;
+                  e.stopPropagation();
+                  setCaptionExpanded(!captionExpanded);
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  margin: 0,
+                  cursor: isLong ? 'pointer' : 'default',
+                  color: '#fff',
+                  fontSize: 13,
+                  fontWeight: 400,
+                  lineHeight: 1.45,
+                  fontFamily: 'inherit',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+                  wordBreak: 'break-word',
+                }}
+                aria-expanded={captionExpanded}
+                aria-label={isLong ? (showFull ? 'Show less' : 'Show more') : undefined}
+              >
+                <PostContentWithTags content={displayText} tags={displayTags} />
+                {isLong && (
+                  <>
+                    {showFull ? ' ' : '… '}
+                    <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>
+                      {showFull ? 'less' : 'more'}
+                    </span>
+                  </>
+                )}
+              </button>
+            );
+          })()}
       </div>
     </motion.div>
-  );
-};
-
-interface ActionButtonProps {
-  icon: React.ReactNode;
-  count?: string | null;
-  accent: string;
-  onClick: () => void;
-  ariaLabel: string;
-  animateKey?: number;
-}
-
-const ActionButton: React.FC<ActionButtonProps> = ({
-  icon,
-  count,
-  accent,
-  onClick,
-  ariaLabel,
-  animateKey,
-}) => {
-  const [pressed, setPressed] = useState(false);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onPointerDown={() => setPressed(true)}
-      onPointerUp={() => setPressed(false)}
-      onPointerLeave={() => setPressed(false)}
-      onPointerCancel={() => setPressed(false)}
-      aria-label={ariaLabel}
-      style={{
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        fontFamily: 'Geist, system-ui, sans-serif',
-        padding: 0,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        color: accent,
-        transform: pressed ? 'scale(0.92)' : 'scale(1)',
-        transition: 'transform 0.12s',
-      }}
-    >
-      <motion.span
-        key={animateKey}
-        initial={animateKey ? { scale: 0.85 } : false}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 14 }}
-        style={{ display: 'inline-flex', alignItems: 'center' }}
-      >
-        {icon}
-      </motion.span>
-      {count !== null && count !== undefined && (
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: accent,
-            fontVariantNumeric: 'tabular-nums',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
-          }}
-        >
-          {count}
-        </span>
-      )}
-    </button>
   );
 };
 

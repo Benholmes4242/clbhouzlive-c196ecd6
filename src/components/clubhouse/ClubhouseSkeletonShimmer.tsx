@@ -1,14 +1,12 @@
 /**
- * ClubhouseSkeletonShimmer - Premium loading skeleton for Clubhouse
- * 
- * Matches the current Clubhouse layout:
- * - Same dark background
- * - Top tabs row (centred, no background)
- * - Top-right bare icons (search + profile)
- * - Bottom bar with author row, caption, horizontal action strip (regular)
- *   OR amber-tinted review card with reviewer row + excerpt (review)
- * - Subtle dark-on-dark shimmer animation
- * 
+ * ClubhouseSkeletonShimmer — premium loading skeleton for Clubhouse.
+ *
+ * Matches the new TikTok-pattern layout:
+ *   • Top strip: tabs centered + bare search/profile top-right (no glass pill)
+ *   • Right vertical action rail: creator avatar + like/comment/share/more
+ *   • Bottom-left content slot: course pill + author + caption (regular)
+ *     OR amber-tinted InlineReviewCard skeleton (review)
+ *
  * Shows until first video frame is ready, then fades out smoothly.
  */
 
@@ -25,187 +23,166 @@ interface ClubhouseSkeletonShimmerProps {
   variant?: 'regular' | 'review';
 }
 
-/**
- * Skeleton block with shimmer animation using standardized tailwind keyframe
- */
 const SkeletonBlock: React.FC<{
   className?: string;
   isStatic?: boolean;
   style?: React.CSSProperties;
 }> = ({ className, isStatic = false, style }) => (
-  <div 
-    className={cn(
-      "relative overflow-hidden bg-white/[0.06]",
-      !isStatic && "clb-shimmer-dark",
-      className
-    )}
+  <div
+    className={cn('relative overflow-hidden bg-white/[0.06]', !isStatic && 'clb-shimmer-dark', className)}
     style={style}
   />
 );
 
-/**
- * Main hero media area skeleton
- */
 const MediaAreaSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
   <div className="absolute inset-0">
-    <SkeletonBlock 
-      isStatic={isStatic}
-      className="w-full h-full rounded-none"
-    />
+    <SkeletonBlock isStatic={isStatic} className="w-full h-full rounded-none" />
+  </div>
+);
+
+/** Right-side vertical action rail skeleton — mirrors FeedActionRail shape. */
+const ActionRailSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
+  <div
+    className="absolute flex flex-col items-center"
+    style={{
+      right: 12,
+      bottom: 'calc(var(--bottom-nav-height, 88px) + 24px)',
+      gap: 18,
+    }}
+  >
+    {/* Creator avatar 48px + follow plus */}
+    <div className="relative">
+      <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 48, height: 48 }} />
+      <SkeletonBlock
+        isStatic={isStatic}
+        className="rounded-full"
+        style={{
+          position: 'absolute',
+          bottom: -6,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 20,
+          height: 20,
+          background: 'rgba(247,147,30,0.35)',
+        }}
+      />
+    </div>
+    {/* Like + count */}
+    <div className="flex flex-col items-center" style={{ gap: 4 }}>
+      <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 32, height: 32 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 22, height: 10 }} />
+    </div>
+    {/* Comment + count */}
+    <div className="flex flex-col items-center" style={{ gap: 4 }}>
+      <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 32, height: 32 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 18, height: 10 }} />
+    </div>
+    {/* Share */}
+    <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 30, height: 30 }} />
+    {/* More */}
+    <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 30, height: 30 }} />
   </div>
 );
 
 const RegularBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
-  <>
-    {/* Gradient scrim — matches BreathingRoomBottomBar regular mode */}
-    <div
-      className="absolute inset-x-0 pointer-events-none"
-      style={{
-        bottom: 'var(--bottom-nav-height, 88px)',
-        height: 240,
-        background: 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.92) 55%)',
-      }}
-    />
+  <div
+    className="absolute flex flex-col"
+    style={{
+      bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
+      left: 16,
+      right: 80, // reserve space for action rail
+      gap: 8,
+    }}
+  >
+    {/* Course tag pill */}
+    <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 130, height: 22 }} />
 
-    <div
-      className="absolute inset-x-0 flex flex-col gap-3"
-      style={{
-        bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
-        paddingLeft: 16,
-        paddingRight: 16,
-      }}
-    >
-      {/* Author row */}
-      <div className="flex items-center gap-2.5">
-        <SkeletonBlock isStatic={isStatic} className="rounded-full shrink-0" style={{ width: 34, height: 34 }} />
-        <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 100, height: 12 }} />
-            <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 44, height: 9 }} />
-          </div>
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 170, height: 10 }} />
+    {/* Author row */}
+    <div className="flex items-center gap-2.5">
+      <SkeletonBlock isStatic={isStatic} className="rounded-full shrink-0" style={{ width: 32, height: 32 }} />
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 100, height: 12 }} />
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 44, height: 9 }} />
         </div>
-      </div>
-
-      {/* Caption (2 lines) */}
-      <div className="flex flex-col gap-1.5">
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '88%', height: 11 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '62%', height: 11 }} />
-      </div>
-
-      {/* Action strip */}
-      <div
-        className="flex items-center"
-        style={{
-          gap: 22,
-          paddingTop: 12,
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-        }}
-      >
-        <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 98, height: 32 }} />
-        <div style={{ flex: 1 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 170, height: 10 }} />
       </div>
     </div>
-  </>
+
+    {/* Caption — 2 lines */}
+    <div className="flex flex-col gap-1.5" style={{ marginTop: 2 }}>
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '92%', height: 11 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '60%', height: 11 }} />
+    </div>
+  </div>
 );
 
 const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
-  <>
-    {/* No gradient on review variant */}
-    {/* InlineReviewCard skeleton — mimics the amber-tinted dark card */}
-    <div
-      className="absolute"
-      style={{
-        left: 12,
-        right: 12,
-        bottom: 'calc(var(--bottom-nav-height, 88px) + 72px)',
-        background: 'rgba(20, 13, 4, 0.92)',
-        border: '0.5px solid rgba(245, 158, 11, 0.18)',
-        borderRadius: 16,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Amber accent bar */}
+  <div
+    className="absolute"
+    style={{
+      left: 16,
+      right: 80, // reserve space for action rail
+      bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
+      background: 'rgba(20, 13, 4, 0.92)',
+      border: '0.5px solid rgba(245, 158, 11, 0.18)',
+      borderRadius: 16,
+      overflow: 'hidden',
+    }}
+  >
+    {/* Amber accent bar */}
+    <div style={{ height: 2, background: 'linear-gradient(90deg, rgba(247,147,30,0.85), transparent)' }} />
+    <div style={{ padding: '12px 14px 14px', position: 'relative' }}>
+      {/* Rating top-right */}
       <div
         style={{
-          height: 2,
-          background: 'linear-gradient(90deg, rgba(247,147,30,0.85), transparent)',
+          position: 'absolute',
+          top: 8,
+          right: 12,
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 3,
+        }}
+      >
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 34, height: 22 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 18, height: 10 }} />
+      </div>
+
+      {/* Course name */}
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '60%', height: 18, marginBottom: 6 }} />
+
+      {/* Location row */}
+      <div className="flex items-center gap-1.5" style={{ marginBottom: 10 }}>
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 12, height: 12 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 120, height: 10 }} />
+      </div>
+
+      {/* Amber-fade divider */}
+      <div
+        style={{
+          height: 0.5,
+          marginBottom: 10,
+          background: 'linear-gradient(90deg, rgba(247,147,30,0.3) 0%, transparent 75%)',
         }}
       />
-      <div style={{ padding: '12px 14px 14px', position: 'relative' }}>
-        {/* Rating — absolute top-right */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 12,
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 3,
-          }}
-        >
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 34, height: 22 }} />
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 18, height: 10 }} />
-        </div>
 
-        {/* Course name */}
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '60%', height: 18, marginBottom: 6 }} />
-
-        {/* Location row */}
-        <div className="flex items-center gap-1.5" style={{ marginBottom: 10 }}>
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 12, height: 12 }} />
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 120, height: 10 }} />
-        </div>
-
-        {/* Amber-fade divider */}
-        <div
-          style={{
-            height: 0.5,
-            marginBottom: 10,
-            background: 'linear-gradient(90deg, rgba(247,147,30,0.3) 0%, transparent 75%)',
-          }}
-        />
-
-        {/* Reviewer row */}
-        <div className="flex items-center gap-2.5" style={{ marginBottom: 10 }}>
-          <SkeletonBlock isStatic={isStatic} className="rounded-lg shrink-0" style={{ width: 32, height: 32 }} />
-          <div className="flex flex-col gap-1 flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 85, height: 11 }} />
-              <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 76, height: 14 }} />
-            </div>
-            <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 110, height: 9 }} />
+      {/* Reviewer row */}
+      <div className="flex items-center gap-2.5" style={{ marginBottom: 10 }}>
+        <SkeletonBlock isStatic={isStatic} className="rounded-lg shrink-0" style={{ width: 32, height: 32 }} />
+        <div className="flex flex-col gap-1 flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 85, height: 11 }} />
+            <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 76, height: 14 }} />
           </div>
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 110, height: 9 }} />
         </div>
-
-        {/* Excerpt — 2 lines */}
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '92%', height: 11, marginBottom: 4 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '58%', height: 11 }} />
       </div>
-    </div>
 
-    {/* Action strip — same as regular */}
-    <div
-      className="absolute inset-x-0 flex items-center"
-      style={{
-        bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
-        paddingLeft: 16,
-        paddingRight: 16,
-        gap: 22,
-      }}
-    >
-      <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
-      <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
-      <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
-      <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 98, height: 32 }} />
-      <div style={{ flex: 1 }} />
-      <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 28, height: 28 }} />
+      {/* Excerpt — 2 lines */}
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '92%', height: 11, marginBottom: 4 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '58%', height: 11 }} />
     </div>
-  </>
+  </div>
 );
 
 export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> = ({
@@ -214,7 +191,6 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
   className,
   variant = 'regular',
 }) => {
-  // Respect reduced motion: use static skeleton (no shimmer) when preferred
   const reduceMotion = prefersReducedMotion();
   const effectiveStatic = isStatic || reduceMotion;
 
@@ -222,21 +198,17 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={cn(
-            "absolute inset-0 z-50 pointer-events-none",
-            "bg-[#0F0F0F]",
-            className
-          )}
+          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#0F0F0F]', className)}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
           <div className="relative w-full h-full">
-            {/* Hero media area — fills viewport */}
+            {/* Hero media area */}
             <MediaAreaSkeleton isStatic={effectiveStatic} />
 
-            {/* ─── TOP CHROME ─── */}
-            {/* Row 1: Tabs (centred, no background) */}
+            {/* ─── TOP STRIP ─── */}
+            {/* Tabs centered */}
             <div
               className="absolute left-0 right-0 flex items-center justify-center"
               style={{
@@ -249,7 +221,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
               <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 54, height: 14 }} />
             </div>
 
-            {/* Row 2: Top-right bare icons */}
+            {/* Top-right bare icons (search + profile) */}
             <div
               className="absolute flex items-center"
               style={{
@@ -263,7 +235,10 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
               <SkeletonBlock isStatic={effectiveStatic} className="rounded-full" style={{ width: 32, height: 32 }} />
             </div>
 
-            {/* ─── BOTTOM CHROME ─── */}
+            {/* ─── RIGHT ACTION RAIL ─── */}
+            <ActionRailSkeleton isStatic={effectiveStatic} />
+
+            {/* ─── BOTTOM CONTENT ─── */}
             {variant === 'regular' ? (
               <RegularBottomSkeleton isStatic={effectiveStatic} />
             ) : (

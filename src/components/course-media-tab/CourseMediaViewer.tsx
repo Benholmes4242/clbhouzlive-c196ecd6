@@ -291,22 +291,8 @@ export function CourseMediaViewer() {
               <BreathingRoomBottomBar
                 caption={isReview ? '' : (activePost.caption ?? '')}
                 tags={isReview ? [] : (activePost.tags ?? [])}
-                taggedFriends={[]}
-                likesCount={null}
-                commentsCount={null}
-                hasLiked={false}
                 isVisible={true}
-                onLike={noop}
-                onComment={noop}
-                onShare={noop}
-                onMore={noop}
-                isVideo={!!isVideo}
-                isFollowing={false}
-                isOwnPost={true}
-                onFollow={noop}
-                activeVideoElement={activeVideoElement}
                 postId={activePost.id}
-                readOnly={true}
                 bottomOffset={0}
                 isReview={isReview}
                 author={
