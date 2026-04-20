@@ -47,7 +47,7 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
       >
         <span
           style={{
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: 700,
             color: isDark ? 'rgba(255,255,255,0.7)' : 'hsl(var(--foreground))',
           }}
