@@ -62,12 +62,12 @@ export const PostsFeedSkeleton: React.FC = () => {
 
       {/* Compact row skeleton — 2-up with header */}
       <div className="flex flex-col gap-1.5">
-        <SkeletonBlock style={{ width: 80, height: 11, marginLeft: 2 }} />
-        <div className="grid grid-cols-2 gap-2">
+        <SkeletonBlock style={{ width: 80, height: 11, marginLeft: 14 }} />
+        <div className="grid grid-cols-2 gap-[2px]">
           {[0, 1].map((i) => (
             <div
               key={i}
-              className="relative rounded-[12px] overflow-hidden bg-slate-200 animate-pulse"
+              className="relative overflow-hidden bg-slate-200 animate-pulse"
               style={{ aspectRatio: '4 / 5' }}
             />
           ))}
@@ -75,11 +75,11 @@ export const PostsFeedSkeleton: React.FC = () => {
       </div>
 
       {/* Second compact row */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-[2px]">
         {[0, 1].map((i) => (
           <div
             key={i}
-            className="relative rounded-[12px] overflow-hidden bg-slate-200 animate-pulse"
+            className="relative overflow-hidden bg-slate-200 animate-pulse"
             style={{ aspectRatio: '4 / 5' }}
           />
         ))}
