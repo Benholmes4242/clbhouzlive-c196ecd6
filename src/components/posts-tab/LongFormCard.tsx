@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Play, Heart, MessageCircle, Share2, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { formatCompact, formatDuration } from './utils';
+import { MoreHorizontal } from 'lucide-react';
+import { formatDuration, formatDistanceToNowShort } from './utils';
 
 interface LongFormCardProps {
   post: FeedPost;
@@ -17,27 +15,18 @@ interface LongFormCardProps {
   onComment?: () => void;
 }
 
-export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete, likeState, onLike, onComment }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const currentMedia = post.mediaItems[currentMediaIndex] ?? post.mediaItems[0];
-  const firstMedia = currentMedia;
-  const thumbnailUrl = currentMedia?.thumbnailUrl || currentMedia?.imageUrl;
-  const isVideo = currentMedia?.type === 'video';
-  const duration = currentMedia?.duration;
-  const hlsUrl = currentMedia?.hlsUrl;
-  const hasMultipleMedia = post.mediaItems.length > 1;
-
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMediaIndex(i => Math.max(0, i - 1));
-  };
-
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMediaIndex(i => Math.min(post.mediaItems.length - 1, i + 1));
-  };
-  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+export const LongFormCard: React.FC<LongFormCardProps> = ({
+  post,
+  allPosts,
+  postIndex,
+  isOwnPost,
+  onDelete,
+}) => {
+  const firstMedia = post.mediaItems[0];
+  const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
+  const isVideo = firstMedia?.type === 'video';
+  const duration = firstMedia?.duration ?? 0;
+  const hlsUrl = firstMedia?.hlsUrl;
   const tileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,20 +44,23 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
     return () => observer.disconnect();
   }, [hlsUrl]);
 
+  const timeAgoShort = formatDistanceToNowShort(new Date(post.createdAt));
+
   return (
     <div
       ref={tileRef}
-      className="bg-card overflow-hidden border-b border-border/50 cursor-pointer active:scale-[0.99] transition-transform"
-      
+      className="bg-white rounded-[14px] overflow-hidden cursor-pointer relative"
+      style={{ border: '0.5px solid rgba(15,23,42,0.06)' }}
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeedStore.getState().open(allPosts, postIndex);
         }
       }}
     >
-      {/* Media area — 16:9 */}
+      {/* Media — 16:9 */}
       <div
-        className="relative aspect-video bg-muted"
+        className="relative w-full bg-slate-200"
+        style={{ aspectRatio: '16 / 9' }}
         data-posts-tile-index={postIndex ?? -1}
         data-hls-url={hlsUrl || ''}
       >
@@ -76,172 +68,79 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           <img
             src={thumbnailUrl}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover"
+            className="w-full h-full object-cover"
             loading="lazy"
-            style={{ pointerEvents: 'none' }}
           />
         )}
 
-        {/* Play icon — only for videos */}
+        {/* Play affordance — centred on videos only */}
         {isVideo && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{ background: 'rgba(0,0,0,0.45)' }}
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: 56,
+                height: 56,
+                background: 'rgba(0,0,0,0.65)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+              }}
             >
-              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff">
+                <path d="M8 5v14l11-7z" />
+              </svg>
             </div>
           </div>
         )}
 
-        {/* Left arrow */}
-        {hasMultipleMedia && currentMediaIndex > 0 && (
-          <button
-            onClick={handlePrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
-            style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.45)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.15)',
-            }}
-          >
-            <ChevronLeft className="w-4 h-4 text-white" />
-          </button>
-        )}
-
-        {/* Right arrow */}
-        {hasMultipleMedia && currentMediaIndex < post.mediaItems.length - 1 && (
-          <button
-            onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
-            style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.45)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.15)',
-            }}
-          >
-            <ChevronRight className="w-4 h-4 text-white" />
-          </button>
-        )}
-
-        {/* Carousel indicator */}
-        {hasMultipleMedia && (
+        {/* Duration badge — bottom-right */}
+        {isVideo && duration > 0 && (
           <div
-            className="absolute top-2 right-2 px-2 py-1 rounded-full text-[11px] font-semibold text-white"
-            style={{ background: 'rgba(0,0,0,0.4)' }}
-          >
-            {currentMediaIndex + 1}/{post.mediaItems.length}
-          </div>
-        )}
-
-        {/* Duration badge */}
-        {duration != null && duration > 0 && (
-          <div
-            className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-medium text-white"
+            className="absolute bottom-2.5 right-2.5 px-2 py-1 rounded-[6px]"
             style={{
-              background: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(0,0,0,0.7)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
             }}
           >
-            {formatDuration(duration)}
+            <span className="text-[11px] font-semibold text-white leading-none">
+              {formatDuration(duration)}
+            </span>
           </div>
         )}
       </div>
 
-      {/* Caption — headline first, bold */}
-      {post.caption && (
-        <div style={{ padding: '11px 14px 0' }}>
-          <p
-            className={expanded ? '' : 'line-clamp-2'}
-            style={{ fontSize: 15, fontWeight: 700, color: 'hsl(var(--foreground))', lineHeight: 1.35, margin: 0, letterSpacing: '-0.01em' }}
-          >
+      {/* Body */}
+      <div className="px-3.5 pt-3 pb-3.5">
+        {post.caption && (
+          <div className="text-[14px] leading-snug text-slate-900 line-clamp-3">
             {post.caption}
-          </p>
-          {!expanded && post.caption.length > 100 && (
-            <button onClick={(e) => { e.stopPropagation(); setExpanded(true); }} className="text-xs font-semibold text-[#d97706] mt-0.5">
-              See more
-            </button>
+          </div>
+        )}
+        <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-500">
+          {post.courseName && (
+            <>
+              <span className="truncate">{post.courseName}</span>
+              <span className="w-[3px] h-[3px] rounded-full bg-slate-300 flex-shrink-0" />
+            </>
           )}
-          {expanded && post.caption.length > 100 && (
-            <button onClick={(e) => { e.stopPropagation(); setExpanded(false); }} className="text-xs font-semibold text-[#d97706] mt-0.5">
-              less
-            </button>
-          )}
+          <span className="flex-shrink-0">{timeAgoShort} ago</span>
         </div>
-      )}
-
-      {/* Creator + time row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px 10px', flexWrap: 'wrap' }}>
-        {post.avatarUrl && (
-          <SquircleAvatar src={post.avatarUrl} alt="" size={26} hideRing />
-        )}
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-          {post.displayName}
-        </span>
-        <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>·</span>
-        <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>{timeAgo}</span>
-        <div style={{ flex: 1 }} />
-        {isOwnPost && onDelete && (
-          <button
-            onClick={(e) => { e.stopPropagation(); if (window.confirm('Delete this post?')) onDelete(); }}
-            className="p-1.5 -mr-1 text-muted-foreground"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
-        )}
       </div>
 
-      {/* Divider */}
-      <div style={{ height: 1, background: 'hsl(var(--border) / 0.5)', margin: '0 14px' }} />
-
-      {/* Engagement row */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '9px 14px 11px', gap: 4 }}>
+      {/* Own-post menu */}
+      {isOwnPost && onDelete && (
         <button
-          onClick={(e) => { e.stopPropagation(); onLike?.(); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
-        >
-          {likeState?.isLiked ? (
-            <span style={{ fontSize: 16, lineHeight: 1 }}>🧡</span>
-          ) : (
-            <Heart className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
-          )}
-          <span style={{ fontSize: 13, fontWeight: 700, color: likeState?.isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))' }}>
-            {formatCompact(likeState?.count ?? post.likeCount)}
-          </span>
-        </button>
-        <div style={{ width: 1, height: 18, background: 'hsl(var(--border))', margin: '0 10px' }} />
-        <button
-          onClick={(e) => { e.stopPropagation(); onComment?.(); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer' }}
-        >
-          <MessageCircle className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
-            {formatCompact(post.commentCount)}
-          </span>
-        </button>
-        <div style={{ flex: 1 }} />
-        <button
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            minHeight: 34, padding: '0 14px', borderRadius: 20,
-            fontSize: 13, fontWeight: 600,
-            background: 'transparent',
-            border: '1.5px solid hsl(var(--border))',
-            color: 'hsl(var(--muted-foreground))',
-            cursor: 'pointer',
+          onClick={(e) => {
+            e.stopPropagation();
+            if (window.confirm('Delete this post?')) onDelete();
           }}
+          className="absolute top-2 right-2 z-10 p-1.5 rounded-full"
+          style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }}
         >
-          <Share2 className="h-[14px] w-[14px]" />
-          Share
+          <MoreHorizontal className="w-4 h-4 text-white" />
         </button>
-      </div>
+      )}
     </div>
   );
 };
