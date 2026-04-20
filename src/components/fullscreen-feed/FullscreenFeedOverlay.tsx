@@ -107,21 +107,23 @@ export function FullscreenFeedOverlay() {
               <X className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
             </button>
 
-            {/* Top chrome removed in fullscreen — author identity now lives in BreathingRoomBottomBar via FeedOverlayLayer */}
-
-            <SnapFeed
-              posts={posts}
-              activeTab="foryou"
-              onNearEnd={() => {}}
-              onRefresh={async () => {}}
-              isRefreshing={false}
-              hasNextPage={false}
-              followOverrides={followOverrides}
-              onFollowChange={handleFollowChange}
-              startIndex={startIndex}
-              onActiveIndexChange={setActiveIndex}
-              activeIndexOverride={activeIndex}
-            />
+            {posts.length === 0 ? (
+              <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
+            ) : (
+              <>
+                <SnapFeed
+                  posts={posts}
+                  activeTab="foryou"
+                  onNearEnd={() => {}}
+                  onRefresh={async () => {}}
+                  isRefreshing={false}
+                  hasNextPage={false}
+                  followOverrides={followOverrides}
+                  onFollowChange={handleFollowChange}
+                  startIndex={startIndex}
+                  onActiveIndexChange={setActiveIndex}
+                  activeIndexOverride={activeIndex}
+                />
 
             <FeedOverlayLayer
               posts={posts}
