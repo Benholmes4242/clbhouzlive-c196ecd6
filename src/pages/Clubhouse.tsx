@@ -46,7 +46,7 @@ import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
-import { formatTimeAgo } from '@/utils/formatTime';
+
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 // ── Decomposed hooks ──
