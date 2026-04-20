@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
+import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
@@ -125,27 +126,29 @@ export function FullscreenFeedOverlay() {
                   activeIndexOverride={activeIndex}
                 />
 
-            <FeedOverlayLayer
-              posts={posts}
-              activeIndexOverride={activeIndex}
-              onLike={handleLike}
-              onComment={openComments}
-              onShare={handleShare}
-              onMore={() => {}}
-              getLikeState={getActiveLikeState}
-              getCommentCount={getCommentCount}
-              getFollowState={getFollowState}
-              onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
-              onViewProfile={handleViewProfile}
-              onReviewTap={handleReviewTap}
-              onBeforeNavigate={close}
-              overlayVisible={true}
-              isOwnPost={isOwnPost}
-              golfCourse={golfCourse}
-              activeReview={activeReview}
-              isActiveReview={isActiveReview}
-              bottomOffset={0}
-            />
+                <FeedOverlayLayer
+                  posts={posts}
+                  activeIndexOverride={activeIndex}
+                  onLike={handleLike}
+                  onComment={openComments}
+                  onShare={handleShare}
+                  onMore={() => {}}
+                  getLikeState={getActiveLikeState}
+                  getCommentCount={getCommentCount}
+                  getFollowState={getFollowState}
+                  onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
+                  onViewProfile={handleViewProfile}
+                  onReviewTap={handleReviewTap}
+                  onBeforeNavigate={close}
+                  overlayVisible={true}
+                  isOwnPost={isOwnPost}
+                  golfCourse={golfCourse}
+                  activeReview={activeReview}
+                  isActiveReview={isActiveReview}
+                  bottomOffset={0}
+                />
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
