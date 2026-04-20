@@ -207,32 +207,35 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             {/* Hero media area */}
             <MediaAreaSkeleton isStatic={effectiveStatic} />
 
-            {/* ─── TOP STRIP ─── */}
-            {/* Tabs centered */}
+            {/* ─── TOP STRIP — centred cluster: tabs · divider · search · profile ─── */}
             <div
               className="absolute left-0 right-0 flex items-center justify-center"
               style={{
-                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
-                gap: 28,
+                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)',
+                padding: '0 16px',
                 height: 44,
               }}
             >
-              <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 70, height: 14 }} />
-              <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 54, height: 14 }} />
-            </div>
-
-            {/* Top-right bare icons (search + profile) */}
-            <div
-              className="absolute flex items-center"
-              style={{
-                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
-                right: 14,
-                gap: 6,
-                height: 44,
-              }}
-            >
-              <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 22, height: 22 }} />
-              <SkeletonBlock isStatic={effectiveStatic} className="rounded-full" style={{ width: 32, height: 32 }} />
+              <div className="flex items-center" style={{ gap: 14 }}>
+                {/* Tab 1 placeholder */}
+                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 60, height: 14 }} />
+                {/* Tab 2 placeholder */}
+                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 74, height: 14 }} />
+                {/* Divider */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    width: 1,
+                    height: 18,
+                    background: 'rgba(255,255,255,0.1)',
+                    margin: '0 2px',
+                  }}
+                />
+                {/* Search icon placeholder */}
+                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 20, height: 20 }} />
+                {/* Profile avatar placeholder */}
+                <SkeletonBlock isStatic={effectiveStatic} className="rounded-full" style={{ width: 30, height: 30 }} />
+              </div>
             </div>
 
             {/* ─── RIGHT ACTION RAIL ─── */}

@@ -53,7 +53,7 @@ export const ClubhouseTabToggle = ({
               border: 'none',
               cursor: 'pointer',
               padding: '10px 4px 4px',
-              fontSize: 'clamp(13px, 3.6vw, 15px)',
+              fontSize: 'clamp(13px, 3.4vw, 15px)',
               fontWeight: isActive ? 700 : 500,
               color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
               letterSpacing: isActive ? '-0.025em' : '0',
