@@ -39,6 +39,8 @@ interface FeedActionRailProps {
   isVisible: boolean;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
+  /** When true, only the creator avatar is rendered (no follow+, like, comment, share, more). */
+  readOnly?: boolean;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -135,8 +137,9 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   onMore,
   isVisible,
   bottomOffset,
+  readOnly = false,
 }) => {
-  const showFollowPlus = !isOwnPost && !isFollowing && !!creator;
+  const showFollowPlus = !readOnly && !isOwnPost && !isFollowing && !!creator;
 
   // Heart pop animation key — bumps when transitioning to liked
   const [likeAnimKey, setLikeAnimKey] = useState(0);
