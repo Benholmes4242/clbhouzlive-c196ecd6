@@ -12,11 +12,11 @@ const SkeletonBlock: React.FC<{ className?: string; style?: React.CSSProperties 
 
 export const PostsFeedSkeleton: React.FC = () => {
   return (
-    <div className="flex flex-col gap-3.5 px-3 pt-2 pb-6">
+    <div className="flex flex-col gap-3.5 pt-2 pb-6">
       {/* Hero review skeleton */}
       <div
-        className="rounded-[14px] overflow-hidden"
-        style={{ background: '#0F172A', border: '0.5px solid rgba(247,147,30,0.2)' }}
+        className="overflow-hidden"
+        style={{ background: '#0F172A', borderTop: '0.5px solid rgba(247,147,30,0.2)', borderBottom: '0.5px solid rgba(247,147,30,0.2)' }}
       >
         <div
           style={{
@@ -42,8 +42,8 @@ export const PostsFeedSkeleton: React.FC = () => {
 
       {/* LongForm skeleton */}
       <div
-        className="rounded-[14px] overflow-hidden bg-white"
-        style={{ border: '0.5px solid rgba(15,23,42,0.06)' }}
+        className="overflow-hidden bg-white"
+        style={{ borderTop: '0.5px solid rgba(15,23,42,0.06)', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}
       >
         <div className="relative w-full bg-slate-200" style={{ aspectRatio: '16 / 9' }}>
           <div className="absolute inset-0 flex items-center justify-center">
