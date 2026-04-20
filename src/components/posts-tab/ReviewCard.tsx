@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Star, Play, Heart, MessageCircle, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { formatCompact } from './utils';
+import { MoreHorizontal } from 'lucide-react';
 
 interface ReviewCardProps {
   post: FeedPost;
@@ -17,235 +14,157 @@ interface ReviewCardProps {
   onComment?: () => void;
 }
 
-export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete, likeState, onLike, onComment }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const review = post.review;
+export const ReviewCard: React.FC<ReviewCardProps> = ({
+  post,
+  allPosts,
+  postIndex,
+  isOwnPost,
+  onDelete,
+}) => {
+  const review = post.review!;
   const tileRef = useRef<HTMLDivElement>(null);
 
-  const currentMedia = post.mediaItems[currentMediaIndex] ?? post.mediaItems[0];
-  const userMedia = currentMedia;
-  const hlsUrl = currentMedia?.hlsUrl;
-  const thumbnailUrl = currentMedia?.thumbnailUrl || currentMedia?.imageUrl || review?.courseImageUrl;
-  const isVideo = currentMedia?.type === 'video';
-  const duration = currentMedia?.duration;
-  const hasMultipleMedia = post.mediaItems.length > 1;
+  const courseImageUrl =
+    review.courseImageUrl ||
+    post.mediaItems[0]?.thumbnailUrl ||
+    post.mediaItems[0]?.imageUrl ||
+    null;
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMediaIndex(i => Math.max(0, i - 1));
-  };
+  const ratingDisplay =
+    review.rating % 1 === 0 ? review.rating.toFixed(0) : review.rating.toFixed(1);
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMediaIndex(i => Math.min(post.mediaItems.length - 1, i + 1));
-  };
-
-  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
-  const location = [review?.courseRegion, review?.courseCountry].filter(Boolean).join(', ');
-
-  // Unified amber accent for all rating tiers
-  const accentColor = '#f59e0b';
+  const locationLine = [review.courseSubCountry, review.courseRegion]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <div
       ref={tileRef}
-      className="bg-card overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
-      
+      className="relative overflow-hidden cursor-pointer"
+      style={{
+        background: '#0F172A',
+        borderRadius: 14,
+        border: '0.5px solid rgba(247,147,30,0.25)',
+      }}
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeedStore.getState().open(allPosts, postIndex);
         }
       }}
     >
-      {/* Accent stripe — unified amber */}
-      <div className="h-px" style={{ backgroundColor: accentColor }} />
+      {/* Amber accent bar */}
+      <div
+        style={{
+          height: 2,
+          background: 'linear-gradient(90deg, #F7931E 0%, transparent 70%)',
+        }}
+      />
 
-      {/* Course info header */}
-      <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{review.courseName}</p>
-          {location && (
-            <p className="text-xs text-muted-foreground truncate">{location}</p>
-          )}
+      {/* Media — 16:10 */}
+      <div className="relative w-full bg-slate-700" style={{ aspectRatio: '16 / 10' }}>
+        {courseImageUrl && (
+          <img
+            src={courseImageUrl}
+            alt=""
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        )}
+
+        {/* Scrim */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(0deg, rgba(15,23,42,0.92) 0%, rgba(15,23,42,0.2) 50%, transparent 100%)',
+          }}
+        />
+
+        {/* Rating — top-right, huge serif */}
+        <div
+          className="absolute flex items-baseline"
+          style={{
+            top: 12,
+            right: 14,
+            gap: 2,
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+          }}
+        >
+          <span
+            className="text-white font-black leading-none"
+            style={{ fontSize: 36, letterSpacing: '-0.04em' }}
+          >
+            {ratingDisplay}
+          </span>
+          <span
+            className="text-white/55 font-medium"
+            style={{ fontSize: 14, fontFamily: 'system-ui, sans-serif' }}
+          >
+            /10
+          </span>
         </div>
-        <div className="flex items-center gap-1.5 ml-2 shrink-0">
+
+        {/* Course name + location — bottom-left */}
+        <div className="absolute" style={{ left: 14, right: 100, bottom: 12 }}>
           <div
-            className="flex items-center gap-1 rounded-full px-2 py-0.5"
+            className="text-white font-black"
             style={{
-              backgroundColor: `${accentColor}1A`,
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontSize: 22,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             }}
           >
-            <Star className="w-3 h-3" style={{ color: accentColor, fill: accentColor }} />
-            <span className="text-xs font-semibold" style={{ color: accentColor }}>
-              {review.rating.toFixed(1)}
-            </span>
+            {review.courseName}
           </div>
-          {/* Three dots — own post delete */}
-          {isOwnPost && onDelete && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (window.confirm('Delete this post?')) onDelete();
+          {locationLine && (
+            <div
+              className="text-white/70"
+              style={{
+                fontSize: 11,
+                marginTop: 2,
+                textShadow: '0 1px 3px rgba(0,0,0,0.4)',
               }}
-              className="p-1.5 -mr-1 text-muted-foreground hover:text-foreground"
             >
-              <MoreHorizontal className="w-4 h-4" />
-            </button>
+              {locationLine}
+            </div>
           )}
         </div>
       </div>
 
-      {/* Media thumbnail — full bleed 4:3 landscape */}
-      {thumbnailUrl && (
-        <div
-          className="relative aspect-[4/3] bg-muted mt-1 overflow-hidden"
-          data-posts-tile-index={postIndex ?? -1}
-          data-hls-url={userMedia?.hlsUrl || ''}
-        >
-          <img
-            src={thumbnailUrl}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-            style={{ pointerEvents: 'none' }}
-          />
-          {isVideo && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)' }}>
-                <Play className="w-4 h-4 text-white fill-white ml-0.5" />
-              </div>
-            </div>
-          )}
-
-          {/* Left arrow */}
-          {hasMultipleMedia && currentMediaIndex > 0 && (
-            <button
-              onClick={handlePrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: 'rgba(0,0,0,0.45)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-              }}
-            >
-              <ChevronLeft className="w-4 h-4 text-white" />
-            </button>
-          )}
-
-          {/* Right arrow */}
-          {hasMultipleMedia && currentMediaIndex < post.mediaItems.length - 1 && (
-            <button
-              onClick={handleNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center active:scale-95 transition-transform"
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: 'rgba(0,0,0,0.45)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-              }}
-            >
-              <ChevronRight className="w-4 h-4 text-white" />
-            </button>
-          )}
-
-          {/* Carousel indicator */}
-          {hasMultipleMedia && (
-            <div
-              className="absolute top-2 right-2 px-2 py-1 rounded-full text-[11px] font-semibold text-white"
-              style={{ background: 'rgba(0,0,0,0.4)' }}
-            >
-              {currentMediaIndex + 1}/{post.mediaItems.length}
-            </div>
-          )}
-
-          {/* Duration badge */}
-          {isVideo && duration != null && duration > 0 && (
-            <div
-              className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-medium text-white"
-              style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}
-            >
-              {Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Review text */}
-      {post.caption && (
-        <div className="px-3 py-2">
-          <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-3'}`}>
-            {post.caption}
-          </p>
-          {!expanded && post.caption.length > 100 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
-              className="text-xs font-semibold text-[#d97706] mt-0.5"
-            >
-              See more
-            </button>
-          )}
-          {expanded && post.caption.length > 100 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
-              className="text-xs font-semibold text-[#d97706] mt-0.5"
-            >
-              less
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Divider */}
-      <div style={{ height: 1, background: 'hsl(var(--border) / 0.5)', margin: '0 14px' }} />
-
-      {/* Engagement + creator combined row */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '9px 14px 11px', gap: 4 }}>
-        <button
-          onClick={(e) => { e.stopPropagation(); onLike?.(); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
-        >
-          {likeState?.isLiked ? (
-            <span style={{ fontSize: 16, lineHeight: 1 }}>🧡</span>
-          ) : (
-            <Heart className="w-4 h-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
-          )}
-          <span style={{ fontSize: 13, fontWeight: 700, color: likeState?.isLiked ? '#F7931E' : 'hsl(var(--muted-foreground))' }}>
-            {formatCompact(likeState?.count ?? post.likeCount)}
-          </span>
-        </button>
-        <div style={{ width: 1, height: 18, background: 'hsl(var(--border))', margin: '0 10px' }} />
-        <button
-          onClick={(e) => { e.stopPropagation(); onComment?.(); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer' }}
-        >
-          <MessageCircle className="h-[19px] w-[19px]" style={{ color: 'hsl(var(--muted-foreground))' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>
-            {formatCompact(post.commentCount)}
-          </span>
-        </button>
-        <div style={{ flex: 1 }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {post.avatarUrl && (
-            <SquircleAvatar src={post.avatarUrl} alt="" size={22} hideRing />
-          )}
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-            {post.displayName}
-          </span>
-          <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>· {timeAgo}</span>
-        </div>
-        {isOwnPost && onDelete && (
-          <button
-            onClick={(e) => { e.stopPropagation(); if (window.confirm('Delete this post?')) onDelete(); }}
-            className="p-1.5 -mr-1 text-muted-foreground ml-1"
+      {/* Body — excerpt + chevron */}
+      <div className="px-3.5 pt-2.5 pb-3">
+        {review.reviewText && (
+          <div
+            className="text-white/70 italic line-clamp-2"
+            style={{ fontSize: 13, lineHeight: 1.5 }}
           >
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
+            "{review.reviewText}"
+          </div>
         )}
+        <div
+          className="mt-1.5"
+          style={{ fontSize: 11, color: '#F7931E', fontWeight: 600 }}
+        >
+          Read review →
+        </div>
       </div>
+
+      {/* Own-post menu */}
+      {isOwnPost && onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (window.confirm('Delete this post?')) onDelete();
+          }}
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-full"
+          style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }}
+        >
+          <MoreHorizontal className="w-4 h-4 text-white" />
+        </button>
+      )}
     </div>
   );
 };
