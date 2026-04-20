@@ -2028,7 +2028,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: Hero
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
                     border: `1px solid ${isActive ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)'}`,
-                    borderRadius: 22,
+                    borderRadius: 7,
                     padding: '0 11px',
                     cursor: 'pointer',
                     display: 'flex',
