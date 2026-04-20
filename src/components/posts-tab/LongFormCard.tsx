@@ -49,8 +49,8 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({
   return (
     <div
       ref={tileRef}
-      className="bg-white rounded-[14px] overflow-hidden cursor-pointer relative"
-      style={{ border: '0.5px solid rgba(15,23,42,0.06)' }}
+      className="bg-white overflow-hidden cursor-pointer relative"
+      style={{ borderTop: '0.5px solid rgba(15,23,42,0.06)', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeedStore.getState().open(allPosts, postIndex);

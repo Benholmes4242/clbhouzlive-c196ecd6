@@ -193,7 +193,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
   }
 
   return (
-    <div ref={gridRef} className="flex flex-col gap-3.5 px-3 pt-2 pb-6">
+    <div ref={gridRef} className="flex flex-col gap-3.5 pt-2 pb-6">
       {segments.map((segment, i) => {
         if (segment.kind === 'longform') {
           const idx = posts.indexOf(segment.post);
@@ -237,7 +237,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
           const label = allVideo ? 'Clips' : 'Photos';
           return (
             <div key={`compact-${i}`} className="flex flex-col gap-1.5">
-              <div className="flex items-baseline justify-between px-0.5">
+              <div className="flex items-baseline justify-between px-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   {label} · {segment.posts.length}
                 </span>
