@@ -229,31 +229,6 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
         }
 
         // compact-group
-        if (segment.posts.length >= 2) {
-          // Determine label based on media composition
-          const allVideo = segment.posts.every(
-            (p) => p.mediaItems[0]?.type === 'video'
-          );
-          const label = allVideo ? 'Clips' : 'Photos';
-          return (
-            <div key={`compact-${i}`} className="flex flex-col gap-1.5">
-              <div className="flex items-baseline justify-between px-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  {label} · {segment.posts.length}
-                </span>
-              </div>
-              <CompactGridRow
-                posts={segment.posts}
-                startIndex={segment.startIndex}
-                globalIndices={segment.globalIndices}
-                allPosts={posts}
-                isOwnProfile={isOwnProfile}
-                onDeletePost={(postId) => handleDelete(postId)}
-              />
-            </div>
-          );
-        }
-
         return (
           <CompactGridRow
             key={`compact-${i}`}
