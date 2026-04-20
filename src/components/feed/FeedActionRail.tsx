@@ -197,7 +197,6 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               fallback={creator.displayName?.[0] ?? '?'}
               hairlineRing
               ringColor="rgba(255,255,255,0.95)"
-              shape="circle"
             />
           </button>
           {showFollowPlus && (
