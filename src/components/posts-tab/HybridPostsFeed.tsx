@@ -193,7 +193,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
   }
 
   return (
-    <div ref={gridRef} className="flex flex-col gap-3.5 pt-2 pb-6">
+    <div ref={gridRef} className="flex flex-col gap-px pt-2 pb-6">
       {segments.map((segment, i) => {
         if (segment.kind === 'longform') {
           const idx = posts.indexOf(segment.post);
