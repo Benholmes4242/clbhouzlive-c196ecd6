@@ -41,6 +41,8 @@ interface FeedOverlayLayerProps {
   activeIndexOverride?: number;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
+  /** Read-only mode: hides interactive controls on the action rail (only creator avatar shown). */
+  readOnly?: boolean;
 }
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
@@ -61,6 +63,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   onBeforeNavigate,
   activeIndexOverride,
   bottomOffset,
+  readOnly = false,
 }: FeedOverlayLayerProps) {
   const navigate = useNavigate();
   const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
@@ -192,6 +195,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         onMore={onMore}
         isVisible={overlayVisible}
         bottomOffset={bottomOffset}
+        readOnly={readOnly}
       />
 
       {/* Video scrubber — sits between bottom content and action rail on video posts */}

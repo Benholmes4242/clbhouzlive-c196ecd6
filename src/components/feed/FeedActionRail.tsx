@@ -235,40 +235,45 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         </div>
       )}
 
-      {/* Like */}
-      <ActionButton
-        onClick={onLike}
-        ariaLabel={hasLiked ? 'Unlike' : 'Like'}
-        count={formatCount(likesCount)}
-        accentCount={hasLiked}
-        animateKey={likeAnimKey}
-      >
-        <Heart
-          size={32}
-          fill={hasLiked ? '#F7931E' : 'transparent'}
-          stroke={hasLiked ? '#F7931E' : '#fff'}
-          strokeWidth={1.8}
-        />
-      </ActionButton>
+      {/* Read-only: render only the creator avatar above. Skip all interactive controls. */}
+      {!readOnly && (
+        <>
+          {/* Like */}
+          <ActionButton
+            onClick={onLike}
+            ariaLabel={hasLiked ? 'Unlike' : 'Like'}
+            count={formatCount(likesCount)}
+            accentCount={hasLiked}
+            animateKey={likeAnimKey}
+          >
+            <Heart
+              size={32}
+              fill={hasLiked ? '#F7931E' : 'transparent'}
+              stroke={hasLiked ? '#F7931E' : '#fff'}
+              strokeWidth={1.8}
+            />
+          </ActionButton>
 
-      {/* Comment */}
-      <ActionButton
-        onClick={onComment}
-        ariaLabel="Comments"
-        count={formatCount(commentsCount)}
-      >
-        <MessageCircle size={32} stroke="#fff" strokeWidth={1.8} />
-      </ActionButton>
+          {/* Comment */}
+          <ActionButton
+            onClick={onComment}
+            ariaLabel="Comments"
+            count={formatCount(commentsCount)}
+          >
+            <MessageCircle size={32} stroke="#fff" strokeWidth={1.8} />
+          </ActionButton>
 
-      {/* Share */}
-      <ActionButton onClick={onShare} ariaLabel="Share">
-        <Send size={30} stroke="#fff" strokeWidth={1.8} />
-      </ActionButton>
+          {/* Share */}
+          <ActionButton onClick={onShare} ariaLabel="Share">
+            <Send size={30} stroke="#fff" strokeWidth={1.8} />
+          </ActionButton>
 
-      {/* More */}
-      <ActionButton onClick={onMore} ariaLabel="More options">
-        <MoreHorizontal size={30} stroke="#fff" strokeWidth={2} />
-      </ActionButton>
+          {/* More */}
+          <ActionButton onClick={onMore} ariaLabel="More options">
+            <MoreHorizontal size={30} stroke="#fff" strokeWidth={2} />
+          </ActionButton>
+        </>
+      )}
     </motion.div>
   );
 };
