@@ -12,7 +12,7 @@ const SkeletonBlock: React.FC<{ className?: string; style?: React.CSSProperties 
 
 export const PostsFeedSkeleton: React.FC = () => {
   return (
-    <div className="flex flex-col gap-3.5 pt-2 pb-6">
+    <div className="flex flex-col gap-px pt-2 pb-6">
       {/* Hero review skeleton */}
       <div
         className="overflow-hidden"
@@ -63,7 +63,7 @@ export const PostsFeedSkeleton: React.FC = () => {
       {/* Compact row skeleton — 2-up with header */}
       <div className="flex flex-col gap-1.5">
         <SkeletonBlock style={{ width: 80, height: 11, marginLeft: 14 }} />
-        <div className="grid grid-cols-2 gap-[2px]">
+        <div className="grid grid-cols-2 gap-px">
           {[0, 1].map((i) => (
             <div
               key={i}
@@ -75,7 +75,7 @@ export const PostsFeedSkeleton: React.FC = () => {
       </div>
 
       {/* Second compact row */}
-      <div className="grid grid-cols-2 gap-[2px]">
+      <div className="grid grid-cols-2 gap-px">
         {[0, 1].map((i) => (
           <div
             key={i}
