@@ -1,9 +1,10 @@
 /**
  * CourseMediaViewer — Modern fullscreen viewer for course media strips.
  *
- * Uses the Breathing Room chrome (ClubhouseTopBar + BreathingRoomBottomBar +
- * BreathingRoomMuteToggle + InlineReviewCard + scrubber) but with all social
- * actions disabled. Reviews render with the dedicated review card.
+ * Read-only viewer that uses the canonical FeedOverlayLayer in readOnly mode.
+ * The action rail renders only the creator avatar (tap → profile); like /
+ * comment / share / more controls are suppressed. Author identity, course tag
+ * pill, and review card all render via the shared system.
  *
  * Powered by its own Zustand store so it never conflicts with FullscreenFeedOverlay.
  * Reached from course detail About tab and Reviews tab media strips.
@@ -12,17 +13,11 @@
 import React, { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, MapPin } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
-import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
-import { BreathingRoomBottomBar } from '@/components/feed/BreathingRoomBottomBar';
-import { BreathingRoomMuteToggle } from '@/components/feed/BreathingRoomMuteToggle';
-import { InlineReviewCard } from '@/components/feed/InlineReviewCard';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
-import { Z } from '@/config/zIndex';
-import { formatTimeAgo } from '@/utils/formatTime';
+import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
+import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -60,6 +55,8 @@ export const useCourseMediaViewerStore = create<CourseMediaViewerState>((set) =>
 
 // ── Component ──
 
+const noop = () => {};
+
 export function CourseMediaViewer() {
   const navigate = useNavigate();
   const {
@@ -71,26 +68,8 @@ export function CourseMediaViewer() {
     setActiveIndex,
   } = useCourseMediaViewerStore();
 
-  const activeVideoElement = useClubhouseStore((s) => s.activeVideoElement);
   const activePost: FeedPost | null = posts[activeIndex] ?? null;
-  const isVideo = activePost?.mediaItems?.[0]?.type === 'video';
   const isReview = !!(activePost?.isReview && activePost?.review);
-
-  // Identity bar author info (mirrors Clubhouse.tsx pattern)
-  const activeAuthor = useMemo(() => {
-    if (!activePost) return null;
-    return {
-      id: activePost.userId,
-      displayName: activePost.displayName,
-      username: activePost.username,
-      avatarUrl: activePost.avatarUrl,
-      handicapIndex: activePost.handicapIndex ?? null,
-      homeClub: activePost.homeClub ?? null,
-      timeAgoLabel: activePost.createdAt
-        ? formatTimeAgo(activePost.createdAt, 'short')
-        : '',
-    };
-  }, [activePost]);
 
   // Course chip (hidden on review posts to avoid duplication with the review panel)
   const golfCourse = useMemo(() => {
@@ -99,10 +78,33 @@ export function CourseMediaViewer() {
     return { id: activePost.courseId, name: activePost.courseName };
   }, [activePost, isReview]);
 
+  // Active review for FeedOverlayLayer
+  const activeReview = useMemo(() => {
+    if (!activePost?.review) return null;
+    return {
+      reviewId: activePost.review.reviewId,
+      courseId: activePost.review.courseId,
+      courseName: activePost.review.courseName,
+      courseImageUrl: null,
+      rating: activePost.review.rating,
+      courseCountry: activePost.review.courseCountry ?? null,
+      courseRegion: activePost.review.courseRegion ?? null,
+      courseSubCountry: activePost.review.courseSubCountry ?? null,
+      reviewText: activePost.review.reviewText ?? null,
+    };
+  }, [activePost]);
+
   const handleViewProfile = () => {
     if (!activePost) return;
     close();
     navigate(getProfilePathById(activePost.userId));
+  };
+
+  const handleReviewTap = () => {
+    if (!activePost?.review) return;
+    const review = activePost.review;
+    close();
+    navigate(`/courses/${review.courseId}?tab=reviews&review=${review.reviewId}`);
   };
 
   // Body scroll lock + status bar (unchanged behaviour)
@@ -137,198 +139,81 @@ export function CourseMediaViewer() {
     return () => window.removeEventListener('keydown', h);
   }, [isOpen, close]);
 
-  // No-op stubs for read-only social actions
-  const noop = () => {};
-
   return (
-    <>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-[9000] bg-black flex flex-col"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          className="fixed inset-0 z-[9000] bg-black flex flex-col"
+        >
+          {/* Close — top-left */}
+          <button
+            onClick={close}
+            aria-label="Close"
+            className="absolute left-4 z-[9020] flex items-center justify-center active:scale-95 transition-all"
+            style={{
+              top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+              width: 34,
+              height: 34,
+              borderRadius: 12,
+              background: 'rgba(0, 0, 0, 0.50)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+            }}
           >
-            {/* Close — top-left */}
-            <button
-              onClick={close}
-              aria-label="Close"
-              className="absolute left-4 z-[9020] flex items-center justify-center active:scale-95 transition-all"
-              style={{
-                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-                width: 34,
-                height: 34,
-                borderRadius: 12,
-                background: 'rgba(0, 0, 0, 0.50)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                border: '1px solid rgba(255, 255, 255, 0.10)',
-              }}
-            >
-              <X className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
-            </button>
+            <X className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
+          </button>
 
-            {/* SnapFeed — drives the actual media playback */}
-            <SnapFeed
-              posts={posts}
-              activeTab="foryou"
-              onNearEnd={() => {}}
-              onRefresh={async () => {}}
-              isRefreshing={false}
-              hasNextPage={false}
-              followOverrides={new Map()}
-              onFollowChange={() => {}}
-              startIndex={startIndex}
-              onActiveIndexChange={setActiveIndex}
-              activeIndexOverride={activeIndex}
-            />
-
-            {/* Top bar — identity only (no tabs / search / profile pill) */}
-            {activePost && (
-              <ClubhouseTopBar
+          {posts.length === 0 ? (
+            <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
+          ) : (
+            <>
+              {/* SnapFeed — drives the actual media playback */}
+              <SnapFeed
+                posts={posts}
                 activeTab="foryou"
-                onTabChange={() => {}}
-                isBusinessActor={false}
-                user={null}
-                hidden={false}
-                activeAuthor={activeAuthor}
-                onAuthorTap={handleViewProfile}
-                hideTabs={true}
-                hideProfilePill={true}
-                hideSearch={true}
+                onNearEnd={() => {}}
+                onRefresh={async () => {}}
+                isRefreshing={false}
+                hasNextPage={false}
+                followOverrides={new Map()}
+                onFollowChange={() => {}}
+                startIndex={startIndex}
+                onActiveIndexChange={setActiveIndex}
+                activeIndexOverride={activeIndex}
               />
-            )}
 
-            {/* Course chip (non-review posts only) */}
-            {golfCourse && (
-              <motion.button
-                type="button"
-                onClick={() => {
-                  close();
-                  navigate(`/courses/${golfCourse.id}`);
-                }}
-                initial={false}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.18, ease: 'easeOut' }}
-                style={{
-                  position: 'fixed',
-                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 132px)',
-                  left: 16,
-                  zIndex: Z.echo,
-                  pointerEvents: 'auto',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  maxWidth: 'calc(100% - 32px)',
-                  padding: '6px 10px',
-                  borderRadius: 14,
-                  background: 'rgba(0, 0, 0, 0.50)',
-                  border: '1px solid rgba(255, 255, 255, 0.10)',
-                  backdropFilter: 'blur(14px)',
-                  WebkitBackdropFilter: 'blur(14px)',
-                  cursor: 'pointer',
-                  fontFamily: 'Geist, system-ui, sans-serif',
-                }}
-              >
-                <MapPin size={12} stroke="#F7931E" strokeWidth={2.25} />
-                <span
-                  style={{
-                    fontSize: 11.5,
-                    fontWeight: 700,
-                    letterSpacing: '-0.005em',
-                    color: '#fff',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {golfCourse.name}
-                </span>
-              </motion.button>
-            )}
-
-            {/* Mute toggle — video posts only */}
-            {isVideo && <BreathingRoomMuteToggle isVisible={true} bottomOffset={0} />}
-
-            {/* Inline review card — review posts only */}
-            {isReview && activePost?.review && (
-              <div
-                style={{
-                  position: 'fixed',
-                  bottom: 88,
-                  left: 16,
-                  right: 16,
-                  zIndex: Z.echo,
-                  pointerEvents: 'auto',
-                }}
-              >
-                <InlineReviewCard
-                  courseName={activePost.review.courseName}
-                  rating={activePost.review.rating}
-                  courseRegion={activePost.review.courseRegion ?? null}
-                  courseCountry={activePost.review.courseCountry ?? null}
-                  courseSubCountry={activePost.review.courseSubCountry ?? null}
-                  reviewText={activePost.review.reviewText ?? activePost.caption ?? null}
-                  reviewer={{
-                    name: activePost.displayName,
-                    avatar: activePost.avatarUrl,
-                  }}
-                  isVisible={true}
-                  onTap={() => {
-                    if (!activePost.review) return;
-                    const review = activePost.review;
-                    close();
-                    navigate(`/courses/${review.courseId}?tab=reviews&review=${review.reviewId}`);
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Bottom bar — read-only caption only (no actions) */}
-            {activePost && (
-              <BreathingRoomBottomBar
-                caption={isReview ? '' : (activePost.caption ?? '')}
-                tags={isReview ? [] : (activePost.tags ?? [])}
-                isVisible={true}
-                postId={activePost.id}
+              {/* Shared overlay system — readOnly hides interactive controls */}
+              <FeedOverlayLayer
+                posts={posts}
+                activeIndexOverride={activeIndex}
+                onLike={noop}
+                onComment={noop}
+                onShare={noop}
+                onMore={noop}
+                getLikeState={() => ({ isLiked: false, count: 0 })}
+                getCommentCount={() => 0}
+                getFollowState={() => false}
+                onFollow={noop}
+                onViewProfile={handleViewProfile}
+                onReviewTap={handleReviewTap}
+                onBeforeNavigate={close}
+                overlayVisible={true}
+                isOwnPost={true}
+                golfCourse={golfCourse}
+                activeReview={activeReview}
+                isActiveReview={isReview}
                 bottomOffset={0}
-                isReview={isReview}
-                author={
-                  !isReview && activeAuthor
-                    ? {
-                        id: activeAuthor.id,
-                        displayName: activeAuthor.displayName,
-                        avatarUrl: activeAuthor.avatarUrl,
-                        handicapIndex: activeAuthor.handicapIndex,
-                        homeClub: activeAuthor.homeClub,
-                        timeAgoLabel: activeAuthor.timeAgoLabel,
-                      }
-                    : null
-                }
-                onAuthorTap={handleViewProfile}
+                readOnly={true}
               />
-            )}
-
-            {/* Scrubber — rendered separately because readOnly hides the action strip */}
-            {isVideo && activeVideoElement && (
-              <div
-                style={{
-                  position: 'fixed',
-                  bottom: 56,
-                  left: 0,
-                  right: 0,
-                  pointerEvents: 'auto',
-                  zIndex: Z.echo + 1,
-                }}
-              >
-                <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+            </>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

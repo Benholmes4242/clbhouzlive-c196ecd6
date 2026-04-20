@@ -39,6 +39,8 @@ interface FeedActionRailProps {
   isVisible: boolean;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
+  /** When true, only the creator avatar is rendered (no follow+, like, comment, share, more). */
+  readOnly?: boolean;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -135,8 +137,9 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   onMore,
   isVisible,
   bottomOffset,
+  readOnly = false,
 }) => {
-  const showFollowPlus = !isOwnPost && !isFollowing && !!creator;
+  const showFollowPlus = !readOnly && !isOwnPost && !isFollowing && !!creator;
 
   // Heart pop animation key — bumps when transitioning to liked
   const [likeAnimKey, setLikeAnimKey] = useState(0);
@@ -232,40 +235,45 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         </div>
       )}
 
-      {/* Like */}
-      <ActionButton
-        onClick={onLike}
-        ariaLabel={hasLiked ? 'Unlike' : 'Like'}
-        count={formatCount(likesCount)}
-        accentCount={hasLiked}
-        animateKey={likeAnimKey}
-      >
-        <Heart
-          size={32}
-          fill={hasLiked ? '#F7931E' : 'transparent'}
-          stroke={hasLiked ? '#F7931E' : '#fff'}
-          strokeWidth={1.8}
-        />
-      </ActionButton>
+      {/* Read-only: render only the creator avatar above. Skip all interactive controls. */}
+      {!readOnly && (
+        <>
+          {/* Like */}
+          <ActionButton
+            onClick={onLike}
+            ariaLabel={hasLiked ? 'Unlike' : 'Like'}
+            count={formatCount(likesCount)}
+            accentCount={hasLiked}
+            animateKey={likeAnimKey}
+          >
+            <Heart
+              size={32}
+              fill={hasLiked ? '#F7931E' : 'transparent'}
+              stroke={hasLiked ? '#F7931E' : '#fff'}
+              strokeWidth={1.8}
+            />
+          </ActionButton>
 
-      {/* Comment */}
-      <ActionButton
-        onClick={onComment}
-        ariaLabel="Comments"
-        count={formatCount(commentsCount)}
-      >
-        <MessageCircle size={32} stroke="#fff" strokeWidth={1.8} />
-      </ActionButton>
+          {/* Comment */}
+          <ActionButton
+            onClick={onComment}
+            ariaLabel="Comments"
+            count={formatCount(commentsCount)}
+          >
+            <MessageCircle size={32} stroke="#fff" strokeWidth={1.8} />
+          </ActionButton>
 
-      {/* Share */}
-      <ActionButton onClick={onShare} ariaLabel="Share">
-        <Send size={30} stroke="#fff" strokeWidth={1.8} />
-      </ActionButton>
+          {/* Share */}
+          <ActionButton onClick={onShare} ariaLabel="Share">
+            <Send size={30} stroke="#fff" strokeWidth={1.8} />
+          </ActionButton>
 
-      {/* More */}
-      <ActionButton onClick={onMore} ariaLabel="More options">
-        <MoreHorizontal size={30} stroke="#fff" strokeWidth={2} />
-      </ActionButton>
+          {/* More */}
+          <ActionButton onClick={onMore} ariaLabel="More options">
+            <MoreHorizontal size={30} stroke="#fff" strokeWidth={2} />
+          </ActionButton>
+        </>
+      )}
     </motion.div>
   );
 };
