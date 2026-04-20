@@ -72,6 +72,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                 src={friend.profile.profile_photo_url}
                 alt={displayName}
                 size={28}
+                thinRing
                 className={index > 0 ? '-ml-1.5' : ''}
               />
             ) : (
@@ -89,7 +90,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                   justifyContent: 'center',
                   fontSize: 11,
                   fontWeight: 700,
-                  border: '2px solid #F8FAFC',
+                  border: '1px solid #F8FAFC',
                   flexShrink: 0,
                 }}
               >
@@ -113,7 +114,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                 fontSize: 10,
                 fontWeight: 700,
                 padding: '0 6px',
-                border: '2px solid #F8FAFC',
+                border: '1px solid #F8FAFC',
                 flexShrink: 0,
               }}
             >
