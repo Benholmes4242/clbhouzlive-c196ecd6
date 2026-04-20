@@ -118,9 +118,9 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({
           </div>
         )}
         <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-500">
-          {post.golfCourse?.name && (
+          {post.courseName && (
             <>
-              <span className="truncate">{post.golfCourse.name}</span>
+              <span className="truncate">{post.courseName}</span>
               <span className="w-[3px] h-[3px] rounded-full bg-slate-300 flex-shrink-0" />
             </>
           )}

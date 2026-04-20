@@ -88,7 +88,7 @@ const CompactTile: React.FC<{
       )}
 
       {/* Caption + sub overlay — bottom gradient */}
-      {(post.caption || post.golfCourse) && (
+      {(post.caption || post.courseName) && (
         <div
           className="absolute left-0 right-0 bottom-0 px-2.5 pb-2.5 pt-6 pointer-events-none"
           style={{
@@ -108,7 +108,7 @@ const CompactTile: React.FC<{
             className="text-[9.5px] text-white/75 mt-0.5 truncate"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
           >
-            {post.golfCourse?.name ? `${post.golfCourse.name} · ` : ''}
+            {post.courseName ? `${post.courseName} · ` : ''}
             {formatDistanceToNowShort(new Date(post.createdAt))}
           </div>
         </div>
