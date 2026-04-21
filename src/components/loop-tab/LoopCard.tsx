@@ -442,8 +442,8 @@ export const LoopCard = React.memo(function LoopCard({
 
           <div style={{ flex: 1 }} />
 
-          {/* "I've played here" — kept when course is known, pushed right */}
-          {courseName && courseId && (
+          {/* "I've played here" — only when user has actually played this course */}
+          {showPlayedPill && (
             <button
               onClick={() => navigate(`/courses/${courseId}`)}
               className="active:scale-[0.97] transition-transform"
@@ -464,8 +464,8 @@ export const LoopCard = React.memo(function LoopCard({
             </button>
           )}
 
-          {/* Share — pill, rightmost when no course button */}
-          {!(courseName && courseId) && (
+          {/* Share — pill, rightmost when no played pill */}
+          {!showPlayedPill && (
             <button
               onClick={handleShare}
               aria-label="Share"
@@ -484,6 +484,54 @@ export const LoopCard = React.memo(function LoopCard({
             </button>
           )}
         </div>
+
+        {/* 5. REVIEW NUDGE — ambient prompt for played-but-not-reviewed (max 1 per page) */}
+        {showReviewNudge && (
+          <div
+            className="flex items-center gap-2 px-4 py-2.5"
+            style={{
+              background: 'rgba(247,147,30,0.06)',
+              borderTop: '1px solid rgba(247,147,30,0.15)',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                color: 'hsl(var(--foreground))',
+                flex: 1,
+                lineHeight: 1.35,
+              }}
+            >
+              You've played <strong>{courseName}</strong> too — share your review?
+            </span>
+            <button
+              onClick={() => navigate(`/courses/${courseId}?review=1`)}
+              style={{
+                fontSize: 12, fontWeight: 700, color: '#fff',
+                background: '#F7931E',
+                border: 'none',
+                borderRadius: 20,
+                padding: '5px 11px',
+                cursor: 'pointer',
+              }}
+            >
+              Review
+            </button>
+            <button
+              onClick={dismissNudge}
+              aria-label="Dismiss"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 4,
+                cursor: 'pointer',
+                color: 'hsl(var(--muted-foreground))',
+              }}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
       </article>
 
