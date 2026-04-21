@@ -3022,6 +3022,44 @@ export type Database = {
         }
         Relationships: []
       }
+      course_mood_blurbs: {
+        Row: {
+          blurb: string
+          course_id: string
+          expires_at: string
+          generated_at: string
+          id: string
+          mood: string
+          user_id: string | null
+        }
+        Insert: {
+          blurb: string
+          course_id: string
+          expires_at?: string
+          generated_at?: string
+          id?: string
+          mood: string
+          user_id?: string | null
+        }
+        Update: {
+          blurb?: string
+          course_id?: string
+          expires_at?: string
+          generated_at?: string
+          id?: string
+          mood?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_mood_blurbs_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_prestige_tags: {
         Row: {
           awarded_at: string
@@ -15817,6 +15855,37 @@ export type Database = {
           width: number
         }[]
       }
+      get_explore_hero: {
+        Args: { p_mood: string; p_user_id: string }
+        Returns: {
+          context_stats: Json
+          course_id: string
+          course_name: string
+          global_rank: number
+          hero_image_url: string
+          location_primary: string
+          location_secondary: string
+          rating_avg: number
+          review_count: number
+          why_ai: string
+        }[]
+      }
+      get_explore_recommendations: {
+        Args: { p_limit?: number; p_mood: string; p_user_id: string }
+        Returns: {
+          context_stats: Json
+          course_id: string
+          course_name: string
+          global_rank: number
+          hero_image_url: string
+          location_primary: string
+          location_secondary: string
+          match_label: string
+          rating_avg: number
+          review_count: number
+          why_ai: string
+        }[]
+      }
       get_fast_climbers: {
         Args: { days_param?: number; limit_param?: number }
         Returns: {
@@ -15841,6 +15910,21 @@ export type Database = {
           self_has_played: boolean
           self_has_reviewed: boolean
           top_friend_avatars: string[]
+          top_friend_names: string[]
+        }[]
+      }
+      get_friend_played_recommendations: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          country: string
+          course_id: string
+          course_name: string
+          friend_played_count: number
+          friend_rating_avg: number
+          rating_avg: number
+          region: string
+          review_count: number
+          thumbnail_image: string
           top_friend_names: string[]
         }[]
       }
@@ -15927,6 +16011,22 @@ export type Database = {
         Returns: {
           country: string
           member_count: number
+        }[]
+      }
+      get_global_course_videos: {
+        Args: { p_limit?: number; p_offset?: number; p_user_id: string }
+        Returns: {
+          course_id: string
+          course_name: string
+          created_at: string
+          creator_avatar_url: string
+          creator_name: string
+          duration_ms: number
+          hls_url: string
+          like_count: number
+          media_id: string
+          post_id: string
+          poster_url: string
         }[]
       }
       get_handicap_improvement_leaderboard: {
@@ -16040,6 +16140,25 @@ export type Database = {
           is_current_user: boolean
           rank: number
           user_id: string
+        }[]
+      }
+      get_nearby_courses: {
+        Args: {
+          p_limit?: number
+          p_radius_km?: number
+          p_user_lat: number
+          p_user_lng: number
+        }
+        Returns: {
+          country: string
+          course_id: string
+          course_name: string
+          distance_km: number
+          global_rank: number
+          rating_avg: number
+          region: string
+          review_count: number
+          thumbnail_image: string
         }[]
       }
       get_or_create_dm_conversation: {
@@ -16630,6 +16749,18 @@ export type Database = {
           global_rank: number
           region_list: string[]
           regions_count: number
+        }[]
+      }
+      get_user_passport: {
+        Args: { p_user_id: string; p_year?: number }
+        Returns: {
+          avg_rating_given: number
+          countries_played: number
+          courses_played: number
+          friends_courses_to_try: number
+          reviews_written: number
+          top_100_played: number
+          wishlist_count: number
         }[]
       }
       get_user_podium_proximity: {
