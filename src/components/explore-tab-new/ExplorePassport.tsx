@@ -1,0 +1,109 @@
+import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUserPassport } from './hooks/useUserPassport';
+
+interface ExplorePassportProps {
+  userId: string | undefined;
+}
+
+function Stat({ value, label }: { value: string | number; label: string }) {
+  return (
+    <div style={{ flex: 1, minWidth: 0, padding: '10px 4px' }}>
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: 900,
+          letterSpacing: '-0.02em',
+          color: '#0F172A',
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: 'rgba(15,23,42,0.55)',
+          marginTop: 6,
+          lineHeight: 1.2,
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function ExplorePassportInner({ userId }: ExplorePassportProps) {
+  const navigate = useNavigate();
+  const { data: passport, isLoading } = useUserPassport(userId);
+
+  if (!userId) return null;
+
+  if (isLoading) {
+    return (
+      <section style={{ padding: '24px 16px 0' }}>
+        <div
+          className="animate-pulse"
+          style={{ height: 110, background: 'rgba(15,23,42,0.06)', borderRadius: 14 }}
+        />
+      </section>
+    );
+  }
+
+  if (!passport) return null;
+
+  return (
+    <section style={{ padding: '24px 16px 0' }}>
+      <div style={{ padding: '0 0 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
+          Your Passport
+        </h2>
+        <button
+          type="button"
+          onClick={() => navigate('/profile')}
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: '#F7931E',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+          }}
+        >
+          View profile
+        </button>
+      </div>
+      <div
+        style={{
+          background: '#FFFFFF',
+          border: '1px solid rgba(15,23,42,0.08)',
+          borderRadius: 14,
+          padding: '6px 8px',
+          display: 'flex',
+          alignItems: 'stretch',
+        }}
+      >
+        <Stat value={passport.courses_played ?? 0} label="Courses" />
+        <div style={{ width: 1, background: 'rgba(15,23,42,0.08)', margin: '8px 0' }} />
+        <Stat value={passport.countries_played ?? 0} label="Countries" />
+        <div style={{ width: 1, background: 'rgba(15,23,42,0.08)', margin: '8px 0' }} />
+        <Stat value={passport.top_100_played ?? 0} label="Top 100" />
+        <div style={{ width: 1, background: 'rgba(15,23,42,0.08)', margin: '8px 0' }} />
+        <Stat
+          value={
+            passport.avg_rating_given != null
+              ? Number(passport.avg_rating_given).toFixed(1)
+              : '—'
+          }
+          label="Avg given"
+        />
+      </div>
+    </section>
+  );
+}
+
+export const ExplorePassport = memo(ExplorePassportInner);

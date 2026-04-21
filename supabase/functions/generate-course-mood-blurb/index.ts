@@ -101,27 +101,26 @@ Deno.serve(async (req) => {
 
     const prompt = `You are writing a single 2-3 sentence paragraph explaining why a specific golf course is being recommended to a user. Write in British English, restrained voice, no hype or adjective stacking.
 
-=== ONLY USE FACTS FROM THIS BLOCK ===
-Course name: ${course.name}
-Location: ${locationStr}
-Course type: ${courseTypeStr}
+Course: ${course.name}, ${locationStr} (${courseTypeStr})
 Rating on Clbhouz: ${ratingAvg} from ${reviewCount} reviews
-Major championships hosted: ${notable}
-Course description (the only narrative source you may draw from): ${course.description ?? "(none provided)"}
+Notable: ${notable}
+Description: ${course.description ?? "none"}
 
-User's highest-rated courses (for taste reference only — never invent details about these):
+User's highest-rated courses (for reference):
 ${userCourseList}
 
 Mood: ${body.mood}
 Mood context: ${MOOD_CONTEXT[body.mood]}
-=== END FACTS ===
 
-Strict rules:
-1. Use ONLY facts from the block above. Do not introduce architects, designers, opening years, historical figures, tournaments, or anecdotes that are not explicitly listed.
-2. If the description is "(none provided)", do not invent narrative details — describe the course only via its location, type, rating, and major-championships fields.
-3. ${body.user_id && userCourseList !== "no review history yet" ? "Reference ONE specific course from the user's list to anchor the recommendation (by name only, no invented details about it)" : "Avoid personal references since the user has no review history"}.
-4. British English spelling and idiom. Restrained. No marketing-speak ("nestled", "iconic", "stunning", "must-play", "discover", "experience").
-5. Maximum 3 sentences. Returns ONLY the paragraph text — no preamble, no quotes, no labels.`;
+Write a 2-3 sentence paragraph that:
+1. Cites concrete facts from the course data (course_type, rating, notable features)
+2. ${body.user_id && userCourseList !== "no review history yet"
+  ? `Only compare the recommended course to a course from the user's list IF the two share course_type OR country OR a clear architectural family (e.g. both heathland, both links, both parkland). If no genuine similarity exists, omit the user-anchor sentence entirely and write 2 sentences about the recommended course alone — do NOT force a comparison.`
+  : "Avoids personal references since the user has no review history"}
+3. Avoids invented details (no fake designer names, no fake history). Only cite facts present in the data block above.
+4. Uses British English
+5. Does not exceed 3 sentences
+6. Returns ONLY the paragraph text — no preamble, no quotes, no labels`;
 
     // 4. Call Lovable AI Gateway with 5s timeout
     let blurb: string | null = null;
