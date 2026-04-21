@@ -15,7 +15,7 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Send, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -138,8 +138,39 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   isVisible,
   bottomOffset,
   readOnly = false,
+  isVideo = false,
+  isMuted = false,
+  onToggleMute,
 }) => {
   const showFollowPlus = !readOnly && !isOwnPost && !isFollowing && !!creator;
+
+  const muteButton = isVideo && onToggleMute ? (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggleMute();
+      }}
+      aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'none',
+        border: 'none',
+        padding: 0,
+        color: '#fff',
+        cursor: 'pointer',
+        filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+      }}
+    >
+      {isMuted ? (
+        <VolumeX size={28} stroke="#fff" strokeWidth={1.8} />
+      ) : (
+        <Volume2 size={28} stroke="#fff" strokeWidth={1.8} />
+      )}
+    </button>
+  ) : null;
 
   // Heart pop animation key — bumps when transitioning to liked
   const [likeAnimKey, setLikeAnimKey] = useState(0);
@@ -170,6 +201,9 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
+      {/* Playback: mute toggle — video posts only, top of rail */}
+      {muteButton}
+
       {/* Creator avatar with follow+ badge */}
       {creator && (
         <div style={{ position: 'relative', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))' }}>
