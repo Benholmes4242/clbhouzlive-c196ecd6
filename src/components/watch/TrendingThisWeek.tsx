@@ -1,218 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { useRef, useEffect, useState, useCallback } from 'react';
-import Hls from 'hls.js';
+import WatchRailTile from './WatchRailTile';
+import WatchSectionHeader from './WatchSectionHeader';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
 }
 
-/* ── Per-card autoplay tile ── */
-function TrendingCard({
-  post,
-  index,
-  allPosts,
-}: {
-  post: any;
-  index: number;
-  allPosts: any[];
-}) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
-  const [hasPlayed, setHasPlayed] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const media = post.mediaItems[0];
-  const thumb = media?.thumbnailUrl || media?.imageUrl || '';
-  const hlsUrl = media?.hlsUrl || '';
-
-  // Per-card IntersectionObserver — autoplay once when 40% visible
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el || !hlsUrl || hasPlayed) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasPlayed) {
-          startAutoplay();
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hlsUrl, hasPlayed]);
-
-  const startAutoplay = useCallback(() => {
-    const video = videoRef.current;
-    if (!video || !hlsUrl) return;
-
-    video.muted = true;
-    video.playsInline = true;
-
-    if (Hls.isSupported()) {
-      const hls = new Hls({ enableWorker: false, maxBufferLength: 4 });
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(() => {});
-      });
-      hlsRef.current = hls;
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = hlsUrl;
-      video.play().catch(() => {});
-    }
-
-    setIsPlaying(true);
-
-    video.onended = () => {
-      setIsPlaying(false);
-      setHasPlayed(true);
-      hlsRef.current?.destroy();
-      hlsRef.current = null;
-    };
-  }, [hlsUrl]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      hlsRef.current?.destroy();
-      hlsRef.current = null;
-    };
-  }, []);
-
-  const handleTap = () => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  };
-
-  return (
-    <div
-      ref={cardRef}
-      style={{
-        flexShrink: 0,
-        position: 'relative',
-        width: 200,
-        borderRadius: 12,
-        overflow: 'hidden',
-        cursor: 'pointer',
-        aspectRatio: '3/4',
-      }}
-      onClick={handleTap}
-    >
-      {/* Thumbnail */}
-      <img
-        src={thumb}
-        alt=""
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          display: 'block',
-          position: 'absolute',
-          inset: 0,
-        }}
-      />
-
-      {/* Autoplay video layer */}
-      {hlsUrl && (
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: isPlaying ? 1 : 0,
-            transition: 'opacity 0.3s',
-          }}
-        />
-      )}
-
-      {/* Gradient */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.1) 45%, transparent 70%)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Glassy rank number — bottom left, outline style */}
-      <span style={{
-        position: 'absolute', bottom: 6, left: 6,
-        fontSize: 48, fontWeight: 900,
-        lineHeight: 1, letterSpacing: '-2px',
-        fontFamily: 'Georgia, serif',
-        color: 'transparent',
-        WebkitTextStroke: '1.5px rgba(255,255,255,0.3)',
-        pointerEvents: 'none', zIndex: 2,
-        userSelect: 'none',
-      }}>
-        {index + 1}
-      </span>
-
-      {/* Likes */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 10,
-          right: 10,
-          fontSize: 11,
-          fontWeight: 600,
-          color: 'rgba(255,255,255,0.9)',
-          pointerEvents: 'none',
-        }}
-      >
-        🧡 {post.likeCount}
-      </div>
-
-      {/* Glass play button — shown after autoplay finishes */}
-      {hasPlayed && !isPlaying && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.45)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          <div
-            style={{
-              width: 0,
-              height: 0,
-              borderLeft: '8px solid rgba(255,255,255,0.9)',
-              borderTop: '5px solid transparent',
-              borderBottom: '5px solid transparent',
-              marginLeft: 2,
-            }}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Main component ── */
 export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekProps) {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
@@ -242,18 +37,29 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '4px 16px 10px',
+            padding: '12px 16px 16px',
           }}
         >
-          <div
-            style={{
-              ...shimmerBase,
-              width: 140,
-              height: 12,
-              borderRadius: 6,
-              animation: 'clb-shimmer 1.5s ease-in-out infinite',
-            }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div
+              style={{
+                ...shimmerBase,
+                width: 70,
+                height: 10,
+                borderRadius: 4,
+                animation: 'clb-shimmer 1.5s ease-in-out infinite',
+              }}
+            />
+            <div
+              style={{
+                ...shimmerBase,
+                width: 160,
+                height: 20,
+                borderRadius: 6,
+                animation: 'clb-shimmer 1.5s ease-in-out infinite',
+              }}
+            />
+          </div>
           <div
             style={{
               ...shimmerBase,
@@ -264,7 +70,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
             }}
           />
         </div>
-        <div style={{ display: 'flex', gap: 10, padding: '0 16px 16px' }}>
+        <div style={{ display: 'flex', gap: 12, padding: '0 16px 4px' }}>
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
@@ -287,57 +93,29 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   return (
     <div style={{ background: '#F8FAFC' }}>
-      {/* Label row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 16px 8px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 16 }}>🔥</span>
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 800,
-              color: '#1a1a1a',
-              letterSpacing: '-0.2px',
-            }}
-          >
-            Hot right now
-          </span>
-        </div>
-        <button
-          onClick={() => navigate('/watch/clips')}
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: '#F7931E',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          See all →
-        </button>
-      </div>
+      <WatchSectionHeader
+        eyebrow="Trending"
+        title="Hot right now"
+        onSeeAll={() => navigate('/watch/clips')}
+        paddingTop={12}
+      />
 
-      {/* Horizontal scroll — ranked cards */}
+      {/* Horizontal scroll — ranked cards, with edge padding + snap */}
       <div
         style={{
           display: 'flex',
-          gap: 10,
+          gap: 12,
           overflowX: 'auto',
-          padding: '0 16px 16px',
+          padding: '0 16px 4px',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x mandatory',
         }}
       >
         {topPosts.map((post, i) => (
-          <TrendingCard key={post.id} post={post} index={i} allPosts={topPosts} />
+          <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
+            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} />
+          </div>
         ))}
       </div>
     </div>
