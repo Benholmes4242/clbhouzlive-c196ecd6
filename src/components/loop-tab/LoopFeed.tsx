@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
@@ -7,6 +7,7 @@ import { LoopCard } from './LoopCard';
 import { FriendsFeedSkeleton } from '@/components/friends-tab/FriendsFeedSkeleton';
 import { FriendsAutoplay } from '@/components/friends-tab/FriendsAutoplay';
 import { NetworkReviewShelf } from './NetworkReviewShelf';
+import { useFriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 
 const SHELF_INTERVAL = 3;
 
