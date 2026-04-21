@@ -45,16 +45,18 @@ const ClubTagPill = ({ course, className, positioning = 'fixed' }: ClubTagPillPr
         maxWidth: isMobile ? '52vw' : '28vw'
       } : undefined}
     >
-      <div 
+      <div
         className={cn(
-          "flex items-center gap-1.5 rounded-full px-2.5 py-1.5",
-          "bg-hud-bg backdrop-blur-2xl border border-hud-border",
-          "text-white shadow-hud",
-          "hover:bg-hud-bg/80 transition-all duration-200"
+          // Canonical glass pill styling (matches GlassPill component)
+          "inline-flex items-center gap-1 rounded-full px-2 py-1",
+          "bg-black/70 backdrop-blur-sm",
+          "border border-white/10",
+          "shadow-sm",
+          "hover:bg-black/80 transition-colors"
         )}
       >
-        <MapPin className="w-4 h-4 flex-shrink-0" />
-        <span className="text-sm font-medium truncate">
+        <MapPin className="w-3 h-3 flex-shrink-0 text-white" />
+        <span className="text-[10px] leading-none font-semibold text-white truncate">
           {course.name}
         </span>
       </div>
