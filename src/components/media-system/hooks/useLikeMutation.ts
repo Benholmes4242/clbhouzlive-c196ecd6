@@ -37,11 +37,15 @@ export function useLikeMutation() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
-      queryClient.invalidateQueries({ queryKey: ['explore-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['watch-feed'] });
+      // Mark feed caches stale without active refetch — optimistic state in
+      // useClubhouseLikes drives the UI. An active refetch here would re-order
+      // posts and combined with scroll-snap-type: y mandatory cause the feed
+      // to jump to a different slide. Next natural refetch (tab switch, PTR,
+      // route re-entry) will sync with the server.
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['explore-posts'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['watch-feed'], refetchType: 'none' });
       queryClient.invalidateQueries({ queryKey: ['profile-posts'], refetchType: 'none' });
       queryClient.invalidateQueries({ queryKey: ['real-posts'], refetchType: 'none' });
       queryClient.invalidateQueries({ queryKey: ['actor-posts'], refetchType: 'none' });
