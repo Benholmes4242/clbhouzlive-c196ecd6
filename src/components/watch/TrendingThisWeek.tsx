@@ -116,7 +116,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
       >
         {topPosts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} />
+            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} viewedPostIds={viewedPostIds} />
           </div>
         ))}
       </div>
