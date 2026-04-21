@@ -33,12 +33,17 @@ export function useSuggestedFeed(userId: string | undefined) {
           return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
         }
 
-        if (!data || data.length === 0) {
-          return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+        const rows = ((data ?? []) as unknown as FeedRpcRow[]);
+        const rawRowCount = rows.length;
+
+        if (rawRowCount === 0) {
+          return {
+            posts: [] as FeedPost[],
+            nextCursor: undefined as string | undefined,
+            rawRowCount: 0,
+          };
         }
 
-        const rows = ((data ?? []) as unknown as FeedRpcRow[]);
-        
         const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
 
         // Track ALL fetched post IDs — including ones filtered out —
@@ -52,22 +57,28 @@ export function useSuggestedFeed(userId: string | undefined) {
           seenPostIds.current = new Set(arr.slice(-500));
         }
 
+        // Cursor advances based on raw rows (not filtered output) so we don't
+        // stop prematurely when the client-side filter is aggressive. The RPC
+        // returning zero rows is the only true end-of-feed signal.
         const lastRow = rows[rows.length - 1];
-        // Only advance cursor if we got filtered posts AND raw rows.
-        // If rows came back but all were filtered, stop pagination to prevent
-        // an infinite fetch loop burning through the entire posts table.
-        const nextCursor: string | undefined =
-          rows.length > 0 && posts.length > 0
-            ? lastRow.post_created_at
-            : undefined;
+        const nextCursor: string | undefined = lastRow.post_created_at;
 
-        return { posts, nextCursor };
+        return { posts, nextCursor, rawRowCount };
       } catch (err) {
         console.error('[SuggestedFeed] Unexpected error:', err);
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+        return {
+          posts: [] as FeedPost[],
+          nextCursor: undefined as string | undefined,
+          rawRowCount: 0,
+        };
       }
     },
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: (lastPage) => {
+      // Terminate ONLY when the RPC itself returned zero candidates,
+      // not when client-side filtering removed them all.
+      if (lastPage.rawRowCount === 0) return undefined;
+      return lastPage.nextCursor;
+    },
     initialPageParam: undefined as string | undefined,
     enabled: !!userId,
     staleTime: 0,

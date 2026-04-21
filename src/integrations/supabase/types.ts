@@ -16130,20 +16130,12 @@ export type Database = {
           business_logo_url: string
           business_name: string
           comment_count: number
-          course_global_rank: number
           course_id: string
-          course_latitude: number
-          course_longitude: number
           course_name: string
-          course_thumbnail_image: string
           creator_avatar_url: string
           creator_display_name: string
-          creator_handicap_index: number
-          creator_home_club: string
-          creator_home_club_visibility: string
           creator_is_verified: boolean
           creator_relation: string
-          creator_show_handicap: boolean
           creator_username: string
           display_order: number
           duration_seconds: number

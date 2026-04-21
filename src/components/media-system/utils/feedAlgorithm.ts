@@ -235,11 +235,11 @@ function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
     else regular.push(finalVideos[vi++]);
   }
 
-  // Interleave reviews every 6 regular posts
+  // Interleave reviews every 6 regular posts (reviews land at slot 6, 12, 18, ...)
   const merged: FeedPost[] = [];
   let ri = 0, regi = 0, slot = 1;
   while (regi < regular.length || ri < reviews.length) {
-    if (slot === 4 && ri < reviews.length) merged.push(reviews[ri++]);
+    if (slot === 6 && ri < reviews.length) merged.push(reviews[ri++]);
     else if (regi < regular.length) merged.push(regular[regi++]);
     else if (ri < reviews.length) merged.push(reviews[ri++]);
     else break;
