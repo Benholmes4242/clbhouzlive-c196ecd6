@@ -358,11 +358,12 @@ export const LoopCard = React.memo(function LoopCard({
                   {topFriendAvatars.slice(0, 3).map((url, idx) => (
                     <div
                       key={idx}
-                      className="rounded-full overflow-hidden border-2 bg-muted"
+                      className="overflow-hidden bg-muted"
                       style={{
                         width: 18,
                         height: 18,
-                        borderColor: 'hsl(var(--card))',
+                        borderRadius: 5,
+                        border: '1px solid hsl(var(--card))',
                       }}
                     >
                       {url ? (
