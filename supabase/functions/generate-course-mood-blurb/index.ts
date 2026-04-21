@@ -114,8 +114,10 @@ Mood context: ${MOOD_CONTEXT[body.mood]}
 
 Write a 2-3 sentence paragraph that:
 1. Cites concrete facts from the course data (course_type, rating, notable features)
-2. ${body.user_id && userCourseList !== "no review history yet" ? "References ONE specific course from the user's list to anchor the recommendation" : "Avoids personal references since the user has no review history"}
-3. Avoids invented details (no fake designer names, no fake history)
+2. ${body.user_id && userCourseList !== "no review history yet"
+  ? `Only compare the recommended course to a course from the user's list IF the two share course_type OR country OR a clear architectural family (e.g. both heathland, both links, both parkland). If no genuine similarity exists, omit the user-anchor sentence entirely and write 2 sentences about the recommended course alone — do NOT force a comparison.`
+  : "Avoids personal references since the user has no review history"}
+3. Avoids invented details (no fake designer names, no fake history). Only cite facts present in the data block above.
 4. Uses British English
 5. Does not exceed 3 sentences
 6. Returns ONLY the paragraph text — no preamble, no quotes, no labels`;
