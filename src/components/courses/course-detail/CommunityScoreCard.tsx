@@ -117,8 +117,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   if (totalRatings === 0) {
     return (
       <div>
-        <SectionHeader />
-        <p style={{ fontSize: 13, color: '#94A3B8', margin: 0, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: '#94A3B8', margin: 0, lineHeight: 1.6, textAlign: 'center' as const }}>
           No ratings yet — be the first to rate {courseName || 'this course'}.
         </p>
       </div>
@@ -191,8 +190,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   return (
     <div>
-      <SectionHeader />
-
       {/* Score row — flat */}
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
         <span
