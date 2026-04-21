@@ -4,7 +4,8 @@
  */
 
 import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import { useQuery } from '@tanstack/react-query';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, MoreHorizontal, Send, ChevronRight, MapPin, Smile, Image as ImageIcon } from 'lucide-react';
@@ -61,11 +62,6 @@ interface CommentsSheetProps {
   creatorUserId?: string;
   initialCommentId?: string | null;
   initialParentCommentId?: string | null;
-  courseId?: string | null;
-  courseName?: string | null;
-  courseCountry?: string | null;
-  courseSubCountry?: string | null;
-  courseRegion?: string | null;
   aspectRatio?: number;
   isReview?: boolean;
   reviewRating?: number | null;
@@ -95,8 +91,6 @@ function CommentsSheet({
   initialParentCommentId,
   
   caption,
-  courseId,
-  courseName,
   isReview,
   likesCount,
   likeSource = 'post',
@@ -151,8 +145,30 @@ function CommentsSheet({
   const isDark = false;
 
   const cleanCaption = useMemo(() => removeGolfCourseFromContent(caption ?? null), [caption]);
-  const extractedCourse = useMemo(() => extractGolfCourseFromContent(caption ?? null), [caption]);
-  const displayCourseName = courseName || extractedCourse?.name || null;
+
+  // Self-fetch the post's course so callers don't need to thread courseId/courseName.
+  // Same self-contained data-ownership pattern this component already uses for comments.
+  const { data: postCourse } = useQuery({
+    queryKey: ['post-course', postId],
+    queryFn: async () => {
+      if (!postId) return null;
+      const { data, error } = await supabase
+        .from('posts')
+        .select('course_id, golf_courses:course_id(id, name)')
+        .eq('id', postId)
+        .maybeSingle();
+      if (error) {
+        console.warn('[CommentsSheet] Failed to fetch post course:', error);
+        return null;
+      }
+      return (data?.golf_courses as { id: string; name: string } | null) ?? null;
+    },
+    enabled: !!postId && isOpen,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+  const displayCourseId = postCourse?.id ?? null;
+  const displayCourseName = postCourse?.name ?? null;
 
   // ── Likes hook ──
   const { data: likers, isLoading: likersLoading } =
