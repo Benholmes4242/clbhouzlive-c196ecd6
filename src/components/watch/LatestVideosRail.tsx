@@ -28,7 +28,6 @@ export default function LatestVideosRail() {
     userId,
     filter: 'latest',
   });
-  const { data: viewedPostIds } = useViewedPostIds();
 
   if (isLoading || posts.length === 0) {
     return (
