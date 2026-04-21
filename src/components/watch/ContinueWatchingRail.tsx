@@ -27,7 +27,7 @@ export default function ContinueWatchingRail({ userId }: ContinueWatchingRailPro
         className="flex gap-3 overflow-x-auto"
         style={{
           scrollbarWidth: 'none',
-          padding: '0 16px 16px',
+          padding: '0 40px 16px',
           scrollSnapType: 'x mandatory',
         }}
       >
