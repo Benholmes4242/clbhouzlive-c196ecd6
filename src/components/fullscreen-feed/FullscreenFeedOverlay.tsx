@@ -18,7 +18,6 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { getProfilePathById } from '@/lib/profileRoutes';
-import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgressTracker';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
@@ -35,8 +34,9 @@ export function FullscreenFeedOverlay() {
   const isOwnPost = !!(userId && activePost?.userId === userId);
   const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
 
-  // Track watch progress while fullscreen viewer is open.
-  useWatchProgressTracker(userId);
+  // Watch-progress tracking lives inside SnapFeed (the actual video host),
+  // which the overlay renders below. Mounting it here as well would
+  // cross-target the inline Clubhouse SnapFeed's DOM via the global selector.
 
   // Listen for "continue-watching:seek" events dispatched by the
   // ContinueWatching rail. Seeks the active video to the saved position
