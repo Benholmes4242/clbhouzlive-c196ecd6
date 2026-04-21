@@ -7175,6 +7175,7 @@ export type Database = {
           processed_at: string | null
           processing_error: string | null
           processing_status: string | null
+          source_review_media_id: string | null
           stream_id: string | null
           studio_edits: Json | null
           trim_end: number | null
@@ -7206,6 +7207,7 @@ export type Database = {
           processed_at?: string | null
           processing_error?: string | null
           processing_status?: string | null
+          source_review_media_id?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
           trim_end?: number | null
@@ -7237,6 +7239,7 @@ export type Database = {
           processed_at?: string | null
           processing_error?: string | null
           processing_status?: string | null
+          source_review_media_id?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
           trim_end?: number | null
@@ -7250,6 +7253,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_media_source_review_media_id_fkey"
+            columns: ["source_review_media_id"]
+            isOneToOne: false
+            referencedRelation: "course_review_media"
             referencedColumns: ["id"]
           },
         ]
