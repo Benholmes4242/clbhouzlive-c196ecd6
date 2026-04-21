@@ -54,6 +54,7 @@ export default function WatchRailTile({
   allPosts,
   rank,
   width = 200,
+  viewedPostIds,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
