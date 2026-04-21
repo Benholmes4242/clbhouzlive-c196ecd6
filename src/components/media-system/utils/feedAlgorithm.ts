@@ -467,6 +467,63 @@ export function buildSuggestedFeedWithEditorials(
   return buildSuggestedFeed(combined);
 }
 
+// ── Creator diversity (Watch tab — Session 2 of 3) ────────────────────────────
+// Hard guarantee that no two consecutive posts in a list come from the same
+// creator. Walks the array; on a violation, swaps the offending position with
+// the next post that has a different userId.
+//
+// This is a *post-ranking* pass intended for surfaces like the Watch tab where
+// the algorithm doesn't already balance creator distribution. It deliberately
+// does NOT consider editorials specially — the Watch tab doesn't surface them.
+// Suggested feed has its own creator-rank cap inside the RPC and balanceMediaTypes
+// pipeline, so this helper is intentionally generic and not invoked from there.
+//
+// Tradeoff: a swap can move a post by ±N positions. The product rule "no two
+// same-creator posts in a row" is more important than precise slot ordering.
+export function enforceCreatorDiversity<T extends { userId?: string; id?: string }>(
+  posts: T[]
+): T[] {
+  if (posts.length < 2) return posts;
+  const result = [...posts];
+  let swaps = 0;
+
+  for (let i = 1; i < result.length; i++) {
+    const prev = result[i - 1];
+    const current = result[i];
+    if (!prev?.userId || !current?.userId) continue;
+    if (prev.userId !== current.userId) continue;
+
+    // Find the next post with a different userId from `prev`.
+    let foundSwap = false;
+    for (let j = i + 1; j < result.length; j++) {
+      if (result[j]?.userId && result[j].userId !== prev.userId) {
+        [result[i], result[j]] = [result[j], result[i]];
+        foundSwap = true;
+        swaps++;
+        break;
+      }
+    }
+
+    // No swap found → tail of array is all the same creator. Log once and stop;
+    // further iterations would be no-ops.
+    if (!foundSwap) {
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[enforceCreatorDiversity] Could not break adjacency at index ${i} — ` +
+          `tail of feed is single-creator (${prev.userId}). Stopping.`
+        );
+      }
+      break;
+    }
+  }
+
+  if (import.meta.env.DEV && swaps > 0) {
+    console.log(`[enforceCreatorDiversity] performed ${swaps} swap(s) over ${posts.length} posts`);
+  }
+
+  return result;
+}
+
 // Legacy exports
 export { isReviewPost, isEditorialCard };
 export const interleaveReviews = buildFriendsFeed;

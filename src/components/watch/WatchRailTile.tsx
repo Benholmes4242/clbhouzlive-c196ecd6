@@ -1,5 +1,5 @@
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -12,6 +12,20 @@ interface WatchRailTileProps {
   rank?: number;
   /** Tile width in px. Defaults to 200. */
   width?: number;
+}
+
+// Hybrid "why" labels — Session 2 of 3.
+// Server-side reasons (TRENDING / NEAR YOU / FROM A COURSE YOU'VE PLAYED)
+// are deferred until we add the joins to get_watch_shorts. For now we derive
+// the two cheap reasons from data already on FeedPost.
+const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
+const POPULAR_REVIEW_LIKES = 25;
+
+function deriveSurfacingReason(post: FeedPost): string | null {
+  const ageMs = Date.now() - new Date(post.createdAt).getTime();
+  if (ageMs < NEW_THRESHOLD_MS) return 'NEW';
+  if (post.isReview && post.likeCount >= POPULAR_REVIEW_LIKES) return 'POPULAR REVIEW';
+  return null;
 }
 
 /**
@@ -98,6 +112,8 @@ export default function WatchRailTile({
     useFullscreenFeedStore.getState().open(allPosts, index);
   };
 
+  const surfacingReason = useMemo(() => deriveSurfacingReason(post), [post]);
+
   return (
     <div
       ref={cardRef}
@@ -154,6 +170,35 @@ export default function WatchRailTile({
           pointerEvents: 'none',
         }}
       />
+
+      {/* Surfacing reason — small amber pill, top-left, glass back */}
+      {surfacingReason && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 3,
+            padding: '3px 7px',
+            borderRadius: 6,
+            background: 'rgba(0,0,0,0.42)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: '#F7931E',
+            pointerEvents: 'none',
+            maxWidth: 'calc(100% - 16px)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {surfacingReason}
+        </div>
+      )}
 
       {/* Optional rank — outlined serif, bottom-left */}
       {typeof rank === 'number' && (

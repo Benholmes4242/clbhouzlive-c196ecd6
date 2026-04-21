@@ -576,7 +576,15 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
           
           streamId = result.streamId;
           publicUrl = generateStreamHlsUrl(streamId);
-          const posterTime = mediaItem?.posterTimestamp ?? 1;
+          // Smart poster: prefer user-chosen frame, otherwise default to the
+          // video midpoint (duration/2) instead of the first frame. First-frame
+          // posters are usually a black fade-in or pre-action still — midpoint
+          // gives a far more representative tile preview. Min 1s to stay safe
+          // for very short clips.
+          const computedDefaultPosterTime = clientDuration && clientDuration > 0
+            ? Math.max(1, Math.floor(clientDuration / 2))
+            : 1;
+          const posterTime = mediaItem?.posterTimestamp ?? computedDefaultPosterTime;
           posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: posterTime });
           
           // Track for potential cleanup
