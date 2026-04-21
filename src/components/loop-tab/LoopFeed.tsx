@@ -59,6 +59,32 @@ export function LoopFeed({
     }
   }, [posts.length, isFullscreenOpen, appendPosts]);
 
+  // Batch-fetch friend-course activity for unique course IDs in the page
+  const courseIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const p of posts) {
+      const cid = p.review?.courseId;
+      if (cid) ids.add(cid);
+    }
+    return Array.from(ids);
+  }, [posts]);
+
+  const { data: activityMap } = useFriendCourseActivity(userId, courseIds);
+
+  // Throttle review nudge to max 1 per page (first eligible card wins)
+  const nudgePostId = useMemo(() => {
+    if (!activityMap) return null;
+    for (const p of posts) {
+      const cid = p.review?.courseId;
+      if (!cid) continue;
+      const a = activityMap[cid];
+      if (a && a.self_has_played && !a.self_has_reviewed && !a.nudge_dismissed_recently) {
+        return p.id;
+      }
+    }
+    return null;
+  }, [posts, activityMap]);
+
   if (isLoading && posts.length === 0) {
     return <FriendsFeedSkeleton />;
   }
