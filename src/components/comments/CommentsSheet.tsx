@@ -1024,7 +1024,7 @@ function CommentsSheet({
 
                 {/* Quick-reaction strip */}
                 {!replyingTo && inputText.length === 0 && (
-                  <div className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide -mx-1 px-1">
+                  <div className="flex items-center justify-center gap-2 mb-3 overflow-x-auto scrollbar-hide -mx-1 px-1">
                     {['⛳️', '🔥', '👏', '🎯', '❤️', '😂', '🏆'].map((emoji) => (
                       <button
                         key={emoji}
