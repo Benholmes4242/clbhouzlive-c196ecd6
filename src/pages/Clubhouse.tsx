@@ -332,8 +332,8 @@ const ClubhouseContent = () => {
         hidden={isTournamentCardActive}
       />
 
-      {/* Offline indicator */}
-      {!isOnline && (
+      {/* Offline indicator — hidden on editorial cards */}
+      {!isOnline && !isTournamentCardActive && (
         <div style={{
           position: 'fixed',
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
@@ -353,8 +353,8 @@ const ClubhouseContent = () => {
         </div>
        )}
 
-      {/* Profile completeness nudge — new users only, first 7 days */}
-      <ProfileCompleteNudge />
+      {/* Profile completeness nudge — new users only, first 7 days, hidden on editorial cards */}
+      {!isTournamentCardActive && <ProfileCompleteNudge />}
 
       {/* Rehydration skeleton */}
       <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} />

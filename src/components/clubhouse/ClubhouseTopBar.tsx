@@ -76,8 +76,9 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             padding: '0 16px',
             height: 44,
             opacity: hidden ? 0 : 1,
+            transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
             pointerEvents: hidden ? 'none' : 'auto',
-            transition: 'opacity 0.2s ease',
+            transition: 'opacity 240ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
