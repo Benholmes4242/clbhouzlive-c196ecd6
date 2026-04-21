@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
@@ -284,6 +284,17 @@ export function SettingsPageV2() {
             isBeta
             iconTheme="notifications"
             onClick={() => open('notifications')}
+          />
+        </SettingsSection>
+
+        {/* Watch */}
+        <SettingsSection title="Watch">
+          <SettingsChevronRow
+            icon={<Play size={18} />}
+            title="Watch Preferences"
+            subtitle="Manage saved, dismissed, and personalization signals"
+            iconTheme="notifications"
+            onClick={() => navigate('/settings/watch-preferences')}
           />
         </SettingsSection>
 

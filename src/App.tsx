@@ -212,6 +212,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 // ManageTeamPage removed — now handled via ManageTeamModal bottom sheet
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+const WatchPreferencesPage = lazy(() => import("./pages/WatchPreferencesPage"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
 // CreateMomentPage removed — PostStudio is now the sole creation flow
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
@@ -319,6 +320,7 @@ function AppRoutes() {
         <Route path="/profile/:username" element={<ProfileWrapped />} />
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         <Route path="/settings" element={<SettingsWrapped />} />
+        <Route path="/settings/watch-preferences" element={<Suspense fallback={<GenericPageSkeleton />}><WatchPreferencesPage /></Suspense>} />
         <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/videos" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
