@@ -3,7 +3,7 @@ import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import HighQualityImage from '@/components/ui/high-quality-image';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface PostHeaderProps {
   user: {
@@ -25,13 +25,16 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center space-x-3">
-        <HighQualityImage
+        {/* TODO(avatar-userid): userId not surfaced at this layer — colour hashes
+            from alt. See src/lib/avatarFallback.ts. Follow-up: plumb user_id
+            through the PostHeaderProps.user data source. */}
+        <SquircleAvatar
           src={user.avatar}
-          alt={user.name}
-          className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity object-cover"
-          width={64}
-          height={64}
+          alt={user.name || 'Golfer'}
+          size={64}
+          hideRing
           onClick={handleProfileClick}
+          className="cursor-pointer hover:opacity-80 transition-opacity"
         />
         <div>
           <div className="flex items-center space-x-1">

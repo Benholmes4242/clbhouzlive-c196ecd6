@@ -1,5 +1,6 @@
 import React from 'react';
 import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Calendar, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -38,7 +39,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
     friendActivityMap.set(hit.friend_id, (friendActivityMap.get(hit.friend_id) || 0) + 1);
   });
 
-  let mostActiveFriend: { name: string; username: string; avatarUrl: string | null; rounds: number } | null = null;
+  let mostActiveFriend: { userId: string; name: string; username: string; avatarUrl: string | null; rounds: number } | null = null;
   let maxRounds = 0;
   friendActivityMap.forEach((count, friendId) => {
     if (count > maxRounds) {
@@ -46,6 +47,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
       const friend = recent.find((r) => r.friend_id === friendId);
       if (friend) {
         mostActiveFriend = {
+          userId: friendId,
           name: friend.friend_profile.display_name || friend.friend_profile.username,
           username: friend.friend_profile.username,
           avatarUrl: friend.friend_profile.profile_photo_url,
@@ -147,16 +149,13 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, time
             onClick={handleFriendClick}
             className="w-full flex items-center gap-2 py-2.5 px-2 -mx-2 rounded-lg hover:bg-muted/60 active:scale-[0.97] transition-all text-left"
           >
-            <Squircle width={20} height={20} className="shrink-0">
-              <img
-                src={mostActiveFriend.avatarUrl || '/placeholder.svg'}
-                alt={`${mostActiveFriend.name}'s profile`}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                onError={(e) => {
-                  e.currentTarget.src = '/placeholder.svg';
-                }}
-              />
-            </Squircle>
+            <SquircleAvatar
+              src={mostActiveFriend.avatarUrl}
+              alt={mostActiveFriend.name}
+              userId={mostActiveFriend.userId}
+              size={20}
+              hideRing
+            />
             <p className="text-xs text-muted-foreground">
               Most active:{' '}
               <span className="font-semibold text-foreground hover:underline">{mostActiveFriend.name}</span>

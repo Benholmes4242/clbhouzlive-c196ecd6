@@ -72,7 +72,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course })
             onClick={(e) => { e.stopPropagation(); navigate(`/user/${friend.friend_profile.username}`); }}
             className="active:opacity-70 transition-opacity"
           >
-            <SquircleAvatar size={28} src={friend.friend_profile.profile_photo_url} alt={name} fallback={name.charAt(0)} hideRing />
+            <SquircleAvatar size={28} src={friend.friend_profile.profile_photo_url} alt={name} userId={friend.friend_id} hideRing />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {name}

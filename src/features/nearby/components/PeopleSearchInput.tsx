@@ -5,6 +5,7 @@ import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { PlayerGamesList } from './PlayerGamesList';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import '../GamesTab.css';
 
 interface User {
@@ -100,10 +101,12 @@ export function PeopleSearchInput({ selectedUser, onSelect }: PeopleSearchInputP
               ) : (
                 results.map(user => (
                   <TapButton key={user.id} className="resultRow" onClick={() => handleSelect(user)}>
-                    <img 
-                      src={user.profile_photo_url || '/placeholder.svg'} 
+                    <SquircleAvatar
+                      src={user.profile_photo_url}
                       alt={user.display_name}
-                      className="userAvatar"
+                      userId={user.id}
+                      size={40}
+                      hideRing
                     />
                     <div className="rMid">
                       <div className="rTitle">{user.display_name}</div>

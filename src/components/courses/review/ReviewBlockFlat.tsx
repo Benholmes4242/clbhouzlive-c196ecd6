@@ -177,7 +177,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0 }}
           >
             {user.avatarUrl ? (
-              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} fallback={user.initials} />
+              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} />
             ) : (
               <div
                 style={{
@@ -200,7 +200,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </button>
         ) : (
           user.avatarUrl ? (
-            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} fallback={user.initials} />
+            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} />
           ) : (
             <div
               style={{

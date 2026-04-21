@@ -6,6 +6,7 @@ import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
 import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface JoinRequest {
   id: string;
@@ -159,9 +160,13 @@ export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSh
                 key={r.id}
                 className="flex items-center gap-3 p-3 bg-neutral-800 rounded-sq-sm border border-neutral-700"
               >
-                <Squircle width={40} height={40}>
-                  <img src={r.requester?.profile_photo_url || '/placeholder.svg'} alt={r.requester?.display_name || 'User'} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                </Squircle>
+                <SquircleAvatar
+                  src={r.requester?.profile_photo_url}
+                  alt={r.requester?.display_name || 'User'}
+                  userId={r.requester?.id}
+                  size={40}
+                  hideRing
+                />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-white truncate">
                     {r.requester?.display_name || 'Unknown'}

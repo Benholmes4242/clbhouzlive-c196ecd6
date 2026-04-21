@@ -53,16 +53,6 @@ function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-function getInitials(name: string | null | undefined): string {
-  if (!name) return '?';
-  return name
-    .split(/\s+/)
-    .map((p) => p[0])
-    .filter(Boolean)
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 
 function formatSeasonName(id: SeasonId): string {
@@ -924,7 +914,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {allEntries.map((p, i) => {
           const isLast = i === allEntries.length - 1;
           const showStreak = timeFilter === 'seasonal' && p.streak_current >= 3;
-          const initials = getInitials(p.display_name);
 
           return (
             <div
@@ -981,7 +970,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   alt={p.display_name}
                   userId={p.user_id}
                   size={30}
-                  fallback={initials}
                   hideRing
                 />
               </div>

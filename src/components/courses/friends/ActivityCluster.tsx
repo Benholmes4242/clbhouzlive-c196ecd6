@@ -104,7 +104,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 20px 8px 36px', borderTop: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(247,147,30,0.02)', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
             className="active:opacity-70 transition-opacity"
           >
-            <SquircleAvatar size={26} src={friend.friend_profile.profile_photo_url} alt={name} fallback={(name || '?').charAt(0)} hideRing />
+            <SquircleAvatar size={26} src={friend.friend_profile.profile_photo_url} alt={name} userId={friend.friend_id} hideRing />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {name}

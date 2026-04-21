@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatHcp } from '@/lib/formatHcp';
 import { TapButton } from '@/components/ui/TapButton';
 import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface HostGameViewProps {
@@ -70,9 +71,13 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
                     onClick={() => navigate(getProfilePathById(p.user_id, (p as any).creator_only, p.username))}
                     className="flex items-center gap-1.5 px-2 py-1 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
                   >
-                    <Squircle width={20} height={20}>
-                      <img src={p.profile_photo_url || '/placeholder.svg'} alt={p.display_name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                    </Squircle>
+                    <SquircleAvatar
+                      src={p.profile_photo_url}
+                      alt={p.display_name}
+                      userId={p.user_id}
+                      size={20}
+                      hideRing
+                    />
                     <span className="text-[11px] text-white/90">{p.display_name}</span>
                     {p.show_handicap && p.eg_handicap_index != null && (
                       <span className="text-[10px] text-white/60">({formatHcp(p.eg_handicap_index)})</span>

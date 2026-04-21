@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { MentionText } from '@/components/comments/MentionText';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CommentPreviewProps {
@@ -47,8 +48,9 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
         id: c.id,
         content: c.content,
         created_at: c.created_at,
+        user_id: c.user_id,
         username: c.user_profiles?.username || c.user_profiles?.display_name || 'Golfer',
-        avatar_url: c.user_profiles?.avatar_url || '',
+        avatar_url: c.user_profiles?.avatar_url || null,
       }));
     },
     enabled: totalComments > 0,
@@ -66,13 +68,12 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
       <div className="mt-3 space-y-2">
         {previewComments.map((comment) => (
           <div key={comment.id} className="flex items-start space-x-3">
-            <img
-              src={comment.avatar_url || '/placeholder.svg'}
+            <SquircleAvatar
+              src={comment.avatar_url}
               alt={comment.username}
-              className="w-6 h-6 rounded-full object-cover flex-shrink-0"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/placeholder.svg';
-              }}
+              userId={comment.user_id}
+              size={24}
+              hideRing
             />
             <div className="flex-1 min-w-0">
               <div className="text-sm">

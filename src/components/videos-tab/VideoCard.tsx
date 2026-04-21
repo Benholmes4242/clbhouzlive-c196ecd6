@@ -162,7 +162,13 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
             <button onClick={() => navigate(`/profile/${post.userId}`)} className="shrink-0">
-              <SquircleAvatar src={post.avatarUrl || '/placeholder.svg'} size="sm" hideRing />
+              <SquircleAvatar
+                src={post.avatarUrl}
+                alt={post.displayName}
+                userId={post.userId}
+                size="sm"
+                hideRing
+              />
             </button>
             <button onClick={() => navigate(`/profile/${post.userId}`)} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>

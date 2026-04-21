@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/utils/haptics';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { ReviewOfWeekCardFeedPost } from '@/components/media-system/types/media';
 
 const AMBER = '#F7931E';
@@ -154,8 +155,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
     { label: 'Facilities', score: card.facilitiesScore },
   ].filter(b => b.score != null) as { label: string; score: number }[];
 
-  const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-
   const hasPhotos = card.photoUrls.length > 0;
 
   // Deep-link to course reviews tab with auto-scroll to this specific review
@@ -239,18 +238,13 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             {/* Reviewer row */}
             <div className="flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="shrink-0 overflow-hidden" style={{ width: 'clamp(32px, 5vh, 40px)', height: 'clamp(32px, 5vh, 40px)', borderRadius: '34%' }}>
-                  {card.reviewer.avatarUrl ? (
-                    <img src={card.reviewer.avatarUrl} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center font-bold"
-                      style={{ background: 'rgba(247,147,30,0.15)', color: AMBER, fontSize: 'clamp(11px, 1.6vh, 13px)' }}
-                    >
-                      {getInitials(card.reviewer.displayName)}
-                    </div>
-                  )}
-                </div>
+                <SquircleAvatar
+                  src={card.reviewer.avatarUrl}
+                  alt={card.reviewer.displayName}
+                  userId={card.reviewer.userId}
+                  size={40}
+                  hideRing
+                />
                 <div>
                   <div className="flex items-center gap-1">
                     <button

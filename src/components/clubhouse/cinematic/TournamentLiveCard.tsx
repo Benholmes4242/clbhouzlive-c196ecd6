@@ -97,9 +97,9 @@ function PlayerAvatar({ name, photoUrl, tourSlug, size }: {
   name: string; photoUrl: string | null; tourSlug: string; size: number;
 }) {
   const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
-  const initials = name.split(/[\s.]/).filter(Boolean)
-    .map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
-  return <SquircleAvatar src={src} alt={name} size={size} fallback={initials} hideRing />;
+  // TODO(avatar-userid): userId not surfaced at this layer (pro player, no app user) —
+  // colour hashes from alt. See src/lib/avatarFallback.ts.
+  return <SquircleAvatar src={src} alt={name} size={size} hideRing />;
 }
 
 function HeartIcon({ filled }: { filled: boolean }) {

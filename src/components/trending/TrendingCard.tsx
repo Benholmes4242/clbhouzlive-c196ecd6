@@ -16,6 +16,7 @@ import { useTrendingCard } from '@/hooks/useTrendingCard';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const TrendingCard = () => {
   const { trendingPosts, loading, nextSlide, prevSlide, currentIndex, totalPosts } = useTrendingCard();
@@ -141,10 +142,12 @@ const TrendingCard = () => {
               <div className="flex justify-between items-end">
                 <div className="flex-1 min-w-0 max-w-[calc(100%-80px)]">
                   <div className="flex items-end gap-2 mb-1">
-                    <img
-                      src={user?.profile_photo_url || '/placeholder.svg'}
+                    <SquircleAvatar
+                      src={user?.profile_photo_url}
                       alt={user?.display_name || user?.username || 'User'}
-                      className="w-12 h-12 object-cover"
+                      userId={user?.id}
+                      size={48}
+                      hideRing
                     />
                     <p className="text-white font-bold text-base truncate">
                       {user?.display_name || user?.username}

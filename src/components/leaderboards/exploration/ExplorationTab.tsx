@@ -59,17 +59,6 @@ function loadSavedFilters() {
 // Helpers
 // ----------------------------------------------------------------------------
 
-function getInitials(name: string): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
 
 function selectGlobalEyebrow(args: {
   isLoggedIn: boolean;
@@ -1186,7 +1175,6 @@ function PlayerStandings({
                 alt={p.display_name ?? p.username ?? ''}
                 userId={p.user_id}
                 size={30}
-                fallback={getInitials(p.display_name ?? p.username ?? '')}
                 hideRing
               />
             </div>
