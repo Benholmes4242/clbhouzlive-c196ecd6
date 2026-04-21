@@ -88,6 +88,7 @@ export default function LatestVideosRail() {
                 post={post}
                 index={i + 1}
                 allPosts={posts}
+                viewedPostIds={viewedPostIds}
               />
             </div>
           ))}
