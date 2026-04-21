@@ -11745,6 +11745,7 @@ export type Database = {
       }
       user_content_preferences: {
         Row: {
+          course_id: string | null
           last_interaction_at: string
           post_id: string
           progress_seconds: number | null
@@ -11753,6 +11754,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          course_id?: string | null
           last_interaction_at?: string
           post_id: string
           progress_seconds?: number | null
@@ -11761,6 +11763,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          course_id?: string | null
           last_interaction_at?: string
           post_id?: string
           progress_seconds?: number | null
@@ -15815,6 +15818,20 @@ export type Database = {
           total_top100_played: number
           user_id: string
           username: string
+        }[]
+      }
+      get_friend_course_activity: {
+        Args: { p_course_ids: string[]; p_user_id: string }
+        Returns: {
+          course_id: string
+          friend_played_count: number
+          network_rating_avg: number
+          network_rating_count: number
+          nudge_dismissed_recently: boolean
+          self_has_played: boolean
+          self_has_reviewed: boolean
+          top_friend_avatars: string[]
+          top_friend_names: string[]
         }[]
       }
       get_friends_feed: {
