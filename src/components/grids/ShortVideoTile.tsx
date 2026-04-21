@@ -191,7 +191,7 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
       {/* Like count badge - top right (Watch tab standard) */}
       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-10">
         {likeCount > 0 ? (
-          <span style={{ fontSize: 12, lineHeight: 1 }}>🧡</span>
+          <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
         ) : (
           <Heart className="w-3 h-3 text-white" />
         )}
