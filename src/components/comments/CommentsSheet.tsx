@@ -576,7 +576,7 @@ function CommentsSheet({
               className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0"
               style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
             >
-              {/* Left: tab group */}
+              {/* Left: tabs with inline counts */}
               <div className="flex items-end gap-6">
                 {(['comments', 'likes'] as const).map((tab) => {
                   const isActive = activeTab === tab;
@@ -590,29 +590,41 @@ function CommentsSheet({
                         setActiveTab(tab);
                         scrollRef.current?.scrollTo({ top: 0 });
                       }}
-                      className="relative flex flex-col items-center pb-[10px] min-h-[44px] bg-transparent border-0 cursor-pointer"
+                      className="relative flex items-baseline gap-1.5 pt-[10px] pb-[14px] min-h-[44px] bg-transparent border-0 cursor-pointer"
                     >
-                      {/* Amber eyebrow count */}
                       <span
-                        className="text-[11px] font-semibold uppercase tracking-[0.05em] leading-none mb-[3px] transition-colors duration-200"
-                        style={{ color: isActive ? '#F7931E' : 'rgba(15,23,42,0.25)' }}
-                      >
-                        {count > 0 ? count : '\u00A0'}
-                      </span>
-                      {/* Label */}
-                      <span
-                        className="text-[15px] font-semibold leading-snug whitespace-nowrap transition-colors duration-200"
+                        className="whitespace-nowrap transition-colors duration-200"
                         style={{
-                          color: isActive ? '#0F172A' : '#94A3B8'
+                          fontSize: 17,
+                          fontWeight: 700,
+                          letterSpacing: '-0.01em',
+                          color: isActive ? INK : INK_SUBTLE,
+                          lineHeight: 1.2,
                         }}
                       >
                         {label}
                       </span>
-                      {/* Amber underline bar */}
+                      {count > 0 && (
+                        <span
+                          className="transition-colors duration-200 tabular-nums"
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: isActive ? 'rgba(15,23,42,0.5)' : INK_SUBTLE,
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {count}
+                        </span>
+                      )}
+                      {/* Amber underline — 24px fixed */}
                       <div
-                        className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full transition-opacity duration-200"
+                        className="absolute bottom-0 left-0 transition-opacity duration-200"
                         style={{
-                          background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                          width: 24,
+                          height: 2,
+                          background: AMBER,
+                          borderRadius: 1,
                           opacity: isActive ? 1 : 0,
                         }}
                       />
@@ -622,7 +634,7 @@ function CommentsSheet({
               </div>
 
               {/* Right: sort toggle + close */}
-              <div className="flex items-center gap-1 pb-[6px]">
+              <div className="flex items-center gap-1 pb-[8px]">
                 <AnimatePresence>
                   {activeTab === 'comments' && totalCount > 1 && (
                     <motion.div
@@ -630,58 +642,74 @@ function CommentsSheet({
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      style={{ display: 'flex', alignItems: 'center', gap: 3, borderRadius: 8, background: 'rgba(15,23,42,0.05)', padding: '3px 3px' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 2, borderRadius: 8, background: 'rgba(15,23,42,0.05)', padding: '2px' }}
                     >
-                      {(['best', 'newest'] as const).map(s => (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => setSort(s)}
-                          className="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors min-h-[28px] capitalize"
-                          style={{
-                            background: sort === s ? '#0F172A' : 'transparent',
-                            color: sort === s ? '#ffffff' : '#94A3B8',
-                            border: 'none',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {s === 'best' ? 'Best' : 'Newest'}
-                        </button>
-                      ))}
+                      {(['best', 'newest'] as const).map(s => {
+                        const active = sort === s;
+                        return (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => setSort(s)}
+                            style={{
+                              padding: '5px 11px',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              fontWeight: 600,
+                              minHeight: 28,
+                              background: active ? '#fff' : 'transparent',
+                              color: active ? INK : INK_SOFT,
+                              boxShadow: active ? '0 1px 2px rgba(15,23,42,0.06)' : 'none',
+                              border: 0,
+                              cursor: 'pointer',
+                              transition: 'background 150ms, color 150ms',
+                            }}
+                          >
+                            {s === 'best' ? 'Best' : 'Newest'}
+                          </button>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer"
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer"
+                  aria-label="Close"
                 >
-                  <X className="w-[15px] h-[15px]" style={{ color: '#94A3B8' }} />
+                  <X size={16} style={{ color: INK_SUBTLE }} />
                 </button>
               </div>
             </div>
 
-            {/* Post caption — shown above comments when present */}
+            {/* Post caption — quote block */}
             {activeTab === 'comments' && (cleanCaption || displayCourseName) && (
               <div
-                className="px-4 py-3 shrink-0"
-                style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+                className="px-4 py-3 shrink-0 flex gap-3"
+                style={{ borderBottom: `0.5px solid ${BORDER}` }}
               >
-                {cleanCaption && (
-                  <MentionText
-                    text={cleanCaption}
-                    className="text-[14px] leading-[20px] line-clamp-2 text-foreground/70"
-                    mentionClassName="font-semibold [color:#E8980A]"
-                  />
-                )}
-                {displayCourseName && (
-                  <p className={cn(
-                    'text-[13px] leading-[18px] font-semibold truncate text-foreground',
-                    cleanCaption ? 'mt-1' : ''
-                  )}>
-                    📍 {displayCourseName}
-                  </p>
-                )}
+                {/* Vertical amber quote bar */}
+                <div style={{ width: 3, borderRadius: 2, background: 'rgba(247,147,30,0.5)', flexShrink: 0 }} />
+                <div className="flex-1 min-w-0">
+                  {cleanCaption && (
+                    <MentionText
+                      text={cleanCaption}
+                      className="text-[13px] leading-[18px] line-clamp-2"
+                      style={{ color: INK_SOFT }}
+                      mentionClassName="font-semibold [color:#E8980A]"
+                    />
+                  )}
+                  {displayCourseName && (
+                    <div
+                      className={cn('flex items-center gap-1', cleanCaption ? 'mt-1' : '')}
+                      style={{ fontSize: 11.5, color: INK_SUBTLE }}
+                    >
+                      <MapPin size={11} style={{ color: AMBER }} strokeWidth={2.25} />
+                      <span className="truncate">{displayCourseName}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
