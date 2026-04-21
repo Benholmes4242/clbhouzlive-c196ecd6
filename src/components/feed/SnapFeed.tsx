@@ -307,6 +307,8 @@ export function SnapFeed({
       { root: container, threshold: [0, 0.85] }
     );
 
+    // Reconcile observer attachments without forcing layout on existing sentinels.
+    // IO will fire within a frame for newly-attached targets with the correct state.
     const reconcileSentinels = () => {
       const sentinels = Array.from(container.querySelectorAll("[data-pga-sentinel='true']"));
       const currentSet = new Set<Element>(sentinels);
@@ -323,30 +325,42 @@ export function SnapFeed({
         if (!observedSet.has(sentinel)) {
           observedSet.add(sentinel);
           observer.observe(sentinel);
+          // No syncSentinelVisibility here — let IO publish the correct state.
         }
-        syncSentinelVisibility(sentinel);
       });
 
       if (sentinels.length === 0) {
         visibleSet.clear();
+        publishVisibility();
       }
-
-      publishVisibility();
     };
 
-    // Initial seed kills first-mount / return-to-page flash.
-    reconcileSentinels();
+    // Initial seed — synchronous measurement to kill first-mount / return-to-page flash.
+    const initialSentinels = Array.from(container.querySelectorAll("[data-pga-sentinel='true']"));
+    initialSentinels.forEach((sentinel) => {
+      observedSet.add(sentinel);
+      observer.observe(sentinel);
+      syncSentinelVisibility(sentinel);
+    });
+    publishVisibility();
 
     // SnapFeed virtualizes slides, so editorial sentinels mount later as the user
-    // scrolls into the active window. Watch DOM changes and attach/detach observers
-    // as those sentinel nodes appear/disappear.
+    // scrolls into the active window. Watch direct child mount/unmount on the
+    // scroll container (subtree:false avoids reacting to descendant noise like
+    // like animations or video buffer mutations) and coalesce per frame.
+    let rafId: number | null = null;
     const mutationObserver = new MutationObserver(() => {
-      reconcileSentinels();
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        reconcileSentinels();
+      });
     });
 
-    mutationObserver.observe(container, { childList: true, subtree: true });
+    mutationObserver.observe(container, { childList: true, subtree: false });
 
     return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
       mutationObserver.disconnect();
       observer.disconnect();
     };
