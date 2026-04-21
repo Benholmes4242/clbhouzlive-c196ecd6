@@ -110,9 +110,40 @@ export default function WatchRailTile({
     };
   }, []);
 
+  const { openActions } = useWatchActions();
+
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
   };
+
+  // Long-press → show action sheet (Save / Share / Not interested / Report)
+  const longPressTimerRef = useRef<number | null>(null);
+  const longPressFiredRef = useRef(false);
+
+  const startLongPress = useCallback(() => {
+    longPressFiredRef.current = false;
+    longPressTimerRef.current = window.setTimeout(() => {
+      longPressFiredRef.current = true;
+      haptic('medium');
+      openActions(post);
+    }, 400);
+  }, [openActions, post]);
+
+  const cancelLongPress = useCallback(() => {
+    if (longPressTimerRef.current) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const handleClick = useCallback(() => {
+    if (longPressFiredRef.current) {
+      // Long-press already fired → suppress the implicit tap.
+      longPressFiredRef.current = false;
+      return;
+    }
+    handleTap();
+  }, []);
 
   const surfacingReason = useMemo(() => deriveSurfacingReason(post), [post]);
 
