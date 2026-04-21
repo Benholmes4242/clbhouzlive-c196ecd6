@@ -17084,6 +17084,7 @@ export type Database = {
       }
       refresh_college_season_stats_auto: { Args: never; Returns: undefined }
       refresh_college_weekly_movers: { Args: never; Returns: undefined }
+      refresh_expired_course_mood_blurbs: { Args: never; Returns: number }
       register_push_token: {
         Args: { p_platform: string; p_token: string }
         Returns: string
