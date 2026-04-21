@@ -100,7 +100,7 @@ export function ReviewPostingOptionsSheet({
   visibility,
   onVisibilityChange,
 }: ReviewPostingOptionsSheetProps) {
-  const getInitials = (name: string) => name.charAt(0).toUpperCase();
+  
 
   const handleActorSelect = (actor: ActiveActor) => {
     if (!canActorReview(actor)) return;
@@ -186,7 +186,7 @@ export function ReviewPostingOptionsSheet({
                       size={40}
                       src={actor.avatarUrl}
                       alt={actor.name}
-                      fallback={getInitials(actor.name)}
+                      userId={actor.id}
                       hideRing
                       className={cn(!canReview && "grayscale")}
                     />
