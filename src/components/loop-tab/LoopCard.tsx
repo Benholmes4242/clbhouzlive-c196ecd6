@@ -90,6 +90,7 @@ export const LoopCard = React.memo(function LoopCard({
   const [isLiked, setIsLiked] = useState(post.isLikedByMe);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [showComments, setShowComments] = useState(false);
+  const [nudgeDismissedLocal, setNudgeDismissedLocal] = useState(false);
 
   const cleanCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
   const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
