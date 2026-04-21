@@ -108,7 +108,7 @@ const PostPlayRatingModal = ({
   }, [uploadSessionId]);
   
   // Share review hook
-  const { shareReview, isSharing } = useShareReview();
+  const { notifyReviewShared, isSharing } = useShareReview();
   
   // Existing rating data fetching
   const { existingRating, fetchExistingMedia } = useExistingRating({
@@ -423,15 +423,11 @@ const PostPlayRatingModal = ({
             heroSubtitle={course ? formatCourseLocationShort(course) : ''}
             onBack={handleClose}
             onShareReview={async () => {
-              if (!state.submittedRatingId && !existingRating?.id) {
+              const ratingId = state.submittedRatingId || existingRating?.id;
+              if (!ratingId) {
                 return { success: false };
               }
-              const result = await shareReview({
-                ratingId: state.submittedRatingId || existingRating?.id,
-                courseId: course!.id,
-                reviewText: state.reviewText.trim() || null,
-                media: state.existingMediaItems,
-              });
+              const result = await notifyReviewShared({ ratingId });
               return result || { success: false };
             }}
           />
