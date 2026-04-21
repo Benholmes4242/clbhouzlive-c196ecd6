@@ -1,5 +1,4 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Check } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { CategoryChip } from './hooks/useWatchCategoryChips';
 
 interface WatchMoreCategoriesSheetProps {
@@ -12,8 +11,10 @@ interface WatchMoreCategoriesSheetProps {
 
 /**
  * Bottom sheet for the "More" overflow chip on the Watch tab.
- * Lists the secondary categories that don't fit alongside the
- * three primary chips (For you, Nearby, Reviews).
+ * Uses 'The Dispatch' canonical bottom-sheet style:
+ *   - Hairline-separated flat rows
+ *   - Active row: 3px amber left stripe, 4% amber tint, 6px amber dot
+ *   - 8.5px bold uppercase amber eyebrow + 20px black title
  */
 export default function WatchMoreCategoriesSheet({
   open,
@@ -23,99 +24,117 @@ export default function WatchMoreCategoriesSheet({
   onSelect,
 }: WatchMoreCategoriesSheetProps) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="bottom"
-        className="h-auto max-h-[70vh] rounded-t-2xl p-0 border-t"
-        style={{ background: '#F8FAFC' }}
-      >
-        <SheetHeader className="px-5 pt-5 pb-3 text-left">
-          <SheetTitle
+    <BottomSheet
+      open={open}
+      onClose={() => onOpenChange(false)}
+      ariaLabelledBy="watch-more-categories-title"
+    >
+      {/* Dispatch header */}
+      <div style={{ padding: '6px 20px 14px' }}>
+        <div
+          style={{
+            fontSize: 8.5,
+            fontWeight: 900,
+            color: '#F7931E',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            marginBottom: 4,
+          }}
+        >
+          Categories
+        </div>
+        <div
+          id="watch-more-categories-title"
+          style={{
+            fontSize: 20,
+            fontWeight: 900,
+            color: '#0F172A',
+            letterSpacing: '-0.03em',
+          }}
+        >
+          Browse categories
+        </div>
+      </div>
+
+      <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        {categories.length === 0 && (
+          <div
             style={{
-              fontSize: 18,
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              color: 'hsl(var(--foreground))',
+              padding: '24px 20px',
+              fontSize: 13,
+              color: '#94A3B8',
+              textAlign: 'center',
             }}
           >
-            Browse categories
-          </SheetTitle>
-        </SheetHeader>
-
-        <div style={{ padding: '4px 8px 24px' }}>
-          {categories.length === 0 && (
-            <div
+            No more categories yet.
+          </div>
+        )}
+        {categories.map((cat) => {
+          const isActive = activeTag === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => {
+                onSelect(cat.id);
+                onOpenChange(false);
+              }}
+              aria-pressed={isActive}
               style={{
-                padding: '24px 12px',
-                fontSize: 13,
-                color: 'hsl(var(--muted-foreground))',
-                textAlign: 'center',
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '14px 20px',
+                background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                border: 'none',
+                borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                cursor: 'pointer',
+                textAlign: 'left',
               }}
             >
-              No more categories yet.
-            </div>
-          )}
-          {categories.map((cat) => {
-            const isActive = activeTag === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  onSelect(cat.id);
-                  onOpenChange(false);
-                }}
-                className="w-full active:bg-black/5 transition-colors"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '14px 12px',
-                  borderBottom: '0.5px solid hsl(var(--border) / 0.4)',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-              >
-                <span
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
                   style={{
                     fontSize: 15,
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? '#c97a10' : 'hsl(var(--foreground))',
+                    fontWeight: isActive ? 800 : 600,
+                    color: '#0F172A',
                     letterSpacing: '-0.01em',
                   }}
                 >
                   {cat.label}
-                </span>
-                <span
+                </div>
+              </div>
+
+              <span
+                style={{
+                  fontSize: 13,
+                  color: '#94A3B8',
+                  fontVariantNumeric: 'tabular-nums',
+                  flexShrink: 0,
+                }}
+              >
+                {cat.postCount}
+              </span>
+
+              {isActive && (
+                <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: '#F7931E',
+                    flexShrink: 0,
                   }}
-                >
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: 'hsl(var(--muted-foreground))',
-                    }}
-                  >
-                    {cat.postCount}
-                  </span>
-                  {isActive && (
-                    <Check
-                      size={16}
-                      style={{ color: '#F7931E' }}
-                      strokeWidth={2.5}
-                    />
-                  )}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </SheetContent>
-    </Sheet>
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Safe area bottom padding */}
+      <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
+    </BottomSheet>
   );
 }
