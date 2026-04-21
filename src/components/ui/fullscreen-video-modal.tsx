@@ -8,6 +8,7 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
+import { SquircleAvatar } from './SquircleAvatar';
 
 interface FullscreenVideoModalProps {
   isOpen: boolean;
@@ -163,10 +164,12 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
               <div className="flex items-center space-x-3">
                 {/* User info */}
                 <div className="flex items-center space-x-2">
-                  <img
-                    src={videoData.user.profile_photo_url || '/placeholder.svg'}
-                    alt={videoData.user.display_name || videoData.user.username}
-                    className="w-10 h-10 rounded-full object-cover"
+                  <SquircleAvatar
+                    src={videoData.user.profile_photo_url}
+                    alt={videoData.user.display_name || videoData.user.username || 'User'}
+                    userId={videoData.user.id}
+                    size={40}
+                    hideRing
                   />
                   <span className="text-white font-medium">
                     {videoData.user.display_name || videoData.user.username}

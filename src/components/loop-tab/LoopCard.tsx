@@ -263,7 +263,9 @@ export const LoopCard = React.memo(function LoopCard({
             aria-label={`View ${post.displayName}'s profile`}
           >
             <SquircleAvatar
-              src={post.avatarUrl || '/placeholder.svg'}
+              src={post.avatarUrl}
+              alt={post.displayName}
+              userId={post.userId}
               size="sm"
               hideRing
             />

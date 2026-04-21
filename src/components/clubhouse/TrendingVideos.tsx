@@ -9,6 +9,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { cn } from '@/lib/utils';
 import MediaDisplay from '@/components/explore/MediaDisplay';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface TrendingVideosProps {
   videos: ExploreContentItem[];
@@ -310,10 +311,14 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   {/* User info */}
                   <div className="absolute bottom-3 left-3 right-3">
                     <div className="flex items-center gap-2">
-                      <img
-                        src={video.user?.avatar || '/placeholder.svg'}
-                        alt={video.user?.name || 'User'}
-                        className="w-12 h-12 rounded-full object-cover"
+                      {/* TODO(avatar-userid): userId not surfaced at this layer — colour hashes
+                          from alt. See src/lib/avatarFallback.ts. Follow-up: plumb user_id
+                          through the ExploreContentItem.user data source. */}
+                      <SquircleAvatar
+                        src={video.user?.avatar}
+                        alt={video.user?.name || video.user?.username || 'User'}
+                        size={48}
+                        hideRing
                       />
                       <div className="min-w-0 flex-1">
                         <p className="text-white text-base font-medium truncate">
