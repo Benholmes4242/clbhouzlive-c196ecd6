@@ -112,6 +112,8 @@ export default function WatchRailTile({
     useFullscreenFeedStore.getState().open(allPosts, index);
   };
 
+  const surfacingReason = useMemo(() => deriveSurfacingReason(post), [post]);
+
   return (
     <div
       ref={cardRef}
@@ -168,6 +170,35 @@ export default function WatchRailTile({
           pointerEvents: 'none',
         }}
       />
+
+      {/* Surfacing reason — small amber pill, top-left, glass back */}
+      {surfacingReason && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 3,
+            padding: '3px 7px',
+            borderRadius: 6,
+            background: 'rgba(0,0,0,0.42)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: '#F7931E',
+            pointerEvents: 'none',
+            maxWidth: 'calc(100% - 16px)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {surfacingReason}
+        </div>
+      )}
 
       {/* Optional rank — outlined serif, bottom-left */}
       {typeof rank === 'number' && (
