@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
+import { Star } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
@@ -64,11 +65,17 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
 
       {rating != null && rating > 0 && (
         <span
-          className="absolute top-2 right-2 rounded-full liquid-glass flex items-center gap-1 text-[13px] font-semibold text-white leading-none"
-          style={{ padding: '4px 9px' }}
+          className="absolute top-2 right-2 flex items-center gap-1 leading-none"
+          style={{
+            padding: '4px 8px',
+            borderRadius: 9999,
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
         >
-          <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-3 h-3" />
-          {rating.toFixed(1)}
+          <Star className="w-[11px] h-[11px]" style={{ color: '#F7931E', fill: '#F7931E' }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{rating.toFixed(1)}</span>
         </span>
       )}
 
