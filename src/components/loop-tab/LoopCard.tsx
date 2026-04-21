@@ -58,8 +58,11 @@ export const LoopCard = React.memo(function LoopCard({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  activity,
+  showNudge = false,
 }: LoopCardProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl || '';
