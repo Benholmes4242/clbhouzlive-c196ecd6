@@ -693,12 +693,13 @@ function CommentsSheet({
                 <div style={{ width: 3, borderRadius: 2, background: 'rgba(247,147,30,0.5)', flexShrink: 0 }} />
                 <div className="flex-1 min-w-0">
                   {cleanCaption && (
-                    <MentionText
-                      text={cleanCaption}
-                      className="text-[13px] leading-[18px] line-clamp-2"
-                      style={{ color: INK_SOFT }}
-                      mentionClassName="font-semibold [color:#E8980A]"
-                    />
+                    <div style={{ color: INK_SOFT }}>
+                      <MentionText
+                        text={cleanCaption}
+                        className="text-[13px] leading-[18px] line-clamp-2"
+                        mentionClassName="font-semibold [color:#E8980A]"
+                      />
+                    </div>
                   )}
                   {displayCourseName && (
                     <div
