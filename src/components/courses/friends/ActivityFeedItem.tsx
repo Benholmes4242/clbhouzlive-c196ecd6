@@ -31,7 +31,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({ hit }) => {
     >
       {/* Friend avatar */}
       <button onClick={handleFriendClick} style={{ flexShrink: 0, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
-        <SquircleAvatar size={34} src={hit.friend_profile.profile_photo_url} alt={friendName} fallback={friendName.charAt(0)} hideRing />
+        <SquircleAvatar size={34} src={hit.friend_profile.profile_photo_url} alt={friendName} userId={hit.friend_id} hideRing />
       </button>
 
       {/* Course info */}

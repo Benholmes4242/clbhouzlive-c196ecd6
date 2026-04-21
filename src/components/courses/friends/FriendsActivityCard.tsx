@@ -76,7 +76,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
           </div>
           {/* Avatar + name */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-            <SquircleAvatar size={34} src={entry.avatarUrl} alt={entry.friendName} fallback={entry.friendName.charAt(0)} hideRing />
+            <SquircleAvatar size={34} src={entry.avatarUrl} alt={entry.friendName} userId={entry.friendId} hideRing />
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: '14px', fontWeight: index === 0 ? 800 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {entry.friendName}

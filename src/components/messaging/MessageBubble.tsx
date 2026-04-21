@@ -108,7 +108,9 @@ export function MessageBubble({
   }
 
   const senderName = message.sender?.display_name || message.sender?.username || 'Unknown';
-  const senderInitials = senderName.substring(0, 2).toUpperCase();
+  // TODO(avatar-userid): userId not surfaced at this layer (sender is a denormalised
+  // join) — colour hashes from alt. See src/lib/avatarFallback.ts. Follow-up: plumb
+  // sender.id through the message.sender data source.
   const deliveryStatus = 'sent' as const;
 
   // Course share card
@@ -120,7 +122,7 @@ export function MessageBubble({
       <div style={{ display: 'flex', gap: 8, justifyContent: isOwnMessage ? 'flex-end' : 'flex-start', alignItems: 'flex-end' }}>
         {/* Avatar for received */}
         {!isOwnMessage && showSenderInfo && (
-          <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} fallback={senderInitials} hideRing className="flex-shrink-0" />
+          <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} hideRing className="flex-shrink-0" />
         )}
         {!isOwnMessage && !showSenderInfo && <div style={{ width: 28, flexShrink: 0 }} />}
 
@@ -308,7 +310,7 @@ export function MessageBubble({
     <div style={{ display: 'flex', gap: 8, justifyContent: isOwnMessage ? 'flex-end' : 'flex-start', alignItems: 'flex-end' }}>
       {/* Avatar for received */}
       {!isOwnMessage && showSenderInfo && (
-        <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} fallback={senderInitials} hideRing className="flex-shrink-0" />
+        <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} hideRing className="flex-shrink-0" />
       )}
       {!isOwnMessage && !showSenderInfo && <div style={{ width: 28, flexShrink: 0 }} />}
 
