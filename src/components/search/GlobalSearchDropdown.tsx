@@ -174,15 +174,8 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     }
   };
 
-  // Get initials for fallback avatar
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .substring(0, 2)
-      .toUpperCase();
-  };
+
+
 
   // Loading shimmer rows
   const LoadingShimmer = () => (

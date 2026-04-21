@@ -219,11 +219,13 @@ function ReviewCard({
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
+            {/* TODO(avatar-userid): userId not surfaced at this layer — colour hashes
+                from alt. See src/lib/avatarFallback.ts. Follow-up: plumb user_id
+                through the ReviewsTab data source. */}
             <SquircleAvatar 
               size={48} 
               src={review.user.avatarUrl}
               alt={`${review.user.name} avatar`}
-              fallback={getInitials(review.user.name)}
             />
             <div className="min-w-0">
               <div className="flex items-center flex-wrap gap-2">
@@ -377,14 +379,8 @@ function toLocale(n: number) {
   return n.toLocaleString();
 }
 
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
+
+
 
 /* ---------- Review Text Component ---------- */
 
