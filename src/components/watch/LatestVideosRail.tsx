@@ -82,11 +82,10 @@ export default function LatestVideosRail() {
         >
           {rail.map((post, i) => (
             <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-              <WatchRailTile
+              <LatestVideoTile
                 post={post}
                 index={i + 1}
                 allPosts={posts}
-                viewedPostIds={viewedPostIds}
               />
             </div>
           ))}
