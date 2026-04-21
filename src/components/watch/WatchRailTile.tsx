@@ -29,9 +29,14 @@ interface WatchRailTileProps {
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 const POPULAR_REVIEW_LIKES = 25;
 
-function deriveSurfacingReason(post: FeedPost): string | null {
+function deriveSurfacingReason(
+  post: FeedPost,
+  viewedPostIds?: Set<string>,
+): string | null {
   const ageMs = Date.now() - new Date(post.createdAt).getTime();
-  if (ageMs < NEW_THRESHOLD_MS) return 'NEW';
+  const isFresh = ageMs < NEW_THRESHOLD_MS;
+  const alreadyViewed = viewedPostIds?.has(post.id) ?? false;
+  if (isFresh && !alreadyViewed) return 'NEW';
   if (post.isReview && post.likeCount >= POPULAR_REVIEW_LIKES) return 'POPULAR REVIEW';
   return null;
 }
