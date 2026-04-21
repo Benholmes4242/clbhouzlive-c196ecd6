@@ -226,11 +226,11 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
                 height: 44,
               }}
             >
-              <div className="flex items-center" style={{ gap: 14 }}>
+              <div className="flex items-center" style={{ gap: 16 }}>
                 {/* Tab 1 placeholder */}
-                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 60, height: 14 }} />
+                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 70, height: 16 }} />
                 {/* Tab 2 placeholder */}
-                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 74, height: 14 }} />
+                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 84, height: 16 }} />
                 {/* Divider */}
                 <div
                   aria-hidden="true"
