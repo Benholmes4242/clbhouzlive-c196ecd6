@@ -292,6 +292,24 @@ function CommentsSheet({
     }
   }, [inputText, isAddingComment, replyingTo, addComment, highlightComment, onCommentPosted]);
 
+  const handleQuickReaction = useCallback(async (emoji: string) => {
+    if (isAddingComment) return;
+    try {
+      const newId = await addComment(emoji, undefined);
+      analyticsEvents.track('comment_submitted', {
+        post_id: postId,
+        is_reply: false,
+        content_length: emoji.length,
+        has_mention: false,
+        quick_reaction: true,
+      });
+      setTimeout(() => highlightComment(newId), 150);
+      onCommentPosted?.();
+    } catch (error) {
+      console.error('Failed to add quick reaction:', error);
+    }
+  }, [isAddingComment, addComment, postId, highlightComment, onCommentPosted]);
+
   const handleInputKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
