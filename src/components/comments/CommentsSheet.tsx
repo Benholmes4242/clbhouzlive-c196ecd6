@@ -798,8 +798,8 @@ function CommentsSheet({
                       type="button"
                       onClick={async (e) => {
                         e.stopPropagation();
-                        if (courseId) {
-                          navigate(`/courses/${courseId}`);
+                        if (displayCourseId) {
+                          navigate(`/courses/${displayCourseId}`);
                           onClose();
                           return;
                         }
