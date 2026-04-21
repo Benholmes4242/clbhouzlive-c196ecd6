@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
-import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
+import {
+  getAvatarFallbackColor,
+  getInitialsFromName,
+} from '@/lib/avatarFallback';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
@@ -51,8 +54,10 @@ export interface SquircleAvatarProps {
   thinRing?: boolean;
   /** Use a 0.5px hairline ring (for ultra-minimal contexts like the Clubhouse feed) */
   hairlineRing?: boolean;
-  /** Fallback text (e.g., initials) */
+  /** Fallback text (e.g., initials). If omitted, derived from `alt`. */
   fallback?: string;
+  /** User UUID — used to derive deterministic fallback colour. If absent, hashes `alt` instead. */
+  userId?: string | null;
   /** Additional CSS classes */
   className?: string;
   /** Callback when image loads */
@@ -99,6 +104,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   thinRing = false,
   hairlineRing = false,
   fallback,
+  userId,
   className,
   onLoad,
   priority = false,
@@ -156,21 +162,36 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     setImageLoaded(false);
   };
 
-  // Fallback content (initials or first letter)
-  const fallbackContent = fallback || alt.charAt(0).toUpperCase() || '?';
-  
-  // Calculate fallback font size based on avatar size
-  const fallbackFontSize = Math.round(pixelSize * 0.38);
+  // Compute deterministic fallback colour and initials.
+  const fallbackColor = getAvatarFallbackColor(userId ?? alt);
+  const fallbackInitials = fallback || getInitialsFromName(alt) || '?';
+
+  // Initials are slightly smaller than silhouette proportions: ~36% of container.
+  const fallbackFontSize = Math.max(10, Math.round(pixelSize * 0.36));
 
   // Inner avatar content (image or fallback)
   // Fallback is shown immediately (even while image is loading) so the avatar
   // is never invisible. The image cross-fades in on top once loaded.
   const avatarContent = (
     <>
-      {/* Fallback always visible until image has fully loaded */}
       {(!imageLoaded || showFallback) && (
-        <div className="absolute inset-0 bg-muted">
-          <PlayerSilhouette />
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ background: fallbackColor }}
+        >
+          <span
+            style={{
+              color: '#ffffff',
+              fontFamily: 'DM Sans, system-ui, -apple-system, sans-serif',
+              fontWeight: 700,
+              fontSize: `${fallbackFontSize}px`,
+              lineHeight: 1,
+              letterSpacing: '-0.01em',
+              userSelect: 'none',
+            }}
+          >
+            {fallbackInitials}
+          </span>
         </div>
       )}
       {imageSrc && !showFallback && (
