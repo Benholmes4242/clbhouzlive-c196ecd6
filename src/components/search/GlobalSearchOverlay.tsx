@@ -528,6 +528,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical' as const,
                                 overflow: 'hidden',
+                                // Reserve 2 lines of height so 1-line names don't collapse the card
+                                minHeight: 'calc(12.5px * 1.25 * 2)',
                               }}
                             >
                               {item.label}
