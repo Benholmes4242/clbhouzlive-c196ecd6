@@ -61,11 +61,11 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           {hasUnreadNotifications && (
             <span
               className={cn(
-                "absolute -top-0.5 -right-0.5 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
+                "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-black ring-[1.5px] ring-[#0a0a0a]",
                 notificationCount > 9
-                  ? "h-[15px] min-w-[15px] px-[3px] text-[9px]"
+                  ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
                   : notificationCount > 0
-                  ? "h-[13px] w-[13px] text-[9px]"
+                  ? "h-[18px] w-[18px] text-[10px]"
                   : "h-2.5 w-2.5"
               )}
               aria-label={`${notificationCount} unread notifications`}
