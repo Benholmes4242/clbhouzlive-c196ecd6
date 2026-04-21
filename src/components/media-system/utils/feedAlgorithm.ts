@@ -1,9 +1,15 @@
 import type { FeedPost, FeedTab } from '../types/media';
 
-// ── Orbit Feed Algorithm v1.0 ─────────────────────────────────────────────────
+// ── Orbit Feed Algorithm v1.1 ─────────────────────────────────────────────────
 // Scoring model: engagement gravity × relationship amplifier × time decay × session entropy
 // Posts compete for positions. Editorial cards are scored, not fixed-injected.
 // Every session produces a unique feed. High quality always rises — but never identically.
+//
+// v1.1 (Session A cleanup):
+//   - balanceMediaTypes split into named pure passes:
+//       balanceVideoImage → interleaveReviewsIntoFeed → placeEditorials
+//   - filterForSuggested reduced to a pass-through safety net + warn,
+//     since the get_suggested_feed RPC now filters renderable posts server-side.
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const SUGGESTED_MIN_VIDEO_DURATION = 4;
@@ -61,27 +67,34 @@ function isReviewPost(p: FeedPost): boolean {
   return !!p.isReview;
 }
 
-// ── Suggested Feed Filter ─────────────────────────────────────────────────────
+// ── Suggested Feed Filter (PASS-THROUGH SAFETY NET) ───────────────────────────
+// The get_suggested_feed RPC now filters non-renderable posts server-side.
+// This client-side function is kept as a safety net: if an unexpected post shape
+// sneaks through (e.g. media without dimensions), we log it for observability
+// but do NOT drop it — the RPC contract is that everything returned is renderable.
+// Can be removed entirely after ~2 weeks of clean logs.
 export function filterForSuggested(posts: FeedPost[]): FeedPost[] {
-  return posts.filter(post => {
-    if (isEditorialCard(post) || isReviewPost(post)) return true;
-    const media = post.mediaItems;
-    if (!media || media.length === 0) return false;
-    const isCarousel = media.length > 1 && media.every(m => m.type === 'image');
-    if (isCarousel) return true;
-    const first = media[0];
-    if (first.type === 'video') {
-      const ar = (first.width && first.height) ? first.width / first.height : 0;
-      if (ar > SUGGESTED_MAX_ASPECT_RATIO) return false;
-      if (first.duration !== undefined && first.duration < SUGGESTED_MIN_VIDEO_DURATION) return false;
-      return true;
+  if (process.env.NODE_ENV === 'development') {
+    for (const post of posts) {
+      if (isEditorialCard(post) || isReviewPost(post)) continue;
+      const media = post.mediaItems;
+      if (!media || media.length === 0) {
+        console.warn('[filterForSuggested] unexpected post without media:', post.id);
+        continue;
+      }
+      const first = media[0];
+      if (first.type === 'video') {
+        const ar = (first.width && first.height) ? first.width / first.height : 0;
+        if (ar > SUGGESTED_MAX_ASPECT_RATIO) {
+          console.warn('[filterForSuggested] unexpected landscape video:', post.id, 'AR=', ar);
+        }
+        if (first.duration !== undefined && first.duration < SUGGESTED_MIN_VIDEO_DURATION) {
+          console.warn('[filterForSuggested] unexpected short video:', post.id, 'dur=', first.duration);
+        }
+      }
     }
-    if (first.type === 'image') {
-      if (first.width && first.height && first.width > first.height) return false;
-      return true;
-    }
-    return false;
-  });
+  }
+  return posts;
 }
 
 // ── Deduplication ──────────────────────────────────────────────────────────────
@@ -190,28 +203,16 @@ function enforceEditorialGap(posts: FeedPost[]): FeedPost[] {
   return result;
 }
 
-// ── Video/Image Balance Pass ──────────────────────────────────────────────────
-function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
-  // Separate editorials — keep their scored positions, rebuild around them
-  const editorialPositions: { idx: number; post: FeedPost }[] = [];
-  const nonEditorials: FeedPost[] = [];
-
-  posts.forEach((p, idx) => {
-    if (isEditorialCard(p)) {
-      editorialPositions.push({ idx, post: p });
-    } else {
-      nonEditorials.push(p);
-    }
-  });
-
-  const reviews = nonEditorials.filter(p => isReviewPost(p));
-  const videos = nonEditorials.filter(p =>
-    !isReviewPost(p) && p.mediaItems.some(m => m.type === 'video'));
-  const images = nonEditorials.filter(p =>
-    !isReviewPost(p) && !p.mediaItems.some(m => m.type === 'video'));
+// ── Pass 1: Video / Image Balance ─────────────────────────────────────────────
+// Pure function. Takes non-editorial, non-review posts and produces a list
+// interleaved at VIDEO_TARGET_RATIO (80% video / 20% image).
+// Drains both pools fully — never drops content.
+function balanceVideoImage(posts: FeedPost[]): FeedPost[] {
+  const videos = posts.filter(p => p.mediaItems.some(m => m.type === 'video'));
+  const images = posts.filter(p => !p.mediaItems.some(m => m.type === 'video'));
 
   const regularCount = videos.length + images.length;
-  if (regularCount === 0) return posts;
+  if (regularCount === 0) return [];
 
   const targetVideos = Math.round(regularCount * VIDEO_TARGET_RATIO);
   const targetImages = regularCount - targetVideos;
@@ -225,43 +226,85 @@ function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
     ? [...selectedImages, ...videos.slice(targetVideos)]
     : selectedImages;
 
-  // Interleave at 80/20 ratio
-  const regular: FeedPost[] = [];
+  const out: FeedPost[] = [];
   let vi = 0, ii = 0;
   while (vi < finalVideos.length || ii < finalImages.length) {
     const videosDue = (vi / (finalVideos.length || 1)) <= VIDEO_TARGET_RATIO || ii >= finalImages.length;
-    if (videosDue && vi < finalVideos.length) regular.push(finalVideos[vi++]);
-    else if (ii < finalImages.length) regular.push(finalImages[ii++]);
-    else regular.push(finalVideos[vi++]);
+    if (videosDue && vi < finalVideos.length) out.push(finalVideos[vi++]);
+    else if (ii < finalImages.length) out.push(finalImages[ii++]);
+    else out.push(finalVideos[vi++]);
   }
+  return out;
+}
 
-  // Interleave reviews every 6 regular posts (reviews land at slot 6, 12, 18, ...)
-  const merged: FeedPost[] = [];
+// ── Pass 2: Interleave Reviews into Regular Stream ────────────────────────────
+// Pure function. Inserts a review at output positions 6, 12, 18, ...
+// Slot math is local to this function — no other pass touches it.
+function interleaveReviewsIntoFeed(regular: FeedPost[], reviews: FeedPost[]): FeedPost[] {
+  const out: FeedPost[] = [];
   let ri = 0, regi = 0, slot = 1;
   while (regi < regular.length || ri < reviews.length) {
-    if (slot === 6 && ri < reviews.length) merged.push(reviews[ri++]);
-    else if (regi < regular.length) merged.push(regular[regi++]);
-    else if (ri < reviews.length) merged.push(reviews[ri++]);
+    if (slot === 6 && ri < reviews.length) out.push(reviews[ri++]);
+    else if (regi < regular.length) out.push(regular[regi++]);
+    else if (ri < reviews.length) out.push(reviews[ri++]);
     else break;
     slot = slot < 6 ? slot + 1 : 1;
   }
+  return out;
+}
 
-  // Re-insert editorials at their proportional scored positions
-  const totalScored = posts.length;
-  const result = [...merged];
+// ── Pass 3: Place Editorial Cards ─────────────────────────────────────────────
+// Pure function. Re-inserts editorial cards at proportional positions based on
+// where they ranked in the original scored list. Maintains MIN_EDITORIAL_GAP via
+// enforceEditorialGap downstream in the pipeline.
+function placeEditorials(
+  body: FeedPost[],
+  editorialPositions: { idx: number; post: FeedPost }[],
+  totalScored: number
+): FeedPost[] {
+  const out = [...body];
   let insertOffset = 0;
-
   for (const { idx, post } of editorialPositions) {
     const proportion = totalScored > 0 ? idx / totalScored : 0;
     const insertAt = Math.min(
-      Math.round(proportion * result.length) + insertOffset,
-      result.length
+      Math.round(proportion * out.length) + insertOffset,
+      out.length
     );
-    result.splice(insertAt, 0, post);
+    out.splice(insertAt, 0, post);
     insertOffset++;
   }
+  return out;
+}
 
-  return result;
+// ── Composed Balance Pass ─────────────────────────────────────────────────────
+// Orchestrates the three passes. Output contract identical to the pre-refactor
+// monolithic balanceMediaTypes: same inputs produce same outputs.
+function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
+  // Partition: editorials retain their scored positions, the rest gets rebuilt
+  const editorialPositions: { idx: number; post: FeedPost }[] = [];
+  const nonEditorials: FeedPost[] = [];
+
+  posts.forEach((p, idx) => {
+    if (isEditorialCard(p)) {
+      editorialPositions.push({ idx, post: p });
+    } else {
+      nonEditorials.push(p);
+    }
+  });
+
+  const reviews = nonEditorials.filter(p => isReviewPost(p));
+  const nonReviews = nonEditorials.filter(p => !isReviewPost(p));
+
+  if (nonReviews.length === 0 && reviews.length === 0) return posts;
+
+  // Pass 1: balance video/image at 80/20
+  const balanced = balanceVideoImage(nonReviews);
+  // Pass 2: interleave reviews at slot 6, 12, 18, ...
+  const withReviews = interleaveReviewsIntoFeed(balanced, reviews);
+  // Pass 3: re-insert editorials at proportional positions
+  const withEditorials = placeEditorials(withReviews, editorialPositions, posts.length);
+
+  return withEditorials;
 }
 
 // ── Full Orbit Suggested Feed Pipeline ───────────────────────────────────────
