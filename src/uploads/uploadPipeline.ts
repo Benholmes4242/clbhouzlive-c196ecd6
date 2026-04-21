@@ -989,15 +989,12 @@ async function finalizePost(jobId: string, postId: string, job: any, uploadedStr
     }
   }
 
-  // Handle course info
-  if (job.courseInfo) {
-    try {
-      const updatedContent = `${job.caption || ''}\n\n📍 Played at ${job.courseInfo.name}, ${job.courseInfo.country}`.trim();
-      await supabase.from('posts').update({ content: updatedContent }).eq('id', postId);
-    } catch (courseError) {
-      console.warn(`[uploadPipeline] Course info error (non-fatal):`, courseError);
-    }
-  }
+  // Course info is already linked via posts.course_id — we no longer mutate
+  // posts.content to append "📍 Played at ...". Embedding the course name in
+  // content caused duplication across 13 render surfaces (pill + caption both
+  // showing the course) and required removeGolfCourseFromContent as a
+  // read-time scrubber workaround. The pill renders from structured
+  // course_id data, which is the single source of truth.
 
   // Mark stream assets as attached
   if (uploadedStreamUids.length > 0) {
