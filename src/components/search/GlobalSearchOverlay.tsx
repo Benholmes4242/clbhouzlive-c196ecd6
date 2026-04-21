@@ -1,6 +1,6 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, BadgeCheck, Briefcase, ChevronRight, Star, Lock } from 'lucide-react';
+import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,13 @@ import {
   type RecentSearch,
 } from '@/hooks/useGlobalEntitySearch';
 
-/* ─── Skeleton sub-components ─── */
+/* ─── Design tokens ─── */
+const INK = '#0F172A';
+const INK_SOFT = '#475569';
+const INK_SUBTLE = '#94A3B8';
+const BORDER = 'rgba(15,23,42,0.08)';
+const AMBER = '#F7931E';
+const GREEN = '#006747';
 
 const CROSSFADE = { duration: 0.15 };
 const FADE_PROPS = {
@@ -26,17 +32,67 @@ const FADE_PROPS = {
   transition: CROSSFADE,
 };
 
-/** Eyebrow shimmer pill matching real section headers */
-function EyebrowSkeleton({ width = 'w-16' }: { width?: string }) {
+/* ─── Reusable section header ─── */
+
+function SectionHeader({
+  label,
+  action,
+  onActionClick,
+}: {
+  label: string;
+  action?: string;
+  onActionClick?: () => void;
+}) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
-      <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
-      <div className={`h-2.5 ${width} rounded clb-shimmer-light`} />
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        padding: '18px 16px 10px',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          color: INK,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {label}
+      </span>
+      {action && onActionClick && (
+        <button
+          type="button"
+          onClick={onActionClick}
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: AMBER,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          {action}
+        </button>
+      )}
     </div>
   );
 }
 
-/** Row shimmer matching a real result row */
+/* ─── Skeletons ─── */
+
+function EyebrowSkeleton({ width = 'w-16' }: { width?: string }) {
+  return (
+    <div style={{ padding: '18px 16px 10px' }}>
+      <div className={`h-3 ${width} rounded clb-shimmer-light`} />
+    </div>
+  );
+}
+
 function RowSkeleton({ avatarShape, nameW = 'w-32', subtitleW = 'w-24' }: {
   avatarShape: string;
   nameW?: string;
@@ -53,12 +109,6 @@ function RowSkeleton({ avatarShape, nameW = 'w-32', subtitleW = 'w-24' }: {
   );
 }
 
-/** Divider matching real result dividers */
-function SkeletonDivider() {
-  return <div className="ml-[52px] border-b border-border/30" />;
-}
-
-/** Section-aware search skeleton (Gap 2, 3, 6, 7) */
 function SearchSkeleton() {
   const sections = [
     { label: 'Courses', count: 2, shape: 'rounded-xl', eyebrowW: 'w-14' },
@@ -71,14 +121,12 @@ function SearchSkeleton() {
         <div key={label}>
           <EyebrowSkeleton width={eyebrowW} />
           {Array.from({ length: count }).map((_, i) => (
-            <div key={i}>
-              <RowSkeleton
-                avatarShape={shape}
-                nameW={label === 'People' ? 'w-28' : 'w-32'}
-                subtitleW={label === 'People' ? 'w-20' : 'w-24'}
-              />
-              {i < count - 1 && <SkeletonDivider />}
-            </div>
+            <RowSkeleton
+              key={i}
+              avatarShape={shape}
+              nameW={label === 'People' ? 'w-28' : 'w-32'}
+              subtitleW={label === 'People' ? 'w-20' : 'w-24'}
+            />
           ))}
         </div>
       ))}
@@ -86,43 +134,32 @@ function SearchSkeleton() {
   );
 }
 
-/** Trending skeleton (Gap 1) — 4 rows matching real trending item layout */
-function TrendingSkeletonSection() {
+function TrendingShelfSkeleton() {
   return (
     <div>
       <EyebrowSkeleton width="w-20" />
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 px-4 min-h-[56px]">
-          <div className="w-10 h-10 rounded-xl clb-shimmer-light shrink-0" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-32 rounded clb-shimmer-light" />
-            <div className="h-3 w-24 rounded clb-shimmer-light" />
+      <div
+        className="flex scrollbar-hide"
+        style={{
+          gap: 10,
+          overflowX: 'auto',
+          padding: '4px 16px',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} style={{ flexShrink: 0, width: 140 }}>
+            <div
+              className="clb-shimmer-light"
+              style={{ width: 140, height: 175, borderRadius: 14 }}
+            />
+            <div className="h-3 w-28 rounded clb-shimmer-light mt-2" />
+            <div className="h-2.5 w-20 rounded clb-shimmer-light mt-1.5" />
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
-}
-
-/* ── Reusable white card wrapper ── */
-
-function WhiteCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div
-      className={`mx-4 overflow-hidden rounded-2xl ${className}`}
-      style={{
-        background: '#ffffff',
-        border: '1px solid rgba(0,0,0,0.06)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function CardDivider() {
-  return <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />;
 }
 
 /* ─── Main component ─── */
@@ -139,6 +176,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(inputValue, 250);
   const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
+  const [typeFilter, setTypeFilter] = useState<'all' | 'courses' | 'people' | 'businesses'>('all');
 
   const { people, clubs, businesses, trending, trendingLoading, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
@@ -154,11 +192,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     }
   }, [isOpen]);
 
-  const handleDeleteRecent = useCallback((id: string) => {
-    const updated = recent.filter(s => s.id !== id);
-    localStorage.setItem('recent_searches', JSON.stringify(updated));
-    setRecent(updated);
-  }, [recent]);
+  // Reset filter when query changes
+  useEffect(() => {
+    setTypeFilter('all');
+  }, [debouncedQuery]);
 
   const handleClearAll = useCallback(() => {
     clearRecentSearches();
@@ -187,7 +224,6 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && inputValue.trim()) {
       handleSaveRecent(inputValue.trim());
-      // Track search query
       const totalResults = (people?.length ?? 0) + (clubs?.length ?? 0) + (businesses?.length ?? 0);
       import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
         analyticsEvents.track('search_query', {
@@ -242,6 +278,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const hasResults = hasQuery && !isLoading && !allEmpty;
   const showNoResults = hasQuery && !isLoading && allEmpty;
 
+  const showCourses = typeFilter === 'all' || typeFilter === 'courses';
+  const showPeople = typeFilter === 'all' || typeFilter === 'people';
+  const showBusinesses = typeFilter === 'all' || typeFilter === 'businesses';
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -270,7 +310,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
               }}
             >
-              <Search className="w-4 h-4 shrink-0" style={{ color: '#94a3b8' }} />
+              <Search className="w-4 h-4 shrink-0" style={{ color: INK_SUBTLE }} />
               <input
                 ref={inputRef}
                 type="text"
@@ -291,24 +331,74 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 >
                   <div
                     className="flex items-center justify-center rounded-full"
-                    style={{ width: 22, height: 22, background: 'rgba(0,0,0,0.06)' }}
+                    style={{ width: 24, height: 24, background: 'rgba(0,0,0,0.08)' }}
                   >
-                    <X className="w-[11px] h-[11px]" style={{ color: '#64748b' }} strokeWidth={2.5} />
+                    <X className="w-[12px] h-[12px]" style={{ color: '#64748b' }} strokeWidth={2.5} />
                   </div>
                 </button>
               )}
             </div>
 
-            {/* Cancel button — amber */}
+            {/* Cancel button — brand amber */}
             <button
               type="button"
               onClick={handleClose}
               className="shrink-0 text-[14px] font-semibold min-h-[44px] px-1"
-              style={{ color: '#F5A623' }}
+              style={{ color: AMBER }}
             >
               Cancel
             </button>
           </div>
+
+          {/* Type filter pills — only in active state */}
+          {hasQuery && !isLoading && !allEmpty && (
+            <div
+              className="w-full md:max-w-[560px] flex scrollbar-hide"
+              style={{
+                gap: 8,
+                padding: '10px 16px 2px',
+                overflowX: 'auto',
+              }}
+            >
+              {[
+                { key: 'all' as const, label: 'All', count: clubs.length + people.length + businesses.length },
+                { key: 'courses' as const, label: 'Courses', count: clubs.length },
+                { key: 'people' as const, label: 'People', count: people.length },
+                { key: 'businesses' as const, label: 'Businesses', count: businesses.length },
+              ]
+                .filter(pill => pill.key === 'all' || pill.count > 0)
+                .map(pill => {
+                  const isActive = typeFilter === pill.key;
+                  return (
+                    <button
+                      key={pill.key}
+                      type="button"
+                      onClick={() => setTypeFilter(pill.key)}
+                      style={{
+                        flexShrink: 0,
+                        padding: '6px 14px',
+                        borderRadius: 999,
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        border: `1px solid ${isActive ? INK : BORDER}`,
+                        background: isActive ? INK : '#fff',
+                        color: isActive ? '#fff' : INK_SOFT,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      {pill.label}
+                      {pill.key !== 'all' && pill.count > 0 && (
+                        <span style={{ opacity: 0.5 }}>{pill.count}</span>
+                      )}
+                    </button>
+                  );
+                })}
+            </div>
+          )}
 
           {/* Scroll area */}
           <div
@@ -318,117 +408,164 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
             {/* Idle state */}
             {!hasQuery && (
               <>
-                {/* Recent searches */}
+                {/* Recent — pill chips */}
                 {recent.length > 0 && (
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                          Recent Searches
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleClearAll}
-                        style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
-                      >
-                        Clear all
-                      </button>
-                    </div>
-                    <WhiteCard>
-                      {recent.map((item, index) => (
-                        <div key={item.id}>
-                          <div className="min-h-[44px] flex items-center px-4 gap-3">
-                            <Clock className="w-[15px] h-[15px] shrink-0" style={{ color: '#94a3b8' }} />
-                            <button
-                              type="button"
-                              onClick={() => commitRecentSearch(item.query)}
-                              className="flex-1 text-left truncate min-w-0 block text-[14px] font-medium"
-                              style={{ color: '#0f172a' }}
-                            >
-                              {item.query}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteRecent(item.id)}
-                              className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full"
-                              style={{ background: 'rgba(0,0,0,0.04)' }}
-                              aria-label={`Remove ${item.query}`}
-                            >
-                              <X className="w-[11px] h-[11px]" style={{ color: '#94a3b8' }} strokeWidth={2.5} />
-                            </button>
-                          </div>
-                          {index < recent.length - 1 && <CardDivider />}
-                        </div>
+                    <SectionHeader label="Recent" action="Clear all" onActionClick={handleClearAll} />
+                    <div
+                      style={{
+                        padding: '0 16px 6px',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 6,
+                      }}
+                    >
+                      {recent.slice(0, 10).map(item => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => commitRecentSearch(item.query)}
+                          style={{
+                            padding: '7px 12px',
+                            borderRadius: 999,
+                            background: '#fff',
+                            border: `1px solid ${BORDER}`,
+                            fontSize: 12.5,
+                            color: INK,
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Clock size={11} color={INK_SUBTLE} strokeWidth={2} />
+                          {item.query}
+                        </button>
                       ))}
-                    </WhiteCard>
+                    </div>
                   </div>
                 )}
 
-                {/* Suggested creators shelf */}
+                {/* Today's Picks — horizontal shelf */}
+                {trendingLoading ? (
+                  <TrendingShelfSkeleton />
+                ) : trending.length > 0 ? (
+                  <div>
+                    <SectionHeader
+                      label="Today's picks"
+                      action="See all"
+                      onActionClick={() => {
+                        navigate('/courses');
+                        onClose();
+                      }}
+                    />
+                    <div
+                      className="flex scrollbar-hide"
+                      style={{
+                        gap: 10,
+                        overflowX: 'auto',
+                        padding: '4px 16px',
+                        WebkitOverflowScrolling: 'touch',
+                      }}
+                    >
+                      {trending.slice(0, 12).map(item => (
+                        <button
+                          key={item.id ?? item.label}
+                          type="button"
+                          onClick={() => {
+                            if (item.id) {
+                              handleSaveRecent(item.label);
+                              navigate(`/courses/${item.id}`);
+                              onClose();
+                            } else {
+                              commitRecentSearch(item.label);
+                            }
+                          }}
+                          style={{
+                            flexShrink: 0,
+                            width: 140,
+                            background: 'transparent',
+                            border: 'none',
+                            padding: 0,
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <div
+                            style={{
+                              position: 'relative',
+                              width: 140,
+                              height: 175,
+                              borderRadius: 14,
+                              background: '#E2E8F0',
+                              overflow: 'hidden',
+                              boxShadow: '0 1px 3px rgba(15,23,42,0.08)',
+                            }}
+                          >
+                            {item.image && (
+                              <img
+                                src={item.image}
+                                alt=""
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                }}
+                                loading="lazy"
+                              />
+                            )}
+                          </div>
+                          <div style={{ padding: '8px 2px 0' }}>
+                            <div
+                              style={{
+                                fontSize: 12.5,
+                                fontWeight: 600,
+                                color: INK,
+                                letterSpacing: '-0.01em',
+                                lineHeight: 1.25,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical' as const,
+                                overflow: 'hidden',
+                              }}
+                            >
+                              {item.label}
+                            </div>
+                            {item.subtitle && (
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: INK_SUBTLE,
+                                  marginTop: 2,
+                                }}
+                              >
+                                {item.subtitle.split('·')[0].trim()}
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Golfers to follow — horizontal cards (existing component) */}
                 <SuggestedCreatorsShelf
                   userId={user?.id}
                   title="Golfers to follow"
                   showViewAll={true}
                   onViewAll={() => { navigate('/golfers'); onClose(); }}
                   containerStyle={{
-                    borderTop: '1px solid rgba(0,0,0,0.05)',
-                    borderBottom: '1px solid rgba(0,0,0,0.05)',
-                    background: '#ffffff',
+                    background: 'transparent',
+                    borderTop: 'none',
+                    borderBottom: 'none',
                   }}
                 />
-
-                {/* Today's Picks — skeleton while loading, real list when resolved */}
-                {trendingLoading ? (
-                  <TrendingSkeletonSection />
-                ) : trending.length > 0 ? (
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
-                      <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                        Today's Picks
-                      </span>
-                    </div>
-                    <WhiteCard>
-                      {trending.slice(0, 8).map((item, index) => (
-                        <div key={item.id ?? item.label}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (item.id) {
-                                handleSaveRecent(item.label);
-                                navigate(`/courses/${item.id}`);
-                                onClose();
-                              } else {
-                                commitRecentSearch(item.label);
-                              }
-                            }}
-                            className="min-h-[56px] flex items-center px-4 gap-3 w-full active:bg-black/[0.02]"
-                          >
-                            <div className="w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
-                              {item.image && (
-                                <img src={item.image} alt="" className="w-full h-full object-cover" />
-                              )}
-                            </div>
-                            <div className="flex-1 text-left min-w-0">
-                              <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{item.label}</p>
-                              {item.subtitle && (
-                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>{item.subtitle}</p>
-                              )}
-                            </div>
-                            <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
-                          </button>
-                          {index < Math.min(trending.length, 8) - 1 && <CardDivider />}
-                        </div>
-                      ))}
-                    </WhiteCard>
-                  </div>
-                ) : null}
               </>
             )}
 
-            {/* Active search states — AnimatePresence crossfade (Gap 4) */}
+            {/* Active search states — AnimatePresence crossfade */}
             <AnimatePresence mode="wait">
               {isLoading && hasQuery ? (
                 <motion.div key="search-skeleton" {...FADE_PROPS}>
@@ -437,178 +574,167 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
               ) : hasResults ? (
                 <motion.div key="search-results" {...FADE_PROPS}>
                   {/* Courses */}
-                  {clubs.length > 0 && (
+                  {showCourses && clubs.length > 0 && (
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
-                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                          Courses
-                        </span>
-                      </div>
-                      <WhiteCard>
-                        {clubs.map((course, idx) => (
-                          <div key={course.id}>
-                            {/* Main row — navigate to course */}
-                            <button
-                              type="button"
-                              onClick={() => selectCourse(course)}
-                              className="w-full flex items-center gap-3 px-4 min-h-[56px] active:bg-black/[0.02]"
-                            >
-                              <div className="w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
-                                {course.logo_url && (
-                                  <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0 text-left">
-                                <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{course.name}</p>
-                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
-                                  {[course.region, course.country].filter(Boolean).join(', ')}
-                                  {course.global_rank && ` · #${course.global_rank} World`}
-                                </p>
-                              </div>
-                            </button>
-                            {/* Secondary actions row */}
-                            <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px 59px' }}>
-                              <button
-                                type="button"
-                                onClick={() => selectCourse(course)}
-                                style={{
-                                  padding: '5px 12px', borderRadius: 7,
-                                  background: 'hsl(var(--muted) / 0.6)',
-                                  border: '0.5px solid hsl(var(--border))',
-                                  fontSize: 11, fontWeight: 500,
-                                  color: 'hsl(var(--foreground) / 0.7)',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                View course
-                              </button>
-                              {course.user_has_rated ? (
+                      <SectionHeader label="Courses" />
+                      {clubs.map(course => (
+                        <div key={course.id}>
+                          <button
+                            type="button"
+                            onClick={() => selectCourse(course)}
+                            className="w-full flex items-center gap-3 px-4 min-h-[56px] active:bg-black/[0.02]"
+                          >
+                            <div className="w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
+                              {course.logo_url && (
+                                <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0 text-left">
+                              <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{course.name}</p>
+                              <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                                {[course.region, course.country].filter(Boolean).join(', ')}
+                                {course.global_rank && ` · #${course.global_rank} World`}
+                              </p>
+                            </div>
+                          </button>
+                          {/* Secondary actions row */}
+                          <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px 58px' }}>
+                            {course.user_has_rated ? (
+                              <>
                                 <button
                                   type="button"
-                                  onClick={() => selectCourseRate(course)}
+                                  onClick={() => selectCourse(course)}
                                   style={{
                                     display: 'flex', alignItems: 'center', gap: 4,
                                     padding: '5px 12px', borderRadius: 7,
                                     background: 'rgba(0,103,71,0.10)',
                                     border: '1px solid rgba(0,103,71,0.25)',
                                     fontSize: 11, fontWeight: 700,
-                                    color: '#006747',
+                                    color: GREEN,
                                     cursor: 'pointer',
                                   }}
                                 >
                                   ✓ Played
                                 </button>
-                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => selectCourse(course)}
+                                  style={{
+                                    padding: '5px 12px', borderRadius: 7,
+                                    background: 'rgba(15,23,42,0.04)',
+                                    border: '0.5px solid rgba(15,23,42,0.1)',
+                                    fontSize: 11, fontWeight: 500,
+                                    color: INK_SOFT,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  View course
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => selectCourse(course)}
+                                  style={{
+                                    padding: '5px 12px', borderRadius: 7,
+                                    background: 'rgba(15,23,42,0.04)',
+                                    border: '0.5px solid rgba(15,23,42,0.1)',
+                                    fontSize: 11, fontWeight: 500,
+                                    color: INK_SOFT,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  View course
+                                </button>
                                 <button
                                   type="button"
                                   onClick={() => selectCourseRate(course)}
                                   style={{
                                     display: 'flex', alignItems: 'center', gap: 4,
                                     padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(247,147,30,0.08)',
-                                    border: '1px solid rgba(247,147,30,0.25)',
+                                    background: 'rgba(247,147,30,0.10)',
+                                    border: '1px solid rgba(247,147,30,0.30)',
                                     fontSize: 11, fontWeight: 700,
-                                    color: '#F7931E',
+                                    color: AMBER,
                                     cursor: 'pointer',
                                   }}
                                 >
-                                  <Star size={10} />
-                                  Rate this course
+                                  <Star size={10} fill={AMBER} stroke={AMBER} />
+                                  Rate
                                 </button>
-                              )}
-                            </div>
-                            {idx < clubs.length - 1 && <CardDivider />}
+                              </>
+                            )}
                           </div>
-                        ))}
-                      </WhiteCard>
+                        </div>
+                      ))}
                     </div>
                   )}
 
                   {/* People */}
-                  {people.length > 0 && (
+                  {showPeople && people.length > 0 && (
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
-                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                          People
-                        </span>
-                      </div>
-                      <WhiteCard>
-                        {people.map((person, idx) => (
-                          <div key={person.id}>
-                            <button
-                              type="button"
-                              onClick={() => selectPerson(person)}
-                              className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
-                            >
-                              <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
-                                {person.avatar_url && (
-                                  <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0 text-left">
-                                <div className="flex items-center gap-1 min-w-0">
-                                  <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{person.display_name}</p>
-                                  {person.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />}
-                                  {person.is_public === false && <Lock className="w-3 h-3 shrink-0" style={{ color: '#94a3b8' }} />}
-                                </div>
-                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
-                                  {person.username && !person.username.includes('@')
-                                    ? `@${person.username}`
-                                    : ''}
-                                  {person.home_club_name
-                                    ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
-                                    : ''}
-                                </p>
-                              </div>
-                              <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
-                            </button>
-                            {idx < people.length - 1 && <CardDivider />}
+                      <SectionHeader label="People" />
+                      {people.map(person => (
+                        <button
+                          key={person.id}
+                          type="button"
+                          onClick={() => selectPerson(person)}
+                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
+                        >
+                          <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
+                            {person.avatar_url && (
+                              <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                            )}
                           </div>
-                        ))}
-                      </WhiteCard>
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{person.display_name}</p>
+                              {person.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
+                              {person.is_public === false && <Lock className="w-3 h-3 shrink-0" style={{ color: INK_SUBTLE }} />}
+                            </div>
+                            <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                              {person.username && !person.username.includes('@')
+                                ? `@${person.username}`
+                                : ''}
+                              {person.home_club_name
+                                ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
+                                : ''}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   )}
 
                   {/* Businesses */}
-                  {businesses.length > 0 && (
+                  {showBusinesses && businesses.length > 0 && (
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px 8px' }}>
-                        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                          Businesses
-                        </span>
-                      </div>
-                      <WhiteCard>
-                        {businesses.map((business, idx) => (
-                          <div key={business.id}>
-                            <button
-                              type="button"
-                              onClick={() => selectBusiness(business)}
-                              className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
-                            >
-                              <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative flex items-center justify-center">
-                                {business.logo_url
-                                  ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
-                                  : <Briefcase className="w-5 h-5 text-muted-foreground" />
-                                }
-                              </div>
-                              <div className="flex-1 min-w-0 text-left">
-                                <div className="flex items-center gap-1 min-w-0">
-                                  <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{business.name}</p>
-                                  {business.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: '#F7931E' }} />}
-                                </div>
-                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
-                                  {[business.city, business.country].filter(Boolean).join(', ')}
-                                </p>
-                              </div>
-                              <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
-                            </button>
-                            {idx < businesses.length - 1 && <CardDivider />}
+                      <SectionHeader label="Businesses" />
+                      {businesses.map(business => (
+                        <button
+                          key={business.id}
+                          type="button"
+                          onClick={() => selectBusiness(business)}
+                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
+                        >
+                          <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative flex items-center justify-center">
+                            {business.logo_url
+                              ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
+                              : <Briefcase className="w-5 h-5 text-muted-foreground" />
+                            }
                           </div>
-                        ))}
-                      </WhiteCard>
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{business.name}</p>
+                              {business.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
+                            </div>
+                            <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                              {[business.city, business.country].filter(Boolean).join(', ')}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   )}
                 </motion.div>
@@ -619,13 +745,13 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                       className="w-16 h-16 rounded-full flex items-center justify-center"
                       style={{ background: 'rgba(0,0,0,0.05)' }}
                     >
-                      <Search className="w-7 h-7" style={{ color: '#94a3b8' }} />
+                      <Search className="w-7 h-7" style={{ color: INK_SUBTLE }} />
                     </div>
-                    <p className="text-[14px] font-medium" style={{ color: '#0f172a' }}>
+                    <p className="text-[14px] font-medium" style={{ color: INK }}>
                       No results for "<span className="inline-block max-w-[180px] truncate align-bottom">{debouncedQuery}</span>"
                     </p>
-                    <p className="text-[12px] text-center max-w-[240px] md:max-w-[360px]" style={{ color: '#94a3b8' }}>
-                      Try searching for a course name, player, or business
+                    <p className="text-[12px] text-center max-w-[280px]" style={{ color: INK_SUBTLE }}>
+                      Try a different spelling, or search for a nearby course
                     </p>
                   </div>
                 </motion.div>
