@@ -1,0 +1,1 @@
+UPDATE championship_seasons SET prize_description = '£1,000 Voucher' WHERE name = 'Major Season' AND season_number IN (2, 6);
