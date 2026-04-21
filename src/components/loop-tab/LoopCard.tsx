@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, Share2, MapPin, Star } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MapPin, Star, X } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -11,6 +11,8 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FriendsCardMenu } from '@/components/friends-tab/FriendsCardMenu';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
+import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface LoopCardProps {
   post: FeedPost;
@@ -20,6 +22,8 @@ interface LoopCardProps {
   fetchNextPage?: () => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  activity?: FriendCourseActivity;
+  showNudge?: boolean;
 }
 
 function formatCompact(n: number): string {
