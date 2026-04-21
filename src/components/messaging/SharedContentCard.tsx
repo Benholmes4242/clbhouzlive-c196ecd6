@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Star, Clock, Users, Play, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { MessageType, SharedCourse, SharedTeeTime, SharedMoment } from '@/types/messaging';
@@ -367,12 +367,12 @@ function MomentShareCard({
       {moment.creator_name && (
         <div className="p-3">
           <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-              <AvatarImage src={moment.creator_avatar} />
-              <AvatarFallback className="text-[10px]">
-                {moment.creator_name?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <SquircleAvatar
+              src={moment.creator_avatar}
+              alt={moment.creator_name || ''}
+              size={24}
+              hideRing
+            />
             <span className={cn(
               "text-xs font-medium line-clamp-1",
               isOwnMessage ? "text-primary-foreground" : "text-foreground"

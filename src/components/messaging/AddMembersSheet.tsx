@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Check, UserPlus } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -171,10 +171,13 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                     isSelected ? "bg-[rgba(247,147,30,0.05)]" : "hover:bg-muted"
                   )}
                 >
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage src={user.profile_photo_url || undefined} />
-                    <AvatarFallback>{getInitials(user)}</AvatarFallback>
-                  </Avatar>
+                  <SquircleAvatar
+                    src={user.profile_photo_url}
+                    alt={user.display_name || user.username || ''}
+                    userId={user.id}
+                    size={40}
+                    hideRing
+                  />
                   <div className="flex-1 text-left">
                     <div className="font-medium">{user.display_name || user.username}</div>
                     {user.display_name && (

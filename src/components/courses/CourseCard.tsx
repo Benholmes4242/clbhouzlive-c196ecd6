@@ -9,7 +9,7 @@ import CourseCardLocation from './CourseCardLocation';
 import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import CountryFlag from '@/components/ui/country-flag';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface Course {
   id: string;
@@ -164,18 +164,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <div className="flex items-center justify-between gap-2 pt-1">
             <div className="flex -space-x-2">
               {friendsMeta.avatars.slice(0, 3).map((friend) => (
-                <Avatar
+                <SquircleAvatar
                   key={friend.id}
-                  className="h-6 w-6 border border-background pointer-events-none"
-                >
-                  {friend.profile_photo_url ? (
-                    <AvatarImage src={friend.profile_photo_url} alt={friend.initials} />
-                  ) : (
-                    <AvatarFallback className="text-meta">
-                      {friend.initials}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                  src={friend.profile_photo_url}
+                  alt={friend.initials}
+                  userId={friend.id}
+                  size={24}
+                  thinRing
+                  ringColor="hsl(var(--background))"
+                  className="pointer-events-none"
+                />
               ))}
               {friendsMeta.count > 3 && (
                 <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/80 text-meta text-muted-foreground pointer-events-none">

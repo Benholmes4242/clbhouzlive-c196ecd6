@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -85,10 +85,13 @@ export function BlockedUsersSheet({ open, onClose, userId }: Props) {
               const p = item.user_profiles;
               return (
                 <div key={item.blocked_id} className="flex items-center gap-3 py-2">
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage src={p?.avatar_url} />
-                    <AvatarFallback>{p?.full_name?.[0] ?? '?'}</AvatarFallback>
-                  </Avatar>
+                  <SquircleAvatar
+                    src={p?.avatar_url}
+                    alt={p?.full_name || p?.username || ''}
+                    userId={item.blocked_id}
+                    size={40}
+                    hideRing
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] font-medium text-foreground truncate">{p?.full_name ?? 'Unknown'}</p>
                     <p className="text-[13px] text-muted-foreground">@{p?.username ?? '—'}</p>

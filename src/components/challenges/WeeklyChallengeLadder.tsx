@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useWeeklyChallengeLadder } from '@/hooks/useWeeklyChallengeLadder';
 import { useCurrentSeason } from '@/hooks/useCurrentSeason';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -61,12 +61,13 @@ export const WeeklyChallengeLadder: React.FC = () => {
               </div>
 
               {/* Avatar & Name */}
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={entry.profile.profile_photo_url || undefined} />
-                <AvatarFallback>
-                  {entry.profile.display_name?.[0] || entry.profile.username?.[0]}
-                </AvatarFallback>
-              </Avatar>
+              <SquircleAvatar
+                src={entry.profile.profile_photo_url}
+                alt={entry.profile.display_name || entry.profile.username || ''}
+                userId={entry.user_id}
+                size={40}
+                hideRing
+              />
 
               <div className="flex-1 min-w-0">
                 <p className={`font-medium truncate ${isCurrentUser ? 'text-foreground font-semibold' : 'text-foreground'}`}>

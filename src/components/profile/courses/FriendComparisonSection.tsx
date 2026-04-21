@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { useUserFriends } from '@/hooks/useUserFriends';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
@@ -52,12 +52,13 @@ export const FriendComparisonSection: React.FC<FriendComparisonSectionProps> = (
             {friends.map((friend) => (
               <SelectItem key={friend.id} value={friend.id}>
                 <div className="flex items-center gap-2">
-                  <Avatar className="w-6 h-6">
-                    <AvatarImage src={friend.profile_photo_url || undefined} />
-                    <AvatarFallback className="text-xs">
-                      {friend.display_name?.[0]?.toUpperCase() || friend.username?.[0]?.toUpperCase() || '?'}
-                    </AvatarFallback>
-                  </Avatar>
+                  <SquircleAvatar
+                    src={friend.profile_photo_url}
+                    alt={friend.display_name || friend.username || ''}
+                    userId={friend.id}
+                    size={24}
+                    hideRing
+                  />
                   {friend.display_name || friend.username}
                 </div>
               </SelectItem>

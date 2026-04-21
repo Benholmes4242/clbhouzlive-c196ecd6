@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRivals } from '@/hooks/useRivals';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Search, X, TrendingUp, TrendingDown, Minus, UserPlus } from 'lucide-react';
@@ -82,10 +82,13 @@ export const RivalsPanel: React.FC = () => {
               {searchResults.map(user => (
                 <div key={user.id} className="flex items-center justify-between p-3">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={user.profile_photo_url || undefined} />
-                      <AvatarFallback>{user.display_name?.[0] || user.username?.[0]}</AvatarFallback>
-                    </Avatar>
+                    <SquircleAvatar
+                      src={user.profile_photo_url}
+                      alt={user.display_name || user.username || ''}
+                      userId={user.id}
+                      size={32}
+                      hideRing
+                    />
                     <div>
                       <p className="font-medium text-sm">{user.display_name || user.username}</p>
                       <p className="text-xs text-muted-foreground">@{user.username}</p>
@@ -125,12 +128,13 @@ export const RivalsPanel: React.FC = () => {
               className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
             >
               <div className="flex items-center gap-4 flex-1">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={rival.profile.profile_photo_url || undefined} />
-                  <AvatarFallback>
-                    {rival.profile.display_name?.[0] || rival.profile.username?.[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <SquircleAvatar
+                  src={rival.profile.profile_photo_url}
+                  alt={rival.profile.display_name || rival.profile.username || ''}
+                  userId={rival.rival_user_id}
+                  size={48}
+                  hideRing
+                />
                 
                 <div className="flex-1">
                   <p className="font-medium">{rival.profile.display_name || rival.profile.username}</p>
