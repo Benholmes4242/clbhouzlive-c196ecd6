@@ -7,7 +7,15 @@ import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, MoreHorizontal, SendHorizontal, ChevronRight } from 'lucide-react';
+import { X, Heart, MoreHorizontal, Send, ChevronRight, MapPin, Smile, Image as ImageIcon } from 'lucide-react';
+
+// ── Local design tokens ──
+const INK = '#0F172A';
+const INK_SOFT = '#475569';
+const INK_SUBTLE = '#94A3B8';
+const INK_MUTED = 'rgba(15,23,42,0.35)';
+const AMBER = '#F7931E';
+const BORDER = 'rgba(15,23,42,0.07)';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
