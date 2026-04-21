@@ -538,9 +538,6 @@ function ProfileHubSheet({
                 </>
               )}
 
-              {/* ── Divider ── */}
-              <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
-
               {/* ── Logout — #6 pill buttons ── */}
               <div className="py-3" style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom, 0px))' }}>
                 {!showLogoutConfirm ? (
