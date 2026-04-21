@@ -3,6 +3,8 @@ import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useSwipeable } from 'react-swipeable';
+import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface CinematicProfileHeaderProps {
   profilePhotoUrl?: string;
@@ -46,9 +48,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const photoInputRef = useRef<HTMLInputElement | null>(null);
   const [isHovering, setIsHovering] = useState(false);
 
-  // Fallback image if no profile photo - using standard shipped asset
-  const fallbackImage = '/placeholder.svg';
-  const actualPhotoUrl = profilePhotoUrl || fallbackImage;
+  const isMobileWidth = typeof window !== 'undefined' && window.innerWidth < 768;
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 

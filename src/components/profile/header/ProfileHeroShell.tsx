@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { cn } from '@/lib/utils';
+import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 
 interface ProfileHeroShellProps {
   headerPhotoUrl?: string | null;
