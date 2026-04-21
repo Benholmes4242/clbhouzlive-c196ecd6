@@ -331,7 +331,7 @@ function CommentsSheet({
         key={comment.id}
         ref={registerRef(comment.id)}
         className={cn(
-          'flex gap-3 px-4 py-3 transition-colors duration-300',
+          'flex gap-3 px-4 py-3 transition-colors duration-300 hover:bg-[rgba(15,23,42,0.02)]',
           isReply && 'pl-10 sm:pl-14',
           highlightedId === comment.id && 'bg-[rgba(247,147,30,0.05)]',
         )}
@@ -343,7 +343,7 @@ function CommentsSheet({
           className="shrink-0"
         >
           <SquircleAvatar
-            size={isReply ? 28 : 34}
+            size={isReply ? 28 : 36}
             src={comment.avatar_url}
             alt={comment.user_name}
             fallback={comment.user_name?.charAt(0) || '?'}
@@ -353,24 +353,24 @@ function CommentsSheet({
 
         {/* Body */}
         <div className="flex-1 min-w-0">
-          {/* Name row */}
+          {/* Name + time */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={cn(
-              'text-[13px] font-semibold truncate max-w-[140px]',
-              isDark ? 'text-white' : 'text-foreground'
-            )}>
+            <span
+              className="truncate max-w-[160px]"
+              style={{ fontSize: 13.5, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}
+            >
               {comment.user_name}
             </span>
             {isOP && (
-              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.06em', background: 'rgba(247,147,30,0.10)', color: '#F7931E' }}>
+              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.06em', background: 'rgba(247,147,30,0.10)', color: AMBER }}>
                 OP
               </span>
             )}
-            <span className={cn('text-[11px]', isDark ? 'text-white/50' : 'text-muted-foreground/60')}>
-              {relativeTime(comment.created_at)}
+            <span style={{ fontSize: 11, color: INK_SUBTLE }}>
+              · {relativeTime(comment.created_at)}
             </span>
             {(comment as any).is_edited && (
-              <span className={cn('text-[11px]', isDark ? 'text-white/25' : 'text-muted-foreground/40')}>
+              <span style={{ fontSize: 11, color: 'rgba(15,23,42,0.3)' }}>
                 edited
               </span>
             )}
@@ -379,10 +379,7 @@ function CommentsSheet({
           {/* Content */}
           <MentionText
             text={comment.content}
-            className={cn(
-              'mt-1 text-[14px] leading-[20px] block',
-              isDark ? 'text-white/90' : 'text-foreground/90'
-            )}
+            className="mt-1 text-[14px] leading-[20px] block"
           />
 
           {/* Media */}
@@ -397,9 +394,9 @@ function CommentsSheet({
             </div>
           )}
 
-          {/* Action row */}
-          <div className="flex items-center gap-4 mt-0.5">
-            {!isReply && (
+          {/* Action row — Reply only on the left */}
+          {!isReply && (
+            <div className="flex items-center mt-0.5">
               <button
                 type="button"
                 onClick={() => {
@@ -407,48 +404,86 @@ function CommentsSheet({
                   highlightComment(comment.id);
                   requestAnimationFrame(() => textareaRef.current?.focus());
                 }}
-                className={cn(
-                  'text-[12px] font-semibold min-h-[44px] flex items-center',
-                  isDark ? 'text-white/40' : 'text-muted-foreground'
-                )}
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: 'rgba(15,23,42,0.5)',
+                  background: 'none',
+                  border: 0,
+                  cursor: 'pointer',
+                  padding: 0,
+                  minHeight: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
               >
                 Reply
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => toggleCommentLike(comment.id)}
-              className="flex items-center gap-1 min-h-[44px]"
-            >
-              <Heart className={cn(
-                'w-4 h-4 transition-colors',
-                comment.has_liked
-                  ? 'fill-[#f59e0b] text-[#f59e0b]'
-                  : isDark ? 'text-white/40' : 'text-muted-foreground/50'
-              )} />
-              {comment.likes_count > 0 && (
-                <span className={cn(
-                  'text-[12px]',
-                  comment.has_liked ? 'text-[#f59e0b]' : isDark ? 'text-white/50' : 'text-muted-foreground/70'
-                )}>
-                  {comment.likes_count}
-                </span>
-              )}
-            </button>
-            {(isOwn || creatorUserId === currentUserId) && (
-              <button
-                type="button"
-                onClick={() => setCommentToDelete(comment)}
-                className={cn(
-                  'ml-auto min-h-[44px] flex items-center',
-                  isDark ? 'text-white/30' : 'text-muted-foreground/40'
-                )}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
+
+        {/* Right-side stacked like button */}
+        <button
+          type="button"
+          onClick={() => toggleCommentLike(comment.id)}
+          aria-label={comment.has_liked ? 'Unlike' : 'Like'}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            background: 'none',
+            border: 0,
+            padding: '6px 4px 0 8px',
+            cursor: 'pointer',
+            flexShrink: 0,
+            minHeight: 44,
+          }}
+        >
+          <Heart
+            size={18}
+            strokeWidth={2}
+            style={{
+              fill: comment.has_liked ? AMBER : 'none',
+              color: comment.has_liked ? AMBER : INK_MUTED,
+              transition: 'color 150ms, fill 150ms',
+            }}
+          />
+          {comment.likes_count > 0 && (
+            <span
+              className="tabular-nums"
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: comment.has_liked ? AMBER : INK_SUBTLE,
+                lineHeight: 1,
+              }}
+            >
+              {comment.likes_count}
+            </span>
+          )}
+        </button>
+
+        {/* Own-post / creator menu on the far right */}
+        {(isOwn || creatorUserId === currentUserId) && !isReply && (
+          <button
+            type="button"
+            onClick={() => setCommentToDelete(comment)}
+            style={{
+              padding: '6px 4px',
+              background: 'transparent',
+              border: 0,
+              cursor: 'pointer',
+              color: 'rgba(15,23,42,0.3)',
+              flexShrink: 0,
+              minHeight: 44,
+            }}
+            aria-label="More options"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+        )}
       </div>
     );
   };
