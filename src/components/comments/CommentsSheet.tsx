@@ -828,7 +828,7 @@ function CommentsSheet({
                           key={liker.userId}
                           type="button"
                           onClick={() => { navigate(`/profile/${liker.userId}`); onClose(); }}
-                          className="flex items-center gap-3 w-full px-4 py-3 min-h-[64px] text-left"
+                          className="flex items-center gap-3 w-full px-4 py-3 min-h-[60px] text-left transition-colors hover:bg-[rgba(15,23,42,0.02)]"
                         >
                           <SquircleAvatar
                             size={40}
@@ -838,11 +838,14 @@ function CommentsSheet({
                             hideRing
                           />
                           <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-semibold truncate text-foreground">
+                            <p
+                              className="truncate"
+                              style={{ fontSize: 14, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
+                            >
                               {liker.displayName}
                             </p>
                             {liker.username && (
-                              <p className="text-[12px] truncate text-muted-foreground">
+                              <p className="truncate" style={{ fontSize: 12, color: INK_SUBTLE }}>
                                 @{liker.username}
                               </p>
                             )}
