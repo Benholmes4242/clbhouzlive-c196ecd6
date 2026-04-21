@@ -578,10 +578,18 @@ function CommentsSheet({
                 <button
                   type="button"
                   onClick={() => toggleReplies(comment.id)}
-                  className={cn(
-                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-10 sm:pl-14',
-                    isDark ? 'text-white/40' : 'text-muted-foreground'
-                  )}
+                  style={{
+                    paddingLeft: 56,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: 'rgba(15,23,42,0.5)',
+                    background: 'none',
+                    border: 0,
+                    cursor: 'pointer',
+                    minHeight: 44,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
                 >
                   Hide replies
                 </button>
