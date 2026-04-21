@@ -18,6 +18,7 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgressTracker';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
