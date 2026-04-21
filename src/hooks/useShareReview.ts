@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -29,77 +28,66 @@ interface ShareReviewResult {
 
 export function useShareReview() {
   const [isSharing, setIsSharing] = useState(false);
-  
   const queryClient = useQueryClient();
 
-  const shareReview = async ({
+  /**
+   * Attaches media uploads to the post row that was auto-created by the
+   * `trg_create_post_from_rating` database trigger when the rating was inserted.
+   *
+   * Previously this function ALSO created the post row, but that responsibility
+   * has moved to the database to eliminate a race condition where the share
+   * would silently fail if the user navigated away before the auto-share
+   * useEffect fired.
+   */
+  const attachMediaToPost = async ({
     ratingId,
-    courseId,
-    reviewText,
     media,
-  }: ShareReviewParams): Promise<ShareReviewResult> => {
+  }: { ratingId: string; media: ReviewMedia[] }): Promise<ShareReviewResult> => {
     setIsSharing(true);
 
     try {
-      // 1) Get current user
-      const { data: userResponse } = await supabase.auth.getUser();
-      const userId = userResponse?.user?.id;
-      if (!userId) {
-        throw new Error('Not authenticated');
-      }
-
-      // 2) Idempotency check: see if this review was already shared
-      const { data: existingPost } = await supabase
+      // Find the post row created by the DB trigger
+      const { data: post, error: lookupError } = await supabase
         .from('posts')
         .select('id')
         .eq('source_review_id', ratingId)
         .eq('actor_type', 'personal')
-        .eq('actor_id', userId)
         .maybeSingle();
 
-      if (existingPost) {
-        toast('Already shared', { description: 'This review has already been shared to your profile.' });
-        return { success: true, postId: existingPost.id, alreadyShared: true };
+      if (lookupError) {
+        console.error('[attachMediaToPost] Post lookup failed:', lookupError);
+        throw new Error('Could not find post row for this review');
       }
 
-      // 3) Create the post row
-      const { data: post, error: postError } = await supabase
-        .from('posts')
-        .insert({
-          user_id: userId,
-          actor_type: 'personal',
-          actor_id: userId,
-          course_id: courseId,
-          content: reviewText || null,
-          visibility: 'anyone',
-          source_review_id: ratingId,
-          categories: ['review'],
-          status: 'published',
-        })
-        .select('id')
-        .single();
-
-      if (postError) {
-        console.error('[ShareReview] Failed to create post:', postError);
-        throw new Error('Failed to share review');
+      if (!post) {
+        // Post row doesn't exist — could mean the user opted out via "Remove
+        // from Clubhouse", or (extremely unlikely) the trigger didn't fire.
+        // Either way: nothing to attach to.
+        console.warn('[attachMediaToPost] No post row found for rating', ratingId);
+        return { success: false, error: 'No post row to attach media to' };
       }
 
       const postId = post.id;
 
-      // 4) Copy media from course_review_media to post_media
-      if (media.length > 0) {
-        // Sort: cover photo first, then preserve original order
-        const coverIndex = media.findIndex(m => m.is_cover === true);
-        let ordered: ReviewMedia[];
-        if (coverIndex > 0) {
-          // Move the cover to display_order: 0
-          const cover = media[coverIndex];
-          ordered = [cover, ...media.filter((_, i) => i !== coverIndex)];
-        } else {
-          ordered = [...media];
-        }
+      // Idempotency: if media already attached (e.g., re-running after partial failure), skip
+      const { data: existingMedia } = await supabase
+        .from('post_media')
+        .select('id')
+        .eq('post_id', postId)
+        .limit(1);
 
-        // Insert into post_media with display_order
+      if (existingMedia && existingMedia.length > 0) {
+        console.log('[attachMediaToPost] Media already attached, skipping');
+        return { success: true, postId, alreadyShared: true };
+      }
+
+      // Copy media — cover photo first, then preserve original order
+      if (media.length > 0) {
+        const coverIndex = media.findIndex(m => m.is_cover === true);
+        const ordered = coverIndex > 0
+          ? [media[coverIndex], ...media.filter((_, i) => i !== coverIndex)]
+          : [...media];
+
         const mediaInserts = ordered.map((m, i) => ({
           post_id: postId,
           media_type: m.media_type,
@@ -114,14 +102,13 @@ export function useShareReview() {
           .insert(mediaInserts);
 
         if (mediaError) {
-          console.error('[ShareReview] Failed to insert post_media:', mediaError);
-          // Clean up the orphaned post
-          await supabase.from('posts').delete().eq('id', postId);
+          console.error('[attachMediaToPost] Failed to insert post_media:', mediaError);
+          // Don't delete the post — text-only review post is still valid content
           throw new Error('Failed to attach media to post');
         }
       }
 
-      // 5) Invalidate all post-related query keys so feeds refresh immediately
+      // Invalidate feed queries so new content appears immediately
       queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
       queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'] });
       queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
@@ -136,29 +123,33 @@ export function useShareReview() {
       queryClient.invalidateQueries({ queryKey: ['clubhouse-shorts'] });
       queryClient.invalidateQueries({ queryKey: ['friends-shorts'] });
 
-      // 6) Dispatch window events so any listening components refresh
       window.dispatchEvent(new CustomEvent('postCreated'));
 
-      // 7) Analytics
       analyticsEvents.track('ratings.review_shared', {
-        courseId,
         ratingId,
         postId,
         mediaCount: media.length,
         hasVideo: media.some(m => m.media_type === 'video'),
       });
 
-      toast.success('Review shared', { description: 'Your review is now visible in Clubhouse and on your profile.' });
-
       return { success: true, postId };
     } catch (err: any) {
-      console.error('[ShareReview] Error:', err);
-      toast.error(err.message || 'Something went wrong. Please try again.');
+      console.error('[attachMediaToPost] Error:', err);
       return { success: false, error: err.message };
     } finally {
       setIsSharing(false);
     }
   };
 
-  return { shareReview, isSharing };
+  // Backward-compat alias — keep `shareReview` exported but route to new impl.
+  // courseId and reviewText params are now ignored (the DB trigger handles
+  // post creation using the rating row's data).
+  const shareReview = async (params: ShareReviewParams): Promise<ShareReviewResult> => {
+    return attachMediaToPost({
+      ratingId: params.ratingId,
+      media: params.media,
+    });
+  };
+
+  return { shareReview, attachMediaToPost, isSharing };
 }
