@@ -14,6 +14,12 @@ interface WatchRailTileProps {
   rank?: number;
   /** Tile width in px. Defaults to 200. */
   width?: number;
+  /**
+   * Set of post IDs the current user has already watched.
+   * When provided, the NEW badge is suppressed for posts in this set.
+   * Optional → falls back to global time-only behavior.
+   */
+  viewedPostIds?: Set<string>;
 }
 
 // Hybrid "why" labels — Session 2 of 3.
