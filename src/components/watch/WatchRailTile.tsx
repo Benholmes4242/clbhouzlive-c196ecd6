@@ -159,7 +159,15 @@ export default function WatchRailTile({
         cursor: 'pointer',
         aspectRatio: '3/4',
       }}
-      onClick={handleTap}
+      onClick={handleClick}
+      onPointerDown={startLongPress}
+      onPointerUp={cancelLongPress}
+      onPointerLeave={cancelLongPress}
+      onPointerCancel={cancelLongPress}
+      onContextMenu={(e) => {
+        // Suppress native long-press context menu so the action sheet wins.
+        e.preventDefault();
+      }}
     >
       {/* Thumbnail */}
       <img
