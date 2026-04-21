@@ -219,8 +219,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
-  const getInitials = (name: string) =>
-    name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+
 
   const getMemberRole = (participant: ParticipantWithProfile) => {
     if (participant.user_id === conversation.created_by) return 'Group Admin';
@@ -270,7 +270,6 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   size={88}
                   src={conversation.avatar_url}
                   alt={conversation.name || 'Group'}
-                  fallback={getInitials(conversation.name || 'Group')}
                   hideRing
                 />
               </div>
@@ -527,7 +526,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                     size={44}
                     src={participant.profile?.profile_photo_url || undefined}
                     alt={participant.profile?.display_name || participant.profile?.username || '?'}
-                    fallback={getInitials(participant.profile?.display_name || participant.profile?.username || '?')}
+                    userId={participant.user_id}
                     hideRing
                   />
 

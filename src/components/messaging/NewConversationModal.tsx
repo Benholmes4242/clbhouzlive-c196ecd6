@@ -198,10 +198,8 @@ export function NewConversationModal({
     }
   };
 
-  const getInitials = (name: string | null, username: string | null) => {
-    const displayText = name || username || '?';
-    return displayText.slice(0, 2).toUpperCase();
-  };
+
+
 
   const isGroupValid = groupName.trim() && selectedUsers.length > 0;
 
@@ -250,8 +248,8 @@ export function NewConversationModal({
           <SquircleAvatar
             src={userProfile.profile_photo_url}
             alt={userProfile.display_name || userProfile.username || 'User'}
+            userId={userProfile.id}
             size={44}
-            fallback={getInitials(userProfile.display_name, userProfile.username)}
             hideRing
           />
           <div className="flex-1 min-w-0">
@@ -349,8 +347,8 @@ export function NewConversationModal({
           <SquircleAvatar
             src={userProfile.profile_photo_url}
             alt={userProfile.display_name || userProfile.username || 'User'}
+            userId={userProfile.id}
             size={44}
-            fallback={getInitials(userProfile.display_name, userProfile.username)}
             hideRing
           />
           <div className="flex-1 min-w-0">
@@ -582,8 +580,8 @@ export function NewConversationModal({
                     <SquircleAvatar
                       src={u.profile_photo_url}
                       alt={u.display_name || u.username || 'User'}
+                      userId={u.id}
                       size={22}
-                      fallback={getInitials(u.display_name, u.username)}
                       hideRing
                     />
                     <span
@@ -648,8 +646,8 @@ export function NewConversationModal({
                         <SquircleAvatar
                           src={u.profile_photo_url}
                           alt={u.display_name || 'User'}
+                          userId={u.id}
                           size={24}
-                          fallback={getInitials(u.display_name, u.username)}
                           hideRing
                         />
                       </div>
