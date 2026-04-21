@@ -359,8 +359,9 @@ export const LoopCard = React.memo(function LoopCard({
                     <SquircleAvatar
                       key={idx}
                       src={url || '/placeholder.svg'}
-                      size="xs"
-                      className="border border-card"
+                      size={20}
+                      thinRing
+                      ringColor="hsl(var(--card))"
                     />
                   ))}
                 </div>
