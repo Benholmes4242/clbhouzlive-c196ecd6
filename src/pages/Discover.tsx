@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 // Lazy load heavy/inactive components for better initial bundle size
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
 const NewLoopTab = lazy(() => import('@/components/discover/NewLoopTab'));
-const NewCoursesTab = lazy(() => import('@/components/discover/NewCoursesTab'));
+const NewCoursesTab = lazy(() => import('@/components/discover/NewExploreTab'));
 
 type MainKey = 'watch' | 'loop' | 'courses';
 
