@@ -9,6 +9,7 @@ export interface UserPassportRow {
   top_100_played: number;
   wishlist_count: number;
   friends_courses_to_try: number;
+  first_play_year: number | null;
 }
 
 export function useUserPassport(userId: string | undefined) {
@@ -30,3 +31,4 @@ export function useUserPassport(userId: string | undefined) {
     },
   });
 }
+

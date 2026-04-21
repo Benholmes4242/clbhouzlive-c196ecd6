@@ -56,12 +56,22 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
 
   if (!passport) return null;
 
+  const sinceLabel =
+    passport.first_play_year != null
+      ? `Lifetime · since ${passport.first_play_year}`
+      : 'Lifetime totals';
+
   return (
     <section style={{ padding: '24px 16px 0' }}>
       <div style={{ padding: '0 0 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-          Your Passport
-        </h2>
+        <div>
+          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
+            Your Passport
+          </h2>
+          <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
+            {sinceLabel}
+          </p>
+        </div>
         <button
           type="button"
           onClick={() => navigate('/profile')}
