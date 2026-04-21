@@ -95,8 +95,14 @@ export function SnapFeed({
     requestAnimationFrame(tryScroll);
   }, [startIndex]);
 
-  const activeIndex = useClubhouseStore(s => s.activeIndex);
+  const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
+  // When an override is supplied (e.g. by FullscreenFeedOverlay which owns its
+  // own active-index store), it is the source of truth for both rendering AND
+  // virtualization window math. Previously SnapFeed used storeActiveIndex for
+  // window math even when overridden — which left off-window slides as black
+  // placeholders when the overlay opened at index ≥ VIRTUAL_WINDOW (4+).
+  const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const location = useLocation();
 
   // Pause all audio when route changes away
