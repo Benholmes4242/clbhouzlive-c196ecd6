@@ -122,22 +122,28 @@ export function LoopFeed({
   return (
     <div ref={feedContainerRef} className="flex flex-col gap-3 pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
-      {posts.map((post, i) => (
-        <div key={post.id}>
-          <div data-card-index={i}>
-            <LoopCard
-              post={post}
-              userId={userId}
-              cardIndex={i}
-              allPosts={posts}
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-            />
+      {posts.map((post, i) => {
+        const cid = post.review?.courseId;
+        const activity = cid && activityMap ? activityMap[cid] : undefined;
+        return (
+          <div key={post.id}>
+            <div data-card-index={i}>
+              <LoopCard
+                post={post}
+                userId={userId}
+                cardIndex={i}
+                allPosts={posts}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                activity={activity}
+                showNudge={nudgePostId === post.id}
+              />
+            </div>
+            {(i + 1) % SHELF_INTERVAL === 0 && <NetworkReviewShelf userId={userId} />}
           </div>
-          {(i + 1) % SHELF_INTERVAL === 0 && <NetworkReviewShelf userId={userId} />}
-        </div>
-      ))}
+        );
+      })}
       <div ref={sentinelRef} className="h-1" />
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">
