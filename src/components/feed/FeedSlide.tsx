@@ -185,8 +185,9 @@ export const FeedSlide = memo(function FeedSlide({
         willChange: 'transform',
       }}
     >
-      {/* PGA card sentinel for IntersectionObserver */}
+      {/* Editorial card sentinel for IntersectionObserver — chrome dismissal */}
       {(post.postType === 'pga_card' ||
+        post.postType === 'tournament_result' ||
         post.postType === 'course_of_week_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
