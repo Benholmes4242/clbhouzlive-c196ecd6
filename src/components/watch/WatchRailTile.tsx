@@ -3,6 +3,8 @@ import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useWatchActions } from './context/WatchActionsContext';
+import { haptic } from '@/utils/haptics';
 
 interface WatchRailTileProps {
   post: FeedPost;
