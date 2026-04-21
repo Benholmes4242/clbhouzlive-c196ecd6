@@ -377,8 +377,8 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
                     <SquircleAvatar
                       src={item.image}
                       alt={item.title}
+                      userId={item.id}
                       size={40}
-                      fallback={item.title ? getInitials(item.title) : '?'}
                       hideRing
                     />
                   ) : (
@@ -386,7 +386,6 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
                       src={item.image}
                       alt={item.title}
                       size={40}
-                      fallback={item.title ? getInitials(item.title) : '?'}
                       hideRing
                     />
                   )}
