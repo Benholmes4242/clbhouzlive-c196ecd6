@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, RefreshCw, WifiOff } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { getProfilePathById } from '@/lib/profileRoutes';
 

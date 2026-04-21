@@ -32,7 +32,6 @@ import {
 } from '@/lib/formatHcp';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
 import type { PeerGroup } from './HandicapTab';

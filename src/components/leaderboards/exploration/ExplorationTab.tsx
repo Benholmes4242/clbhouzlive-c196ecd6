@@ -19,7 +19,6 @@ import {
 } from '@/config/explorerTiers';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import CountryFlag from '@/components/ui/country-flag';
 import { ClubSearchBar } from './ClubSearchBar';
 import { CountrySelector } from '../shared/CountrySelector';
