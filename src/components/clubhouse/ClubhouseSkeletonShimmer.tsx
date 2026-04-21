@@ -21,6 +21,8 @@ interface ClubhouseSkeletonShimmerProps {
   className?: string;
   /** Which post shape to skeleton. Defaults to 'regular'. */
   variant?: 'regular' | 'review';
+  /** When true, the rail skeleton renders a mute placeholder at the top. */
+  isVideo?: boolean;
 }
 
 const SkeletonBlock: React.FC<{
@@ -41,7 +43,7 @@ const MediaAreaSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
 );
 
 /** Right-side vertical action rail skeleton — mirrors FeedActionRail shape. */
-const ActionRailSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
+const ActionRailSkeleton: React.FC<{ isStatic?: boolean; isVideo?: boolean }> = ({ isStatic, isVideo }) => (
   <div
     className="absolute flex flex-col items-center"
     style={{
@@ -50,9 +52,16 @@ const ActionRailSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
       gap: 18,
     }}
   >
-    {/* Creator avatar 48px + follow plus */}
+    {/* Mute placeholder — only for video posts (matches real rail) */}
+    {isVideo && (
+      <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 28, height: 28 }} />
+    )}
+    {/* Creator avatar 48px squircle (matches SquircleAvatar) + follow plus circle */}
     <div className="relative">
-      <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 48, height: 48 }} />
+      <SkeletonBlock
+        isStatic={isStatic}
+        style={{ width: 48, height: 48, borderRadius: '34%' }}
+      />
       <SkeletonBlock
         isStatic={isStatic}
         className="rounded-full"
@@ -190,6 +199,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
   isStatic = false,
   className,
   variant = 'regular',
+  isVideo = false,
 }) => {
   const reduceMotion = prefersReducedMotion();
   const effectiveStatic = isStatic || reduceMotion;
@@ -239,7 +249,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             </div>
 
             {/* ─── RIGHT ACTION RAIL ─── */}
-            <ActionRailSkeleton isStatic={effectiveStatic} />
+            <ActionRailSkeleton isStatic={effectiveStatic} isVideo={isVideo} />
 
             {/* ─── BOTTOM CONTENT ─── */}
             {variant === 'regular' ? (

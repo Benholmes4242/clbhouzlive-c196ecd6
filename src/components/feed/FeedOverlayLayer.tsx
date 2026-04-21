@@ -1,10 +1,9 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { FeedActionRail } from './FeedActionRail';
 import { Z } from '@/config/zIndex';
-import { BreathingRoomMuteToggle } from './BreathingRoomMuteToggle';
 import { InlineReviewCard } from './InlineReviewCard';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
@@ -69,6 +68,14 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
   const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
   const activeVideoElement = useClubhouseStore((s) => s.activeVideoElement);
+  const isMuted = useClubhouseStore((s) => s.isMuted);
+  const toggleMute = useClubhouseStore((s) => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
+
+  const handleToggleMute = useCallback(() => {
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
+  }, [isMuted, markUserGestureUnmute, toggleMute]);
 
   const activePost = posts[activeIndex] ?? null;
 
@@ -127,8 +134,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         transition: 'opacity 0.18s ease',
       }}
     >
-      {/* Mute toggle — only on video posts */}
-      {isVideo && <BreathingRoomMuteToggle isVisible={overlayVisible} bottomOffset={bottomOffset} />}
+      {/* Mute toggle now lives inside FeedActionRail (top of rail) */}
 
       {/* Inline Review Card — renders in the bottom slot for review posts */}
       {activePost.isReview && activePost.review && (
@@ -196,6 +202,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         isVisible={overlayVisible}
         bottomOffset={bottomOffset}
         readOnly={readOnly}
+        isVideo={isVideo}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
       />
 
       {/* Video scrubber — sits between bottom content and action rail on video posts */}
