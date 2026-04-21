@@ -356,22 +356,12 @@ export const LoopCard = React.memo(function LoopCard({
               >
                 <div className="flex -space-x-1.5">
                   {topFriendAvatars.slice(0, 3).map((url, idx) => (
-                    <div
+                    <SquircleAvatar
                       key={idx}
-                      className="overflow-hidden bg-muted"
-                      style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: 5,
-                        border: '1px solid hsl(var(--card))',
-                      }}
-                    >
-                      {url ? (
-                        <img src={url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-muted" />
-                      )}
-                    </div>
+                      src={url || '/placeholder.svg'}
+                      size="xs"
+                      className="border border-card"
+                    />
                   ))}
                 </div>
                 <span style={{ fontSize: 12, fontWeight: 600, color: '#c97a10' }}>
