@@ -26,7 +26,7 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
           size={48} 
           src={profile.profile_photo_url}
           alt={profile.display_name}
-          fallback={getInitials(profile.display_name)}
+          userId={profile.id}
         />
 
         {/* Profile Info */}
