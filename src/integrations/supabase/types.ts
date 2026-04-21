@@ -14560,6 +14560,7 @@ export type Database = {
       }
     }
     Functions: {
+      _get_user_friend_set: { Args: { p_user_id: string }; Returns: string[] }
       _postgis_deprecate: {
         Args: { newname: string; oldname: string; version: string }
         Returns: undefined
@@ -15861,6 +15862,7 @@ export type Database = {
           context_stats: Json
           course_id: string
           course_name: string
+          filter_tier: string
           global_rank: number
           hero_image_url: string
           location_primary: string
@@ -15876,6 +15878,7 @@ export type Database = {
           context_stats: Json
           course_id: string
           course_name: string
+          filter_tier: string
           global_rank: number
           hero_image_url: string
           location_primary: string
