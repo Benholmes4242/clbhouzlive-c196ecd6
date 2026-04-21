@@ -359,10 +359,11 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
               <div className="flex justify-between items-end">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-end gap-2 mb-1">
-                    <img
-                      src={isUserPost ? (item as UserPostWithType).user.profile_photo_url || '/placeholder.svg' : (item as VideoPost).user.avatar || '/placeholder.svg'}
+                    <SquircleAvatar
+                      src={isUserPost ? (item as UserPostWithType).user.profile_photo_url || null : (item as VideoPost).user.avatar || null}
                       alt={displayName || 'Golfer'}
-                      className="w-12 h-12 rounded-full object-cover"
+                      userId={isUserPost ? (item as UserPostWithType).user.id ?? null : ((item as VideoPost).user as any)?.id ?? null}
+                      size={48}
                     />
                     <p className="text-white font-bold text-base truncate">
                       {displayName || 'Golfer'}
