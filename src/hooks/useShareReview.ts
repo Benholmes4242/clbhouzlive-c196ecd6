@@ -32,12 +32,31 @@ export function useShareReview() {
 
   /**
    * Attaches media uploads to the post row that was auto-created by the
-   * `trg_create_post_from_rating` database trigger when the rating was inserted.
+   * `trg_create_post_from_review_media` database trigger.
    *
-   * Previously this function ALSO created the post row, but that responsibility
-   * has moved to the database to eliminate a race condition where the share
-   * would silently fail if the user navigated away before the auto-share
-   * useEffect fired.
+   * ARCHITECTURE:
+   * - When a user submits a review, a `course_ratings` row is created first.
+   * - As media uploads complete, `course_review_media` rows are inserted with
+   *   status='attached'.
+   * - The first successful media insert fires a DB trigger that creates the
+   *   corresponding `posts` row (source_review_id = ratingId).
+   * - This function then copies the `course_review_media` rows into `post_media`
+   *   so they render in the Clubhouse feed.
+   *
+   * RATING-ONLY REVIEWS:
+   * If a review has NO media (rating-only), no post row ever gets created by
+   * the trigger. This function's post lookup will return null, and it will
+   * no-op gracefully — rating-only reviews intentionally do not appear in the
+   * Clubhouse feed or profile Posts tab per product rule. They still appear
+   * on the course detail page (About + Reviews tabs) and still count toward
+   * played courses, badges, leaderboards, and all other stats.
+   *
+   * RACE-FREE BY DESIGN:
+   * This function was previously the SOLE creator of the post row (via a
+   * client-side useEffect), which caused 37 orphaned reviews across 9 users
+   * when the user closed the app mid-upload. Post creation now lives in a
+   * DB trigger, making it race-free. This function remains responsible only
+   * for the media copy.
    */
   const attachMediaToPost = async ({
     ratingId,
