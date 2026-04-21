@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
@@ -7,6 +7,7 @@ import { LoopCard } from './LoopCard';
 import { FriendsFeedSkeleton } from '@/components/friends-tab/FriendsFeedSkeleton';
 import { FriendsAutoplay } from '@/components/friends-tab/FriendsAutoplay';
 import { NetworkReviewShelf } from './NetworkReviewShelf';
+import { useFriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 
 const SHELF_INTERVAL = 3;
 
@@ -58,6 +59,32 @@ export function LoopFeed({
     }
   }, [posts.length, isFullscreenOpen, appendPosts]);
 
+  // Batch-fetch friend-course activity for unique course IDs in the page
+  const courseIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const p of posts) {
+      const cid = p.review?.courseId;
+      if (cid) ids.add(cid);
+    }
+    return Array.from(ids);
+  }, [posts]);
+
+  const { data: activityMap } = useFriendCourseActivity(userId, courseIds);
+
+  // Throttle review nudge to max 1 per page (first eligible card wins)
+  const nudgePostId = useMemo(() => {
+    if (!activityMap) return null;
+    for (const p of posts) {
+      const cid = p.review?.courseId;
+      if (!cid) continue;
+      const a = activityMap[cid];
+      if (a && a.self_has_played && !a.self_has_reviewed && !a.nudge_dismissed_recently) {
+        return p.id;
+      }
+    }
+    return null;
+  }, [posts, activityMap]);
+
   if (isLoading && posts.length === 0) {
     return <FriendsFeedSkeleton />;
   }
@@ -95,22 +122,28 @@ export function LoopFeed({
   return (
     <div ref={feedContainerRef} className="flex flex-col gap-3 pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
-      {posts.map((post, i) => (
-        <div key={post.id}>
-          <div data-card-index={i}>
-            <LoopCard
-              post={post}
-              userId={userId}
-              cardIndex={i}
-              allPosts={posts}
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-            />
+      {posts.map((post, i) => {
+        const cid = post.review?.courseId;
+        const activity = cid && activityMap ? activityMap[cid] : undefined;
+        return (
+          <div key={post.id}>
+            <div data-card-index={i}>
+              <LoopCard
+                post={post}
+                userId={userId}
+                cardIndex={i}
+                allPosts={posts}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                activity={activity}
+                showNudge={nudgePostId === post.id}
+              />
+            </div>
+            {(i + 1) % SHELF_INTERVAL === 0 && <NetworkReviewShelf userId={userId} />}
           </div>
-          {(i + 1) % SHELF_INTERVAL === 0 && <NetworkReviewShelf userId={userId} />}
-        </div>
-      ))}
+        );
+      })}
       <div ref={sentinelRef} className="h-1" />
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">

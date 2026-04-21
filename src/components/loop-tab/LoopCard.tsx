@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, Share2, MapPin, Star } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MapPin, Star, X } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -11,6 +11,8 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FriendsCardMenu } from '@/components/friends-tab/FriendsCardMenu';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
+import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface LoopCardProps {
   post: FeedPost;
@@ -20,6 +22,8 @@ interface LoopCardProps {
   fetchNextPage?: () => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  activity?: FriendCourseActivity;
+  showNudge?: boolean;
 }
 
 function formatCompact(n: number): string {
@@ -54,8 +58,11 @@ export const LoopCard = React.memo(function LoopCard({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  activity,
+  showNudge = false,
 }: LoopCardProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl || '';
@@ -83,6 +90,7 @@ export const LoopCard = React.memo(function LoopCard({
   const [isLiked, setIsLiked] = useState(post.isLikedByMe);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [showComments, setShowComments] = useState(false);
+  const [nudgeDismissedLocal, setNudgeDismissedLocal] = useState(false);
 
   const cleanCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
   const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
@@ -133,6 +141,59 @@ export const LoopCard = React.memo(function LoopCard({
     } else {
       await navigator.clipboard.writeText(shareUrl);
       toast.success('Link copied');
+    }
+  };
+
+  // ===== Network-aware signals =====
+  const friendPlayedCount = activity?.friend_played_count ?? 0;
+  const topFriendNames = activity?.top_friend_names ?? [];
+  const topFriendAvatars = activity?.top_friend_avatars ?? [];
+  const networkRatingAvg = activity?.network_rating_avg;
+  const networkRatingCount = activity?.network_rating_count ?? 0;
+  const selfHasPlayed = !!activity?.self_has_played;
+  const selfHasReviewed = !!activity?.self_has_reviewed;
+
+  const friendChipText = useMemo(() => {
+    if (!friendPlayedCount || topFriendNames.length === 0) return null;
+    const firstName = (n: string) => (n || '').split(' ')[0] || n;
+    if (friendPlayedCount === 1) return `${firstName(topFriendNames[0])} played here`;
+    if (friendPlayedCount === 2) {
+      return `${firstName(topFriendNames[0])} & ${firstName(topFriendNames[1])} played here`;
+    }
+    return `${firstName(topFriendNames[0])} + ${friendPlayedCount - 1} friends played here`;
+  }, [friendPlayedCount, topFriendNames]);
+
+  const showFriendChip = friendPlayedCount > 0;
+  const showNetworkRating = networkRatingAvg != null && networkRatingCount >= 2;
+  const showPlayedPill = selfHasPlayed && !!courseId;
+  const showReviewNudge =
+    showNudge &&
+    !nudgeDismissedLocal &&
+    selfHasPlayed &&
+    !selfHasReviewed &&
+    !!courseId;
+
+  const dismissNudge = async () => {
+    if (!userId || !courseId) return;
+    setNudgeDismissedLocal(true);
+    try {
+      const { error } = await supabase
+        .from('user_content_preferences')
+        .upsert(
+          {
+            user_id: userId,
+            post_id: post.id,
+            course_id: courseId,
+            signal_type: 'nudge_dismissed',
+            interaction_count: 1,
+            last_interaction_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id,post_id,signal_type' }
+        );
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['friend-course-activity', userId] });
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('[LoopCard] Nudge dismiss failed:', err);
     }
   };
 
@@ -278,6 +339,68 @@ export const LoopCard = React.memo(function LoopCard({
           </div>
         )}
 
+        {/* 3.5 NETWORK SIGNALS — friend chip + network rating (only when activity present) */}
+        {(showFriendChip || showNetworkRating) && (
+          <div className="flex items-center gap-2 px-4 pt-2 flex-wrap">
+            {showFriendChip && (
+              <button
+                onClick={() => courseId && navigate(`/courses/${courseId}`)}
+                className="flex items-center gap-1.5 active:scale-[0.97] transition-transform"
+                style={{
+                  background: 'rgba(247,147,30,0.08)',
+                  border: '1px solid rgba(247,147,30,0.22)',
+                  borderRadius: 20,
+                  padding: '4px 10px 4px 4px',
+                }}
+                aria-label={friendChipText || 'Friends played here'}
+              >
+                <div className="flex -space-x-1.5">
+                  {topFriendAvatars.slice(0, 3).map((url, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-full overflow-hidden border-2 bg-muted"
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderColor: 'hsl(var(--card))',
+                      }}
+                    >
+                      {url ? (
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-muted" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#c97a10' }}>
+                  {friendChipText}
+                </span>
+              </button>
+            )}
+            {showNetworkRating && (
+              <div
+                className="flex items-center gap-1"
+                style={{
+                  background: 'rgba(247,147,30,0.06)',
+                  border: '1px solid rgba(247,147,30,0.18)',
+                  borderRadius: 20,
+                  padding: '4px 10px',
+                }}
+                aria-label={`Network average rating ${networkRatingAvg} from ${networkRatingCount} friends`}
+              >
+                <Star className="h-3 w-3" style={{ color: '#F7931E', fill: '#F7931E' }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#c97a10' }}>
+                  {networkRatingAvg?.toFixed(1)}
+                </span>
+                <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>
+                  · {networkRatingCount} friends
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* 4. ENGAGEMENT ROW — pill buttons */}
         <div
           className="flex items-center gap-2 px-4 py-2.5"
@@ -319,8 +442,8 @@ export const LoopCard = React.memo(function LoopCard({
 
           <div style={{ flex: 1 }} />
 
-          {/* "I've played here" — kept when course is known, pushed right */}
-          {courseName && courseId && (
+          {/* "I've played here" — only when user has actually played this course */}
+          {showPlayedPill && (
             <button
               onClick={() => navigate(`/courses/${courseId}`)}
               className="active:scale-[0.97] transition-transform"
@@ -341,8 +464,8 @@ export const LoopCard = React.memo(function LoopCard({
             </button>
           )}
 
-          {/* Share — pill, rightmost when no course button */}
-          {!(courseName && courseId) && (
+          {/* Share — pill, rightmost when no played pill */}
+          {!showPlayedPill && (
             <button
               onClick={handleShare}
               aria-label="Share"
@@ -361,6 +484,54 @@ export const LoopCard = React.memo(function LoopCard({
             </button>
           )}
         </div>
+
+        {/* 5. REVIEW NUDGE — ambient prompt for played-but-not-reviewed (max 1 per page) */}
+        {showReviewNudge && (
+          <div
+            className="flex items-center gap-2 px-4 py-2.5"
+            style={{
+              background: 'rgba(247,147,30,0.06)',
+              borderTop: '1px solid rgba(247,147,30,0.15)',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                color: 'hsl(var(--foreground))',
+                flex: 1,
+                lineHeight: 1.35,
+              }}
+            >
+              You've played <strong>{courseName}</strong> too — share your review?
+            </span>
+            <button
+              onClick={() => navigate(`/courses/${courseId}?review=1`)}
+              style={{
+                fontSize: 12, fontWeight: 700, color: '#fff',
+                background: '#F7931E',
+                border: 'none',
+                borderRadius: 20,
+                padding: '5px 11px',
+                cursor: 'pointer',
+              }}
+            >
+              Review
+            </button>
+            <button
+              onClick={dismissNudge}
+              aria-label="Dismiss"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 4,
+                cursor: 'pointer',
+                color: 'hsl(var(--muted-foreground))',
+              }}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
       </article>
 
