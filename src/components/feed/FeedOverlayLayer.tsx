@@ -78,6 +78,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   }, [isMuted, markUserGestureUnmute, toggleMute]);
 
   const activePost = posts[activeIndex] ?? null;
+  const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
 
   const [captionExpanded, setCaptionExpanded] = useState(false);
 
@@ -87,13 +88,15 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
   if (!activePost) return null;
 
-  // Hide overlays on editorial and tournament cards (they have their own chrome)
-  if (
+  // Hide overlays on editorial and tournament cards (they have their own chrome).
+  // Also hide while a sentinel reports an editorial card is in view, which fires
+  // earlier than activeIndex during snap-scroll — kills mid-swipe chrome bleed.
+  const isEditorialCard = (
     activePost.postType === 'tournament_result' ||
     activePost.postType === 'pga_card' ||
     activePost.postType === 'course_of_week_card'
-  )
-    return null;
+  );
+  if (isEditorialCard || isTournamentCardActive) return null;
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);

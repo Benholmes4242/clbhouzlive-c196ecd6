@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedSlide } from './FeedSlide';
@@ -253,15 +253,48 @@ export function SnapFeed({
   // ── PGA card sentinel observer ──
   const setIsTournamentCardActive = useClubhouseStore(s => s.setIsTournamentCardActive);
 
+  // Stable key that changes only when editorial cards enter/leave/reorder.
+  // Avoids re-binding the observer on every like/comment update.
+  const editorialCardKey = useMemo(
+    () => posts
+      .filter(p =>
+        p.postType === 'pga_card' ||
+        p.postType === 'tournament_result' ||
+        p.postType === 'course_of_week_card'
+      )
+      .map(p => p.id)
+      .join('|'),
+    [posts]
+  );
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const sentinels = container.querySelectorAll("[data-pga-sentinel='true']");
-    if (sentinels.length === 0) return;
+    if (sentinels.length === 0) {
+      // No editorial cards in current feed — ensure flag is false
+      setIsTournamentCardActive(false);
+      return;
+    }
 
     // Track intersection state per sentinel so we activate when ANY is visible
     const visibleSet = new Set<Element>();
+
+    // Synchronous initial check — kills the return-to-page / first-mount flash
+    // by seeding the flag before paint, before the IO has a chance to fire.
+    const containerRect = container.getBoundingClientRect();
+    sentinels.forEach(sentinel => {
+      const rect = sentinel.getBoundingClientRect();
+      const visibleTop = Math.max(rect.top, containerRect.top);
+      const visibleBottom = Math.min(rect.bottom, containerRect.bottom);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+      const ratio = rect.height > 0 ? visibleHeight / rect.height : 0;
+      if (ratio >= 0.85) {
+        visibleSet.add(sentinel);
+      }
+    });
+    setIsTournamentCardActive(visibleSet.size > 0);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -279,7 +312,7 @@ export function SnapFeed({
 
     sentinels.forEach(sentinel => observer.observe(sentinel));
     return () => observer.disconnect();
-  }, [setIsTournamentCardActive]);
+  }, [editorialCardKey, setIsTournamentCardActive]);
 
   return (
     <div
