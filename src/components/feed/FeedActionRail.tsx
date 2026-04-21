@@ -41,6 +41,10 @@ interface FeedActionRailProps {
   bottomOffset?: number;
   /** When true, only the creator avatar is rendered (no follow+, like, comment, share, more). */
   readOnly?: boolean;
+  /** Only present on video posts — renders mute toggle at top of rail */
+  isVideo?: boolean;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
