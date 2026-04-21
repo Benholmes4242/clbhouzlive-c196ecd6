@@ -512,10 +512,22 @@ function CommentsSheet({
                     return next;
                   });
                 }}
-                className="text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10"
-                style={{ color: '#F7931E' }}
+                style={{
+                  marginLeft: 32,
+                  padding: '6px 0 10px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: 'rgba(15,23,42,0.5)',
+                  background: 'none',
+                  border: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  minHeight: 44,
+                }}
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <span style={{ width: 18, height: 1, background: AMBER, opacity: 0.7 }} />
                 View {totalReplies} {totalReplies === 1 ? 'reply' : 'replies'}
               </button>
             ) : (
