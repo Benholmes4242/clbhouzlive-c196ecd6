@@ -157,7 +157,10 @@ export default function WatchRailTile({
     handleTap();
   }, []);
 
-  const surfacingReason = useMemo(() => deriveSurfacingReason(post), [post]);
+  const surfacingReason = useMemo(
+    () => deriveSurfacingReason(post, viewedPostIds),
+    [post, viewedPostIds],
+  );
 
   return (
     <div
