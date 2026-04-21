@@ -398,7 +398,7 @@ function CommentsSheet({
           {/* Content */}
           <MentionText
             text={comment.content}
-            className="mt-1 text-[14px] leading-[20px] block text-slate-900"
+            className="mt-1 text-[14px] leading-[20px] block text-foreground/90"
           />
 
           {/* Media */}

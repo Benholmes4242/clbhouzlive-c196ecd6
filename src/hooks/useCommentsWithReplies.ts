@@ -78,8 +78,16 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
     // Collect actor IDs
     const personalComments = allComments.filter(c => c.actor_type === 'personal' || !c.actor_type);
     const businessComments = allComments.filter(c => c.actor_type === 'business');
-    const userIds = [...new Set(personalComments.map(c => c.actor_id || c.user_id))];
-    const businessIds = [...new Set(businessComments.map(c => c.actor_id))];
+    const userIds = [...new Set(
+      personalComments
+        .map(c => c.actor_id || c.user_id)
+        .filter((id): id is string => typeof id === 'string' && id.length > 0)
+    )];
+    const businessIds = [...new Set(
+      businessComments
+        .map(c => c.actor_id)
+        .filter((id): id is string => typeof id === 'string' && id.length > 0)
+    )];
 
     // Parallel fetches
     const [profilesRes, businessRes, likesRes, myLikesRes] = await Promise.all([
@@ -244,14 +252,25 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
 
     if (!allReplies?.length) return;
 
-    // Get the parent from cache
-    const enriched = await enrichComments(
-      [{ id: commentId, _total_replies_count: allReplies.length }],
-      allReplies,
-      user?.id,
-    );
+    // Enrich the replies via a synthetic parent that carries valid actor
+    // fields so it can't poison the profile batch query. We discard the
+    // synthetic parent and only use its enriched .replies array.
+    const syntheticParent = {
+      id: commentId,
+      user_id: allReplies[0].user_id,
+      actor_type: allReplies[0].actor_type,
+      actor_id: allReplies[0].actor_id,
+      parent_id: null,
+      _total_replies_count: allReplies.length,
+    };
+    // Temporarily mark all replies as belonging to syntheticParent so
+    // enrichComments groups them under it, then we extract.
+    const repliesForEnrichment = allReplies.map(r => ({ ...r, parent_id: commentId }));
+    const enriched = await enrichComments([syntheticParent], repliesForEnrichment, user?.id);
+    const enrichedReplies = enriched[0]?.replies ?? [];
 
-    // Update cache — replace the comment's replies in place
+    // Update cache — replace ONLY the parent's replies array + counts.
+    // Do NOT overwrite the parent's own author/avatar/display_name fields.
     queryClient.setQueryData(['post-comments-with-replies', postId], (old: any) => {
       if (!old?.pages) return old;
       return {
@@ -260,7 +279,7 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
           ...page,
           comments: page.comments.map((c: CommentWithReplies) =>
             c.id === commentId
-              ? { ...c, replies: enriched[0]?.replies ?? c.replies, replies_count: allReplies.length, total_replies_count: allReplies.length }
+              ? { ...c, replies: enrichedReplies, replies_count: allReplies.length, total_replies_count: allReplies.length }
               : c
           ),
         })),
