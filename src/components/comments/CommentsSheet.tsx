@@ -952,6 +952,36 @@ function CommentsSheet({
                   )}
                 </AnimatePresence>
 
+                {/* Quick-reaction strip */}
+                {!replyingTo && inputText.length === 0 && (
+                  <div className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide -mx-1 px-1">
+                    {['⛳️', '🔥', '👏', '🎯', '❤️', '😂', '🏆'].map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => handleQuickReaction(emoji)}
+                        style={{
+                          flexShrink: 0,
+                          width: 36,
+                          height: 36,
+                          borderRadius: '50%',
+                          background: 'rgba(15,23,42,0.04)',
+                          border: 0,
+                          cursor: 'pointer',
+                          fontSize: 19,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          lineHeight: 1,
+                        }}
+                        aria-label={`React with ${emoji}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {/* Input row */}
                 <div className="flex items-end gap-2">
                   <SquircleAvatar
@@ -1003,9 +1033,10 @@ function CommentsSheet({
                       </div>
                     )}
                     <div style={{
-                      display: 'flex', alignItems: 'flex-end', borderRadius: 22, padding: '8px 12px',
-                      background: 'rgba(15,23,42,0.05)',
-                      border: '0.5px solid rgba(15,23,42,0.07)',
+                      display: 'flex', alignItems: 'flex-end', gap: 4, borderRadius: 22, padding: '4px 6px 4px 14px',
+                      background: '#ffffff',
+                      border: `0.5px solid ${BORDER}`,
+                      minHeight: 42,
                     }}>
                       <textarea
                         ref={textareaRef}
@@ -1024,25 +1055,68 @@ function CommentsSheet({
                         onKeyDown={handleInputKeyDown}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                         rows={1}
-                        className="flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug text-foreground placeholder:text-muted-foreground"
-                        style={{ maxHeight: '120px' }}
+                        className="flex-1 min-w-0 bg-transparent outline-none resize-none placeholder:text-[color:#94A3B8]"
+                        style={{
+                          fontSize: 14,
+                          color: INK,
+                          minHeight: 20,
+                          maxHeight: 120,
+                          lineHeight: 1.4,
+                          padding: '8px 0',
+                          fontFamily: 'inherit',
+                        }}
                       />
+                      <div className="flex items-center shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cursor = textareaRef.current?.selectionStart ?? inputText.length;
+                            setInputText(prev => prev.slice(0, cursor) + '😀' + prev.slice(cursor));
+                            requestAnimationFrame(() => textareaRef.current?.focus());
+                          }}
+                          style={{
+                            width: 30, height: 30,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'transparent', border: 0, cursor: 'pointer',
+                            color: INK_SUBTLE, padding: 0,
+                          }}
+                          aria-label="Emoji picker"
+                        >
+                          <Smile size={18} strokeWidth={2} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toast.info('Image attachments coming soon')}
+                          style={{
+                            width: 30, height: 30,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'transparent', border: 0, cursor: 'pointer',
+                            color: INK_SUBTLE, padding: 0,
+                          }}
+                          aria-label="Attach image"
+                        >
+                          <ImageIcon size={18} strokeWidth={2} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleSend}
                     disabled={!inputText.trim() || isAddingComment}
+                    aria-label="Send comment"
                     style={{
-                      width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                      background: inputText.trim() ? '#F7931E' : 'rgba(15,23,42,0.08)',
-                      border: 'none', cursor: 'pointer',
+                      width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+                      background: inputText.trim() ? AMBER : 'rgba(15,23,42,0.1)',
+                      color: inputText.trim() ? '#ffffff' : INK_SUBTLE,
+                      border: 'none',
+                      cursor: inputText.trim() ? 'pointer' : 'not-allowed',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      boxShadow: inputText.trim() ? '0 2px 12px rgba(247,147,30,0.28)' : 'none',
-                      transition: 'all 0.2s',
+                      boxShadow: inputText.trim() ? '0 2px 6px rgba(247,147,30,0.35)' : 'none',
+                      transition: 'background 150ms, box-shadow 150ms',
                     }}
                   >
-                    <SendHorizontal style={{ color: inputText.trim() ? '#ffffff' : 'rgba(15,23,42,0.25)', width: 18, height: 18 }} />
+                    <Send size={16} strokeWidth={2} />
                   </button>
                 </div>
               </div>
