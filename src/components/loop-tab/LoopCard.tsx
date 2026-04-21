@@ -144,6 +144,59 @@ export const LoopCard = React.memo(function LoopCard({
     }
   };
 
+  // ===== Network-aware signals =====
+  const friendPlayedCount = activity?.friend_played_count ?? 0;
+  const topFriendNames = activity?.top_friend_names ?? [];
+  const topFriendAvatars = activity?.top_friend_avatars ?? [];
+  const networkRatingAvg = activity?.network_rating_avg;
+  const networkRatingCount = activity?.network_rating_count ?? 0;
+  const selfHasPlayed = !!activity?.self_has_played;
+  const selfHasReviewed = !!activity?.self_has_reviewed;
+
+  const friendChipText = useMemo(() => {
+    if (!friendPlayedCount || topFriendNames.length === 0) return null;
+    const firstName = (n: string) => (n || '').split(' ')[0] || n;
+    if (friendPlayedCount === 1) return `${firstName(topFriendNames[0])} played here`;
+    if (friendPlayedCount === 2) {
+      return `${firstName(topFriendNames[0])} & ${firstName(topFriendNames[1])} played here`;
+    }
+    return `${firstName(topFriendNames[0])} + ${friendPlayedCount - 1} friends played here`;
+  }, [friendPlayedCount, topFriendNames]);
+
+  const showFriendChip = friendPlayedCount > 0;
+  const showNetworkRating = networkRatingAvg != null && networkRatingCount >= 2;
+  const showPlayedPill = selfHasPlayed && !!courseId;
+  const showReviewNudge =
+    showNudge &&
+    !nudgeDismissedLocal &&
+    selfHasPlayed &&
+    !selfHasReviewed &&
+    !!courseId;
+
+  const dismissNudge = async () => {
+    if (!userId || !courseId) return;
+    setNudgeDismissedLocal(true);
+    try {
+      const { error } = await supabase
+        .from('user_content_preferences')
+        .upsert(
+          {
+            user_id: userId,
+            post_id: post.id,
+            course_id: courseId,
+            signal_type: 'nudge_dismissed',
+            interaction_count: 1,
+            last_interaction_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id,post_id,signal_type' }
+        );
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['friend-course-activity', userId] });
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('[LoopCard] Nudge dismiss failed:', err);
+    }
+  };
+
   return (
     <>
       <article ref={tileRef} className="bg-card border-b border-border/50">
