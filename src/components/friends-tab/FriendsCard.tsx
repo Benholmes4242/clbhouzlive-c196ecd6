@@ -136,7 +136,9 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
             className="flex items-center gap-3 min-w-0 flex-1"
           >
             <SquircleAvatar
-              src={post.avatarUrl || '/placeholder.svg'}
+              src={post.avatarUrl}
+              alt={post.displayName}
+              userId={post.userId}
               size="sm"
               hideRing
             />

@@ -51,17 +51,6 @@ const DARK = '#0F172A';
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
-function getInitials(name: string): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
 
 function getMastheadSubtitle(peerGroup: PeerGroup, clubName: string | null): string {
   switch (peerGroup) {
@@ -1074,7 +1063,6 @@ export function LowestHandicapLeaderboard({
                       alt={p.display_name ?? p.username ?? ''}
                       userId={p.user_id}
                       size={30}
-                      fallback={getInitials(p.display_name ?? p.username ?? '')}
                       hideRing
                     />
                   </div>
