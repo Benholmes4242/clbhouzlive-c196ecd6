@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { X, ArrowLeft, Play, Heart, MapPin, Bookmark, Share2, ChevronDown, ChevronUp, MoreVertical, PlayCircle, ListPlus, ListMusic } from 'lucide-react';
 import QueueDrawer from '@/components/videos/QueueDrawer';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -616,12 +616,13 @@ export const VideoPlayerModal: React.FC = () => {
                     onClick={handleCreatorClick}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                   >
-                    <Avatar className="h-8 w-8 border border-white/20">
-                      <AvatarImage src={videoData.creatorAvatarUrl} alt={videoData.creatorName} />
-                      <AvatarFallback className="bg-primary/20 text-primary-foreground text-xs">
-                        {videoData.creatorName.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    <SquircleAvatar
+                      src={videoData.creatorAvatarUrl}
+                      alt={videoData.creatorName}
+                      userId={videoData.creatorUserId}
+                      size={32}
+                      hideRing
+                    />
                     <span className="text-white font-medium text-sm">{videoData.creatorName}</span>
                   </button>
                 )}
@@ -801,12 +802,13 @@ export const VideoPlayerModal: React.FC = () => {
                       onClick={handleCreatorClick}
                       className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                     >
-                      <Avatar className="h-10 w-10 border border-white/20">
-                        <AvatarImage src={videoData.creatorAvatarUrl} alt={videoData.creatorName} />
-                        <AvatarFallback className="bg-primary/20 text-primary-foreground text-sm">
-                          {videoData.creatorName.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                      <SquircleAvatar
+                        src={videoData.creatorAvatarUrl}
+                        alt={videoData.creatorName}
+                        userId={videoData.creatorUserId}
+                        size={40}
+                        hideRing
+                      />
                       <span className="text-white font-medium">{videoData.creatorName}</span>
                     </button>
                     

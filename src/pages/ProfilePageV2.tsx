@@ -486,7 +486,7 @@ const ProfilePageV2Content: React.FC = () => {
               className="w-full h-full object-cover object-center"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/40" />
+            <CoverPhotoFallback className="w-full h-full" />
           )}
           {/* Cover photo edit affordance — self-profile only */}
           {isSelf && (

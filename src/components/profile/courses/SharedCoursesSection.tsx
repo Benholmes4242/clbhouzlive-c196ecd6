@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useUserFriends } from '@/hooks/useUserFriends';
 
 interface SharedCoursesSectionProps {
@@ -185,12 +185,15 @@ export const SharedCoursesSection: React.FC<SharedCoursesSectionProps> = ({
                 {/* Avatar stack */}
                 <div className="flex -space-x-1.5">
                   {course.friends.slice(0, 3).map((friend) => (
-                    <Avatar key={friend.id} className="w-5 h-5 border border-white">
-                      <AvatarImage src={friend.profile_photo_url || undefined} />
-                      <AvatarFallback className="text-[8px] bg-slate-100">
-                        {friend.display_name?.[0]?.toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <SquircleAvatar
+                      key={friend.id}
+                      src={friend.profile_photo_url}
+                      alt={friend.display_name || ''}
+                      userId={friend.id}
+                      size={20}
+                      thinRing
+                      ringColor="#ffffff"
+                    />
                   ))}
                 </div>
               </div>

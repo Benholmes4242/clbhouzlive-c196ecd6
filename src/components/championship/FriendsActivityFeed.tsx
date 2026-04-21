@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface Activity {
   id: string;
@@ -40,12 +40,13 @@ export const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
             key={activity.id}
             className="flex items-center gap-3 p-2 rounded-sq-sm bg-muted/30 hover:bg-muted/50 transition-colors"
           >
-            <Avatar className="w-8 h-8">
-              <AvatarImage src={activity.userAvatar || undefined} />
-              <AvatarFallback className="text-xs">
-                {activity.userName.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+            <SquircleAvatar
+              src={activity.userAvatar}
+              alt={activity.userName}
+              userId={activity.userId}
+              size={32}
+              hideRing
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm">
                 <span className="font-medium">{activity.userName}</span>
