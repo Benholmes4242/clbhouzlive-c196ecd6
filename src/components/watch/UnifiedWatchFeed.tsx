@@ -183,5 +183,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
       <ScrollToTopGlass />
     </div>
+    </WatchActionsProvider>
   );
 }
