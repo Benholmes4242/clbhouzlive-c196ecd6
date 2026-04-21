@@ -35,9 +35,14 @@ interface ContinueWatchingRow {
 }
 
 function rowToPost(row: ContinueWatchingRow): ContinueWatchingPost {
-  const hlsUrl = row.stream_id
-    ? `https://customer-7we4lvosdkndpkp4.cloudflarestream.com/${row.stream_id}/manifest/video.m3u8`
-    : undefined;
+  // Prefer the canonical media_url from the DB (always carries the correct
+  // Cloudflare Stream customer subdomain). Fall back to constructing from
+  // stream_id + the canonical subdomain constant if media_url is missing.
+  const hlsUrl = row.media_url
+    ? row.media_url
+    : row.stream_id
+      ? `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${row.stream_id}/manifest/video.m3u8`
+      : undefined;
 
   const post: FeedPost = {
     id: row.post_id,
