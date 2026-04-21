@@ -7,7 +7,15 @@ import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, MoreHorizontal, SendHorizontal, ChevronRight } from 'lucide-react';
+import { X, Heart, MoreHorizontal, Send, ChevronRight, MapPin, Smile, Image as ImageIcon } from 'lucide-react';
+
+// ── Local design tokens ──
+const INK = '#0F172A';
+const INK_SOFT = '#475569';
+const INK_SUBTLE = '#94A3B8';
+const INK_MUTED = 'rgba(15,23,42,0.35)';
+const AMBER = '#F7931E';
+const BORDER = 'rgba(15,23,42,0.07)';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -284,6 +292,24 @@ function CommentsSheet({
     }
   }, [inputText, isAddingComment, replyingTo, addComment, highlightComment, onCommentPosted]);
 
+  const handleQuickReaction = useCallback(async (emoji: string) => {
+    if (isAddingComment) return;
+    try {
+      const newId = await addComment(emoji, undefined);
+      analyticsEvents.track('comment_submitted', {
+        post_id: postId,
+        is_reply: false,
+        content_length: emoji.length,
+        has_mention: false,
+        quick_reaction: true,
+      });
+      setTimeout(() => highlightComment(newId), 150);
+      onCommentPosted?.();
+    } catch (error) {
+      console.error('Failed to add quick reaction:', error);
+    }
+  }, [isAddingComment, addComment, postId, highlightComment, onCommentPosted]);
+
   const handleInputKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -323,7 +349,7 @@ function CommentsSheet({
         key={comment.id}
         ref={registerRef(comment.id)}
         className={cn(
-          'flex gap-3 px-4 py-3 transition-colors duration-300',
+          'flex gap-3 px-4 py-3 transition-colors duration-300 hover:bg-[rgba(15,23,42,0.02)]',
           isReply && 'pl-10 sm:pl-14',
           highlightedId === comment.id && 'bg-[rgba(247,147,30,0.05)]',
         )}
@@ -335,7 +361,7 @@ function CommentsSheet({
           className="shrink-0"
         >
           <SquircleAvatar
-            size={isReply ? 28 : 34}
+            size={isReply ? 28 : 36}
             src={comment.avatar_url}
             alt={comment.user_name}
             fallback={comment.user_name?.charAt(0) || '?'}
@@ -345,24 +371,24 @@ function CommentsSheet({
 
         {/* Body */}
         <div className="flex-1 min-w-0">
-          {/* Name row */}
+          {/* Name + time */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={cn(
-              'text-[13px] font-semibold truncate max-w-[140px]',
-              isDark ? 'text-white' : 'text-foreground'
-            )}>
+            <span
+              className="truncate max-w-[160px]"
+              style={{ fontSize: 13.5, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}
+            >
               {comment.user_name}
             </span>
             {isOP && (
-              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.06em', background: 'rgba(247,147,30,0.10)', color: '#F7931E' }}>
+              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.06em', background: 'rgba(247,147,30,0.10)', color: AMBER }}>
                 OP
               </span>
             )}
-            <span className={cn('text-[11px]', isDark ? 'text-white/50' : 'text-muted-foreground/60')}>
-              {relativeTime(comment.created_at)}
+            <span style={{ fontSize: 11, color: INK_SUBTLE }}>
+              · {relativeTime(comment.created_at)}
             </span>
             {(comment as any).is_edited && (
-              <span className={cn('text-[11px]', isDark ? 'text-white/25' : 'text-muted-foreground/40')}>
+              <span style={{ fontSize: 11, color: 'rgba(15,23,42,0.3)' }}>
                 edited
               </span>
             )}
@@ -371,10 +397,7 @@ function CommentsSheet({
           {/* Content */}
           <MentionText
             text={comment.content}
-            className={cn(
-              'mt-1 text-[14px] leading-[20px] block',
-              isDark ? 'text-white/90' : 'text-foreground/90'
-            )}
+            className="mt-1 text-[14px] leading-[20px] block"
           />
 
           {/* Media */}
@@ -389,9 +412,9 @@ function CommentsSheet({
             </div>
           )}
 
-          {/* Action row */}
-          <div className="flex items-center gap-4 mt-0.5">
-            {!isReply && (
+          {/* Action row — Reply only on the left */}
+          {!isReply && (
+            <div className="flex items-center mt-0.5">
               <button
                 type="button"
                 onClick={() => {
@@ -399,48 +422,86 @@ function CommentsSheet({
                   highlightComment(comment.id);
                   requestAnimationFrame(() => textareaRef.current?.focus());
                 }}
-                className={cn(
-                  'text-[12px] font-semibold min-h-[44px] flex items-center',
-                  isDark ? 'text-white/40' : 'text-muted-foreground'
-                )}
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: 'rgba(15,23,42,0.5)',
+                  background: 'none',
+                  border: 0,
+                  cursor: 'pointer',
+                  padding: 0,
+                  minHeight: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
               >
                 Reply
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => toggleCommentLike(comment.id)}
-              className="flex items-center gap-1 min-h-[44px]"
-            >
-              <Heart className={cn(
-                'w-4 h-4 transition-colors',
-                comment.has_liked
-                  ? 'fill-[#f59e0b] text-[#f59e0b]'
-                  : isDark ? 'text-white/40' : 'text-muted-foreground/50'
-              )} />
-              {comment.likes_count > 0 && (
-                <span className={cn(
-                  'text-[12px]',
-                  comment.has_liked ? 'text-[#f59e0b]' : isDark ? 'text-white/50' : 'text-muted-foreground/70'
-                )}>
-                  {comment.likes_count}
-                </span>
-              )}
-            </button>
-            {(isOwn || creatorUserId === currentUserId) && (
-              <button
-                type="button"
-                onClick={() => setCommentToDelete(comment)}
-                className={cn(
-                  'ml-auto min-h-[44px] flex items-center',
-                  isDark ? 'text-white/30' : 'text-muted-foreground/40'
-                )}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
+
+        {/* Right-side stacked like button */}
+        <button
+          type="button"
+          onClick={() => toggleCommentLike(comment.id)}
+          aria-label={comment.has_liked ? 'Unlike' : 'Like'}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            background: 'none',
+            border: 0,
+            padding: '6px 4px 0 8px',
+            cursor: 'pointer',
+            flexShrink: 0,
+            minHeight: 44,
+          }}
+        >
+          <Heart
+            size={18}
+            strokeWidth={2}
+            style={{
+              fill: comment.has_liked ? AMBER : 'none',
+              color: comment.has_liked ? AMBER : INK_MUTED,
+              transition: 'color 150ms, fill 150ms',
+            }}
+          />
+          {comment.likes_count > 0 && (
+            <span
+              className="tabular-nums"
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: comment.has_liked ? AMBER : INK_SUBTLE,
+                lineHeight: 1,
+              }}
+            >
+              {comment.likes_count}
+            </span>
+          )}
+        </button>
+
+        {/* Own-post / creator menu on the far right */}
+        {(isOwn || creatorUserId === currentUserId) && !isReply && (
+          <button
+            type="button"
+            onClick={() => setCommentToDelete(comment)}
+            style={{
+              padding: '6px 4px',
+              background: 'transparent',
+              border: 0,
+              cursor: 'pointer',
+              color: 'rgba(15,23,42,0.3)',
+              flexShrink: 0,
+              minHeight: 44,
+            }}
+            aria-label="More options"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+        )}
       </div>
     );
   };
@@ -469,10 +530,22 @@ function CommentsSheet({
                     return next;
                   });
                 }}
-                className="text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10"
-                style={{ color: '#F7931E' }}
+                style={{
+                  marginLeft: 32,
+                  padding: '6px 0 10px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: 'rgba(15,23,42,0.5)',
+                  background: 'none',
+                  border: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  minHeight: 44,
+                }}
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <span style={{ width: 18, height: 1, background: AMBER, opacity: 0.7 }} />
                 View {totalReplies} {totalReplies === 1 ? 'reply' : 'replies'}
               </button>
             ) : (
@@ -505,10 +578,18 @@ function CommentsSheet({
                 <button
                   type="button"
                   onClick={() => toggleReplies(comment.id)}
-                  className={cn(
-                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-10 sm:pl-14',
-                    isDark ? 'text-white/40' : 'text-muted-foreground'
-                  )}
+                  style={{
+                    paddingLeft: 56,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: 'rgba(15,23,42,0.5)',
+                    background: 'none',
+                    border: 0,
+                    cursor: 'pointer',
+                    minHeight: 44,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
                 >
                   Hide replies
                 </button>
@@ -568,7 +649,7 @@ function CommentsSheet({
               className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0"
               style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
             >
-              {/* Left: tab group */}
+              {/* Left: tabs with inline counts */}
               <div className="flex items-end gap-6">
                 {(['comments', 'likes'] as const).map((tab) => {
                   const isActive = activeTab === tab;
@@ -582,29 +663,41 @@ function CommentsSheet({
                         setActiveTab(tab);
                         scrollRef.current?.scrollTo({ top: 0 });
                       }}
-                      className="relative flex flex-col items-center pb-[10px] min-h-[44px] bg-transparent border-0 cursor-pointer"
+                      className="relative flex items-baseline gap-1.5 pt-[10px] pb-[14px] min-h-[44px] bg-transparent border-0 cursor-pointer"
                     >
-                      {/* Amber eyebrow count */}
                       <span
-                        className="text-[11px] font-semibold uppercase tracking-[0.05em] leading-none mb-[3px] transition-colors duration-200"
-                        style={{ color: isActive ? '#F7931E' : 'rgba(15,23,42,0.25)' }}
-                      >
-                        {count > 0 ? count : '\u00A0'}
-                      </span>
-                      {/* Label */}
-                      <span
-                        className="text-[15px] font-semibold leading-snug whitespace-nowrap transition-colors duration-200"
+                        className="whitespace-nowrap transition-colors duration-200"
                         style={{
-                          color: isActive ? '#0F172A' : '#94A3B8'
+                          fontSize: 17,
+                          fontWeight: 700,
+                          letterSpacing: '-0.01em',
+                          color: isActive ? INK : INK_SUBTLE,
+                          lineHeight: 1.2,
                         }}
                       >
                         {label}
                       </span>
-                      {/* Amber underline bar */}
+                      {count > 0 && (
+                        <span
+                          className="transition-colors duration-200 tabular-nums"
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: isActive ? 'rgba(15,23,42,0.5)' : INK_SUBTLE,
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {count}
+                        </span>
+                      )}
+                      {/* Amber underline — 24px fixed */}
                       <div
-                        className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full transition-opacity duration-200"
+                        className="absolute bottom-0 left-0 transition-opacity duration-200"
                         style={{
-                          background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                          width: 24,
+                          height: 2,
+                          background: AMBER,
+                          borderRadius: 1,
                           opacity: isActive ? 1 : 0,
                         }}
                       />
@@ -614,7 +707,7 @@ function CommentsSheet({
               </div>
 
               {/* Right: sort toggle + close */}
-              <div className="flex items-center gap-1 pb-[6px]">
+              <div className="flex items-center gap-1 pb-[8px]">
                 <AnimatePresence>
                   {activeTab === 'comments' && totalCount > 1 && (
                     <motion.div
@@ -622,58 +715,75 @@ function CommentsSheet({
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      style={{ display: 'flex', alignItems: 'center', gap: 3, borderRadius: 8, background: 'rgba(15,23,42,0.05)', padding: '3px 3px' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 2, borderRadius: 8, background: 'rgba(15,23,42,0.05)', padding: '2px' }}
                     >
-                      {(['best', 'newest'] as const).map(s => (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => setSort(s)}
-                          className="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors min-h-[28px] capitalize"
-                          style={{
-                            background: sort === s ? '#0F172A' : 'transparent',
-                            color: sort === s ? '#ffffff' : '#94A3B8',
-                            border: 'none',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {s === 'best' ? 'Best' : 'Newest'}
-                        </button>
-                      ))}
+                      {(['best', 'newest'] as const).map(s => {
+                        const active = sort === s;
+                        return (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => setSort(s)}
+                            style={{
+                              padding: '5px 11px',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              fontWeight: 600,
+                              minHeight: 28,
+                              background: active ? '#fff' : 'transparent',
+                              color: active ? INK : INK_SOFT,
+                              boxShadow: active ? '0 1px 2px rgba(15,23,42,0.06)' : 'none',
+                              border: 0,
+                              cursor: 'pointer',
+                              transition: 'background 150ms, color 150ms',
+                            }}
+                          >
+                            {s === 'best' ? 'Best' : 'Newest'}
+                          </button>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer"
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer"
+                  aria-label="Close"
                 >
-                  <X className="w-[15px] h-[15px]" style={{ color: '#94A3B8' }} />
+                  <X size={16} style={{ color: INK_SUBTLE }} />
                 </button>
               </div>
             </div>
 
-            {/* Post caption — shown above comments when present */}
+            {/* Post caption — quote block */}
             {activeTab === 'comments' && (cleanCaption || displayCourseName) && (
               <div
-                className="px-4 py-3 shrink-0"
-                style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+                className="px-4 py-3 shrink-0 flex gap-3"
+                style={{ borderBottom: `0.5px solid ${BORDER}` }}
               >
-                {cleanCaption && (
-                  <MentionText
-                    text={cleanCaption}
-                    className="text-[14px] leading-[20px] line-clamp-2 text-foreground/70"
-                    mentionClassName="font-semibold [color:#E8980A]"
-                  />
-                )}
-                {displayCourseName && (
-                  <p className={cn(
-                    'text-[13px] leading-[18px] font-semibold truncate text-foreground',
-                    cleanCaption ? 'mt-1' : ''
-                  )}>
-                    📍 {displayCourseName}
-                  </p>
-                )}
+                {/* Vertical amber quote bar */}
+                <div style={{ width: 3, borderRadius: 2, background: 'rgba(247,147,30,0.5)', flexShrink: 0 }} />
+                <div className="flex-1 min-w-0">
+                  {cleanCaption && (
+                    <div style={{ color: INK_SOFT }}>
+                      <MentionText
+                        text={cleanCaption}
+                        className="text-[13px] leading-[18px] line-clamp-2"
+                        mentionClassName="font-semibold [color:#E8980A]"
+                      />
+                    </div>
+                  )}
+                  {displayCourseName && (
+                    <div
+                      className={cn('flex items-center gap-1', cleanCaption ? 'mt-1' : '')}
+                      style={{ fontSize: 11.5, color: INK_SUBTLE }}
+                    >
+                      <MapPin size={11} style={{ color: AMBER }} strokeWidth={2.25} />
+                      <span className="truncate">{displayCourseName}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -718,7 +828,7 @@ function CommentsSheet({
                           key={liker.userId}
                           type="button"
                           onClick={() => { navigate(`/profile/${liker.userId}`); onClose(); }}
-                          className="flex items-center gap-3 w-full px-4 py-3 min-h-[64px] text-left"
+                          className="flex items-center gap-3 w-full px-4 py-3 min-h-[60px] text-left transition-colors hover:bg-[rgba(15,23,42,0.02)]"
                         >
                           <SquircleAvatar
                             size={40}
@@ -728,11 +838,14 @@ function CommentsSheet({
                             hideRing
                           />
                           <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-semibold truncate text-foreground">
+                            <p
+                              className="truncate"
+                              style={{ fontSize: 14, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
+                            >
                               {liker.displayName}
                             </p>
                             {liker.username && (
-                              <p className="text-[12px] truncate text-muted-foreground">
+                              <p className="truncate" style={{ fontSize: 12, color: INK_SUBTLE }}>
                                 @{liker.username}
                               </p>
                             )}
@@ -850,6 +963,36 @@ function CommentsSheet({
                   )}
                 </AnimatePresence>
 
+                {/* Quick-reaction strip */}
+                {!replyingTo && inputText.length === 0 && (
+                  <div className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide -mx-1 px-1">
+                    {['⛳️', '🔥', '👏', '🎯', '❤️', '😂', '🏆'].map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => handleQuickReaction(emoji)}
+                        style={{
+                          flexShrink: 0,
+                          width: 36,
+                          height: 36,
+                          borderRadius: '50%',
+                          background: 'rgba(15,23,42,0.04)',
+                          border: 0,
+                          cursor: 'pointer',
+                          fontSize: 19,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          lineHeight: 1,
+                        }}
+                        aria-label={`React with ${emoji}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {/* Input row */}
                 <div className="flex items-end gap-2">
                   <SquircleAvatar
@@ -901,9 +1044,10 @@ function CommentsSheet({
                       </div>
                     )}
                     <div style={{
-                      display: 'flex', alignItems: 'flex-end', borderRadius: 22, padding: '8px 12px',
-                      background: 'rgba(15,23,42,0.05)',
-                      border: '0.5px solid rgba(15,23,42,0.07)',
+                      display: 'flex', alignItems: 'flex-end', gap: 4, borderRadius: 22, padding: '4px 6px 4px 14px',
+                      background: '#ffffff',
+                      border: `0.5px solid ${BORDER}`,
+                      minHeight: 42,
                     }}>
                       <textarea
                         ref={textareaRef}
@@ -922,25 +1066,68 @@ function CommentsSheet({
                         onKeyDown={handleInputKeyDown}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                         rows={1}
-                        className="flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug text-foreground placeholder:text-muted-foreground"
-                        style={{ maxHeight: '120px' }}
+                        className="flex-1 min-w-0 bg-transparent outline-none resize-none placeholder:text-[color:#94A3B8]"
+                        style={{
+                          fontSize: 14,
+                          color: INK,
+                          minHeight: 20,
+                          maxHeight: 120,
+                          lineHeight: 1.4,
+                          padding: '8px 0',
+                          fontFamily: 'inherit',
+                        }}
                       />
+                      <div className="flex items-center shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cursor = textareaRef.current?.selectionStart ?? inputText.length;
+                            setInputText(prev => prev.slice(0, cursor) + '😀' + prev.slice(cursor));
+                            requestAnimationFrame(() => textareaRef.current?.focus());
+                          }}
+                          style={{
+                            width: 30, height: 30,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'transparent', border: 0, cursor: 'pointer',
+                            color: INK_SUBTLE, padding: 0,
+                          }}
+                          aria-label="Emoji picker"
+                        >
+                          <Smile size={18} strokeWidth={2} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toast.info('Image attachments coming soon')}
+                          style={{
+                            width: 30, height: 30,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'transparent', border: 0, cursor: 'pointer',
+                            color: INK_SUBTLE, padding: 0,
+                          }}
+                          aria-label="Attach image"
+                        >
+                          <ImageIcon size={18} strokeWidth={2} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleSend}
                     disabled={!inputText.trim() || isAddingComment}
+                    aria-label="Send comment"
                     style={{
-                      width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                      background: inputText.trim() ? '#F7931E' : 'rgba(15,23,42,0.08)',
-                      border: 'none', cursor: 'pointer',
+                      width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+                      background: inputText.trim() ? AMBER : 'rgba(15,23,42,0.1)',
+                      color: inputText.trim() ? '#ffffff' : INK_SUBTLE,
+                      border: 'none',
+                      cursor: inputText.trim() ? 'pointer' : 'not-allowed',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      boxShadow: inputText.trim() ? '0 2px 12px rgba(247,147,30,0.28)' : 'none',
-                      transition: 'all 0.2s',
+                      boxShadow: inputText.trim() ? '0 2px 6px rgba(247,147,30,0.35)' : 'none',
+                      transition: 'background 150ms, box-shadow 150ms',
                     }}
                   >
-                    <SendHorizontal style={{ color: inputText.trim() ? '#ffffff' : 'rgba(15,23,42,0.25)', width: 18, height: 18 }} />
+                    <Send size={16} strokeWidth={2} />
                   </button>
                 </div>
               </div>
