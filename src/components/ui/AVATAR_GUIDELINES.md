@@ -83,16 +83,42 @@ The `<SquircleAvatar>` component is the **single source of truth** for this geom
 <SquircleAvatar size="2xl" ... />
 ```
 
-## With Fallback (Initials)
+## Fallback Behaviour (Updated)
+
+When no `src` is provided or the image fails to load, `SquircleAvatar` renders
+initials on a deterministic coloured background:
+
+- **Colour** is derived from the user's UUID (preferred) or their display name
+  (fallback). Same user → same colour every time, everywhere in the app.
+- **Initials** are auto-derived from `alt` (the user's display name). Two
+  characters max. Override via `fallback` prop if needed.
 
 ```tsx
-<SquircleAvatar 
-  src={user.avatar} 
-  alt={user.name}
-  fallback="JD" // Shows "JD" if image fails to load
-  size={56} 
+// Recommended — colour is consistent across the whole app for this user
+<SquircleAvatar
+  src={user.profile_photo_url}
+  alt={user.display_name}
+  userId={user.id}
+  size="md"
+/>
+
+// If UUID isn't available (rare), colour hashes from the name
+<SquircleAvatar
+  src={null}
+  alt="Chris Leeson"
+  size="md"
+/>
+
+// Manual override for edge cases
+<SquircleAvatar
+  src={null}
+  alt="Guest"
+  fallback="G"
+  size="md"
 />
 ```
+
+Palette and hash live in `src/lib/avatarFallback.ts`. Do not fork.
 
 ## Achievement Ring Colors
 
@@ -116,3 +142,17 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 ## Questions?
 
 See `src/components/ui/SquircleAvatar.tsx` for the implementation details.
+
+## Changelog
+
+### 2026-04-21 — Fallback unification
+- `SquircleAvatar.fallback` prop now actually renders. Previously the prop was
+  accepted but silently dropped; only `PlayerSilhouette` ever rendered.
+- New `userId` prop drives deterministic per-user fallback colour.
+- `avatar.tsx` (shadcn) and `optimized-avatar.tsx` deprecated app-wide
+  (Avatar/AvatarFallback/AvatarImage exports removed from `components/index.ts`).
+- 3 duplicate `FALLBACK_PALETTE` / `getAvatarFallbackColor` copies consolidated
+  into `src/lib/avatarFallback.ts`.
+- New `CoverPhotoFallback` component unifies the empty cover-photo state
+  across `ProfilePageV2`, `ProfileHeroShell`, and `CinematicProfileHeader`.
+

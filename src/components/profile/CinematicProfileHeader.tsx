@@ -48,8 +48,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const photoInputRef = useRef<HTMLInputElement | null>(null);
   const [isHovering, setIsHovering] = useState(false);
 
-  const isMobileWidth = typeof window !== 'undefined' && window.innerWidth < 768;
-
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   const handlePhotoSelect = () => {
@@ -98,17 +96,21 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       }}
       {...swipeHandlers}
     >
-      {/* Blurred Background - Static image only */}
+      {/* Blurred Background - Static image only (or fallback) */}
       <div className="absolute inset-0 z-0">
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${actualPhotoUrl})`,
-            filter: isMobile ? 'blur(20px) saturate(1.2)' : 'blur(40px) saturate(1.2)',
-            transform: 'scale(1.1)',
-          }}
-        />
-        
+        {profilePhotoUrl ? (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${profilePhotoUrl})`,
+              filter: isMobile ? 'blur(20px) saturate(1.2)' : 'blur(40px) saturate(1.2)',
+              transform: 'scale(1.1)',
+            }}
+          />
+        ) : (
+          <CoverPhotoFallback className="absolute inset-0" />
+        )}
+
         {/* Gradient overlay for smooth transition to page content */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent via-60% to-white" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
@@ -131,19 +133,30 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
-          {/* Profile Photo - Image only */}
-          <img
-            ref={photoRef}
-            src={actualPhotoUrl}
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            alt={`${displayName} profile`}
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = fallbackImage;
-            }}
-          />
+          {/* Profile Photo - Image or fallback squircle */}
+          {profilePhotoUrl ? (
+            <img
+              ref={photoRef}
+              src={profilePhotoUrl}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              alt={`${displayName} profile`}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <SquircleAvatar
+                src={null}
+                alt={displayName}
+                size={isMobile ? 200 : 240}
+                hideRing
+              />
+            </div>
+          )}
         </div>
 
         {/* Upload Interface for Empty State */}
