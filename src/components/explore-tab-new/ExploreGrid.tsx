@@ -4,13 +4,9 @@ import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
-import { FeaturedRegionHero } from './FeaturedRegionHero';
 import { TrendingCoursesStrip } from './TrendingCoursesStrip';
-import { ExploreRegionsStrip } from './ExploreRegionsStrip';
-import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 
 const TRENDING_AFTER = 6;
-const REGIONS_AFTER = 18;
 
 interface ExploreGridProps {
   posts: FeedPost[];
@@ -37,7 +33,6 @@ export default function ExploreGrid({
   refetch,
   gridRef,
   activeRegion,
-  onRegionChange,
 }: ExploreGridProps) {
   const fetchGuard = useRef(false);
 
@@ -101,13 +96,6 @@ export default function ExploreGrid({
 
   return (
     <>
-      {/* Discovery modules above the grid */}
-      <FeaturedRegionHero
-        onRegionSelect={(slug) => onRegionChange(slug)}
-        activeRegion={activeRegion}
-      />
-      <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
-
       {/* Grid */}
       <div ref={gridRef} className="grid grid-cols-2 gap-[1px] px-[1px]">
         {coursePosts.map((post, index) => (
@@ -123,13 +111,6 @@ export default function ExploreGrid({
 
             {index === TRENDING_AFTER - 1 && (
               <TrendingCoursesStrip activeRegion={activeRegion} />
-            )}
-
-            {index === REGIONS_AFTER - 1 && activeRegion === null && (
-              <ExploreRegionsStrip
-                onRegionSelect={(slug) => onRegionChange(slug)}
-                activeRegion={activeRegion}
-              />
             )}
           </div>
         ))}

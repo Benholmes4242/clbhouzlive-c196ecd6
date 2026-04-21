@@ -6,33 +6,18 @@ export function BucketListStrip() {
   const navigate = useNavigate();
   const { data: courses, isLoading } = useBucketListCourses();
 
-  // Loading state
   if (isLoading) {
     return (
-      <div
-        style={{
-          borderTop: '1px solid hsl(var(--border) / 0.08)',
-          borderBottom: '0.5px solid hsl(var(--border) / 0.15)',
-          padding: '12px 0 14px',
-          marginBottom: 4,
-        }}
-      >
-        <div
-          style={{
-            padding: '0 16px 10px',
-            fontSize: 12,
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: 0.5,
-            color: '#006747',
-          }}
-        >
-          YOUR BUCKET LIST
+      <section style={{ padding: '24px 0 0' }}>
+        <div style={{ padding: '0 16px 12px' }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
+            Your bucket list
+          </h2>
+          <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
+            Places you've saved
+          </p>
         </div>
-        <div
-          className="flex overflow-x-auto"
-          style={{ padding: '0 16px', gap: 12, scrollbarWidth: 'none' }}
-        >
+        <div className="flex overflow-x-auto" style={{ padding: '0 16px', gap: 12, scrollbarWidth: 'none' }}>
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
@@ -41,7 +26,7 @@ export function BucketListStrip() {
             />
           ))}
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -49,30 +34,16 @@ export function BucketListStrip() {
   const isEmpty = items.length === 0;
 
   return (
-    <div
-      style={{
-        background: 'white',
-        borderTop: '1px solid hsl(var(--border) / 0.08)',
-        borderBottom: '0.5px solid hsl(var(--border) / 0.15)',
-        padding: '12px 0 14px',
-        marginBottom: 4,
-      }}
-    >
-      {/* Section label */}
-      <div
-        style={{
-          padding: '0 16px 10px',
-          fontSize: 12,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: 0.5,
-          color: '#006747',
-        }}
-      >
-        YOUR BUCKET LIST
+    <section style={{ padding: '24px 0 0' }}>
+      <div style={{ padding: '0 16px 12px' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
+          Your bucket list
+        </h2>
+        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
+          Places you've saved
+        </p>
       </div>
 
-      {/* Horizontal scroll */}
       <div
         className="flex overflow-x-auto"
         style={{
@@ -119,12 +90,11 @@ export function BucketListStrip() {
                   key={row.course_id}
                   onClick={() => navigate(`/courses/${row.course_id}`)}
                   className="shrink-0 text-left active:scale-[0.97] transition-transform"
-                   style={{ width: 167 }}
-                 >
-                   {/* Image */}
-                   <div
-                     className="overflow-hidden"
-                     style={{ width: 167, height: 109, borderRadius: 12 }}
+                  style={{ width: 167 }}
+                >
+                  <div
+                    className="overflow-hidden"
+                    style={{ width: 167, height: 109, borderRadius: 12 }}
                   >
                     {img ? (
                       <img
@@ -138,7 +108,6 @@ export function BucketListStrip() {
                     )}
                   </div>
 
-                  {/* Body */}
                   <p
                     className="line-clamp-2"
                     style={{
@@ -166,7 +135,6 @@ export function BucketListStrip() {
               );
             })}
 
-            {/* "Add more" link */}
             <button
               onClick={() => navigate('/courses')}
               className="shrink-0 self-center active:scale-[0.97] transition-transform"
@@ -182,6 +150,6 @@ export function BucketListStrip() {
           </>
         )}
       </div>
-    </div>
+    </section>
   );
 }

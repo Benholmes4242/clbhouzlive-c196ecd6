@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Heart } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
@@ -67,11 +67,15 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
   };
 
   return (
-    <div className="pt-5 pb-5" style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
-      <h3 className="flex items-center gap-1.5 text-[16px] font-bold text-foreground px-4 pb-4">
-        <span style={{ fontSize: 16, lineHeight: 1 }}>🧡</span>
-        Most loved this month
-      </h3>
+    <section style={{ padding: '24px 0 4px' }}>
+      <div style={{ padding: '0 16px 12px' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
+          Most loved this month
+        </h2>
+        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
+          Top reviews your community shared
+        </p>
+      </div>
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {reviews.map((review) => (
           <button
@@ -98,13 +102,20 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
             {/* Bottom gradient */}
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
 
-            {/* Rating badge */}
+            {/* Rating badge — unified star + text */}
             <span
-              className="absolute rounded-full flex items-center gap-[3px] text-[12px] font-semibold text-white leading-none liquid-glass"
-              style={{ top: 8, right: 8, padding: '4px 9px' }}
+              className="absolute flex items-center gap-1 leading-none"
+              style={{
+                top: 8, right: 8,
+                padding: '4px 8px',
+                borderRadius: 9999,
+                background: 'rgba(0,0,0,0.55)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
             >
-              <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[12px] h-[12px]" />
-              {review.rating.toFixed(1)}
+              <Star className="w-[11px] h-[11px]" style={{ color: '#F7931E', fill: '#F7931E' }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{review.rating.toFixed(1)}</span>
             </span>
 
             {/* Course name + location */}
@@ -133,7 +144,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
           </button>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 

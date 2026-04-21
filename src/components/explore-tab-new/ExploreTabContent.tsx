@@ -10,10 +10,8 @@ import { ExploreRecommendations } from './ExploreRecommendations';
 import { ExplorePassport } from './ExplorePassport';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
-import { ExploreVideoGrid } from './ExploreVideoGrid';
 import { FeaturedCoursesCarousel } from './FeaturedCoursesCarousel';
 import { BucketListStrip } from './BucketListStrip';
-import { BestRoundsStrip } from './BestRoundsStrip';
 import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
@@ -78,14 +76,10 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
-      {/* ===== EDITORIAL / SUPPORTING (ported from courses-tab) ===== */}
+      {/* ===== EDITORIAL (unified typography) ===== */}
       {activeRegion === null && <FeaturedCoursesCarousel onRegionSelect={handleRegionChange} />}
       {activeRegion === null && <BucketListStrip />}
-      <BestRoundsStrip activeRegion={activeRegion} />
       <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
-
-      {/* ===== VIDEO TAIL ===== */}
-      <ExploreVideoGrid posts={coursePosts} isLoading={isLoading} />
 
       {/* ===== Section divider before legacy rails ===== */}
       <div style={{ padding: '32px 16px 12px' }}>
@@ -97,7 +91,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         </p>
       </div>
 
-      {/* ===== LEGACY: kept live alongside new content for Session 2 ===== */}
+      {/* ===== LEGACY full feed (no injected hero, no injected regions) ===== */}
       <ExploreGrid
         posts={posts}
         coursePosts={coursePosts}
