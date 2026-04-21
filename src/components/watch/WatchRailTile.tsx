@@ -14,6 +14,12 @@ interface WatchRailTileProps {
   rank?: number;
   /** Tile width in px. Defaults to 200. */
   width?: number;
+  /**
+   * Set of post IDs the current user has already watched.
+   * When provided, the NEW badge is suppressed for posts in this set.
+   * Optional → falls back to global time-only behavior.
+   */
+  viewedPostIds?: Set<string>;
 }
 
 // Hybrid "why" labels — Session 2 of 3.
@@ -23,9 +29,14 @@ interface WatchRailTileProps {
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 const POPULAR_REVIEW_LIKES = 25;
 
-function deriveSurfacingReason(post: FeedPost): string | null {
+function deriveSurfacingReason(
+  post: FeedPost,
+  viewedPostIds?: Set<string>,
+): string | null {
   const ageMs = Date.now() - new Date(post.createdAt).getTime();
-  if (ageMs < NEW_THRESHOLD_MS) return 'NEW';
+  const isFresh = ageMs < NEW_THRESHOLD_MS;
+  const alreadyViewed = viewedPostIds?.has(post.id) ?? false;
+  if (isFresh && !alreadyViewed) return 'NEW';
   if (post.isReview && post.likeCount >= POPULAR_REVIEW_LIKES) return 'POPULAR REVIEW';
   return null;
 }
@@ -43,6 +54,7 @@ export default function WatchRailTile({
   allPosts,
   rank,
   width = 200,
+  viewedPostIds,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -145,7 +157,10 @@ export default function WatchRailTile({
     handleTap();
   }, []);
 
-  const surfacingReason = useMemo(() => deriveSurfacingReason(post), [post]);
+  const surfacingReason = useMemo(
+    () => deriveSurfacingReason(post, viewedPostIds),
+    [post, viewedPostIds],
+  );
 
   return (
     <div

@@ -5,6 +5,7 @@ import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import WatchSectionHeader from './WatchSectionHeader';
 import WatchRailTile from './WatchRailTile';
+import { useViewedPostIds } from './hooks/useViewedPostIds';
 
 // Hero re-uses the rich VideoCard treatment for the freshest single post.
 const VideoCard = lazy(() =>
@@ -28,6 +29,7 @@ export default function LatestVideosRail() {
     userId,
     filter: 'latest',
   });
+  const { data: viewedPostIds } = useViewedPostIds();
 
   if (isLoading || posts.length === 0) {
     return (
@@ -86,6 +88,7 @@ export default function LatestVideosRail() {
                 post={post}
                 index={i + 1}
                 allPosts={posts}
+                viewedPostIds={viewedPostIds}
               />
             </div>
           ))}

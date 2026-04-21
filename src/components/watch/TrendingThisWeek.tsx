@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
+import { useViewedPostIds } from './hooks/useViewedPostIds';
 import WatchRailTile from './WatchRailTile';
 import WatchSectionHeader from './WatchSectionHeader';
 
@@ -18,6 +19,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
     filter: 'top',
     enabled: !!userId && enabled,
   });
+  const { data: viewedPostIds } = useViewedPostIds();
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
 
@@ -114,7 +116,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
       >
         {topPosts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} />
+            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} viewedPostIds={viewedPostIds} />
           </div>
         ))}
       </div>
