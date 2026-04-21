@@ -2,11 +2,18 @@ import { useState, useCallback, useRef, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegionChips } from './hooks/useExploreRegionChips';
+import { useExploreMood } from './hooks/useExploreMood';
 import { ExploreHeader } from './ExploreHeader';
+import { MoodChips } from './MoodChips';
+import { ExploreHero } from './ExploreHero';
+import { ExploreRecommendations } from './ExploreRecommendations';
+import { ExplorePassport } from './ExplorePassport';
+import { ExploreEchoCTA } from './ExploreEchoCTA';
+import { ExploreDestinations } from './ExploreDestinations';
+import { ExploreVideoGrid } from './ExploreVideoGrid';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSearchOverlay } from './ExploreSearchOverlay';
-import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -20,6 +27,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement | null>(null);
 
+  const { mood, setMood } = useExploreMood();
   const { regions, isLoading: regionsLoading } = useExploreRegionChips();
 
   const {
@@ -58,18 +66,26 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         embedded={embedded}
       />
 
-      {/* Echo — course discovery */}
-      <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-        <EchoContextualButton
-          prompt="Help me find my next golf course to play. Ask me a few questions about my preferences — type of course, location, handicap, budget — and suggest some great options."
-          label="Ask Echo to find you a course"
-          sublabel="Describe your ideal round and Echo will suggest"
-          dark={false}
-          compact
-          source="discover_explore_tab"
-        />
+      {/* ===== NEW: Session 2 mood-driven discovery surface ===== */}
+      <MoodChips active={mood} onChange={setMood} />
+      <ExploreHero userId={userId} mood={mood} />
+      <ExploreRecommendations userId={userId} mood={mood} />
+      <ExplorePassport userId={userId} />
+      <ExploreEchoCTA mood={mood} />
+      <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
+      <ExploreVideoGrid posts={coursePosts} isLoading={isLoading} />
+
+      {/* ===== Section divider before legacy rails ===== */}
+      <div style={{ padding: '32px 16px 12px' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
+          More to explore
+        </h2>
+        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
+          The full course feed
+        </p>
       </div>
 
+      {/* ===== LEGACY: kept live alongside new content for Session 2 ===== */}
       <ExploreGrid
         posts={posts}
         coursePosts={coursePosts}
