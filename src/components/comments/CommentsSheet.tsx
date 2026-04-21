@@ -95,6 +95,7 @@ function CommentsSheet({
   initialParentCommentId,
   
   caption,
+  courseId,
   courseName,
   isReview,
   likesCount,
@@ -690,10 +691,12 @@ function CommentsSheet({
                           {count}
                         </span>
                       )}
-                      {/* Amber underline — 24px fixed */}
+                      {/* Amber underline — 24px fixed, centered */}
                       <div
-                        className="absolute bottom-0 left-0 transition-opacity duration-200"
+                        className="absolute bottom-0 transition-opacity duration-200"
                         style={{
+                          left: '50%',
+                          transform: 'translateX(-50%)',
                           width: 24,
                           height: 2,
                           background: AMBER,
@@ -775,13 +778,53 @@ function CommentsSheet({
                     </div>
                   )}
                   {displayCourseName && (
-                    <div
-                      className={cn('flex items-center gap-1', cleanCaption ? 'mt-1' : '')}
-                      style={{ fontSize: 11.5, color: INK_SUBTLE }}
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (courseId) {
+                          navigate(`/courses/${courseId}`);
+                          onClose();
+                          return;
+                        }
+                        try {
+                          const { data } = await supabase
+                            .from('golf_courses')
+                            .select('id')
+                            .ilike('name', displayCourseName.trim())
+                            .limit(1)
+                            .maybeSingle();
+                          if (data?.id) {
+                            navigate(`/courses/${data.id}`);
+                          } else {
+                            navigate(`/courses?search=${encodeURIComponent(displayCourseName)}`);
+                          }
+                          onClose();
+                        } catch {
+                          navigate(`/courses?search=${encodeURIComponent(displayCourseName)}`);
+                          onClose();
+                        }
+                      }}
+                      className={cn(
+                        'inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 min-h-[28px]',
+                        cleanCaption ? 'mt-1' : ''
+                      )}
+                      style={{ fontSize: 11.5, color: INK_SUBTLE, textAlign: 'left' }}
+                      aria-label={`View ${displayCourseName}`}
                     >
                       <MapPin size={11} style={{ color: AMBER }} strokeWidth={2.25} />
-                      <span className="truncate">{displayCourseName}</span>
-                    </div>
+                      <span
+                        className="truncate"
+                        style={{
+                          maxWidth: 260,
+                          textDecoration: 'underline',
+                          textDecorationColor: 'rgba(15,23,42,0.15)',
+                          textUnderlineOffset: 2,
+                        }}
+                      >
+                        {displayCourseName}
+                      </span>
+                    </button>
                   )}
                 </div>
               </div>
