@@ -179,7 +179,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
           {showLikes && (
             <div className="inline-flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
               {(likes ?? 0) > 0 ? (
-                <span style={{ fontSize: 12, lineHeight: 1 }}>🧡</span>
+                <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
               ) : (
                 <Heart className="w-3 h-3 flex-shrink-0 text-white" />
               )}

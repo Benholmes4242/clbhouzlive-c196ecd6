@@ -221,7 +221,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
               style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
             >
               {isLiked ? (
-                <span style={{ fontSize: 19, lineHeight: 1 }}>🧡</span>
+                <Heart style={{ width: 19, height: 19, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
               ) : (
                 <Heart className="h-[19px] w-[19px] text-muted-foreground" />
               )}
