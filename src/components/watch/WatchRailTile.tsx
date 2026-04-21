@@ -220,13 +220,15 @@ export default function WatchRailTile({
             top: 8,
             left: 8,
             zIndex: 3,
-            padding: '3px 7px',
+            height: 18,
+            padding: '0 7px',
             borderRadius: 6,
             background: 'rgba(0,0,0,0.42)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
             fontSize: 9,
             fontWeight: 700,
+            lineHeight: 1,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             color: '#F7931E',
@@ -235,6 +237,10 @@ export default function WatchRailTile({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
           }}
         >
           {surfacingReason}
