@@ -43,10 +43,8 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
     navigate(`/profile/${friendId}`);
   };
 
-  const getInitials = (friend: NetworkFriend) => {
-    const name = friend.display_name || friend.username || '';
-    return name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || '?';
-  };
+
+
 
   return (
     <div className={cn('mt-2 mb-1.5', className)}>
@@ -74,7 +72,7 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
               size={47}
               src={friend.profile_photo_url}
               alt={friend.display_name || friend.username}
-              fallback={getInitials(friend)}
+              userId={friend.id}
               hideRing={!unseenReviewerIds.has(friend.id)}
               ringColor={unseenReviewerIds.has(friend.id) ? '#F7931E' : undefined}
             />

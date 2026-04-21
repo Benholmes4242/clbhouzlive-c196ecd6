@@ -39,10 +39,8 @@ const CompareWithFriendsModal: React.FC<CompareWithFriendsModalProps> = ({
     return friend.display_name || friend.username || 'Golf Friend';
   };
 
-  const getInitials = (friend: any) => {
-    const name = getDisplayName(friend);
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
+
+
 
   const getTrophyLevel = (courses: number) => {
     if (courses >= 300) return { name: 'Legend', emoji: '👑', color: 'text-purple-500' };
@@ -161,10 +159,10 @@ const CompareWithFriendsModal: React.FC<CompareWithFriendsModalProps> = ({
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <SquircleAvatar
-                              src={friend.profile_photo_url || ''}
+                              src={friend.profile_photo_url || null}
                               alt={getDisplayName(friend)}
+                              userId={friend.id}
                               size="md"
-                              fallback={getInitials(friend)}
                             />
                             <div>
                               <h4 className="font-medium">{getDisplayName(friend)}</h4>

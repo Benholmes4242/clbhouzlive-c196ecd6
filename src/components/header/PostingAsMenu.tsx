@@ -144,7 +144,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
 
   const { logout: handleLogout } = useLogout();
 
-  const getInitials = (name: string) => name.charAt(0).toUpperCase();
+  
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -239,7 +239,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             size={44}
             src={activeActor?.avatarUrl}
             alt={displayName}
-            fallback={getInitials(displayName)}
+            userId={activeActor?.id}
             hideRing
           />
           <div className="flex flex-col min-w-0 flex-1">
@@ -327,7 +327,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                       size={28}
                       src={actor.avatarUrl}
                       alt={actor.name}
-                      fallback={getInitials(actor.name)}
+                      userId={actor.id}
                       hideRing
                     />
                     <div className="flex-1 text-left min-w-0">

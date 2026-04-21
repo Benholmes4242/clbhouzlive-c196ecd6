@@ -36,7 +36,7 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
   // Show selector if user has more than personal profile OR always show for navigation
   const hasMultipleActors = availableActors.length > 1;
 
-  const getInitials = (name: string) => name.charAt(0).toUpperCase();
+  
 
   // Truncate display name to prevent layout breaks
   const truncateDisplayName = (name: string, maxLength = 18) => {
@@ -51,7 +51,7 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
         size={sizePixels}
         src={actor.avatarUrl}
         alt={actor.name}
-        fallback={getInitials(actor.name)}
+        userId={actor.id}
         hideRing
       />
     );

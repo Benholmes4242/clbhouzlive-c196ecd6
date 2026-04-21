@@ -103,10 +103,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
     }
   };
 
-  const getInitials = (user: UserResult) => {
-    const name = user.display_name || user.username || '?';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
+
+
 
   return (
     <BottomSheet

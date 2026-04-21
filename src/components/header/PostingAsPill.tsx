@@ -119,7 +119,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
       );
     }
 
-    const getInitials = (name: string) => name.charAt(0).toUpperCase();
+    
 
     // Get styles based on theme
     const getPillStyles = () => {
@@ -166,7 +166,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             size={28}
             src={activeActor.avatarUrl}
             alt={activeActor.name}
-            fallback={getInitials(activeActor.name)}
+            userId={activeActor.id}
             hideRing
           />
           

@@ -15,14 +15,8 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
   
   if (!profile) return null;
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
+
+
 
   return (
     <div className="rounded-sq-sm bg-white/5 border border-white/10 p-3">
@@ -32,7 +26,7 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
           size={48} 
           src={profile.profile_photo_url}
           alt={profile.display_name}
-          fallback={getInitials(profile.display_name)}
+          userId={request.requester_user_id}
         />
 
         {/* Profile Info */}

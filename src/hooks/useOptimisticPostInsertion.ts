@@ -31,7 +31,7 @@ export const useOptimisticPostInsertion = () => {
         id: postData.userProfile.id,
         name: postData.userProfile.display_name || postData.userProfile.username || 'User',
         username: postData.userProfile.username,
-        avatar: postData.userProfile.profile_photo_url || '/placeholder.svg',
+        avatar: postData.userProfile.profile_photo_url ?? null,
         verified: false
       } : undefined,
       likes: 0,

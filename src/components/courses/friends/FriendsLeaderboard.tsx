@@ -45,10 +45,8 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
     return friend.display_name || friend.username || 'Golf Friend';
   };
 
-  const getInitials = (friend: any) => {
-    const name = getDisplayName(friend);
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
+
+
 
   const getTrophyLevel = (courses: number) => {
     if (courses >= 300) return { name: 'Legend', color: 'from-purple-500 to-violet-600', emoji: '👑' };
@@ -159,10 +157,10 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
 
               {/* Avatar */}
               <SquircleAvatar
-                src={friend.profile_photo_url || ''}
+                src={friend.profile_photo_url || null}
                 alt={getDisplayName(friend)}
+                userId={friend.id}
                 size="md"
-                fallback={getInitials(friend)}
               />
 
               {/* Friend Info */}

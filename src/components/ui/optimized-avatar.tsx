@@ -2,6 +2,12 @@ import React, { memo } from 'react';
 import { getDirectImageUrl, isR2Url, isPreviewEnvironment } from '@/utils/r2ImageUtils';
 import { Avatar, AvatarImage, AvatarFallback } from './avatar';
 
+if (process.env.NODE_ENV !== 'production') {
+  console.error(
+    '[OptimizedAvatar] Deprecated. Use <SquircleAvatar /> from @/components/ui/SquircleAvatar instead. See src/components/ui/AVATAR_GUIDELINES.md.'
+  );
+}
+
 /**
  * ⚠️ FORBIDDEN FOR USER AVATARS - USE <Squircle /> ONLY ⚠️
  * 

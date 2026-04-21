@@ -62,7 +62,7 @@ export function WizardHeader({
 
   if (!isNumericStep) return null;
 
-  const getInitials = (name: string) => name.charAt(0).toUpperCase();
+  
 
   const handleBackOrClose = () => {
     if (isFirstStep) {

@@ -88,9 +88,8 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
     navigate(`/course/${courseId}`);
   };
 
-  const getInitials = (name: string) => {
-    return name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || '?';
-  };
+
+
 
   return (
     <section className={`mb-4 ${className}`}>
@@ -124,7 +123,7 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
                   size={32}
                   src={friend.avatar_url}
                   alt={friend.display_name}
-                  fallback={getInitials(friend.display_name)}
+                  userId={friend.friend_id}
                   hideRing
                   className="ring-2 ring-[#f8fafc]"
                 />
@@ -205,7 +204,7 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
                           size={20}
                           src={friend.friend_profile.profile_photo_url}
                           alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                          fallback={(friend.friend_profile.display_name || friend.friend_profile.username)?.charAt(0)}
+                          userId={friend.friend_id}
                           hideRing
                           thinRing
                           className="ring-1 ring-card"
