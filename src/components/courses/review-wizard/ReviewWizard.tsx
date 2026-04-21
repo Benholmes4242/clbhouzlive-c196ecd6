@@ -47,7 +47,7 @@ export function ReviewWizard({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  const { shareReview, isSharing } = useShareReview();
+  const { notifyReviewShared, isSharing } = useShareReview();
   const { activeActor, availableActors } = useActiveActor();
   
 
@@ -153,62 +153,40 @@ export function ReviewWizard({
   // All steps use light status bar
   useMedianStatusBar("light", "transparent", isOpen, false);
 
-  // ---- AUTO-SHARE for new reviews ----
+  // ---- AUTO-SHARE NOTIFICATION for new reviews ----
+  // Media copy is handled server-side by trg_sync_review_media_to_post_media.
+  // We wait briefly for uploads + triggers to settle, then invalidate feeds
+  // and fire analytics with accurate media counts.
   useEffect(() => {
     if (
       wizard.state.step === 'success' &&
       !isEditMode &&
       !alreadyShared &&
       !autoShareAttempted.current &&
-      wizard.submittedRatingId &&
-      activeCourse
+      wizard.submittedRatingId
     ) {
       autoShareAttempted.current = true;
       setIsAutoSharing(true);
 
-      (async () => {
+      const timer = window.setTimeout(async () => {
         try {
-          // Fetch media from DB (same as handleShareFromPreview)
-          const { data: dbMedia } = await supabase
-            .from('course_review_media')
-            .select('id, media_url, media_type, poster_url, stream_id, is_cover')
-            .eq('review_id', wizard.submittedRatingId!)
-            .in('status', ['attached', 'ready'])
-            .order('created_at', { ascending: true });
-
-          const media = (dbMedia || []).map(m => ({
-            id: m.id,
-            media_url: m.media_url,
-            media_type: m.media_type,
-            poster_url: m.poster_url,
-            stream_id: m.stream_id,
-            is_cover: m.is_cover ?? false,
-          }));
-
-          const result = await shareReview({
+          const result = await notifyReviewShared({
             ratingId: wizard.submittedRatingId!,
-            courseId: activeCourse.id,
-            reviewText: wizard.state.review || null,
-            media,
           });
-
           if (result.success) {
             setSharedPostId(result.postId || null);
             setAutoShareComplete(true);
-            // Invalidate feed queries
-            queryClient.invalidateQueries({ queryKey: ['media-feed'] });
-            queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
-            queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
-            queryClient.invalidateQueries({ queryKey: ['review-shared', wizard.submittedRatingId] });
           }
         } catch (err) {
-          console.error('[ReviewWizard] Auto-share failed:', err);
+          console.error('[ReviewWizard] Auto-share notify failed:', err);
         } finally {
           setIsAutoSharing(false);
         }
-      })();
+      }, 1500);
+
+      return () => window.clearTimeout(timer);
     }
-  }, [wizard.state.step, isEditMode, alreadyShared, wizard.submittedRatingId, activeCourse]);
+  }, [wizard.state.step, isEditMode, alreadyShared, wizard.submittedRatingId, notifyReviewShared]);
 
   // ---- OPT-OUT: remove shared post ----
   const handleOptOutShare = useCallback(async () => {
@@ -301,40 +279,15 @@ export function ReviewWizard({
   }, [sharedPostId, wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
   const handleShareFromPreview = useCallback(async () => {
-    if (!wizard.submittedRatingId || !activeCourse) return;
-    
-    const { data: dbMedia, error: mediaError } = await supabase
-      .from('course_review_media')
-      .select('id, media_url, media_type, poster_url, stream_id, is_cover')
-      .eq('review_id', wizard.submittedRatingId)
-      .in('status', ['attached', 'ready'])
-      .order('created_at', { ascending: true });
-    
-    if (mediaError) {
-      console.error('[ShareReview] Failed to fetch review media:', mediaError);
-    }
-    
-    const media = (dbMedia || []).map(m => ({
-      id: m.id,
-      media_url: m.media_url,
-      media_type: m.media_type,
-      poster_url: m.poster_url,
-      stream_id: m.stream_id,
-      is_cover: m.is_cover ?? false,
-    }));
-    
-    const result = await shareReview({
+    if (!wizard.submittedRatingId) return;
+    const result = await notifyReviewShared({
       ratingId: wizard.submittedRatingId,
-      courseId: activeCourse.id,
-      reviewText: wizard.state.review || null,
-      media,
     });
-    
     if (result.success) {
       setSharedPostId(result.postId || null);
       wizard.goToStep('share-success');
     }
-  }, [wizard, activeCourse, shareReview]);
+  }, [wizard, notifyReviewShared]);
 
   const handleDone = useCallback(() => {
     wizard.cleanup();

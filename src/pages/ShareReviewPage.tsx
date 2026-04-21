@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 export default function ShareReviewPage() {
   const { courseId, reviewId } = useParams<{ courseId: string; reviewId: string }>();
   const navigate = useNavigate();
-  const { shareReview, isSharing } = useShareReview();
+  const { notifyReviewShared, isSharing } = useShareReview();
   const { user } = useSupabaseSession();
   const [hasShared, setHasShared] = useState(false);
 
@@ -87,19 +87,8 @@ export default function ShareReviewPage() {
   const handleShare = useCallback(async () => {
     if (!courseId || !reviewId || !review) return;
 
-    const media = (review.course_review_media || []).map((m: any) => ({
-      id: m.id,
-      media_url: m.media_url,
-      media_type: m.media_type,
-      poster_url: m.poster_url,
-      stream_id: m.stream_id,
-    }));
-
-    const result = await shareReview({
+    const result = await notifyReviewShared({
       ratingId: reviewId,
-      courseId,
-      reviewText: review.review || null,
-      media,
     });
 
     if (result.success) {
@@ -108,7 +97,7 @@ export default function ShareReviewPage() {
         navigate(`/courses/${courseId}?reviewId=${reviewId}`);
       }, 1500);
     }
-  }, [courseId, reviewId, review, shareReview, navigate]);
+  }, [courseId, reviewId, review, notifyReviewShared, navigate]);
 
   const isLoading = courseLoading || reviewLoading;
 
