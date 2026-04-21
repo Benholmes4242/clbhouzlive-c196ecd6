@@ -250,7 +250,7 @@ export function SnapFeed({
     });
   }, [activeIndex]);
 
-  // ── PGA card sentinel observer ──
+  // ── Editorial card sentinel observer ──
   const setIsTournamentCardActive = useClubhouseStore(s => s.setIsTournamentCardActive);
 
   // Stable key that changes only when editorial cards enter/leave/reorder.
@@ -271,30 +271,27 @@ export function SnapFeed({
     const container = containerRef.current;
     if (!container) return;
 
-    const sentinels = container.querySelectorAll("[data-pga-sentinel='true']");
-    if (sentinels.length === 0) {
-      // No editorial cards in current feed — ensure flag is false
-      setIsTournamentCardActive(false);
-      return;
-    }
-
-    // Track intersection state per sentinel so we activate when ANY is visible
     const visibleSet = new Set<Element>();
+    const observedSet = new Set<Element>();
 
-    // Synchronous initial check — kills the return-to-page / first-mount flash
-    // by seeding the flag before paint, before the IO has a chance to fire.
-    const containerRect = container.getBoundingClientRect();
-    sentinels.forEach(sentinel => {
+    const syncSentinelVisibility = (sentinel: Element) => {
       const rect = sentinel.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
       const visibleTop = Math.max(rect.top, containerRect.top);
       const visibleBottom = Math.min(rect.bottom, containerRect.bottom);
       const visibleHeight = Math.max(0, visibleBottom - visibleTop);
       const ratio = rect.height > 0 ? visibleHeight / rect.height : 0;
+
       if (ratio >= 0.85) {
         visibleSet.add(sentinel);
+      } else {
+        visibleSet.delete(sentinel);
       }
-    });
-    setIsTournamentCardActive(visibleSet.size > 0);
+    };
+
+    const publishVisibility = () => {
+      setIsTournamentCardActive(visibleSet.size > 0);
+    };
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -305,13 +302,54 @@ export function SnapFeed({
             visibleSet.delete(entry.target);
           }
         }
-        setIsTournamentCardActive(visibleSet.size > 0);
+        publishVisibility();
       },
       { root: container, threshold: [0, 0.85] }
     );
 
-    sentinels.forEach(sentinel => observer.observe(sentinel));
-    return () => observer.disconnect();
+    const reconcileSentinels = () => {
+      const sentinels = Array.from(container.querySelectorAll("[data-pga-sentinel='true']"));
+      const currentSet = new Set<Element>(sentinels);
+
+      observedSet.forEach((sentinel) => {
+        if (!currentSet.has(sentinel)) {
+          observer.unobserve(sentinel);
+          observedSet.delete(sentinel);
+          visibleSet.delete(sentinel);
+        }
+      });
+
+      sentinels.forEach((sentinel) => {
+        if (!observedSet.has(sentinel)) {
+          observedSet.add(sentinel);
+          observer.observe(sentinel);
+        }
+        syncSentinelVisibility(sentinel);
+      });
+
+      if (sentinels.length === 0) {
+        visibleSet.clear();
+      }
+
+      publishVisibility();
+    };
+
+    // Initial seed kills first-mount / return-to-page flash.
+    reconcileSentinels();
+
+    // SnapFeed virtualizes slides, so editorial sentinels mount later as the user
+    // scrolls into the active window. Watch DOM changes and attach/detach observers
+    // as those sentinel nodes appear/disappear.
+    const mutationObserver = new MutationObserver(() => {
+      reconcileSentinels();
+    });
+
+    mutationObserver.observe(container, { childList: true, subtree: true });
+
+    return () => {
+      mutationObserver.disconnect();
+      observer.disconnect();
+    };
   }, [editorialCardKey, setIsTournamentCardActive]);
 
   return (
