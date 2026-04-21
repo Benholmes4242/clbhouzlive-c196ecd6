@@ -7,7 +7,9 @@ import WatchSectionHeader from './WatchSectionHeader';
 import WatchRailTile from './WatchRailTile';
 
 // Hero re-uses the rich VideoCard treatment for the freshest single post.
-const VideoCard = lazy(() => import('@/components/videos-tab/VideoCard'));
+const VideoCard = lazy(() =>
+  import('@/components/videos-tab/VideoCard').then((m) => ({ default: m.VideoCard }))
+);
 
 /**
  * "Latest videos" section — one full-bleed autoplay hero anchor +
