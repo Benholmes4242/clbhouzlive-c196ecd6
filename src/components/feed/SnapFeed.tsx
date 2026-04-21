@@ -7,6 +7,8 @@ import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { registerInPool } from '@/utils/hlsPoolPreloader';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgressTracker';
 
 
 const NEAR_END_THRESHOLD = 3;
@@ -109,6 +111,21 @@ export function SnapFeed({
   useEffect(() => {
     pauseAllAudio();
   }, [location.pathname]);
+
+  // Watch-progress tracking — populates user_content_preferences with
+  // watched_partial / watched_complete signals for whichever surface is
+  // hosting this SnapFeed (Clubhouse Suggested inline, fullscreen overlay,
+  // course media viewer). Container-scoped so stacked SnapFeeds don't
+  // cross-target each other's <video> elements.
+  const { session } = useSupabaseSession();
+  const trackerUserId = session?.user?.id;
+  const getTrackerContainer = useCallback(() => containerRef.current, []);
+  useWatchProgressTracker({
+    userId: trackerUserId,
+    activeIndex,
+    posts,
+    getContainer: getTrackerContainer,
+  });
 
   // ── IntersectionObserver setup ──
   useEffect(() => {
