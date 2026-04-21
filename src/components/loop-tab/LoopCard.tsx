@@ -339,6 +339,68 @@ export const LoopCard = React.memo(function LoopCard({
           </div>
         )}
 
+        {/* 3.5 NETWORK SIGNALS — friend chip + network rating (only when activity present) */}
+        {(showFriendChip || showNetworkRating) && (
+          <div className="flex items-center gap-2 px-4 pt-2 flex-wrap">
+            {showFriendChip && (
+              <button
+                onClick={() => courseId && navigate(`/courses/${courseId}`)}
+                className="flex items-center gap-1.5 active:scale-[0.97] transition-transform"
+                style={{
+                  background: 'rgba(247,147,30,0.08)',
+                  border: '1px solid rgba(247,147,30,0.22)',
+                  borderRadius: 20,
+                  padding: '4px 10px 4px 4px',
+                }}
+                aria-label={friendChipText || 'Friends played here'}
+              >
+                <div className="flex -space-x-1.5">
+                  {topFriendAvatars.slice(0, 3).map((url, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-full overflow-hidden border-2 bg-muted"
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderColor: 'hsl(var(--card))',
+                      }}
+                    >
+                      {url ? (
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-muted" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#c97a10' }}>
+                  {friendChipText}
+                </span>
+              </button>
+            )}
+            {showNetworkRating && (
+              <div
+                className="flex items-center gap-1"
+                style={{
+                  background: 'rgba(247,147,30,0.06)',
+                  border: '1px solid rgba(247,147,30,0.18)',
+                  borderRadius: 20,
+                  padding: '4px 10px',
+                }}
+                aria-label={`Network average rating ${networkRatingAvg} from ${networkRatingCount} friends`}
+              >
+                <Star className="h-3 w-3" style={{ color: '#F7931E', fill: '#F7931E' }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#c97a10' }}>
+                  {networkRatingAvg?.toFixed(1)}
+                </span>
+                <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }}>
+                  · {networkRatingCount} friends
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* 4. ENGAGEMENT ROW — pill buttons */}
         <div
           className="flex items-center gap-2 px-4 py-2.5"
