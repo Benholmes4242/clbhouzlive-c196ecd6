@@ -2,6 +2,7 @@ import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+import { enforceCreatorDiversity } from '@/components/media-system/utils/feedAlgorithm';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 import type { WatchFilter } from '../types';
 
@@ -85,11 +86,14 @@ export function useWatchFeed({ userId, filter, category, searchQuery, userLat, u
   const allPosts = useMemo(() => {
     const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
-    return posts.filter(p => {
+    const deduped = posts.filter(p => {
       if (seen.has(p.id)) return false;
       seen.add(p.id);
       return true;
     });
+    // Hard guarantee: no two consecutive posts from the same creator.
+    // Runs after dedup so we never trip over duplicate IDs.
+    return enforceCreatorDiversity(deduped);
   }, [query.data]);
 
   const resetSeen = useCallback(() => {
