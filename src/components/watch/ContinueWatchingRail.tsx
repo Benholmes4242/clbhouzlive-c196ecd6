@@ -152,14 +152,14 @@ function ContinueWatchingTile({
           left: 0,
           right: 0,
           height: 3,
-          background: 'rgba(255,255,255,0.18)',
+          background: 'rgba(255,255,255,0.15)',
         }}
       >
         <div
           style={{
             width: `${progressPct}%`,
             height: '100%',
-            background: '#F7931E',
+            background: '#FFFFFF',
           }}
         />
       </div>
