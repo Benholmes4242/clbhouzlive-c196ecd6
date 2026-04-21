@@ -31,12 +31,13 @@ export function useWatchProgressTracker(userId: string | undefined) {
     }
 
     const interval = window.setInterval(() => {
-      // Find the currently visible video element. SnapFeed renders the
-      // active card with [data-active="true"]; fall back to first video
-      // if attribute isn't present.
+      // SnapFeed renders each slide with `data-index={idx}` inside a
+      // [data-snap-feed] container. Locate the active slide's video.
+      const activeSlide = document.querySelector(
+        `[data-snap-feed] [data-index="${activeIndex}"] video`,
+      ) as HTMLVideoElement | null;
       const activeCard =
-        (document.querySelector('[data-active="true"] video') as HTMLVideoElement | null) ??
-        (document.querySelector('.snap-feed video') as HTMLVideoElement | null);
+        activeSlide ?? (document.querySelector('[data-snap-feed] video') as HTMLVideoElement | null);
 
       if (!activeCard || activeCard.paused) return;
       const current = activeCard.currentTime;
