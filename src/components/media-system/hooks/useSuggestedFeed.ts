@@ -13,7 +13,7 @@ export function useSuggestedFeed(userId: string | undefined) {
   const query = useInfiniteQuery({
     queryKey: ['media-feed', 'suggested', userId],
     queryFn: async ({ pageParam }) => {
-      if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+      if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined, rawRowCount: 0 };
 
       // Seed the session entropy for this user+hour combination
       if (userId) initSessionSeed(userId);
@@ -30,7 +30,7 @@ export function useSuggestedFeed(userId: string | undefined) {
 
         if (error) {
           console.error('[SuggestedFeed] RPC error:', error);
-          return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+          return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined, rawRowCount: 0 };
         }
 
         const rows = ((data ?? []) as unknown as FeedRpcRow[]);
