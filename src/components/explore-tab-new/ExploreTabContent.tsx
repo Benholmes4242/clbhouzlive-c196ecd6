@@ -11,6 +11,10 @@ import { ExplorePassport } from './ExplorePassport';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
 import { ExploreVideoGrid } from './ExploreVideoGrid';
+import { FeaturedCoursesCarousel } from './FeaturedCoursesCarousel';
+import { BucketListStrip } from './BucketListStrip';
+import { BestRoundsStrip } from './BestRoundsStrip';
+import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSearchOverlay } from './ExploreSearchOverlay';
@@ -66,13 +70,21 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         embedded={embedded}
       />
 
-      {/* ===== NEW: Session 2 mood-driven discovery surface ===== */}
+      {/* ===== ACTIVE / PERSONALISED ===== */}
       <MoodChips active={mood} onChange={setMood} />
       <ExploreHero userId={userId} mood={mood} />
       <ExploreRecommendations userId={userId} mood={mood} />
       <ExplorePassport userId={userId} />
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
+
+      {/* ===== EDITORIAL / SUPPORTING (ported from courses-tab) ===== */}
+      {activeRegion === null && <FeaturedCoursesCarousel onRegionSelect={handleRegionChange} />}
+      {activeRegion === null && <BucketListStrip />}
+      <BestRoundsStrip activeRegion={activeRegion} />
+      <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
+
+      {/* ===== VIDEO TAIL ===== */}
       <ExploreVideoGrid posts={coursePosts} isLoading={isLoading} />
 
       {/* ===== Section divider before legacy rails ===== */}
