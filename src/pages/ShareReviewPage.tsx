@@ -97,7 +97,7 @@ export default function ShareReviewPage() {
         navigate(`/courses/${courseId}?reviewId=${reviewId}`);
       }, 1500);
     }
-  }, [courseId, reviewId, review, shareReview, navigate]);
+  }, [courseId, reviewId, review, notifyReviewShared, navigate]);
 
   const isLoading = courseLoading || reviewLoading;
 
