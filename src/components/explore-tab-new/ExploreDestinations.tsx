@@ -7,7 +7,7 @@ interface ExploreDestinationsProps {
 }
 
 function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDestinationsProps) {
-  const { regions, isLoading } = useExploreRegionsWithImages();
+  const { data: regions, isLoading } = useExploreRegionsWithImages();
 
   if (isLoading) {
     return (
