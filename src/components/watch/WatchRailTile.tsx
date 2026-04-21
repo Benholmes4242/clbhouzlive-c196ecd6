@@ -3,6 +3,8 @@ import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useWatchActions } from './context/WatchActionsContext';
+import { haptic } from '@/utils/haptics';
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -108,9 +110,40 @@ export default function WatchRailTile({
     };
   }, []);
 
+  const { openActions } = useWatchActions();
+
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
   };
+
+  // Long-press → show action sheet (Save / Share / Not interested / Report)
+  const longPressTimerRef = useRef<number | null>(null);
+  const longPressFiredRef = useRef(false);
+
+  const startLongPress = useCallback(() => {
+    longPressFiredRef.current = false;
+    longPressTimerRef.current = window.setTimeout(() => {
+      longPressFiredRef.current = true;
+      haptic('medium');
+      openActions(post);
+    }, 400);
+  }, [openActions, post]);
+
+  const cancelLongPress = useCallback(() => {
+    if (longPressTimerRef.current) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const handleClick = useCallback(() => {
+    if (longPressFiredRef.current) {
+      // Long-press already fired → suppress the implicit tap.
+      longPressFiredRef.current = false;
+      return;
+    }
+    handleTap();
+  }, []);
 
   const surfacingReason = useMemo(() => deriveSurfacingReason(post), [post]);
 
@@ -126,7 +159,15 @@ export default function WatchRailTile({
         cursor: 'pointer',
         aspectRatio: '3/4',
       }}
-      onClick={handleTap}
+      onClick={handleClick}
+      onPointerDown={startLongPress}
+      onPointerUp={cancelLongPress}
+      onPointerLeave={cancelLongPress}
+      onPointerCancel={cancelLongPress}
+      onContextMenu={(e) => {
+        // Suppress native long-press context menu so the action sheet wins.
+        e.preventDefault();
+      }}
     >
       {/* Thumbnail */}
       <img

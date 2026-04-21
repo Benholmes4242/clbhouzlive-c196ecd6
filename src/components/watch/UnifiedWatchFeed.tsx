@@ -9,6 +9,9 @@ import WatchGrid from './WatchGrid';
 import WatchSectionHeader from './WatchSectionHeader';
 import WatchSectionDivider from './WatchSectionDivider';
 import WatchMoreCategoriesSheet from './WatchMoreCategoriesSheet';
+import ContinueWatchingRail from './ContinueWatchingRail';
+import LongPressTipBanner from './LongPressTipBanner';
+import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { Skeleton } from '@/components/ui/skeleton';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -86,7 +89,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   });
 
   return (
+    <WatchActionsProvider>
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
+      <LongPressTipBanner />
+      <ContinueWatchingRail userId={userId} />
+
       {/* ── Section 1: Trending clips rail ── */}
       <TrendingThisWeek />
 
@@ -176,5 +183,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
       <ScrollToTopGlass />
     </div>
+    </WatchActionsProvider>
   );
 }
