@@ -333,8 +333,8 @@ function placeEditorials(
 }
 
 // ── Composed Balance Pass ─────────────────────────────────────────────────────
-// Orchestrates the three passes. Output contract identical to the pre-refactor
-// monolithic balanceMediaTypes: same inputs produce same outputs.
+// Orchestrates the four passes:
+//   balanceVideoImage → interleaveReviewsIntoFeed → placeEditorials → enforceReviewFloor
 function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
   // Partition: editorials retain their scored positions, the rest gets rebuilt
   const editorialPositions: { idx: number; post: FeedPost }[] = [];
@@ -355,12 +355,31 @@ function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
 
   // Pass 1: balance video/image at 80/20
   const balanced = balanceVideoImage(nonReviews);
-  // Pass 2: interleave reviews at slot 6, 12, 18, ...
+  // Pass 2: interleave reviews at slot 5, 10, 15, 20, 25, 30
   const withReviews = interleaveReviewsIntoFeed(balanced, reviews);
   // Pass 3: re-insert editorials at proportional positions
   const withEditorials = placeEditorials(withReviews, editorialPositions, posts.length);
 
-  return withEditorials;
+  // Pass 4: per-page review floor guarantee.
+  // Compute "unused" reviews — those from the bucket not present in the first page.
+  const firstPage = withEditorials.slice(0, REVIEW_FLOOR_PAGE_SIZE);
+  const usedReviewIds = new Set(firstPage.filter(isReviewPost).map(p => p.id));
+  const unusedReviews = reviews.filter(r => !usedReviewIds.has(r.id));
+  const { feed: floored, floorEnforced } = enforceReviewFloor(withEditorials, unusedReviews);
+
+  // ── Observability (Session B): strip after ~2 weeks of clean telemetry ──
+  if (process.env.NODE_ENV === 'development') {
+    const pg = floored.slice(0, REVIEW_FLOOR_PAGE_SIZE);
+    console.log('[Orbit] page assembled', {
+      pageSize: pg.length,
+      reviewCount: pg.filter(isReviewPost).length,
+      editorialCount: pg.filter(isEditorialCard).length,
+      floorEnforced,
+      reviewBucketRemaining: unusedReviews.length,
+    });
+  }
+
+  return floored;
 }
 
 // ── Full Orbit Suggested Feed Pipeline ───────────────────────────────────────
