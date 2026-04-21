@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { cn } from '@/lib/utils';
+import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 
 interface ProfileHeroShellProps {
   headerPhotoUrl?: string | null;
@@ -149,19 +150,15 @@ const ProfileHeroShell: React.FC<ProfileHeroShellProps> = ({
           />
         </>
       ) : (
-        <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center text-muted-foreground">
-          {/* Abstract golf pattern for empty state */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full border border-white/20" />
-            <div className="absolute top-1/3 right-1/3 w-48 h-48 rounded-full border border-white/10" />
-            <div className="absolute bottom-1/4 right-1/4 w-24 h-24 rounded-full border border-white/15" />
-          </div>
-          <Camera className="w-16 h-16 mb-4 opacity-50" />
-          <p className="text-lg font-medium mb-2">No Profile Photo</p>
-          <p className="text-sm text-center px-4">
-            {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
-          </p>
-        </div>
+        <>
+          <CoverPhotoFallback className="w-full h-full" />
+          {isOwnProfile && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none">
+              <Camera className="w-12 h-12 mb-3 opacity-60" />
+              <p className="text-sm font-medium">Upload a cover photo in Edit Profile</p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Cinematic gradient overlays */}

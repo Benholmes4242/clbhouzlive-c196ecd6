@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface PhotosGridProps {
   items: ExploreContentItem[];
@@ -206,10 +207,13 @@ export default function PhotosGrid({
               {/* Meta row - avatar + name + likes */}
               <div className="absolute bottom-2 right-2 flex items-center gap-2">
                 {/* User avatar */}
-                <img
-                  src={item.user?.avatar || '/placeholder.svg'}
+                <SquircleAvatar
+                  src={item.user?.avatar || null}
                   alt={item.user?.name || 'Golfer'}
-                  className="w-6 h-6 rounded-full object-cover border border-white/50"
+                  userId={(item.user as any)?.id ?? null}
+                  size={24}
+                  hairlineRing
+                  ringColor="rgba(255,255,255,0.5)"
                 />
                 {/* Display name only - never username */}
                 <span className="text-white text-xs font-medium truncate max-w-[80px]">

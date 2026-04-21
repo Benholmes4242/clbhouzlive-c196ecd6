@@ -2,6 +2,7 @@ import React from 'react';
 import { Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PostMeta from '@/components/posts/PostMeta';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface User {
   id: string;
@@ -72,13 +73,13 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
         <div className="flex items-center space-x-3 mb-3">
           {/* Profile Photo */}
           <div className="relative flex-shrink-0">
-            <img
-              src={user.avatar || '/placeholder.svg'}
+            <SquircleAvatar
+              src={user.avatar || null}
               alt={user.name || 'User'}
-              className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder.svg';
-              }}
+              userId={(user as any).id ?? null}
+              size={48}
+              hairlineRing
+              ringColor="rgba(255,255,255,0.2)"
             />
           </div>
           

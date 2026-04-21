@@ -9,6 +9,7 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { cn } from '@/lib/utils';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface DiscoverTrendingVideosProps {
   videos: ExploreContentItem[];
@@ -272,10 +273,11 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 {/* User info */}
                 <div className="absolute bottom-3 left-3 right-3">
                   <div className="flex items-center gap-2">
-                    <img
-                      src={video.user?.avatar || '/placeholder.svg'}
-                      alt={video.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
+                    <SquircleAvatar
+                      src={video.user?.avatar || null}
+                      alt={video.user?.name || video.user?.username || 'Anonymous'}
+                      userId={(video.user as any)?.id ?? null}
+                      size={48}
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-white text-base font-medium truncate">
