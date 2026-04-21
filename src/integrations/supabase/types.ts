@@ -11743,6 +11743,41 @@ export type Database = {
           },
         ]
       }
+      user_content_preferences: {
+        Row: {
+          last_interaction_at: string
+          post_id: string
+          progress_seconds: number | null
+          signal_type: string
+          total_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          last_interaction_at?: string
+          post_id: string
+          progress_seconds?: number | null
+          signal_type: string
+          total_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          last_interaction_at?: string
+          post_id?: string
+          progress_seconds?: number | null
+          signal_type?: string
+          total_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_content_preferences_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_cosmetic_unlocks: {
         Row: {
           id: string
@@ -12448,6 +12483,7 @@ export type Database = {
           has_completed_onboarding: boolean | null
           has_profile_video: boolean | null
           has_seen_creator_welcome: boolean | null
+          has_seen_watch_longpress_tip: boolean
           header_photo_url: string | null
           home_club: string | null
           home_club_business_id: string | null
@@ -12468,6 +12504,7 @@ export type Database = {
           is_verified_golfer: boolean
           last_notifications_seen_at: string | null
           last_rating_at: string | null
+          last_seen_post_id: string | null
           location: string | null
           logo_url: string | null
           mini_card_crop_height: number | null
@@ -12562,6 +12599,7 @@ export type Database = {
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           has_seen_creator_welcome?: boolean | null
+          has_seen_watch_longpress_tip?: boolean
           header_photo_url?: string | null
           home_club?: string | null
           home_club_business_id?: string | null
@@ -12582,6 +12620,7 @@ export type Database = {
           is_verified_golfer?: boolean
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
+          last_seen_post_id?: string | null
           location?: string | null
           logo_url?: string | null
           mini_card_crop_height?: number | null
@@ -12676,6 +12715,7 @@ export type Database = {
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           has_seen_creator_welcome?: boolean | null
+          has_seen_watch_longpress_tip?: boolean
           header_photo_url?: string | null
           home_club?: string | null
           home_club_business_id?: string | null
@@ -12696,6 +12736,7 @@ export type Database = {
           is_verified_golfer?: boolean
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
+          last_seen_post_id?: string | null
           location?: string | null
           logo_url?: string | null
           mini_card_crop_height?: number | null
@@ -12771,6 +12812,13 @@ export type Database = {
             columns: ["home_club_business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_last_seen_post_id_fkey"
+            columns: ["last_seen_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
           {
@@ -13745,6 +13793,37 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_quality_scores: {
+        Row: {
+          last_post_at: string | null
+          post_count: number | null
+          quality_score: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -15451,6 +15530,34 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_continue_watching: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          comment_count: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          height: number
+          last_interaction_at: string
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_user_id: string
+          poster_url: string
+          progress_seconds: number
+          share_count: number
+          stream_id: string
+          total_seconds: number
+          width: number
+        }[]
+      }
       get_conversation_last_senders: {
         Args: { p_conversation_ids: string[] }
         Returns: {
@@ -16882,6 +16989,10 @@ export type Database = {
         Returns: Json
       }
       reset_golfer_verification_test_user: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      reset_watch_personalization: {
         Args: { p_user_id: string }
         Returns: undefined
       }
