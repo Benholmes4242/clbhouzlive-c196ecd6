@@ -9,6 +9,7 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { cn } from '@/lib/utils';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface DiscoverTrendingVideosProps {
   videos: ExploreContentItem[];

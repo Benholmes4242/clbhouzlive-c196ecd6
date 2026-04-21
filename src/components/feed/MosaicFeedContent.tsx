@@ -13,6 +13,7 @@ import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
 import FeedVideoPlayer, { FeedVideoPlayerRef } from './FeedVideoPlayer';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';

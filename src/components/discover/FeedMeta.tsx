@@ -2,6 +2,7 @@ import React from 'react';
 import { Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PostMeta from '@/components/posts/PostMeta';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface User {
   id: string;

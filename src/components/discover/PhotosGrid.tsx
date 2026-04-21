@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface PhotosGridProps {
   items: ExploreContentItem[];
