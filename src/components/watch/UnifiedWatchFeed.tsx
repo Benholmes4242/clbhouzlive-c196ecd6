@@ -1,17 +1,17 @@
-import { useState, useRef, Suspense, lazy } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { MapPin } from 'lucide-react';
+import { MapPin, MoreHorizontal } from 'lucide-react';
 import { useWatchCategoryChips } from './hooks/useWatchCategoryChips';
 import TrendingThisWeek from './TrendingThisWeek';
+import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
+import WatchSectionHeader from './WatchSectionHeader';
+import WatchSectionDivider from './WatchSectionDivider';
+import WatchMoreCategoriesSheet from './WatchMoreCategoriesSheet';
 import { useWatchFeed } from './hooks/useWatchFeed';
-import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-
-const VideosTabContent = lazy(() => import('@/components/videos-tab/VideosTabContent'));
 
 interface ChipButtonProps {
   label: string;
@@ -31,9 +31,9 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
         fontSize: 13,
         fontWeight: 600,
         borderRadius: 20,
-        background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+        background: isActive ? '#F7931E' : 'transparent',
         border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-        color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+        color: isActive ? '#ffffff' : 'hsl(var(--muted-foreground))',
       }}
     >
       {icon}
@@ -42,69 +42,34 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
   );
 }
 
-function SectionHeader({
-  eyebrow,
-  title,
-  onSeeAll,
-  paddingTop = 12,
-}: {
-  eyebrow: string;
-  title: string;
-  onSeeAll?: () => void;
-  paddingTop?: number;
-}) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-      padding: `${paddingTop}px 16px 10px`,
-    }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <span style={{
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-          color: '#F7931E',
-        }}>
-          {eyebrow}
-        </span>
-        <span style={{
-          fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em',
-          color: 'hsl(var(--foreground))',
-        }}>
-          {title}
-        </span>
-      </div>
-      {onSeeAll && (
-        <button
-          onClick={onSeeAll}
-          className="active:scale-[0.97] transition-transform"
-          style={{
-            fontSize: 12, fontWeight: 600, color: '#F7931E',
-            background: 'none', border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 2,
-            padding: 0,
-          }}
-        >
-          See all →
-        </button>
-      )}
-    </div>
-  );
-}
-
 interface UnifiedWatchFeedProps {
   embedded?: boolean;
 }
 
+// Categories surfaced as primary chips (always visible alongside For you / Nearby).
+// Anything else from `useWatchCategoryChips` falls into the "More" overflow sheet.
+const PRIMARY_CATEGORY_IDS = ['review'];
+
 export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedProps) {
-  const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const [activeTag, setActiveTag] = useState<string>('all');
+  const [moreSheetOpen, setMoreSheetOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const { data: categoryChips = [], isLoading: chipsLoading } = useWatchCategoryChips();
 
-  const activeCategory = (activeTag === 'all' || activeTag === 'near') ? undefined : activeTag;
-  const activeFilter = activeTag === 'near' ? 'near' as const : 'trending' as const;
+  const { primaryChips, overflowChips } = useMemo(() => {
+    const primary = categoryChips.filter((c) => PRIMARY_CATEGORY_IDS.includes(c.id));
+    const overflow = categoryChips.filter((c) => !PRIMARY_CATEGORY_IDS.includes(c.id));
+    return { primaryChips: primary, overflowChips: overflow };
+  }, [categoryChips]);
+
+  // Active tag may live in the overflow sheet — surface its label on the More chip.
+  const activeOverflowChip = overflowChips.find((c) => c.id === activeTag);
+
+  const activeCategory = activeTag === 'all' || activeTag === 'near' ? undefined : activeTag;
+  const activeFilter = activeTag === 'near' ? ('near' as const) : ('trending' as const);
 
   const {
     posts,
@@ -122,26 +87,31 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
   return (
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
+      {/* ── Section 1: Trending clips rail ── */}
+      <TrendingThisWeek />
 
-      {/* ── Section 1: Trending clips (dark hero block) ── */}
-      <div>
-        <TrendingThisWeek />
-      </div>
+      <WatchSectionDivider />
 
-      {/* ── Section 2: Latest videos ── */}
-      <div>
-        <SectionHeader eyebrow="Videos" title="Latest videos" onSeeAll={() => navigate('/watch/videos')} paddingTop={26} />
-        <Suspense fallback={<VideosFeedSkeleton />}>
-          <VideosTabContent embedded={embedded} hideStickyHeader limitCards={3} />
-        </Suspense>
-      </div>
+      {/* ── Section 2: Latest videos — hero + horizontal rail ── */}
+      <LatestVideosRail />
 
+      <WatchSectionDivider />
+
+      {/* ── Section 3: More clips — chips + grid ── */}
       <div>
-        <SectionHeader eyebrow="Shorts" title="More clips" onSeeAll={() => navigate('/watch/clips')} />
-        {/* ── Filter chips — directly above the clips grid ── */}
+        <WatchSectionHeader
+          eyebrow="Shorts"
+          title="More clips"
+          paddingTop={4}
+        />
+
+        {/* Chip bar — 3 primary + More overflow */}
         <div
-          className="flex gap-2 overflow-x-auto px-4"
-          style={{ scrollbarWidth: 'none', paddingTop: 4, paddingBottom: 10 }}
+          className="flex gap-2 overflow-x-auto"
+          style={{
+            scrollbarWidth: 'none',
+            padding: '0 16px 12px',
+          }}
         >
           <ChipButton
             label="For you"
@@ -155,19 +125,34 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
             onTap={() => setActiveTag('near')}
           />
           {chipsLoading
-            ? [0, 1, 2].map(i => <Skeleton key={i} className="shrink-0 w-[72px] h-[34px] rounded-full" />)
-            : categoryChips.map(chip => (
+            ? [0].map((i) => (
+                <Skeleton
+                  key={i}
+                  className="shrink-0 w-[78px] h-[36px] rounded-full"
+                />
+              ))
+            : primaryChips.map((chip) => (
                 <ChipButton
                   key={chip.id}
                   label={chip.label}
                   isActive={activeTag === chip.id}
                   onTap={() => setActiveTag(chip.id)}
                 />
-              ))
-          }
+              ))}
+          {overflowChips.length > 0 && (
+            <ChipButton
+              label={activeOverflowChip ? activeOverflowChip.label : 'More'}
+              icon={<MoreHorizontal size={14} />}
+              isActive={!!activeOverflowChip}
+              onTap={() => setMoreSheetOpen(true)}
+            />
+          )}
         </div>
-        <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
-        <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
+
+        <WatchAutoplay
+          posts={posts}
+          gridRef={gridRef as React.RefObject<HTMLDivElement>}
+        />
         <WatchGrid
           posts={posts}
           isLoading={isLoading}
@@ -180,6 +165,15 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           userId={userId}
         />
       </div>
+
+      <WatchMoreCategoriesSheet
+        open={moreSheetOpen}
+        onOpenChange={setMoreSheetOpen}
+        categories={overflowChips}
+        activeTag={activeTag}
+        onSelect={(id) => setActiveTag(id)}
+      />
+
       <ScrollToTopGlass />
     </div>
   );
