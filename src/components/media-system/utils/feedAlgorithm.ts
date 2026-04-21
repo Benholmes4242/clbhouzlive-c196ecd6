@@ -238,19 +238,75 @@ function balanceVideoImage(posts: FeedPost[]): FeedPost[] {
 }
 
 // ── Pass 2: Interleave Reviews into Regular Stream ────────────────────────────
-// Pure function. Inserts a review at output positions 6, 12, 18, ...
+// Pure function. Inserts a review at output positions 5, 10, 15, 20, 25, 30...
 // Slot math is local to this function — no other pass touches it.
+// Cadence: every 5 slots → 6 reviews per 30-post page (was 5 at every-6 cadence).
 function interleaveReviewsIntoFeed(regular: FeedPost[], reviews: FeedPost[]): FeedPost[] {
   const out: FeedPost[] = [];
   let ri = 0, regi = 0, slot = 1;
   while (regi < regular.length || ri < reviews.length) {
-    if (slot === 6 && ri < reviews.length) out.push(reviews[ri++]);
+    if (slot === 5 && ri < reviews.length) out.push(reviews[ri++]);
     else if (regi < regular.length) out.push(regular[regi++]);
     else if (ri < reviews.length) out.push(reviews[ri++]);
     else break;
-    slot = slot < 6 ? slot + 1 : 1;
+    slot = slot < 5 ? slot + 1 : 1;
   }
   return out;
+}
+
+// ── Pass 4: Per-Page Review Floor Guarantee ───────────────────────────────────
+// Final safety-net pass. After cadence + editorial placement, if the assembled
+// feed contains fewer than REVIEW_FLOOR reviews per PAGE_SIZE-window AND the
+// unused review bucket has >= MIN_BUCKET_SIZE candidates, force-swap reviews
+// into evenly-spaced non-review, non-editorial slots until the floor is met.
+//
+// Tradeoff: displaced non-review posts are dropped (Option A from brief). At
+// most 1-2 posts per page in the rare floor-activated scenario. Revisit with
+// a deferral queue if user feedback flags missing content.
+const REVIEW_FLOOR_PAGE_SIZE = 30;
+const REVIEW_FLOOR = 4;
+const REVIEW_FLOOR_MIN_BUCKET = 4;
+
+function enforceReviewFloor(
+  feed: FeedPost[],
+  unusedReviews: FeedPost[]
+): { feed: FeedPost[]; floorEnforced: boolean } {
+  if (feed.length < REVIEW_FLOOR_PAGE_SIZE) {
+    return { feed, floorEnforced: false };
+  }
+  if (unusedReviews.length < REVIEW_FLOOR_MIN_BUCKET) {
+    return { feed, floorEnforced: false };
+  }
+
+  const page = feed.slice(0, REVIEW_FLOOR_PAGE_SIZE);
+  const tail = feed.slice(REVIEW_FLOOR_PAGE_SIZE);
+  const currentReviews = page.filter(isReviewPost).length;
+  if (currentReviews >= REVIEW_FLOOR) {
+    return { feed, floorEnforced: false };
+  }
+
+  const needed = REVIEW_FLOOR - currentReviews;
+  const available = Math.min(needed, unusedReviews.length);
+  const step = Math.floor(REVIEW_FLOOR_PAGE_SIZE / (REVIEW_FLOOR + 1)); // ~6
+  const candidateSlots: number[] = [];
+  for (let i = step; i < REVIEW_FLOOR_PAGE_SIZE && candidateSlots.length < available; i += step) {
+    if (!isReviewPost(page[i]) && !isEditorialCard(page[i])) {
+      candidateSlots.push(i);
+    }
+  }
+
+  if (candidateSlots.length === 0) {
+    return { feed, floorEnforced: false };
+  }
+
+  const result = [...page];
+  candidateSlots.forEach((slotIdx, i) => {
+    if (i < unusedReviews.length) {
+      result[slotIdx] = unusedReviews[i];
+    }
+  });
+
+  return { feed: [...result, ...tail], floorEnforced: true };
 }
 
 // ── Pass 3: Place Editorial Cards ─────────────────────────────────────────────
