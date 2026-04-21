@@ -15,7 +15,7 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
+import { Heart, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX, Plus } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -257,17 +257,15 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 height: 20,
                 borderRadius: '50%',
                 background: '#F7931E',
-                color: '#000',
-                fontSize: 15,
-                fontWeight: 700,
-                lineHeight: '17px',
-                textAlign: 'center',
-                border: '1.5px solid rgba(0,0,0,0.3)',
+                border: '1.5px solid rgba(255,255,255,0.95)',
                 cursor: 'pointer',
                 padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              +
+              <Plus size={12} strokeWidth={3} color="rgba(255,255,255,0.95)" />
             </button>
           )}
         </div>
