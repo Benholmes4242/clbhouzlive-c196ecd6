@@ -36,6 +36,7 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
+import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
