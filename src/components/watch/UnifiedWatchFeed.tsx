@@ -89,7 +89,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   });
 
   return (
+    <WatchActionsProvider>
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
+      <LongPressTipBanner />
+      <ContinueWatchingRail userId={userId} />
+
       {/* ── Section 1: Trending clips rail ── */}
       <TrendingThisWeek />
 
