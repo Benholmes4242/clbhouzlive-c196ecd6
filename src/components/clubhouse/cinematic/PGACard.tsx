@@ -781,12 +781,12 @@ export const PGACard: React.FC<PGACardProps> = ({
             }}
           >
             {likeState.isLiked ? (
-              <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+              <Heart style={{ width: 17, height: 17, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
             ) : (
               <Heart style={{ width: 17, height: 17, color: '#6b7280', fill: 'transparent' }} />
             )}
             {likeState.count > 0 && (
-              <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#f59e0b' : '#6b7280' }}>
+              <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#F7931E' : '#6b7280' }}>
                 {formatCount(likeState.count)}
               </span>
             )}
@@ -1128,12 +1128,12 @@ export const PGACard: React.FC<PGACardProps> = ({
             }}
           >
             {likeState.isLiked ? (
-              <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+              <Heart style={{ width: 17, height: 17, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
             ) : (
               <Heart style={{ width: 17, height: 17, color: '#6b7280', fill: 'transparent' }} />
             )}
             {likeState.count > 0 && (
-              <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#f59e0b' : '#6b7280' }}>
+              <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#F7931E' : '#6b7280' }}>
                 {formatCount(likeState.count)}
               </span>
             )}
@@ -1450,12 +1450,12 @@ export const PGACard: React.FC<PGACardProps> = ({
           }}
         >
           {likeState.isLiked ? (
-            <span style={{ fontSize: 17, lineHeight: 1 }}>🧡</span>
+            <Heart style={{ width: 17, height: 17, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
           ) : (
             <Heart style={{ width: 17, height: 17, color: '#6b7280', fill: 'transparent' }} />
           )}
           {likeState.count > 0 && (
-            <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#f59e0b' : '#6b7280' }}>
+            <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#F7931E' : '#6b7280' }}>
               {formatCount(likeState.count)}
             </span>
           )}
