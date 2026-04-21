@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, RefreshCw, WifiOff } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
@@ -64,13 +65,6 @@ function getInitials(name: string | null | undefined): string {
     .slice(0, 2);
 }
 
-const FALLBACK_PALETTE = ['#1F2937', '#334155', '#475569', '#5B6470', '#3F4A55', '#2C3540', '#404B58', '#525E6B'];
-function getAvatarFallbackColor(userId: string | null | undefined): string {
-  if (!userId) return FALLBACK_PALETTE[0];
-  let hash = 0;
-  for (let i = 0; i < userId.length; i++) hash = (hash * 31 + userId.charCodeAt(i)) | 0;
-  return FALLBACK_PALETTE[Math.abs(hash) % FALLBACK_PALETTE.length];
-}
 
 function formatSeasonName(id: SeasonId): string {
   switch (id) {
