@@ -19,6 +19,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
     filter: 'top',
     enabled: !!userId && enabled,
   });
+  const { data: viewedPostIds } = useViewedPostIds();
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
 
