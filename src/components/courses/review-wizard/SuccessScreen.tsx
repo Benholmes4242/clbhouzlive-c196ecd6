@@ -315,7 +315,7 @@ export function SuccessScreen({
           }}
         >
           <Home className="w-4 h-4" />
-          {isEditMode ? 'Back to clbhouz' : 'Go to Clubhouse'}
+          {isEditMode ? 'Back to Clbhouz' : 'Go to Clbhouz'}
         </button>
 
         {isNewReview && !optedOut && onOptOutShare && (
