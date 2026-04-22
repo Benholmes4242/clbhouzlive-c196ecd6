@@ -23,20 +23,31 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
       onClick={onTap}
       className="shrink-0 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
       style={{
-        minHeight: 36,
-        padding: '0 16px',
-        fontSize: 13,
+        height: 36,
+        padding: '0 14px',
+        fontSize: 14,
         fontWeight: 600,
-        borderRadius: 20,
-        background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-        color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+        borderRadius: 999,
+        background: isActive ? '#0F172A' : '#FFFFFF',
+        border: isActive ? '1px solid transparent' : '1px solid rgba(15,23,42,0.12)',
+        color: isActive ? '#FFFFFF' : '#0F172A',
+        whiteSpace: 'nowrap',
       }}
     >
       {icon}
       {label}
     </button>
   );
+}
+
+const SUBHEAD_BY_TAG: Record<string, string> = {
+  all: 'Tailored to your taste',
+  near: 'Filmed near you',
+};
+function getSubheadForTag(tag: string, chipLabel?: string): string {
+  if (SUBHEAD_BY_TAG[tag]) return SUBHEAD_BY_TAG[tag];
+  if (chipLabel) return `${chipLabel} from across the community`;
+  return 'Shorts from the community';
 }
 
 export default function ClipsSubpage() {
