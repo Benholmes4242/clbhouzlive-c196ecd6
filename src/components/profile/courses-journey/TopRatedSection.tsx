@@ -47,6 +47,11 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         course_id,
         rating,
         created_at,
+        review_date,
+        design_score,
+        condition_score,
+        clubhouse_score,
+        facilities_score,
         golf_courses!inner (
           id,
           name,
@@ -62,8 +67,10 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         )
       `)
       .eq('user_id', userId)
+      // Server-side primary sort; we re-apply the full canonical comparator
+      // client-side so the chain is identical to every other own-rating surface.
       .order('rating', { ascending: false })
-      .limit(10);
+      .limit(50);
 
     if (ratedError) throw ratedError;
 

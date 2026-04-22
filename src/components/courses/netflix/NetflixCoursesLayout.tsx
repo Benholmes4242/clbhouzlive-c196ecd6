@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import NetflixCourseRow from './NetflixCourseRow';
 import NetflixHeroBanner from './NetflixHeroBanner';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 interface NetflixCoursesLayoutProps {
   allCourses: any[];
@@ -57,9 +58,16 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     }
 
     // Highest Rated (courses with ratings 8+) - Row 2 with Hero Banner
+    // These are own-rating rows: each entry is a single user's rating on
+    // a course, so use the own-rating comparator (rating → breakdown sum
+    // → review_date DESC → course_id).
     const highRatedCourses = allCourses
       .filter(course => course.rating && course.rating >= 8)
-      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .sort((a, b) => compareOwnRatings(
+        { course_id: a.course_id ?? a.golf_courses?.id ?? '', rating: a.rating, design_score: a.design_score, condition_score: a.condition_score, clubhouse_score: a.clubhouse_score, facilities_score: a.facilities_score, review_date: a.review_date ?? a.created_at },
+        { course_id: b.course_id ?? b.golf_courses?.id ?? '', rating: b.rating, design_score: b.design_score, condition_score: b.condition_score, clubhouse_score: b.clubhouse_score, facilities_score: b.facilities_score, review_date: b.review_date ?? b.created_at },
+        'desc'
+      ))
       .slice(0, 10);
 
     if (highRatedCourses.length > 0) {
@@ -124,9 +132,14 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     }
 
     // Highlight Reel (special courses - same height as Recently Played but wider cards)
+    // Same own-rating shape — use the shared comparator for stable order.
     const highlightCourses = allCourses
       .filter(course => course.rating && course.rating >= 7)
-      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .sort((a, b) => compareOwnRatings(
+        { course_id: a.course_id ?? a.golf_courses?.id ?? '', rating: a.rating, design_score: a.design_score, condition_score: a.condition_score, clubhouse_score: a.clubhouse_score, facilities_score: a.facilities_score, review_date: a.review_date ?? a.created_at },
+        { course_id: b.course_id ?? b.golf_courses?.id ?? '', rating: b.rating, design_score: b.design_score, condition_score: b.condition_score, clubhouse_score: b.clubhouse_score, facilities_score: b.facilities_score, review_date: b.review_date ?? b.created_at },
+        'desc'
+      ))
       .slice(0, 8);
 
     if (highlightCourses.length > 0) {
