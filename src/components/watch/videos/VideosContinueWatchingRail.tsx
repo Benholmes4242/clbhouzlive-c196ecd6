@@ -1,0 +1,50 @@
+import { memo } from 'react';
+import { useVideosContinueWatching } from './hooks/useVideosContinueWatching';
+import { SectionHeader } from '../proshop/SectionHeader';
+import { HRail } from '../proshop/HRail';
+import { VideoLandscapeTile } from './VideoLandscapeTile';
+
+interface VideosContinueWatchingRailProps {
+  userId: string | undefined;
+}
+
+/**
+ * Continue Watching rail (long-form only). Hides if the user has no
+ * in-progress long-form videos. Mood-independent — pickup behaviour shouldn't
+ * silently disappear when filtering changes.
+ */
+function VideosContinueWatchingRailInner({ userId }: VideosContinueWatchingRailProps) {
+  const { data: posts = [], isLoading } = useVideosContinueWatching(userId, 8);
+
+  if (isLoading) return null;
+  if (posts.length === 0) return null;
+
+  return (
+    <section>
+      <SectionHeader
+        title="Continue watching"
+        sub="Pick up where you left off"
+      />
+      <HRail>
+        {posts.map((post, i) => {
+          const progress =
+            post.totalSeconds && post.totalSeconds > 0
+              ? post.progressSeconds / post.totalSeconds
+              : 0;
+          return (
+            <VideoLandscapeTile
+              key={post.id}
+              post={post}
+              index={i}
+              allPosts={posts}
+              progress={progress}
+            />
+          );
+        })}
+      </HRail>
+    </section>
+  );
+}
+
+export const VideosContinueWatchingRail = memo(VideosContinueWatchingRailInner);
+export default VideosContinueWatchingRail;
