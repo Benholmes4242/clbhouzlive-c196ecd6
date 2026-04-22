@@ -14,7 +14,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
           fontSize: 22,
           fontWeight: 900,
           letterSpacing: '-0.02em',
-          color: '#0F172A',
+          color: '#FFFFFF',
           lineHeight: 1,
         }}
       >
@@ -26,7 +26,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
           fontWeight: 700,
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color: 'rgba(15,23,42,0.55)',
+          color: 'rgba(255,255,255,0.7)',
           marginTop: 6,
           lineHeight: 1.2,
         }}
