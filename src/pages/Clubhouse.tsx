@@ -27,6 +27,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 // ── New feed components ──
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
+import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
@@ -414,6 +415,13 @@ const ClubhouseContent = () => {
             onShare={(post) => handleShare(post)}
             getLikeState={(post) => getActiveLikeState(post)}
             getCommentCount={(post) => getCommentCount(post)}
+            isFullscreen
+          />
+
+          {/* Windowed carousel dots — centred under top chrome */}
+          <FullscreenCarouselOverlay
+            activePost={activePost}
+            activeIndex={activeIndex}
           />
 
           {/* Overlay layer — action rail, creator capsule, scrubber, dots */}
