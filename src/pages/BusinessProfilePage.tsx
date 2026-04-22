@@ -568,10 +568,6 @@ const BusinessProfilePage: React.FC = () => {
         {/* About section */}
         <section className="px-5 mb-6">
           <div className="mb-2">
-            <div className="flex items-center gap-1.5 mb-1">
-              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>About</span>
-            </div>
             <h3 className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>About</h3>
           </div>
           {bioText ? (
