@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MoreHorizontal, X } from 'lucide-react';
 import CourseCard from '@/components/courses/CourseCard';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 interface RegionalCoursesModalProps {
   isOpen: boolean;
@@ -15,6 +16,17 @@ interface RegionalCoursesModalProps {
 }
 
 type SortOption = 'recently-played' | 'highest-ranked' | 'lowest-ranked';
+
+// Adapter from this modal's row shape to the canonical own-rating comparator input.
+const toOwnRatingRow = (c: any) => ({
+  course_id: c.course_id ?? c.golf_courses?.id ?? '',
+  rating: c.rating,
+  design_score: c.design_score,
+  condition_score: c.condition_score,
+  clubhouse_score: c.clubhouse_score,
+  facilities_score: c.facilities_score,
+  review_date: c.review_date ?? c.created_at ?? c.played_date,
+});
 
 const sortCourses = (courses: any[], sortBy: SortOption) => {
   const coursesCopy = [...courses];
@@ -29,10 +41,8 @@ const sortCourses = (courses: any[], sortBy: SortOption) => {
     
     case 'highest-ranked':
       return coursesCopy.sort((a, b) => {
-        // Sort by user rating descending, then by regional rank ascending
-        if (a.rating && b.rating) {
-          return b.rating - a.rating;
-        }
+        // Canonical own-rating cascade (DESC) when both sides are rated.
+        if (a.rating && b.rating) return compareOwnRatings(toOwnRatingRow(a), toOwnRatingRow(b), 'desc');
         if (a.rating && !b.rating) return -1;
         if (!a.rating && b.rating) return 1;
         
@@ -43,10 +53,8 @@ const sortCourses = (courses: any[], sortBy: SortOption) => {
     
     case 'lowest-ranked':
       return coursesCopy.sort((a, b) => {
-        // Sort by user rating ascending, then by regional rank descending
-        if (a.rating && b.rating) {
-          return a.rating - b.rating;
-        }
+        // Canonical own-rating cascade (ASC) when both sides are rated.
+        if (a.rating && b.rating) return compareOwnRatings(toOwnRatingRow(a), toOwnRatingRow(b), 'asc');
         if (a.rating && !b.rating) return -1;
         if (!a.rating && b.rating) return 1;
         

@@ -1,6 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 // Helper function to get the best ranking for sorting
 const getCourseRanking = (course: any) => {
@@ -13,9 +14,30 @@ const getCourseRanking = (course: any) => {
 // Custom sorting function for user courses
 const getSortedUserCourses = (userCourses: any[]) => {
   // Get courses with ratings (from course_ratings table)
+  // Canonical own-rating cascade: rating DESC → breakdown sum DESC → review_date DESC → course_id ASC
   const rated = userCourses
     .filter(c => c.rating !== null && c.rating !== undefined)
-    .sort((a, b) => b.rating - a.rating); // Highest rating first
+    .sort((a, b) => compareOwnRatings(
+      {
+        course_id: a.course_id ?? a.golf_courses?.id ?? '',
+        rating: a.rating,
+        design_score: a.design_score,
+        condition_score: a.condition_score,
+        clubhouse_score: a.clubhouse_score,
+        facilities_score: a.facilities_score,
+        review_date: a.review_date ?? a.created_at ?? a.played_date,
+      },
+      {
+        course_id: b.course_id ?? b.golf_courses?.id ?? '',
+        rating: b.rating,
+        design_score: b.design_score,
+        condition_score: b.condition_score,
+        clubhouse_score: b.clubhouse_score,
+        facilities_score: b.facilities_score,
+        review_date: b.review_date ?? b.created_at ?? b.played_date,
+      },
+      'desc'
+    ));
   
   // Get courses without ratings, sorted by Top 100 ranking
   const unrated = userCourses
@@ -101,22 +123,30 @@ export const useFriendData = (userId: string | undefined, selectedFriendId: stri
       // Then get ratings for these courses
       const { data: ratings, error: ratingsError } = await supabase
         .from('course_ratings')
-        .select('course_id, rating')
+        .select('course_id, rating, design_score, condition_score, clubhouse_score, facilities_score, review_date')
         .eq('user_id', selectedFriendId);
 
       if (ratingsError) throw ratingsError;
       
-      // Create a map of ratings by course_id
+      // Create a map of ratings by course_id (full row, not just the score)
       const ratingsMap = new Map();
-      ratings?.forEach(rating => {
-        ratingsMap.set(rating.course_id, rating.rating);
+      ratings?.forEach(r => {
+        ratingsMap.set(r.course_id, r);
       });
       
-      // Add ratings to courses
-      const coursesWithRatings = courses?.map(course => ({
-        ...course,
-        rating: ratingsMap.get(course.course_id) || null
-      })) || [];
+      // Add ratings to courses (merge canonical sort fields onto the row)
+      const coursesWithRatings = courses?.map(course => {
+        const r = ratingsMap.get(course.course_id);
+        return {
+          ...course,
+          rating: r?.rating ?? null,
+          design_score: r?.design_score ?? null,
+          condition_score: r?.condition_score ?? null,
+          clubhouse_score: r?.clubhouse_score ?? null,
+          facilities_score: r?.facilities_score ?? null,
+          review_date: r?.review_date ?? null,
+        };
+      }) || [];
       
       return getSortedUserCourses(coursesWithRatings);
     },
@@ -135,6 +165,11 @@ export const useFriendData = (userId: string | undefined, selectedFriendId: stri
         .select(`
           course_id,
           rating,
+          design_score,
+          condition_score,
+          clubhouse_score,
+          facilities_score,
+          review_date,
           created_at,
           golf_courses (*)
         `)
@@ -142,12 +177,17 @@ export const useFriendData = (userId: string | undefined, selectedFriendId: stri
 
       if (ratingsError) throw ratingsError;
       
-      // Map to expected structure
+      // Map to expected structure (preserve canonical sort fields)
       const coursesWithRatings = ratings?.map(r => ({
         course_id: r.course_id,
         played_date: r.created_at,
         golf_courses: r.golf_courses,
-        rating: r.rating
+        rating: r.rating,
+        design_score: r.design_score,
+        condition_score: r.condition_score,
+        clubhouse_score: r.clubhouse_score,
+        facilities_score: r.facilities_score,
+        review_date: r.review_date,
       })) || [];
       
       return getSortedUserCourses(coursesWithRatings);
