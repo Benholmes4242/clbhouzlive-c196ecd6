@@ -91,29 +91,43 @@ const Top100CoursesHubPanel = () => {
   // Flatten and sort courses
   const allCourses: SearchedCourseWithRating[] = React.useMemo(() => {
     const courses = coursesData?.pages.flat() ?? [];
-    
-    return [...courses].sort((a, b) => {
-      switch (sortOption) {
-        case 'user_rating':
-          const ratingA = a.average_rating ?? -1;
-          const ratingB = b.average_rating ?? -1;
-          if (ratingB !== ratingA) return ratingB - ratingA;
-          return (a.name ?? '').localeCompare(b.name ?? '');
-        case 'official':
-        default:
-          const rankA = selectedList.includes('global') ? a.list_memberships.find((m: any) => m.list_slug.includes('global'))?.rank :
-                       selectedList.includes('usa') ? a.list_memberships.find((m: any) => m.list_slug.includes('usa'))?.rank :
-                       selectedList.includes('gb-i') ? a.list_memberships.find((m: any) => m.list_slug.includes('gb-i'))?.rank :
-                       selectedList.includes('europe') ? a.list_memberships.find((m: any) => m.list_slug.includes('europe'))?.rank :
-                       a.list_memberships[0]?.rank;
-          const rankB = selectedList.includes('global') ? b.list_memberships.find((m: any) => m.list_slug.includes('global'))?.rank :
-                       selectedList.includes('usa') ? b.list_memberships.find((m: any) => m.list_slug.includes('usa'))?.rank :
-                       selectedList.includes('gb-i') ? b.list_memberships.find((m: any) => m.list_slug.includes('gb-i'))?.rank :
-                       selectedList.includes('europe') ? b.list_memberships.find((m: any) => m.list_slug.includes('europe'))?.rank :
-                       b.list_memberships[0]?.rank;
-          return (rankA || 999) - (rankB || 999);
+
+    // Determine the rank-matching slug fragment ONCE, based on selectedList,
+    // instead of running 4× .includes + .find() inside every comparator call.
+    const matcher =
+      selectedList.includes('global') ? 'global' :
+      selectedList.includes('usa') ? 'usa' :
+      selectedList.includes('gb-i') ? 'gb-i' :
+      selectedList.includes('europe') ? 'europe' :
+      null;
+
+    const getRankForSelectedList = (course: SearchedCourseWithRating): number => {
+      const memberships = course.list_memberships ?? [];
+      if (matcher) {
+        const m = memberships.find((x: any) => x.list_slug.includes(matcher));
+        return m?.rank ?? 999;
       }
-    });
+      return memberships[0]?.rank ?? 999;
+    };
+
+    if (sortOption === 'user_rating') {
+      return [...courses].sort((a, b) => {
+        const ratingA = a.average_rating ?? -1;
+        const ratingB = b.average_rating ?? -1;
+        if (ratingB !== ratingA) return ratingB - ratingA;
+        return (a.name ?? '').localeCompare(b.name ?? '');
+      });
+    }
+
+    // 'official' sort — pre-extract rank keys so the comparator is O(1)
+    const withRankKey = courses.map((c) => ({
+      course: c,
+      rankKey: getRankForSelectedList(c),
+    }));
+
+    withRankKey.sort((a, b) => a.rankKey - b.rankKey);
+
+    return withRankKey.map((x) => x.course);
   }, [coursesData, sortOption, selectedList]);
 
   // Scroll restoration on mount (after courses load)

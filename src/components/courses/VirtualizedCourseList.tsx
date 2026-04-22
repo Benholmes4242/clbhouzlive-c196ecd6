@@ -1,14 +1,14 @@
 /**
  * Phase 2 Perf: Virtualized course list for better scroll performance
  * Only renders visible items + buffer, reducing DOM nodes significantly
- * 
+ *
  * Uses UnifiedCourseCard - the single source of truth for course cards.
- * 
+ *
  * Column-aware: calculates heights based on actual grid column count
  * to avoid over-sizing on md:grid-cols-2 / lg:grid-cols-3 layouts.
  */
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { UnifiedCourseCard } from './UnifiedCourseCard';
 import { fromGolfCourse } from '@/lib/mappers/toCourseCardModel';
 import { useNavigate } from 'react-router-dom';
@@ -64,6 +64,27 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   // (e.g. a collapsible filter section), trigger recomputeContainerOffset()
   // when that content's size changes.
   const containerOffsetRef = useRef(0);
+
+  // ── Refs mirroring state read inside updateVisibleRange ──
+  // Keeps the callback identity stable across pagination so the scroll
+  // listener isn't torn down + re-attached every time courses.length changes.
+  const coursesLengthRef = useRef(courses.length);
+  const rowHeightRef = useRef(rowHeight);
+  const columnCountRef = useRef(columnCount);
+
+  useEffect(() => { coursesLengthRef.current = courses.length; }, [courses.length]);
+  useEffect(() => { rowHeightRef.current = rowHeight; }, [rowHeight]);
+  useEffect(() => { columnCountRef.current = columnCount; }, [columnCount]);
+
+  // ── Memoise mapped card models (one per course, recompute when courses array changes) ──
+  // Stable references let React.memo on UnifiedCourseCard bail out when props are unchanged.
+  const cardModelMap = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof fromGolfCourse>>();
+    for (const course of courses) {
+      map.set(course.id, fromGolfCourse(course));
+    }
+    return map;
+  }, [courses]);
 
   // Detect viewport size → update column count (row height is now measured)
   useEffect(() => {
@@ -126,7 +147,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columnCount, courses.length === 0]);
 
-  // Update visible range on scroll (row-aware)
+  // Update visible range on scroll (row-aware) — reads dynamic state from refs
+  // so the callback identity is stable across pagination and re-renders.
   const updateVisibleRange = useCallback(() => {
     if (!containerRef.current) return;
 
@@ -137,25 +159,29 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     // Use cached offset — no per-frame layout reads
     const scrollRelative = Math.max(0, scrollTop - containerOffsetRef.current);
 
+    const rh = rowHeightRef.current;
+    const cc = columnCountRef.current;
+    const cl = coursesLengthRef.current;
+
     // Calculate in rows, then convert to item indices
-    const startRow = Math.max(0, Math.floor(scrollRelative / rowHeight) - BUFFER_ROWS);
-    const visibleRows = Math.ceil(viewportHeight / rowHeight);
-    const totalRows = Math.ceil(courses.length / columnCount);
+    const startRow = Math.max(0, Math.floor(scrollRelative / rh) - BUFFER_ROWS);
+    const visibleRows = Math.ceil(viewportHeight / rh);
+    const totalRows = Math.ceil(cl / cc);
     const endRow = Math.min(totalRows, startRow + visibleRows + BUFFER_ROWS * 2);
 
-    const startIndex = startRow * columnCount;
-    const endIndex = Math.min(courses.length, endRow * columnCount);
+    const startIndex = startRow * cc;
+    const endIndex = Math.min(cl, endRow * cc);
 
     // Always show at least 10 items initially
-    const finalEnd = Math.max(endIndex, Math.min(10, courses.length));
+    const finalEnd = Math.max(endIndex, Math.min(10, cl));
 
     setVisibleRange((prev) => {
       if (prev.start === startIndex && prev.end === finalEnd) return prev;
       return { start: startIndex, end: finalEnd };
     });
-  }, [courses.length, rowHeight, columnCount, getScrollContainer]);
+  }, [getScrollContainer]);
 
-  // Throttled scroll handler
+  // Throttled scroll handler — stable now that updateVisibleRange identity is stable
   useEffect(() => {
     let rafId: number | null = null;
     let ticking = false;
@@ -180,11 +206,17 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     };
   }, [updateVisibleRange, getScrollContainer]);
 
-  // Recalculate on courses change
+  // Recalculate on courses change — invokes the stable callback, no teardown
   useEffect(() => {
     const timer = setTimeout(() => updateVisibleRange(), 50);
     return () => clearTimeout(timer);
   }, [courses.length, updateVisibleRange]);
+
+  // Stable card click handler — accepts course ID, partial-applied at call site
+  const handleCardClick = useCallback((courseId: string) => {
+    onCourseClick?.();
+    navigate(`/courses/${courseId}`);
+  }, [onCourseClick, navigate]);
 
   // Total height accounts for columns
   const totalRows = Math.ceil(courses.length / columnCount);
@@ -201,16 +233,13 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
           {courses.map((course, i) => (
             <div key={course.id} className="mb-0" ref={i === 0 ? sampleCardRef : undefined}>
-              <UnifiedCourseCard 
-                course={fromGolfCourse(course)}
+              <UnifiedCourseCard
+                course={cardModelMap.get(course.id) ?? fromGolfCourse(course)}
                 showRankBadges={true}
                 showRating={true}
                 showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
-                onClick={() => {
-                  onCourseClick?.();
-                  navigate(`/courses/${course.id}`);
-                }}
+                onClick={() => handleCardClick(course.id)}
               />
             </div>
           ))}
@@ -224,7 +253,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   const visibleCourses = courses.slice(visibleRange.start, visibleRange.end);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
     >
@@ -235,16 +264,13 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
         >
           {visibleCourses.map((course, i) => (
             <div key={course.id} className="mb-0" ref={i === 0 ? sampleCardRef : undefined}>
-              <UnifiedCourseCard 
-                course={fromGolfCourse(course)}
+              <UnifiedCourseCard
+                course={cardModelMap.get(course.id) ?? fromGolfCourse(course)}
                 showRankBadges={true}
                 showRating={true}
                 showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
-                onClick={() => {
-                  onCourseClick?.();
-                  navigate(`/courses/${course.id}`);
-                }}
+                onClick={() => handleCardClick(course.id)}
               />
             </div>
           ))}

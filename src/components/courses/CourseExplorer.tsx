@@ -131,10 +131,12 @@ async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSea
   }
 
   // ── All other sort modes: standard PostgREST query ──
+  // Explicit column list — only what fromGolfCourse + UnifiedCourseCard read.
+  // Keeps the payload small (avoids description/website_url/etc.) for faster scroll.
   let query = supabase
     .from('golf_courses')
     .select(
-      `*, course_rating_aggregates(avg_overall_score)`,
+      `id, name, country, sub_country, thumbnail_image, global_rank, regional_rank, usa_rank, course_rating_aggregates(avg_overall_score)`,
       isFirstPage ? { count: 'exact' } : undefined,
     );
 
