@@ -19,6 +19,8 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
 import { MostLovedRail } from './proshop/MostLovedRail';
+import { WatchMoodChips } from './proshop/WatchMoodChips';
+import { useWatchMood } from './proshop/hooks/useWatchMood';
 
 interface ChipButtonProps {
   label: string;
@@ -64,6 +66,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const [activeTag, setActiveTag] = useState<string>('all');
   const [moreSheetOpen, setMoreSheetOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
+  const { mood, setMood } = useWatchMood();
 
   const { data: categoryChips = [], isLoading: chipsLoading } = useWatchCategoryChips();
 
@@ -98,6 +101,9 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
       <LongPressTipBanner />
 
+      {/* ── Pro Shop: mood chips at the top of the Watch tab ── */}
+      <WatchMoodChips active={mood} onChange={setMood} />
+
       {/* ── Pro Shop: Watch of the Week editorial hero ── */}
       <WatchOfTheWeekHero />
 
@@ -126,9 +132,9 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Section 3: More clips — chips + grid ── */}
       <div>
         <WatchSectionHeader
-          eyebrow="Shorts"
-          title="More clips"
-          onSeeAll={() => navigate('/watch/clips')}
+          eyebrow="Browse"
+          title="More to explore"
+          sub="Filter by category"
           paddingTop={4}
         />
 

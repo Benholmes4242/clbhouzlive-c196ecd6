@@ -97,8 +97,10 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
     <div style={{ background: '#F8FAFC' }}>
       <WatchSectionHeader
         eyebrow="Trending"
-        title="Hot right now"
+        title="Quick clips"
+        sub="Under 90 seconds, on the green"
         onSeeAll={() => navigate('/watch/clips')}
+        seeAllLabel="More clips"
         paddingTop={12}
       />
 

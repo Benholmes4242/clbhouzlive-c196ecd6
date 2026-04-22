@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseAnchoredContent } from './hooks/useCourseAnchoredContent';
 import { useFeedPostsByIds } from './hooks/useFeedPostsByIds';
+import { useWatchMood } from './hooks/useWatchMood';
 import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import WatchRailTile from '../WatchRailTile';
@@ -13,15 +14,18 @@ import WatchRailTile from '../WatchRailTile';
  *
  * Hides entirely when:
  *  - user has no played courses with fresh content, OR
- *  - the course has no resolvable posts (RLS / soft-deletes)
+ *  - the course has no resolvable posts (RLS / soft-deletes), OR
+ *  - the active mood doesn't make sense for played-course content
+ *    (the RPC returns empty for follows/trending/tour_week)
  */
 function CourseAnchoredRailInner() {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
+  const { mood } = useWatchMood();
 
   const { data: courses = [], isLoading: coursesLoading } =
-    useUserCourseAnchoredContent(userId);
+    useUserCourseAnchoredContent(userId, mood);
 
   const topCourse = courses[0];
   const postIds = useMemo(() => topCourse?.recent_post_ids ?? [], [topCourse]);
