@@ -82,7 +82,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
 
       {/* ===== Section divider before legacy rails ===== */}
-      <div style={{ padding: '32px 16px 12px' }}>
+      <div style={{ padding: '24px 16px 12px' }}>
         <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
           More to explore
         </h2>

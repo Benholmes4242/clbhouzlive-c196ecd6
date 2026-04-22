@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 
+/** Single source of truth for the Echo concierge amber ink colour. */
+const ECHO_AMBER_INK = '#B26910';
+
 interface ExploreEchoCTAProps {
   mood: ExploreMoodId;
 }
@@ -18,9 +21,9 @@ interface MoodConfig {
 
 const MOOD_PROMPTS: Record<ExploreMoodId, MoodConfig> = {
   foryou: {
-    sampleQuote: '"A heathland course near London for Saturday"',
+    sampleQuote: '"A heathland course like Sunningdale"',
     samplePrompt:
-      'Find me a heathland course near London I could play this Saturday. Ask a couple of follow-ups about budget and how far I am willing to travel, then suggest a few options.',
+      'Find me a heathland course with a similar feel to Sunningdale. Ask about region, budget, and how far I am willing to travel, then suggest a few options.',
     chips: [
       {
         label: 'Plays like Sunningdale',
@@ -52,8 +55,8 @@ const MOOD_PROMPTS: Record<ExploreMoodId, MoodConfig> = {
       'Show me where my friends have been playing this month and help me pick somewhere to follow them onto. Ask which friend group or region matters most.',
     chips: [
       { label: 'Recently logged by friends', prompt: 'Show me courses my friends have logged recently with strong reviews. Ask which friends to prioritise.' },
-      { label: 'Where Tom + 2 others played', prompt: 'Find courses where multiple friends have played and rated highly. Ask which friends or region to focus on.' },
-      { label: 'Group-friendly fourballs', prompt: 'Suggest courses that are great for fourballs with friends. Ask region, vibe, and how serious the round should be.' },
+      { label: 'Where multiple friends played', prompt: 'Find courses where three or more of my friends have played and rated highly. Ask which friends or region to focus on.' },
+      { label: 'Good for a group trip', prompt: 'Suggest courses that work well for a group trip with friends. Ask the region, how many of us, and how serious the round should be.' },
     ],
   },
   hidden: {
@@ -171,7 +174,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: '#B26910',
+              color: ECHO_AMBER_INK,
               margin: 0,
               lineHeight: 1,
             }}
@@ -207,7 +210,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
               background: '#FFFFFF',
               border: '1px solid rgba(247,147,30,0.3)',
               borderRadius: 12,
-              color: '#B26910',
+              color: ECHO_AMBER_INK,
               lineHeight: 1.2,
               whiteSpace: 'nowrap',
             }}

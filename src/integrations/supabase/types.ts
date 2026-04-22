@@ -16754,32 +16754,19 @@ export type Database = {
           regions_count: number
         }[]
       }
-      get_user_passport:
-        | {
-            Args: { p_user_id: string }
-            Returns: {
-              avg_rating_given: number
-              countries_played: number
-              courses_played: number
-              first_play_year: number
-              friends_courses_to_try: number
-              reviews_written: number
-              top_100_played: number
-              wishlist_count: number
-            }[]
-          }
-        | {
-            Args: { p_user_id: string; p_year?: number }
-            Returns: {
-              avg_rating_given: number
-              countries_played: number
-              courses_played: number
-              friends_courses_to_try: number
-              reviews_written: number
-              top_100_played: number
-              wishlist_count: number
-            }[]
-          }
+      get_user_passport: {
+        Args: { p_user_id: string }
+        Returns: {
+          avg_rating_given: number
+          countries_played: number
+          courses_played: number
+          first_play_year: number
+          friends_courses_to_try: number
+          reviews_written: number
+          top_100_played: number
+          wishlist_count: number
+        }[]
+      }
       get_user_podium_proximity: {
         Args: {
           p_division_id?: string
