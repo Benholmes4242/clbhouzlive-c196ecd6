@@ -9,6 +9,7 @@ import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { useSectionLoader } from '@/hooks/useSectionLoader';
 import SkeletonRow from '@/components/ui/SkeletonRow';
 import type { TopRatedSectionProps } from './types';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 const TopRatedSection: React.FC<TopRatedSectionProps> = ({ 
   userId,
