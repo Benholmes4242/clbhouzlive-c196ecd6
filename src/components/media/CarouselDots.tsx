@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 export interface CarouselDotsProps {
   count: number;
   active: number;
-  variant: 'segments' | 'elongated';
+  variant: 'segments' | 'elongated' | 'windowed';
   /** Controls opacity for fade behaviour. Default true. */
   isVisible?: boolean;
   className?: string;
@@ -72,6 +72,39 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                 }}
               />
             </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (variant === 'windowed') {
+    return (
+      <div
+        role="group"
+        aria-label="Media carousel position"
+        className={`flex gap-1 justify-center items-center ${className}`}
+        style={containerStyle}
+      >
+        <span className="sr-only" aria-live="polite">
+          Image {safeActive + 1} of {count}
+        </span>
+        {Array.from({ length: count }).map((_, i) => {
+          const d = Math.abs(i - safeActive);
+          const size = d === 0 ? 8 : d === 1 ? 6 : d === 2 ? 5 : 4;
+          const opacity = d === 0 ? 1 : d === 1 ? 0.8 : d === 2 ? 0.55 : 0.3;
+          return (
+            <div
+              key={i}
+              className="rounded-full transition-all duration-300 ease-out"
+              style={{
+                width: size,
+                height: size,
+                background: 'rgba(255, 255, 255, 0.98)',
+                opacity,
+                boxShadow: d === 0 ? '0 1px 3px rgba(0,0,0,0.3)' : undefined,
+              }}
+            />
           );
         })}
       </div>
