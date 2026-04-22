@@ -81,8 +81,9 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
   if (variant === 'windowed') {
     const WINDOW_SIZE = 5;
     const HALF_WINDOW = 2;
-    const GAP = 4;
-    const SLOT_PITCH = 8 + GAP; // largest dot + gap, used for translate maths
+    const GAP = 2;
+    const MAX_DOT = 6;
+    const SLOT_PITCH = MAX_DOT + GAP; // largest dot + gap, used for translate maths
 
     // Small-count branch: all dots fit, no sliding — keep slot-based scaling
     if (count <= WINDOW_SIZE) {
@@ -98,7 +99,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
           </span>
           {Array.from({ length: count }).map((_, i) => {
             const d = Math.abs(i - safeActive);
-            const size = d === 0 ? 8 : d === 1 ? 6 : 4;
+            const size = d === 0 ? 6 : d === 1 ? 5 : 3;
             const opacity = d === 0 ? 1 : d === 1 ? 0.8 : 0.4;
             return (
               <div
@@ -141,7 +142,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
         <div
           style={{
             width: viewportWidth,
-            height: 8,
+            height: MAX_DOT,
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
@@ -160,23 +161,23 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
               const slot = i - windowStart;
               const inWindow = slot >= 0 && slot < WINDOW_SIZE;
 
-              let baseSize = 4;
+              let baseSize = 3;
               let baseOpacity = 0;
               if (inWindow) {
                 if (slot === 2) {
-                  baseSize = 8;
+                  baseSize = 6;
                   baseOpacity = 1;
                 } else if (slot === 1 || slot === 3) {
-                  baseSize = 6;
+                  baseSize = 5;
                   baseOpacity = 0.8;
                 } else {
-                  baseSize = 4;
+                  baseSize = 3;
                   baseOpacity = 0.4;
                 }
               }
 
               const isActive = i === safeActive;
-              const size = isActive ? 8 : baseSize;
+              const size = isActive ? 6 : baseSize;
               const opacity = isActive ? 1 : baseOpacity;
 
               return (
@@ -186,7 +187,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                   style={{
                     flex: `0 0 ${SLOT_PITCH - GAP}px`,
                     width: SLOT_PITCH - GAP,
-                    height: 8,
+                    height: MAX_DOT,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
