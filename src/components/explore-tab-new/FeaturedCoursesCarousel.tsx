@@ -70,6 +70,23 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
             {location}
           </p>
 
+          {course.why_ai && (
+            <p
+              style={{
+                fontSize: 13,
+                lineHeight: 1.45,
+                color: 'rgba(255,255,255,0.92)',
+                margin: '8px 0 0',
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {course.why_ai}
+            </p>
+          )}
+
           {course.avg_rating && (
             <div className="flex items-center gap-1.5" style={{ marginTop: 4 }}>
               <Star className="w-[13px] h-[13px]" style={{ color: '#F7931E', fill: '#F7931E' }} />
