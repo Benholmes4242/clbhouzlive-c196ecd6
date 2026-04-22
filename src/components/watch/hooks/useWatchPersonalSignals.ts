@@ -56,7 +56,7 @@ export function useWatchPersonalSignals(userId: string | undefined): PersonalSig
         .from('course_shortlists')
         .select('course_id')
         .eq('user_id', userId)
-        .in('list_key', ['want_to_play', 'wishlist']);
+        .eq('list_key', 'want_to_play');
       if (error || !data) return new Set();
       return new Set(
         (data as unknown as Array<{ course_id: string | null }>)
