@@ -14,8 +14,21 @@ import { ReviewWizard } from '@/components/courses/review-wizard';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 import { CourseCardDraggable } from '@/components/CourseCardDraggable';
+
+// File-local adapter: maps the modal's merged course row shape to the
+// canonical OwnRatingRow shape consumed by `compareOwnRatings`.
+const toOwnRatingRow = (c: any) => ({
+  course_id: c.course_id ?? c.golf_courses?.id ?? '',
+  rating: c.rating,
+  design_score: c.design_score,
+  condition_score: c.condition_score,
+  clubhouse_score: c.clubhouse_score,
+  facilities_score: c.facilities_score,
+  review_date: c.review_date ?? c.created_at,
+});
 
 interface EnhancedRegionalCoursesModalProps {
   isOpen: boolean;
@@ -219,10 +232,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
       if (coursesError) throw coursesError;
 
-      // Ratings-only: get user's ratings
+      // Ratings-only: get user's ratings (canonical breakdown columns + review_date for cascade tiebreakers)
       const { data: userRatings, error: ratingsError } = await supabase
         .from('course_ratings')
-        .select('course_id, rating, created_at')
+        .select('course_id, rating, design_score, condition_score, clubhouse_score, facilities_score, review_date, created_at')
         .eq('user_id', userId);
 
       if (ratingsError) throw ratingsError;
@@ -240,7 +253,12 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           userPlayed: ratingsMap.has(course.id),
           lastPlayedAt: ratingData?.created_at,
           rating: ratingData?.rating,
-          created_at: ratingData?.created_at
+          created_at: ratingData?.created_at,
+          design_score: ratingData?.design_score,
+          condition_score: ratingData?.condition_score,
+          clubhouse_score: ratingData?.clubhouse_score,
+          facilities_score: ratingData?.facilities_score,
+          review_date: ratingData?.review_date,
         };
       }) || [];
 
