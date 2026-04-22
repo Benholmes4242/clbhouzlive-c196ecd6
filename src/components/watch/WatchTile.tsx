@@ -4,6 +4,7 @@ import { Film, Play } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
+import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -17,9 +18,6 @@ function abbreviateCount(n: number): string {
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
-
-const LONG_PRESS_MS = 500;
-const TOUCHMOVE_CANCEL_PX = 8;
 
 interface WatchTileProps {
   post: FeedPost;
@@ -150,7 +148,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
             backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
             borderRadius: 6, padding: '3px 8px',
             fontSize: 11, fontWeight: 600, color: 'white',
-            maxWidth: '90%', overflow: 'hidden',
+            maxWidth: 'calc(100% - 88px)', overflow: 'hidden',
             zIndex: 10,
           }}
         >
