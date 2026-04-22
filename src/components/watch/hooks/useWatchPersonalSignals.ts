@@ -38,7 +38,7 @@ export function useWatchPersonalSignals(userId: string | undefined): PersonalSig
         .eq('user_id', userId);
       if (error || !data) return new Set();
       return new Set(
-        (data as Array<{ course_id: string | null }>)
+        (data as unknown as Array<{ course_id: string | null }>)
           .map(r => r.course_id)
           .filter((id): id is string => !!id)
       );
@@ -59,7 +59,7 @@ export function useWatchPersonalSignals(userId: string | undefined): PersonalSig
         .in('list_key', ['want_to_play', 'wishlist']);
       if (error || !data) return new Set();
       return new Set(
-        (data as Array<{ course_id: string | null }>)
+        (data as unknown as Array<{ course_id: string | null }>)
           .map(r => r.course_id)
           .filter((id): id is string => !!id)
       );
