@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, ArrowLeft, Calendar, MessageSquare } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 
 interface RatedCourse {
@@ -15,6 +16,10 @@ interface RatedCourse {
   review: string | null;
   review_date: string;
   course_id: string;
+  design_score: number | null;
+  condition_score: number | null;
+  clubhouse_score: number | null;
+  facilities_score: number | null;
   golf_courses: {
     id: string;
     name: string;
@@ -99,6 +104,10 @@ const MyRatingsContent = () => {
           review,
           review_date,
           course_id,
+          design_score,
+          condition_score,
+          clubhouse_score,
+          facilities_score,
           golf_courses (
             id,
             name,
@@ -116,15 +125,39 @@ const MyRatingsContent = () => {
           )
         `)
         .eq('user_id', targetUserId)
+        // Server primary sort; full canonical chain re-applied client-side.
         .order('rating', { ascending: false });
 
       if (error) {
         console.error('Error fetching ratings:', error);
         throw error;
       }
-      
+
       console.log('Found ratings:', data?.length || 0);
-      return data as RatedCourse[];
+      const rows = (data as RatedCourse[]) || [];
+      return [...rows].sort((a, b) =>
+        compareOwnRatings(
+          {
+            course_id: a.course_id,
+            rating: a.rating,
+            design_score: a.design_score,
+            condition_score: a.condition_score,
+            clubhouse_score: a.clubhouse_score,
+            facilities_score: a.facilities_score,
+            review_date: a.review_date,
+          },
+          {
+            course_id: b.course_id,
+            rating: b.rating,
+            design_score: b.design_score,
+            condition_score: b.condition_score,
+            clubhouse_score: b.clubhouse_score,
+            facilities_score: b.facilities_score,
+            review_date: b.review_date,
+          },
+          'desc'
+        )
+      );
     },
     enabled: !!targetUserId,
   });

@@ -116,11 +116,14 @@ export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
   if (!userId) return [];
 
   try {
+    const { compareOwnRatings } = await import('@/lib/sortCoursesByRating');
+
     // Get recently rated courses (ratings-only: most recent ratings)
     const { data: recentlyRated } = await supabase
       .from('course_ratings')
       .select(`
-        course_id, rating, created_at,
+        course_id, rating, created_at, review_date,
+        design_score, condition_score, clubhouse_score, facilities_score,
         golf_courses!inner(
           id, name, country, sub_country, region, thumbnail_image,
           global_rank, regional_rank, usa_rank
@@ -131,10 +134,12 @@ export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
       .limit(5);
 
     // Get highest rated courses by user
-    const { data: highestRated } = await supabase
+    // Fetch a small overshoot then apply canonical own-rating chain client-side.
+    const { data: highestRatedRaw } = await supabase
       .from('course_ratings')
       .select(`
-        course_id, rating,
+        course_id, rating, review_date, created_at,
+        design_score, condition_score, clubhouse_score, facilities_score,
         golf_courses!inner(
           id, name, country, sub_country, region, thumbnail_image,
           global_rank, regional_rank, usa_rank
@@ -142,7 +147,31 @@ export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
       `)
       .eq('user_id', userId)
       .order('rating', { ascending: false })
-      .limit(5);
+      .limit(20);
+
+    const highestRated = [...((highestRatedRaw || []) as any[])]
+      .sort((a: any, b: any) => compareOwnRatings(
+        {
+          course_id: a.course_id,
+          rating: a.rating,
+          design_score: a.design_score,
+          condition_score: a.condition_score,
+          clubhouse_score: a.clubhouse_score,
+          facilities_score: a.facilities_score,
+          review_date: a.review_date ?? a.created_at,
+        },
+        {
+          course_id: b.course_id,
+          rating: b.rating,
+          design_score: b.design_score,
+          condition_score: b.condition_score,
+          clubhouse_score: b.clubhouse_score,
+          facilities_score: b.facilities_score,
+          review_date: b.review_date ?? b.created_at,
+        },
+        'desc'
+      ))
+      .slice(0, 5);
 
     const suggestions: SearchResult[] = [];
 
@@ -161,7 +190,7 @@ export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
     // Add highest rated (avoid duplicates)
     if (highestRated) {
       const existingIds = new Set(suggestions.map(s => s.id));
-      highestRated.forEach(item => {
+      highestRated.forEach((item: any) => {
         const course = item.golf_courses;
         if (!existingIds.has(course.id)) {
           suggestions.push({

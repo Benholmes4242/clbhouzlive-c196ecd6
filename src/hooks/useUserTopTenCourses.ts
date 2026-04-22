@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 export interface TopTenCourse {
   id: string;
@@ -105,6 +106,12 @@ export function useUserTopTenCourses(userId: string | undefined) {
           .select(`
             course_id,
             rating,
+            review_date,
+            created_at,
+            design_score,
+            condition_score,
+            clubhouse_score,
+            facilities_score,
             golf_courses!inner (
               id,
               name,
@@ -119,6 +126,7 @@ export function useUserTopTenCourses(userId: string | undefined) {
           `)
           .eq('user_id', userId)
           .eq('is_mock', false)
+          // Server primary sort; full canonical chain re-applied client-side.
           .order('rating', { ascending: false })
           .limit(autoSlotsNeeded + excludeList.length); // Fetch extra to filter
 
@@ -126,9 +134,30 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
         if (ratedError) throw ratedError;
 
-        // Filter out excluded/pinned and take what we need
-        const filteredRated = (ratedData || [])
+        // Filter out excluded/pinned, apply canonical own-rating chain, then slice
+        const filteredRated = ((ratedData || []) as any[])
           .filter((r: any) => !excludeList.includes(r.course_id))
+          .sort((a: any, b: any) => compareOwnRatings(
+            {
+              course_id: a.course_id,
+              rating: a.rating,
+              design_score: a.design_score,
+              condition_score: a.condition_score,
+              clubhouse_score: a.clubhouse_score,
+              facilities_score: a.facilities_score,
+              review_date: a.review_date ?? a.created_at,
+            },
+            {
+              course_id: b.course_id,
+              rating: b.rating,
+              design_score: b.design_score,
+              condition_score: b.condition_score,
+              clubhouse_score: b.clubhouse_score,
+              facilities_score: b.facilities_score,
+              review_date: b.review_date ?? b.created_at,
+            },
+            'desc'
+          ))
           .slice(0, autoSlotsNeeded);
 
         // Calculate positions for auto courses (fill gaps after pinned)
