@@ -49,20 +49,20 @@ export const FullscreenCarouselOverlay: React.FC<FullscreenCarouselOverlayProps>
 
   return (
     <>
-      {/* Dots — segments variant, just below top chrome */}
+      {/* Dots — windowed variant, centred just below top chrome */}
       <div
-        className="absolute pointer-events-none"
+        className="absolute pointer-events-none flex justify-center"
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
-          left: 16,
-          right: 16,
+          left: 0,
+          right: 0,
           zIndex: 9029,
         }}
       >
         <CarouselDots
           count={count}
           active={carouselSlide}
-          variant="segments"
+          variant="windowed"
           isVisible={isVisible}
         />
       </div>
