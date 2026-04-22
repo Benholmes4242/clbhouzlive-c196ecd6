@@ -17,6 +17,7 @@ import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
+import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -209,6 +210,11 @@ export function CourseMediaViewer() {
                 isActiveReview={isReview}
                 bottomOffset={0}
                 readOnly={true}
+              />
+
+              <FullscreenCarouselOverlay
+                activePost={activePost}
+                activeIndex={activeIndex}
               />
             </>
           )}

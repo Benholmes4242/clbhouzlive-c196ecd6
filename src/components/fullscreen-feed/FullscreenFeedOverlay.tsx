@@ -9,6 +9,7 @@ import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkelet
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
+import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
@@ -179,6 +180,11 @@ export function FullscreenFeedOverlay() {
                   activeReview={activeReview}
                   isActiveReview={isActiveReview}
                   bottomOffset={0}
+                />
+
+                <FullscreenCarouselOverlay
+                  activePost={activePost}
+                  activeIndex={activeIndex}
                 />
               </>
             )}
