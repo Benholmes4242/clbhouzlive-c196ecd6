@@ -49,7 +49,10 @@ export function useVideosFeed({ userId, filter, searchQuery, enabled: externalEn
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
-      const rows = data as FeedRpcRow[];
+      // Cast via `unknown`: the generated Supabase types lag behind the migrated
+      // RPC return shape (post_-prefixed columns). Runtime payload matches
+      // FeedRpcRow — same pattern as useFeedPostsByIds.ts.
+      const rows = data as unknown as FeedRpcRow[];
       const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
 
       for (const post of posts) {
