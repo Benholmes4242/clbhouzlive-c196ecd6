@@ -28,6 +28,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
+import { CarouselDots } from '@/components/media/CarouselDots';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
