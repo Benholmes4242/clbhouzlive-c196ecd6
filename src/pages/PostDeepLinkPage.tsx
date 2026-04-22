@@ -207,7 +207,7 @@ const PostDeepLinkPage: React.FC = () => {
           className="mt-4 px-5 py-2.5 rounded-full text-[14px] font-medium text-white/80"
           style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
-          Go to Clbhouz
+          Go to clbhouz
         </button>
       </div>
     );
