@@ -58,7 +58,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
   }, []);
 
   return (
-    <div className="bg-background min-h-screen">
+    <div style={{ background: '#F5F1EA', minHeight: '100vh' }}>
       <ExploreHeader
         activeRegion={activeRegion}
         regions={regions}
