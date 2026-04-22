@@ -9,6 +9,8 @@ import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
 
 interface CourseMediaGridProps {
   posts: FeedPost[];
+  /** Grouped-by-post array for fullscreen handoff. Falls back to `posts` if not provided. */
+  postsForFullscreen?: FeedPost[];
   isLoading: boolean;
   isError: boolean;
   hasNextPage: boolean;
@@ -35,6 +37,7 @@ function isLandscape(post: FeedPost): boolean {
 
 export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(({
   posts,
+  postsForFullscreen,
   isLoading,
   isError,
   hasNextPage,
@@ -44,6 +47,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   courseName,
   courseId,
 }, ref) => {
+  const fullscreenPosts = postsForFullscreen ?? posts;
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -65,15 +69,16 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Sync new posts into fullscreen overlay
+  // Sync new posts into fullscreen overlay — use the grouped shape so
+  // SnapFeed receives unique post.id keys (matches the canonical invariant).
   const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
-    if (posts.length > 0) {
-      appendPosts(posts);
+    if (fullscreenPosts.length > 0) {
+      appendPosts(fullscreenPosts);
     }
-  }, [posts.length, isFullscreenOpen, appendPosts]);
+  }, [fullscreenPosts.length, isFullscreenOpen, appendPosts, fullscreenPosts]);
 
   if (isLoading) return <CourseMediaGridSkeleton />;
 
@@ -180,7 +185,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             key={firstMediaKey}
             post={firstPost}
             index={tileIndex++}
-            allPosts={posts}
+            allPosts={fullscreenPosts}
             fetchNextPage={fetchNextPage}
             hasNextPage={hasNextPage}
             isFetchingNextPage={isFetchingNextPage}
@@ -203,7 +208,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
                 <CourseMediaLandscapeCard
                   post={post}
                   index={idx}
-                  allPosts={posts}
+                  allPosts={fullscreenPosts}
                   fetchNextPage={fetchNextPage}
                   hasNextPage={hasNextPage}
                   isFetchingNextPage={isFetchingNextPage}
@@ -217,7 +222,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
               key={mediaKey}
               post={post}
               index={idx}
-              allPosts={posts}
+              allPosts={fullscreenPosts}
               fetchNextPage={fetchNextPage}
               hasNextPage={hasNextPage}
               isFetchingNextPage={isFetchingNextPage}

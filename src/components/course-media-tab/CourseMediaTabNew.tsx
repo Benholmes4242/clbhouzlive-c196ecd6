@@ -20,6 +20,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
 
   const {
     posts,
+    postsForFullscreen,
     mediaCounts,
     isLoading,
     isError,
@@ -75,6 +76,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       <CourseMediaGrid
         ref={gridRef}
         posts={posts}
+        postsForFullscreen={postsForFullscreen}
         isLoading={isLoading}
         isError={isError}
         hasNextPage={hasNextPage ?? false}

@@ -47,7 +47,15 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       ref={tileRef}
       data-course-media-index={index}
       onClick={() => {
-        useFullscreenFeedStore.getState().open(allPosts ?? [post], index);
+        // `allPosts` is the grouped-for-fullscreen array (one entry per post,
+        // mediaItems[] aggregated). Translate the flat tile index → the post
+        // index by matching post.id.
+        const groupedPosts = allPosts ?? [post];
+        const fullscreenIndex = Math.max(
+          0,
+          groupedPosts.findIndex(p => p.id === post.id),
+        );
+        useFullscreenFeedStore.getState().open(groupedPosts, fullscreenIndex);
       }}
       style={{
         position: 'relative',

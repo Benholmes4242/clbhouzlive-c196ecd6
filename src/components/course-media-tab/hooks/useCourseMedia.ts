@@ -1,7 +1,7 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { mapRowToFeedPost } from '@/components/media-system/utils/feedMapper';
+import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 export type CourseMediaFilter = 'all' | 'photos' | 'videos';
@@ -74,7 +74,8 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
     gcTime: 10 * 60 * 1000,
   });
 
-  // Dedup by media_id since the same post can have multiple media items
+  // Dedup by media_id since the same post can have multiple media items.
+  // This array drives the GRID — one tile per media item.
   const allPosts = useMemo(() => {
     const items = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
@@ -84,6 +85,16 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
       seen.add(mediaId);
       return true;
     });
+  }, [query.data]);
+
+  // Grouped by post_id with aggregated mediaItems[] — drives FULLSCREEN.
+  // SnapFeed keys slides by post.id and expects this canonical shape, matching
+  // every other pipeline (Clubhouse / Discover / Profile / Watch all run
+  // groupMultiMedia upstream). Course media is the only RPC that returns
+  // one-row-per-media, so we group here.
+  const postsForFullscreen = useMemo(() => {
+    const flat = query.data?.pages.flatMap((page) => page.posts) ?? [];
+    return groupMultiMedia(flat);
   }, [query.data]);
 
   const mediaCounts = useMemo((): MediaCounts => {
@@ -105,6 +116,7 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
 
   return {
     posts: allPosts,
+    postsForFullscreen,
     mediaCounts,
     isLoading: query.isLoading,
     isError: query.isError,
