@@ -1184,6 +1184,10 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
             trim_end: mediaItem?.trimEnd ?? null,
             poster_timestamp: (mediaItem as any)?.posterTimestamp ?? null,
             ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
+            ...(clientDuration && {
+              duration_seconds: clientDuration,
+              duration_ms: clientDuration * 1000,
+            }),
           })
           .eq('id', existingRowId);
       } else {
@@ -1202,6 +1206,10 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
           trim_end: mediaItem?.trimEnd ?? null,
           poster_timestamp: (mediaItem as any)?.posterTimestamp ?? null,
           ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
+          ...(clientDuration && {
+            duration_seconds: clientDuration,
+            duration_ms: clientDuration * 1000,
+          }),
         });
       }
 
