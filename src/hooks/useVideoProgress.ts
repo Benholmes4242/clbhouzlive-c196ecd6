@@ -82,13 +82,16 @@ export const useVideoProgress = (postId: string): UseVideoProgressResult => {
     lastUpdateRef.current = now;
 
     try {
+      // video_progress.last_position_seconds and duration_seconds are now
+      // numeric(10,3) (widened 2026-04-22). Persist sub-second precision so
+      // resume positions land exactly where the user paused.
       const { error } = await supabase
         .from('video_progress')
         .upsert({
           user_id: userId,
           post_id: postId,
-          last_position_seconds: Math.floor(position),
-          duration_seconds: duration ? Math.floor(duration) : null,
+          last_position_seconds: position,
+          duration_seconds: duration ?? null,
           updated_at: new Date().toISOString(),
         }, {
           onConflict: 'user_id,post_id',
@@ -98,8 +101,8 @@ export const useVideoProgress = (postId: string): UseVideoProgressResult => {
         console.error('Error updating video progress:', error);
       } else {
         setProgress(prev => ({
-          lastPositionSeconds: Math.floor(position),
-          durationSeconds: duration ? Math.floor(duration) : prev?.durationSeconds ?? null,
+          lastPositionSeconds: position,
+          durationSeconds: duration ?? prev?.durationSeconds ?? null,
           updatedAt: new Date().toISOString(),
         }));
       }
