@@ -9,6 +9,7 @@ import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { useSectionLoader } from '@/hooks/useSectionLoader';
 import SkeletonRow from '@/components/ui/SkeletonRow';
 import type { TopRatedSectionProps } from './types';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 const TopRatedSection: React.FC<TopRatedSectionProps> = ({ 
   userId,
@@ -47,6 +48,11 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         course_id,
         rating,
         created_at,
+        review_date,
+        design_score,
+        condition_score,
+        clubhouse_score,
+        facilities_score,
         golf_courses!inner (
           id,
           name,
@@ -62,8 +68,10 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         )
       `)
       .eq('user_id', userId)
+      // Server-side primary sort; we re-apply the full canonical comparator
+      // client-side so the chain is identical to every other own-rating surface.
       .order('rating', { ascending: false })
-      .limit(10);
+      .limit(50);
 
     if (ratedError) throw ratedError;
 
@@ -81,7 +89,34 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
       statsMap.set(stat.course_id, stat.avg_overall_score);
     });
 
-    return (ratedData || []).map(course => ({
+    // Apply canonical own-rating tiebreaker chain client-side then take top 10.
+    // (Server's order-by is only the primary tier; we sort fully here so the
+    // chain matches every other own-rating surface byte-for-byte.)
+    const sorted = [...(ratedData || [])].sort((a, b) =>
+      compareOwnRatings(
+        {
+          course_id: a.course_id,
+          rating: a.rating,
+          design_score: (a as any).design_score,
+          condition_score: (a as any).condition_score,
+          clubhouse_score: (a as any).clubhouse_score,
+          facilities_score: (a as any).facilities_score,
+          review_date: (a as any).review_date ?? a.created_at,
+        },
+        {
+          course_id: b.course_id,
+          rating: b.rating,
+          design_score: (b as any).design_score,
+          condition_score: (b as any).condition_score,
+          clubhouse_score: (b as any).clubhouse_score,
+          facilities_score: (b as any).facilities_score,
+          review_date: (b as any).review_date ?? b.created_at,
+        },
+        'desc'
+      )
+    ).slice(0, 10);
+
+    return sorted.map(course => ({
       ...course,
       played_date: course.created_at,
       id: `rating-${course.course_id}`,

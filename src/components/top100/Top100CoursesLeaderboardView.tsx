@@ -13,6 +13,7 @@ import { getCourseTrophies } from './getCourseTrophies';
 import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
 import { fromLeaderboardCourse } from '@/lib/mappers/toCourseCardModel';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
+import { compareCoursesByRating } from '@/lib/sortCoursesByRating';
 
 interface Top100CoursesLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -106,7 +107,15 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
     
     switch (filters.sortBy) {
       case 'member_rating':
-        return courses.sort((a, b) => (b.avg_rating ?? 0) - (a.avg_rating ?? 0));
+        // CourseLeaderboardEntry has no rating_count; unique_players is the
+        // closest reviewer-count signal in this shape.
+        return courses.sort((a, b) =>
+          compareCoursesByRating(
+            { id: a.course_id, name: a.course_name, avg_rating: a.avg_rating, rating_count: a.unique_players },
+            { id: b.course_id, name: b.course_name, avg_rating: b.avg_rating, rating_count: b.unique_players },
+            'desc'
+          )
+        );
       case 'most_played':
         return courses.sort((a, b) => b.times_played - a.times_played);
       case 'recently_popular':

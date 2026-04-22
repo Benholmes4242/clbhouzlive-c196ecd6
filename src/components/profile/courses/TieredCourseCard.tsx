@@ -19,6 +19,12 @@ export interface CourseCardData {
   rating_value: number | null;
   has_rating: boolean;
   rating_id: string | null;
+  // Optional own-rating breakdown fields used by the canonical sort comparator
+  design_score?: number | null;
+  condition_score?: number | null;
+  clubhouse_score?: number | null;
+  facilities_score?: number | null;
+  review_date?: string | null;
 }
 
 interface TieredCourseCardProps {
