@@ -70,18 +70,29 @@ export default function ClipsSubpage() {
       {/* Sticky header + chips block */}
       <div style={{ position: 'sticky', top: '0px', zIndex: 20, background: 'hsl(var(--background))' }}>
         {/* Header */}
-        <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
+        <div className="flex items-start gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
           <button
             onClick={() => navigate(-1)}
-            className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+            className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform mt-[2px]"
             style={{ background: 'rgba(0,0,0,0.06)' }}
+            aria-label="Back"
           >
             <ChevronLeft size={20} />
           </button>
-          <span className="text-[18px] font-bold text-foreground">
-            Clips
-          </span>
-          <div className="flex-1" />
+          <div className="flex-1 min-w-0">
+            <div className="text-[18px] font-bold text-foreground leading-tight">
+              Clips
+            </div>
+            <div
+              className="leading-tight"
+              style={{ fontSize: 12, fontWeight: 500, color: 'hsl(var(--muted-foreground))', marginTop: 2 }}
+            >
+              {getSubheadForTag(
+                activeTag,
+                categoryChips.find(c => c.id === activeTag)?.label,
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Filter chips */}
