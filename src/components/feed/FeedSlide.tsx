@@ -6,6 +6,7 @@ import { FeedImageCarousel } from './FeedImageCarousel';
 import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
 import { CourseOfWeekCard } from '@/components/clubhouse/cinematic/CourseOfWeekCard';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
+import { CarouselDots } from '@/components/media/CarouselDots';
 import type { FeedPost, PGACardFeedPost, CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
@@ -45,6 +46,12 @@ export const FeedSlide = memo(function FeedSlide({
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
+  const carouselSlide = useClubhouseStore(s => s.carouselPositions.get(index) ?? 0);
+  const isEditorial =
+    post.postType === 'pga_card' ||
+    post.postType === 'tournament_result' ||
+    post.postType === 'course_of_week_card';
+  const showInlineDots = !isEditorial && (media?.length ?? 0) > 1;
 
   // Pinch zoom for single images
   const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } = usePinchZoomPointer();
