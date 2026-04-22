@@ -63,7 +63,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
                 borderRadius: 12,
                 overflow: 'hidden',
                 background: '#0F172A',
-                border: isActive ? '2px solid #F7931E' : '1px solid rgba(15,23,42,0.08)',
+                border: isActive ? '2px solid #F7931E' : 'none',
                 padding: 0,
               }}
             >
