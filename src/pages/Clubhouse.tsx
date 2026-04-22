@@ -419,10 +419,23 @@ const ClubhouseContent = () => {
           />
 
           {/* Windowed carousel dots — centred under top chrome */}
-          <FullscreenCarouselOverlay
-            activePost={activePost}
-            activeIndex={activeIndex}
-          />
+          {(activePost?.mediaItems?.length ?? 0) > 1 && (
+            <div
+              className="fixed pointer-events-none flex justify-center"
+              style={{
+                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+                left: 0,
+                right: 0,
+                zIndex: 9029,
+              }}
+            >
+              <CarouselDots
+                count={activePost!.mediaItems!.length}
+                active={currentMediaIndex}
+                variant="windowed"
+              />
+            </div>
+          )}
 
           {/* Overlay layer — action rail, creator capsule, scrubber, dots */}
           <FeedOverlayLayer
