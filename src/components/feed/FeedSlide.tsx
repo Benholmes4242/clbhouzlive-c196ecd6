@@ -199,6 +199,20 @@ export const FeedSlide = memo(function FeedSlide({
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
       {renderContent()}
+
+      {/* Inline carousel dots — top-right, always visible, multi-media non-editorial only */}
+      {showInlineDots && (
+        <div
+          className="absolute pointer-events-none"
+          style={{ top: 8, right: 8, zIndex: 25, minWidth: 60 }}
+        >
+          <CarouselDots
+            count={media!.length}
+            active={carouselSlide}
+            variant="elongated"
+          />
+        </div>
+      )}
     </div>
   );
 });
