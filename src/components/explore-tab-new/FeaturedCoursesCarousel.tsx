@@ -44,8 +44,8 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
       <button
         type="button"
         onClick={() => navigate(`/courses/${course.course_id}`)}
-        className="relative w-full h-[260px] sm:h-[290px] overflow-hidden block text-left active:scale-[0.99] transition-transform"
-        style={{ background: '#1a1a1a', borderRadius: 12, border: '1px solid rgba(15,23,42,0.08)' }}
+        className="relative w-full overflow-hidden block text-left active:scale-[0.99] transition-transform"
+        style={{ background: '#1a1a1a', borderRadius: 12, border: '1px solid rgba(15,23,42,0.08)', aspectRatio: '16/10' }}
       >
         <img
           src={course.thumbnail_image}
