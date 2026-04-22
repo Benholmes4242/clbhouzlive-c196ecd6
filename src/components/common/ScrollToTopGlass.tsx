@@ -6,31 +6,41 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const rootEl = document.getElementById('root');
+    // On this app, #root is the scroll container. Fall back to window only
+    // if #root isn't present (defensive — shouldn't happen at runtime).
+    const target: HTMLElement | Window = document.getElementById('root') ?? window;
+    let ticking = false;
 
-    const onScroll = () => {
+    const computeVisible = () => {
       // Hide when a fullscreen overlay is active
       if (document.body.classList.contains('route-fullscreen-overlay')) {
         setVisible(false);
         return;
       }
-      const windowScrolled = window.scrollY > 400;
-      const rootScrolled = rootEl ? rootEl.scrollTop > 400 : false;
-      setVisible(windowScrolled || rootScrolled);
+      const scrollTop =
+        target instanceof Window ? window.scrollY : (target as HTMLElement).scrollTop;
+      setVisible(scrollTop > 400);
     };
 
-    onScroll();
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        computeVisible();
+        ticking = false;
+      });
+    };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    rootEl?.addEventListener('scroll', onScroll, { passive: true });
+    computeVisible();
+
+    target.addEventListener('scroll', onScroll, { passive: true } as AddEventListenerOptions);
 
     // Also watch for body class changes (fullscreen overlay toggle)
-    const observer = new MutationObserver(() => onScroll());
+    const observer = new MutationObserver(() => computeVisible());
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      rootEl?.removeEventListener('scroll', onScroll);
+      target.removeEventListener('scroll', onScroll as EventListener);
       observer.disconnect();
     };
   }, []);
