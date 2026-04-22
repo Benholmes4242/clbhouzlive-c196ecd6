@@ -71,8 +71,8 @@ const sortCourses = (courses: any[], sortBy: SortOption) => {
           if (canonical !== 0) return canonical;
 
           // Tier 4: community avg DESC (Enhanced-specific)
-          const aGlobal = a.golf_courses?.average_rating ?? 0;
-          const bGlobal = b.golf_courses?.average_rating ?? 0;
+          const aGlobal = a.community_avg ?? 0;
+          const bGlobal = b.community_avg ?? 0;
           if (aGlobal !== bGlobal) return bGlobal - aGlobal;
 
           // Tier 5: regional_rank ASC (lower rank = better; Enhanced-specific)
@@ -87,8 +87,8 @@ const sortCourses = (courses: any[], sortBy: SortOption) => {
         if (!aRating && bRating) return 1;
 
         // Both played but unrated — community avg then regional_rank (existing)
-        const aGlobalRating = a.golf_courses?.average_rating ?? 0;
-        const bGlobalRating = b.golf_courses?.average_rating ?? 0;
+        const aGlobalRating = a.community_avg ?? 0;
+        const bGlobalRating = b.community_avg ?? 0;
         if (aGlobalRating !== bGlobalRating) return bGlobalRating - aGlobalRating;
 
         const aRank = a.golf_courses?.regional_rank ?? a.golf_courses?.global_rank ?? 9999;
@@ -108,8 +108,8 @@ const sortCourses = (courses: any[], sortBy: SortOption) => {
           if (canonical !== 0) return canonical;
 
           // Tier 4: community avg ASC (flipped for "lowest")
-          const aGlobal = a.golf_courses?.average_rating ?? 0;
-          const bGlobal = b.golf_courses?.average_rating ?? 0;
+          const aGlobal = a.community_avg ?? 0;
+          const bGlobal = b.community_avg ?? 0;
           if (aGlobal !== bGlobal) return aGlobal - bGlobal;
 
           // Tier 5: regional_rank DESC (flipped — worse rank = "lower")
@@ -124,8 +124,8 @@ const sortCourses = (courses: any[], sortBy: SortOption) => {
         if (!aRating && bRating) return 1;
 
         // Both played but unrated — community avg then regional_rank (existing, flipped)
-        const aGlobalRating = a.golf_courses?.average_rating ?? 0;
-        const bGlobalRating = b.golf_courses?.average_rating ?? 0;
+        const aGlobalRating = a.community_avg ?? 0;
+        const bGlobalRating = b.community_avg ?? 0;
         if (aGlobalRating !== bGlobalRating) return aGlobalRating - bGlobalRating;
 
         const aRank = a.golf_courses?.regional_rank ?? a.golf_courses?.global_rank ?? 0;
