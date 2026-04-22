@@ -5,6 +5,7 @@ import { CourseCardModel } from '@/types/courseCard';
 import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { CourseCommunityRating } from './CourseCommunityRating';
 import { format } from 'date-fns';
+import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 
 /**
  * UNIFIED COURSE CARD COMPONENT
@@ -67,7 +68,7 @@ function getRegionalBadgeSlug(course: CourseCardModel): 'usa' | 'gb-i' | 'europe
   return null;
 }
 
-export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
+const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
   course,
   variant = 'vertical',
   showRankBadges = true,
@@ -168,9 +169,18 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
         {course.imageUrl ? (
           <img
-            src={course.imageUrl}
+            src={getOptimizedImageUrl(course.imageUrl, { width: 640 })}
+            srcSet={generateImageSrcSet(course.imageUrl, [
+              { width: 400 },
+              { width: 640 },
+              { width: 800 },
+            ])}
+            sizes="(min-width: 1024px) 340px, (min-width: 768px) 384px, 100vw"
             alt={course.name}
             loading="lazy"
+            decoding="async"
+            width={640}
+            height={380}
             className="w-full h-full object-cover transition-transform duration-500 group-active:scale-[1.02]"
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
           />
@@ -308,12 +318,10 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             <div
               className="flex items-center gap-1.5 flex-shrink-0"
               style={{
-                background: 'rgba(255,255,255,0.12)',
+                background: 'rgba(15,23,42,0.55)',
                 border: '0.5px solid rgba(255,255,255,0.20)',
                 borderRadius: 9999,
                 padding: '4px 8px',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
               }}
             >
               <img
@@ -335,5 +343,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
     </button>
   );
 };
+
+export const UnifiedCourseCard = React.memo(UnifiedCourseCardImpl);
 
 export default UnifiedCourseCard;
