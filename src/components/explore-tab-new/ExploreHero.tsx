@@ -58,7 +58,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
   const tierLabel = hero.filter_tier ? TIER_LABELS[hero.filter_tier] ?? '' : '';
 
   return (
-    <div className="px-4 pt-4">
+    <section style={{ padding: '24px 16px 0' }}>
       <button
         type="button"
         onClick={() => navigate(`/courses/${hero.course_id}`)}
