@@ -213,7 +213,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {/* Desktop: main nav links */}
             <nav className="hidden lg:flex items-center gap-1">
               {[
-                { label: 'Clubhouse', path: '/clubhouse' },
+                { label: 'Clbhouz', path: '/clubhouse' },
                 { label: 'Discover', path: '/discover' },
                 { label: 'Courses', path: '/courses' },
                 { label: 'Tour', path: '/tour' },
