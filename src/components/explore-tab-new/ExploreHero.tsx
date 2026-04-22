@@ -44,12 +44,12 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
 
   if (isLoading) {
     return (
-      <div className="px-4 pt-4">
+      <section style={{ padding: '24px 16px 0' }}>
         <div
           className="w-full animate-pulse"
           style={{ aspectRatio: '4/5', borderRadius: 16, background: 'rgba(15,23,42,0.06)' }}
         />
-      </div>
+      </section>
     );
   }
 
