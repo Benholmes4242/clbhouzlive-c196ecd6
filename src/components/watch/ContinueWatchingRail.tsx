@@ -22,7 +22,7 @@ export default function ContinueWatchingRail({ userId }: ContinueWatchingRailPro
 
   return (
     <>
-      <WatchSectionHeader eyebrow="Continue Watching" title="Pick up where you left off" />
+      <WatchSectionHeader eyebrow="Continue" title="Continue watching" sub="Pick up where you left off" />
       <div
         className="flex gap-3 overflow-x-auto"
         style={{
