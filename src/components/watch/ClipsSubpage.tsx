@@ -51,7 +51,7 @@ export default function ClipsSubpage() {
 
   return (
     <WatchActionsProvider>
-      <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM } as any}>
+      <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
         {/* ── Editorial header ── */}
         <div
           style={{
