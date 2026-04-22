@@ -58,9 +58,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     }
 
     // Highest Rated (courses with ratings 8+) - Row 2 with Hero Banner
-    // These are own-rating rows: each entry is a single user's rating on
-    // a course, so use the own-rating comparator (rating → breakdown sum
-    // → review_date DESC → course_id).
+    // Own-rating comparator: these rows represent a single user's ratings, not aggregate community data
     const highRatedCourses = allCourses
       .filter(course => course.rating && course.rating >= 8)
       .sort((a, b) => compareOwnRatings(
@@ -132,7 +130,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     }
 
     // Highlight Reel (special courses - same height as Recently Played but wider cards)
-    // Same own-rating shape — use the shared comparator for stable order.
+    // Own-rating comparator: these rows represent a single user's ratings, not aggregate community data
     const highlightCourses = allCourses
       .filter(course => course.rating && course.rating >= 7)
       .sort((a, b) => compareOwnRatings(

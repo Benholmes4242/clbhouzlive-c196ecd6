@@ -1,5 +1,7 @@
 // Mock course leaderboard data for dev/demo testing
 // Toggle this to enable mock data in development
+import { compareCoursesByRating, type CommunityRatingRow } from '@/lib/sortCoursesByRating';
+
 export const USE_MOCK_COURSE_LEADERBOARD_DATA = false;
 
 // Regions and countries
@@ -140,15 +142,16 @@ export function sortMostPlayed(courses: MockLeaderboardCourse[]): MockLeaderboar
 }
 
 export function sortHighestRated(courses: MockLeaderboardCourse[]): MockLeaderboardCourse[] {
-  // Aligned with canonical community-rating tiebreaker chain:
-  //   rating DESC → ratings_count DESC → breakdown sum DESC → name ASC.
-  // Mock courses don't carry breakdown data, so the third tier collapses
-  // to zero on both sides and effectively no-ops; name ASC stays stable.
-  return [...courses].sort((a, b) => {
-    if (b.avg_rating !== a.avg_rating) return b.avg_rating - a.avg_rating;
-    if (b.ratings_count !== a.ratings_count) return b.ratings_count - a.ratings_count;
-    return a.course_name.localeCompare(b.course_name);
-  });
+  // Delegate to the canonical community-rating comparator so mock data stays
+  // in lockstep with live surfaces. Mock rows lack breakdown fields, so the
+  // breakdown tier collapses to a no-op via the comparator's `?? 0` handling.
+  return [...courses].sort((a, b) =>
+    compareCoursesByRating(
+      { id: a.id, name: a.course_name, avg_rating: a.avg_rating, rating_count: a.ratings_count },
+      { id: b.id, name: b.course_name, avg_rating: b.avg_rating, rating_count: b.ratings_count },
+      'desc'
+    )
+  );
 }
 
 export function sortTrending(courses: MockLeaderboardCourse[]): MockLeaderboardCourse[] {
