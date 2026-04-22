@@ -81,8 +81,9 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
   if (variant === 'windowed') {
     const WINDOW_SIZE = 5;
     const HALF_WINDOW = 2;
-    const GAP = 4;
-    const SLOT_PITCH = 8 + GAP; // largest dot + gap, used for translate maths
+    const GAP = 2;
+    const MAX_DOT = 6;
+    const SLOT_PITCH = MAX_DOT + GAP; // largest dot + gap, used for translate maths
 
     // Small-count branch: all dots fit, no sliding — keep slot-based scaling
     if (count <= WINDOW_SIZE) {
