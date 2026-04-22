@@ -10,7 +10,7 @@ function MoodChipsInner({ active, onChange }: MoodChipsProps) {
   return (
     <div
       className="relative"
-      style={{ background: '#F5F1EA', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}
+      style={{ background: '#F8FAFC', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}
     >
       <div
         role="tablist"
@@ -34,9 +34,9 @@ function MoodChipsInner({ active, onChange }: MoodChipsProps) {
                 fontSize: 13,
                 fontWeight: 600,
                 borderRadius: 20,
-                background: isActive ? '#0F172A' : '#FFFFFF',
-                border: isActive ? '1px solid #0F172A' : '1px solid rgba(15,23,42,0.12)',
-                color: isActive ? '#FFFFFF' : '#0F172A',
+                background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+                border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 letterSpacing: '-0.01em',
               }}
             >
@@ -53,7 +53,7 @@ function MoodChipsInner({ active, onChange }: MoodChipsProps) {
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
           width: 40,
-          background: 'linear-gradient(to right, rgba(245,241,234,0) 0%, #F5F1EA 100%)',
+          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
         }}
       />
     </div>
