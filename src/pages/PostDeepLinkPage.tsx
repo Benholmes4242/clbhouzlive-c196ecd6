@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, useBlocker } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Loader2, MapPin } from 'lucide-react';
@@ -41,24 +41,6 @@ const PostDeepLinkPage: React.FC = () => {
   const [post, setPost] = useState<PostPreview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-
-  // Instagram-style navigation blocker for unauthenticated users
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      !user &&
-      !authLoading &&
-      currentLocation.pathname !== nextLocation.pathname
-  );
-
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      blocker.reset();
-      navigate('/auth', {
-        replace: true,
-        state: { from: 'post_deep_link', postId },
-      });
-    }
-  }, [blocker, navigate, postId, user, authLoading]);
 
   useEffect(() => {
     async function loadPost() {
