@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MapPin, MoreHorizontal } from 'lucide-react';
 import { useWatchCategoryChips } from './hooks/useWatchCategoryChips';
@@ -55,6 +56,7 @@ const PRIMARY_CATEGORY_IDS = ['review'];
 
 export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedProps) {
   const { session } = useSupabaseSession();
+  const navigate = useNavigate();
   const userId = session?.user?.id;
   const [activeTag, setActiveTag] = useState<string>('all');
   const [moreSheetOpen, setMoreSheetOpen] = useState(false);
@@ -109,6 +111,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         <WatchSectionHeader
           eyebrow="Shorts"
           title="More clips"
+          onSeeAll={() => navigate('/watch/clips')}
           paddingTop={4}
         />
 
