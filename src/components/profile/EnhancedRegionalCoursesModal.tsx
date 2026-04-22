@@ -61,46 +61,75 @@ const sortCourses = (courses: any[], sortBy: SortOption) => {
     
     case 'highest-rated':
       sortedPlayedCourses.sort((a, b) => {
-        const aUserRating = a.rating || a.userRating;
-        const bUserRating = b.rating || b.userRating;
-        const aGlobalRating = a.golf_courses?.average_rating || 0;
-        const bGlobalRating = b.golf_courses?.average_rating || 0;
-        
-        if (aUserRating && bUserRating) {
-          return bUserRating - aUserRating;
+        const aRating = a.rating ?? a.userRating;
+        const bRating = b.rating ?? b.userRating;
+
+        // Rated-vs-unrated guard (existing behaviour preserved)
+        if (aRating && bRating) {
+          // Tiers 1-3: canonical own-rating cascade (DESC)
+          const canonical = compareOwnRatings(toOwnRatingRow(a), toOwnRatingRow(b), 'desc');
+          if (canonical !== 0) return canonical;
+
+          // Tier 4: community avg DESC (Enhanced-specific)
+          const aGlobal = a.golf_courses?.average_rating ?? 0;
+          const bGlobal = b.golf_courses?.average_rating ?? 0;
+          if (aGlobal !== bGlobal) return bGlobal - aGlobal;
+
+          // Tier 5: regional_rank ASC (lower rank = better; Enhanced-specific)
+          const aRank = a.golf_courses?.regional_rank ?? a.golf_courses?.global_rank ?? 9999;
+          const bRank = b.golf_courses?.regional_rank ?? b.golf_courses?.global_rank ?? 9999;
+          if (aRank !== bRank) return aRank - bRank;
+
+          // Tier 6: course_id ASC (stable final tiebreaker)
+          return (a.course_id ?? '').localeCompare(b.course_id ?? '');
         }
-        if (aUserRating && !bUserRating) return -1;
-        if (!aUserRating && bUserRating) return 1;
-        
-        if (aGlobalRating !== bGlobalRating) {
-          return bGlobalRating - aGlobalRating;
-        }
-        
-        const aRank = a.golf_courses?.regional_rank || a.golf_courses?.global_rank || 9999;
-        const bRank = b.golf_courses?.regional_rank || b.golf_courses?.global_rank || 9999;
+        if (aRating && !bRating) return -1;
+        if (!aRating && bRating) return 1;
+
+        // Both played but unrated — community avg then regional_rank (existing)
+        const aGlobalRating = a.golf_courses?.average_rating ?? 0;
+        const bGlobalRating = b.golf_courses?.average_rating ?? 0;
+        if (aGlobalRating !== bGlobalRating) return bGlobalRating - aGlobalRating;
+
+        const aRank = a.golf_courses?.regional_rank ?? a.golf_courses?.global_rank ?? 9999;
+        const bRank = b.golf_courses?.regional_rank ?? b.golf_courses?.global_rank ?? 9999;
         return aRank - bRank;
       });
       break;
     
     case 'lowest-rated':
       sortedPlayedCourses.sort((a, b) => {
-        const aUserRating = a.rating || a.userRating;
-        const bUserRating = b.rating || b.userRating;
-        const aGlobalRating = a.golf_courses?.average_rating || 0;
-        const bGlobalRating = b.golf_courses?.average_rating || 0;
-        
-        if (aUserRating && bUserRating) {
-          return aUserRating - bUserRating;
+        const aRating = a.rating ?? a.userRating;
+        const bRating = b.rating ?? b.userRating;
+
+        if (aRating && bRating) {
+          // Tiers 1-3: canonical cascade with ASC primary (review_date stays DESC inside)
+          const canonical = compareOwnRatings(toOwnRatingRow(a), toOwnRatingRow(b), 'asc');
+          if (canonical !== 0) return canonical;
+
+          // Tier 4: community avg ASC (flipped for "lowest")
+          const aGlobal = a.golf_courses?.average_rating ?? 0;
+          const bGlobal = b.golf_courses?.average_rating ?? 0;
+          if (aGlobal !== bGlobal) return aGlobal - bGlobal;
+
+          // Tier 5: regional_rank DESC (flipped — worse rank = "lower")
+          const aRank = a.golf_courses?.regional_rank ?? a.golf_courses?.global_rank ?? 0;
+          const bRank = b.golf_courses?.regional_rank ?? b.golf_courses?.global_rank ?? 0;
+          if (aRank !== bRank) return bRank - aRank;
+
+          // Tier 6: course_id ASC (stable, never flips)
+          return (a.course_id ?? '').localeCompare(b.course_id ?? '');
         }
-        if (aUserRating && !bUserRating) return -1;
-        if (!aUserRating && bUserRating) return 1;
-        
-        if (aGlobalRating !== bGlobalRating) {
-          return aGlobalRating - bGlobalRating;
-        }
-        
-        const aRank = a.golf_courses?.regional_rank || a.golf_courses?.global_rank || 0;
-        const bRank = b.golf_courses?.regional_rank || b.golf_courses?.global_rank || 0;
+        if (aRating && !bRating) return -1;
+        if (!aRating && bRating) return 1;
+
+        // Both played but unrated — community avg then regional_rank (existing, flipped)
+        const aGlobalRating = a.golf_courses?.average_rating ?? 0;
+        const bGlobalRating = b.golf_courses?.average_rating ?? 0;
+        if (aGlobalRating !== bGlobalRating) return aGlobalRating - bGlobalRating;
+
+        const aRank = a.golf_courses?.regional_rank ?? a.golf_courses?.global_rank ?? 0;
+        const bRank = b.golf_courses?.regional_rank ?? b.golf_courses?.global_rank ?? 0;
         return bRank - aRank;
       });
       break;
