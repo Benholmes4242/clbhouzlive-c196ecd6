@@ -9,12 +9,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const VALID_MOODS = ["foryou", "weekend", "friends", "hidden", "bucket", "hero_feature"];
+const VALID_MOODS = [
+  "foryou", "weekend", "friends", "hidden", "bucket", "hero_feature",
+  "watch_of_week", "clip_of_week", "video_of_week",
+];
+
+const POST_SCOPED_MOODS = new Set(["watch_of_week", "clip_of_week", "video_of_week"]);
 
 interface RequestBody {
   course_id: string;
   user_id?: string | null;
   mood: string;
+  post_id?: string | null;
 }
 
 const MOOD_CONTEXT: Record<string, string> = {
@@ -24,6 +30,9 @@ const MOOD_CONTEXT: Record<string, string> = {
   hidden: "This is a 'hidden gem' recommendation — well-rated but under-the-radar",
   bucket: "This is a 'bucket list' recommendation — widely wishlisted by the community",
   hero_feature: "This is a featured editorial pick",
+  watch_of_week: "Editorial 'Watch of the Week' on the Watch tab. Reference the user's played courses if relevant. Keep to 1-2 sentences.",
+  clip_of_week: "Editorial 'Clip of the Week' — short-form quick-hit. Why is THIS clip worth watching? 1-2 sentences.",
+  video_of_week: "Editorial 'Video of the Week' — long-form pick. What's the time investment payoff? 1-2 sentences.",
 };
 
 Deno.serve(async (req) => {

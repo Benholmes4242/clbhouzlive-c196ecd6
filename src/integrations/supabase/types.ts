@@ -3030,6 +3030,7 @@ export type Database = {
           generated_at: string
           id: string
           mood: string
+          post_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -3039,6 +3040,7 @@ export type Database = {
           generated_at?: string
           id?: string
           mood: string
+          post_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -3048,6 +3050,7 @@ export type Database = {
           generated_at?: string
           id?: string
           mood?: string
+          post_id?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -3056,6 +3059,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_mood_blurbs_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
         ]
@@ -15581,6 +15591,27 @@ export type Database = {
           username: string
         }[]
       }
+      get_clip_of_the_week: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          caption: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          post_id: string
+          thumbnail_url: string
+          user_id: string
+          username: string
+          why_ai: string
+        }[]
+      }
       get_cloudflare_secrets: { Args: never; Returns: Json }
       get_continue_watching: {
         Args: { p_limit?: number; p_user_id: string }
@@ -16741,6 +16772,16 @@ export type Database = {
           tier_name: string
         }[]
       }
+      get_user_course_anchored_content: {
+        Args: { p_limit_per_course?: number; p_user_id: string }
+        Returns: {
+          content_count: number
+          course_country: string
+          course_id: string
+          course_name: string
+          recent_post_ids: string[]
+        }[]
+      }
       get_user_exploration_status: {
         Args: { p_user_id: string }
         Returns: {
@@ -16832,11 +16873,76 @@ export type Database = {
           username: string
         }[]
       }
+      get_video_of_the_week: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          caption: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          post_id: string
+          thumbnail_url: string
+          user_id: string
+          username: string
+          why_ai: string
+        }[]
+      }
       get_watch_category_counts: {
         Args: never
         Returns: {
           category: string
           post_count: number
+        }[]
+      }
+      get_watch_most_loved_this_week: {
+        Args: { p_limit?: number }
+        Returns: {
+          avatar_url: string
+          caption: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          engagement_score: number
+          format: string
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          post_id: string
+          thumbnail_url: string
+          user_id: string
+          username: string
+        }[]
+      }
+      get_watch_of_the_week: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          caption: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          format: string
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          post_id: string
+          thumbnail_url: string
+          user_id: string
+          username: string
+          why_ai: string
         }[]
       }
       get_watch_shorts: {
@@ -17978,6 +18084,7 @@ export type Database = {
       }
       trigger_push_queue_processing: { Args: never; Returns: undefined }
       trigger_video_metadata_backfill: { Args: never; Returns: undefined }
+      trigger_watch_editorial_blurb_refresh: { Args: never; Returns: undefined }
       unaccent: { Args: { "": string }; Returns: string }
       unblock_user: { Args: { p_blocked_id: string }; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
