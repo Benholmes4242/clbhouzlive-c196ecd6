@@ -68,8 +68,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           borderRadius: 16,
           overflow: 'hidden',
           aspectRatio: '4/5',
-          background: '#0F172A',
-          boxShadow: '0 4px 20px -8px rgba(15,23,42,0.25)',
+          background: '#F8FAFC',
         }}
       >
         {hero.hero_image_url ? (
