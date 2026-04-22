@@ -1,0 +1,274 @@
+-- =============================================================================
+-- Task E — Loosen video-duration predicate in get_suggested_feed
+-- =============================================================================
+-- Audit found ONE live function (not three) carries this predicate:
+--   COALESCE(pm.duration_ms, 0) >= 4000
+-- which silently excluded any video whose duration_ms was NULL.
+-- Treat NULL as eligible so videos still being measured aren't hidden.
+-- The two earlier migrations (20260421140923, 20260421152639) are historical
+-- versions of the same function — only the 20260421153012 version is live.
+-- All other behaviour preserved verbatim.
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION public.get_suggested_feed(
+  p_user_id uuid,
+  p_page_size integer DEFAULT 10,
+  p_cursor text DEFAULT NULL::text,
+  p_seen_post_ids uuid[] DEFAULT '{}'::uuid[],
+  p_mode text DEFAULT 'suggested'::text
+)
+ RETURNS TABLE(post_id uuid, post_content text, post_created_at timestamp with time zone, post_user_id uuid, post_actor_type text, post_actor_id uuid, post_status text, source_review_id uuid, media_id uuid, media_type text, media_url text, poster_url text, stream_id text, duration_seconds numeric, width integer, height integer, display_order integer, creator_username text, creator_display_name text, creator_avatar_url text, creator_is_verified boolean, business_name text, business_logo_url text, business_is_verified boolean, like_count bigint, comment_count bigint, share_count bigint, review_rating numeric, review_course_id uuid, review_course_name text, review_course_image text, review_course_region text, review_course_country text, review_course_sub_country text, creator_relation text, is_liked_by_me boolean, is_followed_by_me boolean, engagement_score numeric, post_type text, tournament_meta jsonb, review_text text, post_tags jsonb, course_id uuid, course_name text)
+ LANGUAGE plpgsql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+-- TODO(Clbhouz): Extend dismissal filter + similar_dismissed_score
+-- from get_watch_shorts to this RPC once Watch calibration is verified
+-- (target: 1-2 weeks after Session 3 ships).
+DECLARE
+  v_cursor_ts timestamptz;
+  v_mode text := COALESCE(p_mode, 'suggested');
+  v_page_size integer := LEAST(COALESCE(p_page_size, 10), 60);
+BEGIN
+  IF p_cursor IS NOT NULL THEN
+    v_cursor_ts := p_cursor::timestamptz;
+  END IF;
+
+  RETURN QUERY
+  WITH candidates AS (
+    SELECT
+      p.id, p.created_at, p.content, p.course_id,
+      p.like_count, p.comment_count, p.is_pinned,
+      p.user_id AS p_uid, p.actor_type, p.actor_id,
+      p.source_review_id, p.post_type, p.status
+    FROM posts p
+    WHERE p.visibility = 'anyone'
+      AND p.status = 'published'
+      AND p.user_id <> p_user_id
+      AND (v_cursor_ts IS NULL OR p.created_at < v_cursor_ts)
+      AND p.id <> ALL(p_seen_post_ids)
+      AND (
+        p.source_review_id IS NOT NULL
+        OR
+        EXISTS (
+          SELECT 1
+          FROM post_media pm
+          WHERE pm.post_id = p.id
+            AND (
+              (
+                pm.media_type = 'video'
+                AND pm.width IS NOT NULL
+                AND pm.height IS NOT NULL
+                AND pm.height > 0
+                AND (pm.width::numeric / pm.height::numeric) <= 1.0
+                AND (pm.duration_ms IS NULL OR pm.duration_ms >= 4000)
+              )
+              OR
+              (
+                pm.media_type = 'image'
+                AND (
+                  pm.width IS NULL
+                  OR pm.height IS NULL
+                  OR pm.width <= pm.height
+                )
+              )
+            )
+        )
+      )
+    ORDER BY p.created_at DESC
+    LIMIT v_page_size * 40
+  ),
+  scored AS (
+    SELECT
+      c.*,
+      CASE
+        WHEN v_mode = 'popular' THEN
+          (COALESCE(c.like_count, 0) * 1.0 + COALESCE(c.comment_count, 0) * 2.5)
+          / (1.0 + EXTRACT(EPOCH FROM (now() - c.created_at)) / 86400.0)
+        ELSE 0
+      END AS calc_score,
+      ROW_NUMBER() OVER (PARTITION BY c.p_uid ORDER BY c.created_at DESC) AS creator_rank
+    FROM candidates c
+  ),
+  top_post_ids AS (
+    SELECT s.id
+    FROM scored s
+    WHERE (v_mode <> 'popular' OR s.creator_rank <= 3)
+    ORDER BY
+      CASE WHEN v_mode = 'popular' THEN s.calc_score END DESC NULLS LAST,
+      CASE WHEN v_mode <> 'popular' THEN
+        CASE
+          WHEN s.created_at > now() - interval '7 days'  THEN 0
+          WHEN s.created_at > now() - interval '60 days' THEN 1
+          ELSE 2
+        END
+      END ASC NULLS LAST,
+      CASE WHEN v_mode <> 'popular' THEN random() END ASC NULLS LAST
+    LIMIT v_page_size
+  ),
+  with_media AS (
+    SELECT
+      s.id                                                          AS wm_post_id,
+      s.content                                                     AS wm_post_content,
+      s.created_at                                                  AS wm_post_created_at,
+      s.p_uid                                                       AS wm_post_user_id,
+      s.actor_type                                                  AS wm_post_actor_type,
+      s.actor_id                                                    AS wm_post_actor_id,
+      s.status                                                      AS wm_post_status,
+      s.source_review_id                                            AS wm_source_review_id,
+      pm.id                                                         AS wm_media_id,
+      pm.media_type                                                 AS wm_media_type,
+      pm.media_url                                                  AS wm_media_url,
+      pm.poster_url                                                 AS wm_poster_url,
+      NULL::text                                                    AS wm_stream_id,
+      pm.duration_ms::numeric / 1000.0                              AS wm_duration_seconds,
+      pm.width                                                      AS wm_width,
+      pm.height                                                     AS wm_height,
+      pm.display_order                                              AS wm_display_order,
+      up.username                                                   AS wm_creator_username,
+      up.display_name                                               AS wm_creator_display_name,
+      up.profile_photo_url                                          AS wm_creator_avatar_url,
+      COALESCE(up.is_verified, FALSE)                               AS wm_creator_is_verified,
+      ba.name                                                       AS wm_business_name,
+      ba.logo_url                                                   AS wm_business_logo_url,
+      COALESCE(ba.is_verified, FALSE)                               AS wm_business_is_verified,
+      COALESCE(s.like_count, 0)::bigint                             AS wm_like_count,
+      COALESCE(s.comment_count, 0)::bigint                          AS wm_comment_count,
+      0::bigint                                                     AS wm_share_count,
+      cr.rating                                                     AS wm_review_rating,
+      cr.course_id                                                  AS wm_review_course_id,
+      COALESCE(gc_review.name, gc_course.name)                      AS wm_review_course_name,
+      COALESCE(gc_review.thumbnail_image, gc_course.thumbnail_image) AS wm_review_course_image,
+      COALESCE(gc_review.region, gc_course.region)                  AS wm_review_course_region,
+      COALESCE(gc_review.country, gc_course.country)                AS wm_review_course_country,
+      COALESCE(gc_review.sub_country, gc_course.sub_country)        AS wm_review_course_sub_country,
+      'none'::text                                                  AS wm_creator_relation,
+      EXISTS (
+        SELECT 1 FROM post_likes pl
+        WHERE pl.post_id = s.id AND pl.user_id = p_user_id
+      )                                                             AS wm_is_liked_by_me,
+      EXISTS (
+        SELECT 1 FROM user_follows uf
+        WHERE uf.follower_id = p_user_id AND uf.following_id = s.p_uid
+      )                                                             AS wm_is_followed_by_me,
+      s.calc_score                                                  AS wm_engagement_score,
+      COALESCE(s.post_type, 'post')                                 AS wm_post_type,
+      NULL::jsonb                                                   AS wm_tournament_meta,
+      cr.review                                                     AS wm_review_text,
+      (
+        SELECT jsonb_agg(jsonb_build_object(
+          'tagged_entity_id', pt.tagged_entity_id,
+          'tagged_entity_type', te.entity_type,
+          'display_name', te.name,
+          'slug', te.slug,
+          'username', te.username
+        ))
+        FROM post_tags pt
+        JOIN taggable_entities te ON te.id = pt.tagged_entity_id
+        WHERE pt.post_id = s.id
+          AND te.entity_type IN ('user', 'business', 'golf_club')
+      )                                                             AS wm_post_tags,
+      gc_course.id                                                  AS wm_course_id,
+      gc_course.name                                                AS wm_course_name
+    FROM scored s
+    INNER JOIN top_post_ids tpi ON tpi.id = s.id
+    LEFT JOIN user_profiles up ON up.id = s.p_uid
+    LEFT JOIN business_accounts ba ON s.actor_type = 'business' AND ba.id = s.actor_id
+    LEFT JOIN post_media pm ON pm.post_id = s.id
+    LEFT JOIN course_ratings cr ON s.source_review_id IS NOT NULL AND cr.id = s.source_review_id
+    LEFT JOIN golf_courses gc_review ON cr.course_id IS NOT NULL AND gc_review.id = cr.course_id
+    LEFT JOIN golf_courses gc_course ON s.course_id IS NOT NULL AND gc_course.id = s.course_id
+    WHERE (v_mode <> 'popular' OR s.creator_rank <= 3)
+  )
+  SELECT
+    wm.wm_post_id, wm.wm_post_content, wm.wm_post_created_at,
+    wm.wm_post_user_id, wm.wm_post_actor_type, wm.wm_post_actor_id,
+    wm.wm_post_status, wm.wm_source_review_id, wm.wm_media_id,
+    wm.wm_media_type, wm.wm_media_url, wm.wm_poster_url, wm.wm_stream_id,
+    wm.wm_duration_seconds, wm.wm_width, wm.wm_height, wm.wm_display_order,
+    wm.wm_creator_username, wm.wm_creator_display_name, wm.wm_creator_avatar_url,
+    wm.wm_creator_is_verified, wm.wm_business_name, wm.wm_business_logo_url,
+    wm.wm_business_is_verified, wm.wm_like_count, wm.wm_comment_count,
+    wm.wm_share_count, wm.wm_review_rating, wm.wm_review_course_id,
+    wm.wm_review_course_name, wm.wm_review_course_image, wm.wm_review_course_region,
+    wm.wm_review_course_country, wm.wm_review_course_sub_country,
+    wm.wm_creator_relation, wm.wm_is_liked_by_me, wm.wm_is_followed_by_me,
+    wm.wm_engagement_score, wm.wm_post_type, wm.wm_tournament_meta,
+    wm.wm_review_text, wm.wm_post_tags,
+    wm.wm_course_id, wm.wm_course_name
+  FROM with_media wm
+  ORDER BY
+    wm.wm_post_created_at DESC,
+    wm.wm_display_order ASC;
+END;
+$function$;
+
+-- =============================================================================
+-- Task D — Version-controlled cron job for video metadata backfill
+-- =============================================================================
+-- Existing cron jobid 42 was created out-of-band and has no migration file.
+-- Recreate under a predictable jobname so a migrations-only rebuild preserves
+-- the schedule. cron.schedule with the same jobname is an upsert.
+-- =============================================================================
+
+CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS pg_net  WITH SCHEMA extensions;
+
+CREATE OR REPLACE FUNCTION public.trigger_video_metadata_backfill()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_supabase_url text := 'https://ybxkehyomcakqjvuhnna.supabase.co';
+BEGIN
+  PERFORM net.http_post(
+    url := v_supabase_url || '/functions/v1/backfill-video-metadata',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+    ),
+    body := '{}'::jsonb
+  );
+EXCEPTION WHEN OTHERS THEN
+  RAISE WARNING 'Failed to trigger video metadata backfill: %', SQLERRM;
+END;
+$function$;
+
+-- Unschedule the orphan jobid 42 if present (it was bare net.http_post with
+-- baked-in anon key) so we don't end up with two parallel schedules.
+DO $$
+DECLARE
+  v_jobid int;
+BEGIN
+  SELECT jobid INTO v_jobid
+  FROM cron.job
+  WHERE jobname = 'backfill-video-metadata'
+  ORDER BY jobid ASC
+  LIMIT 1;
+  IF v_jobid IS NOT NULL THEN
+    PERFORM cron.unschedule(v_jobid);
+  END IF;
+END $$;
+
+SELECT cron.schedule(
+  'backfill-video-metadata',
+  '*/10 * * * *',
+  $$SELECT public.trigger_video_metadata_backfill()$$
+);
+
+-- =============================================================================
+-- Task G — Reconcile 22 mismatched duration rows
+-- =============================================================================
+-- Trigger only mirrors when one side is NULL; rows with both populated but
+-- disagreeing (up to ±500ms) persist. duration_ms wins (typically came from
+-- Cloudflare's millisecond probe; duration_seconds came from client rounding).
+-- =============================================================================
+
+UPDATE public.post_media
+SET duration_seconds = ROUND(duration_ms::numeric / 1000)::integer
+WHERE media_type = 'video'
+  AND duration_ms IS NOT NULL
+  AND duration_seconds IS NOT NULL
+  AND duration_ms <> duration_seconds * 1000;
