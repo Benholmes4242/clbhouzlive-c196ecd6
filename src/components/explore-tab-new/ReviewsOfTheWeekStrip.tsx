@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -114,7 +114,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
                 WebkitBackdropFilter: 'blur(8px)',
               }}
             >
-              <Star className="w-[11px] h-[11px]" style={{ color: '#F7931E', fill: '#F7931E' }} />
+              <img src={clbhouzLogo} alt="" style={{ width: 12, height: 12, objectFit: 'contain' }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{review.rating.toFixed(1)}</span>
             </span>
 

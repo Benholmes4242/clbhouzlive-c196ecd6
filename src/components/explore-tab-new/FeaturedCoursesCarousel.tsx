@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Star } from 'lucide-react';
 import { useCourseOfTheWeek } from './hooks/useCourseOfTheWeek';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
 interface FeaturedCoursesCarouselProps {
   onRegionSelect: (slug: string) => void;
@@ -89,7 +89,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
 
           {course.avg_rating && (
             <div className="flex items-center gap-1.5" style={{ marginTop: 4 }}>
-              <Star className="w-[13px] h-[13px]" style={{ color: '#F7931E', fill: '#F7931E' }} />
+              <img src={clbhouzLogo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
               <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>
                 {Number(course.avg_rating).toFixed(1)}
               </span>
