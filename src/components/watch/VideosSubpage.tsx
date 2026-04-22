@@ -18,7 +18,7 @@ import { MoreToWatchDivider } from '@/components/watch/videos/MoreToWatchDivider
 import { VideosFullFeed } from '@/components/watch/videos/VideosFullFeed';
 import { VideosSearchOverlay } from '@/components/videos-tab/VideosSearchOverlay';
 
-const CREAM = '#F5F1EA';
+const CREAM = '#F8FAFC';
 
 /**
  * Phase 3 Pro Shop new build — Videos subpage.
