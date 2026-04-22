@@ -15613,34 +15613,63 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
-      get_continue_watching: {
-        Args: { p_limit?: number; p_user_id: string }
-        Returns: {
-          comment_count: number
-          creator_avatar_url: string
-          creator_display_name: string
-          creator_is_verified: boolean
-          creator_username: string
-          display_order: number
-          duration_seconds: number
-          height: number
-          last_interaction_at: string
-          like_count: number
-          media_id: string
-          media_type: string
-          media_url: string
-          post_content: string
-          post_created_at: string
-          post_id: string
-          post_user_id: string
-          poster_url: string
-          progress_seconds: number
-          share_count: number
-          stream_id: string
-          total_seconds: number
-          width: number
-        }[]
-      }
+      get_continue_watching:
+        | {
+            Args: { p_limit?: number; p_user_id: string }
+            Returns: {
+              comment_count: number
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              height: number
+              last_interaction_at: string
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_user_id: string
+              poster_url: string
+              progress_seconds: number
+              share_count: number
+              stream_id: string
+              total_seconds: number
+              width: number
+            }[]
+          }
+        | {
+            Args: { p_format?: string; p_limit?: number; p_user_id: string }
+            Returns: {
+              comment_count: number
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              height: number
+              last_interaction_at: string
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_user_id: string
+              poster_url: string
+              progress_seconds: number
+              share_count: number
+              stream_id: string
+              total_seconds: number
+              width: number
+            }[]
+          }
       get_conversation_last_senders: {
         Args: { p_conversation_ids: string[] }
         Returns: {
@@ -16106,56 +16135,101 @@ export type Database = {
           user_count: number
         }[]
       }
-      get_long_form_videos: {
-        Args: {
-          p_cursor?: string
-          p_mode?: string
-          p_page_size?: number
-          p_search_query?: string
-          p_seen_post_ids?: string[]
-          p_user_id: string
-        }
-        Returns: {
-          business_is_verified: boolean
-          business_logo_url: string
-          business_name: string
-          comment_count: number
-          course_country: string
-          course_region: string
-          course_sub_country: string
-          creator_avatar_url: string
-          creator_display_name: string
-          creator_is_verified: boolean
-          creator_relation: string
-          creator_username: string
-          display_order: number
-          duration_seconds: number
-          engagement_score: number
-          height: number
-          is_followed_by_me: boolean
-          is_liked_by_me: boolean
-          like_count: number
-          media_id: string
-          media_type: string
-          media_url: string
-          post_actor_id: string
-          post_actor_type: string
-          post_content: string
-          post_created_at: string
-          post_id: string
-          post_status: string
-          post_user_id: string
-          poster_url: string
-          review_course_id: string
-          review_course_image: string
-          review_course_name: string
-          review_rating: number
-          share_count: number
-          source_review_id: string
-          stream_id: string
-          width: number
-        }[]
-      }
+      get_long_form_videos:
+        | {
+            Args: {
+              p_cursor?: string
+              p_mode?: string
+              p_page_size?: number
+              p_search_query?: string
+              p_seen_post_ids?: string[]
+              p_user_id: string
+            }
+            Returns: {
+              business_is_verified: boolean
+              business_logo_url: string
+              business_name: string
+              comment_count: number
+              course_country: string
+              course_region: string
+              course_sub_country: string
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_relation: string
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              engagement_score: number
+              height: number
+              is_followed_by_me: boolean
+              is_liked_by_me: boolean
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_actor_id: string
+              post_actor_type: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_status: string
+              post_user_id: string
+              poster_url: string
+              review_course_id: string
+              review_course_image: string
+              review_course_name: string
+              review_rating: number
+              share_count: number
+              source_review_id: string
+              stream_id: string
+              width: number
+            }[]
+          }
+        | {
+            Args: {
+              p_category?: string
+              p_cursor?: string
+              p_mode?: string
+              p_page_size?: number
+              p_search_query?: string
+              p_seen_post_ids?: string[]
+              p_user_id: string
+            }
+            Returns: {
+              actor_id: string
+              actor_type: string
+              comment_count: number
+              course_id: string
+              course_name: string
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_relation: string
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              height: number
+              hls_url: string
+              is_followed_by_me: boolean
+              is_liked_by_me: boolean
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_user_id: string
+              poster_url: string
+              review_categories: Json
+              review_id: string
+              review_overall_score: number
+              share_count: number
+              stream_id: string
+              width: number
+            }[]
+          }
       get_lowest_handicap_leaderboard: {
         Args: {
           p_club_id?: string
