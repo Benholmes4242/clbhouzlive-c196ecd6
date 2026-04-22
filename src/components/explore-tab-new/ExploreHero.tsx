@@ -211,7 +211,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           )}
         </div>
       </button>
-    </div>
+    </section>
   );
 }
 
