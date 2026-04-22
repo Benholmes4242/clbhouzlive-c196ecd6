@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useExploreRecommendations, type ExploreRecRow } from './hooks/useExploreRecommendations';
 import type { ExploreMoodId } from './hooks/useExploreMood';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
 interface ExploreRecommendationsProps {
   userId: string | undefined;
@@ -131,6 +132,7 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
         )}
         {rec.rating_avg != null && (rec.review_count ?? 0) > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10 }}>
+            <img src={clbhouzLogo} alt="" style={{ width: 12, height: 12, objectFit: 'contain' }} />
             <span style={{ fontSize: 12, fontWeight: 800, color: '#F7931E' }}>
               {Number(rec.rating_avg).toFixed(1)}
             </span>
