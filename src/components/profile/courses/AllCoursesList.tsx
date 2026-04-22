@@ -8,6 +8,7 @@ import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFil
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList } from 'lucide-react';
+import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 
 interface AllCoursesListProps {
   userId: string;
@@ -38,7 +39,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     enabled: !!userId && userActivity.length > 0,
     queryFn: async () => {
       const courseIds = userActivity.map(a => a.course_id);
-      
+
+      // Extra in-place fetch (per implementation brief): pull breakdown
+      // scores + review_date so the own-rating comparator has full inputs.
+      // Kept local to this component — useUserCourseActivity is intentionally
+      // NOT modified so other consumers are unaffected.
       const [coursesResult, ratingsResult] = await Promise.all([
         supabase
           .from('golf_courses')
@@ -46,7 +51,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           .in('id', courseIds),
         supabase
           .from('course_ratings')
-          .select('id, course_id')
+          .select('id, course_id, design_score, condition_score, clubhouse_score, facilities_score, review_date, created_at')
           .eq('user_id', userId)
           .eq('is_mock', false)
           .in('course_id', courseIds),
@@ -55,10 +60,27 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       if (coursesResult.error) throw coursesResult.error;
 
       const ratingIdMap = new Map<string, string>();
-      (ratingsResult.data || []).forEach(r => ratingIdMap.set(r.course_id, r.id));
+      const ratingDetailsMap = new Map<string, {
+        design_score: number | null;
+        condition_score: number | null;
+        clubhouse_score: number | null;
+        facilities_score: number | null;
+        review_date: string | null;
+      }>();
+      (ratingsResult.data || []).forEach(r => {
+        ratingIdMap.set(r.course_id, r.id);
+        ratingDetailsMap.set(r.course_id, {
+          design_score: r.design_score,
+          condition_score: r.condition_score,
+          clubhouse_score: r.clubhouse_score,
+          facilities_score: r.facilities_score,
+          review_date: r.review_date ?? r.created_at ?? null,
+        });
+      });
 
       return (coursesResult.data || []).map(course => {
         const activity = userActivity.find(a => a.course_id === course.id);
+        const details = ratingDetailsMap.get(course.id);
         return {
           ...course,
           is_top100: activity?.is_top100 || false,
@@ -66,6 +88,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           rating_value: activity?.rating_value || null,
           has_rating: activity?.has_rating || false,
           rating_id: ratingIdMap.get(course.id) || null,
+          design_score: details?.design_score ?? null,
+          condition_score: details?.condition_score ?? null,
+          clubhouse_score: details?.clubhouse_score ?? null,
+          facilities_score: details?.facilities_score ?? null,
+          review_date: details?.review_date ?? null,
         } as CourseCardData;
       });
     },
@@ -106,6 +133,17 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     }
 
     // Step 3: Sort
+    const buildOwnRow = (c: any) => ({
+      course_id: c.id,
+      course_name: c.name,
+      rating: c.rating_value,
+      design_score: c.design_score,
+      condition_score: c.condition_score,
+      clubhouse_score: c.clubhouse_score,
+      facilities_score: c.facilities_score,
+      review_date: c.review_date,
+    });
+
     switch (activeSort) {
       case 'recently-played':
         result.sort((a, b) => {
@@ -115,10 +153,10 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         });
         break;
       case 'rating-high-low':
-        result.sort((a, b) => (b.rating_value || 0) - (a.rating_value || 0));
+        result.sort((a, b) => compareOwnRatings(buildOwnRow(a), buildOwnRow(b), 'desc'));
         break;
       case 'rating-low-high':
-        result.sort((a, b) => (a.rating_value || 0) - (b.rating_value || 0));
+        result.sort((a, b) => compareOwnRatings(buildOwnRow(a), buildOwnRow(b), 'asc'));
         break;
     }
 
