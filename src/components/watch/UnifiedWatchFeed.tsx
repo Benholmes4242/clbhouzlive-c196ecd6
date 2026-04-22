@@ -16,6 +16,9 @@ import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { Skeleton } from '@/components/ui/skeleton';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
+import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
+import { MostLovedRail } from './proshop/MostLovedRail';
 
 interface ChipButtonProps {
   label: string;
@@ -94,7 +97,16 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     <WatchActionsProvider>
     <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
       <LongPressTipBanner />
+
+      {/* ── Pro Shop: Watch of the Week editorial hero ── */}
+      <WatchOfTheWeekHero />
+
       <ContinueWatchingRail userId={userId} />
+
+      {/* ── Pro Shop: Course-anchored rail (top played course) ── */}
+      <CourseAnchoredRail />
+
+      <WatchSectionDivider />
 
       {/* ── Section 1: Trending clips rail ── */}
       <TrendingThisWeek />
@@ -103,6 +115,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
       {/* ── Section 2: Latest videos — hero + horizontal rail ── */}
       <LatestVideosRail />
+
+      <WatchSectionDivider />
+
+      {/* ── Pro Shop: Most loved this week ── */}
+      <MostLovedRail />
 
       <WatchSectionDivider />
 
