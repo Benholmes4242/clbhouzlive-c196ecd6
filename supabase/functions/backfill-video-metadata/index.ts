@@ -188,7 +188,7 @@ serve(async (req) => {
       .from('post_media')
       .select('id, media_url, stream_id')
       .eq('media_type', 'video')
-      .or('width.is.null,height.is.null,aspect_ratio.is.null');
+      .or('width.is.null,height.is.null,aspect_ratio.is.null,duration_seconds.is.null,duration_ms.is.null');
 
     if (fetchError) {
       throw fetchError;
@@ -271,6 +271,7 @@ serve(async (req) => {
           height,
           aspect_ratio: aspectRatio,
           duration_seconds: durationSeconds,
+          duration_ms: durationSeconds != null ? durationSeconds * 1000 : null,
           poster_url: posterUrl,
           stream_id: streamId
         })

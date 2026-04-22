@@ -190,6 +190,9 @@ export async function updatePostMediaMetadata(
       width: metadata.width,
       height: metadata.height,
       duration_seconds: metadata.durationSeconds,
+      duration_ms: metadata.durationSeconds != null
+        ? metadata.durationSeconds * 1000
+        : null,
       aspect_ratio: metadata.aspectRatio,
     })
     .eq('id', postMediaId);

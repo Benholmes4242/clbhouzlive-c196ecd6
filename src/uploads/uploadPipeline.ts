@@ -710,9 +710,12 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
               aspect_ratio: aspectRatio,
               orientation,
             }),
-            // Include client-measured duration for videos
+            // Include client-measured duration for videos.
+            // Write both columns explicitly — the DB trigger mirrors on INSERT
+            // but we don't want correctness to depend on trigger presence.
             ...(clientDuration && {
               duration_seconds: clientDuration,
+              duration_ms: clientDuration * 1000,
             }),
           })
           .select('id')
@@ -895,6 +898,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             height: item.height || null,
             aspect_ratio: item.aspectRatio || null,
             duration_seconds: item.duration || null,
+            duration_ms: item.duration ? item.duration * 1000 : null,
             studio_edits: studioEditsJson,
             filter_id: filterId,
             upload_status: 'completed' as any,
@@ -1108,8 +1112,21 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
       let height: number | null = null;
       let aspectRatioVal: number | null = null;
       let orientation: string | null = null;
+      let clientDuration: number | null = null;
 
       if (file.type.startsWith('video/')) {
+        // Measure dimensions/duration BEFORE upload so retry rows aren't left
+        // with NULL duration_seconds/duration_ms (matches Task A on the
+        // primary insert path).
+        const videoDims = await measureVideoDimensions(file);
+        if (videoDims.width && videoDims.height) {
+          width = videoDims.width;
+          height = videoDims.height;
+          aspectRatioVal = videoDims.aspectRatio;
+          orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
+        }
+        clientDuration = videoDims.duration;
+
         const speedTracker = new UploadSpeedTracker();
         const result = await new Promise<{ streamId: string }>((resolve, reject) => {
           uploadVideoWithTus({
@@ -1180,6 +1197,10 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
             trim_end: mediaItem?.trimEnd ?? null,
             poster_timestamp: (mediaItem as any)?.posterTimestamp ?? null,
             ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
+            ...(clientDuration && {
+              duration_seconds: clientDuration,
+              duration_ms: clientDuration * 1000,
+            }),
           })
           .eq('id', existingRowId);
       } else {
@@ -1198,6 +1219,10 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
           trim_end: mediaItem?.trimEnd ?? null,
           poster_timestamp: (mediaItem as any)?.posterTimestamp ?? null,
           ...(width && height && { width, height, aspect_ratio: aspectRatioVal, orientation }),
+          ...(clientDuration && {
+            duration_seconds: clientDuration,
+            duration_ms: clientDuration * 1000,
+          }),
         });
       }
 

@@ -1,3 +1,6 @@
+// TODO(security): No signature verification. Any caller can POST to this
+// endpoint and overwrite metadata for any post_media row by stream_id.
+// Follow-up: add HMAC verification using Cloudflare's webhook signing secret.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const corsHeaders = {
@@ -48,7 +51,7 @@ Deno.serve(async (req) => {
     // Find post_media by stream_id or URL match
     const { data: mediaRows, error: findError } = await supabase
       .from('post_media')
-      .select('id, width, height, duration_seconds')
+      .select('id, width, height, duration_seconds, aspect_ratio')
       .or(`stream_id.eq.${uid},media_url.ilike.%${uid}%`)
       .eq('media_type', 'video');
 
@@ -67,8 +70,10 @@ Deno.serve(async (req) => {
     const row = mediaRows[0];
     if (!row.width && width) updateData.width = width;
     if (!row.height && height) updateData.height = height;
-    if (!row.duration_seconds && durationSeconds)
+    if (!row.duration_seconds && durationSeconds) {
       updateData.duration_seconds = durationSeconds;
+      updateData.duration_ms = durationSeconds * 1000;
+    }
     if (!row.aspect_ratio && width && height) updateData.aspect_ratio = aspectRatio;
 
     const ids = mediaRows.map((r: { id: string }) => r.id);
