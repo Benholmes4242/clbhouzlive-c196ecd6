@@ -35,7 +35,6 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
         width: 240,
         flexShrink: 0,
         background: '#FFFFFF',
-        border: '1px solid rgba(15,23,42,0.08)',
         borderRadius: 14,
         overflow: 'hidden',
       }}

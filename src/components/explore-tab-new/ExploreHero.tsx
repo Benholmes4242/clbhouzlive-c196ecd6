@@ -112,9 +112,15 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: '#FFFFFF',
-              background: 'rgba(247,147,30,0.95)',
-              padding: '4px 8px',
+              background: 'rgba(0, 0, 0, 0.28)',
+              backdropFilter: 'blur(22px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+              padding: '4px 10px',
               borderRadius: 4,
+              transform: 'rotate(-6deg)',
+              transformOrigin: 'left center',
             }}
           >
             Featured
