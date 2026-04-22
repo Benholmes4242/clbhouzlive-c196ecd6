@@ -42,9 +42,9 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
                 fontSize: 14,
                 fontWeight: 600,
                 borderRadius: 999,
-                background: isActive ? '#0F172A' : '#FFFFFF',
-                border: isActive ? '1px solid transparent' : '1px solid rgba(15,23,42,0.12)',
-                color: isActive ? '#FFFFFF' : '#0F172A',
+                background: isActive ? 'rgba(247,147,30,0.12)' : '#FFFFFF',
+                border: isActive ? '1px solid rgba(247,147,30,0.4)' : '1px solid rgba(15,23,42,0.12)',
+                color: isActive ? '#B86A0A' : '#0F172A',
                 whiteSpace: 'nowrap',
                 letterSpacing: '-0.01em',
               }}
