@@ -39,9 +39,9 @@ interface VirtualizedCourseListProps {
   showGhostRank?: boolean;
 }
 
-// Row height for scroll calculations (per grid row, not per item)
-const ROW_HEIGHT = 300; // Mobile row height
-const ROW_HEIGHT_SM = 280; // Desktop row height
+// Initial row-height estimate. The actual rendered height is measured at runtime
+// from a sample card on mount + when courses/columnCount change.
+const INITIAL_ROW_HEIGHT = 240;
 const BUFFER_ROWS = 3; // Number of rows to render above/below viewport
 
 const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
@@ -52,16 +52,23 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   showGhostRank = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const sampleCardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
-  const [rowHeight, setRowHeight] = useState(ROW_HEIGHT);
+  const [rowHeight, setRowHeight] = useState<number>(INITIAL_ROW_HEIGHT);
   const [columnCount, setColumnCount] = useState(1);
 
-  // Detect viewport size → update row height + column count
+  // Cached container offset relative to scroll container (top-left).
+  // Avoids per-frame getBoundingClientRect() calls inside the scroll handler.
+  // NOTE: If a future change introduces dynamic-height content above the list
+  // (e.g. a collapsible filter section), trigger recomputeContainerOffset()
+  // when that content's size changes.
+  const containerOffsetRef = useRef(0);
+
+  // Detect viewport size → update column count (row height is now measured)
   useEffect(() => {
     const check = () => {
       const w = window.innerWidth;
-      setRowHeight(w < 640 ? ROW_HEIGHT : ROW_HEIGHT_SM);
       // Match Tailwind breakpoints: 1 col default, 2 at md (768), 3 at lg (1024)
       if (w >= 1024) setColumnCount(3);
       else if (w >= 768) setColumnCount(2);
@@ -86,6 +93,39 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     return document.body;
   }, []);
 
+  // Recompute the cached container offset (mount, resize, list-size change)
+  const recomputeContainerOffset = useCallback(() => {
+    if (!containerRef.current) return;
+    const scrollContainer = getScrollContainer();
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const scrollContainerRect = scrollContainer.getBoundingClientRect();
+    containerOffsetRef.current =
+      containerRect.top - scrollContainerRect.top + scrollContainer.scrollTop;
+  }, [getScrollContainer]);
+
+  useEffect(() => {
+    recomputeContainerOffset();
+    window.addEventListener('resize', recomputeContainerOffset);
+    return () => window.removeEventListener('resize', recomputeContainerOffset);
+  }, [recomputeContainerOffset, courses.length]);
+
+  // Measure first rendered card to derive accurate row height (incl. CSS gap)
+  useEffect(() => {
+    if (courses.length === 0) return;
+    const rafId = requestAnimationFrame(() => {
+      if (!sampleCardRef.current) return;
+      const height = sampleCardRef.current.offsetHeight;
+      // Tailwind: gap-2 (8px) on mobile, gap-6 (24px) at sm+
+      const gap = window.innerWidth >= 640 ? 24 : 8;
+      const measured = height + gap;
+      if (measured > 0 && Math.abs(measured - rowHeight) > 4) {
+        setRowHeight(measured);
+      }
+    });
+    return () => cancelAnimationFrame(rafId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnCount, courses.length === 0]);
+
   // Update visible range on scroll (row-aware)
   const updateVisibleRange = useCallback(() => {
     if (!containerRef.current) return;
@@ -94,11 +134,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     const scrollTop = scrollContainer.scrollTop;
     const viewportHeight = scrollContainer.clientHeight;
 
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const scrollContainerRect = scrollContainer.getBoundingClientRect();
-    const containerTop = containerRect.top - scrollContainerRect.top + scrollTop;
-
-    const scrollRelative = Math.max(0, scrollTop - containerTop);
+    // Use cached offset — no per-frame layout reads
+    const scrollRelative = Math.max(0, scrollTop - containerOffsetRef.current);
 
     // Calculate in rows, then convert to item indices
     const startRow = Math.max(0, Math.floor(scrollRelative / rowHeight) - BUFFER_ROWS);
@@ -112,7 +149,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     // Always show at least 10 items initially
     const finalEnd = Math.max(endIndex, Math.min(10, courses.length));
 
-    setVisibleRange({ start: startIndex, end: finalEnd });
+    setVisibleRange((prev) => {
+      if (prev.start === startIndex && prev.end === finalEnd) return prev;
+      return { start: startIndex, end: finalEnd };
+    });
   }, [courses.length, rowHeight, columnCount, getScrollContainer]);
 
   // Throttled scroll handler
@@ -159,8 +199,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     return (
       <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
-          {courses.map((course) => (
-            <div key={course.id} className="mb-0">
+          {courses.map((course, i) => (
+            <div key={course.id} className="mb-0" ref={i === 0 ? sampleCardRef : undefined}>
               <UnifiedCourseCard 
                 course={fromGolfCourse(course)}
                 showRankBadges={true}
@@ -193,8 +233,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
           className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6 will-change-transform"
           style={{ transform: `translateY(${offsetY}px)` }}
         >
-          {visibleCourses.map((course) => (
-            <div key={course.id} className="mb-0">
+          {visibleCourses.map((course, i) => (
+            <div key={course.id} className="mb-0" ref={i === 0 ? sampleCardRef : undefined}>
               <UnifiedCourseCard 
                 course={fromGolfCourse(course)}
                 showRankBadges={true}
