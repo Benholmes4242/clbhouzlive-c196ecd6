@@ -161,24 +161,29 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
               const slot = i - windowStart;
               const inWindow = slot >= 0 && slot < WINDOW_SIZE;
 
-              let baseSize = 2;
-              let baseOpacity = 0;
+              // Slot the active dot occupies in the window.
+              // In the middle: 2. Near start: 0 or 1. Near end: 3 or 4.
+              const activeSlot = safeActive - windowStart;
+              // Distance from the active dot's slot drives sizing so the
+              // biggest dot always tracks the active item, including at edges.
+              const slotDist = inWindow ? Math.abs(slot - activeSlot) : 99;
+
+              let size = 2;
+              let opacity = 0;
               if (inWindow) {
-                if (slot === 2) {
-                  baseSize = 6;
-                  baseOpacity = 1;
-                } else if (slot === 1 || slot === 3) {
-                  baseSize = 4;
-                  baseOpacity = 0.8;
+                if (slotDist === 0) {
+                  size = 6;
+                  opacity = 1;
+                } else if (slotDist === 1) {
+                  size = 4;
+                  opacity = 0.8;
                 } else {
-                  baseSize = 2;
-                  baseOpacity = 0.4;
+                  size = 2;
+                  opacity = 0.4;
                 }
               }
 
               const isActive = i === safeActive;
-              const size = isActive ? 6 : baseSize;
-              const opacity = isActive ? 1 : baseOpacity;
 
               return (
                 <div
