@@ -108,12 +108,43 @@ Deno.serve(async (req) => {
       ? `Has hosted: ${(course.major_championships as string[]).join(", ")}`
       : "no major championships hosted";
 
-    const prompt = `You are writing a single 2-3 sentence paragraph explaining why a specific golf course is being recommended to a user. Write in British English, restrained voice, no hype or adjective stacking.
+    // 3b. Optional post context — only fetched for post-scoped editorial moods
+    let postContext = "";
+    if (body.post_id && POST_SCOPED_MOODS.has(body.mood)) {
+      const { data: post } = await supabase
+        .from("posts")
+        .select("content, like_count, comment_count, user_id")
+        .eq("id", body.post_id)
+        .maybeSingle();
+
+      if (post) {
+        let creatorHandle = "a Clbhouz creator";
+        if (post.user_id) {
+          const { data: creator } = await supabase
+            .from("user_profiles")
+            .select("display_name, username")
+            .eq("id", post.user_id)
+            .maybeSingle();
+          if (creator) {
+            creatorHandle = creator.display_name || (creator.username ? `@${creator.username}` : creatorHandle);
+          }
+        }
+        const captionPreview = (post.content ?? "").slice(0, 220);
+        postContext = `
+
+Featured post:
+- Caption: ${captionPreview || "(no caption)"}
+- Creator: ${creatorHandle}
+- Engagement: ${post.like_count ?? 0} likes, ${post.comment_count ?? 0} comments`;
+      }
+    }
+
+    const prompt = `You are writing a single 1-2 sentence editorial blurb for the Clbhouz golf app. Write in British English, restrained voice, no hype or adjective stacking.
 
 Course: ${course.name}, ${locationStr} (${courseTypeStr})
 Rating on Clbhouz: ${ratingAvg} from ${reviewCount} reviews
 Notable: ${notable}
-Description: ${course.description ?? "none"}
+Description: ${course.description ?? "none"}${postContext}
 
 User's highest-rated courses (for reference):
 ${userCourseList}
@@ -121,14 +152,16 @@ ${userCourseList}
 Mood: ${body.mood}
 Mood context: ${MOOD_CONTEXT[body.mood]}
 
-Write a 2-3 sentence paragraph that:
-1. Cites concrete facts from the course data (course_type, rating, notable features)
+Write a 1-2 sentence paragraph that:
+1. ${POST_SCOPED_MOODS.has(body.mood)
+  ? "Centres on the FEATURED POST — why this specific clip/video is worth the viewer's time. Mention the course only as anchor, not as the subject."
+  : "Cites concrete facts from the course data (course_type, rating, notable features)"}
 2. ${body.user_id && userCourseList !== "no review history yet"
-  ? `Only compare the recommended course to a course from the user's list IF the two share course_type OR country OR a clear architectural family (e.g. both heathland, both links, both parkland). If no genuine similarity exists, omit the user-anchor sentence entirely and write 2 sentences about the recommended course alone — do NOT force a comparison.`
+  ? `Only compare to a course from the user's list IF the two share course_type OR country OR a clear architectural family. If no genuine similarity exists, omit any comparison.`
   : "Avoids personal references since the user has no review history"}
 3. Avoids invented details (no fake designer names, no fake history). Only cite facts present in the data block above.
 4. Uses British English
-5. Does not exceed 3 sentences
+5. ${POST_SCOPED_MOODS.has(body.mood) ? "1-2 sentences MAX" : "Does not exceed 3 sentences"}
 6. Returns ONLY the paragraph text — no preamble, no quotes, no labels`;
 
     // 4. Call Lovable AI Gateway with 5s timeout
