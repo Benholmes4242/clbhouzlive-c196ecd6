@@ -17,9 +17,13 @@ interface CourseMediaTileProps {
   fetchNextPage?: () => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  /** Optional opener wrapper from the grid that injects pagination callbacks
+   *  into the fullscreen store. When omitted, falls back to a direct
+   *  store.open() with no pagination. */
+  onOpenFullscreen?: (posts: FeedPost[], index: number) => void;
 }
 
-export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts }) => {
+export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts, onOpenFullscreen }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
@@ -55,7 +59,11 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
           0,
           groupedPosts.findIndex(p => p.id === post.id),
         );
-        useFullscreenFeedStore.getState().open(groupedPosts, fullscreenIndex);
+        if (onOpenFullscreen) {
+          onOpenFullscreen(groupedPosts, fullscreenIndex);
+        } else {
+          useFullscreenFeedStore.getState().open(groupedPosts, fullscreenIndex);
+        }
       }}
       style={{
         position: 'relative',

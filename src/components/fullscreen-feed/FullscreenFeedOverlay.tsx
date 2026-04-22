@@ -25,6 +25,9 @@ export function FullscreenFeedOverlay() {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially } = useFullscreenFeedStore();
+  const hasNextPage = useFullscreenFeedStore(s => s.hasNextPage);
+  const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
+  const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
 
   const activeActor = { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
@@ -159,10 +162,14 @@ export function FullscreenFeedOverlay() {
                 <SnapFeed
                   posts={posts}
                   activeTab="foryou"
-                  onNearEnd={() => {}}
+                  onNearEnd={() => {
+                    if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
+                      fetchNextPage();
+                    }
+                  }}
                   onRefresh={async () => {}}
-                  isRefreshing={false}
-                  hasNextPage={false}
+                  isRefreshing={isFetchingNextPage}
+                  hasNextPage={hasNextPage}
                   followOverrides={followOverrides}
                   onFollowChange={handleFollowChange}
                   startIndex={startIndex}
