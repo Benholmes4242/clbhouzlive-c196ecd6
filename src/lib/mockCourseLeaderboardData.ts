@@ -140,6 +140,10 @@ export function sortMostPlayed(courses: MockLeaderboardCourse[]): MockLeaderboar
 }
 
 export function sortHighestRated(courses: MockLeaderboardCourse[]): MockLeaderboardCourse[] {
+  // Aligned with canonical community-rating tiebreaker chain:
+  //   rating DESC → ratings_count DESC → breakdown sum DESC → name ASC.
+  // Mock courses don't carry breakdown data, so the third tier collapses
+  // to zero on both sides and effectively no-ops; name ASC stays stable.
   return [...courses].sort((a, b) => {
     if (b.avg_rating !== a.avg_rating) return b.avg_rating - a.avg_rating;
     if (b.ratings_count !== a.ratings_count) return b.ratings_count - a.ratings_count;
