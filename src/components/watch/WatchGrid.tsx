@@ -1,8 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
+import WatchActionSheet from './WatchActionSheet';
 
 interface WatchGridProps {
   posts: FeedPost[];
@@ -28,6 +29,13 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   userId,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Long-press action sheet state — lifted here so a single sheet serves all tiles
+  // (and so the same wiring benefits both Watch and Clips surfaces).
+  const [actionSheetPost, setActionSheetPost] = useState<FeedPost | null>(null);
+  const handleLongPress = useCallback((post: FeedPost) => {
+    setActionSheetPost(post);
+  }, []);
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
@@ -104,6 +112,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
               fetchNextPage={fetchNextPage}
               hasNextPage={hasNextPage}
               isFetchingNextPage={isFetchingNextPage}
+              onLongPress={handleLongPress}
             />
           </div>
         ))}
@@ -126,6 +135,13 @@ const WatchGrid: React.FC<WatchGridProps> = ({
           ))}
         </div>
       )}
+
+      <WatchActionSheet
+        open={!!actionSheetPost}
+        onOpenChange={(open) => { if (!open) setActionSheetPost(null); }}
+        post={actionSheetPost}
+        userId={userId}
+      />
     </>
   );
 };

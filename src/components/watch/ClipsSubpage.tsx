@@ -23,20 +23,31 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
       onClick={onTap}
       className="shrink-0 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
       style={{
-        minHeight: 36,
-        padding: '0 16px',
-        fontSize: 13,
+        height: 36,
+        padding: '0 14px',
+        fontSize: 14,
         fontWeight: 600,
-        borderRadius: 20,
-        background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-        color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+        borderRadius: 999,
+        background: isActive ? '#0F172A' : '#FFFFFF',
+        border: isActive ? '1px solid transparent' : '1px solid rgba(15,23,42,0.12)',
+        color: isActive ? '#FFFFFF' : '#0F172A',
+        whiteSpace: 'nowrap',
       }}
     >
       {icon}
       {label}
     </button>
   );
+}
+
+const SUBHEAD_BY_TAG: Record<string, string> = {
+  all: 'Tailored to your taste',
+  near: 'Filmed near you',
+};
+function getSubheadForTag(tag: string, chipLabel?: string): string {
+  if (SUBHEAD_BY_TAG[tag]) return SUBHEAD_BY_TAG[tag];
+  if (chipLabel) return `${chipLabel} from across the community`;
+  return 'Shorts from the community';
 }
 
 export default function ClipsSubpage() {
@@ -59,18 +70,29 @@ export default function ClipsSubpage() {
       {/* Sticky header + chips block */}
       <div style={{ position: 'sticky', top: '0px', zIndex: 20, background: 'hsl(var(--background))' }}>
         {/* Header */}
-        <div className="flex items-center gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
+        <div className="flex items-start gap-3 px-4" style={{ paddingTop: 12, paddingBottom: 8 }}>
           <button
             onClick={() => navigate(-1)}
-            className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+            className="w-[36px] h-[36px] rounded-full flex items-center justify-center active:scale-[0.97] transition-transform mt-[2px]"
             style={{ background: 'rgba(0,0,0,0.06)' }}
+            aria-label="Back"
           >
             <ChevronLeft size={20} />
           </button>
-          <span className="text-[18px] font-bold text-foreground">
-            Clips
-          </span>
-          <div className="flex-1" />
+          <div className="flex-1 min-w-0">
+            <div className="text-[18px] font-bold text-foreground leading-tight">
+              Clips
+            </div>
+            <div
+              className="leading-tight"
+              style={{ fontSize: 12, fontWeight: 500, color: 'hsl(var(--muted-foreground))', marginTop: 2 }}
+            >
+              {getSubheadForTag(
+                activeTag,
+                categoryChips.find(c => c.id === activeTag)?.label,
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Filter chips */}
