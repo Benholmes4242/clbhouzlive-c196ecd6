@@ -1,12 +1,86 @@
-// TODO(security): No signature verification. Any caller can POST to this
-// endpoint and overwrite metadata for any post_media row by stream_id.
-// Follow-up: add HMAC verification using Cloudflare's webhook signing secret.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+/**
+ * Verify the Cloudflare Stream webhook signature.
+ * Spec: https://developers.cloudflare.com/stream/manage-video-library/using-webhooks/
+ *
+ * Header format: Webhook-Signature: time=<unix>,sig1=<hex_hmac_sha256>
+ * Signature source: `${time}.${rawBody}`
+ * Algorithm: HMAC-SHA256, hex lowercase.
+ *
+ * Additional check: reject timestamps older than 5 minutes (replay protection).
+ */
+async function verifyCloudflareSignature(
+  header: string,
+  rawBody: string,
+  secret: string,
+): Promise<boolean> {
+  // Parse the header into a map of key→value.
+  const parts = new Map<string, string>();
+  for (const piece of header.split(',')) {
+    const eq = piece.indexOf('=');
+    if (eq === -1) continue;
+    parts.set(piece.slice(0, eq).trim(), piece.slice(eq + 1).trim());
+  }
+
+  const time = parts.get('time');
+  const sig1 = parts.get('sig1');
+  if (!time || !sig1) {
+    console.warn('[stream-webhook] Webhook-Signature header missing time or sig1');
+    return false;
+  }
+
+  // Replay protection: reject timestamps that are too old.
+  const timeSec = Number(time);
+  if (!Number.isFinite(timeSec)) {
+    console.warn('[stream-webhook] Webhook-Signature time is not a number');
+    return false;
+  }
+  const ageSeconds = Math.floor(Date.now() / 1000) - timeSec;
+  const MAX_AGE_SECONDS = 5 * 60;
+  if (Math.abs(ageSeconds) > MAX_AGE_SECONDS) {
+    console.warn(`[stream-webhook] Webhook timestamp too old or future-dated (age=${ageSeconds}s)`);
+    return false;
+  }
+
+  // Compute expected signature.
+  const encoder = new TextEncoder();
+  const keyBytes = encoder.encode(secret);
+  const messageBytes = encoder.encode(`${time}.${rawBody}`);
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyBytes,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sigBytes = await crypto.subtle.sign('HMAC', cryptoKey, messageBytes);
+  const expected = [...new Uint8Array(sigBytes)]
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  // Constant-time comparison.
+  return timingSafeEqual(expected, sig1);
+}
+
+/**
+ * Constant-time string comparison. Avoids timing side-channels that could
+ * leak the valid signature one character at a time.
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -16,10 +90,45 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const webhookSecret = Deno.env.get('CLOUDFLARE_STREAM_WEBHOOK_SECRET');
 
-    const body = await req.json();
-    console.log('[stream-webhook] Received:', JSON.stringify(body));
+    // Read the raw body FIRST — signature verification requires the exact bytes
+    // Cloudflare sent. Parsing as JSON beforehand would break verification.
+    const rawBody = await req.text();
+
+    // Verify HMAC signature from Cloudflare Stream.
+    // Header format: Webhook-Signature: time=<unix>,sig1=<hex_hmac_sha256>
+    // Signed content: `${time}.${rawBody}`
+    // Algorithm: HMAC-SHA256, hex-encoded.
+    // Spec: https://developers.cloudflare.com/stream/manage-video-library/using-webhooks/
+    const sigHeader = req.headers.get('Webhook-Signature');
+    if (!webhookSecret) {
+      console.error('[stream-webhook] CLOUDFLARE_STREAM_WEBHOOK_SECRET not configured — rejecting all requests');
+      return new Response(JSON.stringify({ error: 'Server not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (!sigHeader) {
+      console.warn('[stream-webhook] Missing Webhook-Signature header — rejecting');
+      return new Response(JSON.stringify({ error: 'Missing signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const verified = await verifyCloudflareSignature(sigHeader, rawBody, webhookSecret);
+    if (!verified) {
+      console.warn('[stream-webhook] Signature verification failed — rejecting');
+      return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const body = JSON.parse(rawBody);
+    console.log('[stream-webhook] Received:', rawBody);
 
     const { uid, status, input, duration } = body;
 
