@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Loader2, MapPin } from 'lucide-react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
+import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
 
 interface PostPreview {
   id: string;
@@ -39,29 +42,52 @@ const PostDeepLinkPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [post, setPost] = useState<PostPreview | null>(null);
+  const [feedPost, setFeedPost] = useState<ReturnType<typeof mapActivityPostToFeedPost> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const hasOpenedFullscreen = useRef(false);
 
   useEffect(() => {
     async function loadPost() {
       if (!postId) { setNotFound(true); setIsLoading(false); return; }
 
+      // Full join — supplies both the lightweight guest preview AND the data
+      // required to map into a FeedPost for the authenticated fullscreen viewer.
       const { data, error } = await supabase
         .from('posts')
         .select(`
           id,
+          content,
           caption,
           media_urls,
           post_type,
           created_at,
+          course_id,
+          source_review_id,
+          rating,
           user_profiles!inner (
+            id,
             username,
             display_name,
-            avatar_url
+            avatar_url,
+            profile_photo_url
           ),
           golf_courses (
+            id,
             name,
-            country
+            country,
+            sub_country,
+            region
+          ),
+          post_media (
+            id,
+            media_type,
+            media_url,
+            aspect_ratio,
+            width,
+            height,
+            poster_url,
+            duration_seconds
           )
         `)
         .eq('id', postId)
@@ -69,27 +95,95 @@ const PostDeepLinkPage: React.FC = () => {
 
       if (error || !data) {
         setNotFound(true);
-      } else {
-        setPost(data as unknown as PostPreview);
+        setIsLoading(false);
+        return;
       }
+
+      const row = data as any;
+      const profileRow = row.user_profiles ?? {};
+      const courseRow = row.golf_courses ?? null;
+
+      // Lightweight preview shape used by the guest viewer
+      setPost({
+        id: row.id,
+        caption: row.caption ?? row.content ?? null,
+        media_urls: row.media_urls ?? null,
+        post_type: row.post_type ?? null,
+        created_at: row.created_at,
+        user_profiles: profileRow ? {
+          username: profileRow.username,
+          display_name: profileRow.display_name,
+          avatar_url: profileRow.avatar_url ?? profileRow.profile_photo_url,
+        } : null,
+        golf_courses: courseRow ? { name: courseRow.name, country: courseRow.country } : null,
+      });
+
+      // Full FeedPost mapping for the authenticated fullscreen viewer
+      const activityPost: ActivityPost = {
+        id: row.id,
+        type: 'post',
+        content: row.content ?? row.caption ?? '',
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        timeAgo: '',
+        created_at: row.created_at,
+        course_id: row.course_id ?? null,
+        source_review_id: row.source_review_id ?? null,
+        isReview: !!row.source_review_id || row.post_type === 'review',
+        rating: row.rating ?? undefined,
+        course: courseRow ? {
+          id: courseRow.id,
+          name: courseRow.name,
+          country: courseRow.country ?? undefined,
+          sub_country: courseRow.sub_country ?? undefined,
+          region: courseRow.region ?? undefined,
+        } : undefined,
+        post_media: (row.post_media ?? []).map((m: any) => ({
+          id: m.id,
+          media_type: m.media_type,
+          media_url: m.media_url,
+          aspect_ratio: m.aspect_ratio,
+          width: m.width,
+          height: m.height,
+          poster_url: m.poster_url,
+          duration_seconds: m.duration_seconds,
+        })),
+        post_tags: [],
+        user: {
+          id: profileRow.id,
+          display_name: profileRow.display_name,
+          username: profileRow.username,
+          profile_photo_url: profileRow.profile_photo_url ?? profileRow.avatar_url,
+        },
+      };
+
+      setFeedPost(mapActivityPostToFeedPost(activityPost));
       setIsLoading(false);
     }
 
     loadPost();
   }, [postId]);
 
-  // Logged-in users: go to Clubhouse and open the post's comments sheet
+  // Logged-in users: open the global fullscreen viewer with the loaded post
+  // and the comments sheet open. Closing the viewer navigates back.
   useEffect(() => {
-    if (!authLoading && user && !isLoading && postId) {
-      navigate('/', {
-        replace: true,
-        state: {
-          deepLinkPostId: postId,
-          openComments: true,
-        },
-      });
-    }
-  }, [authLoading, user, isLoading, navigate, postId]);
+    if (authLoading || !user || isLoading || !feedPost) return;
+    if (hasOpenedFullscreen.current) return;
+    hasOpenedFullscreen.current = true;
+
+    useFullscreenFeedStore.getState().open([feedPost], 0, {
+      openCommentsInitially: true,
+      onClose: () => {
+        // Go back if there's history; otherwise land on Clubhouse.
+        if (window.history.length > 1) {
+          navigate(-1);
+        } else {
+          navigate('/', { replace: true });
+        }
+      },
+    });
+  }, [authLoading, user, isLoading, feedPost, navigate]);
 
   // --- Loading ---
   if (isLoading || authLoading) {
@@ -119,7 +213,13 @@ const PostDeepLinkPage: React.FC = () => {
     );
   }
 
-  // --- Full-screen post viewer (unauthenticated) ---
+  // --- Logged-in: the global FullscreenFeedOverlay renders above everything.
+  //     Render a black scrim so we don't flash the guest viewer behind it. ---
+  if (user) {
+    return <div className="fixed inset-0 bg-black z-40" aria-hidden="true" />;
+  }
+
+  // --- Full-screen post viewer (unauthenticated guest) ---
   const profile = post.user_profiles;
   const course = post.golf_courses;
   const mediaUrl = post.media_urls?.[0] ?? null;
