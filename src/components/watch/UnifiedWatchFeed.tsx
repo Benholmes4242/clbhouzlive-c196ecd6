@@ -19,6 +19,8 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
 import { MostLovedRail } from './proshop/MostLovedRail';
+import { WatchMoodChips } from './proshop/WatchMoodChips';
+import { useWatchMood } from './proshop/hooks/useWatchMood';
 
 interface ChipButtonProps {
   label: string;
