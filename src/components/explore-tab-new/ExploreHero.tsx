@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ExploreHeroRow } from './hooks/useExploreHero';
 import { useExploreHero } from './hooks/useExploreHero';
 import type { ExploreMoodId } from './hooks/useExploreMood';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
 interface ExploreHeroProps {
   userId: string | undefined;
@@ -206,6 +207,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           )}
           {hero.rating_avg != null && (hero.review_count ?? 0) > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
+              <img src={clbhouzLogo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
               <span style={{ fontSize: 13, fontWeight: 800, color: '#F7931E' }}>
                 {Number(hero.rating_avg).toFixed(1)}
               </span>
