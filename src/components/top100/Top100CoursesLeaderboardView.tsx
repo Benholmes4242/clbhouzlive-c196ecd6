@@ -107,10 +107,12 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
     
     switch (filters.sortBy) {
       case 'member_rating':
+        // CourseLeaderboardEntry has no rating_count; unique_players is the
+        // closest reviewer-count signal in this shape.
         return courses.sort((a, b) =>
           compareCoursesByRating(
-            { id: a.course_id, name: a.course_name, avg_rating: a.avg_rating, rating_count: a.rating_count },
-            { id: b.course_id, name: b.course_name, avg_rating: b.avg_rating, rating_count: b.rating_count },
+            { id: a.course_id, name: a.course_name, avg_rating: a.avg_rating, rating_count: a.unique_players },
+            { id: b.course_id, name: b.course_name, avg_rating: b.avg_rating, rating_count: b.unique_players },
             'desc'
           )
         );
