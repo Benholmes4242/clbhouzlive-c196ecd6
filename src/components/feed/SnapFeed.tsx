@@ -35,6 +35,8 @@ interface SnapFeedProps {
   startIndex?: number;
   onActiveIndexChange?: (idx: number) => void;
   activeIndexOverride?: number;
+  /** Forwarded to FeedSlide so fullscreen hosts (FullscreenFeedOverlay, CourseMediaViewer) can suppress the inline top-right dots in favour of the segmented FullscreenCarouselOverlay. */
+  isFullscreen?: boolean;
 }
 
 export function SnapFeed({
@@ -44,6 +46,7 @@ export function SnapFeed({
   startIndex,
   onActiveIndexChange,
   activeIndexOverride,
+  isFullscreen,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -442,6 +445,7 @@ export function SnapFeed({
             getCommentCount={getCommentCount}
             onZoomChange={handleZoomChange}
             activeIndexOverride={activeIndexOverride}
+            isFullscreen={isFullscreen}
           />
         );
       })}

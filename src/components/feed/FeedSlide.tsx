@@ -24,6 +24,8 @@ interface FeedSlideProps {
   getCommentCount?: (post: FeedPost) => number;
   onZoomChange?: (isZoomed: boolean) => void;
   activeIndexOverride?: number;
+  /** When true, suppress the inline top-right elongated dots — fullscreen surfaces render their own segmented dots via FullscreenCarouselOverlay. */
+  isFullscreen?: boolean;
 }
 
 export const FeedSlide = memo(function FeedSlide({
@@ -39,6 +41,7 @@ export const FeedSlide = memo(function FeedSlide({
   getCommentCount,
   onZoomChange,
   activeIndexOverride,
+  isFullscreen = false,
 }: FeedSlideProps) {
   const { user } = useSupabaseSession();
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
@@ -51,7 +54,7 @@ export const FeedSlide = memo(function FeedSlide({
     post.postType === 'pga_card' ||
     post.postType === 'tournament_result' ||
     post.postType === 'course_of_week_card';
-  const showInlineDots = !isEditorial && (media?.length ?? 0) > 1;
+  const showInlineDots = !isFullscreen && !isEditorial && (media?.length ?? 0) > 1;
 
   // Pinch zoom for single images
   const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } = usePinchZoomPointer();
