@@ -63,54 +63,71 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
 
   return (
     <section style={{ padding: '24px 16px 0' }}>
-      <div style={{ padding: '0 0 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <div>
-          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-            Your Passport
-          </h2>
-          <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
-            {sinceLabel}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate('/profile')}
+      <div style={{ padding: '0 0 12px' }}>
+        <p
           style={{
-            fontSize: 12,
+            fontSize: 10,
             fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
             color: '#F7931E',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
+            margin: 0,
+            lineHeight: 1,
           }}
         >
-          View profile
-        </button>
+          Your Journey
+        </p>
+        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: '4px 0 0', lineHeight: 1.15 }}>
+          Season passport
+        </h2>
+        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
+          {sinceLabel}
+        </p>
       </div>
       <div
         style={{
-          background: '#FFFFFF',
-          border: '1px solid rgba(15,23,42,0.08)',
+          background: 'linear-gradient(135deg, #0F4A3A 0%, #1A6A54 100%)',
+          border: 'none',
           borderRadius: 14,
-          padding: '6px 8px',
-          display: 'flex',
-          alignItems: 'stretch',
+          padding: 18,
+          position: 'relative',
         }}
       >
-        <Stat value={passport.courses_played ?? 0} label="Courses" />
-        <div style={{ width: 1, background: 'rgba(15,23,42,0.08)', margin: '8px 0' }} />
-        <Stat value={passport.countries_played ?? 0} label="Countries" />
-        <div style={{ width: 1, background: 'rgba(15,23,42,0.08)', margin: '8px 0' }} />
-        <Stat value={passport.top_100_played ?? 0} label="Top 100" />
-        <div style={{ width: 1, background: 'rgba(15,23,42,0.08)', margin: '8px 0' }} />
-        <Stat
-          value={
-            passport.avg_rating_given != null
-              ? Number(passport.avg_rating_given).toFixed(1)
-              : '—'
-          }
-          label="Avg given"
-        />
+        <div style={{ display: 'flex', alignItems: 'stretch' }}>
+          <Stat value={passport.courses_played ?? 0} label="Courses" />
+          <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+          <Stat value={passport.countries_played ?? 0} label="Countries" />
+          <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+          <Stat value={passport.top_100_played ?? 0} label="Top 100" />
+          <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+          <Stat
+            value={
+              passport.avg_rating_given != null
+                ? Number(passport.avg_rating_given).toFixed(1)
+                : '—'
+            }
+            label="Avg given"
+          />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+          <button
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="active:scale-[0.97] transition-transform"
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.02em',
+              color: '#FFFFFF',
+              background: 'rgba(255,255,255,0.14)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              padding: '6px 12px',
+              borderRadius: 999,
+            }}
+          >
+            View profile
+          </button>
+        </div>
       </div>
     </section>
   );
