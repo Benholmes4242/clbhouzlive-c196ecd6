@@ -24,7 +24,7 @@ import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
+import { Trophy, ChevronRight, ChevronDown, ChevronLeft, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -512,22 +512,23 @@ const ProfilePageV2Content: React.FC = () => {
           )}
         </div>
 
-        {/* Glass back button - positioned below safe area */}
+        {/* Glass back button - matches course detail hero style */}
         <button
           type="button"
           onClick={() => safeGoBack(navigate, '/clubhouse')}
-           className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-[0.97] transition-all z-10 pointer-events-auto"
+          className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10 pointer-events-auto"
           style={{
-            top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-            background: 'rgba(0, 0, 0, 0.45)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
+            borderRadius: '12px',
+            background: 'rgba(0, 0, 0, 0.28)',
+            backdropFilter: 'blur(22px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
           }}
           aria-label="Back"
         >
-          <ArrowLeft className="h-4 w-4 text-white" />
+          <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
         </button>
 
         {/* Avatar - squircle, left-aligned */}

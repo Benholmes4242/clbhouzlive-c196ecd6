@@ -16,7 +16,7 @@ import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Phone, Globe, MapPin, MoreHorizontal, Check, ExternalLink, Loader2, 
-  ChevronRight, Share2, Link2, AlertCircle, ArrowLeft, Camera, Flag, Pencil
+  ChevronRight, ChevronLeft, Share2, Link2, AlertCircle, ArrowLeft, Camera, Flag, Pencil
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -325,22 +325,23 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </div>
 
-        {/* P1: Back button — h-11 w-11, rounded-full, active:scale */}
+        {/* Back button — matches course detail hero style */}
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-[0.97] transition-all z-10 pointer-events-auto"
+          className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10 pointer-events-auto"
           style={{
-            top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-            background: 'rgba(0, 0, 0, 0.45)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
+            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
+            borderRadius: '12px',
+            background: 'rgba(0, 0, 0, 0.28)',
+            backdropFilter: 'blur(22px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
           }}
           aria-label="Back"
         >
-          <ArrowLeft className="h-4 w-4 text-white" />
+          <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
         </button>
 
         {/* Avatar - unified button, left-aligned */}
