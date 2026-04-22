@@ -70,9 +70,9 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        background: 'rgba(20, 13, 4, 0.92)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        background: 'rgba(15, 23, 42, 0.92)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         border: '1px solid rgba(245, 158, 11, 0.22)',
         borderRadius: 14,
         overflow: 'hidden',
@@ -113,13 +113,13 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         }}
       />
 
-      <div style={{ padding: '12px 14px 14px', position: 'relative' }}>
+      <div style={{ padding: '10px 10px 10px', position: 'relative' }}>
         {/* Rating — absolute top-right, overlaps course name padding */}
         <div
           style={{
             position: 'absolute',
             top: 8,
-            right: 12,
+            right: 10,
             display: 'flex',
             alignItems: 'baseline',
             gap: 2,
@@ -153,10 +153,10 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         {/* Row 1: Course name */}
         <div
           style={{
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: 900,
             color: '#ffffff',
-            lineHeight: 1.12,
+            lineHeight: 1.15,
             letterSpacing: '-0.03em',
             fontFamily: 'Georgia, serif',
             marginBottom: 4,
@@ -214,47 +214,36 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             fallback={initials}
             hideRing
           />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.85)',
-                  lineHeight: 1.2,
-                }}
-              >
-                {reviewer.name || 'Golfer'}
-              </span>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  background: 'rgba(245,158,11,0.12)',
-                  border: '0.5px solid rgba(245,158,11,0.35)',
-                  borderRadius: 6,
-                  padding: '3px 7px',
-                  fontSize: 9,
-                  fontWeight: 700,
-                  color: '#f59e0b',
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase' as const,
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                ★ Course Review
-              </span>
-            </div>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <span
               style={{
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.38)',
-                lineHeight: 1,
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.85)',
+                lineHeight: 1.2,
               }}
             >
-              reviewed this course
+              {reviewer.name || 'Golfer'}
+            </span>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                background: 'rgba(245,158,11,0.12)',
+                border: '0.5px solid rgba(245,158,11,0.35)',
+                borderRadius: 6,
+                padding: '3px 7px',
+                fontSize: 9,
+                fontWeight: 700,
+                color: '#f59e0b',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase' as const,
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ★ Course Review
             </span>
           </div>
         </div>
