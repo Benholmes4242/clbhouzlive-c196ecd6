@@ -51,26 +51,31 @@ const PostDeepLinkPage: React.FC = () => {
     async function loadPost() {
       if (!postId) { setNotFound(true); setIsLoading(false); return; }
 
-      // Full join — supplies both the lightweight guest preview AND the data
-      // required to map into a FeedPost for the authenticated fullscreen viewer.
+      // Schema-accurate fetch:
+      // - posts has `content` (not `caption`), `post_type`, `status`; no `media_urls`/`rating`
+      // - user_profiles has `profile_photo_url` (no `avatar_url`)
+      // - posts → user_profiles uses the explicit FK `posts_user_profile_id_fkey`
+      //   (there's also `posts_user_id_fkey` to auth.users — must disambiguate)
+      // - ratings live on course_ratings, joined via source_review_id
       const { data, error } = await supabase
         .from('posts')
         .select(`
           id,
           content,
-          caption,
-          media_urls,
           post_type,
           created_at,
+          user_id,
+          actor_type,
+          actor_id,
+          status,
           course_id,
           source_review_id,
-          rating,
-          user_profiles!inner (
+          user_profiles!posts_user_profile_id_fkey (
             id,
             username,
             display_name,
-            avatar_url,
-            profile_photo_url
+            profile_photo_url,
+            is_verified
           ),
           golf_courses (
             id,
@@ -78,6 +83,11 @@ const PostDeepLinkPage: React.FC = () => {
             country,
             sub_country,
             region
+          ),
+          course_ratings:source_review_id (
+            id,
+            rating,
+            review
           ),
           post_media (
             id,
@@ -87,10 +97,13 @@ const PostDeepLinkPage: React.FC = () => {
             width,
             height,
             poster_url,
-            duration_seconds
+            stream_id,
+            duration_seconds,
+            display_order
           )
         `)
         .eq('id', postId)
+        .eq('status', 'published')
         .maybeSingle();
 
       if (error || !data) {
@@ -102,18 +115,25 @@ const PostDeepLinkPage: React.FC = () => {
       const row = data as any;
       const profileRow = row.user_profiles ?? {};
       const courseRow = row.golf_courses ?? null;
+      const ratingRow = row.course_ratings ?? null;
 
       // Lightweight preview shape used by the guest viewer
       setPost({
         id: row.id,
-        caption: row.caption ?? row.content ?? null,
-        media_urls: row.media_urls ?? null,
+        caption: row.content ?? null,
+        media_urls: Array.isArray(row.post_media)
+          ? row.post_media
+              .slice()
+              .sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0))
+              .map((m: any) => m.media_url)
+              .filter(Boolean)
+          : null,
         post_type: row.post_type ?? null,
         created_at: row.created_at,
         user_profiles: profileRow ? {
           username: profileRow.username,
           display_name: profileRow.display_name,
-          avatar_url: profileRow.avatar_url ?? profileRow.profile_photo_url,
+          avatar_url: profileRow.profile_photo_url ?? null,
         } : null,
         golf_courses: courseRow ? { name: courseRow.name, country: courseRow.country } : null,
       });
@@ -122,7 +142,7 @@ const PostDeepLinkPage: React.FC = () => {
       const activityPost: ActivityPost = {
         id: row.id,
         type: 'post',
-        content: row.content ?? row.caption ?? '',
+        content: row.content ?? '',
         likes: 0,
         comments: 0,
         shares: 0,
@@ -131,7 +151,7 @@ const PostDeepLinkPage: React.FC = () => {
         course_id: row.course_id ?? null,
         source_review_id: row.source_review_id ?? null,
         isReview: !!row.source_review_id || row.post_type === 'review',
-        rating: row.rating ?? undefined,
+        rating: ratingRow?.rating ?? undefined,
         course: courseRow ? {
           id: courseRow.id,
           name: courseRow.name,
@@ -154,7 +174,7 @@ const PostDeepLinkPage: React.FC = () => {
           id: profileRow.id,
           display_name: profileRow.display_name,
           username: profileRow.username,
-          profile_photo_url: profileRow.profile_photo_url ?? profileRow.avatar_url,
+          profile_photo_url: profileRow.profile_photo_url,
         },
       };
 
