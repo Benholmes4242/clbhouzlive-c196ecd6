@@ -18,7 +18,7 @@ import { ClipsCourseAnchoredRail } from './clips/ClipsCourseAnchoredRail';
 import { ClipsMostLovedRail } from './clips/ClipsMostLovedRail';
 import { MoreToExploreDivider } from './clips/MoreToExploreDivider';
 
-const CREAM = '#F5F1EA';
+const CREAM = '#F8FAFC';
 
 /**
  * Phase 2 Pro Shop rebuild of the Clips subpage.
