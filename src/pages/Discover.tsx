@@ -55,8 +55,8 @@ const Discover = () => {
               <SegmentedControl
                 tabs={[
                   { id: 'watch', label: 'Watch' },
-                  { id: 'loop', label: 'Friends' },
                   { id: 'courses', label: 'Explore' },
+                  { id: 'loop', label: 'Friends' },
                 ]}
                 activeTab={main}
                 onTabChange={(id) => setMain(id as MainKey)}
@@ -66,7 +66,7 @@ const Discover = () => {
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
               activeKey={main as MainKey}
-              order={['watch', 'loop', 'courses'] as const}
+              order={['watch', 'courses', 'loop'] as const}
             >
               {(key: MainKey) => {
                 if (key === 'watch') {
