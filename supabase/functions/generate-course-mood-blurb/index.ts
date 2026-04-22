@@ -215,32 +215,21 @@ Write a 1-2 sentence paragraph that:
     const ttlDays = usedFallback ? 7 : 30;
     const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000).toISOString();
 
-    const { error: upsertErr } = await supabase
-      .from("course_mood_blurbs")
-      .upsert(
-        {
-          course_id: body.course_id,
-          user_id: body.user_id ?? null,
-          mood: body.mood,
-          blurb,
-          generated_at: new Date().toISOString(),
-          expires_at: expiresAt,
-        },
-        { onConflict: "course_id,user_id,mood", ignoreDuplicates: false },
-      );
+    const isPostScoped = !!(body.post_id && POST_SCOPED_MOODS.has(body.mood));
 
-    if (upsertErr) {
-      // Try delete+insert if onConflict failed (because of NULL user_id semantics)
+    if (isPostScoped) {
+      // Post-scoped editorial blurbs use the (post_id, mood) unique slot.
+      // Delete any stale blurb for this post+mood, then insert fresh.
       await supabase
         .from("course_mood_blurbs")
         .delete()
-        .eq("course_id", body.course_id)
-        .eq("mood", body.mood)
-        .is("user_id", body.user_id ?? null);
+        .eq("post_id", body.post_id!)
+        .eq("mood", body.mood);
 
       const { error: insertErr } = await supabase.from("course_mood_blurbs").insert({
         course_id: body.course_id,
-        user_id: body.user_id ?? null,
+        user_id: null,
+        post_id: body.post_id,
         mood: body.mood,
         blurb,
         generated_at: new Date().toISOString(),
@@ -252,6 +241,49 @@ Write a 1-2 sentence paragraph that:
           JSON.stringify({ error: "Cache write failed", details: insertErr.message, blurb }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
+      }
+    } else {
+      // Course-scoped (legacy) path — unchanged.
+      const { error: upsertErr } = await supabase
+        .from("course_mood_blurbs")
+        .upsert(
+          {
+            course_id: body.course_id,
+            user_id: body.user_id ?? null,
+            post_id: null,
+            mood: body.mood,
+            blurb,
+            generated_at: new Date().toISOString(),
+            expires_at: expiresAt,
+          },
+          { onConflict: "course_id,user_id,mood", ignoreDuplicates: false },
+        );
+
+      if (upsertErr) {
+        await supabase
+          .from("course_mood_blurbs")
+          .delete()
+          .eq("course_id", body.course_id)
+          .eq("mood", body.mood)
+          .is("user_id", body.user_id ?? null)
+          .is("post_id", null);
+
+        const { error: insertErr } = await supabase.from("course_mood_blurbs").insert({
+          course_id: body.course_id,
+          user_id: body.user_id ?? null,
+          post_id: null,
+          mood: body.mood,
+          blurb,
+          generated_at: new Date().toISOString(),
+          expires_at: expiresAt,
+        });
+
+        if (insertErr) {
+          return new Response(
+            JSON.stringify({ error: "Cache write failed", details: insertErr.message, blurb }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
       }
     }
 
