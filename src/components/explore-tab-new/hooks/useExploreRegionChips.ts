@@ -1,38 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useExploreRegionsWithImages, type ExploreRegionFull } from './useExploreRegionsWithImages';
 
 interface RegionChip {
   slug: string | null;
   title: string;
 }
 
+/**
+ * Returns the region chip projection (slug + title) used by the Explore header.
+ * Reads from the same React Query cache as `useExploreRegionsWithImages` so
+ * we issue a single network request for both surfaces.
+ */
 export function useExploreRegionChips() {
-  const query = useQuery({
-    queryKey: ['explore-regions'],
-    queryFn: async (): Promise<RegionChip[]> => {
-      const { data, error } = await supabase
-        .from('explore_regions')
-        .select('slug, title')
-        .order('sort_order');
+  const query = useExploreRegionsWithImages();
 
-      if (error) {
-        console.error('[ExploreRegionChips] error:', error);
-        return [{ slug: null, title: 'All' }];
-      }
-
-      const chips: RegionChip[] = [
-        { slug: null, title: 'All' },
-        ...(data ?? []).map(r => ({ slug: r.slug, title: r.title })),
-      ];
-
-      return chips;
-    },
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
-  });
+  const regions: RegionChip[] = [
+    { slug: null, title: 'All' },
+    ...((query.data ?? []) as ExploreRegionFull[]).map(r => ({ slug: r.slug, title: r.title })),
+  ];
 
   return {
-    regions: query.data ?? [{ slug: null, title: 'All' }],
+    regions,
     isLoading: query.isLoading,
   };
 }

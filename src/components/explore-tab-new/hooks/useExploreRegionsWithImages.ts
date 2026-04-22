@@ -12,7 +12,7 @@ export interface ExploreRegionFull {
 
 export function useExploreRegionsWithImages() {
   return useQuery({
-    queryKey: ['explore-regions-full'],
+    queryKey: ['explore-regions'],
     queryFn: async (): Promise<ExploreRegionFull[]> => {
       const { data, error } = await supabase
         .from('explore_regions')
