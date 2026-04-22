@@ -154,19 +154,20 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
             flexShrink: 0,
             width: 34,
             height: 34,
-            borderRadius: '50%',
-            background: '#F7931E',
+            borderRadius: 9,
+            background: 'linear-gradient(135deg, #F7931E, #E8920A)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            overflow: 'hidden',
           }}
         >
-          <img
-            src={echoIcon}
-            alt=""
-            style={{ width: 22, height: 22, objectFit: 'contain' }}
-          />
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="8" width="2" height="8" rx="1" fill="white" opacity="0.7" />
+            <rect x="7" y="5" width="2" height="14" rx="1" fill="white" opacity="0.85" />
+            <rect x="11" y="3" width="2" height="18" rx="1" fill="white" />
+            <rect x="15" y="6" width="2" height="12" rx="1" fill="white" opacity="0.85" />
+            <rect x="19" y="9" width="2" height="6" rx="1" fill="white" opacity="0.7" />
+          </svg>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p
