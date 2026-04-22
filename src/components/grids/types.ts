@@ -16,6 +16,10 @@ export interface PostMedia {
   aspect_ratio?: number | null;
   studio_edits?: any;
   filter_id?: string | null;
+  /** Phase 4: server-computed format ('clip' | 'video' | 'image') */
+  derived_format?: 'clip' | 'video' | 'image' | null;
+  /** Phase 4: feed eligibility ('pending' | 'processing' | 'complete' | 'failed' | 'skipped') */
+  processing_status?: string | null;
 }
 
 export interface GridPost {

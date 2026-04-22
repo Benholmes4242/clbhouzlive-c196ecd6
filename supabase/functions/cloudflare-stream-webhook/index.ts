@@ -185,6 +185,27 @@ Deno.serve(async (req) => {
     }
     if (!row.aspect_ratio && width && height) updateData.aspect_ratio = aspectRatio;
 
+    // Phase 4: Format-boundary enforcement.
+    // Mark the row eligible for feeds atomically with the metadata write.
+    // Defensive: only mark 'complete' when we have a valid positive duration —
+    // either from this webhook payload OR already persisted on the row.
+    // If Cloudflare returns junk metadata, leave the row stuck rather than
+    // letting a phantom (zero-length / unknown-duration) post into feeds.
+    const effectiveDuration =
+      durationSeconds && durationSeconds > 0
+        ? durationSeconds
+        : row.duration_seconds && row.duration_seconds > 0
+        ? row.duration_seconds
+        : null;
+
+    if (effectiveDuration !== null) {
+      updateData.processing_status = 'complete';
+      updateData.processed_at = new Date().toISOString();
+    } else {
+      updateData.processing_status = 'failed';
+      updateData.processing_error = 'Cloudflare Stream returned no usable duration';
+    }
+
     const ids = mediaRows.map((r: { id: string }) => r.id);
     const { error: updateError } = await supabase
       .from('post_media')
@@ -194,7 +215,7 @@ Deno.serve(async (req) => {
     if (updateError) throw updateError;
 
     console.log(
-      `[stream-webhook] Updated ${ids.length} row(s) for uid: ${uid}`
+      `[stream-webhook] Updated ${ids.length} row(s) for uid: ${uid} status=${updateData.processing_status}`
     );
 
     return new Response(
