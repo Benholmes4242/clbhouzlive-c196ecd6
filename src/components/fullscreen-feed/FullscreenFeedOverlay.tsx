@@ -24,7 +24,7 @@ export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex } = useFullscreenFeedStore();
+  const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially } = useFullscreenFeedStore();
 
   const activeActor = { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
@@ -86,6 +86,16 @@ export function FullscreenFeedOverlay() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [isOpen, close]);
+
+  // Deep-link entry: open comments sheet on mount when requested by the opener
+  // (e.g. PostDeepLinkPage routing in from a notification tap).
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!openCommentsInitially) return;
+    if (posts.length === 0) return;
+    openComments();
+    consumeOpenCommentsInitially();
+  }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially]);
 
   // Body scroll lock
   useEffect(() => {
