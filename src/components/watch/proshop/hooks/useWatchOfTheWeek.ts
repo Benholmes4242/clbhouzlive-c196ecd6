@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { WatchMoodId } from './useWatchMood';
 
 export interface WatchOfTheWeek {
   post_id: string;
@@ -21,11 +22,17 @@ export interface WatchOfTheWeek {
   why_ai: string | null;
 }
 
-export function useWatchOfTheWeek() {
+export function useWatchOfTheWeek(
+  userId: string | undefined,
+  mood: WatchMoodId = 'for_you',
+) {
   return useQuery({
-    queryKey: ['watch-of-the-week'],
+    queryKey: ['watch-of-the-week', userId ?? null, mood],
     queryFn: async (): Promise<WatchOfTheWeek | null> => {
-      const { data, error } = await supabase.rpc('get_watch_of_the_week' as any);
+      const { data, error } = await supabase.rpc('get_watch_of_the_week' as any, {
+        p_user_id: userId ?? null,
+        p_mood: mood,
+      });
       if (error) {
         if (import.meta.env.DEV) {
           console.error('[useWatchOfTheWeek] error:', error);

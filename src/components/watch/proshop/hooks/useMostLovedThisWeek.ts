@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { WatchMoodId } from './useWatchMood';
 
 export interface MostLovedRow {
   post_id: string;
@@ -21,13 +22,22 @@ export interface MostLovedRow {
   engagement_score: number;
 }
 
-export function useMostLovedThisWeek(limit = 12) {
+export function useMostLovedThisWeek(
+  limit = 12,
+  userId: string | undefined = undefined,
+  mood: WatchMoodId = 'for_you',
+) {
   return useQuery({
-    queryKey: ['watch-most-loved-this-week', limit],
+    queryKey: ['watch-most-loved-this-week', limit, userId ?? null, mood],
     queryFn: async (): Promise<MostLovedRow[]> => {
-      const { data, error } = await supabase.rpc('get_watch_most_loved_this_week' as any, {
-        p_limit: limit,
-      });
+      const { data, error } = await supabase.rpc(
+        'get_watch_most_loved_this_week' as any,
+        {
+          p_limit: limit,
+          p_user_id: userId ?? null,
+          p_mood: mood,
+        },
+      );
       if (error) {
         if (import.meta.env.DEV) {
           console.error('[useMostLovedThisWeek] error:', error);
