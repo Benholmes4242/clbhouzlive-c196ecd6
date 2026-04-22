@@ -2,7 +2,6 @@ import { memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { ExploreMoodId } from './hooks/useExploreMood';
-import echoIcon from '@/assets/echo-icon.png';
 
 /** Single source of truth for the Echo concierge amber ink colour. */
 const ECHO_AMBER_INK = '#B26910';
