@@ -17990,6 +17990,7 @@ export type Database = {
         Returns: string
       }
       trigger_push_queue_processing: { Args: never; Returns: undefined }
+      trigger_video_metadata_backfill: { Args: never; Returns: undefined }
       unaccent: { Args: { "": string }; Returns: string }
       unblock_user: { Args: { p_blocked_id: string }; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
