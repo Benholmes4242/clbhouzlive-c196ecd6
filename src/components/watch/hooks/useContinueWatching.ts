@@ -95,7 +95,10 @@ export function useContinueWatching(userId: string | undefined, limit = 10) {
         p_limit: limit,
       });
       if (error) {
-        console.error('[ContinueWatching] RPC error:', error);
+        if (import.meta.env.DEV) {
+          console.error('[ContinueWatching] RPC error:', error);
+          throw error;
+        }
         return [];
       }
       return ((data as ContinueWatchingRow[] | null) ?? []).map(rowToPost);

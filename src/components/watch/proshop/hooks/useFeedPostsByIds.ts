@@ -35,12 +35,13 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
           course_id,
           actor_type,
           actor_id,
-          post_media (
+          post_media!inner (
             id, media_type, media_url, hls_url, poster_url, stream_id,
-            width, height, duration_seconds, display_order
+            width, height, duration_seconds, display_order,
+            derived_format, processing_status
           ),
           user_profiles!posts_user_id_fkey (
-            username, display_name, avatar_url, is_verified
+            username, display_name, profile_photo_url, is_verified
           ),
           golf_courses (
             id, name
@@ -64,6 +65,9 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
         const course = post.golf_courses ?? {};
         if (media.length === 0) continue;
         for (const m of media) {
+          // Phase 4b: skip media that isn't ready for feeds
+          if (m.processing_status !== 'complete') continue;
+          if (!m.derived_format) continue;
           flatRows.push({
             post_id: post.id,
             post_user_id: post.user_id,
@@ -73,7 +77,7 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
             actor_id: post.actor_id ?? post.user_id,
             creator_username: profile.username ?? null,
             creator_display_name: profile.display_name ?? null,
-            creator_avatar_url: profile.avatar_url ?? null,
+            creator_avatar_url: profile.profile_photo_url ?? null,
             creator_is_verified: !!profile.is_verified,
             creator_relation: 'none',
             course_id: post.course_id ?? null,
@@ -81,7 +85,7 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
             media_id: m.id,
             media_type: m.media_type,
             media_url: m.media_url,
-            hls_url: m.hls_url,
+            hls_url: m.hls_url ?? m.media_url,
             poster_url: m.poster_url,
             stream_id: m.stream_id,
             width: m.width,
