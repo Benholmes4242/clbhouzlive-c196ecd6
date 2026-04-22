@@ -524,6 +524,65 @@ export function enforceCreatorDiversity<T extends { userId?: string; id?: string
   return result;
 }
 
+// ── Course Diversity Pass ─────────────────────────────────────────────────────
+// Hard guarantee: no more than MAX_CONSECUTIVE_SAME_COURSE posts in a row from
+// the same course. Mirrors enforceCreatorDiversity. Used by useWatchFeed to
+// prevent course-domination (e.g., 5 consecutive Royal County Down clips) on
+// Watch + Clips surfaces.
+const MAX_CONSECUTIVE_SAME_COURSE = 2;
+
+export function enforceCourseDiversity<T extends { courseId?: string; id?: string }>(
+  posts: T[]
+): T[] {
+  if (posts.length < MAX_CONSECUTIVE_SAME_COURSE + 1) return posts;
+  const result = [...posts];
+  let swaps = 0;
+
+  for (let i = MAX_CONSECUTIVE_SAME_COURSE; i < result.length; i++) {
+    const current = result[i];
+    if (!current?.courseId) continue;
+
+    // Check if this post would create a run of >MAX_CONSECUTIVE_SAME_COURSE
+    let runLength = 1;
+    for (let k = i - 1; k >= 0 && runLength <= MAX_CONSECUTIVE_SAME_COURSE; k--) {
+      if (result[k]?.courseId === current.courseId) runLength++;
+      else break;
+    }
+    if (runLength <= MAX_CONSECUTIVE_SAME_COURSE) continue;
+
+    // Find the next post with a different courseId (and that wouldn't itself
+    // create a run when swapped into position i).
+    let foundSwap = false;
+    for (let j = i + 1; j < result.length; j++) {
+      const candidate = result[j];
+      if (!candidate?.courseId) continue;
+      if (candidate.courseId === current.courseId) continue;
+      // Quick check: candidate's courseId must differ from result[i-1]
+      if (candidate.courseId === result[i - 1]?.courseId) continue;
+      [result[i], result[j]] = [result[j], result[i]];
+      foundSwap = true;
+      swaps++;
+      break;
+    }
+
+    if (!foundSwap) {
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[enforceCourseDiversity] Could not break course-run at index ${i} — ` +
+          `tail of feed lacks alternate courses. Stopping.`
+        );
+      }
+      break;
+    }
+  }
+
+  if (import.meta.env.DEV && swaps > 0) {
+    console.log(`[enforceCourseDiversity] performed ${swaps} swap(s) over ${posts.length} posts`);
+  }
+
+  return result;
+}
+
 // Legacy exports
 export { isReviewPost, isEditorialCard };
 export const interleaveReviews = buildFriendsFeed;
