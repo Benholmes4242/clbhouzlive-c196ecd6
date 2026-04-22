@@ -1,8 +1,10 @@
 import { memo } from 'react';
 import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useMostLovedThisWeek, type MostLovedRow } from './hooks/useMostLovedThisWeek';
+import { useWatchMood } from './hooks/useWatchMood';
 import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import { Pin } from './Pin';
@@ -57,7 +59,9 @@ function diversifyByCreator(rows: MostLovedRow[]): MostLovedRow[] {
 
 function MostLovedRailInner() {
   const navigate = useNavigate();
-  const { data: rowsRaw = [], isLoading } = useMostLovedThisWeek(12);
+  const { session } = useSupabaseSession();
+  const { mood } = useWatchMood();
+  const { data: rowsRaw = [], isLoading } = useMostLovedThisWeek(12, session?.user?.id, mood);
 
   if (isLoading || rowsRaw.length === 0) return null;
 

@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import { Play } from 'lucide-react';
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
+import { useWatchMood } from './hooks/useWatchMood';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
@@ -13,7 +15,9 @@ function formatDuration(seconds: number | null): string {
 }
 
 function WatchOfTheWeekHeroInner() {
-  const { data: pick, isLoading } = useWatchOfTheWeek();
+  const { session } = useSupabaseSession();
+  const { mood } = useWatchMood();
+  const { data: pick, isLoading } = useWatchOfTheWeek(session?.user?.id, mood);
 
   if (isLoading || !pick) return null;
 
