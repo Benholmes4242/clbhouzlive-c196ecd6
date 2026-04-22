@@ -392,6 +392,21 @@ export function SnapFeed({
     };
   }, [editorialCardKey, setIsTournamentCardActive]);
 
+  // Dev-only invariant: SnapFeed keys slides by post.id. Callers MUST pass a
+  // grouped-by-post array (apply groupMultiMedia upstream). If a duplicate id
+  // surfaces, surface it loudly so the buggy pipeline is fixed at its source
+  // rather than silently dropping media via a defensive dedup here.
+  if (process.env.NODE_ENV !== 'production') {
+    const ids = posts.map(p => p.id);
+    if (new Set(ids).size !== ids.length) {
+      // eslint-disable-next-line no-console
+      console.error(
+        '[SnapFeed] Ungrouped posts array received — caller must apply groupMultiMedia() before open(). Duplicate ids:',
+        ids,
+      );
+    }
+  }
+
   return (
     <div
       ref={containerRef}
