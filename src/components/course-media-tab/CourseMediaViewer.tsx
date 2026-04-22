@@ -25,16 +25,30 @@ import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
 
+interface CourseMediaViewerOpenOptions {
+  /** Pagination handoff — opener (typically a strip that owns a paginating
+   *  data hook) passes its current pagination signals so the viewer can ask
+   *  for more pages as the user nears the end. Optional; surfaces that don't
+   *  paginate fall through to `hasNextPage: false` (no behaviour change). */
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
+}
+
 interface CourseMediaViewerState {
   isOpen: boolean;
   posts: FeedPost[];
   startIndex: number;
   activeIndex: number;
   carouselPositions: Map<number, number>;
-  open: (posts: FeedPost[], startIndex?: number) => void;
+  hasNextPage: boolean;
+  fetchNextPage: (() => void) | null;
+  isFetchingNextPage: boolean;
+  open: (posts: FeedPost[], startIndex?: number, options?: CourseMediaViewerOpenOptions) => void;
   close: () => void;
   setActiveIndex: (idx: number) => void;
   setCarouselPosition: (feedIdx: number, mediaIdx: number) => void;
+  setPaginationState: (state: { hasNextPage: boolean; isFetchingNextPage: boolean }) => void;
 }
 
 export const useCourseMediaViewerStore = create<CourseMediaViewerState>((set) => ({
@@ -43,8 +57,28 @@ export const useCourseMediaViewerStore = create<CourseMediaViewerState>((set) =>
   startIndex: 0,
   activeIndex: 0,
   carouselPositions: new Map(),
-  open: (posts, startIndex = 0) => set({ isOpen: true, posts, startIndex, activeIndex: startIndex }),
-  close: () => set({ isOpen: false, posts: [], startIndex: 0, activeIndex: 0, carouselPositions: new Map() }),
+  hasNextPage: false,
+  fetchNextPage: null,
+  isFetchingNextPage: false,
+  open: (posts, startIndex = 0, options) => set({
+    isOpen: true,
+    posts,
+    startIndex,
+    activeIndex: startIndex,
+    hasNextPage: options?.hasNextPage ?? false,
+    fetchNextPage: options?.fetchNextPage ?? null,
+    isFetchingNextPage: options?.isFetchingNextPage ?? false,
+  }),
+  close: () => set({
+    isOpen: false,
+    posts: [],
+    startIndex: 0,
+    activeIndex: 0,
+    carouselPositions: new Map(),
+    hasNextPage: false,
+    fetchNextPage: null,
+    isFetchingNextPage: false,
+  }),
   setActiveIndex: (idx) => set({ activeIndex: idx }),
   setCarouselPosition: (feedIdx, mediaIdx) =>
     set((s) => {
@@ -52,6 +86,8 @@ export const useCourseMediaViewerStore = create<CourseMediaViewerState>((set) =>
       next.set(feedIdx, mediaIdx);
       return { carouselPositions: next };
     }),
+  setPaginationState: ({ hasNextPage, isFetchingNextPage }) =>
+    set({ hasNextPage, isFetchingNextPage }),
 }));
 
 // ── Component ──
