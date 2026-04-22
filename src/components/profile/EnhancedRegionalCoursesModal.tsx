@@ -380,8 +380,17 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
       );
     }
 
-    return sortCourses(filtered, sortBy);
-  }, [entered, allRegionCourses, effectiveSearch, sortBy]);
+    // Decorate each row with community_avg pulled from the separate
+    // communityRatings query (Record<course_id, number>). This wires the
+    // hybrid cascade's tier 4 (community avg) to real data instead of the
+    // non-existent golf_courses.average_rating column.
+    const decorated = filtered.map(c => ({
+      ...c,
+      community_avg: (communityRatings as Record<string, number>)[c.golf_courses?.id] ?? null,
+    }));
+
+    return sortCourses(decorated, sortBy);
+  }, [entered, allRegionCourses, effectiveSearch, sortBy, communityRatings]);
 
   const getSortLabel = (option: SortOption) => {
     switch (option) {
