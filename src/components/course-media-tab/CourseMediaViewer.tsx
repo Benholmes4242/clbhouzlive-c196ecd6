@@ -216,10 +216,14 @@ export function CourseMediaViewer() {
               <SnapFeed
                 posts={posts}
                 activeTab="foryou"
-                onNearEnd={() => {}}
+                onNearEnd={() => {
+                  if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
+                    fetchNextPage();
+                  }
+                }}
                 onRefresh={async () => {}}
-                isRefreshing={false}
-                hasNextPage={false}
+                isRefreshing={isFetchingNextPage}
+                hasNextPage={hasNextPage}
                 followOverrides={new Map()}
                 onFollowChange={() => {}}
                 startIndex={startIndex}
