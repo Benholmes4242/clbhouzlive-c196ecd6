@@ -16,7 +16,7 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
     <div
       className="relative"
       style={{
-        background: '#F5F1EA',
+        background: '#F8FAFC',
         borderBottom: '0.5px solid rgba(15,23,42,0.06)',
       }}
     >
@@ -62,7 +62,7 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
           width: 40,
-          background: 'linear-gradient(to right, rgba(245,241,234,0) 0%, #F5F1EA 100%)',
+          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
         }}
       />
     </div>
