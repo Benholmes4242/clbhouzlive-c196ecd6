@@ -15616,63 +15616,34 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
-      get_continue_watching:
-        | {
-            Args: { p_limit?: number; p_user_id: string }
-            Returns: {
-              comment_count: number
-              creator_avatar_url: string
-              creator_display_name: string
-              creator_is_verified: boolean
-              creator_username: string
-              display_order: number
-              duration_seconds: number
-              height: number
-              last_interaction_at: string
-              like_count: number
-              media_id: string
-              media_type: string
-              media_url: string
-              post_content: string
-              post_created_at: string
-              post_id: string
-              post_user_id: string
-              poster_url: string
-              progress_seconds: number
-              share_count: number
-              stream_id: string
-              total_seconds: number
-              width: number
-            }[]
-          }
-        | {
-            Args: { p_format?: string; p_limit?: number; p_user_id: string }
-            Returns: {
-              comment_count: number
-              creator_avatar_url: string
-              creator_display_name: string
-              creator_is_verified: boolean
-              creator_username: string
-              display_order: number
-              duration_seconds: number
-              height: number
-              last_interaction_at: string
-              like_count: number
-              media_id: string
-              media_type: string
-              media_url: string
-              post_content: string
-              post_created_at: string
-              post_id: string
-              post_user_id: string
-              poster_url: string
-              progress_seconds: number
-              share_count: number
-              stream_id: string
-              total_seconds: number
-              width: number
-            }[]
-          }
+      get_continue_watching: {
+        Args: { p_format?: string; p_limit?: number; p_user_id: string }
+        Returns: {
+          comment_count: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          height: number
+          last_interaction_at: string
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_user_id: string
+          poster_url: string
+          progress_seconds: number
+          share_count: number
+          stream_id: string
+          total_seconds: number
+          width: number
+        }[]
+      }
       get_conversation_last_senders: {
         Args: { p_conversation_ids: string[] }
         Returns: {
