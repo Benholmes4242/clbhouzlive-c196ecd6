@@ -21,7 +21,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
             Editorial pick
           </p>
         </div>
-        <div className="w-full h-[260px] sm:h-[290px] bg-muted animate-pulse rounded-[12px]" />
+        <div className="w-full bg-muted animate-pulse rounded-[12px]" style={{ aspectRatio: '16/10' }} />
       </section>
     );
   }
