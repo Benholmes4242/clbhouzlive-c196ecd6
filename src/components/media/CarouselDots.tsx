@@ -93,6 +93,8 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
           const d = Math.abs(i - safeActive);
           const size = d === 0 ? 8 : d === 1 ? 6 : d === 2 ? 5 : 4;
           const opacity = d === 0 ? 1 : d === 1 ? 0.8 : d === 2 ? 0.55 : 0.3;
+          // Instagram-style arch: outer dots sink downward
+          const translateY = d === 0 ? 0 : d === 1 ? 1 : d === 2 ? 2 : 3;
           return (
             <div
               key={i}
@@ -102,6 +104,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                 height: size,
                 background: 'rgba(255, 255, 255, 0.98)',
                 opacity,
+                transform: `translateY(${translateY}px)`,
                 boxShadow: d === 0 ? '0 1px 3px rgba(0,0,0,0.3)' : undefined,
               }}
             />
