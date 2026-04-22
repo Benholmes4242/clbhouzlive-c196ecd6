@@ -8,7 +8,7 @@ interface ExplorePassportProps {
 
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (
-    <div style={{ flex: 1, minWidth: 0, padding: '10px 4px', overflow: 'hidden' }}>
+    <div style={{ flex: 1, minWidth: 0, padding: '10px 4px', overflow: 'hidden', textAlign: 'center' }}>
       <div
         style={{
           fontSize: 'clamp(18px, 5vw, 22px)',

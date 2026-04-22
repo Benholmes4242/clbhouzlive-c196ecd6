@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { ExploreMoodId } from './hooks/useExploreMood';
+import echoIcon from '@/assets/echo-icon.png';
 
 /** Single source of truth for the Echo concierge amber ink colour. */
 const ECHO_AMBER_INK = '#B26910';
@@ -156,16 +157,17 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
             height: 34,
             borderRadius: '50%',
             background: '#F7931E',
-            color: '#FFFFFF',
-            fontSize: 14,
-            fontWeight: 500,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            letterSpacing: '-0.01em',
+            overflow: 'hidden',
           }}
         >
-          E
+          <img
+            src={echoIcon}
+            alt=""
+            style={{ width: 22, height: 22, objectFit: 'contain' }}
+          />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p
