@@ -1,8 +1,8 @@
 import { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { MdOutlineStarOutline } from 'react-icons/md';
 import { supabase } from '@/integrations/supabase/client';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
 interface TrendingCourse {
   course_id: string;
@@ -74,7 +74,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
               </p>
               {course.review_count > 0 && (
                 <span className="flex items-center gap-0.5 text-[10px] font-semibold text-amber-600 mt-0.5">
-                  <MdOutlineStarOutline className="w-3 h-3" />
+                  <img src={clbhouzLogo} alt="" className="w-3 h-3 object-contain" />
                   {course.review_count} {course.review_count === 1 ? 'review' : 'reviews'}
                 </span>
               )}
