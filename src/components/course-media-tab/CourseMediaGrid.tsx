@@ -69,15 +69,16 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Sync new posts into fullscreen overlay
+  // Sync new posts into fullscreen overlay — use the grouped shape so
+  // SnapFeed receives unique post.id keys (matches the canonical invariant).
   const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
-    if (posts.length > 0) {
-      appendPosts(posts);
+    if (fullscreenPosts.length > 0) {
+      appendPosts(fullscreenPosts);
     }
-  }, [posts.length, isFullscreenOpen, appendPosts]);
+  }, [fullscreenPosts.length, isFullscreenOpen, appendPosts, fullscreenPosts]);
 
   if (isLoading) return <CourseMediaGridSkeleton />;
 
