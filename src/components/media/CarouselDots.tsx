@@ -142,7 +142,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
         <div
           style={{
             width: viewportWidth,
-            height: 8,
+            height: MAX_DOT,
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
@@ -161,23 +161,23 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
               const slot = i - windowStart;
               const inWindow = slot >= 0 && slot < WINDOW_SIZE;
 
-              let baseSize = 4;
+              let baseSize = 3;
               let baseOpacity = 0;
               if (inWindow) {
                 if (slot === 2) {
-                  baseSize = 8;
+                  baseSize = 6;
                   baseOpacity = 1;
                 } else if (slot === 1 || slot === 3) {
-                  baseSize = 6;
+                  baseSize = 5;
                   baseOpacity = 0.8;
                 } else {
-                  baseSize = 4;
+                  baseSize = 3;
                   baseOpacity = 0.4;
                 }
               }
 
               const isActive = i === safeActive;
-              const size = isActive ? 8 : baseSize;
+              const size = isActive ? 6 : baseSize;
               const opacity = isActive ? 1 : baseOpacity;
 
               return (
@@ -187,7 +187,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                   style={{
                     flex: `0 0 ${SLOT_PITCH - GAP}px`,
                     width: SLOT_PITCH - GAP,
-                    height: 8,
+                    height: MAX_DOT,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
