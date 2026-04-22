@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 export const EXPLORE_MOODS = [
   { id: 'foryou', label: 'For You', emoji: '✨' },
-  { id: 'weekend', label: 'Weekend', emoji: '🚗' },
+  { id: 'weekend', label: 'Near me', emoji: '📍' },
   { id: 'friends', label: 'Friends Played', emoji: '👥' },
   { id: 'hidden', label: 'Hidden Gems', emoji: '💎' },
   { id: 'bucket', label: 'Bucket List', emoji: '🏆' },
