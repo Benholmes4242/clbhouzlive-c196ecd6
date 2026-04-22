@@ -169,10 +169,6 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
       {/* Title row */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-1.5 mb-1">
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Achievements</span>
-          </div>
           <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>
             Achievements
           </h2>
