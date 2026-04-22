@@ -186,6 +186,7 @@ export function CourseMediaViewer() {
                 startIndex={startIndex}
                 onActiveIndexChange={setActiveIndex}
                 activeIndexOverride={activeIndex}
+                isFullscreen
               />
 
               {/* Shared overlay system — readOnly hides interactive controls */}
