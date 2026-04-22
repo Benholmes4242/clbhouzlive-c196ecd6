@@ -1,3 +1,9 @@
+/**
+ * @deprecated Phase 1 — use the Watch tab inside `/discover` instead. The
+ * standalone `/watch` route already redirects to the Discover surface
+ * (see App.tsx). This file is kept temporarily for reference and will be
+ * removed once we confirm no callers reach it.
+ */
 import React, { useState, useRef, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WatchHeader from '@/components/watch/WatchHeader';
