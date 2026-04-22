@@ -104,6 +104,9 @@ export function CourseMediaViewer() {
     activeIndex,
     setActiveIndex,
   } = useCourseMediaViewerStore();
+  const hasNextPage = useCourseMediaViewerStore(s => s.hasNextPage);
+  const fetchNextPage = useCourseMediaViewerStore(s => s.fetchNextPage);
+  const isFetchingNextPage = useCourseMediaViewerStore(s => s.isFetchingNextPage);
 
   const activePost: FeedPost | null = posts[activeIndex] ?? null;
   const isReview = !!(activePost?.isReview && activePost?.review);
