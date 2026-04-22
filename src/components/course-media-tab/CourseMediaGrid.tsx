@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { AlertCircle, Camera, Loader2 } from 'lucide-react';
@@ -71,7 +71,9 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
 
   // Sync new posts into fullscreen overlay — use the grouped shape so
   // SnapFeed receives unique post.id keys (matches the canonical invariant).
-  const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
+  const isFullscreenOpen = useFullscreenFeedStore(s => s.isOpen);
+  const appendPosts = useFullscreenFeedStore(s => s.appendPosts);
+  const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
@@ -79,6 +81,28 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       appendPosts(fullscreenPosts);
     }
   }, [fullscreenPosts.length, isFullscreenOpen, appendPosts, fullscreenPosts]);
+
+  // Mirror the hook's pagination state into the store so the overlay's
+  // SnapFeed sees fresh hasNextPage / isFetchingNextPage values reactively
+  // (not just the snapshot taken at .open() time).
+  useEffect(() => {
+    if (!isFullscreenOpen) return;
+    setPaginationState({
+      hasNextPage: hasNextPage ?? false,
+      isFetchingNextPage: isFetchingNextPage ?? false,
+    });
+  }, [isFullscreenOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
+
+  // Single open-fullscreen entrypoint — wraps the store call with the current
+  // pagination callbacks so the overlay can drive `fetchNextPage` itself.
+  const handleOpenFullscreen = useCallback((postsToOpen: FeedPost[], index: number) => {
+    useFullscreenFeedStore.getState().open(postsToOpen, index, {
+      hasNextPage: hasNextPage ?? false,
+      fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
+      isFetchingNextPage: isFetchingNextPage ?? false,
+    });
+  }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
+
 
   if (isLoading) return <CourseMediaGridSkeleton />;
 
