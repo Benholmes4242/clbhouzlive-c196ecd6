@@ -99,7 +99,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
           </span>
           {Array.from({ length: count }).map((_, i) => {
             const d = Math.abs(i - safeActive);
-            const size = d === 0 ? 5 : d === 1 ? 4 : 3;
+            const size = d === 0 ? 5 : d === 1 ? 5 : 3;
             const opacity = d === 0 ? 1 : d === 1 ? 0.8 : 0.4;
             return (
               <div
@@ -175,7 +175,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                   size = 5;
                   opacity = 1;
                 } else if (slotDist === 1) {
-                  size = 4;
+                  size = 5;
                   opacity = 0.8;
                 } else {
                   size = 3;
