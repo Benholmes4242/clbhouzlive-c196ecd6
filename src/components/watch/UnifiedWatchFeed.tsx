@@ -109,6 +109,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         <WatchSectionHeader
           eyebrow="Shorts"
           title="More clips"
+          onSeeAll={() => navigate('/watch/clips')}
           paddingTop={4}
         />
 
