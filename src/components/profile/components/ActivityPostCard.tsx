@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { ActivityPost } from '../types/ActivityTypes';
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play, ChevronLeft, ChevronRight, Star, MapPin } from 'lucide-react';
-import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import { CarouselDots } from '@/components/media/CarouselDots';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { getStreamPoster } from '@/utils/stream';
@@ -169,10 +169,16 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
           )}
 
           {hasMultipleMedia && (
-            <MediaNavigationDots
-              mediaCount={post.post_media.length}
-              currentIndex={currentMediaIndex}
-            />
+            <div
+              className="absolute pointer-events-none"
+              style={{ top: 8, right: 8, zIndex: 25, minWidth: 60 }}
+            >
+              <CarouselDots
+                count={post.post_media.length}
+                active={currentMediaIndex}
+                variant="elongated"
+              />
+            </div>
           )}
         </>
       ) : (

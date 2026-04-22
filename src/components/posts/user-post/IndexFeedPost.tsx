@@ -8,7 +8,7 @@ import { UserPostData, GolfCourse } from './types';
 import { UserInfoOverlay } from './overlays/UserInfoOverlay';
 import { CaptionOverlay } from './overlays/CaptionOverlay';
 import { InteractionIconsOverlay } from './overlays/InteractionIconsOverlay';
-import { MediaNavigationDots } from './overlays/MediaNavigationDots';
+import { CarouselDots } from '@/components/media/CarouselDots';
 import { MediaContainer } from './MediaContainer';
 
 
@@ -210,10 +210,18 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           currentMediaType={currentMediaMemo?.media_type}
         />
 
-        <MediaNavigationDots
-          mediaCount={post.post_media.length}
-          currentIndex={currentMediaIndex}
-        />
+        {post.post_media.length > 1 && (
+          <div
+            className="absolute pointer-events-none"
+            style={{ top: 8, right: 8, zIndex: 25, minWidth: 60 }}
+          >
+            <CarouselDots
+              count={post.post_media.length}
+              active={currentMediaIndex}
+              variant="elongated"
+            />
+          </div>
+        )}
       </MediaContainer>
     </div>
   );

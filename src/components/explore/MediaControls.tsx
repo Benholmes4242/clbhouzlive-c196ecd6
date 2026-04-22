@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
-import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import { CarouselDots } from '@/components/media/CarouselDots';
 
 interface MediaControlsProps {
   hasMultipleMedia: boolean;
@@ -33,11 +33,17 @@ const MediaControls: React.FC<MediaControlsProps> = ({
 
   return (
     <div {...swipeHandlers} className="absolute inset-0">
-      {/* Navigation Dots - Bottom Center */}
-      <MediaNavigationDots
-        mediaCount={mediaCount}
-        currentIndex={currentIndex}
-      />
+      {/* Carousel dots — top-right */}
+      <div
+        className="absolute pointer-events-none"
+        style={{ top: 8, right: 8, zIndex: 25, minWidth: 60 }}
+      >
+        <CarouselDots
+          count={mediaCount}
+          active={currentIndex}
+          variant="elongated"
+        />
+      </div>
 
       {/* Navigation Arrows */}
       {((!isMobile && isHovered) || isMobile) && (
