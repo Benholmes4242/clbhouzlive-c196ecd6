@@ -15,10 +15,9 @@ const MAX_DURATION = 30; // Lightning Round = ≤30s
  * with the rest of the Clips surface.
  */
 export function useLightningRound(userId: string | undefined, mood: ClipsMoodId) {
-  // Map clips moods to underlying RPC mode/filters.
-  // 'trending' / 'for_you' → trending sort; 'friends' & 'your_courses' rely on
-  // client-side personal re-rank in the consuming hook.
-  const rpcMode = mood === 'trending' ? 'trending' : 'trending';
+  // Phase 4b: broken ternary fixed. 'trending' chip gets engagement-sorted,
+  // all other moods get personalised 'for_you' within the 30s duration cap.
+  const rpcMode = mood === 'trending' ? 'trending' : 'for_you';
 
   return useQuery({
     queryKey: ['clips-lightning-round', userId ?? null, mood],
