@@ -1112,8 +1112,21 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
       let height: number | null = null;
       let aspectRatioVal: number | null = null;
       let orientation: string | null = null;
+      let clientDuration: number | null = null;
 
       if (file.type.startsWith('video/')) {
+        // Measure dimensions/duration BEFORE upload so retry rows aren't left
+        // with NULL duration_seconds/duration_ms (matches Task A on the
+        // primary insert path).
+        const videoDims = await measureVideoDimensions(file);
+        if (videoDims.width && videoDims.height) {
+          width = videoDims.width;
+          height = videoDims.height;
+          aspectRatioVal = videoDims.aspectRatio;
+          orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
+        }
+        clientDuration = videoDims.duration;
+
         const speedTracker = new UploadSpeedTracker();
         const result = await new Promise<{ streamId: string }>((resolve, reject) => {
           uploadVideoWithTus({
