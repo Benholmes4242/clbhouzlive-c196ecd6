@@ -39,7 +39,7 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
         overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#0F172A' }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#F8FAFC' }}>
         {rec.hero_image_url ? (
           <img
             src={rec.hero_image_url}
