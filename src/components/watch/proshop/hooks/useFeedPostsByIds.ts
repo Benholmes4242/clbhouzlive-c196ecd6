@@ -4,16 +4,14 @@ import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/uti
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 /**
- * Fetch a fixed set of posts by ID using the canonical get_watch_shorts RPC
- * with mode='by_ids'. If that mode isn't supported by the RPC, falls back
- * to fetching nothing (rail will hide). The course-anchored rail uses this
- * to render real WatchTile components from the IDs returned by
- * get_user_course_anchored_content.
+ * Fetch a fixed set of posts by ID for the course-anchored rail.
  *
- * Implementation note: rather than add yet another RPC, we just query the
- * underlying posts + post_media + user_profiles via PostgREST directly and
- * map them into the FeedPost shape. This avoids needing a new SECURITY
- * DEFINER function and respects existing RLS on posts.
+ * Implementation: queries posts + post_media via PostgREST embed (FK exists),
+ * then fetches user_profiles and golf_courses in parallel via separate
+ * queries. We avoid PostgREST embeds for those two tables because no FK
+ * constraint is declared on posts.user_id / posts.course_id, which would
+ * trigger PGRST200 ("Could not find a relationship") errors. Each query
+ * goes through the authenticated client so RLS policies apply individually.
  */
 export function useFeedPostsByIds(postIds: string[] | undefined, userId: string | undefined) {
   return useQuery({
@@ -22,7 +20,6 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
     queryFn: async (): Promise<FeedPost[]> => {
       if (!postIds || postIds.length === 0) return [];
 
-      // Fetch posts with embedded media + creator profile.
       const { data: rows, error } = await supabase
         .from('posts')
         .select(`
@@ -39,30 +36,65 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
             id, media_type, media_url, hls_url, poster_url, stream_id,
             width, height, duration_seconds, display_order,
             derived_format, processing_status
-          ),
-          user_profiles!posts_user_id_fkey (
-            username, display_name, profile_photo_url, is_verified
-          ),
-          golf_courses (
-            id, name
           )
         `)
         .in('id', postIds)
         .eq('status', 'published');
 
       if (error) {
-        if (import.meta.env.DEV) console.error('[useFeedPostsByIds] error:', error);
+        if (import.meta.env.DEV) console.error('[useFeedPostsByIds] posts error:', error);
         return [];
       }
 
-      // Adapt the nested PostgREST shape into the flat FeedRpcRow shape the
-      // mapper expects. One row per (post, media) pair so groupMultiMedia
-      // can collapse them.
+      const postRows = (rows as any[]) ?? [];
+      if (postRows.length === 0) return [];
+
+      const userIds = Array.from(
+        new Set(postRows.map((p) => p.user_id).filter(Boolean) as string[])
+      );
+      const courseIds = Array.from(
+        new Set(postRows.map((p) => p.course_id).filter(Boolean) as string[])
+      );
+
+      // Fetch profiles + courses in parallel. Empty-input cases short-circuit
+      // to a resolved empty result so the mapping path is uniform.
+      const [profilesRes, coursesRes] = await Promise.all([
+        userIds.length > 0
+          ? supabase
+              .from('user_profiles')
+              .select('id, username, display_name, profile_photo_url, is_verified')
+              .in('id', userIds)
+          : Promise.resolve({ data: [] as any[], error: null }),
+        courseIds.length > 0
+          ? supabase
+              .from('golf_courses')
+              .select('id, name')
+              .in('id', courseIds)
+          : Promise.resolve({ data: [] as any[], error: null }),
+      ]);
+
+      if (profilesRes.error && import.meta.env.DEV) {
+        console.error('[useFeedPostsByIds] profiles error:', profilesRes.error);
+      }
+      if (coursesRes.error && import.meta.env.DEV) {
+        console.error('[useFeedPostsByIds] courses error:', coursesRes.error);
+      }
+
+      const profileMap = new Map<string, any>();
+      for (const p of (profilesRes.data as any[]) ?? []) {
+        if (p?.id) profileMap.set(p.id, p);
+      }
+      const courseMap = new Map<string, any>();
+      for (const c of (coursesRes.data as any[]) ?? []) {
+        if (c?.id) courseMap.set(c.id, c);
+      }
+
+      // One row per (post, media) pair so groupMultiMedia can collapse them.
       const flatRows: FeedRpcRow[] = [];
-      for (const post of (rows as any[]) ?? []) {
+      for (const post of postRows) {
         const media: any[] = post.post_media ?? [];
-        const profile = post.user_profiles ?? {};
-        const course = post.golf_courses ?? {};
+        const profile = profileMap.get(post.user_id) ?? {};
+        const course = post.course_id ? courseMap.get(post.course_id) ?? {} : {};
         if (media.length === 0) continue;
         for (const m of media) {
           // Phase 4b: skip media that isn't ready for feeds
