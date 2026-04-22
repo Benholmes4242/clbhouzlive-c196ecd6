@@ -23,7 +23,8 @@ export function useUserPassport(userId: string | undefined) {
         p_user_id: userId!,
       } as any);
       if (error) {
-        console.error('[useUserPassport] error', error);
+        console.error('[useUserPassport] RPC error:', error);
+        if (import.meta.env.DEV) throw error;
         return null;
       }
       const row = Array.isArray(data) ? data[0] : null;

@@ -28,7 +28,8 @@ export function useExploreHero(userId: string | undefined, mood: ExploreMoodId) 
         p_mood: mood,
       } as any);
       if (error) {
-        console.error('[useExploreHero] error', error);
+        console.error('[useExploreHero] RPC error:', error);
+        if (import.meta.env.DEV) throw error;
         return null;
       }
       const row = Array.isArray(data) ? data[0] : null;

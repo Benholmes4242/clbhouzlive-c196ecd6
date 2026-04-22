@@ -170,7 +170,26 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     );
   }
 
-  if (recs.length === 0) return null;
+  if (recs.length === 0) {
+    if (mood === 'friends') {
+      return (
+        <section style={{ padding: '24px 16px 0' }}>
+          <div style={{ padding: '0 0 12px' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#F7931E', margin: 0 }}>
+              From your friends
+            </p>
+            <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: '4px 0 0', lineHeight: 1.15 }}>
+              No friends' rounds yet
+            </h2>
+            <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
+              When the people you follow log a round, you'll see their recent courses here.
+            </p>
+          </div>
+        </section>
+      );
+    }
+    return null;
+  }
 
   const tier = recs[0]?.filter_tier;
   const tierLabel =

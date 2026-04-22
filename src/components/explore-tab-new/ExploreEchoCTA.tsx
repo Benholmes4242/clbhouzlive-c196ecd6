@@ -174,7 +174,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: '#B26910',
+              color: ECHO_AMBER_INK,
               margin: 0,
               lineHeight: 1,
             }}
@@ -210,7 +210,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
               background: '#FFFFFF',
               border: '1px solid rgba(247,147,30,0.3)',
               borderRadius: 12,
-              color: '#B26910',
+              color: ECHO_AMBER_INK,
               lineHeight: 1.2,
               whiteSpace: 'nowrap',
             }}

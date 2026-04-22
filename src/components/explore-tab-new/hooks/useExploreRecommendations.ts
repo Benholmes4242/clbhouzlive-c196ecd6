@@ -34,7 +34,8 @@ export function useExploreRecommendations(
         p_limit: limit,
       } as any);
       if (error) {
-        console.error('[useExploreRecommendations] error', error);
+        console.error('[useExploreRecommendations] RPC error:', error);
+        if (import.meta.env.DEV) throw error;
         return [];
       }
       return (data ?? []) as ExploreRecRow[];
