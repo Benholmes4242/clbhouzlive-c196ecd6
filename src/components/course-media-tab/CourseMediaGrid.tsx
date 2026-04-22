@@ -9,6 +9,8 @@ import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
 
 interface CourseMediaGridProps {
   posts: FeedPost[];
+  /** Grouped-by-post array for fullscreen handoff. Falls back to `posts` if not provided. */
+  postsForFullscreen?: FeedPost[];
   isLoading: boolean;
   isError: boolean;
   hasNextPage: boolean;
@@ -35,6 +37,7 @@ function isLandscape(post: FeedPost): boolean {
 
 export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(({
   posts,
+  postsForFullscreen,
   isLoading,
   isError,
   hasNextPage,
@@ -44,6 +47,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   courseName,
   courseId,
 }, ref) => {
+  const fullscreenPosts = postsForFullscreen ?? posts;
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
