@@ -2,7 +2,8 @@ import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
-import { enforceCreatorDiversity } from '@/components/media-system/utils/feedAlgorithm';
+import { enforceCreatorDiversity, enforceCourseDiversity } from '@/components/media-system/utils/feedAlgorithm';
+import { useWatchPersonalSignals, computePersonalBoost } from './useWatchPersonalSignals';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 import type { WatchFilter } from '../types';
 
@@ -83,6 +84,8 @@ export function useWatchFeed({ userId, filter, category, searchQuery, userLat, u
     gcTime: 10 * 60 * 1000,
   });
 
+  const personalSignals = useWatchPersonalSignals(userId);
+
   const allPosts = useMemo(() => {
     const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
@@ -91,10 +94,35 @@ export function useWatchFeed({ userId, filter, category, searchQuery, userLat, u
       seen.add(p.id);
       return true;
     });
-    // Hard guarantee: no two consecutive posts from the same creator.
-    // Runs after dedup so we never trip over duplicate IDs.
-    return enforceCreatorDiversity(deduped);
-  }, [query.data]);
+
+    // Personalisation re-rank (lightweight, client-side).
+    // Skip when we have no signals yet (cold start) — preserve trending order.
+    const hasAnySignal =
+      personalSignals.playedCourseIds.size > 0 ||
+      personalSignals.wantToPlayCourseIds.size > 0 ||
+      personalSignals.followingUserIds.size > 0;
+
+    let ordered = deduped;
+    if (hasAnySignal) {
+      // Stable sort: tie-break by original index so trending order is
+      // preserved when nothing personalises a pair of posts.
+      const withIdx = deduped.map((post, idx) => ({
+        post,
+        idx,
+        boost: computePersonalBoost(post, personalSignals),
+      }));
+      withIdx.sort((a, b) => {
+        if (b.boost !== a.boost) return b.boost - a.boost;
+        return a.idx - b.idx;
+      });
+      ordered = withIdx.map(x => x.post);
+    }
+
+    // Diversity passes run AFTER personal re-rank so adjacency rules apply
+    // to the final ordering the user actually sees.
+    const creatorDiverse = enforceCreatorDiversity(ordered);
+    return enforceCourseDiversity(creatorDiverse);
+  }, [query.data, personalSignals]);
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];
