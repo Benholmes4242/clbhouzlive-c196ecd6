@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -8,7 +7,8 @@ import { useWatchMood } from './hooks/useWatchMood';
 import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import { Pin } from './Pin';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CreatorChip } from './CreatorChip';
+import { PlayAffordance } from './PlayAffordance';
 
 function rowToFullscreenPost(row: MostLovedRow) {
   return {
