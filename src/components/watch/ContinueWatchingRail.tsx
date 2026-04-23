@@ -158,6 +158,7 @@ function ContinueWatchingTile({
               fontSize: 11,
               fontWeight: 600,
               color: 'white',
+              lineHeight: 1,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
