@@ -900,10 +900,10 @@ function CommentsSheet({
                         <button
                           key={liker.userId}
                           type="button"
-                          // TODO Phase B: route business likers to their business profile.
-                          // Currently `liker` only carries userId — needs actor_type/actor_id
-                          // plumbed through usePostLikes before this can branch correctly.
-                          onClick={() => { navigate(`/profile/${liker.userId}`); onClose(); }}
+                          onClick={() => {
+                            navigate(getActorRouteByType(liker.actorType, liker.actorId ?? liker.userId));
+                            onClose();
+                          }}
                           className="flex items-center gap-3 w-full px-4 py-3 min-h-[60px] text-left transition-colors hover:bg-[rgba(15,23,42,0.02)]"
                         >
                           <SquircleAvatar
