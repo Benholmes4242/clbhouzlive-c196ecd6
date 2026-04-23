@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Film, Play } from 'lucide-react';
+import { Film, Heart, MessageCircle, Play } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
@@ -121,7 +121,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
     <div
       ref={tileRef}
       data-watch-index={index}
-      className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer select-none"
+      className="relative aspect-[4/5] overflow-hidden rounded-[12px] cursor-pointer select-none"
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -251,33 +251,28 @@ const WatchTile: React.FC<WatchTileProps> = ({
         </button>
       )}
 
-      {/* Engagement stats — bottom-right (likes always, comments if > 0) */}
+      {/* Engagement stats — bottom-right (likes always, comments if > 0).
+          Canonical: Lucide Heart + MessageCircle in brand amber, no pill,
+          text-shadow handles legibility on busy thumbnails. Mirrors
+          WatchRailTile so portrait tiles read identically across surfaces. */}
       <div
-        className="absolute z-10 flex flex-col items-end gap-[3px]"
-        style={{ bottom: 6, right: 6 }}
+        className="absolute z-10 flex flex-col items-end gap-1"
+        style={{
+          bottom: 8,
+          right: 8,
+          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+        }}
       >
-        <div
-          className="rounded-[4px] flex items-center gap-[3px]"
-          style={{
-            background: 'rgba(0,0,0,0.55)',
-            padding: '2px 5px',
-          }}
-        >
-          <span style={{ fontSize: 10, lineHeight: 1 }}>🧡</span>
-          <span className="text-[11px] font-medium text-white">
+        <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.95)' }}>
+          <Heart size={12} strokeWidth={1.8} style={{ color: '#F7931E', fill: '#F7931E' }} />
+          <span className="text-[11px] font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
             {abbreviateCount(likeCount)}
           </span>
         </div>
         {commentCount > 0 && (
-          <div
-            className="rounded-[4px] flex items-center gap-[3px]"
-            style={{
-              background: 'rgba(0,0,0,0.55)',
-              padding: '2px 5px',
-            }}
-          >
-            <span style={{ fontSize: 10, lineHeight: 1 }}>💬</span>
-            <span className="text-[11px] font-medium text-white">
+          <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.95)' }}>
+            <MessageCircle size={12} strokeWidth={1.8} style={{ color: '#F7931E' }} />
+            <span className="text-[11px] font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {abbreviateCount(commentCount)}
             </span>
           </div>
