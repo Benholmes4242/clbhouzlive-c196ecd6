@@ -5,7 +5,8 @@ import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — divider ownership now lives in
 // the page composition (UnifiedWatchFeed); rails no longer render their own.
 import { HRail } from './proshop/HRail';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CreatorChip } from './proshop/CreatorChip';
+import { PlayAffordance } from './proshop/PlayAffordance';
 
 interface ContinueWatchingRailProps {
   userId: string | undefined;
