@@ -91,7 +91,7 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
   };
 
   return (
-    <article style={{ padding: '0 16px 18px' }}>
+    <article style={{ padding: '0 0 18px' }}>
       <button
         type="button"
         onClick={handleTap}
@@ -104,7 +104,7 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 12,
+          borderRadius: 0,
           overflow: 'hidden',
           background: 'transparent',
           border: 'none',
