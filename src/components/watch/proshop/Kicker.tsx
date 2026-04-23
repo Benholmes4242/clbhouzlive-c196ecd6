@@ -5,8 +5,10 @@ interface KickerProps {
   color?: 'amber' | 'emerald' | 'slate';
 }
 
+// Phase 5f: amber → primary token (exact match: --primary 31 93% 54% = #F7931E).
+// Emerald + slate kept as hex — no matching design token exists.
 const COLOR_MAP: Record<NonNullable<KickerProps['color']>, string> = {
-  amber: '#F7931E',
+  amber: 'hsl(var(--primary))',
   emerald: '#006747',
   slate: '#0F172A',
 };

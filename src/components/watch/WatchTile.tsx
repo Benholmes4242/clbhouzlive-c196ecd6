@@ -264,14 +264,14 @@ const WatchTile: React.FC<WatchTileProps> = ({
         }}
       >
         <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.95)' }}>
-          <Heart size={12} strokeWidth={1.8} style={{ color: '#F7931E', fill: '#F7931E' }} />
+          <Heart size={12} strokeWidth={1.8} style={{ color: 'hsl(var(--primary))', fill: 'hsl(var(--primary))' }} />
           <span className="text-[11px] font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
             {abbreviateCount(likeCount)}
           </span>
         </div>
         {commentCount > 0 && (
           <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.95)' }}>
-            <MessageCircle size={12} strokeWidth={1.8} style={{ color: '#F7931E' }} />
+            <MessageCircle size={12} strokeWidth={1.8} style={{ color: 'hsl(var(--primary))' }} />
             <span className="text-[11px] font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {abbreviateCount(commentCount)}
             </span>

@@ -101,7 +101,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
   return (
     <WatchActionsProvider>
-    <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
+    <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
       <LongPressTipBanner />
 
       {/* ── Pro Shop: mood chips at the top of the Watch tab ── */}
@@ -124,8 +124,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Pro Shop: Most loved this week ── */}
       <MostLovedRail />
 
-      {/* ── Section 3: More clips — chips + grid ── */}
-      <div>
+      {/* ── Section 3: More clips — chips + grid ──
+          Phase 5g: explicit 24px paddingBottom guarantees clearance from
+          the bottom nav even when PageRoot is bypassed. */}
+      <div style={{ paddingBottom: 24 }}>
         <WatchSectionHeader
           eyebrow="Browse"
           title="More to explore"
