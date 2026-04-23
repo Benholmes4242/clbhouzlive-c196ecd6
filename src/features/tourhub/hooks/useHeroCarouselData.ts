@@ -107,7 +107,11 @@ export function useHeroCarouselData() {
               .from('sr_leaderboards')
               .select(`
                 tournament_id, position, score,
-                player:sr_players!inner(sr_id, first_name, last_name, photo_url, pga_tour_id)
+                player:sr_players!sr_leaderboards_player_id_fkey(sr_id, first_name, last_name, photo_url, pga_tour_id),
+                team:sr_teams!sr_leaderboards_team_id_fkey(
+                  sr_id, display_name, abbr_name,
+                  members:sr_team_players(position_in_team, player:sr_players!sr_team_players_player_id_fkey(sr_id, first_name, last_name, photo_url))
+                )
               `)
               .in('tournament_id', allTournamentIds)
               .gt('strokes', 0)
@@ -142,14 +146,35 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Build leaderboard map
+      // Build leaderboard map — synthesize a player-shaped object from team data when needed
       const leaderboardMap: Record<string, { score: number | null; player: any }> = {};
       (leaderboardResult.data || []).forEach((entry: any) => {
-        if (entry.player) {
-          leaderboardMap[entry.tournament_id] = {
-            score: entry.score,
-            player: entry.player,
+        let player = entry.player;
+        if (!player && entry.team) {
+          // Team event: synthesize a "player" object so downstream renders show the team name
+          const members = (entry.team.members || [])
+            .filter((m: any) => m.player)
+            .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+          const primary = members[0]?.player;
+          const teamName = entry.team.abbr_name || entry.team.display_name || '';
+          const parts = teamName.split(' / ');
+          player = {
+            sr_id: entry.team.sr_id,
+            first_name: '',
+            last_name: teamName,
+            full_name: teamName,
+            photo_url: primary?.photo_url ?? null,
+            pga_tour_id: null,
+            _isTeam: true,
+            _teamName: teamName,
+            _teamMembers: members.map((m: any) => ({
+              fullName: m.player.full_name || `${m.player.first_name || ''} ${m.player.last_name || ''}`.trim(),
+              photoUrl: m.player.photo_url,
+            })),
           };
+        }
+        if (player) {
+          leaderboardMap[entry.tournament_id] = { score: entry.score, player };
         }
       });
 
