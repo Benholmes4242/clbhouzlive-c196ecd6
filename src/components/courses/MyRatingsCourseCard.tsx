@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flag } from 'lucide-react';
+import { Flag, GripVertical } from 'lucide-react';
 import MyRatingsRing from './MyRatingsRing';
 import {
   getBreakdownSum,
@@ -34,6 +34,13 @@ interface Props {
   rank: number;
   onCourseClick: (courseId: string) => void;
   onAddBreakdown: (courseId: string) => void;
+  /** When provided, renders a drag-handle in the top-right corner. */
+  dragHandle?: {
+    listeners?: Record<string, unknown>;
+    attributes?: Record<string, unknown>;
+    setActivatorNodeRef?: (el: HTMLElement | null) => void;
+    isDragging?: boolean;
+  };
 }
 
 const formatDate = (iso: string): string => {
@@ -93,6 +100,7 @@ const MyRatingsCourseCard: React.FC<Props> = ({
   rank,
   onCourseClick,
   onAddBreakdown,
+  dragHandle,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -112,13 +120,44 @@ const MyRatingsCourseCard: React.FC<Props> = ({
   return (
     <div
       style={{
+        position: 'relative',
         background: '#FFFFFF',
         border: '0.5px solid #E2E8F0',
         borderRadius: 8,
         overflow: 'hidden',
         fontFamily: '"Geist", sans-serif',
+        boxShadow: dragHandle?.isDragging ? '0 8px 24px rgba(15,23,42,0.18)' : 'none',
       }}
     >
+      {dragHandle && (
+        <button
+          type="button"
+          ref={(el) => dragHandle.setActivatorNodeRef?.(el)}
+          {...(dragHandle.attributes ?? {})}
+          {...(dragHandle.listeners ?? {})}
+          aria-label="Drag to reorder"
+          style={{
+            position: 'absolute',
+            top: 6,
+            right: 6,
+            zIndex: 5,
+            width: 28,
+            height: 28,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(255,255,255,0.92)',
+            border: '0.5px solid #E2E8F0',
+            borderRadius: 6,
+            color: '#475569',
+            cursor: 'grab',
+            touchAction: 'none',
+            padding: 0,
+          }}
+        >
+          <GripVertical size={14} />
+        </button>
+      )}
       {/* TOP SECTION ~76px */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         {/* Image */}
