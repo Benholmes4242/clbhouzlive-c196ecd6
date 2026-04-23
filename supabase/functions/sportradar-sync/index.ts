@@ -618,9 +618,116 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
   }
 
   for (const entry of leaderboard) {
+    const isTeamEntry = Array.isArray(entry.players) && entry.players.length > 0;
+
+    if (isTeamEntry) {
+      // ═══ TEAM BRANCH ═══════════════════════════════════════
+      const teamSrId = entry.id;
+      if (!teamSrId) continue;
+
+      // 1. Upsert each team member into sr_players via their REAL sr_id
+      const memberPlayerIds: Array<{ id: string; position: number }> = [];
+      for (let i = 0; i < entry.players.length; i++) {
+        const member = entry.players[i];
+        if (!member?.id) continue;
+
+        let memberId: string | null = null;
+        const { data: existingMember } = await supabase
+          .from('sr_players').select('id').eq('sr_id', member.id).maybeSingle();
+
+        if (existingMember) {
+          memberId = existingMember.id;
+        } else {
+          const { data: newMember } = await supabase.from('sr_players').insert({
+            sr_id: member.id,
+            first_name: member.first_name,
+            last_name: member.last_name,
+            full_name: `${member.first_name || ''} ${member.last_name || ''}`.trim(),
+            abbr_name: member.abbr_name,
+            country: member.country,
+            raw_data: member,
+          }).select().single();
+          memberId = newMember?.id ?? null;
+        }
+        if (memberId) memberPlayerIds.push({ id: memberId, position: i + 1 });
+      }
+      if (memberPlayerIds.length === 0) continue;
+
+      // 2. Upsert the sr_teams row
+      let teamId: string | null = null;
+      const abbrName = buildAbbrName(entry.players);
+      const { data: existingTeam } = await supabase
+        .from('sr_teams').select('id').eq('sr_id', teamSrId).maybeSingle();
+
+      if (existingTeam) {
+        teamId = existingTeam.id;
+        await supabase.from('sr_teams').update({
+          tournament_id: tournament.id,
+          display_name: entry.name,
+          abbr_name: abbrName,
+          raw_data: entry,
+          updated_at: new Date().toISOString(),
+        }).eq('id', teamId);
+      } else {
+        const { data: newTeam } = await supabase.from('sr_teams').insert({
+          sr_id: teamSrId,
+          tournament_id: tournament.id,
+          display_name: entry.name,
+          abbr_name: abbrName,
+          raw_data: entry,
+        }).select().single();
+        teamId = newTeam?.id ?? null;
+      }
+      if (!teamId) continue;
+
+      // 3. Upsert sr_team_players rows
+      for (const { id: memberId, position } of memberPlayerIds) {
+        await supabase.from('sr_team_players').upsert({
+          team_id: teamId,
+          player_id: memberId,
+          position_in_team: position,
+        }, { onConflict: 'team_id,player_id' });
+      }
+
+      // 4. Upsert leaderboard row keyed by team_id (player_id MUST be null — XOR check)
+      const rounds = entry.rounds || [];
+      const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
+      const derivedThru = latestRound?.thru ?? entry.thru ?? null;
+      const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
+
+      const { error } = await supabase.from('sr_leaderboards').upsert({
+        tournament_id: tournament.id,
+        team_id: teamId,
+        player_id: null,
+        position: entry.position,
+        position_tied: entry.tied || false,
+        score: entry.score,
+        strokes: entry.strokes,
+        thru: derivedThru,
+        round_1: rounds[0]?.strokes,
+        round_2: rounds[1]?.strokes,
+        round_3: rounds[2]?.strokes,
+        round_4: rounds[3]?.strokes,
+        money: entry.money,
+        points: entry.points,
+        status: derivedStatus,
+        starting_score: entry.starting_score,
+        wins: entry.wins,
+        losses: entry.losses,
+        raw_data: entry,
+      }, { onConflict: 'tournament_id,team_id' });
+      if (error) {
+        console.error(`[syncLeaderboard team] Upsert error for team ${teamSrId}:`, error.message);
+      } else {
+        totalRecords++;
+      }
+      continue;
+    }
+
+    // ═══ SINGLE-PLAYER BRANCH (original logic, unchanged) ═══
     const player = entry.player || entry;
     const playerSrId = player.id || entry.id;
-    
+
     if (!playerSrId) continue;
 
     let playerId: string | null = null;
@@ -647,15 +754,14 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
 
     if (playerId) {
       const rounds = entry.rounds || [];
-      // Derive thru from the latest round's thru field (Sportradar puts thru per-round, not at entry level)
       const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
       const derivedThru = latestRound?.thru ?? entry.thru ?? null;
-      // Status is at entry level for WD/cut, default to 'active' if playing
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournament.id,
         player_id: playerId,
+        team_id: null,
         position: entry.position,
         position_tied: entry.tied || false,
         score: entry.score,
@@ -668,7 +774,6 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         money: entry.money,
         points: entry.points,
         status: derivedStatus,
-        // New fields
         starting_score: entry.starting_score,
         wins: entry.wins,
         losses: entry.losses,
