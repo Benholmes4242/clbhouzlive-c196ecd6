@@ -142,7 +142,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
             top: 6,
             left: '50%',
             transform: 'translateX(-50%)',
-            maxWidth: 'calc(100% - 88px)',
+            maxWidth: 'calc(100% - 24px)',
             zIndex: 10,
           }}
         >
