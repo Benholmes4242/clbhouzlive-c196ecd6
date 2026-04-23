@@ -3,8 +3,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import WatchSectionHeader from './WatchSectionHeader';
-import LatestVideoTile from './LatestVideoTile';
 import VideoFeedCard from './videos/VideoFeedCard';
+import { VideoRailTile } from './videos/VideoRailTile';
 import { HRail } from './proshop/HRail';
 
 /**
@@ -65,10 +65,11 @@ export default function LatestVideosRail() {
         <HRail paddingTop={20} paddingBottom={4}>
           {rail.map((post, i) => (
             <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-              <LatestVideoTile
+              <VideoRailTile
                 post={post}
                 index={i + 1}
                 allPosts={posts}
+                width={200}
               />
             </div>
           ))}
