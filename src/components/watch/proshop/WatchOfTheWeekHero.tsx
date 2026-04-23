@@ -76,7 +76,7 @@ function WatchOfTheWeekHeroInner() {
           aspectRatio: '16/10',
           borderRadius: 12,
           overflow: 'hidden',
-          background: '#0F172A',
+          background: 'transparent',
           border: 'none',
           padding: 0,
           marginTop: 6,
