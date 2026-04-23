@@ -49,7 +49,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: 'p
 
         if (likesError) throw likesError;
         if (!data || data.length === 0) return [] as PostLiker[];
-        likes = data;
+        likes = data as RawLike[];
       }
 
       // Dedupe by (actor_type, actor_id) when actor info present, otherwise by user_id.
