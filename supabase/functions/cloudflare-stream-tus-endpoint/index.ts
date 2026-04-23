@@ -13,59 +13,57 @@ interface TusEndpointRequest {
   metadata?: Record<string, string>;
 }
 
+function jsonResponse(status: number, body: Record<string, unknown>) {
+  console.log("Returning:", status, body);
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 serve(async (req) => {
-  // CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { status: 200, headers: corsHeaders });
   }
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse(405, { error: "Method not allowed" });
   }
 
   try {
     const accountId = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
     const streamToken = Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN");
+    const apiToken = Deno.env.get("CLOUDFLARE_API_TOKEN");
+
+    console.log("Env check:", {
+      hasAccountId: !!accountId,
+      hasStreamToken: !!streamToken,
+      hasApiToken: !!apiToken,
+    });
 
     if (!accountId || !streamToken) {
-      return new Response(
-        JSON.stringify({ error: "Missing Cloudflare credentials" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+      return jsonResponse(500, { error: "Missing Cloudflare credentials" });
     }
 
     const body: TusEndpointRequest = await req.json();
+    console.log("[TUS] Request body:", body);
+
     const { fileName, fileSizeBytes, maxDurationSeconds = 3600, metadata = {} } = body;
 
     if (!fileName || !fileSizeBytes) {
-      return new Response(
-        JSON.stringify({ error: "Missing fileName or fileSizeBytes" }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+      return jsonResponse(400, { error: "Missing fileName or fileSizeBytes" });
     }
 
     console.log(
       `🎬 [TUS] Creating TUS upload for: ${fileName} (${Math.round(fileSizeBytes / 1024 / 1024)}MB)`
     );
 
-    // Encode metadata as base64 for TUS protocol
     const encodedMetadata = encodeMetadata({
       name: fileName,
       maxDurationSeconds: maxDurationSeconds.toString(),
       ...metadata,
     });
 
-    // Request TUS upload URL from Cloudflare Stream
-    // Using the direct_user endpoint with TUS headers
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream?direct_user=true`,
       {
@@ -79,59 +77,34 @@ serve(async (req) => {
       }
     );
 
-    // For TUS, Cloudflare returns the upload URL in the Location header
     const uploadUrl = response.headers.get("Location");
     const streamMediaId = response.headers.get("stream-media-id");
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error("❌ [TUS] Cloudflare error:", response.status, errorText);
-      
-      return new Response(
-        JSON.stringify({
-          error: `Cloudflare TUS error: ${response.status}`,
-          details: errorText,
-        }),
-        {
-          status: response.status,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+
+      return jsonResponse(response.status, {
+        error: `Cloudflare TUS error: ${response.status}`,
+        details: errorText,
+      });
     }
 
     if (!uploadUrl) {
       console.error("❌ [TUS] No Location header in response");
-      return new Response(
-        JSON.stringify({ error: "No upload URL returned from Cloudflare" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+      return jsonResponse(500, { error: "No upload URL returned from Cloudflare" });
     }
 
     console.log(`✅ [TUS] Upload URL created. streamId: ${streamMediaId}`);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        uploadUrl,
-        streamId: streamMediaId,
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    return jsonResponse(200, {
+      success: true,
+      uploadUrl,
+      streamId: streamMediaId,
+    });
   } catch (error) {
     console.error("❌ [TUS] Error:", error);
-    return new Response(
-      JSON.stringify({ error: normalizeError(error).message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    return jsonResponse(500, { error: normalizeError(error).message });
   }
 });
 
