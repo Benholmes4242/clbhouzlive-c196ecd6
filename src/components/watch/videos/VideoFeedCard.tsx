@@ -1,6 +1,6 @@
 import { memo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Heart, MessageCircle } from 'lucide-react';
+import { Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -131,7 +131,7 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
 
         {duration > 0 ? (
           <div style={{ position: 'absolute', bottom: 8, right: 8 }}>
-            <Pin variant="dark" icon={<Clock size={10} />}>{formatHMS(duration)}</Pin>
+            <Pin variant="dark">{formatHMS(duration)}</Pin>
           </div>
         ) : null}
 
