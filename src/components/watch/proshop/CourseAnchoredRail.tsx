@@ -39,7 +39,7 @@ function CourseAnchoredRailInner() {
   if (!topCourse || posts.length === 0) return null;
 
   return (
-    <section style={{ background: '#F8FAFC' }}>
+    <section style={{ background: 'hsl(var(--background))' }}>
       <SectionHeader
         kicker="From your courses"
         title={topCourse.course_name}

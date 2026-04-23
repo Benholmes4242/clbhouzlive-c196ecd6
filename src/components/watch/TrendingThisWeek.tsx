@@ -34,7 +34,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
     } as React.CSSProperties;
 
     return (
-      <div style={{ background: '#F8FAFC' }}>
+      <div style={{ background: 'hsl(var(--background))' }}>
         <div
           style={{
             display: 'flex',
@@ -95,7 +95,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
+    <div style={{ background: 'hsl(var(--background))' }}>
       <WatchSectionHeader
         eyebrow="Trending"
         title="Quick clips"
