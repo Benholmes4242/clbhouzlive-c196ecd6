@@ -214,6 +214,13 @@ export function usePGACard(userId?: string): {
               score,
               player:sr_players!sr_leaderboards_player_id_fkey (
                 full_name, photo_url, headshot_override
+              ),
+              team:sr_teams!sr_leaderboards_team_id_fkey (
+                display_name, abbr_name,
+                members:sr_team_players (
+                  position_in_team,
+                  player:sr_players!sr_team_players_player_id_fkey ( full_name, photo_url )
+                )
               )
             `)
             .eq('tournament_id', t.id)
@@ -221,8 +228,26 @@ export function usePGACard(userId?: string): {
             .limit(1)
             .maybeSingle();
 
-          if (!lb?.player) return null;
+          if (!lb) return null;
           const year = new Date(t.end_date + 'T12:00:00').getFullYear();
+
+          // Team-format result
+          if (lb.team) {
+            const sortedMembers = (lb.team.members || [])
+              .filter((m: any) => m.player)
+              .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+            const primary = sortedMembers[0]?.player;
+            return {
+              year,
+              playerName: (lb.team.abbr_name || lb.team.display_name || '') as string,
+              photoUrl: primary?.photo_url ?? null,
+              scoreDisplay: lb.score != null
+                ? lb.score === 0 ? 'E' : lb.score > 0 ? `+${lb.score}` : `${lb.score}`
+                : null,
+            };
+          }
+
+          if (!lb.player) return null;
           return {
             year,
             playerName: lb.player.full_name as string,
