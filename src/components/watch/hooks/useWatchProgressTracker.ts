@@ -79,6 +79,10 @@ export function useWatchProgressTracker({
       const current = activeCard.currentTime;
       const total = activeCard.duration;
       if (!isFinite(total) || total < 1) return;
+      // Don't persist sub-second glances — Math.round(0.4)=0 would otherwise
+      // upsert a stub row that overwrites legitimate progress on re-open
+      // (upsert key is user_id,post_id,signal_type).
+      if (!isFinite(current) || current < 1) return;
 
       // Snapshot every tick (even while paused) so a final-write on swipe has
       // accurate state. Only the throttled DB write below is gated on play.
