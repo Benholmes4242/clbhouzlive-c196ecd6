@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 
 import { RatingBar } from '@/components/ui/RatingBar';
 import { RatingTierDistribution, RatingTierDistributionData } from './RatingTierDistribution';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 
 interface CategoryAverage {
   design: number | null;
@@ -25,15 +26,6 @@ interface CourseReviewsSummaryProps {
 
 const formatScore = (value: number | null | undefined) =>
   value == null ? '—' : value.toFixed(1);
-
-// Get tier label from score
-const getTierLabel = (score: number): string => {
-  if (score >= 9) return 'Outstanding';
-  if (score >= 8) return 'Excellent';
-  if (score >= 7) return 'Very Good';
-  if (score >= 6) return 'Good';
-  return 'Fair';
-};
 
 /**
  * Compute community highlights from category averages.
@@ -151,7 +143,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                    : "text-[#6b7280]"
                 )}
               >
-                {getTierLabel(averageRating)}
+                {getRatingTierLabel(averageRating)}
               </span>
             </div>
 

@@ -8,6 +8,7 @@
  */
 
 import { FeedAdapter, MediaItem, CreatorInfo, GolfCourseInfo, ExtractedReviewData } from '@/types/feed-adapter';
+import { getRatingTier } from '@/lib/ratingTier';
 
 /**
  * Course review media item structure from the database
@@ -110,7 +111,7 @@ export const courseFeedAdapter: FeedAdapter<CourseReviewMediaItem> = {
     
     const course = item.course;
     const rating = item.rating || 0;
-    const tierLabel = rating >= 9 ? 'OUTSTANDING' : rating >= 8 ? 'EXCELLENT' : rating >= 7 ? 'VERY GOOD' : rating >= 6 ? 'GOOD' : 'FAIR';
+    const tierLabel = getRatingTier(rating);
     
     return {
       courseId: course?.id || '',

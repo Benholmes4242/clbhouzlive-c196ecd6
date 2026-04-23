@@ -3,11 +3,11 @@ import { Flag, GripVertical } from 'lucide-react';
 import MyRatingsRing from './MyRatingsRing';
 import {
   getBreakdownSum,
-  getTier,
   hasAnyBreakdown,
   hasFullBreakdown,
   type TiedAbove,
 } from '@/lib/breakdown';
+import { getRatingTier } from '@/lib/ratingTier';
 
 export interface MyRatingsCourseCardData {
   id: string;
@@ -105,7 +105,7 @@ const MyRatingsCourseCard: React.FC<Props> = ({
   const [expanded, setExpanded] = useState(false);
 
   const c = course.golf_courses;
-  const tier = getTier(course.rating);
+  const tier = getRatingTier(course.rating);
   const breakdownSum = getBreakdownSum(course);
   const fullBreakdown = hasFullBreakdown(course);
   const anyBreakdown = hasAnyBreakdown(course);

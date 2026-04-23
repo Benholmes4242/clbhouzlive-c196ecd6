@@ -173,6 +173,9 @@ export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
  * Get rating theme for a score value
  * @param score - The rating score (0-10)
  * @returns RatingTheme with all color values
+ *
+ * TODO (Phase B): Align thresholds to canonical ratingTier.ts in Phase B.
+ * Currently uses 6.5 boundary for GOOD/FAIR; canonical uses 6.0.
  */
 export function getRatingTheme(score: number): RatingTheme {
   if (score >= 9.0) return COURSE_RATING_THEMES.OUTSTANDING;
