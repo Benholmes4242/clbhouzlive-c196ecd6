@@ -8,12 +8,6 @@ import { Pin } from './proshop/Pin';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
-function formatDuration(seconds?: number): string {
-  if (!seconds) return '0:00';
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
 
 function abbreviateCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -39,7 +33,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
 }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
-  const duration = media?.duration;
+  
   const likeCount = post.likeCount ?? 0;
   const commentCount = post.commentCount ?? 0;
   const tileRef = useRef<HTMLDivElement>(null);
@@ -197,20 +191,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
         <Play size={18} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
       </div>
 
-      {/* Duration — top-left (relocated to avoid play-triangle collision) */}
-      {duration != null && duration > 0 && (
-        <div
-          className="absolute top-1.5 left-1.5 z-10 rounded-[4px] flex items-center"
-          style={{
-            background: 'rgba(0, 0, 0, 0.55)',
-            padding: '2px 5px',
-          }}
-        >
-          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
-            {formatDuration(duration)}
-          </span>
-        </div>
-      )}
+
 
       {/* Creator chip — bottom-left */}
       {showCreatorChip && (
