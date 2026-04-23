@@ -324,12 +324,15 @@ export function useRecentlyCompletedTournaments() {
             tournament_id,
             position,
             score,
-            player:sr_players!inner(
-              id,
-              sr_id,
-              first_name,
-              last_name,
-              photo_url
+            player:sr_players!sr_leaderboards_player_id_fkey(
+              id, sr_id, first_name, last_name, photo_url
+            ),
+            team:sr_teams!sr_leaderboards_team_id_fkey(
+              id, sr_id, display_name, abbr_name,
+              members:sr_team_players(
+                position_in_team,
+                player:sr_players!sr_team_players_player_id_fkey(id, full_name, photo_url)
+              )
             )
           `)
           .in('tournament_id', tournamentIds)
@@ -357,14 +360,27 @@ export function useRecentlyCompletedTournaments() {
       }> = {};
       if (leaderboardResult.data) {
         leaderboardResult.data.forEach((entry: any) => {
-          if (entry.player) {
+          let player = entry.player;
+          if (!player && entry.team) {
+            const members = (entry.team.members || [])
+              .filter((m: any) => m.player)
+              .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+            const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
+            player = {
+              sr_id: entry.team.sr_id,
+              first_name: '',
+              last_name: teamName,
+              photo_url: members[0]?.player?.photo_url ?? null,
+            };
+          }
+          if (player) {
             leaderboardMap[entry.tournament_id] = {
               score: entry.score,
               player: {
-                sr_id: entry.player.sr_id,
-                first_name: entry.player.first_name || '',
-                last_name: entry.player.last_name || '',
-                photo_url: entry.player.photo_url,
+                sr_id: player.sr_id,
+                first_name: player.first_name || '',
+                last_name: player.last_name || '',
+                photo_url: player.photo_url,
               },
             };
           }
