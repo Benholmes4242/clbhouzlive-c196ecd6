@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useNavigationType } from 'react-router-dom';
 import { ChevronLeft, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -37,10 +37,24 @@ const CREAM = '#F8FAFC';
  */
 export default function VideosSubpage() {
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { mood, setMood } = useVideosMood();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Force scroll to top on mount for forward navigation.
+  // Lazy-loaded subpages mount after global ScrollToTop fires against the
+  // Suspense fallback, so we re-assert here. POP is left alone so the
+  // browser/ScrollRestoration can restore the previous position.
+  useEffect(() => {
+    if (navigationType !== 'POP') {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <WatchActionsProvider>

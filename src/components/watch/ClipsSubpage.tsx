@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useNavigationType } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
@@ -39,10 +39,24 @@ const CREAM = '#F8FAFC';
  */
 export default function ClipsSubpage() {
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { mood, setMood } = useClipsMood();
   const gridRef = useRef<HTMLDivElement>(null);
+
+  // Force scroll to top on mount for forward navigation.
+  // Lazy-loaded subpages mount after global ScrollToTop fires against the
+  // Suspense fallback, so we re-assert here. POP is left alone so the
+  // browser/ScrollRestoration can restore the previous position.
+  useEffect(() => {
+    if (navigationType !== 'POP') {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Bottom mosaic feed — always personalised, never bound to mood.
   const {
