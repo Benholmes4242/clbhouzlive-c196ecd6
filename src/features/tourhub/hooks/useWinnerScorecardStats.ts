@@ -11,21 +11,31 @@ export interface WinnerStats {
   rounds: number;
 }
 
+/**
+ * Aggregates per-round scoring stats from the winning leaderboard row.
+ *
+ * Accepts either a player id or a team id (team-format events). Pass
+ * `entityKind` to disambiguate. Defaults to 'player' for backward compat.
+ */
 export function useWinnerScorecardStats(
   tournamentId: string | undefined,
-  playerId: string | undefined
+  entityId: string | undefined,
+  entityKind: 'player' | 'team' = 'player',
 ) {
   return useQuery({
-    queryKey: ['winner-scorecard-stats', tournamentId, playerId],
+    queryKey: ['winner-scorecard-stats', tournamentId, entityId, entityKind],
     queryFn: async (): Promise<WinnerStats | null> => {
-      if (!tournamentId || !playerId) return null;
+      if (!tournamentId || !entityId) return null;
 
-      const { data, error } = await supabase
+      const query = supabase
         .from('sr_leaderboards')
         .select('raw_data')
-        .eq('tournament_id', tournamentId)
-        .eq('player_id', playerId)
-        .maybeSingle();
+        .eq('tournament_id', tournamentId);
+
+      const { data, error } = await (entityKind === 'team'
+        ? query.eq('team_id', entityId)
+        : query.eq('player_id', entityId)
+      ).maybeSingle();
 
       if (error || !data?.raw_data) return null;
 
@@ -44,7 +54,7 @@ export function useWinnerScorecardStats(
         rounds:       rounds.length,
       };
     },
-    enabled: !!tournamentId && !!playerId,
+    enabled: !!tournamentId && !!entityId,
     staleTime: 60_000,
   });
 }

@@ -572,6 +572,8 @@ export function useTourHubDataStatus() {
 }
 
 // Hook: Get leaderboard for a tournament (empty state aware)
+// Returns rows joined with both player and team — consumers should use
+// resolveLeaderboardEntity to get a uniform entity object.
 export function useTourLeaderboard(tournamentId: string) {
   return useQuery({
     queryKey: ['tourhub', 'leaderboard', tournamentId],
@@ -580,7 +582,16 @@ export function useTourLeaderboard(tournamentId: string) {
         .from('sr_leaderboards')
         .select(`
           *,
-          player:sr_players(*)
+          player:sr_players!sr_leaderboards_player_id_fkey(*),
+          team:sr_teams!sr_leaderboards_team_id_fkey(
+            id, sr_id, display_name, abbr_name, country,
+            members:sr_team_players(
+              position_in_team,
+              player:sr_players!sr_team_players_player_id_fkey(
+                id, sr_id, first_name, last_name, full_name, photo_url, country
+              )
+            )
+          )
         `)
         .eq('tournament_id', tournamentId)
         .order('position', { ascending: true });

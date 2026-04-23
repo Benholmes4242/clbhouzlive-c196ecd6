@@ -1,6 +1,10 @@
 /**
  * ExpandedLeaderboard — Full-field leaderboard rendered inside the hero glass card
  * Dark-glass aesthetic with sticky column headers and internal scrolling.
+ *
+ * Supports both single-player rows (stroke play) AND team rows (Zurich Classic,
+ * Grant Thornton, etc.). Team rows render a stacked dual-avatar via
+ * LeaderEntityAvatar and show the team's abbreviated name (e.g. "Smalley / Springer").
  */
 
 import React, { useState, useCallback } from 'react';
@@ -8,13 +12,25 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { Database } from '@/integrations/supabase/types';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
+import { LeaderEntityAvatar, type TeamMemberAvatar } from '../shared/LeaderEntityAvatar';
 
 // Derive types from the actual Supabase schema
 type SrLeaderboardRow = Database['public']['Tables']['sr_leaderboards']['Row'];
 type SrPlayerRow = Database['public']['Tables']['sr_players']['Row'];
+type SrTeamRow = Database['public']['Tables']['sr_teams']['Row'];
+
+interface TeamMemberJoined {
+  position_in_team: number;
+  player: Pick<SrPlayerRow, 'id' | 'sr_id' | 'first_name' | 'last_name' | 'full_name' | 'photo_url' | 'country'> | null;
+}
+
+interface TeamJoined extends Pick<SrTeamRow, 'id' | 'sr_id' | 'display_name' | 'abbr_name' | 'country'> {
+  members?: TeamMemberJoined[];
+}
 
 export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
   player: SrPlayerRow | null;
+  team?: TeamJoined | null;
 }
 
 function getScoreColor(toPar: number | null): string {
@@ -156,7 +172,7 @@ const ColumnHeaders = React.memo(function ColumnHeaders() {
   );
 });
 
-// Single player row
+// Single player OR team row
 const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   entry,
   tourCode,
@@ -167,17 +183,12 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   onPlayerTap?: (player: PlayerInfo) => void;
 }) {
   const player = entry.player;
+  const team = entry.team;
   const [imgError, setImgError] = useState(false);
-  if (!player) return null;
 
-  const firstName = player.first_name || '';
-  const lastName = player.last_name || '';
-  const displayName = firstName && firstName[0]
-    ? `${firstName[0]}. ${lastName}`
-    : lastName || 'Unknown';
-  const fullName = player.full_name || `${firstName} ${lastName}`.trim();
-  const effectiveTourCode = player.tour_codes?.[0] ?? tourCode;
-  const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, player.headshot_override);
+  // Drop rows that have neither a player nor a team (orphaned)
+  if (!player && !team) return null;
+
   const posDisplay = entry.position_tied ? `T${entry.position}` : `${entry.position ?? '-'}`;
   const thruDisplay = formatThru(entry);
   const isCut = entry.status === 'cut' || entry.status === 'wd' || entry.status === 'dq';
@@ -186,20 +197,154 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   const lastCompletedRound = entry.round_4 != null ? 4 : entry.round_3 != null ? 3 : entry.round_2 != null ? 2 : entry.round_1 != null ? 1 : 0;
   const currentRound = Math.min(lastCompletedRound + 1, 4);
 
+  // ── TEAM ROW ─────────────────────────────────────────
+  if (!player && team) {
+    const sortedMembers = (team.members || [])
+      .filter((m) => m.player != null)
+      .sort((a, b) => a.position_in_team - b.position_in_team);
+
+    const teamMembers: TeamMemberAvatar[] = sortedMembers.map((m) => ({
+      fullName:
+        m.player!.full_name ||
+        `${m.player!.first_name || ''} ${m.player!.last_name || ''}`.trim(),
+      photoUrl: m.player!.photo_url,
+      tourCode,
+      headshotOverride: null,
+    }));
+
+    const teamDisplayName = team.abbr_name || team.display_name || 'Team';
+    const primary = sortedMembers[0]?.player;
+    const handleTeamTap = onPlayerTap && primary
+      ? () => {
+          // For team rows, surface the primary player's scorecard.
+          onPlayerTap({
+            id: primary.id,
+            srId: primary.sr_id || '',
+            name: teamDisplayName,
+            firstName: primary.first_name || '',
+            lastName: primary.last_name || '',
+            photoUrl: primary.photo_url || undefined,
+            countryCode: team.country || primary.country || undefined,
+            position: posDisplay,
+            totalScore: entry.score ?? 0,
+            thru: thruDisplay,
+            currentRound,
+          });
+        }
+      : undefined;
+
+    return (
+      <button
+        type="button"
+        aria-label={`${teamDisplayName}, position ${posDisplay}, ${formatScore(entry.score ?? null)} to par, thru ${thruDisplay}`}
+        onClick={handleTeamTap}
+        className="flex items-center w-full text-left"
+        style={{
+          padding: '9px 16px',
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          opacity: isCut ? 0.4 : 1,
+          background: 'none',
+          borderRadius: 0,
+          border: 'none',
+          cursor: handleTeamTap ? 'pointer' : 'default',
+        }}
+      >
+        <span style={{
+          width: 22, textAlign: 'center', flexShrink: 0,
+          fontSize: 12, fontWeight: 600,
+          color: 'rgba(255,255,255,0.35)', fontVariantNumeric: 'tabular-nums',
+        }}>
+          {posDisplay}
+        </span>
+
+        <div className="flex items-center gap-2 flex-1 min-w-0" style={{ paddingLeft: 4 }}>
+          <LeaderEntityAvatar
+            teamMembers={teamMembers}
+            size={33}
+            ringColor="#0A1628"
+            borderColor="rgba(255,255,255,0.18)"
+            borderWidth={1.5}
+            radiusPct={34}
+          />
+          <span className="truncate" style={{
+            fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.85)',
+          }}>
+            {teamDisplayName}
+          </span>
+        </div>
+
+        {/* Total */}
+        <span style={{
+          width: 46, textAlign: 'right', flexShrink: 0,
+          fontSize: 15, fontWeight: 700,
+          color: getScoreColor(entry.score ?? null),
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {formatScore(entry.score ?? null)}
+        </span>
+
+        {/* Today + Thru rendered below by the shared block — re-use scaffold */}
+        {(() => {
+          const isActivelyPlaying = entry.thru != null && entry.thru >= 1 && entry.thru < 18
+            && entry.status !== 'wd' && entry.status !== 'dq' && entry.status !== 'cut';
+          const todayToPar = (() => {
+            if (!isActivelyPlaying) return null;
+            const completedTotal = [1, 2, 3, 4]
+              .filter(r => r < currentRound)
+              .reduce((sum, r) => {
+                const s = entry[`round_${r}` as keyof typeof entry] as number | null;
+                return s != null ? sum + s : sum;
+              }, 0);
+            return entry.score != null ? entry.score - completedTotal : null;
+          })();
+          return (
+            <span style={{
+              width: 46, textAlign: 'right', flexShrink: 0,
+              fontSize: 13, fontWeight: 600,
+              color: getTodayScoreColor(todayToPar),
+              fontVariantNumeric: 'tabular-nums',
+            }}>
+              {formatScore(todayToPar)}
+            </span>
+          );
+        })()}
+
+        <span style={{
+          width: 40, textAlign: 'right', flexShrink: 0,
+          fontSize: 12, fontWeight: 500,
+          color: thruDisplay === 'F' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.7)',
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {thruDisplay}
+        </span>
+      </button>
+    );
+  }
+
+  // ── SINGLE-PLAYER ROW (existing logic) ────────────────
+  const firstName = player!.first_name || '';
+  const lastName = player!.last_name || '';
+  const displayName = firstName && firstName[0]
+    ? `${firstName[0]}. ${lastName}`
+    : lastName || 'Unknown';
+  const fullName = player!.full_name || `${firstName} ${lastName}`.trim();
+  const effectiveTourCode = player!.tour_codes?.[0] ?? tourCode;
+  const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, player!.headshot_override);
+
   const handleTap = onPlayerTap
     ? () => {
         onPlayerTap({
-          id: player.id,
-          srId: player.sr_id || '',
+          id: player!.id,
+          srId: player!.sr_id || '',
           name: fullName,
           firstName,
           lastName,
           photoUrl: getPlayerHeadshotUrl(
-            player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim(),
+            player!.full_name || `${player!.first_name || ''} ${player!.last_name || ''}`.trim(),
             effectiveTourCode,
-            player.headshot_override
-          ) || player.photo_url || undefined,
-          countryCode: player.country_code || player.country || undefined,
+            player!.headshot_override
+          ) || player!.photo_url || undefined,
+          countryCode: player!.country_code || player!.country || undefined,
           position: posDisplay,
           totalScore: entry.score ?? 0,
           thru: thruDisplay,

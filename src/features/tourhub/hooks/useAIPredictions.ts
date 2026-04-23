@@ -339,6 +339,13 @@ async function getPgaSeasonId(): Promise<string | null> {
 }
 
 async function fetchPredictionsForTournament(tournament: any): Promise<AIPredictionData | null> {
+  // Early skip: AI predictions currently assume single-player stroke-play tournaments.
+  // Team / cup / match formats need separate predictor logic — not yet built.
+  // Skipping prevents pollution of ai_predictions with player-shaped data for team events.
+  if (tournament?.event_type && tournament.event_type !== 'stroke') {
+    return null;
+  }
+
   const { data: aiPredictions } = await supabase
     .from('ai_predictions')
     .select('*')
