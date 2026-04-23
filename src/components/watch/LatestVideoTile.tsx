@@ -74,8 +74,7 @@ export default function LatestVideoTile({
 
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
   const creator = post.displayName || post.username || '';
-  const likeLabel = `${post.likeCount} ${post.likeCount === 1 ? 'like' : 'likes'}`;
-  const metaLine = [ageLabel, likeLabel].filter(Boolean).join(' · ');
+  const metaLine = [creator, ageLabel].filter(Boolean).join(' · ');
 
   return (
     <div
@@ -144,47 +143,35 @@ export default function LatestVideoTile({
         )}
       </div>
 
-      {/* Meta */}
-      <div style={{ marginTop: 8, padding: '0 2px' }}>
+      {/* Meta — matches VideoFeedCard rhythm: bold title, muted creator·date below */}
+      <div style={{ marginTop: 10, padding: '0 2px' }}>
         <div
           style={{
-            fontSize: 13,
-            fontWeight: 500,
+            fontSize: 14,
+            fontWeight: 700,
             lineHeight: 1.3,
-            color: 'hsl(var(--foreground))',
+            letterSpacing: '-0.01em',
+            color: '#0F172A',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            marginBottom: 4,
             wordBreak: 'break-word',
           }}
         >
           {post.caption || 'Untitled'}
         </div>
-        {creator && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 400,
-              color: 'hsl(var(--muted-foreground))',
-              marginBottom: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {creator}
-          </div>
-        )}
         {metaLine && (
           <div
             style={{
               fontSize: 11,
-              fontWeight: 400,
-              color: 'hsl(var(--muted-foreground))',
-              fontVariantNumeric: 'tabular-nums',
+              fontWeight: 500,
+              color: 'rgba(15,23,42,0.55)',
+              marginTop: 2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
             {metaLine}
