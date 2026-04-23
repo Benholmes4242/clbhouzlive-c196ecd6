@@ -78,6 +78,24 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
     }
   };
 
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/video/${post.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: post.caption || 'Check out this video', url: shareUrl });
+      } catch {
+        /* user cancelled */
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied');
+      } catch {
+        /* clipboard unavailable */
+      }
+    }
+  };
+
   return (
     <article style={{ padding: '0 16px 18px' }}>
       <button
@@ -174,21 +192,33 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); openActions(post); }}
+        {/* Engagement counts (display-only) */}
+        <div
           style={{
-            background: 'none',
-            border: 'none',
-            padding: '4px 0 4px 4px',
-            cursor: 'pointer',
-            color: 'rgba(15,23,42,0.55)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
             flexShrink: 0,
+            color: 'rgba(15,23,42,0.55)',
           }}
-          aria-label="More options"
         >
-          <MoreVertical size={18} />
-        </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Heart size={14} />
+            <span style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+              {formatCompact(post.likeCount)}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <MessageCircle size={14} />
+            <span style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+              {formatCompact(post.commentCount)}
+            </span>
+          </div>
+        </div>
+
+        <div style={{ flexShrink: 0, marginRight: -8 }}>
+          <VideoCardMenu postId={post.id} userId={userId} onShare={handleShare} />
+        </div>
       </div>
     </article>
   );
