@@ -365,7 +365,11 @@ function CommentsSheet({
     parentId?: string,
   ) => {
     const isOwn = currentUserId === comment.user_id;
-    const isOP = comment.user_id === creatorUserId;
+    // OP badge: for business-authored posts, match the business actor on the comment.
+    // For personal-authored posts (default), match the human user_id as before.
+    const isOP = creatorActorType === 'business'
+      ? comment.actor_type === 'business' && comment.actor_id === creatorActorId
+      : comment.user_id === creatorUserId;
     
 
     return (
