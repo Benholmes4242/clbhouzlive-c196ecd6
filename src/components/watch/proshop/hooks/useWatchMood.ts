@@ -18,6 +18,9 @@ const DEFAULT_MOOD: WatchMoodId = 'for_you';
  * Reads/writes the active Watch tab mood from `?mood=` so refresh and
  * deep-link preserve state. Falls back to 'for_you'. Default mood is
  * never written to the URL — keeps URLs clean.
+ * Uses replace: true so filter toggles don't pollute browser history —
+ * tapping back from the subpage returns to the previous page, not through
+ * every chip tap.
  */
 export function useWatchMood() {
   const [params, setParams] = useSearchParams();
@@ -34,7 +37,7 @@ export function useWatchMood() {
       } else {
         newParams.set('mood', next);
       }
-      setParams(newParams, { replace: false });
+      setParams(newParams, { replace: true });
     },
     [params, setParams],
   );
