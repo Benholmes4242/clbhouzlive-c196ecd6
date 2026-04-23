@@ -31,27 +31,32 @@ interface AllCoursesListProps {
 const PAGE_SIZE = 20;
 
 /**
- * Maps the local CourseCardData → MyRatingsCourseCardData expected by the
- * world-class card component. Only safe to call when course.has_rating is
- * truthy and rating_value is non-null.
+ * Maps a hydrated CourseCardData row → the RatedCourseData shape consumed
+ * by the new stratified My Ratings cards. Only safe to call when the row
+ * has a non-null rating_value.
  */
-const toMyRatingsCardData = (course: CourseCardData): MyRatingsCourseCardData => ({
-  id: course.rating_id ?? course.id,
-  rating: course.rating_value ?? 0,
-  review_date: course.review_date ?? course.last_played_at ?? new Date().toISOString(),
+const toRatedCourseData = (
+  course: CourseCardData & {
+    global_rank?: number | null;
+    review_text?: string | null;
+  },
+): RatedCourseData => ({
+  id: course.id,
+  name: course.name,
+  country: course.country,
+  sub_country: course.sub_country,
+  thumbnail_image: course.thumbnail_image,
+  is_top100: course.is_top100,
+  global_rank: course.global_rank ?? null,
+  last_played_at: course.last_played_at,
+  rating_value: course.rating_value as number,
+  rating_id: course.rating_id,
   design_score: course.design_score ?? null,
   condition_score: course.condition_score ?? null,
   clubhouse_score: course.clubhouse_score ?? null,
   facilities_score: course.facilities_score ?? null,
-  golf_courses: {
-    id: course.id,
-    name: course.name,
-    country: course.country,
-    sub_country: course.sub_country,
-    region: null,
-    global_rank: course.is_top100 ? (course as unknown as { global_rank?: number }).global_rank ?? null : null,
-    thumbnail_image: course.thumbnail_image,
-  },
+  review: course.review_text ?? null,
+  review_date: course.review_date ?? null,
 });
 
 export const AllCoursesList: React.FC<AllCoursesListProps> = ({ 
@@ -62,11 +67,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<CoursePrimaryTab>('all');
-  const [activeSort, setActiveSort] = useState<CourseSortOption>('recently-played');
+  const [activeSort, setActiveSort] = useState<CourseSortOption>('rating-high-low');
   const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<CourseCardData | null>(null);
+
+  const handleCourseClick = useCallback(
+    (courseId: string, ratingId: string | null) => {
+      if (ratingId) {
+        navigate(`/courses/${courseId}?tab=reviews&review=${ratingId}`);
+      } else {
+        navigate(`/courses/${courseId}`);
+      }
+    },
+    [navigate],
+  );
 
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
