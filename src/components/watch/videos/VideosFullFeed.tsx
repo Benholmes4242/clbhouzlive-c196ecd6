@@ -1,12 +1,14 @@
 import { memo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
-import { Loader2, MoreVertical, Clock } from 'lucide-react';
+import { Loader2, Clock, Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
 import { haptic } from '@/utils/haptics';
