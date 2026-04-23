@@ -290,7 +290,7 @@ function VideosFullFeedInner({ userId }: VideosFullFeedProps) {
   return (
     <div style={{ paddingTop: 8, paddingBottom: 24 }}>
       {posts.map((post, i) => (
-        <VideoFeedCard key={post.id} post={post} index={i} allPosts={posts} />
+        <VideoFeedCard key={post.id} post={post} index={i} allPosts={posts} userId={userId} />
       ))}
 
       <div ref={sentinelRef} style={{ height: 1 }} />
