@@ -165,7 +165,7 @@ function MostLovedRailInner() {
                 gap: 6,
                 background: 'rgba(0,0,0,0.6)',
                 borderRadius: 999,
-                padding: '2px 8px 2px 2px',
+                padding: '3px 8px 3px 3px',
                 maxWidth: 'calc(100% - 16px)',
                 pointerEvents: 'none',
               }}
