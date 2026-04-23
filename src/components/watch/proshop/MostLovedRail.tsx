@@ -169,15 +169,14 @@ function MostLovedRailInner() {
                 pointerEvents: 'none',
               }}
             >
-              {row.avatar_url ? (
-                <img
+              <div style={{ flexShrink: 0 }}>
+                <SquircleAvatar
                   src={row.avatar_url}
-                  alt=""
-                  style={{ width: 18, height: 18, borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
+                  alt={row.display_name || row.username || ''}
+                  size={18}
+                  hideRing
                 />
-              ) : (
-                <div style={{ width: 18, height: 18, borderRadius: 999, background: 'rgba(255,255,255,0.18)', flexShrink: 0 }} />
-              )}
+              </div>
               <span
                 style={{
                   fontSize: 11,
