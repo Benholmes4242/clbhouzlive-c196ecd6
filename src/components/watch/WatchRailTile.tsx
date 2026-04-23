@@ -5,8 +5,9 @@ import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from './context/WatchActionsContext';
 import { Pin } from './proshop/Pin';
+import { CreatorChip } from './proshop/CreatorChip';
+import { PlayAffordance } from './proshop/PlayAffordance';
 import { haptic } from '@/utils/haptics';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -267,7 +268,7 @@ export default function WatchRailTile({
         </span>
       )}
 
-      {/* Creator chip — bottom-left, glass pill + avatar (canonical for portrait overlay tiles). */}
+      {/* Creator chip — bottom-left, canonical CreatorChip */}
       {(post.displayName || post.username) && (
         <div
           style={{
@@ -275,33 +276,14 @@ export default function WatchRailTile({
             bottom: 8,
             left: 8,
             zIndex: 2,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'rgba(0,0,0,0.6)',
-            borderRadius: 999,
-            padding: '2px 8px 2px 2px',
             maxWidth: 'calc(100% - 70px)',
-            pointerEvents: 'none',
           }}
         >
-          <div style={{ flexShrink: 0 }}>
-            <SquircleAvatar
-              src={post.avatarUrl}
-              alt={post.displayName || post.username || ''}
-              size={18}
-              hideRing
-            />
-          </div>
-          <span
-            style={{
-              fontSize: 11, fontWeight: 600, color: 'white',
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              maxWidth: 110,
-            }}
-          >
-            {post.displayName || post.username}
-          </span>
+          <CreatorChip
+            name={post.displayName || post.username || ''}
+            avatarUrl={post.avatarUrl}
+            maxLabelWidth={110}
+          />
         </div>
       )}
 
@@ -336,27 +318,10 @@ export default function WatchRailTile({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.6)',
-            border: '1px solid rgba(255,255,255,0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
             pointerEvents: 'none',
           }}
         >
-          <div
-            style={{
-              width: 0,
-              height: 0,
-              borderLeft: '8px solid rgba(255,255,255,0.9)',
-              borderTop: '5px solid transparent',
-              borderBottom: '5px solid transparent',
-              marginLeft: 2,
-            }}
-          />
+          <PlayAffordance size={32} variant="outlined" />
         </div>
       )}
     </div>

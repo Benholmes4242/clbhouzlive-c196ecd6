@@ -5,7 +5,8 @@ import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — divider ownership now lives in
 // the page composition (UnifiedWatchFeed); rails no longer render their own.
 import { HRail } from './proshop/HRail';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CreatorChip } from './proshop/CreatorChip';
+import { PlayAffordance } from './proshop/PlayAffordance';
 
 interface ContinueWatchingRailProps {
   userId: string | undefined;
@@ -106,66 +107,26 @@ function ContinueWatchingTile({
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 38,
-          height: 38,
-          borderRadius: '50%',
-          background: 'rgba(0,0,0,0.6)',
-          border: '1px solid rgba(255,255,255,0.18)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
         }}
       >
-        <div
-          style={{
-            width: 0,
-            height: 0,
-            borderLeft: '11px solid rgba(255,255,255,0.95)',
-            borderTop: '7px solid transparent',
-            borderBottom: '7px solid transparent',
-            marginLeft: 3,
-          }}
-        />
+        <PlayAffordance size={38} variant="outlined" />
       </div>
 
-      {/* Creator chip — canonical glass-pill+avatar (matches WatchRailTile) */}
+      {/* Creator chip — canonical CreatorChip */}
       {(post.displayName || post.username) && (
         <div
           style={{
             position: 'absolute',
             bottom: 12,
             left: 8,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'rgba(0,0,0,0.6)',
-            borderRadius: 999,
-            padding: '2px 8px 2px 2px',
             maxWidth: 'calc(100% - 16px)',
-            pointerEvents: 'none',
           }}
         >
-          <div style={{ flexShrink: 0 }}>
-            <SquircleAvatar
-              src={post.avatarUrl}
-              alt={post.displayName || post.username || ''}
-              size={18}
-              hideRing
-            />
-          </div>
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: 'white',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxWidth: 130,
-            }}
-          >
-            {post.displayName || post.username}
-          </span>
+          <CreatorChip
+            name={post.displayName || post.username || ''}
+            avatarUrl={post.avatarUrl}
+            maxLabelWidth={130}
+          />
         </div>
       )}
 

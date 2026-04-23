@@ -1,14 +1,14 @@
 import { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { MostLovedRow } from '../proshop/hooks/useMostLovedThisWeek';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { Pin } from '../proshop/Pin';
+import { CreatorChip } from '../proshop/CreatorChip';
+import { PlayAffordance } from '../proshop/PlayAffordance';
 import type { ClipsMoodId } from './hooks/useClipsMood';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ClipsMostLovedRailProps {
   userId: string | undefined;
@@ -164,13 +164,9 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
                 position: 'absolute',
                 top: '50%', left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 32, height: 32,
-                borderRadius: '50%',
-                background: 'rgba(0,0,0,0.6)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              <Play size={13} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
+              <PlayAffordance size={32} />
             </div>
 
             <div
@@ -184,43 +180,20 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               }}
             />
 
-            {/* Canonical glass-pill+avatar creator chip */}
+            {/* Canonical CreatorChip */}
             <div
               style={{
                 position: 'absolute',
                 bottom: 8,
                 left: 8,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(0,0,0,0.6)',
-                borderRadius: 999,
-                padding: '2px 8px 2px 2px',
                 maxWidth: 'calc(100% - 16px)',
-                pointerEvents: 'none',
               }}
             >
-              <div style={{ flexShrink: 0 }}>
-                <SquircleAvatar
-                  src={row.avatar_url}
-                  alt={row.display_name || row.username || ''}
-                  size={18}
-                  hideRing
-                />
-              </div>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: 'white',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: 130,
-                }}
-              >
-                {row.display_name || row.username || ''}
-              </span>
+              <CreatorChip
+                name={row.display_name || row.username || ''}
+                avatarUrl={row.avatar_url}
+                maxLabelWidth={130}
+              />
             </div>
           </button>
         ))}

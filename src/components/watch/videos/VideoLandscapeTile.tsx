@@ -1,9 +1,9 @@
 import { memo, useRef } from 'react';
-import { Play, Clock } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
+import { PlayAffordance } from '../proshop/PlayAffordance';
 import { haptic } from '@/utils/haptics';
 
 interface VideoLandscapeTileProps {
@@ -131,13 +131,9 @@ function VideoLandscapeTileInner({
             position: 'absolute',
             top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 40, height: 40,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
-          <Play size={16} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
+          <PlayAffordance size={40} />
         </div>
 
         {/* Progress bar overlay (Continue Watching) */}

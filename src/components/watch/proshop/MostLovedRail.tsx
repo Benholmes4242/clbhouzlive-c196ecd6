@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -8,7 +7,8 @@ import { useWatchMood } from './hooks/useWatchMood';
 import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import { Pin } from './Pin';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CreatorChip } from './CreatorChip';
+import { PlayAffordance } from './PlayAffordance';
 
 function rowToFullscreenPost(row: MostLovedRow) {
   return {
@@ -133,13 +133,9 @@ function MostLovedRailInner() {
                 position: 'absolute',
                 top: '50%', left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 32, height: 32,
-                borderRadius: '50%',
-                background: 'rgba(0,0,0,0.55)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              <Play size={13} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
+              <PlayAffordance size={32} />
             </div>
 
             {/* Bottom gradient */}
@@ -154,43 +150,20 @@ function MostLovedRailInner() {
               }}
             />
 
-            {/* Bottom-left creator — canonical glass-pill+avatar */}
+            {/* Bottom-left creator — canonical CreatorChip */}
             <div
               style={{
                 position: 'absolute',
                 bottom: 8,
                 left: 8,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(0,0,0,0.6)',
-                borderRadius: 999,
-                padding: '2px 8px 2px 2px',
                 maxWidth: 'calc(100% - 16px)',
-                pointerEvents: 'none',
               }}
             >
-              <div style={{ flexShrink: 0 }}>
-                <SquircleAvatar
-                  src={row.avatar_url}
-                  alt={row.display_name || row.username || ''}
-                  size={18}
-                  hideRing
-                />
-              </div>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: 'white',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: 130,
-                }}
-              >
-                {row.display_name || row.username || ''}
-              </span>
+              <CreatorChip
+                name={row.display_name || row.username || ''}
+                avatarUrl={row.avatar_url}
+                maxLabelWidth={130}
+              />
             </div>
           </button>
         ))}
