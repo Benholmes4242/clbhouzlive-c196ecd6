@@ -9230,6 +9230,7 @@ export type Database = {
           starting_score: number | null
           status: string | null
           strokes: number | null
+          team_id: string | null
           thru: number | null
           thru_updated_at: string | null
           tournament_id: string | null
@@ -9254,6 +9255,7 @@ export type Database = {
           starting_score?: number | null
           status?: string | null
           strokes?: number | null
+          team_id?: string | null
           thru?: number | null
           thru_updated_at?: string | null
           tournament_id?: string | null
@@ -9278,6 +9280,7 @@ export type Database = {
           starting_score?: number | null
           status?: string | null
           strokes?: number | null
+          team_id?: string | null
           thru?: number | null
           thru_updated_at?: string | null
           tournament_id?: string | null
@@ -9290,6 +9293,13 @@ export type Database = {
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_leaderboards_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "sr_teams"
             referencedColumns: ["id"]
           },
           {
@@ -9802,6 +9812,83 @@ export type Database = {
           tournament_id?: string | null
         }
         Relationships: []
+      }
+      sr_team_players: {
+        Row: {
+          player_id: string
+          position_in_team: number
+          team_id: string
+        }
+        Insert: {
+          player_id: string
+          position_in_team: number
+          team_id: string
+        }
+        Update: {
+          player_id?: string
+          position_in_team?: number
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_team_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_team_players_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "sr_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_teams: {
+        Row: {
+          abbr_name: string | null
+          country: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          raw_data: Json | null
+          sr_id: string
+          tournament_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          abbr_name?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          raw_data?: Json | null
+          sr_id: string
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          abbr_name?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          raw_data?: Json | null
+          sr_id?: string
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sr_tee_time_players: {
         Row: {
