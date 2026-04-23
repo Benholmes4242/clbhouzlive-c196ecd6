@@ -9,21 +9,32 @@ export interface LeaderStats {
   doubleBogeys: number;
 }
 
+/**
+ * Reads leaderboard raw_data → rounds aggregate stats.
+ *
+ * Accepts either a player id (sr_players.id) for stroke-play tournaments
+ * OR a team id (sr_teams.id) for team-format events. Pass `entityKind` to
+ * disambiguate. Defaults to 'player' for backward compatibility.
+ */
 export function useLeaderScorecardStats(
   tournamentId: string | null | undefined,
-  playerId: string | null | undefined
+  entityId: string | null | undefined,
+  entityKind: 'player' | 'team' = 'player',
 ) {
   return useQuery({
-    queryKey: ['leader-scorecard-stats-hero', tournamentId, playerId],
+    queryKey: ['leader-scorecard-stats-hero', tournamentId, entityId, entityKind],
     queryFn: async (): Promise<LeaderStats | null> => {
-      if (!tournamentId || !playerId) return null;
+      if (!tournamentId || !entityId) return null;
 
-      const { data, error } = await supabase
+      const query = supabase
         .from('sr_leaderboards')
         .select('raw_data')
-        .eq('tournament_id', tournamentId)
-        .eq('player_id', playerId)
-        .maybeSingle();
+        .eq('tournament_id', tournamentId);
+
+      const { data, error } = await (entityKind === 'team'
+        ? query.eq('team_id', entityId)
+        : query.eq('player_id', entityId)
+      ).maybeSingle();
 
       if (error || !data?.raw_data) return null;
 
@@ -38,7 +49,7 @@ export function useLeaderScorecardStats(
         doubleBogeys: rounds.reduce((s, r) => s + (r.double_bogeys ?? 0), 0),
       };
     },
-    enabled: !!tournamentId && !!playerId,
+    enabled: !!tournamentId && !!entityId,
     staleTime: 30_000,
     refetchInterval: false,
     refetchOnWindowFocus: true,
