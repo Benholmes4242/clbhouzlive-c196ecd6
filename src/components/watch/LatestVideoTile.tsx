@@ -121,35 +121,6 @@ export default function LatestVideoTile({
           />
         )}
 
-        {/* Center play affordance */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.55)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          <div
-            style={{
-              width: 0,
-              height: 0,
-              borderLeft: '8px solid rgba(255,255,255,0.95)',
-              borderTop: '5px solid transparent',
-              borderBottom: '5px solid transparent',
-              marginLeft: 2,
-            }}
-          />
-        </div>
-
         {/* Duration badge */}
         {durationLabel && (
           <div
