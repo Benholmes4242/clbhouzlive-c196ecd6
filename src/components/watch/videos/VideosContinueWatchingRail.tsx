@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { useVideosContinueWatching } from './hooks/useVideosContinueWatching';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
-import { VideoLandscapeTile } from './VideoLandscapeTile';
+import { VideoRailTile } from './VideoRailTile';
 
 interface VideosContinueWatchingRailProps {
   userId: string | undefined;
@@ -32,11 +32,12 @@ function VideosContinueWatchingRailInner({ userId }: VideosContinueWatchingRailP
               ? post.progressSeconds / post.totalSeconds
               : 0;
           return (
-            <VideoLandscapeTile
+            <VideoRailTile
               key={post.id}
               post={post}
               index={i}
               allPosts={posts}
+              width={280}
               progress={progress}
             />
           );
