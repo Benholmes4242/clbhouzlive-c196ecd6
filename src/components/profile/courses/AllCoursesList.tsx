@@ -14,6 +14,15 @@ import MyRatingsCourseCard, {
 } from '@/components/courses/MyRatingsCourseCard';
 import EditRatingModal from '@/components/courses/EditRatingModal';
 import { annotateTies } from '@/lib/breakdown';
+import MyRatingsTier1Card from '@/components/courses/my-ratings/MyRatingsTier1Card';
+import MyRatingsTier2Card from '@/components/courses/my-ratings/MyRatingsTier2Card';
+import MyRatingsTier3Card from '@/components/courses/my-ratings/MyRatingsTier3Card';
+import MyRatingsTierDivider from '@/components/courses/my-ratings/MyRatingsTierDivider';
+import {
+  getCardTier,
+  type MyRatingsCardTier,
+} from '@/components/courses/my-ratings/myRatingsTiering';
+import type { MyRatingsTierCourse } from '@/components/courses/my-ratings/types';
 
 interface AllCoursesListProps {
   userId: string;
