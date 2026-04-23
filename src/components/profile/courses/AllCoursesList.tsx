@@ -220,29 +220,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     return result;
   }, [courses, activeTab, activeCountry, activeSort]);
 
-  // Tie annotation: only meaningful when sorting by rating descending
-  // (the brief's "why above" reveal compares to the next-lower card).
-  const tieAnnotated = useMemo(() => {
-    if (activeSort !== 'rating-high-low') return filteredCourses;
-    // annotateTies needs MyRatingsCourseCardData-shaped rows. Build a parallel
-    // map keyed by course id so we can hand the tiedAbove back onto the
-    // CourseCardData rows without changing their type.
-    const ratedShaped = filteredCourses
-      .filter(c => c.has_rating && c.rating_value != null)
-      .map(c => ({
-        ...toMyRatingsCardData(c),
-        __srcCourseId: c.id,
-      }));
-    const annotated = annotateTies(ratedShaped as any);
-    const tieMap = new Map<string, any>();
-    annotated.forEach((row: any) => {
-      if (row.tiedAbove) tieMap.set(row.__srcCourseId, row.tiedAbove);
-    });
-    return filteredCourses.map(c => ({
-      ...c,
-      __tiedAbove: tieMap.get(c.id) ?? undefined,
-    }));
-  }, [filteredCourses, activeSort]);
+  const tieAnnotated = filteredCourses;
 
   const displayedCourses = tieAnnotated.slice(0, displayCount);
   const hasMore = displayCount < tieAnnotated.length;
