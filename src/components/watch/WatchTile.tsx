@@ -39,7 +39,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
 }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
-  const duration = media?.duration;
+  
   const likeCount = post.likeCount ?? 0;
   const commentCount = post.commentCount ?? 0;
   const tileRef = useRef<HTMLDivElement>(null);
