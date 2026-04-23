@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
+import { getActorRouteByType } from '@/types/actor';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
