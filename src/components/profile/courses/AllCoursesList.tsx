@@ -9,7 +9,6 @@ import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionP
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList } from 'lucide-react';
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
-import EditRatingModal from '@/components/courses/EditRatingModal';
 import MyRatingsHeroCard, {
   type RatedCourseData,
 } from './my-ratings/MyRatingsHeroCard';
