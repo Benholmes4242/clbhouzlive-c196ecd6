@@ -176,7 +176,7 @@ function ContinueWatchingTile({
           bottom: 0,
           left: 0,
           right: 0,
-          height: 5,
+          height: 3,
           background: 'rgba(255,255,255,0.28)',
         }}
       >
