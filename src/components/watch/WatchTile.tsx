@@ -6,6 +6,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
 import { Pin } from './proshop/Pin';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';

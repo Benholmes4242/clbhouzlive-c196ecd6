@@ -8,6 +8,7 @@ import { useWatchMood } from './hooks/useWatchMood';
 import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import { Pin } from './Pin';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function rowToFullscreenPost(row: MostLovedRow) {
   return {

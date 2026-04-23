@@ -8,6 +8,7 @@ import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { Pin } from '../proshop/Pin';
 import type { ClipsMoodId } from './hooks/useClipsMood';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ClipsMostLovedRailProps {
   userId: string | undefined;

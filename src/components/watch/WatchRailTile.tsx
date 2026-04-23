@@ -6,6 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from './context/WatchActionsContext';
 import { Pin } from './proshop/Pin';
 import { haptic } from '@/utils/haptics';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface WatchRailTileProps {
   post: FeedPost;
