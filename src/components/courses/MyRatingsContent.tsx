@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -6,12 +6,39 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, ArrowLeft } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import { annotateTies } from '@/lib/breakdown';
 import MyRatingsCourseCard, {
   type MyRatingsCourseCardData,
 } from './MyRatingsCourseCard';
 import EditRatingModal from './EditRatingModal';
+import CourseSortModeToggle, {
+  type CourseSortMode,
+} from './CourseSortModeToggle';
+import {
+  useUserPersonalRank,
+  useSessionSortMode,
+} from '@/hooks/useUserPersonalRank';
 
 interface RatedCourse {
   id: string;
@@ -37,6 +64,60 @@ interface RatedCourse {
   };
 }
 
+// =====================================================================
+// Sortable card wrapper (only used in personal/My Order mode)
+// =====================================================================
+interface SortableCardProps {
+  course: MyRatingsCourseCardData;
+  rank: number;
+  onCourseClick: (id: string) => void;
+  onAddBreakdown: (id: string) => void;
+}
+
+const SortableMyRatingsCard: React.FC<SortableCardProps> = ({
+  course,
+  rank,
+  onCourseClick,
+  onAddBreakdown,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: course.golf_courses.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.85 : 1,
+    zIndex: isDragging ? 10 : 'auto',
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <MyRatingsCourseCard
+        course={course}
+        rank={rank}
+        onCourseClick={onCourseClick}
+        onAddBreakdown={onAddBreakdown}
+        dragHandle={{
+          listeners,
+          attributes,
+          setActivatorNodeRef,
+          isDragging,
+        }}
+      />
+    </div>
+  );
+};
+
+// =====================================================================
+// MAIN
+// =====================================================================
 const MyRatingsContent = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -47,6 +128,18 @@ const MyRatingsContent = () => {
   const isViewingOwnRatings = !viewingUsername && !viewingUserId;
 
   const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useSessionSortMode(
+    'my-ratings:sort-mode',
+    'rating'
+  );
+  // Local working order for drag-and-drop in personal mode. Allows
+  // optimistic updates between drop and persistence.
+  const [personalOrderOverride, setPersonalOrderOverride] = useState<
+    string[] | null
+  >(null);
+  // Track whether we've shown the "newly rated added at end" toast for
+  // this session, to avoid spamming.
+  const newCountToastShownFor = useRef<number | null>(null);
 
   const { data: viewedUserProfile } = useQuery({
     queryKey: ['user-profile', viewingUsername, viewingUserId],
@@ -74,6 +167,14 @@ const MyRatingsContent = () => {
   const displayName = isViewingOwnRatings
     ? 'My'
     : viewedUserProfile?.display_name || viewedUserProfile?.username || 'User';
+
+  // Personal-mode is only available on your OWN profile
+  const personalEnabled = isViewingOwnRatings;
+  const effectiveSortMode: CourseSortMode = personalEnabled ? sortMode : 'rating';
+
+  const personalRank = useUserPersonalRank(
+    personalEnabled ? targetUserId : undefined
+  );
 
   const { data: ratedCourses = [], isLoading } = useQuery({
     queryKey: ['user-rated-courses', targetUserId],
@@ -138,13 +239,94 @@ const MyRatingsContent = () => {
     enabled: !!targetUserId,
   });
 
-  const annotatedCourses = useMemo(
-    () => annotateTies(ratedCourses as RatedCourse[]),
-    [ratedCourses]
-  );
+  // Seed the personal-rank table the first time the user enters My Order
+  // (no-op on the server if rows already exist).
+  useEffect(() => {
+    if (
+      personalEnabled &&
+      effectiveSortMode === 'personal' &&
+      targetUserId &&
+      !personalRank.isLoading &&
+      personalRank.personalRanks.length === 0 &&
+      ratedCourses.length > 0
+    ) {
+      personalRank.seedIfEmpty().catch((e) =>
+        console.error('Failed to seed personal ranks:', e)
+      );
+    }
+  }, [
+    personalEnabled,
+    effectiveSortMode,
+    targetUserId,
+    personalRank,
+    ratedCourses.length,
+  ]);
+
+  // Build the ordered list for the current view mode.
+  const orderedCourses = useMemo(() => {
+    if (effectiveSortMode === 'personal' && personalEnabled) {
+      // If we have a local override (post-drag, pre-refetch), respect it.
+      if (personalOrderOverride) {
+        const byId = new Map(
+          ratedCourses.map((r) => [r.golf_courses.id, r])
+        );
+        const arr: RatedCourse[] = [];
+        for (const id of personalOrderOverride) {
+          const row = byId.get(id);
+          if (row) arr.push(row);
+        }
+        // Append anything not in override (newly rated, unlikely)
+        for (const r of ratedCourses) {
+          if (!personalOrderOverride.includes(r.golf_courses.id)) arr.push(r);
+        }
+        return arr;
+      }
+
+      // Otherwise apply server personal_rank, mapping by golf_courses.id
+      const rowsKeyedByCourseId = ratedCourses.map((r) => ({
+        ...r,
+        course_id: r.golf_courses.id,
+      })) as Array<RatedCourse & { course_id: string }>;
+      const { ordered, newCount } =
+        personalRank.applyPersonalOrder(rowsKeyedByCourseId);
+
+      if (
+        newCount > 0 &&
+        personalRank.personalRanks.length > 0 &&
+        newCountToastShownFor.current !== newCount
+      ) {
+        newCountToastShownFor.current = newCount;
+        toast(
+          `${newCount} newly rated ${
+            newCount === 1 ? 'course' : 'courses'
+          } added to the end of My Order. Drag to position.`
+        );
+      }
+
+      return ordered as RatedCourse[];
+    }
+    // Rating mode — already sorted
+    return ratedCourses;
+  }, [
+    effectiveSortMode,
+    personalEnabled,
+    personalOrderOverride,
+    personalRank,
+    ratedCourses,
+  ]);
+
+  // Tied-above annotations only matter in rating mode. In personal mode
+  // the user has chosen the order so the explanation is moot.
+  const annotatedCourses = useMemo(() => {
+    if (effectiveSortMode === 'personal') return orderedCourses;
+    return annotateTies(orderedCourses as RatedCourse[]);
+  }, [effectiveSortMode, orderedCourses]);
 
   const editingCourse = useMemo(
-    () => annotatedCourses.find((c) => c.golf_courses.id === editingCourseId),
+    () =>
+      annotatedCourses.find(
+        (c) => c.golf_courses.id === editingCourseId
+      ),
     [annotatedCourses, editingCourseId]
   );
 
@@ -154,6 +336,36 @@ const MyRatingsContent = () => {
 
   const handleAddBreakdown = (courseId: string) => {
     setEditingCourseId(courseId);
+  };
+
+  // dnd-kit setup
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const ids = annotatedCourses.map((c) => c.golf_courses.id);
+    const oldIndex = ids.indexOf(String(active.id));
+    const newIndex = ids.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const next = arrayMove(ids, oldIndex, newIndex);
+    setPersonalOrderOverride(next);
+
+    personalRank
+      .persistOrder(next)
+      .then(() => {
+        // Once the server confirms and refetches, drop the override.
+        setPersonalOrderOverride(null);
+      })
+      .catch(() => {
+        toast.error('Could not save your new order. Reverting.');
+        setPersonalOrderOverride(null);
+      });
   };
 
   if (isLoading) {
@@ -172,6 +384,9 @@ const MyRatingsContent = () => {
     );
   }
 
+  const inPersonalMode = effectiveSortMode === 'personal';
+  const sortableIds = annotatedCourses.map((c) => c.golf_courses.id);
+
   return (
     <>
       <div className="space-y-6">
@@ -186,6 +401,19 @@ const MyRatingsContent = () => {
             {annotatedCourses.length} courses rated
           </Badge>
         </div>
+
+        {personalEnabled && annotatedCourses.length > 0 && (
+          <div style={{ maxWidth: 320 }}>
+            <CourseSortModeToggle
+              mode={sortMode}
+              onChange={(m) => {
+                setSortMode(m);
+                // Reset any in-flight override when switching modes
+                setPersonalOrderOverride(null);
+              }}
+            />
+          </div>
+        )}
 
         {annotatedCourses.length === 0 ? (
           <div
@@ -205,6 +433,27 @@ const MyRatingsContent = () => {
                 : `${displayName} hasn't rated any courses yet`}
             </p>
           </div>
+        ) : inPersonalMode ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+              <div className="space-y-3">
+                {annotatedCourses.map((course, index) => (
+                  <SortableMyRatingsCard
+                    key={course.id}
+                    course={course as MyRatingsCourseCardData}
+                    rank={index + 1}
+                    onCourseClick={handleCourseClick}
+                    onAddBreakdown={handleAddBreakdown}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         ) : (
           <div className="space-y-3">
             {annotatedCourses.map((course, index) => (
