@@ -50,6 +50,14 @@ function getTourSlug(tourName: string): string | null {
   return map[normalized] ?? (normalized.includes('LIV') ? null : 'pga');
 }
 
+// Build a readable abbreviated team name from a list of player members.
+// Prefer last names ("Smalley / Springer") over Sportradar's pre-built abbr.
+function buildAbbrName(players: Array<{ last_name?: string | null; abbr_name?: string | null }>): string {
+  return players
+    .map(p => p.last_name || p.abbr_name || '?')
+    .join(' / ');
+}
+
 // Tour slug mapping for tee times — includes LIV (which has tee time data)
 function getTourSlugForTeeTimes(tourName: string): string | null {
   const normalized = (tourName || '').toUpperCase();
@@ -317,9 +325,11 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
         venue_course_name: course?.name,
         venue_par: course?.par,
         venue_yardage: course?.yardage,
-        // Winner/Defender
-        defending_champion: defendingChamp 
-          ? `${defendingChamp.first_name || ''} ${defendingChamp.last_name || ''}`.trim()
+      // Winner/Defender — branch on team vs single-player shape
+        defending_champion: defendingChamp
+          ? (Array.isArray(defendingChamp.players) && defendingChamp.players.length > 0
+              ? buildAbbrName(defendingChamp.players)
+              : `${defendingChamp.first_name || ''} ${defendingChamp.last_name || ''}`.trim() || null)
           : null,
         winner_id: winner?.id,
         timezone: tournament.course_timezone || resolveTimezone(venue?.country, venue?.state),
