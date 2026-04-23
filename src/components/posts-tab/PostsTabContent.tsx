@@ -12,6 +12,7 @@ import {
 
 import { HybridPostsFeed } from './HybridPostsFeed';
 import { PostsAutoplay } from './PostsAutoplay';
+import { BusinessFriendsStyleFeed } from './BusinessFriendsStyleFeed';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
@@ -113,20 +114,36 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         </div>
       )}
 
-      <HybridPostsFeed
-        posts={filteredPosts}
-        userId={user?.id}
-        isLoading={isLoading}
-        isError={isError}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-        refetch={refetch}
-        isOwnProfile={isOwnProfile}
-        actorName={actorName}
-        gridRef={gridRef}
-      />
-      <PostsAutoplay posts={filteredPosts} gridRef={gridRef} />
+      {actorType === 'business' ? (
+        <BusinessFriendsStyleFeed
+          posts={filteredPosts}
+          userId={user?.id}
+          isLoading={isLoading}
+          isError={isError}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          refetch={refetch}
+          isOwnProfile={isOwnProfile}
+        />
+      ) : (
+        <>
+          <HybridPostsFeed
+            posts={filteredPosts}
+            userId={user?.id}
+            isLoading={isLoading}
+            isError={isError}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            refetch={refetch}
+            isOwnProfile={isOwnProfile}
+            actorName={actorName}
+            gridRef={gridRef}
+          />
+          <PostsAutoplay posts={filteredPosts} gridRef={gridRef} />
+        </>
+      )}
     </div>
   );
 };
