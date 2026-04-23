@@ -85,6 +85,10 @@ interface CreatorCapsuleProps {
     name: string;
     username?: string;
     avatar?: string;
+    /** Actor type for the post — determines profile route on tap. Defaults to 'personal'. */
+    actorType?: 'personal' | 'business';
+    /** Actor id (business id when actorType === 'business'). Falls back to user.id. */
+    actorId?: string;
   };
   caption?: string;
   tags?: PostTag[];
