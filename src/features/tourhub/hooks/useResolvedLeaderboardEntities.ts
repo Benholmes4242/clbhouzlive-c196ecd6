@@ -19,6 +19,8 @@ export type LeaderboardEntity = {
   id: string;
   full_name: string;        // "Rory McIlroy" OR "Smalley / Springer"
   display_name: string;     // alias of full_name
+  /** Compact display name — "S. Scheffler" for players, "Smalley / Springer" for teams */
+  short_name: string;
   avatar: {
     primary: { photo_url: string | null; sr_id: string };
     /** Present only for teams */
@@ -26,13 +28,17 @@ export type LeaderboardEntity = {
     silhouette_fallback: boolean;
   };
   country: string | null;
+  country_code: string | null;
   pga_tour_id: string | null;   // null for teams
+  tour_code: string | null;     // primary tour for headshot lookup
+  headshot_override: string | null;
   /** Present only for teams, ordered by position_in_team ascending */
   players?: Array<{
     id: string;
     sr_id: string;
     full_name: string;
     photo_url: string | null;
+    country: string | null;
   }>;
 };
 
@@ -106,6 +112,11 @@ type JoinedRow = {
   } | null;
 };
 
+function buildShortName(first: string | null | undefined, last: string | null | undefined, fallback: string): string {
+  if (first && first[0] && last) return `${first[0]}. ${last}`;
+  return fallback;
+}
+
 export function resolveLeaderboardEntity(row: JoinedRow): LeaderboardEntity | null {
   if (row.team) {
     const members = (row.team.members || [])
@@ -119,6 +130,7 @@ export function resolveLeaderboardEntity(row: JoinedRow): LeaderboardEntity | nu
         m.player!.full_name ||
         `${m.player!.first_name || ''} ${m.player!.last_name || ''}`.trim(),
       photo_url: m.player!.photo_url,
+      country: m.player!.country,
     }));
 
     const name = row.team.abbr_name || row.team.display_name || '';
@@ -129,6 +141,7 @@ export function resolveLeaderboardEntity(row: JoinedRow): LeaderboardEntity | nu
       sr_id: row.team.sr_id,
       full_name: name,
       display_name: name,
+      short_name: name,
       avatar: {
         primary: {
           photo_url: players[0]?.photo_url ?? null,
@@ -140,7 +153,10 @@ export function resolveLeaderboardEntity(row: JoinedRow): LeaderboardEntity | nu
         silhouette_fallback: players.every(p => !p.photo_url),
       },
       country: row.team.country,
+      country_code: null,
       pga_tour_id: null,
+      tour_code: null,
+      headshot_override: null,
       players,
     };
   }
@@ -156,12 +172,23 @@ export function resolveLeaderboardEntity(row: JoinedRow): LeaderboardEntity | nu
       sr_id: row.player.sr_id,
       full_name: name,
       display_name: name,
+      short_name: buildShortName(row.player.first_name, row.player.last_name, name),
       avatar: {
         primary: { photo_url: row.player.photo_url, sr_id: row.player.sr_id },
         silhouette_fallback: !row.player.photo_url,
       },
       country: row.player.country,
+      country_code: null,
       pga_tour_id: row.player.pga_tour_id,
+      tour_code: row.player.tour_codes?.[0] ?? null,
+      headshot_override: row.player.headshot_override ?? null,
+      players: [{
+        id: row.player.id,
+        sr_id: row.player.sr_id,
+        full_name: name,
+        photo_url: row.player.photo_url,
+        country: row.player.country,
+      }],
     };
   }
 

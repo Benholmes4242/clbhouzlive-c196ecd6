@@ -324,12 +324,15 @@ export function useRecentlyCompletedTournaments() {
             tournament_id,
             position,
             score,
-            player:sr_players!inner(
-              id,
-              sr_id,
-              first_name,
-              last_name,
-              photo_url
+            player:sr_players!sr_leaderboards_player_id_fkey(
+              id, sr_id, first_name, last_name, photo_url
+            ),
+            team:sr_teams!sr_leaderboards_team_id_fkey(
+              id, sr_id, display_name, abbr_name,
+              members:sr_team_players(
+                position_in_team,
+                player:sr_players!sr_team_players_player_id_fkey(id, full_name, photo_url)
+              )
             )
           `)
           .in('tournament_id', tournamentIds)
@@ -357,14 +360,27 @@ export function useRecentlyCompletedTournaments() {
       }> = {};
       if (leaderboardResult.data) {
         leaderboardResult.data.forEach((entry: any) => {
-          if (entry.player) {
+          let player = entry.player;
+          if (!player && entry.team) {
+            const members = (entry.team.members || [])
+              .filter((m: any) => m.player)
+              .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+            const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
+            player = {
+              sr_id: entry.team.sr_id,
+              first_name: '',
+              last_name: teamName,
+              photo_url: members[0]?.player?.photo_url ?? null,
+            };
+          }
+          if (player) {
             leaderboardMap[entry.tournament_id] = {
               score: entry.score,
               player: {
-                sr_id: entry.player.sr_id,
-                first_name: entry.player.first_name || '',
-                last_name: entry.player.last_name || '',
-                photo_url: entry.player.photo_url,
+                sr_id: player.sr_id,
+                first_name: player.first_name || '',
+                last_name: player.last_name || '',
+                photo_url: player.photo_url,
               },
             };
           }
@@ -614,12 +630,15 @@ export function useTournamentLeader(tournamentId: string | undefined) {
           score,
           strokes,
           thru,
-          player:sr_players!inner(
-            id,
-            first_name,
-            last_name,
-            country,
-            photo_url
+          player:sr_players!sr_leaderboards_player_id_fkey(
+            id, first_name, last_name, country, photo_url
+          ),
+          team:sr_teams!sr_leaderboards_team_id_fkey(
+            id, display_name, abbr_name, country,
+            members:sr_team_players(
+              position_in_team,
+              player:sr_players!sr_team_players_player_id_fkey(id, full_name, photo_url, country)
+            )
           )
         `)
         .eq('tournament_id', tournamentId)
@@ -630,6 +649,23 @@ export function useTournamentLeader(tournamentId: string | undefined) {
         .maybeSingle();
 
       if (error || !data) return null;
+      let player: any = (data as any).player;
+      const team = (data as any).team;
+      if (!player && team) {
+        const members = (team.members || [])
+          .filter((m: any) => m.player)
+          .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+        const teamName = team.abbr_name || team.display_name || 'Team';
+        player = {
+          id: team.id,
+          first_name: '',
+          last_name: '',
+          country: team.country,
+          photo_url: members[0]?.player?.photo_url ?? null,
+          _teamName: teamName,
+        };
+      }
+      if (!player) return null;
 
       // Score is relative to par (negative = under par)
       const scoreToPar = data.score;

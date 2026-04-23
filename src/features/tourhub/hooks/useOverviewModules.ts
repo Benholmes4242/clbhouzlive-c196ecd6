@@ -149,24 +149,35 @@ export function useLiveRightNow() {
           position,
           score,
           player_id,
+          team_id,
           thru,
           round_1,
           round_2,
           round_3,
           round_4,
-          player:sr_players!inner(id, first_name, last_name)
+          player:sr_players!sr_leaderboards_player_id_fkey(id, first_name, last_name, full_name),
+          team:sr_teams!sr_leaderboards_team_id_fkey(id, display_name, abbr_name)
         `)
         .in('tournament_id', tournamentIds)
         .eq('position', 1)
         .gt('strokes', 0)
         .not('position', 'is', null);
 
-      // Build leader map and count ties at position 1
+      // Build leader map (synthesize player from team for team events) and count ties
       const leaderMap: Record<string, any> = {};
       const leaderCountMap: Record<string, number> = {};
-      for (const entry of allLeaders || []) {
+      for (const entry of (allLeaders || []) as any[]) {
         leaderCountMap[entry.tournament_id] = (leaderCountMap[entry.tournament_id] ?? 0) + 1;
         if (!leaderMap[entry.tournament_id]) {
+          if (!entry.player && entry.team) {
+            const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
+            entry.player = {
+              id: entry.team.id,
+              first_name: '',
+              last_name: '',
+              full_name: teamName,
+            };
+          }
           leaderMap[entry.tournament_id] = entry;
         }
       }
@@ -575,7 +586,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId, c
         round_3,
         round_4,
         tournament_id,
-        player:sr_players!inner(
+        player:sr_players!sr_leaderboards_player_id_fkey(
           id,
           sr_id,
           first_name,
@@ -585,9 +596,10 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId, c
         )
       `)
       .in('tournament_id', liveTournamentIds)
-      .not('position', 'is', null);
-    
-    liveLeaderboardData = data || [];
+      .not('position', 'is', null)
+      .not('player_id', 'is', null);
+
+    liveLeaderboardData = (data || []).filter((row: any) => row.player);
   }
   
   // === PART 3: Build final player stats ===

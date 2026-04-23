@@ -84,16 +84,20 @@ export function useLiveLeaderTeaser() {
 
       const tournament = scored[0];
 
-      // Get all players at position 1 from the selected tournament
+      // Get all leaders at position 1 — supports both player and team events
       const { data: leaders } = await supabase
         .from('sr_leaderboards')
-        .select('score, position, player_id, sr_players!sr_leaderboards_player_id_fkey(full_name)')
+        .select(`
+          score, position, player_id, team_id,
+          player:sr_players!sr_leaderboards_player_id_fkey(full_name),
+          team:sr_teams!sr_leaderboards_team_id_fkey(display_name, abbr_name)
+        `)
         .eq('tournament_id', tournament.id)
         .eq('position', 1);
 
       if (!leaders || leaders.length === 0) return null;
 
-      const first = leaders[0];
+      const first = leaders[0] as any;
       const tiedCount = leaders.length;
 
       if (tiedCount > 1) {
@@ -107,12 +111,17 @@ export function useLiveLeaderTeaser() {
         };
       }
 
-      const playerData = first.sr_players as unknown as { full_name: string } | null;
-      const fullName = playerData?.full_name || 'Unknown';
-      const nameParts = fullName.split(' ');
-      const displayName = nameParts.length >= 2
-        ? `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`
-        : fullName;
+      // Resolve display name from team or player
+      let displayName = 'Unknown';
+      if (first.team) {
+        displayName = first.team.abbr_name || first.team.display_name || 'Team';
+      } else if (first.player) {
+        const fullName = first.player.full_name || 'Unknown';
+        const nameParts = fullName.split(' ');
+        displayName = nameParts.length >= 2
+          ? `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`
+          : fullName;
+      }
 
       return {
         playerName: displayName,

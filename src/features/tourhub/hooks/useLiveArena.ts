@@ -170,6 +170,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       id,
       tournament_id,
       player_id,
+      team_id,
       position,
       score,
       money,
@@ -188,6 +189,16 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
         headshot_override,
         tour_codes,
         country
+      ),
+      team:sr_teams!sr_leaderboards_team_id_fkey (
+        id,
+        display_name,
+        abbr_name,
+        country,
+        members:sr_team_players(
+          position_in_team,
+          player:sr_players!sr_team_players_player_id_fkey(id, first_name, last_name, full_name, photo_url, country)
+        )
       )
     `)
     .in('tournament_id', tournamentIds)
@@ -211,31 +222,51 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
   for (const tournament of tournaments) {
     const leaderboard = leaderboardByTournament[tournament.id] || [];
 
-    // Transform leaderboard data
-    const players: LiveArenaPlayer[] = leaderboard.map((entry: any) => ({
-      id: entry.id,
-      playerId: entry.player_id,
-      position: entry.position,
-      score: entry.score || 0,
-      scoreDisplay: formatScore(entry.score),
-      thru: entry.thru,
-      thruUpdatedAt: entry.thru_updated_at ?? null,
-      money: entry.money,
-      round_1: entry.round_1 ?? null,
-      round_2: entry.round_2 ?? null,
-      round_3: entry.round_3 ?? null,
-      round_4: entry.round_4 ?? null,
-      player: {
-        id: entry.player?.id || '',
-        firstName: entry.player?.first_name || '',
-        lastName: entry.player?.last_name || '',
-        fullName: entry.player?.full_name || 'Unknown',
-        photoUrl: entry.player?.photo_url || null,
-        headshotOverride: entry.player?.headshot_override ?? null,
-        tourCode: entry.player?.tour_codes?.[0] ?? null,
-        country: entry.player?.country || null,
-      },
-    }));
+    // Transform leaderboard data — synthesize player from team for team events
+    const players: LiveArenaPlayer[] = leaderboard.map((entry: any) => {
+      let p = entry.player;
+      if (!p && entry.team) {
+        const members = (entry.team.members || [])
+          .filter((m: any) => m.player)
+          .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+        const primary = members[0]?.player;
+        const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
+        p = {
+          id: entry.team.id,
+          first_name: '',
+          last_name: '',
+          full_name: teamName,
+          photo_url: primary?.photo_url ?? null,
+          headshot_override: null,
+          tour_codes: null,
+          country: entry.team.country,
+        };
+      }
+      return {
+        id: entry.id,
+        playerId: entry.player_id || entry.team_id,
+        position: entry.position,
+        score: entry.score || 0,
+        scoreDisplay: formatScore(entry.score),
+        thru: entry.thru,
+        thruUpdatedAt: entry.thru_updated_at ?? null,
+        money: entry.money,
+        round_1: entry.round_1 ?? null,
+        round_2: entry.round_2 ?? null,
+        round_3: entry.round_3 ?? null,
+        round_4: entry.round_4 ?? null,
+        player: {
+          id: p?.id || '',
+          firstName: p?.first_name || '',
+          lastName: p?.last_name || '',
+          fullName: p?.full_name || 'Unknown',
+          photoUrl: p?.photo_url || null,
+          headshotOverride: p?.headshot_override ?? null,
+          tourCode: p?.tour_codes?.[0] ?? null,
+          country: p?.country || null,
+        },
+      };
+    });
 
     // Extract leader and chase pack
     const leader = players.find(p => p.position === 1) || null;

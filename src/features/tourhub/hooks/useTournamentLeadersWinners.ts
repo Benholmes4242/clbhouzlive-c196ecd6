@@ -73,24 +73,23 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           score,
           money,
           player_id,
+          team_id,
           round_1,
           round_2,
           round_3,
           round_4,
           thru,
-          player:sr_players!inner (
-            first_name,
-            last_name,
-            full_name,
-            headshot_override,
-            photo_url,
-            country,
-            pga_tour_id,
-            tour_codes
+          player:sr_players!sr_leaderboards_player_id_fkey (
+            first_name, last_name, full_name, headshot_override, photo_url, country, pga_tour_id, tour_codes
+          ),
+          team:sr_teams!sr_leaderboards_team_id_fkey (
+            id, display_name, abbr_name, country,
+            members:sr_team_players(
+              position_in_team,
+              player:sr_players!sr_team_players_player_id_fkey(full_name, photo_url, country)
+            )
           )
         `)
-        // NOTE: photo_url is NOT used for display. All player headshots are served from R2
-        // via getPlayerHeadshotUrl(). This field is kept for reference only.
         .in('tournament_id', tournamentIds)
         .lte('position', 10)
         .order('tournament_id', { ascending: true })
@@ -104,34 +103,53 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
       // Group by tournament_id, take the first 3 people (not first 3 positions)
       const byTournament = new Map<string, TournamentFinisher[]>();
 
-      for (const entry of data || []) {
+      for (const entry of (data || []) as any[]) {
         const tid = entry.tournament_id;
         if (!byTournament.has(tid)) byTournament.set(tid, []);
-        
+
         const existing = byTournament.get(tid)!;
-        // Stop after collecting 10 rows per tournament (for tie overflow counting)
         if (existing.length >= 10) continue;
 
-        const player = entry.player as any;
-        const firstName = player?.first_name || null;
-        const lastName = player?.last_name || null;
+        let player = entry.player;
+        let isTeam = false;
+        if (!player && entry.team) {
+          isTeam = true;
+          const members = (entry.team.members || [])
+            .filter((m: any) => m.player)
+            .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+          const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
+          player = {
+            first_name: '',
+            last_name: '',
+            full_name: teamName,
+            headshot_override: null,
+            photo_url: members[0]?.player?.photo_url ?? null,
+            country: entry.team.country,
+            pga_tour_id: null,
+            tour_codes: null,
+          };
+        }
+        if (!player) continue;
+
+        const firstName = player.first_name || null;
+        const lastName = player.last_name || null;
+        const fullName = player.full_name || `${firstName || ''} ${lastName || ''}`.trim() || 'Unknown';
 
         existing.push({
-          playerId: entry.player_id || null,
+          playerId: entry.player_id || entry.team_id || null,
           firstName: firstName || '',
           lastName: lastName || '',
-          fullName: player?.full_name || `${firstName || ''} ${lastName || ''}`.trim() || 'Unknown',
-          headshotOverride: player?.headshot_override || null,
+          fullName,
+          headshotOverride: player.headshot_override || null,
           score: entry.score,
           money: entry.money,
           position: entry.position,
-          photoUrl: player?.photo_url || null,
-          country: player?.country || null,
-          pgaTourId: player?.pga_tour_id || null,
-          tourCode: player?.tour_codes?.[0] ?? null,
-          displayName: formatDisplayName(firstName, lastName),
+          photoUrl: player.photo_url || null,
+          country: player.country || null,
+          pgaTourId: player.pga_tour_id || null,
+          tourCode: player.tour_codes?.[0] ?? null,
+          displayName: isTeam ? fullName : formatDisplayName(firstName, lastName),
           displayScore: formatScore(entry.score),
-          // B44 FIX 4B: populate round scores
           round1: entry.round_1 ?? null,
           round2: entry.round_2 ?? null,
           round3: entry.round_3 ?? null,
