@@ -60,14 +60,24 @@ export default function LatestVideosRail() {
         seeAllLabel="More videos"
       />
 
-      {/* Single hero anchor */}
+      {/* Single hero anchor — Phase 5e: wrapped to apply the canonical
+          12px radius. Heroes were the last full-bleed holdout; matching the
+          radius unifies them with every other tile/hero on the surface. */}
       <Suspense fallback={null}>
-        <VideoCard
-          post={hero}
-          userId={userId}
-          cardIndex={0}
-          allPosts={posts}
-        />
+        <div
+          style={{
+            margin: '0 16px',
+            borderRadius: 12,
+            overflow: 'hidden',
+          }}
+        >
+          <VideoCard
+            post={hero}
+            userId={userId}
+            cardIndex={0}
+            allPosts={posts}
+          />
+        </div>
       </Suspense>
 
       {/* Horizontal rail of next 9 */}
