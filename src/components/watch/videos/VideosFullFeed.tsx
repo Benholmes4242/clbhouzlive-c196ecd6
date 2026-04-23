@@ -28,13 +28,20 @@ function formatHMS(seconds: number | null | undefined): string {
   return `${m}:${pad(sec)}`;
 }
 
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
 interface VideoFeedCardProps {
   post: FeedPost;
   index: number;
   allPosts: FeedPost[];
+  userId?: string;
 }
 
-function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
+function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProps) {
   const navigate = useNavigate();
   const { openActions } = useWatchActions();
   const longPressTimer = useRef<number | null>(null);
