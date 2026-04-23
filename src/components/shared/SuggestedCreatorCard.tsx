@@ -132,10 +132,12 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         </p>
       </div>
 
-      {/* Club + divider + HCP on one row */}
+      {/* Club + divider + HCP on one row — fixed height so the Follow button
+          stays at the same vertical position whether or not the user has a
+          home club / handicap. */}
       <div onClick={handleProfileTap} style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        gap: 5, marginTop: 5, width: '100%', cursor: 'pointer',
+        gap: 5, marginTop: 5, width: '100%', height: 16, cursor: 'pointer',
       }}>
         {creator.homeCourse && (
           <>
