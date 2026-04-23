@@ -325,134 +325,127 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           </div>
         </div>
       ) : (
-        <div className="space-y-2 mt-3">
+        <div className="mt-3">
           {(() => {
-            const isRatingSort =
-              activeSort === 'rating-high-low' || activeSort === 'rating-low-high';
+            const isHighLow = activeSort === 'rating-high-low';
+            const isLowHigh = activeSort === 'rating-low-high';
+            const isRatingSort = isHighLow || isLowHigh;
 
-            // Helper: convert query row → tier card props shape.
-            const toTierCourse = (course: typeof displayedCourses[number]): MyRatingsTierCourse => ({
-              id: course.id,
-              name: course.name,
-              country: course.country,
-              sub_country: course.sub_country,
-              thumbnail_image: course.thumbnail_image,
-              global_rank: course.is_top100
-                ? (course as unknown as { global_rank?: number | null }).global_rank ?? null
-                : null,
-              rating_id: course.rating_id,
-              rating_value: course.rating_value as number,
-              review_date: course.review_date ?? course.last_played_at ?? null,
-              review_text: (course as unknown as { review_text?: string | null }).review_text ?? null,
-              design_score: course.design_score ?? null,
-              condition_score: course.condition_score ?? null,
-              clubhouse_score: course.clubhouse_score ?? null,
-              facilities_score: course.facilities_score ?? null,
-            });
-
-            const renderTierCard = (
-              course: typeof displayedCourses[number],
-              rank: number,
-              tier: MyRatingsCardTier,
-            ) => {
-              const props = {
-                course: toTierCourse(course),
-                rank,
-                onClick: () =>
-                  navigate(
-                    course.rating_id
-                      ? `/courses/${course.id}?tab=reviews&review=${course.rating_id}`
-                      : `/courses/${course.id}`
-                  ),
-              };
-              if (tier === 'tier1') return <MyRatingsTier1Card key={course.id} {...props} />;
-              if (tier === 'tier2') return <MyRatingsTier2Card key={course.id} {...props} />;
-              return <MyRatingsTier3Card key={course.id} {...props} />;
-            };
-
-            // ── Stratified rendering for rating-sorted lists ───────────────
+            // ── Rating-sorted: stratified hero + compact, with dividers ─────
             if (isRatingSort) {
-              // Tier counts across the *entire* filtered+sorted list, not just
-              // the page (so the divider count reflects total rounds in tier).
-              const tierCounts: Record<MyRatingsCardTier, number> = {
-                tier1: 0,
-                tier2: 0,
-                tier3: 0,
+              // Tier counts across the *entire* filtered+sorted list.
+              const tierCounts: Record<MyRatingsBucket, number> = {
+                exceptional: 0,
+                outstanding: 0,
+                excellent: 0,
               };
               tieAnnotated.forEach((c) => {
                 if (c.has_rating && c.rating_value != null) {
-                  tierCounts[getCardTier(c.rating_value)]++;
+                  tierCounts[getBucket(c.rating_value)]++;
                 }
               });
 
               const elements: React.ReactNode[] = [];
-              let currentTier: MyRatingsCardTier | null = null;
+              let currentBucket: MyRatingsBucket | null = null;
               let firstDividerRendered = false;
+              let compactBucket: React.ReactNode[] = [];
+              let compactKeySeed = 0;
+
+              const flushCompact = () => {
+                if (compactBucket.length === 0) return;
+                elements.push(
+                  <div
+                    key={`compact-bucket-${compactKeySeed++}`}
+                    style={{ padding: '0 16px' }}
+                  >
+                    {compactBucket}
+                  </div>,
+                );
+                compactBucket = [];
+              };
 
               displayedCourses.forEach((course, index) => {
                 const rank = index + 1;
                 const isRated = course.has_rating && course.rating_value != null;
+                if (!isRated) return; // unrated dropped from rating-sorted view
 
-                if (!isRated) {
-                  // Edge case: an unrated course in a rating-sorted list.
-                  // Surface via the legacy tiered card so it doesn't disappear.
-                  elements.push(
-                    <TieredCourseCard
-                      key={course.id}
-                      course={course}
-                      isOwnProfile={isOwnProfile}
-                    />
-                  );
-                  return;
-                }
+                const rating = course.rating_value as number;
+                const bucket = getBucket(rating);
 
-                const tier = getCardTier(course.rating_value as number);
-                if (tier !== currentTier) {
+                if (bucket !== currentBucket) {
+                  flushCompact();
                   elements.push(
                     <MyRatingsTierDivider
-                      key={`divider-${tier}`}
-                      tier={tier}
-                      count={tierCounts[tier]}
+                      key={`divider-${bucket}`}
+                      tierName={getBucketLabel(bucket)}
+                      count={tierCounts[bucket]}
                       isFirst={!firstDividerRendered}
-                    />
+                    />,
                   );
                   firstDividerRendered = true;
-                  currentTier = tier;
+                  currentBucket = bucket;
                 }
 
-                elements.push(renderTierCard(course, rank, tier));
+                const heroTier = isHighLow ? getHeroTier(rating) : null;
+                // In low→high mode, render everything as compact rows even
+                // for ≥9.0 — the cinematic hero only fires in high→low.
+
+                if (heroTier !== null) {
+                  flushCompact();
+                  elements.push(
+                    // Negative horizontal margin escapes the parent's
+                    // 10px (px-2.5) padding, achieving true full-bleed.
+                    <div key={course.id} style={{ marginLeft: -10, marginRight: -10 }}>
+                      <MyRatingsHeroCard
+                        course={toRatedCourseData(course as any)}
+                        rank={rank}
+                        onCourseClick={handleCourseClick}
+                      />
+                    </div>,
+                  );
+                } else {
+                  compactBucket.push(
+                    <MyRatingsCompactRow
+                      key={course.id}
+                      course={toRatedCourseData(course as any)}
+                      rank={rank}
+                      onCourseClick={handleCourseClick}
+                    />,
+                  );
+                }
               });
 
+              flushCompact();
               return elements;
             }
 
-            // ── Default rendering (recently-played etc.) ───────────────────
-            return displayedCourses.map((course, index) => {
-              const rank = index + 1;
-              const isRated = course.has_rating && course.rating_value != null;
-              if (isRated) {
-                const cardData: MyRatingsCourseCardData = {
-                  ...toMyRatingsCardData(course),
-                  tiedAbove: (course as any).__tiedAbove,
-                };
-                return (
-                  <MyRatingsCourseCard
-                    key={course.id}
-                    course={cardData}
-                    rank={rank}
-                    onCourseClick={(id) => navigate(`/courses/${id}`)}
-                    onAddBreakdown={() => setEditingCourse(course)}
-                  />
-                );
-              }
-              return (
-                <TieredCourseCard
-                  key={course.id}
-                  course={course}
-                  isOwnProfile={isOwnProfile}
-                />
-              );
-            });
+            // ── Recently-played: flat compact list, dividers off ────────────
+            return (
+              <div style={{ padding: '0 16px' }}>
+                {displayedCourses.map((course, index) => {
+                  const rank = index + 1;
+                  const isRated = course.has_rating && course.rating_value != null;
+                  if (isRated) {
+                    return (
+                      <MyRatingsCompactRow
+                        key={course.id}
+                        course={toRatedCourseData(course as any)}
+                        rank={rank}
+                        onCourseClick={handleCourseClick}
+                      />
+                    );
+                  }
+                  return (
+                    <div key={course.id} className="mb-2">
+                      <TieredCourseCard
+                        course={course}
+                        isOwnProfile={isOwnProfile}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
           })()}
         </div>
       )}
@@ -499,21 +492,6 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               : `That\u2019s ${firstName || 'their'}\u2019s journey so far.`}
           </p>
         </div>
-      )}
-
-      {editingCourse && editingCourse.has_rating && editingCourse.rating_value != null && (
-        <EditRatingModal
-          courseId={editingCourse.id}
-          courseName={editingCourse.name}
-          currentRating={editingCourse.rating_value}
-          currentReview={(editingCourse as any).review_text ?? null}
-          currentDesignScore={editingCourse.design_score ?? null}
-          currentConditionScore={editingCourse.condition_score ?? null}
-          currentClubhouseScore={editingCourse.clubhouse_score ?? null}
-          currentFacilitiesScore={editingCourse.facilities_score ?? null}
-          isOpen={!!editingCourse}
-          onClose={() => setEditingCourse(null)}
-        />
       )}
     </div>
   );
