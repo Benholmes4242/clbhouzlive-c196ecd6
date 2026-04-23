@@ -42,7 +42,9 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
         fontWeight: 600,
         borderRadius: 20,
         background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+        // Phase 5c: 1px in both states (was 1px active / 1.5px inactive).
+        // Eliminates the 0.5px width shift on toggle.
+        border: isActive ? '1px solid hsl(var(--primary))' : '1px solid hsl(var(--border))',
         color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
       }}
     >
@@ -99,7 +101,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
   return (
     <WatchActionsProvider>
-    <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
+    <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
       <LongPressTipBanner />
 
       {/* ── Pro Shop: mood chips at the top of the Watch tab ── */}
@@ -122,8 +124,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Pro Shop: Most loved this week ── */}
       <MostLovedRail />
 
-      {/* ── Section 3: More clips — chips + grid ── */}
-      <div>
+      {/* ── Section 3: More clips — chips + grid ──
+          Phase 5g: explicit 24px paddingBottom guarantees clearance from
+          the bottom nav even when PageRoot is bypassed. */}
+      <div style={{ paddingBottom: 24 }}>
         <WatchSectionHeader
           eyebrow="Browse"
           title="More to explore"

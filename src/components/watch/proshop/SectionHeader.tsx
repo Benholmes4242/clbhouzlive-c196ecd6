@@ -68,17 +68,26 @@ function SectionHeaderInner({
           onClick={action.onClick}
           className="active:scale-[0.97] transition-transform"
           style={{
+            // Phase 5b: 44px iOS-minimum touch target via invisible padding
+            // (negative margin keeps the visual baseline aligned with the
+            // header text above). Visual size unchanged — only hit area grows.
             display: 'inline-flex',
             alignItems: 'center',
             gap: 2,
             fontSize: 12,
             fontWeight: 600,
+            // Phase 5b: #c97a10 = canonical "amber on white" CTA colour.
+            // It is the AA-contrast pair of brand amber #F7931E (which fails
+            // AA on white). Two ambers, two roles, one brand:
+            //   #F7931E → fills, accents, kickers (decorative)
+            //   #c97a10 → text on white surfaces (legibility)
             color: '#c97a10',
             background: 'transparent',
             border: 'none',
-            padding: '4px 0',
+            minHeight: 44,
+            padding: '12px 0 12px 16px',
+            margin: `${(kicker ? 13 : 2) - 12}px -12px -12px 0`,
             flexShrink: 0,
-            marginTop: kicker ? 13 : 2,
           }}
         >
           {action.label}

@@ -28,7 +28,8 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
         padding: '6px 24px',
         borderRadius: 20,
         background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+        // Phase 5c: 1px both states (was 1px / 1.5px) — no width shift on toggle.
+        border: isActive ? '1px solid hsl(var(--primary))' : '1px solid hsl(var(--border))',
         color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
       }}
     >

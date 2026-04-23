@@ -39,9 +39,9 @@ function CourseAnchoredRailInner() {
   if (!topCourse || posts.length === 0) return null;
 
   return (
-    <section style={{ background: '#F8FAFC' }}>
+    <section style={{ background: 'hsl(var(--background))' }}>
       <SectionHeader
-        kicker="FROM YOUR COURSES"
+        kicker="From your courses"
         title={topCourse.course_name}
         sub={`${topCourse.content_count} recent ${
           topCourse.content_count === 1 ? 'post' : 'posts'

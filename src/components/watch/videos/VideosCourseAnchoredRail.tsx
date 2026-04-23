@@ -61,7 +61,7 @@ function VideosCourseAnchoredRailInner({ userId }: VideosCourseAnchoredRailProps
   return (
     <section>
       <SectionHeader
-        kicker="FROM YOUR COURSES"
+        kicker="From your courses"
         title={topCourse.course_name}
         sub={`${topCourse.content_count} long-form video${
           topCourse.content_count === 1 ? '' : 's'

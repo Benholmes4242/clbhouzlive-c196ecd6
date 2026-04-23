@@ -24,7 +24,7 @@ function LightningRoundRailInner({ userId, mood }: LightningRoundRailProps) {
   return (
     <section>
       <SectionHeader
-        kicker="UNDER 30 SEC"
+        kicker="Under 30 sec"
         title="Lightning round"
         sub="Bite-sized golf, bite-sized commitment"
       />

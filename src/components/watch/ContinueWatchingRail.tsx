@@ -184,7 +184,7 @@ function ContinueWatchingTile({
           style={{
             width: `${progressPct}%`,
             height: '100%',
-            background: '#F7931E',
+            background: 'hsl(var(--primary))',
           }}
         />
       </div>
