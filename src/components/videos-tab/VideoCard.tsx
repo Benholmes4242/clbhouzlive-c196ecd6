@@ -166,7 +166,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-            <button onClick={() => navigate(`/profile/${post.userId}`)} className="shrink-0">
+            <button onClick={handleAuthorTap} className="shrink-0">
               <SquircleAvatar
                 src={post.avatarUrl}
                 alt={post.displayName}
@@ -175,7 +175,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
                 hideRing
               />
             </button>
-            <button onClick={() => navigate(`/profile/${post.userId}`)} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <button onClick={handleAuthorTap} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
                 {post.displayName}
               </span>
