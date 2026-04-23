@@ -1,11 +1,11 @@
 import { memo } from 'react';
+import { Play } from 'lucide-react';
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
 import { useWatchMood } from './hooks/useWatchMood';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
-import { PlayAffordance } from './PlayAffordance';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
@@ -118,9 +118,14 @@ function WatchOfTheWeekHeroInner() {
             position: 'absolute',
             top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
+            width: 56, height: 56,
+            borderRadius: '50%',
+            background: 'rgba(0,0,0,0.6)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
-          <PlayAffordance size={56} variant="outlined" />
+          <Play size={22} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
         </div>
 
         {/* Bottom: title + creator + duration */}

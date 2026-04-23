@@ -1,13 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Film, Heart, MessageCircle } from 'lucide-react';
+import { Film, Heart, MessageCircle, Play } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
 import { Pin } from './proshop/Pin';
-import { CreatorChip } from './proshop/CreatorChip';
-import { PlayAffordance } from './proshop/PlayAffordance';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -182,34 +181,65 @@ const WatchTile: React.FC<WatchTileProps> = ({
         }}
       />
 
-      {/* Play affordance — top-right (canonical Pro Shop play) */}
+      {/* Play affordance — center-right area, on every video tile */}
       <div
-        className="absolute pointer-events-none"
-        style={{ top: 8, right: 8, zIndex: 9 }}
+        className="absolute pointer-events-none flex items-center justify-center"
+        style={{
+          top: 10, right: 10, zIndex: 9,
+          width: 28, height: 28, borderRadius: 999,
+          background: 'rgba(0,0,0,0.55)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+        }}
       >
-        <PlayAffordance size={28} />
+        <Play size={14} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
       </div>
 
-      {/* Duration — top-left as canonical Pin */}
+      {/* Duration — top-left (relocated to avoid play-triangle collision) */}
       {duration != null && duration > 0 && (
-        <div className="absolute z-10" style={{ top: 8, left: 8 }}>
-          <Pin variant="dark">{formatDuration(duration)}</Pin>
+        <div
+          className="absolute top-1.5 left-1.5 z-10 rounded-[4px] flex items-center"
+          style={{
+            background: 'rgba(0, 0, 0, 0.55)',
+            padding: '2px 5px',
+          }}
+        >
+          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
+            {formatDuration(duration)}
+          </span>
         </div>
       )}
 
-      {/* Creator chip — bottom-left (canonical CreatorChip) */}
+      {/* Creator chip — bottom-left */}
       {showCreatorChip && (
-        <div
-          className="absolute z-10 active:scale-[0.97] transition-transform"
-          style={{ bottom: 6, left: 6, maxWidth: 'calc(100% - 70px)' }}
+        <button
+          type="button"
+          onClick={handleCreatorTap}
+          className="absolute z-10 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
+          style={{
+            bottom: 6, left: 6,
+            background: 'rgba(0,0,0,0.6)',
+            borderRadius: 999, padding: '2px 8px 2px 2px',
+            maxWidth: 'calc(100% - 70px)',
+          }}
         >
-          <CreatorChip
-            name={creatorLabel}
-            avatarUrl={post.avatarUrl}
-            maxLabelWidth={90}
-            onClick={handleCreatorTap}
-          />
-        </div>
+          <div style={{ flexShrink: 0 }}>
+            <SquircleAvatar
+              src={post.avatarUrl}
+              alt={creatorLabel}
+              size={18}
+              hideRing
+            />
+          </div>
+          <span
+            style={{
+              fontSize: 11, fontWeight: 600, color: 'white',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              maxWidth: 90,
+            }}
+          >
+            {creatorLabel}
+          </span>
+        </button>
       )}
 
       {/* Engagement stats — bottom-right (likes always, comments if > 0).
