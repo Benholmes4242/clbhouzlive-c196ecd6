@@ -21,6 +21,10 @@ interface ReviewCreator {
   name: string;
   username?: string;
   avatar?: string;
+  /** Actor type for the post — determines profile route on capsule tap. */
+  actorType?: 'personal' | 'business';
+  /** Actor id (business id for business-authored reviews). Falls back to id. */
+  actorId?: string;
 }
 
 interface ReviewPostViewerProps extends Omit<FullscreenReviewPostProps, 'children'> {

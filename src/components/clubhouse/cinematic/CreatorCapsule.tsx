@@ -19,6 +19,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { getActorRouteByType } from '@/types/actor';
 import { CourseDNACard } from './CourseDNACard';
 
 import { type ExtractedReviewData } from '@/lib/postHelpers';
@@ -84,6 +85,10 @@ interface CreatorCapsuleProps {
     name: string;
     username?: string;
     avatar?: string;
+    /** Actor type for the post — determines profile route on tap. Defaults to 'personal'. */
+    actorType?: 'personal' | 'business';
+    /** Actor id (business id when actorType === 'business'). Falls back to user.id. */
+    actorId?: string;
   };
   caption?: string;
   tags?: PostTag[];
@@ -188,10 +193,13 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     if (onViewProfile) {
       onViewProfile();
     } else {
-      const path = getProfilePathById(user.id);
+      // Use actor info if supplied, otherwise fall back to legacy personal route
+      const path = user.actorType
+        ? getActorRouteByType(user.actorType, user.actorId ?? user.id)
+        : getProfilePathById(user.id);
       navigate(path);
     }
-  }, [navigate, onViewProfile, onBeforeNavigate, user.id]);
+  }, [navigate, onViewProfile, onBeforeNavigate, user.id, user.actorType, user.actorId]);
 
   // Clean caption: strip embedded "Played at" course text
   const cleanCaption = caption ? removeGolfCourseFromContent(caption) : '';

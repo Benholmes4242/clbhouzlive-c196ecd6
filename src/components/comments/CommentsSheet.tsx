@@ -61,6 +61,10 @@ interface CommentsSheetProps {
   theme?: 'light' | 'dark' | 'grey';
   currentUserId?: string | null;
   creatorUserId?: string;
+  /** Actor type of the post creator (for business-authored posts). */
+  creatorActorType?: 'personal' | 'business';
+  /** Actor id of the post creator (business id for business-authored posts). */
+  creatorActorId?: string;
   initialCommentId?: string | null;
   initialParentCommentId?: string | null;
   aspectRatio?: number;
@@ -88,6 +92,8 @@ function CommentsSheet({
   theme = 'dark',
   currentUserId: currentUserIdProp,
   creatorUserId,
+  creatorActorType,
+  creatorActorId,
   initialCommentId,
   initialParentCommentId,
   
@@ -359,7 +365,11 @@ function CommentsSheet({
     parentId?: string,
   ) => {
     const isOwn = currentUserId === comment.user_id;
-    const isOP = comment.user_id === creatorUserId;
+    // OP badge: for business-authored posts, match the business actor on the comment.
+    // For personal-authored posts (default), match the human user_id as before.
+    const isOP = creatorActorType === 'business'
+      ? comment.actor_type === 'business' && comment.actor_id === creatorActorId
+      : comment.user_id === creatorUserId;
     
 
     return (
@@ -890,10 +900,10 @@ function CommentsSheet({
                         <button
                           key={liker.userId}
                           type="button"
-                          // TODO Phase B: route business likers to their business profile.
-                          // Currently `liker` only carries userId — needs actor_type/actor_id
-                          // plumbed through usePostLikes before this can branch correctly.
-                          onClick={() => { navigate(`/profile/${liker.userId}`); onClose(); }}
+                          onClick={() => {
+                            navigate(getActorRouteByType(liker.actorType, liker.actorId ?? liker.userId));
+                            onClose();
+                          }}
                           className="flex items-center gap-3 w-full px-4 py-3 min-h-[60px] text-left transition-colors hover:bg-[rgba(15,23,42,0.02)]"
                         >
                           <SquircleAvatar

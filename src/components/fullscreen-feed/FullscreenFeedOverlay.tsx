@@ -221,6 +221,8 @@ export function FullscreenFeedOverlay() {
         postId={activePost?.id ?? ""}
         currentUserId={userId}
         creatorUserId={activePost?.userId}
+        creatorActorType={activePost?.actorType === 'business' ? 'business' : 'personal'}
+        creatorActorId={activePost?.actorId}
         creatorName={activePost?.displayName}
         creatorAvatar={activePost?.avatarUrl}
         caption={activePost?.caption}

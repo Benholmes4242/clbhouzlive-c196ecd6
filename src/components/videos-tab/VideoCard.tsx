@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
+import { getActorRouteByType } from '@/types/actor';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -76,6 +77,10 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   const handleTap = () => {
     open(allPosts ?? [post], cardIndex);
   };
+
+  const handleAuthorTap = useCallback(() => {
+    navigate(getActorRouteByType(post.actorType, post.actorId));
+  }, [navigate, post.actorType, post.actorId]);
 
   const toggleLike = async () => {
     if (!userId) return;
@@ -161,7 +166,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-            <button onClick={() => navigate(`/profile/${post.userId}`)} className="shrink-0">
+            <button onClick={handleAuthorTap} className="shrink-0">
               <SquircleAvatar
                 src={post.avatarUrl}
                 alt={post.displayName}
@@ -170,7 +175,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
                 hideRing
               />
             </button>
-            <button onClick={() => navigate(`/profile/${post.userId}`)} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <button onClick={handleAuthorTap} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))' }}>
                 {post.displayName}
               </span>
