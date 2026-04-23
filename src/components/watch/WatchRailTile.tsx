@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from './context/WatchActionsContext';
+import { Pin } from './proshop/Pin';
 import { haptic } from '@/utils/haptics';
 
 interface WatchRailTileProps {
@@ -227,7 +228,7 @@ export default function WatchRailTile({
         }}
       />
 
-      {/* Surfacing reason — small amber pill, top-left, solid scrim */}
+      {/* Surfacing reason — amber Pin (NEW / POPULAR REVIEW), top-left */}
       {surfacingReason && (
         <div
           style={{
@@ -235,28 +236,11 @@ export default function WatchRailTile({
             top: 8,
             left: 8,
             zIndex: 3,
-            height: 18,
-            padding: '0 7px',
-            borderRadius: 6,
-            background: 'rgba(0,0,0,0.55)',
-            fontSize: 9,
-            fontWeight: 700,
-            lineHeight: 1,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: '#F7931E',
-            pointerEvents: 'none',
             maxWidth: 'calc(100% - 16px)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
+            pointerEvents: 'none',
           }}
         >
-          {surfacingReason}
+          <Pin variant="amber" size="sm">{surfacingReason}</Pin>
         </div>
       )}
 
