@@ -136,10 +136,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
         {/* Chip bar — 3 primary + More overflow */}
         <div
-          className="flex gap-2 overflow-x-auto scrollbar-hide no-scrollbar"
+          className="flex gap-2 overflow-x-auto"
           style={{
             scrollbarWidth: 'none',
-            padding: '4px 24px 12px 16px',
+            padding: '0 16px 12px',
           }}
         >
           <ChipButton
