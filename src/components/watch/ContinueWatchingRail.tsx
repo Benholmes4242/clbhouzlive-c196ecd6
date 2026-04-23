@@ -2,7 +2,8 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { ContinueWatchingPost } from './hooks/useContinueWatching';
 import { useContinueWatching } from './hooks/useContinueWatching';
 import WatchSectionHeader from './WatchSectionHeader';
-import WatchSectionDivider from './WatchSectionDivider';
+// WatchSectionDivider removed in Phase 4 — divider ownership now lives in
+// the page composition (UnifiedWatchFeed); rails no longer render their own.
 import { HRail } from './proshop/HRail';
 
 interface ContinueWatchingRailProps {
@@ -30,7 +31,6 @@ export default function ContinueWatchingRail({ userId }: ContinueWatchingRailPro
           </div>
         ))}
       </HRail>
-      <WatchSectionDivider />
     </>
   );
 }
