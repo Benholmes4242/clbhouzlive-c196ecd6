@@ -25,7 +25,7 @@ function HRailInner({
   paddingTop = 0,
   snap = true,
 }: HRailProps) {
-  const leftInset = 50;
+  const leftInset = 16;
 
   return (
     <div
