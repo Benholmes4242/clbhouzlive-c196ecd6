@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 
 interface Review {
   id: string;
