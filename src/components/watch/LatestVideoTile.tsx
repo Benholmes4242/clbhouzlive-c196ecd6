@@ -99,7 +99,7 @@ export default function LatestVideoTile({
           position: 'relative',
           width: '100%',
           aspectRatio: '16 / 9',
-          borderRadius: 10,
+          borderRadius: 12,
           overflow: 'hidden',
           background:
             thumb && !thumbFailed

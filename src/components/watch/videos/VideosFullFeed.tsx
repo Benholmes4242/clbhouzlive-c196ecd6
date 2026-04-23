@@ -83,7 +83,7 @@ function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 10,
+          borderRadius: 12,
           overflow: 'hidden',
           background: '#0F172A',
           border: 'none',
