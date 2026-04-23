@@ -39,6 +39,7 @@ import volvoChinaOpenUpcoming from '@/assets/tours/volvo-china-open-upcoming.jpg
 import { getTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
+import { LeaderEntityAvatar } from '../shared/LeaderEntityAvatar';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, getCurrentRoundLabel as getCurrentRoundLabelShared, UpcomingCountdown } from '../shared/TourHeroHelpers';
@@ -281,20 +282,36 @@ function LeaderHeroStrip({
       }}>
         {/* Left — avatar + name block */}
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-          {/* Avatar — slightly larger */}
-          <div style={{
-            width: 60, height: 62, borderRadius: '30%',
-            border: '2px solid rgba(255,255,255,0.25)',
-            background: 'rgba(0,0,0,0.3)',
-            overflow: 'hidden', flexShrink: 0,
-          }}>
-            {photoUrl && !imgErr ? (
-              <img src={photoUrl} alt="" onError={() => setImgErr(true)}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-            ) : (
-              <PlayerSilhouette size={28} />
-            )}
-          </div>
+          {/* Avatar — slightly larger; team-format renders stacked dual-avatar */}
+          {isTeamEntry ? (
+            <LeaderEntityAvatar
+              teamMembers={sortedMembers.map((m: any) => ({
+                fullName: m.player.full_name || `${m.player.first_name || ''} ${m.player.last_name || ''}`.trim(),
+                photoUrl: m.player.photo_url,
+                tourCode: effectiveTourCode,
+                headshotOverride: null,
+              }))}
+              size={62}
+              ringColor="#0A1628"
+              borderColor="rgba(255,255,255,0.25)"
+              borderWidth={2}
+              radiusPct={30}
+            />
+          ) : (
+            <div style={{
+              width: 60, height: 62, borderRadius: '30%',
+              border: '2px solid rgba(255,255,255,0.25)',
+              background: 'rgba(0,0,0,0.3)',
+              overflow: 'hidden', flexShrink: 0,
+            }}>
+              {photoUrl && !imgErr ? (
+                <img src={photoUrl} alt="" onError={() => setImgErr(true)}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+              ) : (
+                <PlayerSilhouette size={28} />
+              )}
+            </div>
+          )}
           {/* Name + meta */}
           <div style={{ paddingBottom: 2 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
