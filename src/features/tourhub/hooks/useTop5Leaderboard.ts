@@ -29,8 +29,16 @@ export function useTop5Leaderboard(tournamentId: string | undefined) {
           position,
           score,
           player_id,
+          team_id,
           player:sr_players!sr_leaderboards_player_id_fkey (
             id, full_name, photo_url
+          ),
+          team:sr_teams!sr_leaderboards_team_id_fkey (
+            id, display_name, abbr_name,
+            members:sr_team_players(
+              position_in_team,
+              player:sr_players!sr_team_players_player_id_fkey(id, full_name, photo_url)
+            )
           )
         `)
         .eq('tournament_id', tournamentId)
@@ -43,14 +51,30 @@ export function useTop5Leaderboard(tournamentId: string | undefined) {
 
       // Group rows by position to detect ties
       const byPos = new Map<number, Top5Entry[]>();
-      for (const row of data) {
-        if (!row.player) continue;
-        const player = row.player as any;
+      for (const row of data as any[]) {
+        let player = row.player;
+        let entityId: string | null = null;
+        if (!player && row.team) {
+          const members = (row.team.members || [])
+            .filter((m: any) => m.player)
+            .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+          const primary = members[0]?.player;
+          player = {
+            id: row.team.id,
+            full_name: row.team.abbr_name || row.team.display_name || 'Team',
+            photo_url: primary?.photo_url ?? null,
+          };
+          entityId = row.team.id;
+        } else if (player) {
+          entityId = player.id;
+        }
+        if (!player || !entityId) continue;
+
         const pos = Number(row.position);
         const entry: Top5Entry = {
           position: pos,
           isTied: false, // set below
-          playerId: player.id,
+          playerId: entityId,
           playerName: player.full_name,
           photoUrl: getPlayerHeadshotUrl(player.full_name, 'pga')
             || player.photo_url
