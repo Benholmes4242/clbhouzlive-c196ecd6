@@ -22,6 +22,13 @@ const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'product
 const getTourBaseUrl = (tour: string = 'pga') =>
   `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
 
+// Build a readable abbreviated team name from a list of player members.
+function buildAbbrName(players: Array<{ last_name?: string | null; abbr_name?: string | null }>): string {
+  return players
+    .map(p => p.last_name || p.abbr_name || '?')
+    .join(' / ');
+}
+
 interface PendingLiveTournament {
   id: string;
   sr_id: string;
@@ -871,7 +878,118 @@ async function syncLeaderboard(
   let records = 0;
 
   for (const entry of leaderboard) {
-    // Support both nested (entry.player.id) and flat (entry.id) Sportradar formats
+    const isTeamEntry = Array.isArray(entry.players) && entry.players.length > 0;
+
+    if (isTeamEntry) {
+      // ═══ TEAM BRANCH ══════════════════════════════════════
+      const teamSrId = entry.id;
+      if (!teamSrId) continue;
+
+      // 1. Upsert each team member (real player sr_ids)
+      const memberPlayerIds: Array<{ id: string; position: number }> = [];
+      for (let i = 0; i < entry.players.length; i++) {
+        const member = entry.players[i];
+        if (!member?.id) continue;
+
+        let memberId: string | null = null;
+        const { data: existingMember } = await supabase
+          .from('sr_players').select('id').eq('sr_id', member.id).maybeSingle();
+
+        if (existingMember) {
+          memberId = existingMember.id;
+        } else {
+          const { data: newMember } = await supabase.from('sr_players').insert({
+            sr_id: member.id,
+            first_name: member.first_name,
+            last_name: member.last_name,
+            full_name: `${member.first_name || ''} ${member.last_name || ''}`.trim(),
+            country: member.country,
+          }).select().single();
+          memberId = newMember?.id ?? null;
+        }
+        if (memberId) memberPlayerIds.push({ id: memberId, position: i + 1 });
+      }
+      if (memberPlayerIds.length === 0) continue;
+
+      // 2. Upsert sr_teams
+      let teamId: string | null = null;
+      const abbrName = buildAbbrName(entry.players);
+      const { data: existingTeam } = await supabase
+        .from('sr_teams').select('id').eq('sr_id', teamSrId).maybeSingle();
+
+      if (existingTeam) {
+        teamId = existingTeam.id;
+        await supabase.from('sr_teams').update({
+          tournament_id: tournamentDbId,
+          display_name: entry.name,
+          abbr_name: abbrName,
+          raw_data: entry,
+          updated_at: new Date().toISOString(),
+        }).eq('id', teamId);
+      } else {
+        const { data: newTeam } = await supabase.from('sr_teams').insert({
+          sr_id: teamSrId,
+          tournament_id: tournamentDbId,
+          display_name: entry.name,
+          abbr_name: abbrName,
+          raw_data: entry,
+        }).select().single();
+        teamId = newTeam?.id ?? null;
+      }
+      if (!teamId) continue;
+
+      // 3. Upsert sr_team_players
+      for (const { id: memberId, position } of memberPlayerIds) {
+        await supabase.from('sr_team_players').upsert({
+          team_id: teamId,
+          player_id: memberId,
+          position_in_team: position,
+        }, { onConflict: 'team_id,player_id' });
+      }
+
+      // 4. Upsert leaderboard row keyed by team_id
+      const roundsRaw = Array.isArray(entry.rounds) ? entry.rounds : [];
+      const rounds = roundsRaw.map((r: any) => ({
+        thru: typeof r?.thru === 'number' ? r.thru : parseInt(String(r?.thru ?? ''), 10) || 0,
+        strokes: typeof r?.strokes === 'number' ? r.strokes : parseInt(String(r?.strokes ?? ''), 10) || 0,
+        score: typeof r?.score === 'number' ? r.score : null,
+      }));
+      const activeRound = rounds.length > 0
+        ? [...rounds].reverse().find((r: any) => r.thru > 0 && r.strokes > 0) || null
+        : null;
+      const fallbackThru = typeof entry.thru === 'number' ? entry.thru : parseInt(String(entry.thru ?? ''), 10) || 0;
+      const derivedThru = activeRound?.thru ?? (fallbackThru > 0 ? fallbackThru : null);
+      const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
+
+      const { error } = await supabase.from('sr_leaderboards').upsert({
+        tournament_id: tournamentDbId,
+        team_id: teamId,
+        player_id: null,
+        position: entry.position,
+        position_tied: entry.tied || false,
+        score: entry.score,
+        strokes: entry.strokes,
+        thru: derivedThru,
+        thru_updated_at: derivedThru !== null && derivedThru > 0 ? new Date().toISOString() : null,
+        round_1: rounds.length > 0 && rounds[0]?.thru >= 18 && rounds[0]?.strokes > 0 ? rounds[0]?.score : null,
+        round_2: rounds.length > 1 && rounds[1]?.thru >= 18 && rounds[1]?.strokes > 0 ? rounds[1]?.score : null,
+        round_3: rounds.length > 2 && rounds[2]?.thru >= 18 && rounds[2]?.strokes > 0 ? rounds[2]?.score : null,
+        round_4: rounds.length > 3 && rounds[3]?.thru >= 18 && rounds[3]?.strokes > 0 ? rounds[3]?.score : null,
+        money: entry.money,
+        points: entry.points,
+        status: derivedStatus,
+        raw_data: entry,
+      }, { onConflict: 'tournament_id,team_id' });
+
+      if (error) {
+        console.error(`[LiveSync team] Upsert error for team ${teamSrId}:`, error.message);
+      } else {
+        records++;
+      }
+      continue;
+    }
+
+    // ═══ SINGLE-PLAYER BRANCH (existing logic, unchanged) ═══
     const playerSrId = entry.player?.id || entry.id;
     if (!playerSrId) continue;
 
@@ -917,14 +1035,13 @@ async function syncLeaderboard(
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournamentDbId,
         player_id: player.id,
+        team_id: null,
         position: entry.position,
         position_tied: entry.tied || false,
         score: entry.score,
         strokes: entry.strokes,
         thru: derivedThru,
-        // Set thru_updated_at when we have a valid thru value
         thru_updated_at: derivedThru !== null && derivedThru > 0 ? new Date().toISOString() : null,
-        // Only store round strokes when the round is complete (thru >= 18) and strokes > 0
         round_1: rounds.length > 0 && rounds[0]?.thru >= 18 && rounds[0]?.strokes > 0 ? rounds[0]?.score : null,
         round_2: rounds.length > 1 && rounds[1]?.thru >= 18 && rounds[1]?.strokes > 0 ? rounds[1]?.score : null,
         round_3: rounds.length > 2 && rounds[2]?.thru >= 18 && rounds[2]?.strokes > 0 ? rounds[2]?.score : null,
