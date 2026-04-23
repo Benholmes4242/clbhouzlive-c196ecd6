@@ -3,6 +3,7 @@ import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Spark
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
+import { getRatingTier } from '@/lib/ratingTier';
 
 interface CommunityScoreCardProps {
   courseId: string;
@@ -15,14 +16,6 @@ interface CommunityScoreCardProps {
 }
 
 const formatScore = (score: number) => score.toFixed(1);
-
-const getTierLabel = (score: number): string => {
-  if (score >= 9) return 'OUTSTANDING';
-  if (score >= 8) return 'EXCELLENT';
-  if (score >= 7) return 'VERY GOOD';
-  if (score >= 6) return 'GOOD';
-  return 'FAIR';
-};
 
 const SectionHeader: React.FC = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
@@ -111,7 +104,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 }) => {
   const totalRatings = ratingAggregates?.review_count || 0;
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
-  const tierLabel = getTierLabel(communityAverage);
+  const tierLabel = getRatingTier(communityAverage);
 
   // Empty state — flat copy line, no card
   if (totalRatings === 0) {

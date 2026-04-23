@@ -10,6 +10,7 @@
 
 import { FeedAdapter, MediaItem, CreatorInfo, GolfCourseInfo, ExtractedReviewData } from '@/types/feed-adapter';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
+import { getRatingTier } from '@/lib/ratingTier';
 
 export const unifiedMediaItemAdapter: FeedAdapter<UnifiedMediaItem> = {
   getId: (item) => item.postId || item.id,
@@ -72,7 +73,7 @@ export const unifiedMediaItemAdapter: FeedAdapter<UnifiedMediaItem> = {
     if (!item.isReview || !item.sourceReviewId) return null;
     
     const rating = item.reviewRating || 0;
-    const tierLabel = rating >= 9 ? 'OUTSTANDING' : rating >= 8 ? 'EXCELLENT' : rating >= 7 ? 'VERY GOOD' : rating >= 6 ? 'GOOD' : 'FAIR';
+    const tierLabel = getRatingTier(rating);
     
     return {
       courseId: item.golfCourseId || '',

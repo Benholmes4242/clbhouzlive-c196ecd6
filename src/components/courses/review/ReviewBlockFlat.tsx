@@ -2,14 +2,7 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
-
-function getTierLabel(v: number): string {
-  if (v >= 9) return 'Outstanding';
-  if (v >= 8) return 'Excellent';
-  if (v >= 7) return 'Very Good';
-  if (v >= 6) return 'Good';
-  return 'Fair';
-}
+import { getRatingTierLabel } from '@/lib/ratingTier';
 
 interface Review {
   id: string;
