@@ -45,7 +45,7 @@ export function PrivateProfileGate({
           className="h-11 px-6 rounded-xl font-semibold text-sm transition-all active:scale-[0.97]"
           style={{
             background: isUpdating ? 'rgba(247,147,30,0.5)' : '#F7931E',
-            color: '#000',
+            color: '#fff',
             border: 'none',
             minWidth: 160,
           }}
