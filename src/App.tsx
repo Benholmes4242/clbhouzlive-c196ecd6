@@ -123,7 +123,7 @@ const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
 
 const ShareReviewPage = lazy(() => import("./pages/ShareReviewPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
-const MyRatings = lazy(() => import("./pages/MyRatings"));
+
 const JourneyListPage = lazy(() => import("./pages/JourneyListPage"));
 const MapPage = lazy(() => import("./pages/MapPage"));
 const News = lazy(() => import("./pages/News"));
@@ -334,7 +334,7 @@ function AppRoutes() {
         <Route path="/courses/:courseId/share-review/:reviewId" element={<Suspense fallback={<GenericPageSkeleton />}><ShareReviewPage /></Suspense>} />
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
-        <Route path="/my-ratings" element={<Suspense fallback={<CoursesListSkeleton />}><MyRatings /></Suspense>} />
+        
         <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
         <Route path="/map" element={<Suspense fallback={<GenericPageSkeleton />}><MapPage /></Suspense>} />
         <Route path="/friends-activity" element={<Suspense fallback={<CoursesListSkeleton />}><FriendsActivityPage /></Suspense>} />

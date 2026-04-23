@@ -9,6 +9,11 @@ import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionP
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList } from 'lucide-react';
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
+import MyRatingsCourseCard, {
+  type MyRatingsCourseCardData,
+} from '@/components/courses/MyRatingsCourseCard';
+import EditRatingModal from '@/components/courses/EditRatingModal';
+import { annotateTies } from '@/lib/breakdown';
 
 interface AllCoursesListProps {
   userId: string;
@@ -17,6 +22,30 @@ interface AllCoursesListProps {
 }
 
 const PAGE_SIZE = 20;
+
+/**
+ * Maps the local CourseCardData → MyRatingsCourseCardData expected by the
+ * world-class card component. Only safe to call when course.has_rating is
+ * truthy and rating_value is non-null.
+ */
+const toMyRatingsCardData = (course: CourseCardData): MyRatingsCourseCardData => ({
+  id: course.rating_id ?? course.id,
+  rating: course.rating_value ?? 0,
+  review_date: course.review_date ?? course.last_played_at ?? new Date().toISOString(),
+  design_score: course.design_score ?? null,
+  condition_score: course.condition_score ?? null,
+  clubhouse_score: course.clubhouse_score ?? null,
+  facilities_score: course.facilities_score ?? null,
+  golf_courses: {
+    id: course.id,
+    name: course.name,
+    country: course.country,
+    sub_country: course.sub_country,
+    region: null,
+    global_rank: course.is_top100 ? (course as unknown as { global_rank?: number }).global_rank ?? null : null,
+    thumbnail_image: course.thumbnail_image,
+  },
+});
 
 export const AllCoursesList: React.FC<AllCoursesListProps> = ({ 
   userId,
@@ -30,6 +59,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<CourseCardData | null>(null);
 
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
@@ -47,11 +77,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       const [coursesResult, ratingsResult] = await Promise.all([
         supabase
           .from('golf_courses')
-          .select('id, name, country, sub_country, thumbnail_image')
+          .select('id, name, country, sub_country, thumbnail_image, global_rank')
           .in('id', courseIds),
         supabase
           .from('course_ratings')
-          .select('id, course_id, design_score, condition_score, clubhouse_score, facilities_score, review_date, created_at')
+          .select('id, course_id, rating, review, design_score, condition_score, clubhouse_score, facilities_score, review_date, created_at')
           .eq('user_id', userId)
           .eq('is_mock', false)
           .in('course_id', courseIds),
@@ -66,6 +96,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         clubhouse_score: number | null;
         facilities_score: number | null;
         review_date: string | null;
+        review: string | null;
+        rating: number | null;
       }>();
       (ratingsResult.data || []).forEach(r => {
         ratingIdMap.set(r.course_id, r.id);
@@ -75,6 +107,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           clubhouse_score: r.clubhouse_score,
           facilities_score: r.facilities_score,
           review_date: r.review_date ?? r.created_at ?? null,
+          review: r.review ?? null,
+          rating: r.rating ?? null,
         });
       });
 
@@ -93,7 +127,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           clubhouse_score: details?.clubhouse_score ?? null,
           facilities_score: details?.facilities_score ?? null,
           review_date: details?.review_date ?? null,
-        } as CourseCardData;
+          review_text: details?.review ?? null,
+        } as CourseCardData & { global_rank?: number | null; review_text?: string | null };
       });
     },
     staleTime: 60_000,
@@ -163,19 +198,43 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     return result;
   }, [courses, activeTab, activeCountry, activeSort]);
 
-  const displayedCourses = filteredCourses.slice(0, displayCount);
-  const hasMore = displayCount < filteredCourses.length;
-  const remainingCount = Math.min(PAGE_SIZE, filteredCourses.length - displayCount);
-  const totalFiltered = filteredCourses.length;
+  // Tie annotation: only meaningful when sorting by rating descending
+  // (the brief's "why above" reveal compares to the next-lower card).
+  const tieAnnotated = useMemo(() => {
+    if (activeSort !== 'rating-high-low') return filteredCourses;
+    // annotateTies needs MyRatingsCourseCardData-shaped rows. Build a parallel
+    // map keyed by course id so we can hand the tiedAbove back onto the
+    // CourseCardData rows without changing their type.
+    const ratedShaped = filteredCourses
+      .filter(c => c.has_rating && c.rating_value != null)
+      .map(c => ({
+        ...toMyRatingsCardData(c),
+        __srcCourseId: c.id,
+      }));
+    const annotated = annotateTies(ratedShaped as any);
+    const tieMap = new Map<string, any>();
+    annotated.forEach((row: any) => {
+      if (row.tiedAbove) tieMap.set(row.__srcCourseId, row.tiedAbove);
+    });
+    return filteredCourses.map(c => ({
+      ...c,
+      __tiedAbove: tieMap.get(c.id) ?? undefined,
+    }));
+  }, [filteredCourses, activeSort]);
+
+  const displayedCourses = tieAnnotated.slice(0, displayCount);
+  const hasMore = displayCount < tieAnnotated.length;
+  const remainingCount = Math.min(PAGE_SIZE, tieAnnotated.length - displayCount);
+  const totalFiltered = tieAnnotated.length;
 
   const loadMore = useCallback(() => {
     if (!hasMore || isLoadingMore) return;
     setIsLoadingMore(true);
     setTimeout(() => {
-      setDisplayCount(prev => Math.min(prev + PAGE_SIZE, filteredCourses.length));
+      setDisplayCount(prev => Math.min(prev + PAGE_SIZE, tieAnnotated.length));
       setIsLoadingMore(false);
     }, 300);
-  }, [hasMore, isLoadingMore, filteredCourses.length]);
+  }, [hasMore, isLoadingMore, tieAnnotated.length]);
 
   const firstName = displayName?.split(' ')[0];
 
@@ -243,7 +302,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       />
 
       {/* Course list */}
-      {filteredCourses.length === 0 ? (
+      {tieAnnotated.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
           <div className="flex flex-col items-center justify-center text-center">
             <div className="w-14 h-14 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
@@ -267,13 +326,33 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         </div>
       ) : (
         <div className="space-y-2 mt-3">
-          {displayedCourses.map((course) => (
-            <TieredCourseCard
-              key={course.id}
-              course={course}
-              isOwnProfile={isOwnProfile}
-            />
-          ))}
+          {displayedCourses.map((course, index) => {
+            const rank = index + 1;
+            const isRated = course.has_rating && course.rating_value != null;
+            if (isRated) {
+              const cardData: MyRatingsCourseCardData = {
+                ...toMyRatingsCardData(course),
+                tiedAbove: (course as any).__tiedAbove,
+              };
+              return (
+                <MyRatingsCourseCard
+                  key={course.id}
+                  course={cardData}
+                  rank={rank}
+                  onCourseClick={(id) => navigate(`/courses/${id}`)}
+                  onAddBreakdown={() => setEditingCourse(course)}
+                />
+              );
+            }
+            // Unrated → keep the existing tiered card (handles its own UI)
+            return (
+              <TieredCourseCard
+                key={course.id}
+                course={course}
+                isOwnProfile={isOwnProfile}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -305,13 +384,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         </div>
       )}
 
-      {!hasMore && filteredCourses.length > PAGE_SIZE && (
+      {!hasMore && tieAnnotated.length > PAGE_SIZE && (
         <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
           {isOwnProfile ? "You\u2019ve reached the end" : "End of list"} • {totalFiltered.toLocaleString()} courses total
         </p>
       )}
 
-      {!hasMore && filteredCourses.length > 0 && filteredCourses.length <= PAGE_SIZE && (
+      {!hasMore && tieAnnotated.length > 0 && tieAnnotated.length <= PAGE_SIZE && (
         <div className="text-center pt-4 pb-2">
           <p className="text-sm text-foreground font-medium italic">
             {isOwnProfile 
@@ -319,6 +398,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               : `That\u2019s ${firstName || 'their'}\u2019s journey so far.`}
           </p>
         </div>
+      )}
+
+      {editingCourse && editingCourse.has_rating && editingCourse.rating_value != null && (
+        <EditRatingModal
+          courseId={editingCourse.id}
+          courseName={editingCourse.name}
+          currentRating={editingCourse.rating_value}
+          currentReview={(editingCourse as any).review_text ?? null}
+          currentDesignScore={editingCourse.design_score ?? null}
+          currentConditionScore={editingCourse.condition_score ?? null}
+          currentClubhouseScore={editingCourse.clubhouse_score ?? null}
+          currentFacilitiesScore={editingCourse.facilities_score ?? null}
+          isOpen={!!editingCourse}
+          onClose={() => setEditingCourse(null)}
+        />
       )}
     </div>
   );

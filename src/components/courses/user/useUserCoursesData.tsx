@@ -148,13 +148,13 @@ export const useUserCoursesData = (username?: string) => {
     enabled: !!targetUserId,
   });
 
+  // Average-rating tile no longer navigates to a standalone page; the
+  // world-class card list lives in the profile Courses tab.
   const handleAverageRatingClick = () => {
     if (isOwnProfile) {
-      navigate('/my-ratings');
+      navigate('/profile?tab=courses');
     } else if (targetUserProfile?.username) {
-      navigate(`/my-ratings?user=${targetUserProfile.username}`);
-    } else if (targetUserId) {
-      navigate(`/my-ratings?userId=${targetUserId}`);
+      navigate(`/user/${targetUserProfile.username}/courses`);
     }
   };
 
