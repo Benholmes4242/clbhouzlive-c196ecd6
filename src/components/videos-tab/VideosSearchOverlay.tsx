@@ -2,7 +2,7 @@ import { useState, useCallback, memo } from 'react';
 import SearchOverlay from '@/components/shared/SearchOverlay';
 import { useRecentSearches } from '@/hooks/useRecentSearches';
 import { useVideosFeed } from './hooks/useVideosFeed';
-import { VideoCard } from './VideoCard';
+import VideoFeedCard from '@/components/watch/videos/VideoFeedCard';
 import { VideosFeedSkeleton } from './VideosFeedSkeleton';
 
 interface VideosSearchOverlayProps {
@@ -69,14 +69,14 @@ function VideosSearchOverlayInner({ isOpen, onClose, userId }: VideosSearchOverl
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 px-4 pb-4">
+          <div className="flex flex-col pb-4 pt-2">
             {posts.map((post, i) => (
-              <VideoCard
+              <VideoFeedCard
                 key={post.id}
                 post={post}
-                userId={userId}
-                cardIndex={i}
+                index={i}
                 allPosts={posts}
+                userId={userId}
               />
             ))}
           </div>
