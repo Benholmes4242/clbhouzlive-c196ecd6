@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Film, Heart, MessageCircle, Play } from 'lucide-react';
+import { Film, Heart, MessageCircle } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
@@ -174,23 +174,6 @@ const WatchTile: React.FC<WatchTileProps> = ({
           background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
         }}
       />
-
-      {/* Play affordance — centered. Auto-hidden when WatchAutoplay attaches
-          a <video> child to the tile. The hide rule lives in index.css. */}
-      <div
-        className="watch-tile-play absolute pointer-events-none flex items-center justify-center"
-        style={{
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 9,
-          width: 40, height: 40, borderRadius: 999,
-          background: 'rgba(0,0,0,0.55)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-        }}
-      >
-        <Play size={18} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
-      </div>
-
 
 
       {/* Creator chip — bottom-left */}

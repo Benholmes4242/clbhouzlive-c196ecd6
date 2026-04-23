@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Play } from 'lucide-react';
+
 import { useClipOfTheWeek } from './hooks/useClipOfTheWeek';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from '../proshop/Kicker';
@@ -112,25 +112,6 @@ function ClipOfTheWeekHeroInner() {
               {pick.course_name}
             </Pin>
           ) : null}
-        </div>
-
-        {/* Centre play affordance */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 56, height: 56,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <Play size={22} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
         </div>
 
         {/* Bottom: title + creator + counts */}

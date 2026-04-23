@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Play, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { MostLovedRow } from '../proshop/hooks/useMostLovedThisWeek';
@@ -162,21 +162,6 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
                 </Pin>
               </div>
             ) : null}
-
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 32, height: 32,
-                borderRadius: '50%',
-                background: 'rgba(0,0,0,0.6)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <Play size={13} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
-            </div>
 
             <div
               aria-hidden

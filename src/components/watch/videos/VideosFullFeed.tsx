@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
-import { Loader2, Play, MoreVertical, Clock } from 'lucide-react';
+import { Loader2, MoreVertical, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
@@ -114,20 +114,6 @@ function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
           </div>
         ) : null}
 
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 44, height: 44,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <Play size={18} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
-        </div>
       </button>
 
       {/* Meta row */}

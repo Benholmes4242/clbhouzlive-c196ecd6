@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Play, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -130,22 +130,6 @@ function MostLovedRailInner() {
                 </Pin>
               </div>
             ) : null}
-
-            {/* Center play */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 32, height: 32,
-                borderRadius: '50%',
-                background: 'rgba(0,0,0,0.55)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <Play size={13} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
-            </div>
 
             {/* Bottom gradient */}
             <div
