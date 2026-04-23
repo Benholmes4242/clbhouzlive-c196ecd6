@@ -274,6 +274,8 @@ export function usePGACard(userId?: string): {
   });
 
   // ── Result leaderboard (final standings) ──
+  // Joins both player and team — synthesises a uniform player-shaped object
+  // for team rows so downstream consumers don't need to branch.
   const { data: resultLeaderboard } = useQuery({
     queryKey: ['pga-card-result-lb', (recentResult as any)?.id],
     queryFn: async () => {
@@ -284,12 +286,40 @@ export function usePGACard(userId?: string): {
           position, score, money,
           player:sr_players!sr_leaderboards_player_id_fkey (
             id, full_name, photo_url, headshot_override
+          ),
+          team:sr_teams!sr_leaderboards_team_id_fkey (
+            id, sr_id, display_name, abbr_name,
+            members:sr_team_players (
+              position_in_team,
+              player:sr_players!sr_team_players_player_id_fkey ( id, full_name, photo_url )
+            )
           )
         `)
         .eq('tournament_id', (recentResult as any).id)
         .order('position', { ascending: true })
         .limit(10);
-      return data ?? [];
+
+      // Synthesize a player-shaped object for team rows so downstream consumers
+      // (which read `.player.full_name` / `.player.photo_url`) don't break.
+      return (data ?? []).map((row: any) => {
+        if (!row.player && row.team) {
+          const sortedMembers = (row.team.members || [])
+            .filter((m: any) => m.player)
+            .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
+          const primary = sortedMembers[0]?.player;
+          return {
+            ...row,
+            player: {
+              id: row.team.id,
+              full_name: row.team.abbr_name || row.team.display_name || '',
+              photo_url: primary?.photo_url ?? null,
+              headshot_override: null,
+              tour_code: null,
+            },
+          };
+        }
+        return row;
+      });
     },
     enabled: !!recentResult && !topLive,
     staleTime: 10 * 60_000,
