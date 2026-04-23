@@ -197,20 +197,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
         <Play size={18} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
       </div>
 
-      {/* Duration — top-left (relocated to avoid play-triangle collision) */}
-      {duration != null && duration > 0 && (
-        <div
-          className="absolute top-1.5 left-1.5 z-10 rounded-[4px] flex items-center"
-          style={{
-            background: 'rgba(0, 0, 0, 0.55)',
-            padding: '2px 5px',
-          }}
-        >
-          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
-            {formatDuration(duration)}
-          </span>
-        </div>
-      )}
+
 
       {/* Creator chip — bottom-left */}
       {showCreatorChip && (
