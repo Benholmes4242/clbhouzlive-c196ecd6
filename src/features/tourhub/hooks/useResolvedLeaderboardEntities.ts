@@ -19,6 +19,8 @@ export type LeaderboardEntity = {
   id: string;
   full_name: string;        // "Rory McIlroy" OR "Smalley / Springer"
   display_name: string;     // alias of full_name
+  /** Compact display name — "S. Scheffler" for players, "Smalley / Springer" for teams */
+  short_name: string;
   avatar: {
     primary: { photo_url: string | null; sr_id: string };
     /** Present only for teams */
@@ -26,13 +28,17 @@ export type LeaderboardEntity = {
     silhouette_fallback: boolean;
   };
   country: string | null;
+  country_code: string | null;
   pga_tour_id: string | null;   // null for teams
+  tour_code: string | null;     // primary tour for headshot lookup
+  headshot_override: string | null;
   /** Present only for teams, ordered by position_in_team ascending */
   players?: Array<{
     id: string;
     sr_id: string;
     full_name: string;
     photo_url: string | null;
+    country: string | null;
   }>;
 };
 
