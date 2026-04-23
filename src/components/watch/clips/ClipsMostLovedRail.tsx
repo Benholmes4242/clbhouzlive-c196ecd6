@@ -130,7 +130,7 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               aspectRatio: '4/5',
               borderRadius: 12,
               overflow: 'hidden',
-              background: '#0F172A',
+              background: 'transparent',
               border: 'none',
               padding: 0,
               cursor: 'pointer',

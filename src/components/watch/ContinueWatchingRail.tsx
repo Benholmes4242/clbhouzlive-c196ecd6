@@ -78,7 +78,7 @@ function ContinueWatchingTile({
         borderRadius: 12,
         overflow: 'hidden',
         cursor: 'pointer',
-        background: '#0F172A',
+        background: 'transparent',
       }}
     >
       <img
