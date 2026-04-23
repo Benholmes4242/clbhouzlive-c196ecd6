@@ -105,8 +105,8 @@ const SortableMyRatingsCard: React.FC<SortableCardProps> = ({
         onCourseClick={onCourseClick}
         onAddBreakdown={onAddBreakdown}
         dragHandle={{
-          listeners,
-          attributes,
+          listeners: listeners as Record<string, unknown> | undefined,
+          attributes: attributes as unknown as Record<string, unknown>,
           setActivatorNodeRef,
           isDragging,
         }}
