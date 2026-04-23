@@ -92,6 +92,8 @@ function CommentsSheet({
   theme = 'dark',
   currentUserId: currentUserIdProp,
   creatorUserId,
+  creatorActorType,
+  creatorActorId,
   initialCommentId,
   initialParentCommentId,
   
