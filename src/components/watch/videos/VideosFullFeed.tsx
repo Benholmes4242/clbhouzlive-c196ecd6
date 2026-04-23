@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
-import { Loader2, Play, MoreVertical, Clock } from 'lucide-react';
+import { Loader2, MoreVertical, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';

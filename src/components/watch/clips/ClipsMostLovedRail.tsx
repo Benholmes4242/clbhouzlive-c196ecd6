@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Play, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { MostLovedRow } from '../proshop/hooks/useMostLovedThisWeek';
