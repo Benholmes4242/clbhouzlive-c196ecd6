@@ -45,16 +45,23 @@ function rowToFullscreenPost(row: MostLovedRow) {
 }
 
 function diversifyByCreator(rows: MostLovedRow[]): MostLovedRow[] {
-  // Cap 2 consecutive posts from the same creator.
+  // Cap 2 consecutive posts from the same creator at the head of the list.
+  // Collisions are deferred to a queue and appended in original order at the
+  // tail so the output length always equals the input length.
   const out: MostLovedRow[] = [];
+  const deferred: MostLovedRow[] = [];
   for (const row of rows) {
-    if (out.length >= 2 && out[out.length - 1].user_id === row.user_id && out[out.length - 2].user_id === row.user_id) {
-      // skip — defer to later; for simplicity, just drop it
+    if (
+      out.length >= 2 &&
+      out[out.length - 1].user_id === row.user_id &&
+      out[out.length - 2].user_id === row.user_id
+    ) {
+      deferred.push(row);
       continue;
     }
     out.push(row);
   }
-  return out;
+  return [...out, ...deferred];
 }
 
 function MostLovedRailInner() {
@@ -118,9 +125,7 @@ function MostLovedRailInner() {
                 transform: 'translate(-50%, -50%)',
                 width: 32, height: 32,
                 borderRadius: '50%',
-                background: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
+                background: 'rgba(0,0,0,0.55)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >

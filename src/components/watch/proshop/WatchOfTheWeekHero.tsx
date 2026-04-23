@@ -6,6 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
+// Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) return '';
@@ -119,9 +120,7 @@ function WatchOfTheWeekHeroInner() {
             transform: 'translate(-50%, -50%)',
             width: 56, height: 56,
             borderRadius: '50%',
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
+            background: 'rgba(0,0,0,0.6)',
             border: '1px solid rgba(255,255,255,0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}

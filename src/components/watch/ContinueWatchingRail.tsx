@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { ContinueWatchingPost } from './hooks/useContinueWatching';
 import { useContinueWatching } from './hooks/useContinueWatching';
@@ -51,7 +50,6 @@ function ContinueWatchingTile({
   index: number;
   allPosts: ContinueWatchingPost[];
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
   const media = post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const progressPct = post.totalSeconds > 0
@@ -76,7 +74,6 @@ function ContinueWatchingTile({
 
   return (
     <div
-      ref={cardRef}
       onClick={handleTap}
       style={{
         flexShrink: 0,
@@ -104,9 +101,7 @@ function ContinueWatchingTile({
           width: 38,
           height: 38,
           borderRadius: '50%',
-          background: 'rgba(0,0,0,0.55)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
+          background: 'rgba(0,0,0,0.6)',
           border: '1px solid rgba(255,255,255,0.18)',
           display: 'flex',
           alignItems: 'center',

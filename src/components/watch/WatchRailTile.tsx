@@ -227,7 +227,7 @@ export default function WatchRailTile({
         }}
       />
 
-      {/* Surfacing reason — small amber pill, top-left, glass back */}
+      {/* Surfacing reason — small amber pill, top-left, solid scrim */}
       {surfacingReason && (
         <div
           style={{
@@ -238,9 +238,7 @@ export default function WatchRailTile({
             height: 18,
             padding: '0 7px',
             borderRadius: 6,
-            background: 'rgba(0,0,0,0.42)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.55)',
             fontSize: 9,
             fontWeight: 700,
             lineHeight: 1,
@@ -262,7 +260,7 @@ export default function WatchRailTile({
         </div>
       )}
 
-      {/* Optional rank — outlined serif, bottom-left */}
+      {/* Optional rank — outlined sans (Geist inherited), bottom-left */}
       {typeof rank === 'number' && (
         <span
           style={{
@@ -273,7 +271,6 @@ export default function WatchRailTile({
             fontWeight: 900,
             lineHeight: 1,
             letterSpacing: '-2px',
-            fontFamily: 'Georgia, serif',
             color: 'transparent',
             WebkitTextStroke: '1.5px rgba(255,255,255,0.3)',
             pointerEvents: 'none',
@@ -307,7 +304,7 @@ export default function WatchRailTile({
         {post.likeCount}
       </div>
 
-      {/* Glass play button — shown after autoplay finishes */}
+      {/* Solid play button — shown after autoplay finishes */}
       {hasPlayed && !isPlaying && (
         <div
           style={{
@@ -318,9 +315,7 @@ export default function WatchRailTile({
             width: 32,
             height: 32,
             borderRadius: '50%',
-            background: 'rgba(0,0,0,0.45)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            background: 'rgba(0,0,0,0.6)',
             border: '1px solid rgba(255,255,255,0.15)',
             display: 'flex',
             alignItems: 'center',
