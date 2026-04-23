@@ -160,18 +160,10 @@ function MostLovedRailInner() {
                 {row.display_name || row.username || ''}
               </div>
               {row.course_name ? (
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 500,
-                    opacity: 0.85,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    marginTop: 1,
-                  }}
-                >
-                  📍 {row.course_name}
+                <div style={{ marginTop: 4 }}>
+                  <Pin variant="dark" icon={<span style={{ fontSize: 9, lineHeight: 1 }}>📍</span>}>
+                    {row.course_name}
+                  </Pin>
                 </div>
               ) : null}
             </div>
