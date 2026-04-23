@@ -1,3 +1,5 @@
+// TODO (Phase B): Unify with canonical RatingTier from @/lib/ratingTier.ts
+// Currently uses theme-system's RatingTier (underscore format: VERY_GOOD).
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getRatingTheme, type RatingTier } from '@/lib/globalAchievementMilestoneSystem';
