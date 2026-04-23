@@ -157,9 +157,7 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
                 transform: 'translate(-50%, -50%)',
                 width: 32, height: 32,
                 borderRadius: '50%',
-                background: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
+                background: 'rgba(0,0,0,0.6)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
@@ -192,18 +190,10 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
                 {row.display_name || row.username || ''}
               </div>
               {row.course_name ? (
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 500,
-                    opacity: 0.85,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    marginTop: 1,
-                  }}
-                >
-                  📍 {row.course_name}
+                <div style={{ marginTop: 4 }}>
+                  <Pin variant="dark" icon={<span style={{ fontSize: 9, lineHeight: 1 }}>📍</span>}>
+                    {row.course_name}
+                  </Pin>
                 </div>
               ) : null}
             </div>

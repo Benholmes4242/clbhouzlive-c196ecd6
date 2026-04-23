@@ -122,9 +122,7 @@ function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
             transform: 'translate(-50%, -50%)',
             width: 44, height: 44,
             borderRadius: '50%',
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >

@@ -4,6 +4,7 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import { useViewedPostIds } from './hooks/useViewedPostIds';
 import WatchRailTile from './WatchRailTile';
 import WatchSectionHeader from './WatchSectionHeader';
+import { HRail } from './proshop/HRail';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
@@ -105,23 +106,13 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
       />
 
       {/* Horizontal scroll — ranked cards, with edge padding + snap */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 12,
-          overflowX: 'auto',
-          padding: '0 16px 4px',
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
-          scrollSnapType: 'x mandatory',
-        }}
-      >
+      <HRail paddingBottom={4}>
         {topPosts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
             <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} viewedPostIds={viewedPostIds} />
           </div>
         ))}
-      </div>
+      </HRail>
     </div>
   );
 }

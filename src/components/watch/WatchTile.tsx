@@ -4,6 +4,7 @@ import { Film, Play } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
+import { Pin } from './proshop/Pin';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
 
 function formatDuration(seconds?: number): string {
@@ -142,19 +143,17 @@ const WatchTile: React.FC<WatchTileProps> = ({
       {post.courseName && (
         <div
           style={{
-            position: 'absolute', top: 6, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', alignItems: 'center', gap: 4,
-            background: 'rgba(0,0,0,0.55)',
-            borderRadius: 6, padding: '3px 8px',
-            fontSize: 11, fontWeight: 600, color: 'white',
-            maxWidth: 'calc(100% - 88px)', overflow: 'hidden',
+            position: 'absolute',
+            top: 6,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            maxWidth: 'calc(100% - 88px)',
             zIndex: 10,
           }}
         >
-          <span style={{ fontSize: 10, lineHeight: 1 }}>📍</span>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Pin variant="dark" icon={<span style={{ fontSize: 10, lineHeight: 1 }}>📍</span>}>
             {post.courseName}
-          </span>
+          </Pin>
         </div>
       )}
 

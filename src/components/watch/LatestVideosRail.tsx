@@ -5,6 +5,7 @@ import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import WatchSectionHeader from './WatchSectionHeader';
 import LatestVideoTile from './LatestVideoTile';
+import { HRail } from './proshop/HRail';
 
 // Hero re-uses the rich VideoCard treatment for the freshest single post.
 const VideoCard = lazy(() =>
@@ -73,17 +74,7 @@ export default function LatestVideosRail() {
 
       {/* Horizontal rail of next 9 */}
       {rail.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            gap: 12,
-            overflowX: 'auto',
-            padding: '20px 16px 4px',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
-            scrollSnapType: 'x mandatory',
-          }}
-        >
+        <HRail paddingTop={20} paddingBottom={4}>
           {rail.map((post, i) => (
             <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
               <LatestVideoTile
@@ -93,7 +84,7 @@ export default function LatestVideosRail() {
               />
             </div>
           ))}
-        </div>
+        </HRail>
       )}
     </div>
   );
