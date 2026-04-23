@@ -144,8 +144,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
           style={{
             position: 'absolute', top: 6, left: '50%', transform: 'translateX(-50%)',
             display: 'flex', alignItems: 'center', gap: 4,
-            background: 'rgba(0,0,0,0.45)',
-            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            background: 'rgba(0,0,0,0.55)',
             borderRadius: 6, padding: '3px 8px',
             fontSize: 11, fontWeight: 600, color: 'white',
             maxWidth: 'calc(100% - 88px)', overflow: 'hidden',
@@ -188,8 +187,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
         style={{
           top: 10, right: 10, zIndex: 9,
           width: 28, height: 28, borderRadius: 999,
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+          background: 'rgba(0,0,0,0.55)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
         }}
       >
@@ -201,9 +199,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
         <div
           className="absolute top-1.5 left-1.5 z-10 rounded-[4px] flex items-center"
           style={{
-            background: 'rgba(0, 0, 0, 0.45)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(0, 0, 0, 0.55)',
             padding: '2px 5px',
           }}
         >
@@ -221,8 +217,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
           className="absolute z-10 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
           style={{
             bottom: 6, left: 6,
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+            background: 'rgba(0,0,0,0.6)',
             borderRadius: 999, padding: '2px 8px 2px 2px',
             maxWidth: 'calc(100% - 70px)',
           }}
@@ -265,8 +260,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
         <div
           className="rounded-[4px] flex items-center gap-[3px]"
           style={{
-            background: 'rgba(0,0,0,0.45)',
-            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.55)',
             padding: '2px 5px',
           }}
         >
@@ -279,8 +273,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
           <div
             className="rounded-[4px] flex items-center gap-[3px]"
             style={{
-              background: 'rgba(0,0,0,0.45)',
-              backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+              background: 'rgba(0,0,0,0.55)',
               padding: '2px 5px',
             }}
           >
