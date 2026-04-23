@@ -11,6 +11,7 @@ import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 // TODO Brief 3: re-wire VideoThumbPlayer
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { getActorRouteByType } from '@/types/actor';
 
 interface UserProfile {
   id: string;
@@ -200,7 +201,9 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       handleClose();
       // Small delay to ensure modal closes before navigation
       setTimeout(() => {
-        const path = getProfilePathById(user.id, user.creatorOnly, user.username);
+        const path = user.profileType === 'business'
+          ? getActorRouteByType('business', user.id)
+          : getProfilePathById(user.id, user.creatorOnly, user.username);
         navigate(path);
       }, 100);
     }
@@ -211,7 +214,9 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       handleClose();
       // Small delay to ensure modal closes before navigation
       setTimeout(() => {
-        const path = getProfilePathById(user.id, user.creatorOnly, user.username);
+        const path = user.profileType === 'business'
+          ? getActorRouteByType('business', user.id)
+          : getProfilePathById(user.id, user.creatorOnly, user.username);
         navigate(path);
       }, 100);
     }

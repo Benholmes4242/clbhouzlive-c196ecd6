@@ -19,7 +19,7 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { getProfilePathById } from '@/lib/profileRoutes';
+import { getActorRouteByType } from '@/types/actor';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ export function FullscreenFeedOverlay() {
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
     close();
-    navigate(getProfilePathById(activePost.userId));
+    navigate(getActorRouteByType(activePost.actorType, activePost.actorId));
   }, [activePost, close, navigate]);
 
   const handleReviewTap = useCallback(() => {
