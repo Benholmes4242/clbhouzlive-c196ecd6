@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Play } from 'lucide-react';
+
 import { useClipOfTheWeek } from './hooks/useClipOfTheWeek';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from '../proshop/Kicker';

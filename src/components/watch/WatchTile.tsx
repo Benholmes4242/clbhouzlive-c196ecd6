@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Film, Heart, MessageCircle, Play } from 'lucide-react';
+import { Film, Heart, MessageCircle } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';

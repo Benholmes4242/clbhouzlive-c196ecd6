@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Play, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';

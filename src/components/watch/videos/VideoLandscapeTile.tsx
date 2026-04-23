@@ -1,5 +1,5 @@
 import { memo, useRef } from 'react';
-import { Play, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from '../context/WatchActionsContext';

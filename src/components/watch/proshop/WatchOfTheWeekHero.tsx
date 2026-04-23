@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Play } from 'lucide-react';
+
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
 import { useWatchMood } from './hooks/useWatchMood';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
