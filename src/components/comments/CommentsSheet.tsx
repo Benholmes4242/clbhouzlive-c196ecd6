@@ -61,6 +61,10 @@ interface CommentsSheetProps {
   theme?: 'light' | 'dark' | 'grey';
   currentUserId?: string | null;
   creatorUserId?: string;
+  /** Actor type of the post creator (for business-authored posts). */
+  creatorActorType?: 'personal' | 'business';
+  /** Actor id of the post creator (business id for business-authored posts). */
+  creatorActorId?: string;
   initialCommentId?: string | null;
   initialParentCommentId?: string | null;
   aspectRatio?: number;
