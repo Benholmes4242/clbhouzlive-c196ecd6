@@ -25,17 +25,19 @@ function HRailInner({
   paddingTop = 0,
   snap = true,
 }: HRailProps) {
+  const leftInset = 50;
+
   return (
     <div
       style={{
         display: 'flex',
         gap: 12,
         overflowX: 'auto',
-        // DEBUG: 50px left inset to verify padding is being applied at all.
-        // If first tile is still flush to viewport with this value, something
-        // upstream (negative margin, transform, or wrapper override) is
-        // cancelling HRail's padding.
-        padding: `${paddingTop}px 0 ${paddingBottom}px 50px`,
+        // The rail uses scroll-snap on its children. Without matching
+        // scrollPaddingLeft, the browser can snap the first tile flush to the
+        // viewport edge and visually cancel the rail's leading inset.
+        padding: `${paddingTop}px 0 ${paddingBottom}px ${leftInset}px`,
+        scrollPaddingLeft: leftInset,
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
         scrollSnapType: snap ? 'x mandatory' : 'none',
