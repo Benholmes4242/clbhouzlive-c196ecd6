@@ -31,10 +31,11 @@ function HRailInner({
         display: 'flex',
         gap: 12,
         overflowX: 'auto',
-        // Phase 5a: left-only 20px inset so first tile has breathing room
-        // from the viewport edge. Right edge intentionally has zero padding
-        // so tiles bleed off-viewport, signalling "more to scroll".
-        padding: `${paddingTop}px 0 ${paddingBottom}px 20px`,
+        // DEBUG: 50px left inset to verify padding is being applied at all.
+        // If first tile is still flush to viewport with this value, something
+        // upstream (negative margin, transform, or wrapper override) is
+        // cancelling HRail's padding.
+        padding: `${paddingTop}px 0 ${paddingBottom}px 50px`,
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
         scrollSnapType: snap ? 'x mandatory' : 'none',
