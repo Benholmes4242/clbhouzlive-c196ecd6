@@ -75,7 +75,7 @@ function ClipsCourseAnchoredRailInner({ userId, mood }: ClipsCourseAnchoredRailP
   return (
     <section>
       <SectionHeader
-        kicker="FROM YOUR COURSES"
+        kicker="From your courses"
         title={topCourse.course_name}
         sub={`${topCourse.content_count} fresh ${
           topCourse.content_count === 1 ? 'clip' : 'clips'

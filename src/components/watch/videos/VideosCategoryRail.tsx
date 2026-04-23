@@ -30,7 +30,7 @@ function VideosCategoryRailInner({ userId, mood }: VideosCategoryRailProps) {
   return (
     <section>
       <SectionHeader
-        kicker="IN THE MOOD FOR"
+        kicker="In the mood for"
         title={label}
         sub={sub ?? undefined}
       />
