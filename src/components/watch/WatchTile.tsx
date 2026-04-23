@@ -6,6 +6,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
 import { Pin } from './proshop/Pin';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -221,24 +222,14 @@ const WatchTile: React.FC<WatchTileProps> = ({
             maxWidth: 'calc(100% - 70px)',
           }}
         >
-          {post.avatarUrl ? (
-            <img
+          <div style={{ flexShrink: 0 }}>
+            <SquircleAvatar
               src={post.avatarUrl}
-              alt=""
-              style={{
-                width: 18, height: 18, borderRadius: 999, objectFit: 'cover',
-                flexShrink: 0,
-              }}
+              alt={creatorLabel}
+              size={18}
+              hideRing
             />
-          ) : (
-            <div
-              style={{
-                width: 18, height: 18, borderRadius: 999,
-                background: 'rgba(255,255,255,0.18)',
-                flexShrink: 0,
-              }}
-            />
-          )}
+          </div>
           <span
             style={{
               fontSize: 11, fontWeight: 600, color: 'white',

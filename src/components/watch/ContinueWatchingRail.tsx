@@ -5,6 +5,7 @@ import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — divider ownership now lives in
 // the page composition (UnifiedWatchFeed); rails no longer render their own.
 import { HRail } from './proshop/HRail';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ContinueWatchingRailProps {
   userId: string | undefined;
@@ -144,15 +145,14 @@ function ContinueWatchingTile({
             pointerEvents: 'none',
           }}
         >
-          {post.avatarUrl ? (
-            <img
+          <div style={{ flexShrink: 0 }}>
+            <SquircleAvatar
               src={post.avatarUrl}
-              alt=""
-              style={{ width: 18, height: 18, borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
+              alt={post.displayName || post.username || ''}
+              size={18}
+              hideRing
             />
-          ) : (
-            <div style={{ width: 18, height: 18, borderRadius: 999, background: 'rgba(255,255,255,0.18)', flexShrink: 0 }} />
-          )}
+          </div>
           <span
             style={{
               fontSize: 11,

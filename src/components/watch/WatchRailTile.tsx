@@ -6,6 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from './context/WatchActionsContext';
 import { Pin } from './proshop/Pin';
 import { haptic } from '@/utils/haptics';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -284,24 +285,14 @@ export default function WatchRailTile({
             pointerEvents: 'none',
           }}
         >
-          {post.avatarUrl ? (
-            <img
+          <div style={{ flexShrink: 0 }}>
+            <SquircleAvatar
               src={post.avatarUrl}
-              alt=""
-              style={{
-                width: 18, height: 18, borderRadius: 999, objectFit: 'cover',
-                flexShrink: 0,
-              }}
+              alt={post.displayName || post.username || ''}
+              size={18}
+              hideRing
             />
-          ) : (
-            <div
-              style={{
-                width: 18, height: 18, borderRadius: 999,
-                background: 'rgba(255,255,255,0.18)',
-                flexShrink: 0,
-              }}
-            />
-          )}
+          </div>
           <span
             style={{
               fontSize: 11, fontWeight: 600, color: 'white',
