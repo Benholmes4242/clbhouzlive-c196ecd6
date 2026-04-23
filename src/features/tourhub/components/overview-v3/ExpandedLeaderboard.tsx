@@ -1,6 +1,10 @@
 /**
  * ExpandedLeaderboard — Full-field leaderboard rendered inside the hero glass card
  * Dark-glass aesthetic with sticky column headers and internal scrolling.
+ *
+ * Supports both single-player rows (stroke play) AND team rows (Zurich Classic,
+ * Grant Thornton, etc.). Team rows render a stacked dual-avatar via
+ * LeaderEntityAvatar and show the team's abbreviated name (e.g. "Smalley / Springer").
  */
 
 import React, { useState, useCallback } from 'react';
@@ -8,13 +12,25 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { Database } from '@/integrations/supabase/types';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
+import { LeaderEntityAvatar, type TeamMemberAvatar } from '../shared/LeaderEntityAvatar';
 
 // Derive types from the actual Supabase schema
 type SrLeaderboardRow = Database['public']['Tables']['sr_leaderboards']['Row'];
 type SrPlayerRow = Database['public']['Tables']['sr_players']['Row'];
+type SrTeamRow = Database['public']['Tables']['sr_teams']['Row'];
+
+interface TeamMemberJoined {
+  position_in_team: number;
+  player: Pick<SrPlayerRow, 'id' | 'sr_id' | 'first_name' | 'last_name' | 'full_name' | 'photo_url' | 'country'> | null;
+}
+
+interface TeamJoined extends Pick<SrTeamRow, 'id' | 'sr_id' | 'display_name' | 'abbr_name' | 'country'> {
+  members?: TeamMemberJoined[];
+}
 
 export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
   player: SrPlayerRow | null;
+  team?: TeamJoined | null;
 }
 
 function getScoreColor(toPar: number | null): string {
