@@ -1,5 +1,3 @@
-// TODO (Phase B): Unify with canonical RatingTier from @/lib/ratingTier.ts
-// Currently uses theme-system's RatingTier (underscore format: VERY_GOOD).
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getRatingTheme, type RatingTier } from '@/lib/globalAchievementMilestoneSystem';
@@ -23,13 +21,14 @@ interface RatingPillProps {
  * Includes smooth tier change transitions.
  */
 export function RatingPill({ score, tier, label, showRatingInPill = false, className }: RatingPillProps) {
-  const theme = tier 
+  const theme = tier
     ? getRatingTheme(
-        tier === 'OUTSTANDING' ? 9.5 :
-        tier === 'EXCELLENT' ? 8.5 :
-        tier === 'VERY_GOOD' ? 7.5 :
-        tier === 'GOOD' ? 6.5 :
-        5
+        tier === 'EXCEPTIONAL' ? 9.7 :   // midpoint of 9.5-10
+        tier === 'OUTSTANDING' ? 9.25 :  // midpoint of 9.0-9.4
+        tier === 'EXCELLENT' ? 8.5 :     // midpoint of 8.0-8.9
+        tier === 'VERY_GOOD' ? 7.5 :     // midpoint of 7.0-7.9
+        tier === 'GOOD' ? 6.5 :          // midpoint of 6.0-6.9
+        5                                 // fallback for FAIR
       )
     : getRatingTheme(score ?? 0);
 

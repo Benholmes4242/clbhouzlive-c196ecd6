@@ -102,7 +102,7 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fr
 // NEW COLOR SYSTEM (Jan 2026): Gray for Fair→Excellent, Amber/Orange gradient for Outstanding
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
+export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING' | 'EXCEPTIONAL';
 
 export interface RatingTheme {
   key: RatingTier;
@@ -167,21 +167,24 @@ export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
     label: 'Outstanding',
     ...amberTheme,
   },
+  EXCEPTIONAL: {
+    key: 'EXCEPTIONAL',
+    label: 'Exceptional',
+    ...amberTheme,
+  },
 };
 
 /**
  * Get rating theme for a score value
  * @param score - The rating score (0-10)
  * @returns RatingTheme with all color values
- *
- * TODO (Phase B): Align thresholds to canonical ratingTier.ts in Phase B.
- * Currently uses 6.5 boundary for GOOD/FAIR; canonical uses 6.0.
  */
 export function getRatingTheme(score: number): RatingTheme {
+  if (score >= 9.5) return COURSE_RATING_THEMES.EXCEPTIONAL;
   if (score >= 9.0) return COURSE_RATING_THEMES.OUTSTANDING;
   if (score >= 8.0) return COURSE_RATING_THEMES.EXCELLENT;
   if (score >= 7.0) return COURSE_RATING_THEMES.VERY_GOOD;
-  if (score >= 6.5) return COURSE_RATING_THEMES.GOOD;
+  if (score >= 6.0) return COURSE_RATING_THEMES.GOOD;
   return COURSE_RATING_THEMES.FAIR;
 }
 
@@ -442,6 +445,7 @@ export function getThresholdTierId(threshold: number): string {
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const RATING_CSS_VARS = {
+  '--rating-band-exceptional': COURSE_RATING_THEMES.EXCEPTIONAL.accent,
   '--rating-band-outstanding': COURSE_RATING_THEMES.OUTSTANDING.accent,
   '--rating-band-excellent': COURSE_RATING_THEMES.EXCELLENT.accent,
   '--rating-band-very-good': COURSE_RATING_THEMES.VERY_GOOD.accent,
