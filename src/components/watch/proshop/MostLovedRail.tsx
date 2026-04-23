@@ -112,11 +112,6 @@ function MostLovedRailInner() {
               />
             ) : null}
 
-            {/* Format pin top-left */}
-            <div style={{ position: 'absolute', top: 8, left: 8 }}>
-              <Pin variant="dark">{row.format === 'clip' ? 'CLIP' : 'VIDEO'}</Pin>
-            </div>
-
             {/* Course pin top-right (mirrors WatchTile/ClipsMostLovedRail) */}
             {row.course_name ? (
               <div style={{ position: 'absolute', top: 8, right: 8, maxWidth: 'calc(100% - 80px)' }}>

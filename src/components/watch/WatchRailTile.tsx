@@ -245,13 +245,13 @@ export default function WatchRailTile({
         </div>
       )}
 
-      {/* Optional rank — outlined sans (Geist inherited), bottom-left */}
+      {/* Optional rank — outlined sans (Geist inherited), top-left */}
       {typeof rank === 'number' && (
         <span
           style={{
             position: 'absolute',
-            bottom: 6,
-            left: 6,
+            top: 4,
+            left: 8,
             fontSize: 48,
             fontWeight: 900,
             lineHeight: 1,
