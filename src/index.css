@@ -4530,3 +4530,10 @@ em-emoji-picker input:focus {
   bottom: 97px !important;
   top: auto !important;
 }
+
+/* Watch tab: hide the centered play affordance whenever WatchAutoplay
+   has attached a <video> element to the tile (i.e. the tile is autoplaying). */
+.watch-tile:has(video) .watch-tile-play {
+  opacity: 0;
+  transition: opacity 200ms ease;
+}

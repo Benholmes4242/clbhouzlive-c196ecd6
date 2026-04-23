@@ -34,18 +34,18 @@ function ChipButton({ label, icon, isActive, onTap }: ChipButtonProps) {
   return (
     <button
       onClick={onTap}
-      className="shrink-0 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
+      type="button"
+      className="shrink-0 transition-colors active:scale-[0.97] flex items-center gap-1.5"
       style={{
         minHeight: 36,
-        padding: '0 16px',
+        padding: '0 14px',
         fontSize: 13,
         fontWeight: 600,
         borderRadius: 20,
         background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-        // Phase 5c: 1px in both states (was 1px active / 1.5px inactive).
-        // Eliminates the 0.5px width shift on toggle.
-        border: isActive ? '1px solid hsl(var(--primary))' : '1px solid hsl(var(--border))',
+        border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
         color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+        letterSpacing: '-0.01em',
       }}
     >
       {icon}

@@ -122,7 +122,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
     <div
       ref={tileRef}
       data-watch-index={index}
-      className="relative aspect-[4/5] overflow-hidden rounded-[12px] cursor-pointer select-none"
+      className="watch-tile relative aspect-[4/5] overflow-hidden rounded-[12px] cursor-pointer select-none"
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -181,17 +181,20 @@ const WatchTile: React.FC<WatchTileProps> = ({
         }}
       />
 
-      {/* Play affordance — center-right area, on every video tile */}
+      {/* Play affordance — centered. Auto-hidden when WatchAutoplay attaches
+          a <video> child to the tile. The hide rule lives in index.css. */}
       <div
-        className="absolute pointer-events-none flex items-center justify-center"
+        className="watch-tile-play absolute pointer-events-none flex items-center justify-center"
         style={{
-          top: 10, right: 10, zIndex: 9,
-          width: 28, height: 28, borderRadius: 999,
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 9,
+          width: 40, height: 40, borderRadius: 999,
           background: 'rgba(0,0,0,0.55)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
         }}
       >
-        <Play size={14} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
+        <Play size={18} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
       </div>
 
       {/* Duration — top-left (relocated to avoid play-triangle collision) */}
@@ -262,7 +265,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
         </div>
         {commentCount > 0 && (
           <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.95)' }}>
-            <MessageCircle size={12} strokeWidth={1.8} style={{ color: 'hsl(var(--primary))' }} />
+            <MessageCircle size={12} strokeWidth={1.8} style={{ color: '#ffffff' }} />
             <span className="text-[11px] font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {abbreviateCount(commentCount)}
             </span>
