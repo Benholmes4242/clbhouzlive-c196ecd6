@@ -173,7 +173,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 background: isWarmGradientRoute
                     ? 'rgba(255,253,248,0.55)'
                     : isClubhouseRoute 
-                      ? '#0d0d0d'
+                      ? '#0F172A'
                       : 'hsl(210 40% 98% / 0.95)',
                 borderTop: isWarmGradientRoute
                     ? '1px solid rgba(255,255,255,0.3)'
