@@ -78,6 +78,10 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
     open(allPosts ?? [post], cardIndex);
   };
 
+  const handleAuthorTap = useCallback(() => {
+    navigate(getActorRouteByType(post.actorType, post.actorId));
+  }, [navigate, post.actorType, post.actorId]);
+
   const toggleLike = async () => {
     if (!userId) return;
     const newLiked = !isLiked;
