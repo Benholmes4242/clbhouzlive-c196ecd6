@@ -8,7 +8,8 @@ import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
 import WatchSectionHeader from './WatchSectionHeader';
-import WatchSectionDivider from './WatchSectionDivider';
+// WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
+// sections clearly; dividers fragmented the surface visually.
 import WatchMoreCategoriesSheet from './WatchMoreCategoriesSheet';
 import ContinueWatchingRail from './ContinueWatchingRail';
 import LongPressTipBanner from './LongPressTipBanner';
@@ -112,22 +113,14 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Pro Shop: Course-anchored rail (top played course) ── */}
       <CourseAnchoredRail />
 
-      <WatchSectionDivider />
-
       {/* ── Section 1: Trending clips rail ── */}
       <TrendingThisWeek />
-
-      <WatchSectionDivider />
 
       {/* ── Section 2: Latest videos — hero + horizontal rail ── */}
       <LatestVideosRail />
 
-      <WatchSectionDivider />
-
       {/* ── Pro Shop: Most loved this week ── */}
       <MostLovedRail />
-
-      <WatchSectionDivider />
 
       {/* ── Section 3: More clips — chips + grid ── */}
       <div>
@@ -135,7 +128,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           eyebrow="Browse"
           title="More to explore"
           sub="Filter by category"
-          paddingTop={4}
         />
 
         {/* Chip bar — 3 primary + More overflow */}

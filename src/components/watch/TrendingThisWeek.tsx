@@ -102,7 +102,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         sub="Under 90 seconds, on the green"
         onSeeAll={() => navigate('/watch/clips')}
         seeAllLabel="More clips"
-        paddingTop={12}
       />
 
       {/* Horizontal scroll — ranked cards, with edge padding + snap */}

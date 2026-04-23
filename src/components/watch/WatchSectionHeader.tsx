@@ -27,7 +27,7 @@ export default function WatchSectionHeader({
   sub,
   onSeeAll,
   seeAllLabel = 'See all',
-  paddingTop = 12,
+  paddingTop,
 }: WatchSectionHeaderProps) {
   return (
     <ProShopSectionHeader

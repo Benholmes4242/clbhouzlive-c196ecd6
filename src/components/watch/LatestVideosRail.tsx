@@ -39,7 +39,6 @@ export default function LatestVideosRail() {
           sub="Tournament recaps, coaching, vlogs"
           onSeeAll={() => navigate('/watch/videos')}
           seeAllLabel="More videos"
-          paddingTop={4}
         />
         <Suspense fallback={null}>
           <VideosFeedSkeleton />
@@ -59,7 +58,6 @@ export default function LatestVideosRail() {
         sub="Tournament recaps, coaching, vlogs"
         onSeeAll={() => navigate('/watch/videos')}
         seeAllLabel="More videos"
-        paddingTop={4}
       />
 
       {/* Single hero anchor */}

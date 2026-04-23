@@ -63,7 +63,7 @@ function WatchOfTheWeekHeroInner() {
   };
 
   return (
-    <section style={{ padding: '20px 16px 8px' }}>
+    <section style={{ padding: '24px 16px 12px' }}>
       <Kicker color="amber">Watch of the Week</Kicker>
 
       <button
