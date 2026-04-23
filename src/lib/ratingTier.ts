@@ -4,10 +4,17 @@
  * profileFeedAdapter, and unifiedMediaItemAdapter.
  */
 
-export type RatingTier = 'OUTSTANDING' | 'EXCELLENT' | 'VERY GOOD' | 'GOOD' | 'FAIR';
+export type RatingTier =
+  | 'EXCEPTIONAL'
+  | 'OUTSTANDING'
+  | 'EXCELLENT'
+  | 'VERY GOOD'
+  | 'GOOD'
+  | 'FAIR';
 
 export function getRatingTier(rating: number | null | undefined): RatingTier {
   if (rating == null) return 'FAIR';
+  if (rating >= 9.5) return 'EXCEPTIONAL';
   if (rating >= 9) return 'OUTSTANDING';
   if (rating >= 8) return 'EXCELLENT';
   if (rating >= 7) return 'VERY GOOD';
