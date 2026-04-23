@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Play } from 'lucide-react';
+import { Play, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -96,8 +96,9 @@ function MostLovedRailInner() {
               aspectRatio: '4/5',
               borderRadius: 12,
               overflow: 'hidden',
-              background: '#0F172A',
+              background: 'transparent',
               border: 'none',
+              outline: 'none',
               padding: 0,
               cursor: 'pointer',
               scrollSnapAlign: 'start',
@@ -112,9 +113,18 @@ function MostLovedRailInner() {
               />
             ) : null}
 
-            {/* Course pin top-right (mirrors WatchTile/ClipsMostLovedRail) */}
+            {/* Course pin — top centre (matches WatchTile in More to Explore) */}
             {row.course_name ? (
-              <div style={{ position: 'absolute', top: 8, right: 8, maxWidth: 'calc(100% - 80px)' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 8,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  maxWidth: 'calc(100% - 24px)',
+                  zIndex: 3,
+                }}
+              >
                 <Pin variant="dark" icon={<span style={{ fontSize: 10, lineHeight: 1 }}>📍</span>}>
                   {row.course_name}
                 </Pin>
@@ -186,6 +196,26 @@ function MostLovedRailInner() {
               >
                 {row.display_name || row.username || ''}
               </span>
+            </div>
+
+            {/* Likes — amber heart, bottom-right (mirrors WatchTile / WatchRailTile) */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 10,
+                right: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.95)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+                pointerEvents: 'none',
+              }}
+            >
+              <Heart size={13} strokeWidth={1.8} style={{ color: '#F7931E', fill: '#F7931E' }} />
+              {row.like_count}
             </div>
           </button>
         ))}
