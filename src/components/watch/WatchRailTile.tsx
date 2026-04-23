@@ -266,7 +266,55 @@ export default function WatchRailTile({
         </span>
       )}
 
-      {/* Likes — amber heart SVG */}
+      {/* Creator chip — bottom-left, glass pill + avatar (canonical for portrait overlay tiles). */}
+      {(post.displayName || post.username) && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            left: 8,
+            zIndex: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'rgba(0,0,0,0.6)',
+            borderRadius: 999,
+            padding: '2px 8px 2px 2px',
+            maxWidth: 'calc(100% - 70px)',
+            pointerEvents: 'none',
+          }}
+        >
+          {post.avatarUrl ? (
+            <img
+              src={post.avatarUrl}
+              alt=""
+              style={{
+                width: 18, height: 18, borderRadius: 999, objectFit: 'cover',
+                flexShrink: 0,
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 18, height: 18, borderRadius: 999,
+                background: 'rgba(255,255,255,0.18)',
+                flexShrink: 0,
+              }}
+            />
+          )}
+          <span
+            style={{
+              fontSize: 11, fontWeight: 600, color: 'white',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              maxWidth: 110,
+            }}
+          >
+            {post.displayName || post.username}
+          </span>
+        </div>
+      )}
+
+      {/* Likes — amber heart, no pill, text-shadow handles legibility */}
       <div
         style={{
           position: 'absolute',
@@ -274,11 +322,12 @@ export default function WatchRailTile({
           right: 10,
           fontSize: 11,
           fontWeight: 600,
-          color: 'rgba(255,255,255,0.9)',
+          color: 'rgba(255,255,255,0.95)',
           pointerEvents: 'none',
           display: 'flex',
           alignItems: 'center',
           gap: 4,
+          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
         }}
       >
         <Heart
