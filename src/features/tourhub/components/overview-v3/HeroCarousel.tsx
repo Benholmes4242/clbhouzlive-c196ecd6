@@ -215,13 +215,31 @@ function LeaderHeroStrip({
   const displayRound = holeScores.length > 0 ? derivedRound : lastCompletedRound;
 
   const p = leaderEntry.player;
-  if (!p) return null;
+  const team = leaderEntry.team;
+  if (!p && !team) return null;
 
-  const flagEmoji = COUNTRY_TO_FLAG[(p.country ?? '').toUpperCase()] ?? '';
+  // Team-format leader (e.g. Zurich Classic)
+  const isTeamEntry = !p && team;
+  const sortedMembers = isTeamEntry
+    ? (team.members || [])
+        .filter((m: any) => m.player != null)
+        .sort((a: any, b: any) => a.position_in_team - b.position_in_team)
+    : [];
 
-  const fullName = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
-  const effectiveTourCode = p.tour_codes?.[0] ?? tourSlug ?? 'pga';
-  const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, p.headshot_override);
+  const fullName = isTeamEntry
+    ? (team.abbr_name || team.display_name || 'Team')
+    : (p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim());
+
+  const flagEmoji = isTeamEntry
+    ? COUNTRY_TO_FLAG[(team.country ?? '').toUpperCase()] ?? ''
+    : COUNTRY_TO_FLAG[(p.country ?? '').toUpperCase()] ?? '';
+
+  const effectiveTourCode = isTeamEntry
+    ? (tourSlug ?? 'pga')
+    : (p.tour_codes?.[0] ?? tourSlug ?? 'pga');
+  const photoUrl = isTeamEntry
+    ? null
+    : getPlayerHeadshotUrl(fullName, effectiveTourCode, p.headshot_override);
   const score = leaderEntry.score ?? 0;
   const scoreDisplay = score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`;
   const scoreColor = score < 0 ? '#ffffff' : score > 0 ? '#EF4444' : 'rgba(255,255,255,0.55)';
