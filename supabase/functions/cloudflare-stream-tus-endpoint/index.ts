@@ -13,45 +13,37 @@ interface TusEndpointRequest {
   metadata?: Record<string, string>;
 }
 
-function jsonResponse(status: number, body: Record<string, unknown>) {
-  console.log("Returning:", status, body);
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { status: 200, headers: corsHeaders });
   }
 
   if (req.method !== "POST") {
-    return jsonResponse(405, { error: "Method not allowed" });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {
     const accountId = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
     const streamToken = Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN");
-    const apiToken = Deno.env.get("CLOUDFLARE_API_TOKEN");
-
-    console.log("Env check:", {
-      hasAccountId: !!accountId,
-      hasStreamToken: !!streamToken,
-      hasApiToken: !!apiToken,
-    });
 
     if (!accountId || !streamToken) {
-      return jsonResponse(500, { error: "Missing Cloudflare credentials" });
+      return new Response(JSON.stringify({ error: "Missing Cloudflare credentials" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const body: TusEndpointRequest = await req.json();
-    console.log("[TUS] Request body:", body);
-
     const { fileName, fileSizeBytes, maxDurationSeconds = 3600, metadata = {} } = body;
 
     if (!fileName || !fileSizeBytes) {
-      return jsonResponse(400, { error: "Missing fileName or fileSizeBytes" });
+      return new Response(JSON.stringify({ error: "Missing fileName or fileSizeBytes" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     console.log(
@@ -84,37 +76,67 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error("❌ [TUS] Cloudflare error:", response.status, errorText);
 
-      return jsonResponse(response.status, {
-        error: `Cloudflare TUS error: ${response.status}`,
-        details: errorText,
-      });
+      return new Response(
+        JSON.stringify({
+          error: `Cloudflare TUS error: ${response.status}`,
+          details: errorText,
+        }),
+        {
+          status: response.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     if (!uploadUrl) {
       console.error("❌ [TUS] No Location header in response");
-      return jsonResponse(500, { error: "No upload URL returned from Cloudflare" });
+      return new Response(JSON.stringify({ error: "No upload URL returned from Cloudflare" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     console.log(`✅ [TUS] Upload URL created. streamId: ${streamMediaId}`);
 
-    return jsonResponse(200, {
-      success: true,
-      uploadUrl,
-      streamId: streamMediaId,
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        uploadUrl,
+        streamId: streamMediaId,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("❌ [TUS] Error:", error);
-    return jsonResponse(500, { error: normalizeError(error).message });
+    return new Response(JSON.stringify({ error: normalizeError(error).message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
 
 /**
+ * UTF-8 safe base64 encoding. btoa() throws on chars outside Latin-1
+ * (e.g. emoji, smart quotes), so we encode to UTF-8 bytes first.
+ */
+function safeB64(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
+/**
  * Encode metadata for TUS Upload-Metadata header
  * Format: key1 base64value1,key2 base64value2
+ * Keys are ASCII (TUS spec); values are UTF-8 base64 encoded.
  */
 function encodeMetadata(metadata: Record<string, string>): string {
   return Object.entries(metadata)
     .filter(([_, value]) => value !== undefined && value !== null)
-    .map(([key, value]) => `${key} ${btoa(String(value))}`)
+    .map(([key, value]) => `${key} ${safeB64(String(value))}`)
     .join(",");
 }
