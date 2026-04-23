@@ -25,11 +25,18 @@ export function useLikeMutation() {
       } else {
         const { error } = await supabase
           .from('post_likes')
-          .upsert(
-            { post_id: postId, user_id: userId, actor_id: actorId, actor_type: actorType },
-            { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true }
-          );
-        if (error) throw error;
+          .insert({
+            post_id: postId,
+            user_id: userId,
+            actor_id: actorId,
+            actor_type: actorType,
+          });
+
+        // `23505` is Postgres' unique_violation. This can happen if the user
+        // double-taps the like button before the optimistic state settles, or if
+        // a stale isLiked=false state tries to re-insert a row that already exists.
+        // Treat it as a no-op rather than an error — the like already exists.
+        if (error && error.code !== '23505') throw error;
       }
     },
     onError: (error) => {

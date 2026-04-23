@@ -528,17 +528,32 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
       }
     },
     onSettled: () => {
+      // Actively refetch the comments for THIS post — this is the visible change
+      // the user just made, the user expects it to appear immediately.
       queryClient.refetchQueries({ queryKey: ['post-comments-with-replies', postId] });
+
+      // Actively refresh engagement for THIS post (comment count bump) — it's
+      // visible on the post and the user expects it to update live.
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+
+      // Notifications — safe to refetch, not in the scroll-snap viewport.
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
-      queryClient.invalidateQueries({ queryKey: ['explore-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['real-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['watch-feed'] });
+
+      // Feed caches — mark stale WITHOUT active refetch. A refetch here returns
+      // a re-ordered posts array (comment count affects sort score), causing
+      // SnapFeed's index-derived active slide to resolve to a different post
+      // and CSS scroll-snap-type: y mandatory to jump the viewport. Next natural
+      // refetch (tab switch, PTR, route re-entry) will sync with the server.
+      //
+      // Note: ['media-feed'] is a parent key; React Query prefix-matches, so
+      // the specific ['media-feed', 'suggested'] / ['media-feed', 'friends']
+      // invalidations were redundant and have been removed.
+      queryClient.invalidateQueries({ queryKey: ['media-feed'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['explore-posts'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['real-posts'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'], refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['watch-feed'], refetchType: 'none' });
     },
   });
 

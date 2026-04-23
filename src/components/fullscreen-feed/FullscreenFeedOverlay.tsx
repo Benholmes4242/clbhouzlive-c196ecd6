@@ -18,6 +18,7 @@ import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseC
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 export function FullscreenFeedOverlay() {
@@ -29,7 +30,11 @@ export function FullscreenFeedOverlay() {
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
 
-  const activeActor = { type: "personal" as const, id: userId ?? "" };
+  // Use the real active actor (personal or business) so users in business
+  // mode can like/comment/follow as their business from fullscreen. Falls
+  // back to a personal-shaped object during auth loading.
+  const { activeActor: ctxActor } = useActiveActor();
+  const activeActor = ctxActor ?? { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
   const { followOverrides, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
