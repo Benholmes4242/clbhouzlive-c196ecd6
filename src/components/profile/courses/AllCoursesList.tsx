@@ -14,6 +14,15 @@ import MyRatingsCourseCard, {
 } from '@/components/courses/MyRatingsCourseCard';
 import EditRatingModal from '@/components/courses/EditRatingModal';
 import { annotateTies } from '@/lib/breakdown';
+import MyRatingsTier1Card from '@/components/courses/my-ratings/MyRatingsTier1Card';
+import MyRatingsTier2Card from '@/components/courses/my-ratings/MyRatingsTier2Card';
+import MyRatingsTier3Card from '@/components/courses/my-ratings/MyRatingsTier3Card';
+import MyRatingsTierDivider from '@/components/courses/my-ratings/MyRatingsTierDivider';
+import {
+  getCardTier,
+  type MyRatingsCardTier,
+} from '@/components/courses/my-ratings/myRatingsTiering';
+import type { MyRatingsTierCourse } from '@/components/courses/my-ratings/types';
 
 interface AllCoursesListProps {
   userId: string;
@@ -326,33 +335,134 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         </div>
       ) : (
         <div className="space-y-2 mt-3">
-          {displayedCourses.map((course, index) => {
-            const rank = index + 1;
-            const isRated = course.has_rating && course.rating_value != null;
-            if (isRated) {
-              const cardData: MyRatingsCourseCardData = {
-                ...toMyRatingsCardData(course),
-                tiedAbove: (course as any).__tiedAbove,
+          {(() => {
+            const isRatingSort =
+              activeSort === 'rating-high-low' || activeSort === 'rating-low-high';
+
+            // Helper: convert query row → tier card props shape.
+            const toTierCourse = (course: typeof displayedCourses[number]): MyRatingsTierCourse => ({
+              id: course.id,
+              name: course.name,
+              country: course.country,
+              sub_country: course.sub_country,
+              thumbnail_image: course.thumbnail_image,
+              global_rank: course.is_top100
+                ? (course as unknown as { global_rank?: number | null }).global_rank ?? null
+                : null,
+              rating_id: course.rating_id,
+              rating_value: course.rating_value as number,
+              review_date: course.review_date ?? course.last_played_at ?? null,
+              review_text: (course as unknown as { review_text?: string | null }).review_text ?? null,
+              design_score: course.design_score ?? null,
+              condition_score: course.condition_score ?? null,
+              clubhouse_score: course.clubhouse_score ?? null,
+              facilities_score: course.facilities_score ?? null,
+            });
+
+            const renderTierCard = (
+              course: typeof displayedCourses[number],
+              rank: number,
+              tier: MyRatingsCardTier,
+            ) => {
+              const props = {
+                course: toTierCourse(course),
+                rank,
+                onClick: () =>
+                  navigate(
+                    course.rating_id
+                      ? `/courses/${course.id}?tab=reviews&review=${course.rating_id}`
+                      : `/courses/${course.id}`
+                  ),
               };
+              if (tier === 'tier1') return <MyRatingsTier1Card key={course.id} {...props} />;
+              if (tier === 'tier2') return <MyRatingsTier2Card key={course.id} {...props} />;
+              return <MyRatingsTier3Card key={course.id} {...props} />;
+            };
+
+            // ── Stratified rendering for rating-sorted lists ───────────────
+            if (isRatingSort) {
+              // Tier counts across the *entire* filtered+sorted list, not just
+              // the page (so the divider count reflects total rounds in tier).
+              const tierCounts: Record<MyRatingsCardTier, number> = {
+                tier1: 0,
+                tier2: 0,
+                tier3: 0,
+              };
+              tieAnnotated.forEach((c) => {
+                if (c.has_rating && c.rating_value != null) {
+                  tierCounts[getCardTier(c.rating_value)]++;
+                }
+              });
+
+              const elements: React.ReactNode[] = [];
+              let currentTier: MyRatingsCardTier | null = null;
+              let firstDividerRendered = false;
+
+              displayedCourses.forEach((course, index) => {
+                const rank = index + 1;
+                const isRated = course.has_rating && course.rating_value != null;
+
+                if (!isRated) {
+                  // Edge case: an unrated course in a rating-sorted list.
+                  // Surface via the legacy tiered card so it doesn't disappear.
+                  elements.push(
+                    <TieredCourseCard
+                      key={course.id}
+                      course={course}
+                      isOwnProfile={isOwnProfile}
+                    />
+                  );
+                  return;
+                }
+
+                const tier = getCardTier(course.rating_value as number);
+                if (tier !== currentTier) {
+                  elements.push(
+                    <MyRatingsTierDivider
+                      key={`divider-${tier}`}
+                      tier={tier}
+                      count={tierCounts[tier]}
+                      isFirst={!firstDividerRendered}
+                    />
+                  );
+                  firstDividerRendered = true;
+                  currentTier = tier;
+                }
+
+                elements.push(renderTierCard(course, rank, tier));
+              });
+
+              return elements;
+            }
+
+            // ── Default rendering (recently-played etc.) ───────────────────
+            return displayedCourses.map((course, index) => {
+              const rank = index + 1;
+              const isRated = course.has_rating && course.rating_value != null;
+              if (isRated) {
+                const cardData: MyRatingsCourseCardData = {
+                  ...toMyRatingsCardData(course),
+                  tiedAbove: (course as any).__tiedAbove,
+                };
+                return (
+                  <MyRatingsCourseCard
+                    key={course.id}
+                    course={cardData}
+                    rank={rank}
+                    onCourseClick={(id) => navigate(`/courses/${id}`)}
+                    onAddBreakdown={() => setEditingCourse(course)}
+                  />
+                );
+              }
               return (
-                <MyRatingsCourseCard
+                <TieredCourseCard
                   key={course.id}
-                  course={cardData}
-                  rank={rank}
-                  onCourseClick={(id) => navigate(`/courses/${id}`)}
-                  onAddBreakdown={() => setEditingCourse(course)}
+                  course={course}
+                  isOwnProfile={isOwnProfile}
                 />
               );
-            }
-            // Unrated → keep the existing tiered card (handles its own UI)
-            return (
-              <TieredCourseCard
-                key={course.id}
-                course={course}
-                isOwnProfile={isOwnProfile}
-              />
-            );
-          })}
+            });
+          })()}
         </div>
       )}
 
