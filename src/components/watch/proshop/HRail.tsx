@@ -31,10 +31,10 @@ function HRailInner({
         display: 'flex',
         gap: 12,
         overflowX: 'auto',
-        // Phase 5a: left-only 16px inset so first tile aligns with the
-        // kicker/h1 in SectionHeader above. Right edge intentionally has
-        // zero padding so tiles bleed off-viewport, signalling "more to scroll".
-        padding: `${paddingTop}px 0 ${paddingBottom}px 16px`,
+        // Phase 5a: left-only 20px inset so first tile has breathing room
+        // from the viewport edge. Right edge intentionally has zero padding
+        // so tiles bleed off-viewport, signalling "more to scroll".
+        padding: `${paddingTop}px 0 ${paddingBottom}px 20px`,
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
         scrollSnapType: snap ? 'x mandatory' : 'none',
