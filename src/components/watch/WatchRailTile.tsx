@@ -280,7 +280,7 @@ export default function WatchRailTile({
             gap: 6,
             background: 'rgba(0,0,0,0.6)',
             borderRadius: 999,
-            padding: '4px 10px 4px 4px',
+            padding: '2px 8px 2px 2px',
             maxWidth: 'calc(100% - 70px)',
             pointerEvents: 'none',
           }}
