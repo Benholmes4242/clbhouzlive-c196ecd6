@@ -131,13 +131,13 @@ function VideoLandscapeTileInner({
             style={{
               position: 'absolute',
               left: 0, right: 0, bottom: 0,
-              height: 3,
-              background: 'rgba(255,255,255,0.25)',
+              height: 5,
+              background: 'rgba(255,255,255,0.28)',
             }}
           >
             <div
               style={{
-                width: `${Math.min(100, Math.max(0, progress * 100))}%`,
+                width: `${Math.min(100, Math.max(2, progress * 100))}%`,
                 height: '100%',
                 background: '#F7931E',
               }}
