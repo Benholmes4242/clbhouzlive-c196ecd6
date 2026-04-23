@@ -125,9 +125,9 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
             style={{
               flexShrink: 0,
               position: 'relative',
-              width: 160,
+              width: 200,
               aspectRatio: '4/5',
-              borderRadius: 10,
+              borderRadius: 12,
               overflow: 'hidden',
               background: '#0F172A',
               border: 'none',
@@ -145,9 +145,17 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               />
             ) : null}
 
-            <div style={{ position: 'absolute', top: 6, left: 6 }}>
+            <div style={{ position: 'absolute', top: 8, left: 8 }}>
               <Pin variant="dark">CLIP</Pin>
             </div>
+
+            {row.course_name ? (
+              <div style={{ position: 'absolute', top: 8, right: 8, maxWidth: 'calc(100% - 80px)' }}>
+                <Pin variant="dark" icon={<span style={{ fontSize: 10, lineHeight: 1 }}>📍</span>}>
+                  {row.course_name}
+                </Pin>
+              </div>
+            ) : null}
 
             <div
               aria-hidden
@@ -175,27 +183,44 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               }}
             />
 
+            {/* Canonical glass-pill+avatar creator chip */}
             <div
               style={{
                 position: 'absolute',
-                left: 8, right: 8, bottom: 8,
-                color: 'white',
-                fontSize: 11,
-                fontWeight: 600,
-                textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-                textAlign: 'left',
+                bottom: 8,
+                left: 8,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                background: 'rgba(0,0,0,0.6)',
+                borderRadius: 999,
+                padding: '2px 8px 2px 2px',
+                maxWidth: 'calc(100% - 16px)',
+                pointerEvents: 'none',
               }}
             >
-              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {row.avatar_url ? (
+                <img
+                  src={row.avatar_url}
+                  alt=""
+                  style={{ width: 18, height: 18, borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
+                />
+              ) : (
+                <div style={{ width: 18, height: 18, borderRadius: 999, background: 'rgba(255,255,255,0.18)', flexShrink: 0 }} />
+              )}
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'white',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: 130,
+                }}
+              >
                 {row.display_name || row.username || ''}
-              </div>
-              {row.course_name ? (
-                <div style={{ marginTop: 4 }}>
-                  <Pin variant="dark" icon={<span style={{ fontSize: 9, lineHeight: 1 }}>📍</span>}>
-                    {row.course_name}
-                  </Pin>
-                </div>
-              ) : null}
+              </span>
             </div>
           </button>
         ))}

@@ -75,7 +75,7 @@ function ClipOfTheWeekHeroInner() {
           width: '100%',
           aspectRatio: '9/16',
           maxHeight: 460,
-          borderRadius: 14,
+          borderRadius: 12,
           overflow: 'hidden',
           background: '#0F172A',
           border: 'none',

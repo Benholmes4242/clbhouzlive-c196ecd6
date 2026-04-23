@@ -91,7 +91,7 @@ function VideoLandscapeTileInner({
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 10,
+          borderRadius: 12,
           overflow: 'hidden',
           background: '#0F172A',
           border: 'none',
@@ -124,7 +124,7 @@ function VideoLandscapeTileInner({
           </div>
         ) : null}
 
-        {/* Centre play affordance */}
+        {/* Centre play affordance — solid scrim per Phase 1c rule (no blur) */}
         <div
           aria-hidden
           style={{
@@ -133,9 +133,7 @@ function VideoLandscapeTileInner({
             transform: 'translate(-50%, -50%)',
             width: 40, height: 40,
             borderRadius: '50%',
-            background: 'rgba(0,0,0,0.5)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
