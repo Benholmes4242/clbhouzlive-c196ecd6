@@ -1,12 +1,14 @@
 import { memo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
-import { Loader2, MoreVertical, Clock } from 'lucide-react';
+import { Loader2, Clock, Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
 import { haptic } from '@/utils/haptics';
@@ -26,13 +28,20 @@ function formatHMS(seconds: number | null | undefined): string {
   return `${m}:${pad(sec)}`;
 }
 
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
 interface VideoFeedCardProps {
   post: FeedPost;
   index: number;
   allPosts: FeedPost[];
+  userId?: string;
 }
 
-function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
+function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProps) {
   const navigate = useNavigate();
   const { openActions } = useWatchActions();
   const longPressTimer = useRef<number | null>(null);
@@ -66,6 +75,24 @@ function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
     if (longPressTimer.current) {
       window.clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/video/${post.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: post.caption || 'Check out this video', url: shareUrl });
+      } catch {
+        /* user cancelled */
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied');
+      } catch {
+        /* clipboard unavailable */
+      }
     }
   };
 
@@ -165,21 +192,33 @@ function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); openActions(post); }}
+        {/* Engagement counts (display-only) */}
+        <div
           style={{
-            background: 'none',
-            border: 'none',
-            padding: '4px 0 4px 4px',
-            cursor: 'pointer',
-            color: 'rgba(15,23,42,0.55)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
             flexShrink: 0,
+            color: 'rgba(15,23,42,0.55)',
           }}
-          aria-label="More options"
         >
-          <MoreVertical size={18} />
-        </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Heart size={14} />
+            <span style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+              {formatCompact(post.likeCount)}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <MessageCircle size={14} />
+            <span style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+              {formatCompact(post.commentCount)}
+            </span>
+          </div>
+        </div>
+
+        <div style={{ flexShrink: 0, marginRight: -8 }}>
+          <VideoCardMenu postId={post.id} userId={userId} onShare={handleShare} />
+        </div>
       </div>
     </article>
   );
@@ -251,7 +290,7 @@ function VideosFullFeedInner({ userId }: VideosFullFeedProps) {
   return (
     <div style={{ paddingTop: 8, paddingBottom: 24 }}>
       {posts.map((post, i) => (
-        <VideoFeedCard key={post.id} post={post} index={i} allPosts={posts} />
+        <VideoFeedCard key={post.id} post={post} index={i} allPosts={posts} userId={userId} />
       ))}
 
       <div ref={sentinelRef} style={{ height: 1 }} />
