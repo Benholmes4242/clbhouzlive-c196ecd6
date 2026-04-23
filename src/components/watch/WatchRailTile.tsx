@@ -295,7 +295,7 @@ export default function WatchRailTile({
           </div>
           <span
             style={{
-              fontSize: 11, fontWeight: 600, color: 'white', lineHeight: 1,
+              fontSize: 11, fontWeight: 600, color: 'white',
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               maxWidth: 110,
             }}
