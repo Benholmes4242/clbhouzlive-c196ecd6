@@ -5,6 +5,9 @@ import { useSearchParams } from 'react-router-dom';
  * Videos-specific mood filter. Five chips: For you (default) / Course vlogs /
  * Coaching / Tournaments / Friends. Persisted via `?mood=X` so refresh and
  * deep-link preserve state. Default is never written to the URL.
+ * Uses replace: true so filter toggles don't pollute browser history —
+ * tapping back from the subpage returns to the previous page, not through
+ * every chip tap.
  *
  * Distinct from `useClipsMood` and `useWatchMood` — each Pro Shop surface
  * owns its own URL contract because the chip vocabularies differ.
@@ -72,7 +75,7 @@ export function useVideosMood() {
       } else {
         newParams.set('mood', next);
       }
-      setParams(newParams, { replace: false });
+      setParams(newParams, { replace: true });
     },
     [params, setParams],
   );

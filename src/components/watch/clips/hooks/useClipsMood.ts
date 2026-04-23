@@ -5,6 +5,9 @@ import { useSearchParams } from 'react-router-dom';
  * Clips-specific mood filter. Five chips: For you (default) / Lightning /
  * Friends / From your courses / Trending. Persisted via `?mood=X` so refresh
  * and deep-link preserve state. Default is never written to the URL.
+ * Uses replace: true so filter toggles don't pollute browser history —
+ * tapping back from the subpage returns to the previous page, not through
+ * every chip tap.
  *
  * Intentionally separate from `useWatchMood` (Watch tab) — the chip set is
  * different and we want each surface to own its own URL contract.
@@ -37,7 +40,7 @@ export function useClipsMood() {
       } else {
         newParams.set('mood', next);
       }
-      setParams(newParams, { replace: false });
+      setParams(newParams, { replace: true });
     },
     [params, setParams],
   );

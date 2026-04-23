@@ -17,6 +17,9 @@ const DEFAULT_MOOD: ExploreMoodId = 'foryou';
 /**
  * Reads/writes the active mood from the URL (?mood=...) so that
  * refresh and deep-link preserve state. Falls back to 'foryou'.
+ * Uses replace: true so filter toggles don't pollute browser history —
+ * tapping back from the subpage returns to the previous page, not through
+ * every chip tap.
  */
 export function useExploreMood() {
   const [params, setParams] = useSearchParams();
@@ -31,7 +34,7 @@ export function useExploreMood() {
     } else {
       newParams.set('mood', next);
     }
-    setParams(newParams, { replace: false });
+    setParams(newParams, { replace: true });
   }, [params, setParams]);
 
   return { mood, setMood };
