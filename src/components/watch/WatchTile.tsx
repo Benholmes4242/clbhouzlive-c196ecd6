@@ -239,7 +239,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
         }}
       >
         <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.95)' }}>
-          <Heart size={12} strokeWidth={1.8} style={{ color: 'hsl(var(--primary))', fill: 'hsl(var(--primary))' }} />
+          <Heart size={13} strokeWidth={1.8} style={{ color: '#F7931E', fill: '#F7931E' }} />
           <span className="text-[11px] font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
             {abbreviateCount(likeCount)}
           </span>
