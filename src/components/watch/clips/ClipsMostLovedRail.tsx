@@ -167,21 +167,6 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               aria-hidden
               style={{
                 position: 'absolute',
-                top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 32, height: 32,
-                borderRadius: '50%',
-                background: 'rgba(0,0,0,0.6)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <Play size={13} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
-            </div>
-
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
                 bottom: 0, left: 0, right: 0,
                 height: '50%',
                 background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)',

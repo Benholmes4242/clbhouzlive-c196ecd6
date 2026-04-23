@@ -124,22 +124,6 @@ function VideoLandscapeTileInner({
           </div>
         ) : null}
 
-        {/* Centre play affordance — solid scrim per Phase 1c rule (no blur) */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 40, height: 40,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <Play size={16} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 1 }} />
-        </div>
-
         {/* Progress bar overlay (Continue Watching) */}
         {typeof progress === 'number' && progress > 0 && progress < 1 ? (
           <div
