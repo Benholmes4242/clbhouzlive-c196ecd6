@@ -63,7 +63,7 @@ function ClipOfTheWeekHeroInner() {
   };
 
   return (
-    <section style={{ padding: '20px 16px 8px' }}>
+    <section style={{ padding: '24px 16px 12px' }}>
       <Kicker color="emerald">Clip of the Week</Kicker>
 
       <button
