@@ -138,7 +138,7 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
       </button>
 
       {/* Meta row */}
-      <div style={{ display: 'flex', gap: 10, marginTop: 10, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 10, alignItems: 'flex-start', padding: '0 16px' }}>
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); navigate(`/profile/${post.userId}`); }}
