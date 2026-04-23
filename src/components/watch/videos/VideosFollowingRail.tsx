@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
-import { VideoLandscapeTile } from './VideoLandscapeTile';
+import { VideoRailTile } from './VideoRailTile';
 
 interface VideosFollowingRailProps {
   userId: string | undefined;
@@ -26,7 +26,7 @@ function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
       />
       <HRail>
         {posts.map((post, i) => (
-          <VideoLandscapeTile key={post.id} post={post} index={i} allPosts={posts} />
+          <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />
         ))}
       </HRail>
     </section>

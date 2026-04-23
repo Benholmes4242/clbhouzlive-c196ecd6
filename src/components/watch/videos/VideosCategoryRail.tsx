@@ -3,7 +3,7 @@ import { useVideosCategoryRail } from './hooks/useVideosCategoryRail';
 import { moodToCategory, moodCategoryLabel, moodCategorySub, type VideosMoodId } from './hooks/useVideosMood';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
-import { VideoLandscapeTile } from './VideoLandscapeTile';
+import { VideoRailTile } from './VideoRailTile';
 
 interface VideosCategoryRailProps {
   userId: string | undefined;
@@ -36,7 +36,7 @@ function VideosCategoryRailInner({ userId, mood }: VideosCategoryRailProps) {
       />
       <HRail>
         {posts.map((post, i) => (
-          <VideoLandscapeTile key={post.id} post={post} index={i} allPosts={posts} />
+          <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />
         ))}
       </HRail>
     </section>
