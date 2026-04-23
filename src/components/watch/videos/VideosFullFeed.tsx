@@ -114,20 +114,6 @@ function VideoFeedCardInner({ post, index, allPosts }: VideoFeedCardProps) {
           </div>
         ) : null}
 
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 44, height: 44,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <Play size={18} fill="white" stroke="white" strokeWidth={1} style={{ marginLeft: 2 }} />
-        </div>
       </button>
 
       {/* Meta row */}
