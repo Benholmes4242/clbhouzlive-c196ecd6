@@ -11892,6 +11892,35 @@ export type Database = {
           },
         ]
       }
+      user_course_personal_rank: {
+        Row: {
+          course_id: string
+          personal_rank: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          personal_rank: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          personal_rank?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_course_personal_rank_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_course_tracker: {
         Row: {
           checked: boolean | null
@@ -17359,6 +17388,10 @@ export type Database = {
           username: string
         }[]
       }
+      seed_user_personal_ranks: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       send_message: {
         Args: {
           p_content: string
@@ -18142,6 +18175,10 @@ export type Database = {
         Returns: undefined
       }
       update_presence: { Args: { p_status: string }; Returns: undefined }
+      update_user_personal_rank_order: {
+        Args: { p_ordered_course_ids: string[]; p_user_id: string }
+        Returns: undefined
+      }
       updategeometrysrid: {
         Args: {
           catalogn_name: string
