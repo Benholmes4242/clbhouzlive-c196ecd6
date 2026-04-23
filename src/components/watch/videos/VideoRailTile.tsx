@@ -192,7 +192,7 @@ function VideoRailTileInner({
               pointerEvents: 'none',
             }}
           >
-            <Pin variant="dark" icon={<Clock size={10} />}>
+            <Pin variant="dark">
               {formatHMS(duration)}
             </Pin>
           </div>
