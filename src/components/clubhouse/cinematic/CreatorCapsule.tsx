@@ -19,6 +19,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { getActorRouteByType } from '@/types/actor';
 import { CourseDNACard } from './CourseDNACard';
 
 import { type ExtractedReviewData } from '@/lib/postHelpers';
