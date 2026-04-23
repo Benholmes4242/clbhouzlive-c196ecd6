@@ -218,7 +218,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
           style={{
             bottom: 6, left: 6,
             background: 'rgba(0,0,0,0.6)',
-            borderRadius: 999, padding: '3px 8px 3px 3px',
+            borderRadius: 999, padding: '4px 10px 4px 4px',
             maxWidth: 'calc(100% - 70px)',
           }}
         >
