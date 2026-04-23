@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCommentsWithReplies, type CommentWithReplies, type CommentReply } from '@/hooks/useCommentsWithReplies';
+import { getActorRouteByType } from '@/types/actor';
 import { useEditorialComments } from '@/hooks/useEditorialComments';
 import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -374,7 +375,10 @@ function CommentsSheet({
         {/* Avatar */}
         <button
           type="button"
-          onClick={() => navigate(`/profile/${comment.actor_id || comment.user_id}`)}
+          onClick={() => navigate(getActorRouteByType(
+            comment.actor_type,
+            comment.actor_id || comment.user_id
+          ))}
           className="shrink-0"
         >
           <SquircleAvatar
@@ -886,6 +890,9 @@ function CommentsSheet({
                         <button
                           key={liker.userId}
                           type="button"
+                          // TODO Phase B: route business likers to their business profile.
+                          // Currently `liker` only carries userId — needs actor_type/actor_id
+                          // plumbed through usePostLikes before this can branch correctly.
                           onClick={() => { navigate(`/profile/${liker.userId}`); onClose(); }}
                           className="flex items-center gap-3 w-full px-4 py-3 min-h-[60px] text-left transition-colors hover:bg-[rgba(15,23,42,0.02)]"
                         >
