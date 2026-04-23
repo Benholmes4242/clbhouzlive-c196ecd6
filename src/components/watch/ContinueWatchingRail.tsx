@@ -3,6 +3,7 @@ import type { ContinueWatchingPost } from './hooks/useContinueWatching';
 import { useContinueWatching } from './hooks/useContinueWatching';
 import WatchSectionHeader from './WatchSectionHeader';
 import WatchSectionDivider from './WatchSectionDivider';
+import { HRail } from './proshop/HRail';
 
 interface ContinueWatchingRailProps {
   userId: string | undefined;
@@ -22,20 +23,13 @@ export default function ContinueWatchingRail({ userId }: ContinueWatchingRailPro
   return (
     <>
       <WatchSectionHeader eyebrow="Continue" title="Continue watching" sub="Pick up where you left off" />
-      <div
-        className="flex gap-3 overflow-x-auto"
-        style={{
-          scrollbarWidth: 'none',
-          padding: '0 16px 16px',
-          scrollSnapType: 'x mandatory',
-        }}
-      >
+      <HRail>
         {posts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
             <ContinueWatchingTile post={post} index={i} allPosts={posts} />
           </div>
         ))}
-      </div>
+      </HRail>
       <WatchSectionDivider />
     </>
   );
