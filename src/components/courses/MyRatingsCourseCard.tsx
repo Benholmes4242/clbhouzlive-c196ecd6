@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flag } from 'lucide-react';
+import { Flag, GripVertical } from 'lucide-react';
 import MyRatingsRing from './MyRatingsRing';
 import {
   getBreakdownSum,
@@ -34,6 +34,13 @@ interface Props {
   rank: number;
   onCourseClick: (courseId: string) => void;
   onAddBreakdown: (courseId: string) => void;
+  /** When provided, renders a drag-handle in the top-right corner. */
+  dragHandle?: {
+    listeners?: Record<string, unknown>;
+    attributes?: Record<string, unknown>;
+    setActivatorNodeRef?: (el: HTMLElement | null) => void;
+    isDragging?: boolean;
+  };
 }
 
 const formatDate = (iso: string): string => {
