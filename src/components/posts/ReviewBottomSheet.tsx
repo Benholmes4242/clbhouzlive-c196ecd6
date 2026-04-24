@@ -490,7 +490,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                             paddingTop: 4,
                             paddingRight: 8,
                             color: FROST.amber,
-                            fontFamily: 'Georgia, "Times New Roman", serif',
                           }}
                         >
                           {firstChar}
