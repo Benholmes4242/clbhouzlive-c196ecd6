@@ -1,5 +1,6 @@
 import React from 'react';
-import { Flag } from 'lucide-react';
+import { Flag, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { getTierName } from './myRatingsTiering';
 
@@ -68,11 +69,15 @@ const MyRatingsHeroCard: React.FC<MyRatingsHeroCardProps> = ({
   rank,
   onCourseClick,
 }) => {
+  const navigate = useNavigate();
   const reviewText = (course.review ?? '').trim();
   const hasReview = reviewText.length > 0;
   const heroHeight = hasReview ? 220 : 250;
-  const showTop100 =
-    course.global_rank != null && course.global_rank <= 100;
+  const hasAnyBreakdown =
+    course.design_score != null ||
+    course.condition_score != null ||
+    course.clubhouse_score != null ||
+    course.facilities_score != null;
   const dateIso = course.review_date ?? course.last_played_at ?? null;
   const dateText = formatEditorialDate(dateIso);
   const tierName = getTierName(course.rating_value);
@@ -159,56 +164,6 @@ const MyRatingsHeroCard: React.FC<MyRatingsHeroCardProps> = ({
         >
           NO. {rank}
         </div>
-
-        {/* Top 100 badge */}
-        {showTop100 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 14,
-              right: 20,
-              padding: '5px 10px',
-              background: 'rgba(15,23,42,0.55)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              borderRadius: 2,
-              borderLeft: `2px solid ${AMBER}`,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 8.5,
-                fontWeight: 800,
-                letterSpacing: '0.2em',
-                color: AMBER,
-              }}
-            >
-              TOP 100
-            </span>
-            <span
-              style={{
-                width: 2,
-                height: 2,
-                background: 'rgba(255,255,255,0.4)',
-                borderRadius: 1,
-              }}
-            />
-            <span
-              style={{
-                fontFamily: FONT_SERIF,
-                fontStyle: 'italic',
-                fontSize: 12,
-                color: PAPER,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              No. {course.global_rank}
-            </span>
-          </div>
-        )}
 
         {/* Course name */}
         <div
@@ -317,81 +272,122 @@ const MyRatingsHeroCard: React.FC<MyRatingsHeroCardProps> = ({
           </div>
         )}
 
-        {/* Scored breakdown bars */}
-        <div
-          style={{
-            marginTop: hasReview ? 16 : 0,
-            paddingTop: hasReview ? 14 : 0,
-            borderTop: hasReview ? `1px solid ${HAIRLINE_SOFT}` : 'none',
-            display: 'flex',
-            gap: 10,
-          }}
-        >
-          {bars.map(({ label, score }) => {
-            const pct = score != null ? (score / 10) * 100 : 0;
-            return (
-              <div
-                key={label}
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                }}
-              >
+        {/* Scored breakdown bars OR amber nudge */}
+        {hasAnyBreakdown ? (
+          <div
+            style={{
+              marginTop: hasReview ? 16 : 0,
+              paddingTop: hasReview ? 14 : 0,
+              borderTop: hasReview ? `1px solid ${HAIRLINE_SOFT}` : 'none',
+              display: 'flex',
+              gap: 10,
+            }}
+          >
+            {bars.map(({ label, score }) => {
+              const pct = score != null ? (score / 10) * 100 : 0;
+              return (
                 <div
+                  key={label}
                   style={{
-                    height: 3,
-                    background: HAIRLINE_SOFT,
-                    borderRadius: 1.5,
-                    position: 'relative',
-                    overflow: 'hidden',
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
                   }}
                 >
                   <div
                     style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: `${pct}%`,
-                      background: AMBER,
+                      height: 3,
+                      background: HAIRLINE_SOFT,
                       borderRadius: 1.5,
-                    }}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 8,
-                      fontWeight: 700,
-                      color: INK_SECONDARY,
-                      letterSpacing: '0.1em',
+                      position: 'relative',
+                      overflow: 'hidden',
                     }}
                   >
-                    {label}
-                  </span>
-                  <span
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: `${pct}%`,
+                        background: AMBER,
+                        borderRadius: 1.5,
+                      }}
+                    />
+                  </div>
+                  <div
                     style={{
-                      fontFamily: FONT_MONO,
-                      fontSize: 9,
-                      fontWeight: 600,
-                      color: INK,
-                      letterSpacing: '-0.02em',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 4,
                     }}
                   >
-                    {score != null ? score.toFixed(1) : '—'}
-                  </span>
+                    <span
+                      style={{
+                        fontSize: 8,
+                        fontWeight: 700,
+                        color: INK_SECONDARY,
+                        letterSpacing: '0.1em',
+                      }}
+                    >
+                      {label}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: FONT_MONO,
+                        fontSize: 9,
+                        fontWeight: 600,
+                        color: INK,
+                        letterSpacing: '-0.02em',
+                      }}
+                    >
+                      {score != null ? score.toFixed(1) : '—'}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/courses/${course.id}/rate`);
+            }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate(`/courses/${course.id}/rate`);
+              }
+            }}
+            style={{
+              marginTop: hasReview ? 16 : 0,
+              background: 'rgba(247, 147, 30, 0.08)',
+              border: '1px solid rgba(247, 147, 30, 0.2)',
+              borderRadius: 8,
+              padding: '8px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              cursor: 'pointer',
+            }}
+          >
+            <Plus size={12} color={AMBER_DEEP} strokeWidth={2.5} />
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: AMBER_DEEP,
+                letterSpacing: '0.2px',
+              }}
+            >
+              Add breakdowns for a more detailed rating
+            </span>
+          </div>
+        )}
       </div>
     </article>
   );

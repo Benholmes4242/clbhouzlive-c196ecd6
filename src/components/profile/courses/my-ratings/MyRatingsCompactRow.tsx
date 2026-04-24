@@ -1,7 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { Flag } from 'lucide-react';
-import { getCategoryTierLabel } from './myRatingsTiering';
+import { Flag, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { RatedCourseData } from './MyRatingsHeroCard';
 
 /**
@@ -13,13 +13,18 @@ import type { RatedCourseData } from './MyRatingsHeroCard';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 const FONT_SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
+const FONT_MONO =
+  '"Geist Mono", ui-monospace, SFMono-Regular, monospace';
 
 const INK = '#0F172A';
 const INK_SECONDARY = '#475569';
 const INK_TERTIARY = '#94A3B8';
 const INK_QUATERNARY = '#CBD5E1';
+const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97211';
 const PAPER = '#FFFFFF';
 const HAIRLINE = '#E2E8F0';
+const HAIRLINE_SOFT = '#EEF2F6';
 
 interface MyRatingsCompactRowProps {
   course: RatedCourseData;
@@ -45,16 +50,23 @@ const MyRatingsCompactRow: React.FC<MyRatingsCompactRowProps> = ({
   rank,
   onCourseClick,
 }) => {
+  const navigate = useNavigate();
   const dateIso = course.review_date ?? course.last_played_at ?? null;
   const dateText = formatDate(dateIso);
   const country = course.country ?? '';
   const { int, dec } = splitRating(course.rating_value);
 
-  const tierBits: { key: string; label: string; tier: string }[] = [
-    { key: 'd', label: 'Design', tier: getCategoryTierLabel(course.design_score) },
-    { key: 'c', label: 'Cond.', tier: getCategoryTierLabel(course.condition_score) },
-    { key: 'k', label: 'Club.', tier: getCategoryTierLabel(course.clubhouse_score) },
-    { key: 'f', label: 'Fac.', tier: getCategoryTierLabel(course.facilities_score) },
+  const hasAnyBreakdown =
+    course.design_score != null ||
+    course.condition_score != null ||
+    course.clubhouse_score != null ||
+    course.facilities_score != null;
+
+  const breakdownCells: { key: string; label: string; score: number | null }[] = [
+    { key: 'd', label: 'DESIGN', score: course.design_score },
+    { key: 'c', label: 'COND.', score: course.condition_score },
+    { key: 'k', label: 'CLUB.', score: course.clubhouse_score },
+    { key: 'f', label: 'FAC.', score: course.facilities_score },
   ];
 
   return (
@@ -129,111 +141,206 @@ const MyRatingsCompactRow: React.FC<MyRatingsCompactRowProps> = ({
             flex: 1,
             padding: '12px 14px',
             display: 'flex',
-            alignItems: 'center',
-            gap: 12,
+            flexDirection: 'column',
+            gap: 8,
             minWidth: 0,
           }}
         >
-          {/* Left column */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontFamily: FONT_SERIF,
-                fontStyle: 'italic',
-                fontWeight: 400,
-                fontSize: 14,
-                color: INK,
-                lineHeight: 1.2,
-                letterSpacing: '-0.005em',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                marginBottom: 4,
-              }}
-            >
-              {course.name}
-            </div>
-            <div
-              style={{
-                fontSize: 9.5,
-                fontWeight: 600,
-                color: INK_TERTIARY,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                marginBottom: 5,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {country}
-              {country && dateText && ' · '}
-              {dateText}
-            </div>
-            <div
-              style={{
-                fontSize: 9,
-                color: INK_TERTIARY,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {tierBits.map((b, i) => (
-                <React.Fragment key={b.key}>
-                  {i > 0 && (
-                    <span
-                      style={{
-                        color: INK_QUATERNARY,
-                        margin: '0 5px',
-                      }}
-                    >
-                      ·
-                    </span>
-                  )}
-                  <span style={{ color: INK_TERTIARY, fontWeight: 500 }}>
-                    {b.label}{' '}
-                  </span>
-                  <span style={{ color: INK_SECONDARY, fontWeight: 600 }}>
-                    {b.tier}
-                  </span>
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-
-          {/* Rating numeral */}
+          {/* Top row: name/meta + rating numeral */}
           <div
             style={{
               display: 'flex',
-              alignItems: 'baseline',
-              flexShrink: 0,
-              fontFamily: FONT_SERIF,
-              fontStyle: 'italic',
-              fontWeight: 400,
+              alignItems: 'center',
+              gap: 12,
+              minWidth: 0,
             }}
           >
-            <span
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontFamily: FONT_SERIF,
+                  fontStyle: 'italic',
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: INK,
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.005em',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: 4,
+                }}
+              >
+                {course.name}
+              </div>
+              <div
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 600,
+                  color: INK_TERTIARY,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {country}
+                {country && dateText && ' · '}
+                {dateText}
+              </div>
+            </div>
+
+            {/* Rating numeral */}
+            <div
               style={{
-                fontSize: 22,
-                color: INK,
-                letterSpacing: '-0.02em',
-                lineHeight: 0.85,
+                display: 'flex',
+                alignItems: 'baseline',
+                flexShrink: 0,
+                fontFamily: FONT_SERIF,
+                fontStyle: 'italic',
+                fontWeight: 400,
               }}
             >
-              {int}
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                color: INK_SECONDARY,
-                letterSpacing: '-0.02em',
-                lineHeight: 0.85,
-              }}
-            >
-              .{dec}
-            </span>
+              <span
+                style={{
+                  fontSize: 22,
+                  color: INK,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 0.85,
+                }}
+              >
+                {int}
+              </span>
+              <span
+                style={{
+                  fontSize: 13,
+                  color: INK_SECONDARY,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 0.85,
+                }}
+              >
+                .{dec}
+              </span>
+            </div>
           </div>
+
+          {/* Breakdown 2x2 grid OR amber nudge */}
+          {hasAnyBreakdown ? (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '4px 12px',
+              }}
+            >
+              {breakdownCells.map(({ key, label, score }) => {
+                const pct = score != null ? (score / 10) * 100 : 0;
+                return (
+                  <div
+                    key={key}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 3,
+                      minWidth: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: 2,
+                        background: HAIRLINE_SOFT,
+                        borderRadius: 1,
+                        position: 'relative',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: `${pct}%`,
+                          background: AMBER,
+                          borderRadius: 1,
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 10,
+                          color: INK_TERTIARY,
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {label}
+                      </span>
+                      <span
+                        style={{
+                          flexGrow: 1,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: FONT_SERIF,
+                          fontSize: 12,
+                          color: INK,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {score != null ? score.toFixed(1) : '—'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/courses/${course.id}/rate`);
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate(`/courses/${course.id}/rate`);
+                }
+              }}
+              style={{
+                background: 'rgba(247, 147, 30, 0.08)',
+                border: '1px solid rgba(247, 147, 30, 0.2)',
+                borderRadius: 8,
+                padding: '8px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                cursor: 'pointer',
+              }}
+            >
+              <Plus size={12} color={AMBER_DEEP} strokeWidth={2.5} />
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: AMBER_DEEP,
+                  letterSpacing: '0.2px',
+                }}
+              >
+                Add breakdowns for a more detailed rating
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </article>
