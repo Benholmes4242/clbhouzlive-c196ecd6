@@ -21,6 +21,8 @@ import {
   formatFrostRating,
   splitCourseName,
 } from '@/lib/frostPanel';
+import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
