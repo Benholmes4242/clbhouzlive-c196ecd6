@@ -23,6 +23,7 @@ import {
   formatFrostRating,
   splitCourseName,
 } from '@/lib/frostPanel';
+import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
 
 export interface InlineReviewCardProps {
   courseName: string;
