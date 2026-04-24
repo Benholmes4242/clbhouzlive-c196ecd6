@@ -286,7 +286,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
 
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
    const {
-    state, setStep, setActiveMedia, removeMedia, addMedia,
+    state, setStep, setActiveMedia, setCoverMedia, removeMedia, addMedia,
     setCaption, openPanel, closePanel, updateMediaEdits, updateTrim,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
@@ -312,7 +312,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
-  const [coverIndex, setCoverIndex] = useState(0);
+  // Cover is sourced from reducer state (keyed by media ID, persists across remounts/reorders)
+  const coverMediaId = state.coverMediaId;
+  const coverIndex = coverMediaId
+    ? Math.max(0, state.mediaItems.findIndex((m) => m.id === coverMediaId))
+    : 0;
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressFiredRef = useRef(false);
 
@@ -443,10 +447,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   }, [state.mediaItems, setActiveMedia]);
 
   const handleSetCover = useCallback((index: number) => {
-    setCoverIndex(index);
+    const targetId = state.mediaItems[index]?.id;
+    if (!targetId) return;
+    setCoverMedia(targetId);
     setActiveMedia(index);
     toast.success('Cover updated');
-  }, [setActiveMedia]);
+  }, [state.mediaItems, setCoverMedia, setActiveMedia]);
 
   // ── Publish handler — one-step flow ──
   const handlePublish = useCallback(async () => {
@@ -815,7 +821,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             padding: '0 16px',
           }}>
             {state.mediaItems.map((item, i) => {
-              const isActive = i === coverIndex;
+              const isActive = i === state.activeMediaIndex;
               const isCover = i === coverIndex;
               const stillSrc = getPreviewStillSrc(item);
               const previewTransform = getPreviewTransform(item.edits);
