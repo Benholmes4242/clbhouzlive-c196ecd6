@@ -59,4 +59,37 @@ export function invalidateCourseRatingCaches(queryClient: QueryClient) {
 
   // ── Reviews count (profile header) ──
   queryClient.invalidateQueries({ queryKey: ['actor-reviews-count'], exact: false });
+
+  // ── Clubhouse + feed surfaces ──
+  // These cache reviews shared as posts. Keys must match the set
+  // currently invalidated by useReviewWizard's DELETE branch
+  // and useShareReview. Centralising here ensures submit + edit
+  // paths also invalidate feed caches.
+  queryClient.invalidateQueries({ queryKey: ['posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['user-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['profile-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['profile-feed'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['actor-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['clubhouse-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['clubhouse-feed'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['clubhouse-shorts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['feed-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['feed-pinned'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['explore-feed'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['explore-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['explore-content'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['activity-feed'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['activity-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['media-feed'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['trending-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['real-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['watch-feed'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['friends-feed'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['friends-shorts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['followedUsersPosts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['userPosts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['pinned-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['featured-post'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['creator-features'], exact: false });
 }

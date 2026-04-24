@@ -104,16 +104,30 @@ export function useOptimisticReviewUpdate() {
       _isOptimistic: true,
     };
 
-    // Update reviews list - add/update user's review at the top
+    // Detect edit vs new based on whether the user already has a review cached
+    const previousUserRatingForSort = snapshot.previousUserRating as { rating?: number } | null;
+    const isEdit = !!previousUserRatingForSort;
+
+    const upsertReview = (old: ReviewData[] | undefined) => {
+      if (!old) return [optimisticReview];
+      // In edit mode, replace in-place to preserve the active sort order
+      // (e.g. "Highest rated" / "Most helpful"). New reviews go to the top.
+      if (isEdit) {
+        const existingIdx = old.findIndex((r: ReviewData) => r.user_id === userId);
+        if (existingIdx >= 0) {
+          const next = [...old];
+          next[existingIdx] = optimisticReview;
+          return next;
+        }
+      }
+      const filtered = old.filter((r: ReviewData) => r.user_id !== userId);
+      return [optimisticReview, ...filtered];
+    };
+
+    // Update reviews list - replace in-place for edits, prepend for new
     queryClient.setQueryData(
       ['course-reviews-full', courseId],
-      (old: ReviewData[] | undefined) => {
-        if (!old) return [optimisticReview];
-        
-        // Remove any existing review from this user, add new one at top
-        const filtered = old.filter((r: ReviewData) => r.user_id !== userId);
-        return [optimisticReview, ...filtered];
-      }
+      upsertReview
     );
 
     // Also update any cached reviews with additional query params (sort, filter, etc.)
@@ -121,8 +135,7 @@ export function useOptimisticReviewUpdate() {
       { queryKey: ['course-reviews-full', courseId], exact: false },
       (old: ReviewData[] | undefined) => {
         if (!old || !Array.isArray(old)) return old;
-        const filtered = old.filter((r: ReviewData) => r.user_id !== userId);
-        return [optimisticReview, ...filtered];
+        return upsertReview(old);
       }
     );
 

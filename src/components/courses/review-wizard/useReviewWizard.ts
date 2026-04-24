@@ -285,6 +285,17 @@ export function useReviewWizard({
             { queryKey: ['course-reviews-full', course.id], exact: false },
             (old: any) => {
               if (!old || !Array.isArray(old)) return old;
+              // In edit mode, replace the existing row in-place so we don't
+              // disturb the active sort order ("Highest rated", "Most helpful", etc.).
+              if (isEditMode) {
+                const existingIdx = old.findIndex((r: any) => r.user_id === currentUserId);
+                if (existingIdx >= 0) {
+                  const next = [...old];
+                  next[existingIdx] = optimisticReview;
+                  return next;
+                }
+              }
+              // New review: unshift to top (matches default 'recent' sort).
               return [optimisticReview, ...old.filter((r: any) => r.user_id !== currentUserId)];
             }
           );
@@ -856,14 +867,9 @@ export function useReviewWizard({
       if (course?.id && currentUserId) {
         void queryClient.refetchQueries({ queryKey: ['user-played-course', course.id, currentUserId], type: 'all' });
       }
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['user-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['profile-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['clubhouse-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['explore-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      // Feed/post keys (posts, user-posts, profile-feed, clubhouse-posts,
+      // explore-feed, activity-feed, profile-posts, actor-posts, etc.) are
+      // now invalidated by invalidateCourseRatingCaches() — see helper.
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
       // Profile page queries
