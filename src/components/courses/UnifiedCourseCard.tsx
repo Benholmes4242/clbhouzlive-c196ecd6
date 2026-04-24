@@ -196,31 +196,35 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
           }}
         />
 
-        {/* Ghost rank number — Top 100 */}
-        {showGhostRank && course.ranks?.global && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: -4,
-              left: 10,
-              lineHeight: 1,
-              userSelect: 'none',
-              pointerEvents: 'none',
-              zIndex: 1,
-            }}
-          >
-            <span
+        {/* Ghost rank number — Top 100. Prefers displayRank (list position) when provided, falls back to global editorial rank. */}
+        {(() => {
+          const ghostValue = course.displayRank ?? course.ranks?.global;
+          if (!showGhostRank || !ghostValue) return null;
+          return (
+            <div
               style={{
-                fontSize: 84,
-                fontWeight: 900,
-                color: 'rgba(255,255,255,0.12)',
-                letterSpacing: '-0.04em',
+                position: 'absolute',
+                bottom: -4,
+                left: 10,
+                lineHeight: 1,
+                userSelect: 'none',
+                pointerEvents: 'none',
+                zIndex: 1,
               }}
             >
-              {course.ranks.global}
-            </span>
-          </div>
-        )}
+              <span
+                style={{
+                  fontSize: 84,
+                  fontWeight: 900,
+                  color: 'rgba(255,255,255,0.12)',
+                  letterSpacing: '-0.04em',
+                }}
+              >
+                {ghostValue}
+              </span>
+            </div>
+          );
+        })()}
 
         {/* Rank badges — top-left, stacked vertically */}
         {showRankBadges && (

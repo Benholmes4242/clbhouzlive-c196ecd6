@@ -357,7 +357,11 @@ const Top100List = () => {
       }
     });
 
-    return filtered;
+    // Attach displayRank reflecting position in the currently sorted/filtered list.
+    return filtered.map((course, idx) => ({
+      ...course,
+      displayRank: idx + 1,
+    }));
   }, [courses, filterChip, sortMode, playedCourseIds, slug]);
 
   // Save scroll before navigating to course detail

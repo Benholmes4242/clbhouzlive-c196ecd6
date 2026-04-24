@@ -36,4 +36,8 @@ export interface CourseCardModel {
 
   // For mapper reference
   country?: string;
+
+  // Display position within the currently sorted/filtered list (opt-in).
+  // When provided, takes precedence over ranks.global for the ghost rank number.
+  displayRank?: number;
 }

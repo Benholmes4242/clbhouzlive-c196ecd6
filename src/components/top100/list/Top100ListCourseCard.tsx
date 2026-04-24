@@ -18,6 +18,7 @@ interface CourseData {
   globalRank?: number | null;
   regionalRank?: number | null;
   usaRank?: number | null;
+  displayRank?: number;
 }
 
 interface Top100ListCourseCardProps {
@@ -46,6 +47,7 @@ export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
     regional_rank: course.regionalRank,
     usa_rank: course.usaRank,
     average_rating: course.communityRating,
+    displayRank: course.displayRank,
   }, {
     isPlayedByViewer: course.played,
   });
