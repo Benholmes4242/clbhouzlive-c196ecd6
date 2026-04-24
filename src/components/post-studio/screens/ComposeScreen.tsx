@@ -462,7 +462,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
 
-      const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
+      // Reorder so the user-selected cover lands at display_order: 0.
+      // Post Studio cover == display_order: 0; there is no is_cover column on post_media.
+      const coverIdx = state.coverMediaId
+        ? state.mediaItems.findIndex((m) => m.id === state.coverMediaId)
+        : 0;
+      const orderedMediaItems = coverIdx > 0
+        ? [
+            state.mediaItems[coverIdx],
+            ...state.mediaItems.filter((_, i) => i !== coverIdx),
+          ]
+        : state.mediaItems;
+
+      const files = orderedMediaItems.map((m) => m.file).filter((f): f is File => !!f);
       const selectedTags = state.mentions.map((m) => ({
         id: m.entityId, entity_id: m.profileId, entity_type: m.entityType,
         name: m.displayName, username: m.username ?? null,
@@ -472,7 +484,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       const input: UploadJobInput = {
         actorType: state.actorType, actorId: state.actorId ?? user.id, userId: user.id,
         caption: state.caption, files,
-        mediaItems: state.mediaItems.map((item) => ({
+        mediaItems: orderedMediaItems.map((item) => ({
           id: item.id, file: item.file, type: item.mediaType,
           width: item.width ?? undefined, height: item.height ?? undefined,
           duration: item.duration ?? undefined,
@@ -496,7 +508,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       enqueuePostUpload(input);
       analyticsEvents.track('post_published', {
         media_count: state.mediaItems.length,
-        media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
+        media_type: orderedMediaItems[0]?.mediaType ?? 'unknown',
         has_caption: state.caption.trim().length > 0,
         has_tagged_course: state.taggedCourses.length > 0,
         visibility: state.visibility,
