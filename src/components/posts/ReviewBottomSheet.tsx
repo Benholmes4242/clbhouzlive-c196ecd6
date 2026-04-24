@@ -292,7 +292,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   </>
                 )}
               </h1>
-              {locationStr && (
+              {locationStr ? (
                 <div
                   style={{
                     fontSize: 11,
@@ -300,17 +300,24 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     color: FROST.inkMuter,
                     letterSpacing: '0.2px',
                     marginTop: 8,
-                    marginBottom: 20,
                   }}
                 >
                   {locationStr}
                 </div>
-              )}
+              ) : null}
 
               {/* Rating card */}
               <div
                 style={{
-                  marginTop: 18,
+                  marginTop: 20,
+                  borderRadius: 20,
+                  padding: 22,
+                  background: FROST.glassSoft,
+                  border: `1px solid ${FROST.borderNested}`,
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
                   borderRadius: 20,
                   padding: 22,
                   background: FROST.glassSoft,
