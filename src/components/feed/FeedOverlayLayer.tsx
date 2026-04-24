@@ -222,4 +222,56 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   );
 });
 
+/**
+ * Inline subcomponent: review overlay slot.
+ * Extracted so we only call useReviewerStats when the active post is actually a review.
+ */
+const ReviewOverlaySlot = memo(function ReviewOverlaySlot({
+  activePost,
+  overlayVisible,
+  bottomOffset,
+  onReviewTap,
+}: {
+  activePost: FeedPost;
+  overlayVisible: boolean;
+  bottomOffset?: number;
+  onReviewTap: () => void;
+}) {
+  const { data: reviewerStats } = useReviewerStats(activePost.userId);
+  if (!activePost.review) return null;
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        left: 16,
+        right: 80,
+        bottom:
+          bottomOffset !== undefined
+            ? `${bottomOffset + 20}px`
+            : 'calc(var(--bottom-nav-height, 88px) + 20px)',
+        zIndex: Z.echo,
+        pointerEvents: overlayVisible ? 'auto' : 'none',
+      }}
+    >
+      <InlineReviewCard
+        courseName={activePost.review.courseName}
+        rating={activePost.review.rating}
+        courseRegion={activePost.review.courseRegion}
+        courseCountry={activePost.review.courseCountry}
+        courseSubCountry={activePost.review.courseSubCountry}
+        reviewText={activePost.review.reviewText ?? null}
+        reviewer={{
+          name: activePost.displayName,
+          avatar: activePost.avatarUrl,
+        }}
+        breakdown={activePost.review.breakdown ?? null}
+        reviewerStats={reviewerStats ?? null}
+        reviewDate={activePost.createdAt}
+        isVisible={overlayVisible}
+        onTap={() => onReviewTap?.()}
+      />
+    </div>
+  );
+});
+
 export default FeedOverlayLayer;
