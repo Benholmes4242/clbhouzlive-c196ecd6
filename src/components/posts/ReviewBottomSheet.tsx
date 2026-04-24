@@ -11,8 +11,10 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { UserCheck } from 'lucide-react';
+import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   FROST,
@@ -23,6 +25,10 @@ import {
 } from '@/lib/frostPanel';
 import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useIsFollowingUser } from '@/hooks/useIsFollowingUser';
+import { useFollowStore } from '@/store/followStore';
+import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
