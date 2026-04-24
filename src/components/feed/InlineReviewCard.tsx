@@ -216,13 +216,18 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             style={{
               fontSize: 44,
               fontWeight: 800,
-              letterSpacing: '-2.2px',
               lineHeight: 0.85,
-              paddingRight: 4,
               ...FROST_SCORE_GRADIENT,
             }}
           >
-          {formattedRating}
+            <span style={{ letterSpacing: '-2.2px' }}>
+              {formattedRating.split('.')[0]}
+            </span>
+            {formattedRating.includes('.') && (
+              <span style={{ letterSpacing: '-0.5px' }}>
+                .{formattedRating.split('.')[1]}
+              </span>
+            )}
           </span>
         </div>
       </div>
