@@ -204,5 +204,6 @@ export function toCourseCardModel(course: Record<string, any>, context?: Partial
       userRating: course.user_rating || course.userRating || context?.userRating,
     },
     country,
+    displayRank: course.displayRank ?? course.display_rank,
   };
 }
