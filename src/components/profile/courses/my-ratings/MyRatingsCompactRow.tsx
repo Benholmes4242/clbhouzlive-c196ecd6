@@ -1,7 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { Flag } from 'lucide-react';
-import { getCategoryTierLabel } from './myRatingsTiering';
+import { Flag, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { RatedCourseData } from './MyRatingsHeroCard';
 
 /**
@@ -13,13 +13,18 @@ import type { RatedCourseData } from './MyRatingsHeroCard';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 const FONT_SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
+const FONT_MONO =
+  '"Geist Mono", ui-monospace, SFMono-Regular, monospace';
 
 const INK = '#0F172A';
 const INK_SECONDARY = '#475569';
 const INK_TERTIARY = '#94A3B8';
 const INK_QUATERNARY = '#CBD5E1';
+const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97211';
 const PAPER = '#FFFFFF';
 const HAIRLINE = '#E2E8F0';
+const HAIRLINE_SOFT = '#EEF2F6';
 
 interface MyRatingsCompactRowProps {
   course: RatedCourseData;
