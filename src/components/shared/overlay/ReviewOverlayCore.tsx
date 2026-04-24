@@ -184,6 +184,8 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 {/* Tier pill removed (PR 5) */}
+                <div
+                  style={{
                     fontSize: 14,
                     fontWeight: 700,
                     letterSpacing: '-0.2px',
