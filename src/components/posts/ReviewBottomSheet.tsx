@@ -139,13 +139,18 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     });
   }, [breakdown]);
 
-  // Stats sub-line — render only segments present
+  // Stats sub-line — render only segments present.
+  // Average rating hidden when coursesRated < 3 (avoids misleading single-rating averages).
   const statsSubLine = useMemo(() => {
     if (!reviewerStats) return '';
     const segs: string[] = [];
-    if (reviewerStats.coursesRated != null) segs.push(`${reviewerStats.coursesRated} courses`);
-    if (reviewerStats.averageRating != null) segs.push(`Avg ${reviewerStats.averageRating.toFixed(1)}`);
-    if (reviewerStats.memberSince) segs.push(`Since ${reviewerStats.memberSince}`);
+    if (reviewerStats.coursesRated != null) {
+      segs.push(`${reviewerStats.coursesRated} ${reviewerStats.coursesRated === 1 ? 'course' : 'courses'}`);
+    }
+    if (reviewerStats.averageRating != null && (reviewerStats.coursesRated ?? 0) >= 3) {
+      segs.push(`Avg ${reviewerStats.averageRating.toFixed(1)}`);
+    }
+    if (reviewerStats.memberSince) segs.push(`Reviewing since ${reviewerStats.memberSince}`);
     return segs.join(' · ');
   }, [reviewerStats]);
 

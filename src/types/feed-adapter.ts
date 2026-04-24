@@ -82,10 +82,6 @@ export interface ExtractedReviewData {
   tierLabel: string;
   sourceReviewId: string;
   reviewDate?: string;
-  conditionScore?: number;
-  designScore?: number;
-  facilitiesScore?: number;
-  clubhouseScore?: number;
 }
 
 // ============ Normalized Item ============

@@ -15,6 +15,7 @@ import React, { useCallback } from 'react';
 import { FullscreenReviewPost, FullscreenReviewPostProps, ReviewMediaItem } from './FullscreenReviewPost';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 
 interface ReviewCreator {
@@ -80,6 +81,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
   ...fullscreenProps
 }) => {
   const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const { data: reviewerStats } = useReviewerStats(creator.id);
 
   const handleOpenSheet = useCallback(() => {
     openReviewSheet({
@@ -97,6 +99,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
       courseRegion,
       courseSubCountry,
       reviewText,
+      reviewerStats: reviewerStats ?? null,
     });
   }, [
     openReviewSheet,
@@ -109,6 +112,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
     courseRegion,
     courseSubCountry,
     reviewText,
+    reviewerStats,
   ]);
 
   // Build review data for capsule

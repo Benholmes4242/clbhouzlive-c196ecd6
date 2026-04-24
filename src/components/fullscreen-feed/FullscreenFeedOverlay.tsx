@@ -101,8 +101,10 @@ export function FullscreenFeedOverlay() {
       courseRegion: activeReview.courseRegion,
       courseSubCountry: activeReview.courseSubCountry,
       reviewText: activeReview.reviewText,
+      breakdown: activeReview.breakdown ?? null,
+      reviewerStats: reviewerStats ?? null,
     });
-  }, [activeReview, activePost, openReviewSheet]);
+  }, [activeReview, activePost, openReviewSheet, reviewerStats]);
 
   // ESC to close
   useEffect(() => {

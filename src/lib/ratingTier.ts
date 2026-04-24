@@ -1,7 +1,6 @@
 /**
  * Rating tier taxonomy for Clbhouz reviews.
- * Mirrors the logic previously duplicated across courseFeedAdapter,
- * profileFeedAdapter, and unifiedMediaItemAdapter.
+ * Used by feedMapper and the review post surfaces (InlineReviewCard, ReviewBottomSheet, etc.).
  */
 
 export type RatingTier =
