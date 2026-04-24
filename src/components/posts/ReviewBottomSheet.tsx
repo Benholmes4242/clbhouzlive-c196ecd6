@@ -145,25 +145,25 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     });
   }, [breakdown]);
 
-  // Stats sub-line — render only segments present
+  // Stats sub-line — render only segments present (uses live → snapshot fallback)
   const statsSubLine = useMemo(() => {
-    if (!reviewerStats) return '';
+    if (!effectiveStats) return '';
     const segs: string[] = [];
-    if (reviewerStats.coursesRated != null) {
-      const noun = reviewerStats.coursesRated === 1 ? 'course' : 'courses';
-      segs.push(`${reviewerStats.coursesRated} ${noun}`);
+    if (effectiveStats.coursesRated != null) {
+      const noun = effectiveStats.coursesRated === 1 ? 'course' : 'courses';
+      segs.push(`${effectiveStats.coursesRated} ${noun}`);
     }
     if (
-      reviewerStats.averageRating != null &&
-      (reviewerStats.coursesRated ?? 0) >= 3
+      effectiveStats.averageRating != null &&
+      (effectiveStats.coursesRated ?? 0) >= 3
     ) {
-      segs.push(`Avg ${reviewerStats.averageRating.toFixed(1)}`);
+      segs.push(`Avg ${effectiveStats.averageRating.toFixed(1)}`);
     }
-    if (reviewerStats.memberSince) {
-      segs.push(`Reviewing since ${reviewerStats.memberSince}`);
+    if (effectiveStats.memberSince) {
+      segs.push(`Reviewing since ${effectiveStats.memberSince}`);
     }
     return segs.join(' · ');
-  }, [reviewerStats]);
+  }, [effectiveStats]);
 
   // Split review into paragraphs on double-newline
   const paragraphs = useMemo(() => {
