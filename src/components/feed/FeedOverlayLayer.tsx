@@ -5,6 +5,7 @@ import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { FeedActionRail } from './FeedActionRail';
 import { Z } from '@/config/zIndex';
 import { InlineReviewCard } from './InlineReviewCard';
+import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -143,7 +144,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
     >
       {/* Mute toggle now lives inside FeedActionRail (top of rail) */}
 
-      {/* Inline Review Card — renders in the bottom slot for review posts */}
+      {/* Inline Review Card — renders in the bottom slot for review posts.
+          Subcomponent isolates the useReviewerStats hook so it never fires
+          on non-review posts. */}
       {activePost.isReview && activePost.review && (
         <div
           style={{
@@ -158,19 +161,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
         >
-          <InlineReviewCard
-            courseName={activePost.review.courseName}
-            rating={activePost.review.rating}
-            courseRegion={activePost.review.courseRegion}
-            courseCountry={activePost.review.courseCountry}
-            courseSubCountry={activePost.review.courseSubCountry}
-            reviewText={activePost.review.reviewText ?? null}
-            reviewer={{
-              name: activePost.displayName,
-              avatar: activePost.avatarUrl,
-            }}
+          <ReviewOverlaySlot
+            activePost={activePost}
+            onReviewTap={() => onReviewTap?.()}
             isVisible={overlayVisible}
-            onTap={() => onReviewTap?.()}
           />
         </div>
       )}
