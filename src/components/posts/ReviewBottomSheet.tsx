@@ -291,7 +291,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               {/* Title — inline name + subtitle */}
               <h1
                 style={{
-                  fontSize: 28,
+                  fontSize: isCompact ? 24 : 28,
                   fontWeight: 800,
                   letterSpacing: '-0.8px',
                   lineHeight: 1.1,
@@ -331,7 +331,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   borderTop: `1px solid ${FROST.borderSoft}`,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: isCompact ? 'column' : 'row',
+                    alignItems: isCompact ? 'flex-start' : 'flex-start',
+                    gap: isCompact ? 14 : 20,
+                  }}
+                >
                   {/* Score on left */}
                   <div
                     style={{
