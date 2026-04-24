@@ -317,34 +317,10 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         </div>
       )}
 
-      {/* Row 3 — Italic 2-line excerpt (conditional) */}
-      {reviewText && (
-        <div
-          style={{
-            fontSize: 12,
-            fontStyle: 'italic',
-            color: FROST.inkMute,
-            lineHeight: 1.45,
-            letterSpacing: '-0.1px',
-            marginTop: breakdownEntries.length > 0 ? 0 : 14,
-            marginBottom: 10,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            whiteSpace: 'normal',
-            position: 'relative',
-          }}
-        >
-          “{reviewText}”
-        </div>
-      )}
-
       {/* Row 4 — Author row (consolidated inline) */}
       <div
         style={{
-          marginTop: breakdownEntries.length > 0 || reviewText ? 0 : 14,
+          marginTop: breakdownEntries.length > 0 ? 0 : 14,
           display: 'flex',
           alignItems: 'center',
           gap: 6,
