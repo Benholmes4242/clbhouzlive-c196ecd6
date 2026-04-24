@@ -1,11 +1,26 @@
-import React, { useCallback } from 'react';
+/**
+ * ReviewBottomSheet — Frost Panel sheet (PR 2 visual redesign).
+ *
+ * Driven by the unified store (PR 1) via ReviewBottomSheetPortal.
+ * Visual: glass-strong background, two atmospheric glow orbs, big rating card
+ * with radial dial, optional breakdown bars, full review body, author card,
+ * two CTAs (Visit Course + Full Review).
+ */
+
+import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
-const AMBER = '#f59e0b';
+import { getRatingTierLabel } from '@/lib/ratingTier';
+import {
+  FROST,
+  FROST_BLUR,
+  FROST_SCORE_GRADIENT,
+  formatFrostRating,
+  splitCourseName,
+} from '@/lib/frostPanel';
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
@@ -24,7 +39,42 @@ export interface ReviewBottomSheetProps {
   courseRegion?: string | null;
   courseSubCountry?: string | null;
   reviewText?: string | null;
+
+  /** Optional breakdown sub-scores. Renders breakdown rows when present. */
+  breakdown?: {
+    design?: number | null;
+    conditions?: number | null;
+    clubhouse?: number | null;
+    facilities?: number | null;
+  } | null;
+  /** Optional reviewer stats. Renders sub-line below author name when present. */
+  reviewerStats?: {
+    coursesRated?: number | null;
+    averageRating?: number | null;
+    memberSince?: string | null;
+  } | null;
+  courseSubtitle?: string | null;
 }
+
+const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
+const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
+  design: 'Design',
+  conditions: 'Conditions',
+  clubhouse: 'Clubhouse',
+  facilities: 'Facilities',
+};
+
+const SR_ONLY: React.CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0,0,0,0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+};
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
@@ -38,6 +88,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   courseRegion,
   courseSubCountry,
   reviewText,
+  breakdown,
+  reviewerStats,
+  courseSubtitle,
 }) => {
   const navigate = useNavigate();
 
@@ -56,20 +109,51 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     navigate(url);
   }, [courseId, reviewId, navigate, onClose]);
 
-  const locationParts = [
-    courseSubCountry || courseRegion,
-    courseCountry,
-  ].filter(Boolean);
+  const locationParts = [courseSubCountry || courseRegion, courseCountry].filter(Boolean);
   const locationStr = locationParts.join(', ');
 
-  const initials = user.name
-    .split(/[\s.]/)
-    .filter(Boolean)
-    .map(w => w[0]?.toUpperCase() ?? '')
-    .slice(0, 2)
-    .join('');
+  const initials = useMemo(
+    () =>
+      user.name
+        .split(/[\s.]/)
+        .filter(Boolean)
+        .map((w) => w[0]?.toUpperCase() ?? '')
+        .slice(0, 2)
+        .join(''),
+    [user.name],
+  );
 
-  const formattedRating = rating === 10 ? '10' : rating.toFixed(1);
+  const formattedRating = formatFrostRating(rating);
+  const tierLabel = getRatingTierLabel(rating);
+
+  const { name: titleName, subtitle: derivedSubtitle } = useMemo(
+    () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
+    [courseName, courseSubtitle],
+  );
+
+  const breakdownEntries = useMemo(() => {
+    if (!breakdown) return [];
+    return BREAKDOWN_KEYS.flatMap((k) => {
+      const v = breakdown[k];
+      return v == null || Number.isNaN(v) ? [] : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
+    });
+  }, [breakdown]);
+
+  // Stats sub-line — render only segments present
+  const statsSubLine = useMemo(() => {
+    if (!reviewerStats) return '';
+    const segs: string[] = [];
+    if (reviewerStats.coursesRated != null) segs.push(`${reviewerStats.coursesRated} courses`);
+    if (reviewerStats.averageRating != null) segs.push(`Avg ${reviewerStats.averageRating.toFixed(1)}`);
+    if (reviewerStats.memberSince) segs.push(`Since ${reviewerStats.memberSince}`);
+    return segs.join(' · ');
+  }, [reviewerStats]);
+
+  // Radial dial — r=34, c = 2π·34 ≈ 213.6
+  const DIAL_RADIUS = 34;
+  const DIAL_CIRC = 2 * Math.PI * DIAL_RADIUS;
+  const dialOffset = DIAL_CIRC * (1 - Math.max(0, Math.min(1, rating / 10)));
+  const dialPercent = Math.round(rating * 10);
 
   const content = (
     <AnimatePresence>
@@ -87,7 +171,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               position: 'fixed',
               inset: 0,
               zIndex: 100,
-              background: 'rgba(0,0,0,0.5)',
+              background: 'rgba(0, 0, 0, 0.65)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
             }}
           />
 
@@ -114,254 +200,450 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               insetInline: 0,
               bottom: 0,
               zIndex: 101,
-              borderRadius: '20px 20px 0 0',
-              background: '#0F172A',
+              width: '100%',
               maxHeight: '85dvh',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              border: '1px solid rgba(245, 158, 11, 0.22)',
+              overflow: 'auto',
+              borderRadius: '28px 28px 0 0',
+              background: FROST.glassStrong,
+              backdropFilter: FROST_BLUR.sheet,
+              WebkitBackdropFilter: FROST_BLUR.sheet,
+              border: `1px solid ${FROST.border}`,
               borderBottom: 'none',
+              color: FROST.ink,
+              boxShadow: `0 -20px 60px rgba(0,0,0,0.5), ${FROST.innerHighlight}`,
+              transform: 'translateZ(0)',
+              willChange: 'backdrop-filter',
+              fontFamily: 'Geist, system-ui, sans-serif',
             }}
           >
-            {/* Visually-hidden accessible title for screen readers */}
-            <span
-              id="review-sheet-title"
-              style={{
-                position: 'absolute',
-                width: 1,
-                height: 1,
-                padding: 0,
-                margin: -1,
-                overflow: 'hidden',
-                clip: 'rect(0,0,0,0)',
-                whiteSpace: 'nowrap',
-                border: 0,
-              }}
-            >
+            {/* Visually-hidden accessible title */}
+            <span id="review-sheet-title" style={SR_ONLY}>
               Review of {courseName} by {user.name}
             </span>
 
-            {/* Amber accent bar */}
-            <div style={{
-              height: 2.5,
-              background: `linear-gradient(90deg, ${AMBER}CC, transparent)`,
-              borderRadius: '20px 20px 0 0',
-              flexShrink: 0,
-            }} />
+            {/* Glow orbs — atmospheric, behind everything */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: -60,
+                left: '10%',
+                width: 300,
+                height: 200,
+                background: FROST.amberGlow,
+                filter: 'blur(12px)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: 120,
+                right: '5%',
+                width: 250,
+                height: 250,
+                background: FROST.blueGlow,
+                filter: 'blur(10px)',
+                pointerEvents: 'none',
+              }}
+            />
 
             {/* Drag handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10 }}>
-              <div style={{
-                width: 36, height: 4, borderRadius: 999,
-                background: 'rgba(255,255,255,0.20)',
-              }} />
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, position: 'relative' }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 4,
+                  borderRadius: 2,
+                  background: 'rgba(255,255,255,0.30)',
+                }}
+              />
             </div>
 
-            {/* Scrollable body */}
-            <div style={{
-              flex: 1,
-              overflow: 'auto',
-              WebkitOverflowScrolling: 'touch',
-              padding: '16px 20px 0',
-              position: 'relative',
-            }}>
-              {/* Score watermark — Verdict Card signature */}
-              <div style={{
-                position: 'absolute',
-                top: -20,
-                right: -8,
-                fontSize: 160,
-                fontWeight: 900,
-                color: 'rgba(245,158,11,0.055)',
-                lineHeight: 1,
-                letterSpacing: '-0.05em',
-                userSelect: 'none',
-                pointerEvents: 'none',
-                fontFamily: 'Georgia, serif',
-              }}>
-                {formattedRating}
+            {/* Body */}
+            <div style={{ padding: '4px 22px 24px', position: 'relative' }}>
+              {/* Tier pill */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '5px 12px 5px 9px',
+                  background: FROST.amberTint,
+                  border: `1px solid ${FROST.amberBorder}`,
+                  borderRadius: 99,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  color: FROST.amberSoft,
+                  marginTop: 14,
+                  marginBottom: 12,
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: FROST.amber,
+                    boxShadow: '0 0 8px rgba(247,147,30,0.8)',
+                  }}
+                />
+                {tierLabel}
               </div>
 
-              {/* Content — above watermark */}
-              <div style={{ position: 'relative' }}>
-                {/* Rating — absolute top-right */}
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: 2,
-                  fontFamily: 'Georgia, serif',
-                  zIndex: 2,
-                }}>
-                  <span style={{
-                    fontSize: 32,
-                    fontWeight: 900,
-                    color: '#ffffff',
-                    lineHeight: 1,
-                    letterSpacing: '-0.04em',
-                  }}>
-                    {formattedRating}
-                  </span>
-                  <span style={{
-                    fontSize: 14,
+              {/* Title block */}
+              <div
+                style={{
+                  fontSize: 36,
+                  fontWeight: 800,
+                  letterSpacing: '-1.2px',
+                  lineHeight: 0.95,
+                  color: FROST.ink,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {titleName}
+              </div>
+              {derivedSubtitle && (
+                <div
+                  style={{
+                    marginTop: 6,
+                    fontSize: 20,
                     fontWeight: 500,
-                    color: 'rgba(255,255,255,0.38)',
-                    fontFamily: 'inherit',
-                  }}>
-                    /10
-                  </span>
+                    color: FROST.inkMute,
+                    letterSpacing: '-0.2px',
+                    lineHeight: 1.15,
+                  }}
+                >
+                  {derivedSubtitle}
                 </div>
-
-                {/* Course name — serif headline */}
-                <div style={{
-                  fontSize: 28,
-                  fontWeight: 900,
-                  color: '#ffffff',
-                  lineHeight: 1.15,
-                  letterSpacing: '-0.03em',
-                  fontFamily: 'Georgia, serif',
-                  marginBottom: 6,
-                  paddingRight: 76,
-                }}>
-                  {courseName}
-                </div>
-
-                {/* Location */}
-                {locationStr && (
-                  <div style={{
+              )}
+              {locationStr && (
+                <div
+                  style={{
+                    marginTop: 8,
                     display: 'flex',
                     alignItems: 'center',
                     gap: 5,
-                    marginBottom: 14,
-                  }}>
-                    <MapPin size={12} color="rgba(255,255,255,0.35)" />
-                    <span style={{
-                      fontSize: 12,
-                      color: 'rgba(255,255,255,0.38)',
-                    }}>
-                      {locationStr}
-                    </span>
+                    fontSize: 12,
+                    color: FROST.inkMuter,
+                  }}
+                >
+                  <MapPin size={12} />
+                  <span>{locationStr}</span>
+                </div>
+              )}
+
+              {/* Rating card */}
+              <div
+                style={{
+                  marginTop: 18,
+                  borderRadius: 20,
+                  padding: 22,
+                  background: FROST.glassSoft,
+                  border: `1px solid ${FROST.borderNested}`,
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Subtle radial glow */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background:
+                      'radial-gradient(circle at 85% 30%, rgba(247,147,30,0.2), transparent 50%)',
+                    pointerEvents: 'none',
+                  }}
+                />
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 16,
+                    position: 'relative',
+                  }}
+                >
+                  {/* Left — eyebrow + big number */}
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        letterSpacing: '1.5px',
+                        textTransform: 'uppercase',
+                        color: FROST.inkMuter,
+                        marginBottom: 6,
+                      }}
+                    >
+                      Overall
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: 4,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 84,
+                          fontWeight: 800,
+                          letterSpacing: '-4px',
+                          lineHeight: 0.85,
+                          ...FROST_SCORE_GRADIENT,
+                        }}
+                      >
+                        {formattedRating}
+                      </span>
+                      <span style={{ fontSize: 20, color: FROST.inkFaint, fontWeight: 500 }}>
+                        /10
+                      </span>
+                    </div>
                   </div>
-                )}
 
-                {/* Divider — amber fade */}
-                <div style={{
-                  height: 0.5,
-                  background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 80%)`,
-                  marginBottom: 14,
-                }} />
-
-                {/* Reviewer row — avatar + (name + ★ COURSE REVIEW badge) / sub */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  marginBottom: 14,
-                }}>
-                  <SquircleAvatar
-                    size={36}
-                    src={user.avatar}
-                    alt={user.name}
-                    fallback={initials}
-                    hideRing
-                  />
-                  <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: 'rgba(255,255,255,0.85)',
-                      lineHeight: 1.2,
-                    }}>
-                      {user.name}
-                    </span>
-                    <span style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      background: 'rgba(245,158,11,0.12)',
-                      border: '0.5px solid rgba(245,158,11,0.35)',
-                      borderRadius: 6,
-                      padding: '3px 7px',
-                      fontSize: 9,
-                      fontWeight: 700,
-                      color: AMBER,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase' as const,
-                      lineHeight: 1,
-                      whiteSpace: 'nowrap',
-                    }}>
-                      ★ Course Review
-                    </span>
+                  {/* Right — radial dial */}
+                  <div style={{ position: 'relative', width: 74, height: 74, flexShrink: 0 }}>
+                    <svg width={74} height={74} viewBox="0 0 74 74">
+                      <defs>
+                        <linearGradient id="frostRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor={FROST.amber} />
+                          <stop offset="100%" stopColor={FROST.amberSoft} />
+                        </linearGradient>
+                      </defs>
+                      <circle
+                        cx={37}
+                        cy={37}
+                        r={DIAL_RADIUS}
+                        fill="none"
+                        stroke="rgba(255,255,255,0.10)"
+                        strokeWidth={5}
+                      />
+                      <circle
+                        cx={37}
+                        cy={37}
+                        r={DIAL_RADIUS}
+                        fill="none"
+                        stroke="url(#frostRingGrad)"
+                        strokeWidth={5}
+                        strokeLinecap="round"
+                        strokeDasharray={DIAL_CIRC}
+                        strokeDashoffset={dialOffset}
+                        transform="rotate(-90 37 37)"
+                      />
+                    </svg>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: FROST.amberSoft,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {dialPercent}%
+                    </div>
                   </div>
                 </div>
 
-                {/* Review text */}
-                {reviewText && (
-                  <div style={{
-                    fontSize: 14,
-                    color: 'rgba(255,255,255,0.42)',
-                    lineHeight: 1.6,
-                    fontStyle: 'italic',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 10,
-                    WebkitBoxOrient: 'vertical' as const,
-                    overflow: 'hidden',
-                    marginBottom: 16,
-                  }}>
-                    "{reviewText}"
+                {/* Breakdown rows (conditional) */}
+                {breakdownEntries.length > 0 && (
+                  <div style={{ position: 'relative', marginTop: 18 }}>
+                    {breakdownEntries.map(({ key, label, value }) => (
+                      <div
+                        key={key}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '80px 1fr 36px',
+                          gap: 12,
+                          alignItems: 'center',
+                          marginBottom: 9,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: FROST.inkMute,
+                          }}
+                        >
+                          {label}
+                        </span>
+                        <div
+                          style={{
+                            height: 4,
+                            background: 'rgba(255,255,255,0.08)',
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${Math.max(0, Math.min(100, value * 10))}%`,
+                              height: '100%',
+                              background: `linear-gradient(90deg, ${FROST.amber}, ${FROST.amberSoft})`,
+                              boxShadow: '0 0 8px rgba(247,147,30,0.5)',
+                            }}
+                          />
+                        </div>
+                        <span
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            letterSpacing: '-0.3px',
+                            color: FROST.ink,
+                            fontVariantNumeric: 'tabular-nums',
+                            textAlign: 'right',
+                          }}
+                        >
+                          {value.toFixed(1)}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* CTA buttons */}
-            <div style={{
-              display: 'flex', gap: 12,
-              padding: '14px 20px',
-              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
-              borderTop: '1px solid rgba(245,158,11,0.1)',
-              flexShrink: 0,
-            }}>
-            {courseId && (
-              <>
-              <button
-                onClick={handleVisitCourse}
+              {/* Review body */}
+              {reviewText && (
+                <div
+                  style={{
+                    marginTop: 20,
+                    fontSize: 15,
+                    fontWeight: 400,
+                    lineHeight: 1.55,
+                    color: FROST.inkSoft,
+                    whiteSpace: 'pre-wrap',
+                    marginBottom: 20,
+                  }}
+                >
+                  {reviewText}
+                </div>
+              )}
+
+              {/* Author card */}
+              <div
                 style={{
-                  flex: 1,
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 14,
-                  padding: '13px 16px',
-                  color: 'rgba(255,255,255,0.7)',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
+                  marginTop: reviewText ? 0 : 20,
+                  padding: 14,
+                  borderRadius: 16,
+                  background: FROST.glassSoft,
+                  border: `1px solid ${FROST.borderSoft}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
                 }}
               >
-                Visit Course
-              </button>
-              <button
-                onClick={handleGoToReview}
-                style={{
-                  flex: 1,
-                  background: AMBER,
-                  border: 'none',
-                  borderRadius: 14,
-                  padding: '13px 16px',
-                  color: '#0d0904',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(245,158,11,0.25)',
-                }}
-              >
-                Go to Review
-              </button>
-              </>
-            )}
+                <SquircleAvatar
+                  size={42}
+                  src={user.avatar}
+                  alt={user.name}
+                  fallback={initials}
+                  hideRing
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: '-0.2px',
+                      color: FROST.ink,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {user.name}
+                  </div>
+                  {statsSubLine && (
+                    <div
+                      style={{
+                        marginTop: 2,
+                        fontSize: 12,
+                        color: FROST.inkMuter,
+                        fontVariantNumeric: 'tabular-nums',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {statsSubLine}
+                    </div>
+                  )}
+                </div>
+                {/* TODO: wire follow action — out of scope for PR 2 */}
+                <button
+                  type="button"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 99,
+                    background: 'rgba(255,255,255,0.10)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    color: FROST.ink,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  Follow
+                </button>
+              </div>
+
+              {/* CTAs */}
+              {courseId && (
+                <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+                  <button
+                    type="button"
+                    onClick={handleVisitCourse}
+                    style={{
+                      flex: 1,
+                      padding: 14,
+                      borderRadius: 14,
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      color: FROST.ink,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    Visit Course
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleGoToReview}
+                    style={{
+                      flex: 1,
+                      padding: 14,
+                      borderRadius: 14,
+                      background: `linear-gradient(180deg, ${FROST.amber}, ${FROST.amberDeep})`,
+                      border: 'none',
+                      color: FROST.ink,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 20px rgba(247,147,30,0.4)',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    Full Review →
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         </>

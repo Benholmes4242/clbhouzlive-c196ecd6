@@ -1,9 +1,29 @@
+/**
+ * ReviewOverlayCore — Frost Panel review overlay (PR 2 visual redesign).
+ *
+ * Variants:
+ * - 'fullscreen': scaled-up Frost Panel for fullscreen review media viewers.
+ *   Renders tier pill + title row (course name + subtitle, score on right) + author row.
+ *   OMITS breakdown (sheet is one tap away).
+ * - 'tile': compact Frost chip for grid thumbnails (~195px cells).
+ *   Renders tier pill + title + score in top-right corner.
+ *   OMITS author row, OMITS breakdown.
+ *
+ * Tap → existing onCourseTap callback or default navigation.
+ */
+
 import React, { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { getReviewOverlayTheme, getOverlayRatingColors } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
+import { getRatingTierLabel } from '@/lib/ratingTier';
+import {
+  FROST,
+  FROST_BLUR,
+  FROST_SCORE_GRADIENT,
+  formatFrostRating,
+  splitCourseName,
+} from '@/lib/frostPanel';
 
 export type ReviewOverlayVariant = 'fullscreen' | 'tile';
 
@@ -15,7 +35,7 @@ export interface ReviewOverlayCoreProps {
   variant: ReviewOverlayVariant;
   /** Show "Preview" badge (fullscreen only) */
   showPreviewBadge?: boolean;
-  /** User info for bottom panel (tile variant) */
+  /** User info for bottom panel (tile / fullscreen variant) */
   user?: {
     id?: string;
     name?: string;
@@ -26,23 +46,49 @@ export interface ReviewOverlayCoreProps {
   courseId?: string;
   /** Custom handler for course tap (overrides default navigation) */
   onCourseTap?: () => void;
+  /** Optional course subtitle (e.g. "The King's Course"). Falls back to splitting courseName. */
+  courseSubtitle?: string | null;
+  /** Optional reviewer stats — when present, shows "N rated" next to author name. */
+  reviewerStats?: {
+    coursesRated?: number | null;
+  } | null;
   className?: string;
 }
 
-/**
- * Shared review overlay component - single source of truth for review post overlays.
- * Used by: FullscreenReviewPost, ReviewTileOverlay (grid), Profile fullscreen
- * 
- * Variants:
- * - fullscreen: Premium glass panel with two-column layout
- * - tile: Scaled-down version matching fullscreen layout exactly (top + bottom panels)
- * 
- * Theme:
- * - Uses Gray for Fair → Excellent (0-8.9)
- * - Uses Amber/Orange for Outstanding (9.0+)
- * 
- * Wrapped in React.memo to prevent unnecessary re-renders
- */
+const TierPill: React.FC<{ tier: string; size?: 'sm' | 'xs' }> = ({ tier, size = 'sm' }) => {
+  const isXs = size === 'xs';
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: isXs ? 4 : 6,
+        padding: isXs ? '3px 7px 3px 6px' : '4px 10px 4px 8px',
+        background: FROST.amberTint,
+        border: `1px solid ${FROST.amberBorder}`,
+        borderRadius: 99,
+        fontSize: isXs ? 8 : 10,
+        fontWeight: 600,
+        letterSpacing: isXs ? '0.6px' : '0.8px',
+        textTransform: 'uppercase',
+        color: FROST.amberSoft,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <span
+        style={{
+          width: isXs ? 4 : 6,
+          height: isXs ? 4 : 6,
+          borderRadius: '50%',
+          background: FROST.amber,
+          boxShadow: '0 0 6px rgba(247,147,30,0.8)',
+        }}
+      />
+      {tier}
+    </div>
+  );
+};
+
 const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   courseName,
   courseLocation,
@@ -52,52 +98,71 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   user,
   courseId,
   onCourseTap,
+  courseSubtitle,
+  reviewerStats,
   className,
 }) => {
   const navigate = useNavigate();
   const isFullscreen = variant === 'fullscreen';
-  const theme = getReviewOverlayTheme(rating);
-  const ratingColors = getOverlayRatingColors(rating);
-  const isOutstanding = rating >= 9.0;
   const isTappable = !!(courseId || onCourseTap);
 
-  // Memoize initials calculation
-  const initials = useMemo(() => {
-    return (user?.name || 'G')
-      .split(' ')
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join('')
-      .toUpperCase();
-  }, [user?.name]);
+  const initials = useMemo(
+    () =>
+      (user?.name || 'G')
+        .split(' ')
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase(),
+    [user?.name],
+  );
 
-  // Handle tap on course info tile - memoized
-  const handleCourseTap = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering parent handlers
-    
-    if (onCourseTap) {
-      onCourseTap();
-    } else if (courseId) {
-      navigate(`/courses/${courseId}`);
-    }
-  }, [courseId, navigate, onCourseTap]);
+  const handleCourseTap = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (onCourseTap) {
+        onCourseTap();
+      } else if (courseId) {
+        navigate(`/courses/${courseId}`);
+      }
+    },
+    [courseId, navigate, onCourseTap],
+  );
 
-  // Handle tap on user info - memoized
-  const handleUserTap = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    const profileId = user?.username || user?.id;
-    if (profileId) {
-      navigate(`/profile/${profileId}`);
-    }
-  }, [navigate, user?.id, user?.username]);
+  const handleUserTap = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const profileId = user?.username || user?.id;
+      if (profileId) {
+        navigate(`/profile/${profileId}`);
+      }
+    },
+    [navigate, user?.id, user?.username],
+  );
 
-  // Wrapper for making content tappable - memoized component
-  // Uses <div> with role="button" to avoid invalid nested <button> elements
-  // when rendered inside UnifiedMediaTile (which is already a <button>)
+  const formattedRating = useMemo(() => formatFrostRating(rating), [rating]);
+  const tierLabel = useMemo(() => getRatingTierLabel(rating), [rating]);
+
+  const { name: titleName, subtitle: derivedSubtitle } = useMemo(
+    () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
+    [courseName, courseSubtitle],
+  );
+
+  const coursesRated = reviewerStats?.coursesRated ?? null;
+
+  // Wrapper for tappable course area — renders as div (avoids nested <button>)
   const TappableWrapper = useMemo(() => {
-    const Wrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className: wrapperClassName }) => {
+    const Wrapper: React.FC<{ children: React.ReactNode; className?: string; style?: React.CSSProperties }> = ({
+      children,
+      className: wrapperClassName,
+      style,
+    }) => {
       if (!isTappable) {
-        return <div className={cn(wrapperClassName, "pointer-events-auto")}>{children}</div>;
+        return (
+          <div className={cn(wrapperClassName, 'pointer-events-auto')} style={style}>
+            {children}
+          </div>
+        );
       }
       return (
         <div
@@ -112,196 +177,277 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
           }}
           className={cn(
             wrapperClassName,
-            "w-full text-left cursor-pointer pointer-events-auto",
-            "transition-transform active:scale-[0.98]"
+            'w-full text-left cursor-pointer pointer-events-auto',
+            'transition-transform active:scale-[0.98]',
           )}
-          aria-label={`View ${courseName} details`}
+          aria-label={`View ${titleName} details`}
+          style={style}
         >
           {children}
         </div>
       );
     };
     return Wrapper;
-  }, [isTappable, handleCourseTap, courseName]);
-
-  // Memoize formatted rating
-  const formattedRating = useMemo(() => {
-    return rating === 10 ? '10' : rating.toFixed(1);
-  }, [rating]);
+  }, [isTappable, handleCourseTap, titleName]);
 
   return (
-    <div className={cn("absolute inset-0 pointer-events-none z-10", className)}>
-      {/* Tile variant - Lighter, refined match of fullscreen layout */}
+    <div className={cn('absolute inset-0 pointer-events-none z-10', className)}>
+      {/* TILE VARIANT — compact Frost chip for grid thumbnails */}
       {variant === 'tile' && (
         <>
-          {/* Subtle top gradient for legibility */}
+          {/* Subtle gradients for legibility against varied photo backdrops */}
           <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
-          {/* Bottom gradient for legibility */}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
-          
-          {/* TOP PANEL - Scaled for ~195px grid tiles */}
-          <TappableWrapper className="absolute top-2 left-2 right-10 z-10">
-            <div
-              className={cn(
-                "rounded-lg border",
-                "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
-              )}
-              style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                backdropFilter: 'blur(12px) saturate(130%)',
-                WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-                borderColor: 'rgba(210, 180, 97, 0.3)',
-                padding: '6px 8px',
-              }}
-            >
-              {/* Two-column: Left (course info) / Right (rating) */}
-              <div className="flex justify-between items-start gap-1.5">
-                {/* Left: Course name + location */}
-                <div className="flex-1 min-w-0 space-y-0">
-                  <div className="text-white font-semibold text-[13px] leading-tight line-clamp-1">
-                    {courseName}
-                  </div>
-                  {courseLocation && (
-                    <div className="text-white/50 text-[10px] line-clamp-1 font-normal">
-                      {courseLocation}
-                    </div>
-                  )}
-                </div>
-                
-                {/* Right: Rating (vertical stack, compact) */}
-                <div className="flex flex-col items-center gap-0 flex-shrink-0">
-                  <span 
-                    className="text-lg font-bold tabular-nums leading-none"
-                    style={{
-                      background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
-                  >
-                    {formattedRating}
-                  </span>
-                  <span 
-                    className="text-[8px] font-medium tracking-wider truncate max-w-[48px]"
-                    style={{ color: 'rgba(245, 158, 11, 0.65)' }}
-                  >
-                    {theme.label}
-                  </span>
+
+          <TappableWrapper
+            className="absolute top-2 left-2 right-2 z-10"
+            style={{
+              borderRadius: 12,
+              padding: '8px 10px',
+              background: FROST.glass,
+              backdropFilter: FROST_BLUR.tile,
+              WebkitBackdropFilter: FROST_BLUR.tile,
+              border: `1px solid ${FROST.border}`,
+              color: FROST.ink,
+              fontFamily: 'Geist, system-ui, sans-serif',
+              boxShadow: FROST.innerHighlight,
+              transform: 'translateZ(0)',
+              willChange: 'backdrop-filter',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <TierPill tier={tierLabel} size="xs" />
+                <div
+                  style={{
+                    marginTop: 4,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    letterSpacing: '-0.2px',
+                    lineHeight: 1.1,
+                    color: FROST.ink,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as const,
+                  }}
+                >
+                  {titleName}
                 </div>
               </div>
+              <span
+                style={{
+                  fontSize: 24,
+                  fontWeight: 800,
+                  letterSpacing: '-0.4px',
+                  lineHeight: 1,
+                  flexShrink: 0,
+                  fontVariantNumeric: 'tabular-nums',
+                  ...FROST_SCORE_GRADIENT,
+                }}
+              >
+                {formattedRating}
+              </span>
             </div>
           </TappableWrapper>
-          
-          {/* BOTTOM PANEL - User info (bounded both sides) */}
-          <div className="absolute bottom-2 left-2 right-2 z-10 pointer-events-auto">
-            <div
-              className={cn(
-                "flex items-center gap-2",
-                "rounded-lg border",
-                "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
+        </>
+      )}
+
+      {/* FULLSCREEN VARIANT — scaled-up Frost Panel */}
+      {isFullscreen && (
+        <TappableWrapper
+          className="absolute left-4 right-4 z-20 top-[76px]"
+          style={{
+            position: 'relative',
+            padding: '18px 18px 16px',
+            borderRadius: 24,
+            background: FROST.glass,
+            backdropFilter: FROST_BLUR.panel,
+            WebkitBackdropFilter: FROST_BLUR.panel,
+            border: `1px solid ${FROST.border}`,
+            boxShadow: `${FROST.dropShadow}, ${FROST.innerHighlight}`,
+            color: FROST.ink,
+            fontFamily: 'Geist, system-ui, sans-serif',
+            overflow: 'hidden',
+            transform: 'translateZ(0)',
+            willChange: 'backdrop-filter',
+          }}
+        >
+          {/* Decorative amber glow orb */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: -40,
+              right: -30,
+              width: 140,
+              height: 140,
+              borderRadius: '50%',
+              background: FROST.amberGlow,
+              filter: 'blur(10px)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Tier pill + optional preview badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10, position: 'relative' }}>
+            <TierPill tier={tierLabel} />
+            {showPreviewBadge && (
+              <span
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: 99,
+                  background: 'rgba(255,255,255,0.10)',
+                  color: FROST.inkMute,
+                  fontSize: 9,
+                  fontWeight: 600,
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Preview
+              </span>
+            )}
+          </div>
+
+          {/* Title row */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              gap: 12,
+              position: 'relative',
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  letterSpacing: '-0.4px',
+                  lineHeight: 1.05,
+                  color: FROST.ink,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {titleName}
+              </div>
+              {derivedSubtitle && (
+                <div
+                  style={{
+                    marginTop: 2,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: FROST.inkMute,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {derivedSubtitle}
+                </div>
               )}
+              {courseLocation && !derivedSubtitle && (
+                <div
+                  style={{
+                    marginTop: 2,
+                    fontSize: 12,
+                    color: FROST.inkMuter,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {courseLocation}
+                </div>
+              )}
+            </div>
+            <div
               style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                backdropFilter: 'blur(12px) saturate(130%)',
-                WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-                borderColor: 'rgba(210, 180, 97, 0.2)',
-                padding: '6px 8px',
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 2,
+                flexShrink: 0,
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {/* Tappable avatar + name - navigates to profile */}
+              <span
+                style={{
+                  fontSize: 44,
+                  fontWeight: 800,
+                  letterSpacing: '-2.2px',
+                  lineHeight: 0.85,
+                  ...FROST_SCORE_GRADIENT,
+                }}
+              >
+                {formattedRating}
+              </span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: FROST.inkFaint }}>/10</span>
+            </div>
+          </div>
+
+          {/* Author row (only when user is provided) */}
+          {user?.name && (
+            <div
+              style={{
+                marginTop: 14,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                position: 'relative',
+              }}
+            >
               <button
                 type="button"
                 onClick={handleUserTap}
-                className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer transition-opacity active:opacity-80"
-                aria-label={`View ${user?.name || 'Golfer'}'s profile`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  minWidth: 0,
+                }}
+                aria-label={`View ${user.name}'s profile`}
               >
-                <SquircleAvatar
-                  size={22}
-                  src={user?.avatar}
-                  alt={user?.name || 'Golfer'}
-                  fallback={initials}
-                  hideRing
-                />
-                <div className="text-white font-medium text-[11px] truncate leading-tight flex-1">
-                  {user?.name || 'Golfer'}
-                </div>
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-      
-      {/* Fullscreen variant - Refined Premium Glass Panel */}
-      {isFullscreen && (
-        <TappableWrapper
-          className={cn(
-            "absolute left-4 right-4 z-20 top-[76px]",
-            "rounded-xl border",
-            "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
-          )}
-        >
-          <div
-            style={{
-              background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
-              backdropFilter: 'blur(16px) saturate(150%)',
-              WebkitBackdropFilter: 'blur(16px) saturate(150%)',
-              padding: '12px 16px',
-              borderRadius: '0.75rem',
-              border: '1px solid rgba(210, 180, 97, 0.3)',
-            }}
-          >
-            {/* ROW 1: Course Name + Rating Number (compact) */}
-            <div className="flex justify-between items-start gap-3">
-              {/* Left: Course Name */}
-              <h2 className="flex-1 min-w-0 text-white font-semibold text-base sm:text-lg leading-tight line-clamp-2">
-                {courseName}
-              </h2>
-              
-              {/* Right: Rating Number + tier label */}
-              <div className="flex flex-col items-center gap-0 flex-shrink-0">
-                <span 
-                  className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
-                  style={{ 
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    color: 'transparent',
+                <SquircleAvatar size={20} src={user.avatar} alt={user.name} fallback={initials} hideRing />
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: FROST.ink,
+                    lineHeight: 1.2,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
                 >
-                  {formattedRating}
+                  {user.name}
                 </span>
-                <span 
-                  className="text-[9px] font-medium tracking-wider mt-0.5"
-                  style={{ color: 'rgba(245, 158, 11, 0.65)' }}
-                >
-                  {theme.label}
-                </span>
-              </div>
-            </div>
-            
-            {/* ROW 2: Location + Preview badge */}
-            <div className="flex justify-between items-start gap-4 mt-1">
-              <div className="flex-1 min-w-0">
-                {courseLocation && (
-                  <p className="text-white/50 text-xs font-normal">
-                    {courseLocation}
-                  </p>
-                )}
-                
-                {showPreviewBadge && (
-                  <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60 text-[9px] font-medium tracking-wide uppercase">
-                    Preview
+              </button>
+              {coursesRated != null && (
+                <>
+                  <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: FROST.inkMuter,
+                      fontVariantNumeric: 'tabular-nums',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {coursesRated} rated
                   </span>
-                )}
-              </div>
+                </>
+              )}
             </div>
-          </div>
+          )}
         </TappableWrapper>
       )}
     </div>
   );
 };
 
-// Memoize to prevent re-renders when props haven't changed
 export const ReviewOverlayCore = memo(ReviewOverlayCoreInner);
 
 export default ReviewOverlayCore;

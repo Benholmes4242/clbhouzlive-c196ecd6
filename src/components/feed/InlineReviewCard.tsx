@@ -1,19 +1,27 @@
 /**
- * InlineReviewCard — Compact review card shown at the bottom of review posts.
+ * InlineReviewCard — Frost Panel review tile shown at the bottom of review posts.
  *
- * Composition: amber accent bar, COURSE REVIEW badge + score, serif course name,
- * MapPin location, divider, reviewer (avatar + name + "reviewed this course"),
- * 2-line italic excerpt of the review text. Tap anywhere → opens ReviewBottomSheet.
+ * PR 2 (Frost Panel redesign): glass morphism + amber accents + tier pill.
+ * Composition (top → bottom):
+ *   1. Tier pill (replaces ★ COURSE REVIEW chip)
+ *   2. Title row — course name + subtitle / score + "/10"
+ *   3. Breakdown bars (conditional, when `breakdown` prop populated by PR 3)
+ *   4. Author row — avatar + name + "N rated" (conditional) / date
  *
- * Visual language matches ReviewBottomSheet for continuity.
+ * Tap → opens unified ReviewBottomSheet via store (PR 1).
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
-const AMBER = '#f59e0b';
+import { getRatingTierLabel } from '@/lib/ratingTier';
+import {
+  FROST,
+  FROST_BLUR,
+  FROST_SCORE_GRADIENT,
+  formatFrostRating,
+  splitCourseName,
+} from '@/lib/frostPanel';
 
 export interface InlineReviewCardProps {
   courseName: string;
@@ -28,30 +36,84 @@ export interface InlineReviewCardProps {
   };
   isVisible: boolean;
   onTap: () => void;
+
+  /** Optional breakdown sub-scores. Renders the 4-column micro-bar row when present. */
+  breakdown?: {
+    design?: number | null;
+    conditions?: number | null;
+    clubhouse?: number | null;
+    facilities?: number | null;
+  } | null;
+  /** Optional reviewer stats. Renders "N rated" next to author name when present. */
+  reviewerStats?: {
+    coursesRated?: number | null;
+  } | null;
+  /** Optional course subtitle (e.g. "The King's Course"). Falls back to splitting courseName. */
+  courseSubtitle?: string | null;
+  /** Optional review date — renders right-aligned in author row. */
+  reviewDate?: string | Date | null;
+}
+
+const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
+const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
+  design: 'DESI',
+  conditions: 'COND',
+  clubhouse: 'CLUB',
+  facilities: 'FACI',
+};
+
+function formatDateShort(input: string | Date): string {
+  try {
+    const d = typeof input === 'string' ? new Date(input) : input;
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  } catch {
+    return '';
+  }
 }
 
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseName,
   rating,
-  courseRegion,
-  courseCountry,
-  courseSubCountry,
-  reviewText,
   reviewer,
   isVisible,
   onTap,
+  breakdown,
+  reviewerStats,
+  courseSubtitle,
+  reviewDate,
 }) => {
-  const locationParts = [courseSubCountry || courseRegion, courseCountry].filter(Boolean);
-  const locationStr = locationParts.join(', ');
+  const initials = useMemo(
+    () =>
+      (reviewer.name || 'G')
+        .split(/[\s.]/)
+        .filter(Boolean)
+        .map((w) => w[0]?.toUpperCase() ?? '')
+        .slice(0, 2)
+        .join(''),
+    [reviewer.name],
+  );
 
-  const initials = (reviewer.name || 'G')
-    .split(/[\s.]/)
-    .filter(Boolean)
-    .map((w) => w[0]?.toUpperCase() ?? '')
-    .slice(0, 2)
-    .join('');
+  const formattedRating = formatFrostRating(rating);
+  const tierLabel = getRatingTierLabel(rating);
 
-  const formattedRating = rating === 10 ? '10' : rating.toFixed(1);
+  // Resolve course title + subtitle
+  const { name: titleName, subtitle: derivedSubtitle } = useMemo(
+    () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
+    [courseName, courseSubtitle],
+  );
+
+  // Breakdown values that exist
+  const breakdownEntries = useMemo(() => {
+    if (!breakdown) return [];
+    return BREAKDOWN_KEYS.flatMap((k) => {
+      const v = breakdown[k];
+      return v == null || Number.isNaN(v) ? [] : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
+    });
+  }, [breakdown]);
+
+  const dateLabel = reviewDate ? formatDateShort(reviewDate) : '';
+  const coursesRated = reviewerStats?.coursesRated ?? null;
 
   return (
     <motion.button
@@ -61,79 +123,134 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         onTap();
       }}
       initial={false}
-      animate={{
-        opacity: isVisible ? 1 : 0,
-        y: isVisible ? 0 : 8,
-      }}
+      animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
+      whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
+      aria-label={`Open review of ${titleName} by ${reviewer.name || 'Golfer'}`}
       style={{
+        position: 'relative',
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        background: 'rgba(15, 23, 42, 0.92)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        border: '1px solid rgba(245, 158, 11, 0.22)',
-        borderRadius: 14,
-        overflow: 'hidden',
-        position: 'relative',
-        padding: 0,
+        padding: '18px 18px 16px',
         margin: 0,
+        borderRadius: 24,
+        background: FROST.glass,
+        backdropFilter: FROST_BLUR.panel,
+        WebkitBackdropFilter: FROST_BLUR.panel,
+        border: `1px solid ${FROST.border}`,
+        boxShadow: `${FROST.dropShadow}, ${FROST.innerHighlight}`,
+        overflow: 'hidden',
+        color: FROST.ink,
         cursor: 'pointer',
         pointerEvents: isVisible ? 'auto' : 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
         WebkitTapHighlightColor: 'transparent',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+        // Force GPU layer for blur perf
+        transform: 'translateZ(0)',
+        willChange: 'backdrop-filter',
       }}
     >
-      {/* Watermark score — bleeds into background */}
+      {/* Decorative amber glow orb */}
       <div
+        aria-hidden
         style={{
           position: 'absolute',
-          top: -18,
-          right: -6,
-          fontSize: 120,
-          fontWeight: 900,
-          color: 'rgba(247,147,30,0.06)',
-          lineHeight: 1,
-          letterSpacing: '-0.05em',
-          userSelect: 'none',
+          top: -40,
+          right: -30,
+          width: 140,
+          height: 140,
+          borderRadius: '50%',
+          background: FROST.amberGlow,
+          filter: 'blur(10px)',
           pointerEvents: 'none',
-          fontFamily: 'Georgia, serif',
-        }}
-      >
-        {formattedRating}
-      </div>
-
-      {/* Amber accent bar */}
-      <div
-        style={{
-          height: 2.5,
-          background: `linear-gradient(90deg, ${AMBER}CC, transparent)`,
         }}
       />
 
-      <div style={{ padding: '10px 10px 10px', position: 'relative' }}>
-        {/* Rating — absolute top-right, overlaps course name padding */}
+      {/* Row 1 — Tier pill */}
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '4px 10px 4px 8px',
+          background: FROST.amberTint,
+          border: `1px solid ${FROST.amberBorder}`,
+          borderRadius: 99,
+          fontSize: 10,
+          fontWeight: 600,
+          letterSpacing: '0.8px',
+          textTransform: 'uppercase',
+          color: FROST.amberSoft,
+          marginBottom: 10,
+          position: 'relative',
+        }}
+      >
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: FROST.amber,
+            boxShadow: '0 0 8px rgba(247,147,30,0.8)',
+          }}
+        />
+        {tierLabel}
+      </div>
+
+      {/* Row 2 — Title + score */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: 12,
+          position: 'relative',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: '-0.4px',
+              lineHeight: 1.05,
+              color: FROST.ink,
+              wordBreak: 'break-word',
+            }}
+          >
+            {titleName}
+          </div>
+          {derivedSubtitle && (
+            <div
+              style={{
+                marginTop: 2,
+                fontSize: 13,
+                fontWeight: 500,
+                color: FROST.inkMute,
+                lineHeight: 1.2,
+              }}
+            >
+              {derivedSubtitle}
+            </div>
+          )}
+        </div>
         <div
           style={{
-            position: 'absolute',
-            top: 8,
-            right: 10,
             display: 'flex',
             alignItems: 'baseline',
             gap: 2,
-            fontFamily: 'Georgia, serif',
-            zIndex: 2,
+            flexShrink: 0,
+            fontVariantNumeric: 'tabular-nums',
           }}
         >
           <span
             style={{
-              fontSize: 28,
-              fontWeight: 900,
-              color: '#ffffff',
-              lineHeight: 1,
-              letterSpacing: '-0.04em',
+              fontSize: 44,
+              fontWeight: 800,
+              letterSpacing: '-2.2px',
+              lineHeight: 0.85,
+              ...FROST_SCORE_GRADIENT,
             }}
           >
             {formattedRating}
@@ -142,128 +259,141 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             style={{
               fontSize: 13,
               fontWeight: 500,
-              color: 'rgba(255,255,255,0.38)',
-              fontFamily: 'inherit',
+              color: FROST.inkFaint,
             }}
           >
             /10
           </span>
         </div>
+      </div>
 
-        {/* Row 1: Course name */}
+      {/* Row 3 — Breakdown bars (conditional) */}
+      {breakdownEntries.length > 0 && (
         <div
           style={{
-            fontSize: 20,
-            fontWeight: 900,
-            color: '#ffffff',
-            lineHeight: 1.15,
-            letterSpacing: '-0.03em',
-            fontFamily: 'Georgia, serif',
-            marginBottom: 4,
-            paddingRight: 64,
+            marginTop: 12,
+            paddingTop: 10,
+            borderTop: '1px solid rgba(255,255,255,0.10)',
+            display: 'grid',
+            gridTemplateColumns: `repeat(${breakdownEntries.length}, 1fr)`,
+            gap: 8,
+            marginBottom: 12,
           }}
         >
-          {courseName}
+          {breakdownEntries.map(({ key, label, value }) => (
+            <div key={key}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 4,
+                  marginBottom: 4,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 600,
+                    letterSpacing: '0.8px',
+                    textTransform: 'uppercase',
+                    color: FROST.inkMuter,
+                  }}
+                >
+                  {label}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '-0.2px',
+                    color: FROST.ink,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {value.toFixed(1)}
+                </span>
+              </div>
+              <div
+                style={{
+                  height: 3,
+                  borderRadius: 2,
+                  background: 'rgba(255,255,255,0.12)',
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${Math.max(0, Math.min(100, value * 10))}%`,
+                    height: '100%',
+                    background: `linear-gradient(90deg, ${FROST.amber}, ${FROST.amberSoft})`,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
+      )}
 
-        {/* Row 2: Location */}
-        {locationStr && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              marginBottom: 10,
-            }}
-          >
-            <MapPin size={12} color="rgba(255,255,255,0.35)" />
-            <span
-              style={{
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.45)',
-              }}
-            >
-              {locationStr}
-            </span>
-          </div>
-        )}
-
-        {/* Divider */}
-        <div
-          style={{
-            height: 0.5,
-            background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 75%)`,
-            marginBottom: 10,
-          }}
-        />
-
-        {/* Row 3: Reviewer — avatar + (name + ★ COURSE REVIEW badge) / sub */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            marginBottom: reviewText ? 10 : 0,
-            position: 'relative',
-          }}
-        >
+      {/* Row 4 — Author + date */}
+      <div
+        style={{
+          marginTop: breakdownEntries.length > 0 ? 0 : 14,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+          position: 'relative',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           <SquircleAvatar
-            size={32}
+            size={20}
             src={reviewer.avatar || undefined}
             alt={reviewer.name}
             fallback={initials}
             hideRing
           />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.85)',
-                lineHeight: 1.2,
-              }}
-            >
-              {reviewer.name || 'Golfer'}
-            </span>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                background: 'rgba(245,158,11,0.12)',
-                border: '0.5px solid rgba(245,158,11,0.35)',
-                borderRadius: 6,
-                padding: '3px 7px',
-                fontSize: 9,
-                fontWeight: 700,
-                color: '#f59e0b',
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase' as const,
-                lineHeight: 1,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              ★ Course Review
-            </span>
-          </div>
-        </div>
-
-        {/* Row 4: Review excerpt */}
-        {reviewText && (
-          <div
+          <span
             style={{
-              fontSize: 13,
-              color: 'rgba(255,255,255,0.5)',
-              lineHeight: 1.55,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical' as const,
+              fontSize: 12,
+              fontWeight: 600,
+              color: FROST.ink,
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
               overflow: 'hidden',
-              fontStyle: 'italic',
+              textOverflow: 'ellipsis',
             }}
           >
-            "{reviewText}"
-          </div>
+            {reviewer.name || 'Golfer'}
+          </span>
+          {coursesRated != null && (
+            <>
+              <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: FROST.inkMuter,
+                  fontVariantNumeric: 'tabular-nums',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {coursesRated} rated
+              </span>
+            </>
+          )}
+        </div>
+        {dateLabel && (
+          <span
+            style={{
+              fontSize: 11,
+              color: FROST.inkFaint,
+              flexShrink: 0,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {dateLabel}
+          </span>
         )}
       </div>
     </motion.button>

@@ -25,6 +25,8 @@ import { CourseDNACard } from './CourseDNACard';
 import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
+import { getRatingTierLabel } from '@/lib/ratingTier';
+import { FROST, FROST_BLUR, FROST_SCORE_GRADIENT, formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (
@@ -381,17 +383,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     </div>
   );
 
-  // Review mode content - matches regular capsule layout exactly
+  // Review mode content — Frost Panel (PR 2 visual redesign)
   const reviewContent = reviewData && (() => {
-    const accent = '#f59e0b';
-
-    const locationParts = [
-      (reviewData as any).courseSubCountry || (reviewData as any).courseRegion,
-      (reviewData as any).courseCountry,
-    ].filter(Boolean);
-    const locationStr = locationParts.join(', ');
-
-    const captionText = (reviewData as any).reviewText || null;
+    const tierLabel = getRatingTierLabel(reviewData.rating);
+    const formattedRating = formatFrostRating(reviewData.rating);
+    const { name: titleName, subtitle: derivedSubtitle } = splitCourseName(reviewData.courseName);
 
     return (
       <div
@@ -399,184 +395,166 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           e.stopPropagation();
           onReviewTap?.();
         }}
-        style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          padding: '16px 16px 14px',
+          color: FROST.ink,
+          fontFamily: 'Geist, system-ui, sans-serif',
+          cursor: 'pointer',
+        }}
       >
-        {/* Watermark score — bleeds into background */}
-        <div style={{
-          position: 'absolute',
-          top: -18,
-          right: -6,
-          fontSize: 120,
-          fontWeight: 900,
-          color: 'rgba(247,147,30,0.06)',
-          lineHeight: 1,
-          letterSpacing: '-0.05em',
-          userSelect: 'none',
-          pointerEvents: 'none',
-          fontFamily: 'Georgia, serif',
-        }}>
-          {reviewData.rating.toFixed(1)}
+        {/* Decorative amber glow orb */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: -40,
+            right: -30,
+            width: 140,
+            height: 140,
+            borderRadius: '50%',
+            background: FROST.amberGlow,
+            filter: 'blur(10px)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Tier pill */}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '4px 10px 4px 8px',
+            background: FROST.amberTint,
+            border: `1px solid ${FROST.amberBorder}`,
+            borderRadius: 99,
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+            color: FROST.amberSoft,
+            marginBottom: 10,
+            position: 'relative',
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: FROST.amber,
+              boxShadow: '0 0 8px rgba(247,147,30,0.8)',
+            }}
+          />
+          {tierLabel}
         </div>
 
-        {/* Amber accent bar */}
-        <div style={{
-          height: 2.5,
-          background: `linear-gradient(90deg, ${accent}CC, transparent)`,
-        }} />
-
-        <div style={{ padding: '12px 14px 14px', position: 'relative' }}>
-          {/* Rating — absolute top-right, overlaps course name padding */}
-          <div style={{
-            position: 'absolute',
-            top: 8,
-            right: 12,
+        {/* Title row */}
+        <div
+          style={{
             display: 'flex',
-            alignItems: 'baseline',
-            gap: 2,
-            fontFamily: 'Georgia, serif',
-            zIndex: 2,
-          }}>
-            <span style={{
-              fontSize: 28,
-              fontWeight: 900,
-              color: '#ffffff',
-              lineHeight: 1,
-              letterSpacing: '-0.04em',
-            }}>
-              {reviewData.rating === 10 ? '10' : reviewData.rating.toFixed(1)}
-            </span>
-            <span style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.38)',
-              fontFamily: 'inherit',
-            }}>
-              /10
-            </span>
-          </div>
-
-          {/* Row 1: Course name — the headline */}
-          <div style={{
-            fontSize: 22,
-            fontWeight: 900,
-            color: '#ffffff',
-            lineHeight: 1.12,
-            letterSpacing: '-0.03em',
-            fontFamily: 'Georgia, serif',
-            marginBottom: 4,
-            paddingRight: 64,
-          }}>
-            {reviewData.courseName}
-          </div>
-
-          {/* Row 2: Location */}
-          {locationStr && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              marginBottom: 10,
-            }}>
-              <MapPin size={12} color="rgba(255,255,255,0.35)" />
-              <span style={{
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.45)',
-              }}>
-                {locationStr}
-              </span>
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: 12,
+            position: 'relative',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                letterSpacing: '-0.4px',
+                lineHeight: 1.05,
+                color: FROST.ink,
+                wordBreak: 'break-word',
+              }}
+            >
+              {titleName}
             </div>
-          )}
-
-          {/* Divider */}
-          <div style={{
-            height: 0.5,
-            background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 75%)`,
-            marginBottom: 10,
-          }} />
-
-          {/* Row 3: Reviewer — tappable to navigate to profile */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleViewProfile();
-            }}
+            {derivedSubtitle && (
+              <div
+                style={{
+                  marginTop: 2,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: FROST.inkMute,
+                  lineHeight: 1.2,
+                }}
+              >
+                {derivedSubtitle}
+              </div>
+            )}
+          </div>
+          <div
             style={{
               display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              marginBottom: 10,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              textAlign: 'left',
-              width: '100%',
-              position: 'relative',
+              alignItems: 'baseline',
+              gap: 2,
+              flexShrink: 0,
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
-            <SquircleAvatar
-              size={32}
-              src={user?.avatar}
-              alt={user?.name ?? 'Creator'}
-              fallback={initials}
-              hideRing
-            />
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <span style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.85)',
-                  lineHeight: 1.2,
-                }}>
-                  {user?.name || 'Golfer'}
-                </span>
-                <span style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  background: 'rgba(245,158,11,0.12)',
-                  border: '0.5px solid rgba(245,158,11,0.35)',
-                  borderRadius: 6,
-                  padding: '3px 7px',
-                  fontSize: 9,
-                  fontWeight: 700,
-                  color: '#f59e0b',
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase' as const,
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                }}>
-                  ★ Course Review
-                </span>
-              </div>
-              <span style={{
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.38)',
-                lineHeight: 1,
-              }}>
-                reviewed this course
-              </span>
-            </div>
-          </button>
-
-          {/* Row 4: Review text preview */}
-          {captionText && (
-            <div style={{
-              fontSize: 13,
-              color: 'rgba(255,255,255,0.5)',
-              lineHeight: 1.55,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical' as const,
-              overflow: 'hidden',
-              fontStyle: 'italic',
-            }}>
-              "{captionText}"
-            </div>
-          )}
+            <span
+              style={{
+                fontSize: 36,
+                fontWeight: 800,
+                letterSpacing: '-1.6px',
+                lineHeight: 0.85,
+                ...FROST_SCORE_GRADIENT,
+              }}
+            >
+              {formattedRating}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 500, color: FROST.inkFaint }}>/10</span>
+          </div>
         </div>
+
+        {/* Author row */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleViewProfile();
+          }}
+          style={{
+            marginTop: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            textAlign: 'left',
+            width: '100%',
+            position: 'relative',
+            minWidth: 0,
+          }}
+        >
+          <SquircleAvatar
+            size={20}
+            src={user?.avatar}
+            alt={user?.name ?? 'Creator'}
+            fallback={initials}
+            hideRing
+          />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: FROST.ink,
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {user?.name || 'Golfer'}
+          </span>
+        </button>
       </div>
     );
   })();
@@ -703,15 +681,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
           className={cn(
             'overflow-hidden',
-            // Both modes use rounded-xl for consistency with ReviewOverlayCore
-            'rounded-xl'
+            isReview ? 'rounded-3xl' : 'rounded-xl'
           )}
-          style={{ 
-            background: isReview ? 'rgba(20, 13, 4, 0.95)' : 'rgba(0, 0, 0, 0.35)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: `1px solid ${borderColor}`,
-            
+          style={{
+            background: isReview ? FROST.glass : 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: isReview ? FROST_BLUR.panel : 'blur(20px)',
+            WebkitBackdropFilter: isReview ? FROST_BLUR.panel : 'blur(20px)',
+            border: `1px solid ${isReview ? FROST.border : borderColor}`,
+            boxShadow: isReview ? `${FROST.dropShadow}, ${FROST.innerHighlight}` : undefined,
+            transform: isReview ? 'translateZ(0)' : undefined,
+            willChange: isReview ? 'backdrop-filter' : undefined,
           }}
         >
           {/* Collapsed State - mode-dependent, crossfade on post change */}
