@@ -21,6 +21,8 @@ import {
   formatFrostRating,
   splitCourseName,
 } from '@/lib/frostPanel';
+import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
@@ -91,6 +93,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   courseSubtitle,
 }) => {
   const navigate = useNavigate();
+  const viewportWidth = useViewportWidth();
+  const isCompact = viewportWidth < COMPACT_VIEWPORT_MAX;
+
+  // Live reviewer stats — falls back to the snapshot from the payload while loading.
+  // Same React Query key dedupes with any earlier fetch (e.g. tile mount).
+  const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
+  const effectiveStats = liveStats ?? reviewerStats ?? null;
 
   const handleVisitCourse = useCallback(() => {
     if (!courseId) return;
@@ -136,25 +145,25 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     });
   }, [breakdown]);
 
-  // Stats sub-line — render only segments present
+  // Stats sub-line — render only segments present (uses live → snapshot fallback)
   const statsSubLine = useMemo(() => {
-    if (!reviewerStats) return '';
+    if (!effectiveStats) return '';
     const segs: string[] = [];
-    if (reviewerStats.coursesRated != null) {
-      const noun = reviewerStats.coursesRated === 1 ? 'course' : 'courses';
-      segs.push(`${reviewerStats.coursesRated} ${noun}`);
+    if (effectiveStats.coursesRated != null) {
+      const noun = effectiveStats.coursesRated === 1 ? 'course' : 'courses';
+      segs.push(`${effectiveStats.coursesRated} ${noun}`);
     }
     if (
-      reviewerStats.averageRating != null &&
-      (reviewerStats.coursesRated ?? 0) >= 3
+      effectiveStats.averageRating != null &&
+      (effectiveStats.coursesRated ?? 0) >= 3
     ) {
-      segs.push(`Avg ${reviewerStats.averageRating.toFixed(1)}`);
+      segs.push(`Avg ${effectiveStats.averageRating.toFixed(1)}`);
     }
-    if (reviewerStats.memberSince) {
-      segs.push(`Reviewing since ${reviewerStats.memberSince}`);
+    if (effectiveStats.memberSince) {
+      segs.push(`Reviewing since ${effectiveStats.memberSince}`);
     }
     return segs.join(' · ');
-  }, [reviewerStats]);
+  }, [effectiveStats]);
 
   // Split review into paragraphs on double-newline
   const paragraphs = useMemo(() => {
@@ -282,7 +291,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               {/* Title — inline name + subtitle */}
               <h1
                 style={{
-                  fontSize: 28,
+                  fontSize: isCompact ? 24 : 28,
                   fontWeight: 800,
                   letterSpacing: '-0.8px',
                   lineHeight: 1.1,
@@ -322,7 +331,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   borderTop: `1px solid ${FROST.borderSoft}`,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: isCompact ? 'column' : 'row',
+                    alignItems: isCompact ? 'flex-start' : 'flex-start',
+                    gap: isCompact ? 14 : 20,
+                  }}
+                >
                   {/* Score on left */}
                   <div
                     style={{
@@ -367,13 +383,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   {breakdownEntries.length > 0 && (
                     <div
                       style={{
-                        flex: 1,
+                        flex: isCompact ? 'none' : 1,
+                        width: isCompact ? '100%' : 'auto',
                         minWidth: 0,
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
                         columnGap: 16,
                         rowGap: 8,
-                        alignSelf: 'center',
+                        alignSelf: isCompact ? 'stretch' : 'center',
                       }}
                     >
                       {breakdownEntries.map(({ key, label, value }) => (
@@ -532,7 +549,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   >
                     {user.name}
                   </div>
-                  {statsSubLine && (
+                  {statsSubLine ? (
                     <div
                       style={{
                         marginTop: 2,
@@ -546,7 +563,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     >
                       {statsSubLine}
                     </div>
-                  )}
+                  ) : statsLoading ? (
+                    /* Stats sub-line shimmer placeholder while live query resolves */
+                    <div
+                      className="clb-shimmer-dark"
+                      aria-hidden
+                      style={{
+                        marginTop: 6,
+                        width: 140,
+                        height: 10,
+                        borderRadius: 4,
+                        background: 'rgba(255,255,255,0.06)',
+                        overflow: 'hidden',
+                      }}
+                    />
+                  ) : null}
                 </div>
                 {/* TODO: wire follow action — out of scope */}
                 <button

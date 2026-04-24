@@ -126,6 +126,12 @@ const RegularBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =
   </div>
 );
 
+/**
+ * Editorial Frost Panel review skeleton — mirrors PR 7's `InlineReviewCard`.
+ * Uses the same glass background, 2×2 breakdown grid placeholder, italic-excerpt
+ * placeholder, compact author row, and amber "READ FULL REVIEW" band so the
+ * structural transition to the real tile is seamless.
+ */
 const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
   <div
     className="absolute"
@@ -133,63 +139,103 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
       left: 16,
       right: 80, // reserve space for action rail
       bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
-      background: 'rgba(20, 13, 4, 0.92)',
-      border: '0.5px solid rgba(245, 158, 11, 0.18)',
-      borderRadius: 16,
+      background: 'rgba(15, 20, 30, 0.42)',
+      backdropFilter: 'blur(32px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(32px) saturate(180%)',
+      border: '1px solid rgba(255,255,255,0.14)',
+      borderRadius: 24,
       overflow: 'hidden',
+      boxShadow: '0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18)',
     }}
   >
-    {/* Amber accent bar */}
-    <div style={{ height: 2, background: 'linear-gradient(90deg, rgba(247,147,30,0.85), transparent)' }} />
-    <div style={{ padding: '12px 14px 14px', position: 'relative' }}>
-      {/* Rating top-right */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 8,
-          right: 12,
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 3,
-        }}
-      >
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 34, height: 22 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 18, height: 10 }} />
-      </div>
+    {/* Decorative amber glow orb (matches real tile) */}
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        top: -40,
+        right: -30,
+        width: 140,
+        height: 140,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(247,147,30,0.35), transparent 65%)',
+        filter: 'blur(10px)',
+        pointerEvents: 'none',
+      }}
+    />
 
-      {/* Course name */}
-      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '60%', height: 18, marginBottom: 6 }} />
-
-      {/* Location row */}
-      <div className="flex items-center gap-1.5" style={{ marginBottom: 10 }}>
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 12, height: 12 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 120, height: 10 }} />
-      </div>
-
-      {/* Amber-fade divider */}
-      <div
-        style={{
-          height: 0.5,
-          marginBottom: 10,
-          background: 'linear-gradient(90deg, rgba(247,147,30,0.3) 0%, transparent 75%)',
-        }}
-      />
-
-      {/* Reviewer row */}
-      <div className="flex items-center gap-2.5" style={{ marginBottom: 10 }}>
-        <SkeletonBlock isStatic={isStatic} className="rounded-lg shrink-0" style={{ width: 32, height: 32 }} />
-        <div className="flex flex-col gap-1 flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 85, height: 11 }} />
-            <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 76, height: 14 }} />
-          </div>
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 110, height: 9 }} />
+    <div style={{ padding: '18px 18px 0', position: 'relative' }}>
+      {/* Title row — title (1 line) + score on right */}
+      <div className="flex items-end justify-between" style={{ gap: 12 }}>
+        <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '70%', height: 16 }} />
+        </div>
+        <div className="flex items-baseline shrink-0" style={{ gap: 3 }}>
+          <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 46, height: 32 }} />
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 18, height: 9 }} />
         </div>
       </div>
 
+      {/* Location placeholder */}
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 110, height: 9, marginTop: 8 }} />
+
+      {/* 2×2 breakdown grid placeholder — mirrors PR 7 tile */}
+      <div
+        style={{
+          marginTop: 14,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          columnGap: 18,
+          rowGap: 10,
+          paddingTop: 12,
+          paddingBottom: 14,
+          borderTop: '1px solid rgba(255,255,255,0.10)',
+          borderBottom: '1px solid rgba(255,255,255,0.10)',
+          marginBottom: 12,
+        }}
+      >
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-baseline justify-between" style={{ gap: 6 }}>
+            <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 64, height: 8 }} />
+            <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 22, height: 11 }} />
+          </div>
+        ))}
+      </div>
+
       {/* Excerpt — 2 lines */}
-      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '92%', height: 11, marginBottom: 4 }} />
-      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '58%', height: 11 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '94%', height: 10, marginBottom: 4 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '64%', height: 10, marginBottom: 12 }} />
+
+      {/* Author row — small avatar + name + ·N rated · date */}
+      <div className="flex items-center" style={{ gap: 6, marginBottom: 12 }}>
+        <SkeletonBlock isStatic={isStatic} className="rounded-full shrink-0" style={{ width: 22, height: 22 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 90, height: 10, marginLeft: 2 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 50, height: 9 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 40, height: 9 }} />
+      </div>
+    </div>
+
+    {/* "READ FULL REVIEW →" amber band placeholder (edge-to-edge) */}
+    <div
+      style={{
+        padding: '10px 18px',
+        background: 'rgba(247, 147, 30, 0.08)',
+        borderTop: '1px solid rgba(247, 147, 30, 0.35)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}
+    >
+      <SkeletonBlock
+        isStatic={isStatic}
+        className="rounded-sm"
+        style={{ width: 110, height: 9, background: 'rgba(252, 217, 157, 0.20)' }}
+      />
+      <SkeletonBlock
+        isStatic={isStatic}
+        className="rounded-sm"
+        style={{ width: 12, height: 12, background: 'rgba(252, 217, 157, 0.20)' }}
+      />
     </div>
   </div>
 );

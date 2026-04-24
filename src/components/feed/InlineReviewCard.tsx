@@ -23,6 +23,7 @@ import {
   formatFrostRating,
   splitCourseName,
 } from '@/lib/frostPanel';
+import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
 
 export interface InlineReviewCardProps {
   courseName: string;
@@ -84,6 +85,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   reviewDate,
   reviewText,
 }) => {
+  const viewportWidth = useViewportWidth();
+  const isCompact = viewportWidth < COMPACT_VIEWPORT_MAX;
+  const titleSize = isCompact ? 18 : 20;
+  const scoreSize = isCompact ? 38 : 44;
+
   const initials = useMemo(
     () =>
       (reviewer.name || 'G')
@@ -180,7 +186,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 20,
+              fontSize: titleSize,
               fontWeight: 800,
               letterSpacing: '-0.4px',
               lineHeight: 1.1,
@@ -208,7 +214,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         >
           <span
             style={{
-              fontSize: 44,
+              fontSize: scoreSize,
               fontWeight: 800,
               lineHeight: 0.85,
               ...FROST_SCORE_GRADIENT,
