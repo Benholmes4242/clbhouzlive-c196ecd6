@@ -116,6 +116,8 @@ export interface PostStudioState {
   // Media
   mediaItems: StudioMediaItem[];
   activeMediaIndex: number;
+  /** ID of the media item selected as cover. Null = fall back to mediaItems[0]. */
+  coverMediaId: string | null;
 
   // Post content
   caption: string;
@@ -147,6 +149,7 @@ export function createInitialState(overrides?: Partial<PostStudioState>): PostSt
     actorId: null,
     mediaItems: [],
     activeMediaIndex: 0,
+    coverMediaId: null,
     caption: '',
     mentions: [],
     taggedCourses: [],
@@ -174,6 +177,7 @@ export type PostStudioAction =
   | { type: 'REMOVE_MEDIA'; payload: string }
   | { type: 'REORDER_MEDIA'; payload: { fromIndex: number; toIndex: number } }
   | { type: 'SET_ACTIVE_MEDIA'; payload: number }
+  | { type: 'SET_COVER_MEDIA'; payload: string | null }
   | { type: 'UPDATE_MEDIA_TRIM'; payload: { id: string; trimStart: number; trimEnd: number } }
   | { type: 'UPDATE_MEDIA_POSTER'; payload: { id: string; posterTimestamp: number; posterPreviewUrl: string | null } }
   | { type: 'SET_CAPTION'; payload: string }

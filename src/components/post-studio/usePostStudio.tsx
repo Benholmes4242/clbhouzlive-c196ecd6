@@ -45,9 +45,12 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
       const remaining = POST_LIMITS.MAX_MEDIA_COUNT - currentCount;
       const toAdd = action.payload.slice(0, Math.max(0, remaining));
       if (toAdd.length === 0) return state;
+      const newMediaItems = [...state.mediaItems, ...toAdd];
       return {
         ...state,
-        mediaItems: [...state.mediaItems, ...toAdd],
+        mediaItems: newMediaItems,
+        // Auto-assign cover to first item if none yet set
+        coverMediaId: state.coverMediaId ?? newMediaItems[0]?.id ?? null,
         isDirty: true,
       };
     }
@@ -55,10 +58,12 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
     case 'REMOVE_MEDIA': {
       const filtered = state.mediaItems.filter((m) => m.id !== action.payload);
       const newIndex = Math.min(state.activeMediaIndex, Math.max(0, filtered.length - 1));
+      const coverStillExists = filtered.some((m) => m.id === state.coverMediaId);
       return {
         ...state,
         mediaItems: filtered,
         activeMediaIndex: newIndex,
+        coverMediaId: coverStillExists ? state.coverMediaId : (filtered[0]?.id ?? null),
         isDirty: true,
       };
     }
@@ -75,6 +80,13 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
       return {
         ...state,
         activeMediaIndex: Math.max(0, Math.min(action.payload, state.mediaItems.length - 1)),
+      };
+
+    case 'SET_COVER_MEDIA':
+      return {
+        ...state,
+        coverMediaId: action.payload,
+        isDirty: true,
       };
 
     case 'UPDATE_MEDIA_TRIM':
@@ -140,13 +152,19 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
     case 'SET_SCHEDULED_AT':
       return { ...state, scheduledAt: action.payload, isDirty: true };
 
-    case 'LOAD_DRAFT':
-      return {
+    case 'LOAD_DRAFT': {
+      const merged = {
         ...createInitialState(),
         ...action.payload.state,
         draftId: action.payload.draftId,
         isDirty: false,
       };
+      // Backward-compat: older drafts saved before coverMediaId existed
+      if (merged.mediaItems.length > 0 && !merged.coverMediaId) {
+        merged.coverMediaId = merged.mediaItems[0].id;
+      }
+      return merged;
+    }
 
     case 'MARK_DIRTY':
       return { ...state, isDirty: true };
@@ -189,6 +207,7 @@ interface PostStudioContextValue {
   removeMedia: (id: string) => void;
   reorderMedia: (fromIndex: number, toIndex: number) => void;
   setActiveMedia: (index: number) => void;
+  setCoverMedia: (mediaId: string | null) => void;
   updateTrim: (id: string, trimStart: number, trimEnd: number) => void;
   updatePoster: (id: string, posterTimestamp: number, posterPreviewUrl: string | null) => void;
   updateMediaEdits: (id: string, edits: StudioEdits) => void;
@@ -242,6 +261,7 @@ export function PostStudioProvider({
   const removeMedia = useCallback((id: string) => dispatch({ type: 'REMOVE_MEDIA', payload: id }), []);
   const reorderMedia = useCallback((fromIndex: number, toIndex: number) => dispatch({ type: 'REORDER_MEDIA', payload: { fromIndex, toIndex } }), []);
   const setActiveMedia = useCallback((index: number) => dispatch({ type: 'SET_ACTIVE_MEDIA', payload: index }), []);
+  const setCoverMedia = useCallback((mediaId: string | null) => dispatch({ type: 'SET_COVER_MEDIA', payload: mediaId }), []);
   const updateTrim = useCallback((id: string, trimStart: number, trimEnd: number) => dispatch({ type: 'UPDATE_MEDIA_TRIM', payload: { id, trimStart, trimEnd } }), []);
   const updatePoster = useCallback((id: string, posterTimestamp: number, posterPreviewUrl: string | null) => dispatch({ type: 'UPDATE_MEDIA_POSTER', payload: { id, posterTimestamp, posterPreviewUrl } }), []);
   const updateMediaEdits = useCallback(
@@ -273,6 +293,7 @@ export function PostStudioProvider({
       removeMedia,
       reorderMedia,
       setActiveMedia,
+      setCoverMedia,
       updateTrim,
       updatePoster,
       updateMediaEdits,
@@ -300,6 +321,7 @@ export function PostStudioProvider({
       removeMedia,
       reorderMedia,
       setActiveMedia,
+      setCoverMedia,
       updateTrim,
       updatePoster,
       updateMediaEdits,

@@ -286,7 +286,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
 
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
    const {
-    state, setStep, setActiveMedia, removeMedia, addMedia,
+    state, setStep, setActiveMedia, setCoverMedia, removeMedia, addMedia,
     setCaption, openPanel, closePanel, updateMediaEdits, updateTrim,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
@@ -312,7 +312,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
-  const [coverIndex, setCoverIndex] = useState(0);
+  // Cover is sourced from reducer state (keyed by media ID, persists across remounts/reorders)
+  const coverMediaId = state.coverMediaId;
+  const coverIndex = coverMediaId
+    ? Math.max(0, state.mediaItems.findIndex((m) => m.id === coverMediaId))
+    : 0;
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressFiredRef = useRef(false);
 
@@ -443,10 +447,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   }, [state.mediaItems, setActiveMedia]);
 
   const handleSetCover = useCallback((index: number) => {
-    setCoverIndex(index);
+    const targetId = state.mediaItems[index]?.id;
+    if (!targetId) return;
+    setCoverMedia(targetId);
     setActiveMedia(index);
     toast.success('Cover updated');
-  }, [setActiveMedia]);
+  }, [state.mediaItems, setCoverMedia, setActiveMedia]);
 
   // ── Publish handler — one-step flow ──
   const handlePublish = useCallback(async () => {
@@ -456,7 +462,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
 
-      const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
+      // Reorder so the user-selected cover lands at display_order: 0.
+      // Post Studio cover == display_order: 0; there is no is_cover column on post_media.
+      const coverIdx = state.coverMediaId
+        ? state.mediaItems.findIndex((m) => m.id === state.coverMediaId)
+        : 0;
+      const orderedMediaItems = coverIdx > 0
+        ? [
+            state.mediaItems[coverIdx],
+            ...state.mediaItems.filter((_, i) => i !== coverIdx),
+          ]
+        : state.mediaItems;
+
+      const files = orderedMediaItems.map((m) => m.file).filter((f): f is File => !!f);
       const selectedTags = state.mentions.map((m) => ({
         id: m.entityId, entity_id: m.profileId, entity_type: m.entityType,
         name: m.displayName, username: m.username ?? null,
@@ -466,7 +484,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       const input: UploadJobInput = {
         actorType: state.actorType, actorId: state.actorId ?? user.id, userId: user.id,
         caption: state.caption, files,
-        mediaItems: state.mediaItems.map((item) => ({
+        mediaItems: orderedMediaItems.map((item) => ({
           id: item.id, file: item.file, type: item.mediaType,
           width: item.width ?? undefined, height: item.height ?? undefined,
           duration: item.duration ?? undefined,
@@ -490,7 +508,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       enqueuePostUpload(input);
       analyticsEvents.track('post_published', {
         media_count: state.mediaItems.length,
-        media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
+        media_type: orderedMediaItems[0]?.mediaType ?? 'unknown',
         has_caption: state.caption.trim().length > 0,
         has_tagged_course: state.taggedCourses.length > 0,
         visibility: state.visibility,
@@ -815,7 +833,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             padding: '0 16px',
           }}>
             {state.mediaItems.map((item, i) => {
-              const isActive = i === coverIndex;
+              const isActive = i === state.activeMediaIndex;
               const isCover = i === coverIndex;
               const stillSrc = getPreviewStillSrc(item);
               const previewTransform = getPreviewTransform(item.edits);
