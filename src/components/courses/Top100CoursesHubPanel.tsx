@@ -88,8 +88,8 @@ const Top100CoursesHubPanel = () => {
     listSlug: selectedList,
   });
 
-  // Flatten and sort courses
-  const allCourses: SearchedCourseWithRating[] = React.useMemo(() => {
+  // Flatten and sort courses (and attach displayRank reflecting list position)
+  const allCourses: (SearchedCourseWithRating & { displayRank?: number })[] = React.useMemo(() => {
     const courses = coursesData?.pages.flat() ?? [];
 
     // Determine the rank-matching slug fragment ONCE, based on selectedList,
@@ -111,12 +111,13 @@ const Top100CoursesHubPanel = () => {
     };
 
     if (sortOption === 'user_rating') {
-      return [...courses].sort((a, b) => {
+      const sorted = [...courses].sort((a, b) => {
         const ratingA = a.average_rating ?? -1;
         const ratingB = b.average_rating ?? -1;
         if (ratingB !== ratingA) return ratingB - ratingA;
         return (a.name ?? '').localeCompare(b.name ?? '');
       });
+      return sorted.map((c, idx) => ({ ...c, displayRank: idx + 1 }));
     }
 
     // 'official' sort — pre-extract rank keys so the comparator is O(1)
@@ -127,7 +128,7 @@ const Top100CoursesHubPanel = () => {
 
     withRankKey.sort((a, b) => a.rankKey - b.rankKey);
 
-    return withRankKey.map((x) => x.course);
+    return withRankKey.map((x, idx) => ({ ...x.course, displayRank: idx + 1 }));
   }, [coursesData, sortOption, selectedList]);
 
   // Scroll restoration on mount (after courses load)
