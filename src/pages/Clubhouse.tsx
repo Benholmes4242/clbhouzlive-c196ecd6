@@ -181,7 +181,8 @@ const ClubhouseContent = () => {
       return buildSuggestedFeedWithEditorials(
         activeFeed.posts,
         [
-          pgaCard as FeedPost | null,
+          // PGA card temporarily hidden (Zurich Classic team-event week — re-enable after 2026-04-28)
+          null,
           courseOfWeekCard as FeedPost | null,
         ]
       );
