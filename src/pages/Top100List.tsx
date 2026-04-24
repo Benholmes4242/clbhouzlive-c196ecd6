@@ -483,6 +483,7 @@ const Top100List = () => {
                     globalRank: course.global_rank,
                     regionalRank: course.regional_rank,
                     usaRank: course.usa_rank,
+                    displayRank: course.displayRank,
                   }}
                   onClick={() => handleOpenCourse(course.id)}
                 />
