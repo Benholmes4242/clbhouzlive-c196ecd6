@@ -80,6 +80,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
   ...fullscreenProps
 }) => {
   const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const { data: reviewerStats } = useReviewerStats(creator.id);
 
   const handleOpenSheet = useCallback(() => {
     openReviewSheet({
@@ -97,6 +98,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
       courseRegion,
       courseSubCountry,
       reviewText,
+      reviewerStats: reviewerStats ?? null,
     });
   }, [
     openReviewSheet,
@@ -109,6 +111,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
     courseRegion,
     courseSubCountry,
     reviewText,
+    reviewerStats,
   ]);
 
   // Build review data for capsule
