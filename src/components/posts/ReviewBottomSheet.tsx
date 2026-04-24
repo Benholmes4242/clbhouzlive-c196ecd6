@@ -11,9 +11,7 @@ import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 import {
   FROST,
   FROST_BLUR,
@@ -124,7 +122,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   );
 
   const formattedRating = formatFrostRating(rating);
-  const tierLabel = getRatingTierLabel(rating);
 
   const { name: titleName, subtitle: derivedSubtitle } = useMemo(
     () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
@@ -161,11 +158,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     return segs.join(' · ');
   }, [reviewerStats]);
 
-  // Radial dial — r=34, c = 2π·34 ≈ 213.6
+  // Radial dial — r=34, c = 2π·34 ≈ 213.6 (ring only, no label)
   const DIAL_RADIUS = 34;
   const DIAL_CIRC = 2 * Math.PI * DIAL_RADIUS;
   const dialOffset = DIAL_CIRC * (1 - Math.max(0, Math.min(1, rating / 10)));
-  const dialPercent = Math.round(rating * 10);
 
   const content = (
     <AnimatePresence>
