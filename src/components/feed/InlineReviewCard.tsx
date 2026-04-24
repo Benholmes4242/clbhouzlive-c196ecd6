@@ -85,6 +85,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   reviewDate,
   reviewText,
 }) => {
+  const viewportWidth = useViewportWidth();
+  const isCompact = viewportWidth < COMPACT_VIEWPORT_MAX;
+  const titleSize = isCompact ? 18 : 20;
+  const scoreSize = isCompact ? 38 : 44;
+
   const initials = useMemo(
     () =>
       (reviewer.name || 'G')
