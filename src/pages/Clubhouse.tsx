@@ -45,6 +45,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
