@@ -93,6 +93,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   courseSubtitle,
 }) => {
   const navigate = useNavigate();
+  const viewportWidth = useViewportWidth();
+  const isCompact = viewportWidth < COMPACT_VIEWPORT_MAX;
+
+  // Live reviewer stats — falls back to the snapshot from the payload while loading.
+  // Same React Query key dedupes with any earlier fetch (e.g. tile mount).
+  const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
+  const effectiveStats = liveStats ?? reviewerStats ?? null;
 
   const handleVisitCourse = useCallback(() => {
     if (!courseId) return;
