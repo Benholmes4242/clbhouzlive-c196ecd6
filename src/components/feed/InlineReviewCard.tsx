@@ -1,18 +1,20 @@
 /**
- * InlineReviewCard — Frost Panel review tile shown at the bottom of review posts.
+ * InlineReviewCard — Frost Panel review tile (PR 7 editorial layout).
  *
- * PR 2 (Frost Panel redesign): glass morphism + amber accents + tier pill.
  * Composition (top → bottom):
- *   1. Tier pill (replaces ★ COURSE REVIEW chip)
- *   2. Title row — course name + subtitle / score
- *   3. Breakdown bars (conditional, when `breakdown` prop populated by PR 3)
- *   4. Author row — avatar + name + "N rated" (conditional) / date
+ *   1. Title row — course name + subtitle inline / score on right
+ *   2. Location line
+ *   3. Breakdown 2×2 grid (DESIGN / CONDITIONS / CLUBHOUSE / FACILITIES) — conditional
+ *   4. Italic 2-line excerpt in curly quotes — conditional
+ *   5. Author row (avatar + name + N rated + date, all inline)
+ *   6. "READ FULL REVIEW →" amber affordance band (edge-to-edge)
  *
- * Tap → opens unified ReviewBottomSheet via store (PR 1).
+ * Tap → opens unified ReviewBottomSheet via store.
  */
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   FROST,
@@ -36,20 +38,16 @@ export interface InlineReviewCardProps {
   isVisible: boolean;
   onTap: () => void;
 
-  /** Optional breakdown sub-scores. Renders the 4-column micro-bar row when present. */
   breakdown?: {
     design?: number | null;
     conditions?: number | null;
     clubhouse?: number | null;
     facilities?: number | null;
   } | null;
-  /** Optional reviewer stats. Renders "N rated" next to author name when present. */
   reviewerStats?: {
     coursesRated?: number | null;
   } | null;
-  /** Optional course subtitle (e.g. "The King's Course"). Falls back to splitting courseName. */
   courseSubtitle?: string | null;
-  /** Optional review date — renders right-aligned in author row. */
   reviewDate?: string | Date | null;
 }
 
@@ -74,6 +72,9 @@ function formatDateShort(input: string | Date): string {
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseName,
   rating,
+  courseRegion,
+  courseCountry,
+  courseSubCountry,
   reviewer,
   isVisible,
   onTap,
@@ -96,13 +97,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
 
   const formattedRating = formatFrostRating(rating);
 
-  // Resolve course title + subtitle
   const { name: titleName, subtitle: derivedSubtitle } = useMemo(
     () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
     [courseName, courseSubtitle],
   );
 
-  // Breakdown values that exist
   const breakdownEntries = useMemo(() => {
     if (!breakdown) return [];
     return BREAKDOWN_KEYS.flatMap((k) => {
@@ -113,6 +112,9 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
 
   const dateLabel = reviewDate ? formatDateShort(reviewDate) : '';
   const coursesRated = reviewerStats?.coursesRated ?? null;
+
+  const locationParts = [courseSubCountry || courseRegion, courseCountry].filter(Boolean);
+  const locationStr = locationParts.join(', ');
 
   return (
     <motion.button
@@ -125,13 +127,13 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
       animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
-      aria-label={`Open review of ${titleName} by ${reviewer.name || 'Golfer'}`}
+      aria-label={`Open full review of ${titleName}${derivedSubtitle ? ` — ${derivedSubtitle}` : ''} by ${reviewer.name || 'Golfer'}`}
       style={{
         position: 'relative',
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        padding: '22px 18px 16px',
+        padding: '18px 18px 14px',
         margin: 0,
         borderRadius: 24,
         background: FROST.glass,
@@ -145,7 +147,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         pointerEvents: isVisible ? 'auto' : 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
         WebkitTapHighlightColor: 'transparent',
-        // Force GPU layer for blur perf
         transform: 'translateZ(0)',
         willChange: 'backdrop-filter',
       }}
@@ -180,28 +181,21 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           <div
             style={{
               fontSize: 20,
-              fontWeight: 700,
+              fontWeight: 800,
               letterSpacing: '-0.4px',
-              lineHeight: 1.05,
+              lineHeight: 1.1,
               color: FROST.ink,
               wordBreak: 'break-word',
             }}
           >
             {titleName}
+            {derivedSubtitle && (
+              <>
+                <span style={{ color: FROST.inkMute, fontWeight: 500 }}> — </span>
+                <span style={{ color: FROST.inkMute, fontWeight: 500 }}>{derivedSubtitle}</span>
+              </>
+            )}
           </div>
-          {derivedSubtitle && (
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 13,
-                fontWeight: 500,
-                color: FROST.inkMute,
-                lineHeight: 1.2,
-              }}
-            >
-              {derivedSubtitle}
-            </div>
-          )}
         </div>
         <div
           style={{
@@ -229,8 +223,34 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               </span>
             )}
           </span>
+          <span
+            style={{
+              fontSize: 13,
+              color: FROST.inkFaint,
+              fontWeight: 500,
+              marginLeft: 2,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            /10
+          </span>
         </div>
       </div>
+
+      {/* Location line */}
+      {locationStr && (
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 11,
+            color: FROST.inkMuter,
+            letterSpacing: '0.2px',
+            position: 'relative',
+          }}
+        >
+          {locationStr}
+        </div>
+      )}
 
       {/* Row 2 — Breakdown 2×2 grid (conditional) */}
       {breakdownEntries.length > 0 && (
@@ -239,70 +259,59 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             marginTop: 14,
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: '10px 16px',
+            columnGap: 18,
+            rowGap: 10,
             paddingTop: 12,
             paddingBottom: 14,
             borderTop: `1px solid ${FROST.borderSoft}`,
-            marginBottom: 0,
+            borderBottom: `1px solid ${FROST.borderSoft}`,
+            marginBottom: 12,
+            position: 'relative',
           }}
         >
           {breakdownEntries.map(({ key, label, value }) => (
-            <div key={key}>
-              <div
+            <div
+              key={key}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                gap: 6,
+                minWidth: 0,
+              }}
+            >
+              <span
                 style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  justifyContent: 'space-between',
-                  gap: 4,
-                  marginBottom: 4,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 600,
-                    letterSpacing: '0.8px',
-                    textTransform: 'uppercase',
-                    color: FROST.inkMuter,
-                  }}
-                >
-                  {label}
-                </span>
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '-0.2px',
-                    color: FROST.ink,
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  {value.toFixed(1)}
-                </span>
-              </div>
-              <div
-                style={{
-                  height: 3,
-                  borderRadius: 2,
-                  background: 'rgba(255,255,255,0.12)',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                  color: FROST.inkMuter,
+                  whiteSpace: 'nowrap',
                   overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
-                <div
-                  style={{
-                    width: `${Math.max(0, Math.min(100, value * 10))}%`,
-                    height: '100%',
-                    background: `linear-gradient(90deg, ${FROST.amber}, ${FROST.amberSoft})`,
-                    borderRadius: 2,
-                  }}
-                />
-              </div>
+                {label}
+              </span>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  letterSpacing: '-0.2px',
+                  color: FROST.ink,
+                  fontVariantNumeric: 'tabular-nums',
+                  flexShrink: 0,
+                }}
+              >
+                {value.toFixed(1)}
+              </span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Row 3 — Review excerpt (conditional, italic 1-line) */}
+      {/* Row 3 — Italic 2-line excerpt (conditional) */}
       {reviewText && (
         <div
           style={{
@@ -312,11 +321,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             lineHeight: 1.45,
             letterSpacing: '-0.1px',
             marginTop: breakdownEntries.length > 0 ? 0 : 14,
-            marginBottom: 12,
+            marginBottom: 10,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-            WebkitLineClamp: 1,
+            WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             whiteSpace: 'normal',
             position: 'relative',
@@ -326,66 +335,98 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         </div>
       )}
 
-      {/* Row 4 — Author + date */}
+      {/* Row 4 — Author row (consolidated inline) */}
       <div
         style={{
           marginTop: breakdownEntries.length > 0 || reviewText ? 0 : 14,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
+          gap: 6,
+          minWidth: 0,
           position: 'relative',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <SquircleAvatar
-            size={20}
-            src={reviewer.avatar || undefined}
-            alt={reviewer.name}
-            fallback={initials}
-            hideRing
-          />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: FROST.ink,
-              lineHeight: 1.2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {reviewer.name || 'Golfer'}
-          </span>
-          {coursesRated != null && (
-            <>
-              <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
-              <span
-                style={{
-                  fontSize: 12,
-                  color: FROST.inkMuter,
-                  fontVariantNumeric: 'tabular-nums',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {coursesRated} rated
-              </span>
-            </>
-          )}
-        </div>
-        {dateLabel && (
-          <span
-            style={{
-              fontSize: 11,
-              color: FROST.inkFaint,
-              flexShrink: 0,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {dateLabel}
-          </span>
+        <SquircleAvatar
+          size={22}
+          src={reviewer.avatar || undefined}
+          alt={reviewer.name}
+          fallback={initials}
+          hideRing
+        />
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: FROST.ink,
+            lineHeight: 1.2,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            marginLeft: 2,
+          }}
+        >
+          {reviewer.name || 'Golfer'}
+        </span>
+        {coursesRated != null && (
+          <>
+            <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
+            <span
+              style={{
+                fontSize: 12,
+                color: FROST.inkMuter,
+                fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {coursesRated} rated
+            </span>
+          </>
         )}
+        {dateLabel && (
+          <>
+            <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
+            <span
+              style={{
+                fontSize: 11,
+                color: FROST.inkFaint,
+                fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {dateLabel}
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* Row 5 — "READ FULL REVIEW →" affordance band (edge-to-edge) */}
+      <div
+        style={{
+          marginLeft: -18,
+          marginRight: -18,
+          marginBottom: -14,
+          marginTop: 12,
+          padding: '10px 18px',
+          background: 'rgba(247, 147, 30, 0.08)',
+          borderTop: `1px solid ${FROST.amberBorder}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'relative',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase',
+            color: FROST.amberSoft,
+          }}
+        >
+          Read full review
+        </span>
+        <ChevronRight size={14} color={FROST.amberSoft} />
       </div>
     </motion.button>
   );
