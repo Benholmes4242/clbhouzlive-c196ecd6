@@ -353,13 +353,18 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         style={{
                           fontSize: 84,
                           fontWeight: 800,
-                          letterSpacing: '-4px',
                           lineHeight: 0.85,
-                          paddingRight: 6,
                           ...FROST_SCORE_GRADIENT,
                         }}
                       >
-                        {formattedRating}
+                        <span style={{ letterSpacing: '-4px' }}>
+                          {formattedRating.split('.')[0]}
+                        </span>
+                        {formattedRating.includes('.') && (
+                          <span style={{ letterSpacing: '-1px' }}>
+                            .{formattedRating.split('.')[1]}
+                          </span>
+                        )}
                       </span>
                     </div>
                   </div>
