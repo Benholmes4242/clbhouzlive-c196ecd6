@@ -361,7 +361,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       </span>
                       {formattedRating.includes('.') && (
                         <span style={{ letterSpacing: '-0.8px' }}>
-                          .{formattedRating.split('.')[1]}
+                          <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
+                          {formattedRating.split('.')[1]}
                         </span>
                       )}
                     </span>
