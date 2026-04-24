@@ -19,7 +19,7 @@ const prefersReducedMotion = typeof window !== 'undefined'
 
 /**
  * Preview CTA buttons component for post-rating confirmation screen.
- * Positioned horizontally below the ReviewBottomPanel in the safe area.
+ * Positioned horizontally in the safe area.
  */
 export const PreviewCTAButtons: React.FC<PreviewCTAButtonsProps> = ({
   shareState,
