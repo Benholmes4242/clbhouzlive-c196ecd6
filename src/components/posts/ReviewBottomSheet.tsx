@@ -259,20 +259,27 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               }}
             />
 
-            {/* Drag handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, position: 'relative' }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 4,
-                  borderRadius: 2,
-                  background: 'rgba(255,255,255,0.30)',
-                }}
-              />
-            </div>
+            {/* ─── PINNED HEADER ─────────────────────────────── */}
+            <div
+              style={{
+                flex: '0 0 auto',
+                padding: '0 22px',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              {/* Drag handle */}
+              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, paddingBottom: 4 }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 4,
+                    borderRadius: 2,
+                    background: 'rgba(255,255,255,0.30)',
+                  }}
+                />
+              </div>
 
-            {/* Body */}
-            <div style={{ padding: '4px 22px 24px', position: 'relative' }}>
               {/* Title block — inline name + subtitle */}
               <h1
                 style={{
@@ -462,27 +469,55 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 )}
               </div>
 
-              {/* Review body */}
+              {/* Spacer before scroll divider */}
+              <div style={{ height: 16 }} />
+            </div>
+
+            {/* ─── SCROLLABLE MIDDLE (review body only) ──────── */}
+            <div
+              style={{
+                flex: '1 1 auto',
+                overflow: 'auto',
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
+                padding: '0 22px',
+                position: 'relative',
+                zIndex: 1,
+                minHeight: 0,
+              }}
+            >
               {reviewText && (
                 <div
                   style={{
-                    marginTop: 20,
                     fontSize: 15,
                     fontWeight: 400,
                     lineHeight: 1.55,
                     color: FROST.inkSoft,
+                    letterSpacing: '-0.1px',
                     whiteSpace: 'pre-wrap',
-                    marginBottom: 20,
+                    paddingTop: 4,
+                    paddingBottom: 20,
                   }}
                 >
                   {reviewText}
                 </div>
               )}
+            </div>
 
+            {/* ─── PINNED FOOTER ─────────────────────────────── */}
+            <div
+              style={{
+                flex: '0 0 auto',
+                padding: '14px 22px 20px',
+                background: FROST.glassStrong,
+                borderTop: `1px solid ${FROST.borderSoft}`,
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
               {/* Author card */}
               <div
                 style={{
-                  marginTop: reviewText ? 0 : 20,
                   padding: 14,
                   borderRadius: 16,
                   background: FROST.glassSoft,
@@ -551,7 +586,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
               {/* CTAs */}
               {courseId && (
-                <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+                <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
                   <button
                     type="button"
                     onClick={handleVisitCourse}
