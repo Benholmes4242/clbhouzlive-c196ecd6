@@ -318,14 +318,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   overflow: 'hidden',
                 }}
               >
-                  borderRadius: 20,
-                  padding: 22,
-                  background: FROST.glassSoft,
-                  border: `1px solid ${FROST.borderNested}`,
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
                 {/* Subtle radial glow */}
                 <div
                   aria-hidden
