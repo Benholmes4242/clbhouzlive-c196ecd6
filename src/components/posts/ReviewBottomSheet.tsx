@@ -107,6 +107,57 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
 
+  // ─── Follow wiring ────────────────────────────────────────────
+  const { user: viewer } = useSupabaseSession();
+  const isOwnReview = !!viewer?.id && viewer.id === user.id;
+  const followEnabled = !isOwnReview && user.id !== 'preview' && !!viewer?.id;
+
+  const { data: serverIsFollowing } = useIsFollowingUser(
+    followEnabled ? viewer?.id : undefined,
+    followEnabled ? user.id : undefined,
+  );
+
+  const isFollowing = useFollowStore((s) => s.getFollowing(user.id, serverIsFollowing ?? false));
+  const setFollowing = useFollowStore((s) => s.setFollowing);
+
+  const followMutation = useFollowMutation();
+
+  const handleToggleFollow = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (isOwnReview || user.id === 'preview') return;
+      if (!viewer?.id) {
+        toast.error('Please sign in to follow users');
+        return;
+      }
+      if (followMutation.isPending) return;
+
+      const wasFollowing = isFollowing;
+      // Optimistic store update so all surfaces reflect the change immediately.
+      setFollowing(user.id, !wasFollowing);
+
+      followMutation.mutate(
+        {
+          targetUserId: user.id,
+          targetActorType: 'personal',
+          targetActorId: user.id,
+          currentUserId: viewer.id,
+          isFollowed: wasFollowing,
+        },
+        {
+          onError: () => {
+            setFollowing(user.id, wasFollowing);
+          },
+        },
+      );
+    },
+    [isFollowing, isOwnReview, user.id, viewer?.id, setFollowing, followMutation],
+  );
+
+  // ─── Drag scoping ─────────────────────────────────────────────
+  // Scope drag to header only so the scrollable middle scrolls without dismissing.
+  const dragControls = useDragControls();
+
   const handleVisitCourse = useCallback(() => {
     if (!courseId) return;
     onClose();
