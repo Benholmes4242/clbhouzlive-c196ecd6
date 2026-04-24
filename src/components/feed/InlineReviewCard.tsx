@@ -250,6 +250,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               fontWeight: 800,
               letterSpacing: '-2.2px',
               lineHeight: 0.85,
+              paddingRight: 4,
               ...FROST_SCORE_GRADIENT,
             }}
           >
