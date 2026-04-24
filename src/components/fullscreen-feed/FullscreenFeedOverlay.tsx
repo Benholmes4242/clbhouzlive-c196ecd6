@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import CommentsSheet from '@/components/comments/CommentsSheet';
-import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
@@ -41,7 +41,7 @@ export function FullscreenFeedOverlay() {
   const { handleShare } = useClubhouseShare(userId);
   const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
   const isOwnPost = !!(userId && activePost?.userId === userId);
-  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
 
   // Watch-progress tracking lives inside SnapFeed (the actual video host),
   // which the overlay renders below. Mounting it here as well would
@@ -83,9 +83,24 @@ export function FullscreenFeedOverlay() {
   }, [activePost, close, navigate]);
 
   const handleReviewTap = useCallback(() => {
-    if (!activeReview) return;
-    setReviewSheetOpen(true);
-  }, [activeReview]);
+    if (!activeReview || !activePost) return;
+    openReviewSheet({
+      user: {
+        id: activePost.userId ?? '',
+        name: activePost.displayName ?? '',
+        username: activePost.username,
+        avatar: activePost.avatarUrl,
+      },
+      courseId: activeReview.courseId ?? '',
+      courseName: activeReview.courseName ?? '',
+      rating: activeReview.rating ?? 0,
+      reviewId: activeReview.reviewId,
+      courseCountry: activeReview.courseCountry,
+      courseRegion: activeReview.courseRegion,
+      courseSubCountry: activeReview.courseSubCountry,
+      reviewText: activeReview.reviewText,
+    });
+  }, [activeReview, activePost, openReviewSheet]);
 
   // ESC to close
   useEffect(() => {
@@ -230,24 +245,7 @@ export function FullscreenFeedOverlay() {
         likesCount={getActiveLikeState(activePost!)?.count ?? null}
       />
 
-      <ReviewBottomSheet
-        isOpen={reviewSheetOpen}
-        onClose={() => setReviewSheetOpen(false)}
-        user={{
-          id: activePost?.userId ?? '',
-          name: activePost?.displayName ?? '',
-          username: activePost?.username,
-          avatar: activePost?.avatarUrl,
-        }}
-        courseId={activeReview?.courseId ?? ''}
-        courseName={activeReview?.courseName ?? ''}
-        rating={activeReview?.rating ?? 0}
-        reviewId={activeReview?.reviewId}
-        courseCountry={activeReview?.courseCountry}
-        courseRegion={activeReview?.courseRegion}
-        courseSubCountry={activeReview?.courseSubCountry}
-        reviewText={activeReview?.reviewText}
-      />
+      {/* ReviewBottomSheet now renders via root-level ReviewBottomSheetPortal */}
     </>
   );
 }
