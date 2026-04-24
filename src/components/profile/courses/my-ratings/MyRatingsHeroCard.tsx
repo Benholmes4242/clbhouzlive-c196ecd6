@@ -1,5 +1,6 @@
 import React from 'react';
-import { Flag } from 'lucide-react';
+import { Flag, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { getTierName } from './myRatingsTiering';
 
@@ -68,11 +69,15 @@ const MyRatingsHeroCard: React.FC<MyRatingsHeroCardProps> = ({
   rank,
   onCourseClick,
 }) => {
+  const navigate = useNavigate();
   const reviewText = (course.review ?? '').trim();
   const hasReview = reviewText.length > 0;
   const heroHeight = hasReview ? 220 : 250;
-  const showTop100 =
-    course.global_rank != null && course.global_rank <= 100;
+  const hasAnyBreakdown =
+    course.design_score != null ||
+    course.condition_score != null ||
+    course.clubhouse_score != null ||
+    course.facilities_score != null;
   const dateIso = course.review_date ?? course.last_played_at ?? null;
   const dateText = formatEditorialDate(dateIso);
   const tierName = getTierName(course.rating_value);
@@ -159,56 +164,6 @@ const MyRatingsHeroCard: React.FC<MyRatingsHeroCardProps> = ({
         >
           NO. {rank}
         </div>
-
-        {/* Top 100 badge */}
-        {showTop100 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 14,
-              right: 20,
-              padding: '5px 10px',
-              background: 'rgba(15,23,42,0.55)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              borderRadius: 2,
-              borderLeft: `2px solid ${AMBER}`,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 8.5,
-                fontWeight: 800,
-                letterSpacing: '0.2em',
-                color: AMBER,
-              }}
-            >
-              TOP 100
-            </span>
-            <span
-              style={{
-                width: 2,
-                height: 2,
-                background: 'rgba(255,255,255,0.4)',
-                borderRadius: 1,
-              }}
-            />
-            <span
-              style={{
-                fontFamily: FONT_SERIF,
-                fontStyle: 'italic',
-                fontSize: 12,
-                color: PAPER,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              No. {course.global_rank}
-            </span>
-          </div>
-        )}
 
         {/* Course name */}
         <div
