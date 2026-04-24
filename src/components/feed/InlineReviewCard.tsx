@@ -227,17 +227,18 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         </div>
       </div>
 
-      {/* Row 3 — Breakdown bars (conditional) */}
+      {/* Row 2 — Breakdown 2×2 grid (conditional) */}
       {breakdownEntries.length > 0 && (
         <div
           style={{
-            marginTop: 12,
-            paddingTop: 10,
-            borderTop: '1px solid rgba(255,255,255,0.10)',
+            marginTop: 14,
             display: 'grid',
-            gridTemplateColumns: `repeat(${breakdownEntries.length}, 1fr)`,
-            gap: 8,
-            marginBottom: 12,
+            gridTemplateColumns: '1fr 1fr',
+            gap: '10px 16px',
+            paddingTop: 12,
+            paddingBottom: 14,
+            borderTop: `1px solid ${FROST.borderSoft}`,
+            marginBottom: 0,
           }}
         >
           {breakdownEntries.map(({ key, label, value }) => (
@@ -253,7 +254,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               >
                 <span
                   style={{
-                    fontSize: 9,
+                    fontSize: 10,
                     fontWeight: 600,
                     letterSpacing: '0.8px',
                     textTransform: 'uppercase',
@@ -287,6 +288,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
                     width: `${Math.max(0, Math.min(100, value * 10))}%`,
                     height: '100%',
                     background: `linear-gradient(90deg, ${FROST.amber}, ${FROST.amberSoft})`,
+                    borderRadius: 2,
                   }}
                 />
               </div>
@@ -295,10 +297,34 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         </div>
       )}
 
+      {/* Row 3 — Review excerpt (conditional, italic 1-line) */}
+      {reviewText && (
+        <div
+          style={{
+            fontSize: 12,
+            fontStyle: 'italic',
+            color: FROST.inkMute,
+            lineHeight: 1.45,
+            letterSpacing: '-0.1px',
+            marginTop: breakdownEntries.length > 0 ? 0 : 14,
+            marginBottom: 12,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: 'vertical',
+            whiteSpace: 'normal',
+            position: 'relative',
+          }}
+        >
+          “{reviewText}”
+        </div>
+      )}
+
       {/* Row 4 — Author + date */}
       <div
         style={{
-          marginTop: breakdownEntries.length > 0 ? 0 : 14,
+          marginTop: breakdownEntries.length > 0 || reviewText ? 0 : 14,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
