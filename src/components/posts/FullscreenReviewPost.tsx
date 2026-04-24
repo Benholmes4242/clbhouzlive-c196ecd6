@@ -1,18 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RatingPill } from '@/components/ui/RatingPill';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
-import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 // Respect reduced motion preference
 const prefersReducedMotion = typeof window !== 'undefined' 
   ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
@@ -96,38 +92,23 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
-  
-  const navigate = useNavigate();
-  
-  // Controlled sheet state for review bottom sheet
-  const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
 
-  const handleOpenReviewSheet = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    setIsReviewSheetOpen(true);
-  }, [courseId, courseName, reviewId]);
-  
-  const handleCloseReviewSheet = useCallback(() => {
-    
-    setIsReviewSheetOpen(false);
-    // No navigation - user stays on Clubhouse
-  }, []);
-  
-  const handleViewCourse = useCallback(() => {
-    handleCloseReviewSheet();
-    navigate(`/courses/${courseId}`);
-  }, [courseId, navigate, handleCloseReviewSheet]);
-  
-  const handleReadFullReview = useCallback(() => {
-    handleCloseReviewSheet();
-    // Navigate to course reviews tab with reviewId for deep linking (same as CreatorCapsule)
-    if (reviewId) {
-      navigate(`/courses/${courseId}?tab=reviews&review=${reviewId}`);
-    } else {
-      navigate(`/courses/${courseId}?tab=reviews`);
-    }
-  }, [courseId, reviewId, navigate, handleCloseReviewSheet]);
+  const handleOpenReviewSheet = useCallback(() => {
+    openReviewSheet({
+      user: {
+        id: 'preview',
+        name: user?.name ?? 'You',
+        username: user?.username,
+        avatar: user?.avatar,
+      },
+      courseId,
+      courseName,
+      rating,
+      reviewId,
+      reviewText,
+    });
+  }, [openReviewSheet, user, courseId, courseName, rating, reviewId, reviewText]);
   
   // All ratings now use amber/gold styling (unified system)
   
