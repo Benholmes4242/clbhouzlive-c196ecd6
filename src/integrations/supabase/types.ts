@@ -15875,9 +15875,13 @@ export type Database = {
           post_status: string
           post_user_id: string
           poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
           review_course_id: string
           review_course_image: string
           review_course_name: string
+          review_design_score: number
+          review_facilities_score: number
           review_rating: number
           share_count: number
           source_review_id: string
@@ -15996,9 +16000,13 @@ export type Database = {
           post_status: string
           post_user_id: string
           poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
           review_course_id: string
           review_course_image: string
           review_course_name: string
+          review_design_score: number
+          review_facilities_score: number
           review_rating: number
           share_count: number
           source_review_id: string
@@ -16131,12 +16139,16 @@ export type Database = {
           post_tags: Json
           post_user_id: string
           poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
           review_course_country: string
           review_course_id: string
           review_course_image: string
           review_course_name: string
           review_course_region: string
           review_course_sub_country: string
+          review_design_score: number
+          review_facilities_score: number
           review_rating: number
           review_text: string
           share_count: number
@@ -16385,12 +16397,16 @@ export type Database = {
           post_tags: Json
           post_user_id: string
           poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
           review_course_country: string
           review_course_id: string
           review_course_image: string
           review_course_name: string
           review_course_region: string
           review_course_sub_country: string
+          review_design_score: number
+          review_facilities_score: number
           review_rating: number
           review_text: string
           share_count: number
@@ -16429,6 +16445,14 @@ export type Database = {
           is_followed_by: boolean
           is_following: boolean
           target_user_id: string
+        }[]
+      }
+      get_reviewer_stats: {
+        Args: { p_user_id: string }
+        Returns: {
+          avg_rating: number
+          courses_rated: number
+          member_since: string
         }[]
       }
       get_season_calendar: {
@@ -16557,12 +16581,16 @@ export type Database = {
           post_type: string
           post_user_id: string
           poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
           review_course_country: string
           review_course_id: string
           review_course_image: string
           review_course_name: string
           review_course_region: string
           review_course_sub_country: string
+          review_design_score: number
+          review_facilities_score: number
           review_rating: number
           review_text: string
           share_count: number
@@ -17112,9 +17140,13 @@ export type Database = {
           post_status: string
           post_user_id: string
           poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
           review_course_id: string
           review_course_image: string
           review_course_name: string
+          review_design_score: number
+          review_facilities_score: number
           review_rating: number
           share_count: number
           source_review_id: string
