@@ -383,13 +383,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   {breakdownEntries.length > 0 && (
                     <div
                       style={{
-                        flex: 1,
+                        flex: isCompact ? 'none' : 1,
+                        width: isCompact ? '100%' : 'auto',
                         minWidth: 0,
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
                         columnGap: 16,
                         rowGap: 8,
-                        alignSelf: 'center',
+                        alignSelf: isCompact ? 'stretch' : 'center',
                       }}
                     >
                       {breakdownEntries.map(({ key, label, value }) => (
