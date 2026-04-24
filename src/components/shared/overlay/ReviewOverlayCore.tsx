@@ -183,10 +183,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <TierPill tier={tierLabel} size="xs" />
-                <div
-                  style={{
-                    marginTop: 4,
+                {/* Tier pill removed (PR 5) */}
                     fontSize: 14,
                     fontWeight: 700,
                     letterSpacing: '-0.2px',
