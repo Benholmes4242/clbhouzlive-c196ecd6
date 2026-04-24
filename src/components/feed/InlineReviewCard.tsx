@@ -14,7 +14,6 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 import {
   FROST,
   FROST_BLUR,
@@ -56,10 +55,10 @@ export interface InlineReviewCardProps {
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
 const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
-  design: 'DESI',
-  conditions: 'COND',
-  clubhouse: 'CLUB',
-  facilities: 'FACI',
+  design: 'DESIGN',
+  conditions: 'CONDITIONS',
+  clubhouse: 'CLUBHOUSE',
+  facilities: 'FACILITIES',
 };
 
 function formatDateShort(input: string | Date): string {
@@ -82,6 +81,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   reviewerStats,
   courseSubtitle,
   reviewDate,
+  reviewText,
 }) => {
   const initials = useMemo(
     () =>
@@ -95,7 +95,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   );
 
   const formattedRating = formatFrostRating(rating);
-  const tierLabel = getRatingTierLabel(rating);
 
   // Resolve course title + subtitle
   const { name: titleName, subtitle: derivedSubtitle } = useMemo(
@@ -132,7 +131,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        padding: '18px 18px 16px',
+        padding: '22px 18px 16px',
         margin: 0,
         borderRadius: 24,
         background: FROST.glass,
@@ -167,38 +166,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         }}
       />
 
-      {/* Row 1 — Tier pill */}
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '4px 10px 4px 8px',
-          background: FROST.amberTint,
-          border: `1px solid ${FROST.amberBorder}`,
-          borderRadius: 99,
-          fontSize: 10,
-          fontWeight: 600,
-          letterSpacing: '0.8px',
-          textTransform: 'uppercase',
-          color: FROST.amberSoft,
-          marginBottom: 10,
-          position: 'relative',
-        }}
-      >
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: FROST.amber,
-            boxShadow: '0 0 8px rgba(247,147,30,0.8)',
-          }}
-        />
-        {tierLabel}
-      </div>
-
-      {/* Row 2 — Title + score */}
+      {/* Row 1 — Title + score */}
       <div
         style={{
           display: 'flex',
@@ -259,17 +227,18 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         </div>
       </div>
 
-      {/* Row 3 — Breakdown bars (conditional) */}
+      {/* Row 2 — Breakdown 2×2 grid (conditional) */}
       {breakdownEntries.length > 0 && (
         <div
           style={{
-            marginTop: 12,
-            paddingTop: 10,
-            borderTop: '1px solid rgba(255,255,255,0.10)',
+            marginTop: 14,
             display: 'grid',
-            gridTemplateColumns: `repeat(${breakdownEntries.length}, 1fr)`,
-            gap: 8,
-            marginBottom: 12,
+            gridTemplateColumns: '1fr 1fr',
+            gap: '10px 16px',
+            paddingTop: 12,
+            paddingBottom: 14,
+            borderTop: `1px solid ${FROST.borderSoft}`,
+            marginBottom: 0,
           }}
         >
           {breakdownEntries.map(({ key, label, value }) => (
@@ -285,7 +254,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               >
                 <span
                   style={{
-                    fontSize: 9,
+                    fontSize: 10,
                     fontWeight: 600,
                     letterSpacing: '0.8px',
                     textTransform: 'uppercase',
@@ -319,6 +288,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
                     width: `${Math.max(0, Math.min(100, value * 10))}%`,
                     height: '100%',
                     background: `linear-gradient(90deg, ${FROST.amber}, ${FROST.amberSoft})`,
+                    borderRadius: 2,
                   }}
                 />
               </div>
@@ -327,10 +297,34 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         </div>
       )}
 
+      {/* Row 3 — Review excerpt (conditional, italic 1-line) */}
+      {reviewText && (
+        <div
+          style={{
+            fontSize: 12,
+            fontStyle: 'italic',
+            color: FROST.inkMute,
+            lineHeight: 1.45,
+            letterSpacing: '-0.1px',
+            marginTop: breakdownEntries.length > 0 ? 0 : 14,
+            marginBottom: 12,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: 'vertical',
+            whiteSpace: 'normal',
+            position: 'relative',
+          }}
+        >
+          “{reviewText}”
+        </div>
+      )}
+
       {/* Row 4 — Author + date */}
       <div
         style={{
-          marginTop: breakdownEntries.length > 0 ? 0 : 14,
+          marginTop: breakdownEntries.length > 0 || reviewText ? 0 : 14,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

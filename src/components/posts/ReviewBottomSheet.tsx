@@ -11,9 +11,7 @@ import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 import {
   FROST,
   FROST_BLUR,
@@ -124,7 +122,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   );
 
   const formattedRating = formatFrostRating(rating);
-  const tierLabel = getRatingTierLabel(rating);
 
   const { name: titleName, subtitle: derivedSubtitle } = useMemo(
     () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
@@ -161,11 +158,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     return segs.join(' · ');
   }, [reviewerStats]);
 
-  // Radial dial — r=34, c = 2π·34 ≈ 213.6
+  // Radial dial — r=34, c = 2π·34 ≈ 213.6 (ring only, no label)
   const DIAL_RADIUS = 34;
   const DIAL_CIRC = 2 * Math.PI * DIAL_RADIUS;
   const dialOffset = DIAL_CIRC * (1 - Math.max(0, Math.min(1, rating / 10)));
-  const dialPercent = Math.round(rating * 10);
 
   const content = (
     <AnimatePresence>
@@ -275,84 +271,45 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
             {/* Body */}
             <div style={{ padding: '4px 22px 24px', position: 'relative' }}>
-              {/* Tier pill */}
-              <div
+              {/* Title block — inline name + subtitle */}
+              <h1
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '5px 12px 5px 9px',
-                  background: FROST.amberTint,
-                  border: `1px solid ${FROST.amberBorder}`,
-                  borderRadius: 99,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: '1px',
-                  textTransform: 'uppercase',
-                  color: FROST.amberSoft,
-                  marginTop: 14,
-                  marginBottom: 12,
-                }}
-              >
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    background: FROST.amber,
-                    boxShadow: '0 0 8px rgba(247,147,30,0.8)',
-                  }}
-                />
-                {tierLabel}
-              </div>
-
-              {/* Title block */}
-              <div
-                style={{
-                  fontSize: 36,
+                  fontSize: 32,
                   fontWeight: 800,
-                  letterSpacing: '-1.2px',
-                  lineHeight: 0.95,
+                  letterSpacing: '-1.0px',
+                  lineHeight: 1.05,
                   color: FROST.ink,
                   wordBreak: 'break-word',
+                  marginTop: 14,
+                  marginBottom: 0,
                 }}
               >
                 {titleName}
-              </div>
-              {derivedSubtitle && (
+                {derivedSubtitle && (
+                  <>
+                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}> — </span>
+                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}>{derivedSubtitle}</span>
+                  </>
+                )}
+              </h1>
+              {locationStr ? (
                 <div
                   style={{
-                    marginTop: 6,
-                    fontSize: 20,
+                    fontSize: 11,
                     fontWeight: 500,
-                    color: FROST.inkMute,
-                    letterSpacing: '-0.2px',
-                    lineHeight: 1.15,
-                  }}
-                >
-                  {derivedSubtitle}
-                </div>
-              )}
-              {locationStr && (
-                <div
-                  style={{
-                    marginTop: 8,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    fontSize: 12,
                     color: FROST.inkMuter,
+                    letterSpacing: '0.2px',
+                    marginTop: 8,
                   }}
                 >
-                  <MapPin size={12} />
-                  <span>{locationStr}</span>
+                  {locationStr}
                 </div>
-              )}
+              ) : null}
 
               {/* Rating card */}
               <div
                 style={{
-                  marginTop: 18,
+                  marginTop: 20,
                   borderRadius: 20,
                   padding: 22,
                   background: FROST.glassSoft,
@@ -382,20 +339,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     position: 'relative',
                   }}
                 >
-                  {/* Left — eyebrow + big number */}
+                  {/* Left — big number */}
                   <div>
-                    <div
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        letterSpacing: '1.5px',
-                        textTransform: 'uppercase',
-                        color: FROST.inkMuter,
-                        marginBottom: 6,
-                      }}
-                    >
-                      Overall
-                    </div>
                     <div
                       style={{
                         display: 'flex',
@@ -419,7 +364,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     </div>
                   </div>
 
-                  {/* Right — radial dial */}
+                  {/* Right — radial dial (ring only, no label) */}
                   <div style={{ position: 'relative', width: 74, height: 74, flexShrink: 0 }}>
                     <svg width={74} height={74} viewBox="0 0 74 74">
                       <defs>
@@ -449,21 +394,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         transform="rotate(-90 37 37)"
                       />
                     </svg>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: FROST.amberSoft,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {dialPercent}%
-                    </div>
                   </div>
                 </div>
 

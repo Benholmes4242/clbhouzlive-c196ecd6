@@ -25,7 +25,6 @@ import { CourseDNACard } from './CourseDNACard';
 import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 import { FROST, FROST_BLUR, FROST_SCORE_GRADIENT, formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 /** Animated soundwave bars for music playback indicator */
@@ -385,7 +384,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   // Review mode content — Frost Panel (PR 2 visual redesign)
   const reviewContent = reviewData && (() => {
-    const tierLabel = getRatingTierLabel(reviewData.rating);
     const formattedRating = formatFrostRating(reviewData.rating);
     const { name: titleName, subtitle: derivedSubtitle } = splitCourseName(reviewData.courseName);
 
@@ -420,36 +418,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           }}
         />
 
-        {/* Tier pill */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '4px 10px 4px 8px',
-            background: FROST.amberTint,
-            border: `1px solid ${FROST.amberBorder}`,
-            borderRadius: 99,
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: '0.8px',
-            textTransform: 'uppercase',
-            color: FROST.amberSoft,
-            marginBottom: 10,
-            position: 'relative',
-          }}
-        >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: FROST.amber,
-              boxShadow: '0 0 8px rgba(247,147,30,0.8)',
-            }}
-          />
-          {tierLabel}
-        </div>
+        {/* Tier pill removed (PR 5) */}
 
         {/* Title row */}
         <div

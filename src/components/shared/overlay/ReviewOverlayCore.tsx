@@ -16,7 +16,6 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 import {
   FROST,
   FROST_BLUR,
@@ -55,39 +54,7 @@ export interface ReviewOverlayCoreProps {
   className?: string;
 }
 
-const TierPill: React.FC<{ tier: string; size?: 'sm' | 'xs' }> = ({ tier, size = 'sm' }) => {
-  const isXs = size === 'xs';
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: isXs ? 4 : 6,
-        padding: isXs ? '3px 7px 3px 6px' : '4px 10px 4px 8px',
-        background: FROST.amberTint,
-        border: `1px solid ${FROST.amberBorder}`,
-        borderRadius: 99,
-        fontSize: isXs ? 8 : 10,
-        fontWeight: 600,
-        letterSpacing: isXs ? '0.6px' : '0.8px',
-        textTransform: 'uppercase',
-        color: FROST.amberSoft,
-        whiteSpace: 'nowrap',
-      }}
-    >
-      <span
-        style={{
-          width: isXs ? 4 : 6,
-          height: isXs ? 4 : 6,
-          borderRadius: '50%',
-          background: FROST.amber,
-          boxShadow: '0 0 6px rgba(247,147,30,0.8)',
-        }}
-      />
-      {tier}
-    </div>
-  );
-};
+// Tier pill removed (PR 5) — the score speaks for itself.
 
 const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   courseName,
@@ -141,7 +108,6 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   );
 
   const formattedRating = useMemo(() => formatFrostRating(rating), [rating]);
-  const tierLabel = useMemo(() => getRatingTierLabel(rating), [rating]);
 
   const { name: titleName, subtitle: derivedSubtitle } = useMemo(
     () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
@@ -217,10 +183,9 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <TierPill tier={tierLabel} size="xs" />
+                {/* Tier pill removed (PR 5) */}
                 <div
                   style={{
-                    marginTop: 4,
                     fontSize: 14,
                     fontWeight: 700,
                     letterSpacing: '-0.2px',
@@ -290,10 +255,9 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
             }}
           />
 
-          {/* Tier pill + optional preview badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10, position: 'relative' }}>
-            <TierPill tier={tierLabel} />
-            {showPreviewBadge && (
+          {/* Tier pill removed (PR 5) — keep optional preview badge */}
+          {showPreviewBadge && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10, position: 'relative' }}>
               <span
                 style={{
                   padding: '3px 8px',
@@ -308,8 +272,8 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
               >
                 Preview
               </span>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Title row */}
           <div
