@@ -640,24 +640,37 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     />
                   ) : null}
                 </div>
-                {/* TODO: wire follow action — out of scope */}
-                <button
-                  type="button"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: 99,
-                    background: 'rgba(255,255,255,0.10)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    color: FROST.ink,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  Follow
-                </button>
+                {!isOwnReview && user.id !== 'preview' && (
+                  <button
+                    type="button"
+                    onClick={handleToggleFollow}
+                    disabled={followMutation.isPending}
+                    aria-label={isFollowing ? `Unfollow ${user.name}` : `Follow ${user.name}`}
+                    aria-pressed={isFollowing}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 99,
+                      background: isFollowing
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(255,255,255,0.10)',
+                      border: `1px solid ${isFollowing ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.15)'}`,
+                      color: isFollowing ? FROST.inkMute : FROST.ink,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: followMutation.isPending ? 'default' : 'pointer',
+                      opacity: followMutation.isPending ? 0.6 : 1,
+                      fontFamily: 'inherit',
+                      flexShrink: 0,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      transition: 'background 150ms ease, color 150ms ease, border-color 150ms ease',
+                    }}
+                  >
+                    {isFollowing && <UserCheck size={12} strokeWidth={2.5} />}
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                )}
               </div>
 
               {/* CTAs */}
