@@ -166,38 +166,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         }}
       />
 
-      {/* Row 1 — Tier pill */}
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '4px 10px 4px 8px',
-          background: FROST.amberTint,
-          border: `1px solid ${FROST.amberBorder}`,
-          borderRadius: 99,
-          fontSize: 10,
-          fontWeight: 600,
-          letterSpacing: '0.8px',
-          textTransform: 'uppercase',
-          color: FROST.amberSoft,
-          marginBottom: 10,
-          position: 'relative',
-        }}
-      >
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: FROST.amber,
-            boxShadow: '0 0 8px rgba(247,147,30,0.8)',
-          }}
-        />
-        {tierLabel}
-      </div>
-
-      {/* Row 2 — Title + score */}
+      {/* Row 1 — Title + score */}
       <div
         style={{
           display: 'flex',
