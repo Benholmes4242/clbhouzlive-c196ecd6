@@ -25,6 +25,8 @@ import { CourseDNACard } from './CourseDNACard';
 import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
+import { getRatingTierLabel } from '@/lib/ratingTier';
+import { FROST, FROST_BLUR, FROST_SCORE_GRADIENT, formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (
