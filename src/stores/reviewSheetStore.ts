@@ -1,5 +1,18 @@
 import { create } from 'zustand';
 
+export interface ReviewSheetBreakdown {
+  design: number | null;
+  conditions: number | null;
+  clubhouse: number | null;
+  facilities: number | null;
+}
+
+export interface ReviewSheetReviewerStats {
+  coursesRated: number;
+  averageRating: number | null;
+  memberSince: string | null;
+}
+
 export interface ReviewSheetPayload {
   user: { id: string; name: string; username?: string; avatar?: string | null };
   courseId: string;
@@ -10,6 +23,10 @@ export interface ReviewSheetPayload {
   courseRegion?: string | null;
   courseSubCountry?: string | null;
   reviewText?: string | null;
+  /** Optional breakdown sub-scores. Each may be null if the user skipped that breakdown. */
+  breakdown?: ReviewSheetBreakdown | null;
+  /** Optional reviewer aggregate stats — surfaced in the author card. */
+  reviewerStats?: ReviewSheetReviewerStats | null;
 }
 
 interface ReviewSheetState {

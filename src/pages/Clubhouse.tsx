@@ -45,6 +45,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -274,6 +275,7 @@ const ClubhouseContent = () => {
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = useState(false);
   const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const { data: reviewerStats } = useReviewerStats(activePost?.userId);
 
   useEffect(() => {
     if (seasonRecap) {
@@ -301,8 +303,10 @@ const ClubhouseContent = () => {
       courseRegion: activeReview.courseRegion,
       courseSubCountry: activeReview.courseSubCountry,
       reviewText: activeReview.reviewText,
+      breakdown: activeReview.breakdown ?? null,
+      reviewerStats: reviewerStats ?? null,
     });
-  }, [activeReview, activePost, openReviewSheet]);
+  }, [activeReview, activePost, openReviewSheet, reviewerStats]);
 
   const showRehydrationSkeleton = isRehydrating;
 

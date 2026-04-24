@@ -25,6 +25,13 @@ export interface ReviewData {
   courseCountry?: string | null;
   courseSubCountry?: string | null;
   reviewText?: string | null;
+  /** Optional breakdown sub-scores. Each may be null if the user skipped that breakdown. */
+  breakdown?: {
+    design: number | null;
+    conditions: number | null;
+    clubhouse: number | null;
+    facilities: number | null;
+  } | null;
 }
 
 /** Creator relationship to current user */
@@ -459,6 +466,11 @@ export interface FeedRpcRow {
   creator_show_handicap?: boolean | null;
   creator_home_club?: string | null;
   creator_home_club_visibility?: string | null;
+  // Review breakdown sub-scores (PR 3 — optional, null when missing)
+  review_design_score?: number | null;
+  review_condition_score?: number | null;
+  review_facilities_score?: number | null;
+  review_clubhouse_score?: number | null;
 }
 
 /** Timing constants */

@@ -60,6 +60,9 @@ export function invalidateCourseRatingCaches(queryClient: QueryClient) {
   // ── Reviews count (profile header) ──
   queryClient.invalidateQueries({ queryKey: ['actor-reviews-count'], exact: false });
 
+  // ── Reviewer aggregate stats (used by ReviewBottomSheet author card) ──
+  queryClient.invalidateQueries({ queryKey: ['reviewer-stats'], exact: false });
+
   // ── Clubhouse + feed surfaces ──
   // These cache reviews shared as posts. Keys must match the set
   // currently invalidated by useReviewWizard's DELETE branch
