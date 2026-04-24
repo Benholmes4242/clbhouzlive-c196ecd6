@@ -271,77 +271,39 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
             {/* Body */}
             <div style={{ padding: '4px 22px 24px', position: 'relative' }}>
-              {/* Tier pill */}
-              <div
+              {/* Title block — inline name + subtitle */}
+              <h1
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '5px 12px 5px 9px',
-                  background: FROST.amberTint,
-                  border: `1px solid ${FROST.amberBorder}`,
-                  borderRadius: 99,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: '1px',
-                  textTransform: 'uppercase',
-                  color: FROST.amberSoft,
-                  marginTop: 14,
-                  marginBottom: 12,
-                }}
-              >
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    background: FROST.amber,
-                    boxShadow: '0 0 8px rgba(247,147,30,0.8)',
-                  }}
-                />
-                {tierLabel}
-              </div>
-
-              {/* Title block */}
-              <div
-                style={{
-                  fontSize: 36,
+                  fontSize: 32,
                   fontWeight: 800,
-                  letterSpacing: '-1.2px',
-                  lineHeight: 0.95,
+                  letterSpacing: '-1.0px',
+                  lineHeight: 1.05,
                   color: FROST.ink,
                   wordBreak: 'break-word',
+                  marginTop: 14,
+                  marginBottom: 0,
                 }}
               >
                 {titleName}
-              </div>
-              {derivedSubtitle && (
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontSize: 20,
-                    fontWeight: 500,
-                    color: FROST.inkMute,
-                    letterSpacing: '-0.2px',
-                    lineHeight: 1.15,
-                  }}
-                >
-                  {derivedSubtitle}
-                </div>
-              )}
+                {derivedSubtitle && (
+                  <>
+                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}> — </span>
+                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}>{derivedSubtitle}</span>
+                  </>
+                )}
+              </h1>
               {locationStr && (
                 <div
                   style={{
-                    marginTop: 8,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    fontSize: 12,
+                    fontSize: 11,
+                    fontWeight: 500,
                     color: FROST.inkMuter,
+                    letterSpacing: '0.2px',
+                    marginTop: 8,
+                    marginBottom: 20,
                   }}
                 >
-                  <MapPin size={12} />
-                  <span>{locationStr}</span>
+                  {locationStr}
                 </div>
               )}
 
