@@ -12,6 +12,7 @@ import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
