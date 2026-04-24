@@ -151,7 +151,31 @@ interface ActiveTournamentResult {
   tournamentPhase: TournamentPhase;
 }
 
+// One-off override: Zurich Classic 2026 is a team event (unsupported) and the
+// natural fallback would either bleed cross-tour (Volvo China Open) or silently
+// hide the section. Pin RBC Heritage as the active tournament through the
+// blackout window. Becomes inert (no-op) on 2026-04-30 UTC when Cadillac
+// Championship picks up naturally. Safe to remove after that date.
+const ZURICH_OVERRIDE_UNTIL = new Date('2026-04-30T00:00:00Z');
+const RBC_HERITAGE_2026_ID = '430695b1-cdc2-422a-814a-604bed9f2ceb';
+
 async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResult> {
+  // Date-guarded override (see constants above)
+  if (Date.now() < ZURICH_OVERRIDE_UNTIL.getTime()) {
+    const { data: rbc } = await supabase
+      .from('sr_tournaments')
+      .select('*')
+      .eq('id', RBC_HERITAGE_2026_ID)
+      .maybeSingle();
+
+    if (rbc) {
+      const predictions = await fetchPredictionsForTournament(rbc);
+      return { predictions, tournamentPhase: 'completed' };
+    }
+    // If RBC row can't be fetched, fall through to normal logic rather than
+    // nuking the section.
+  }
+
   const pgaSeasonId = await getPgaSeasonId();
   if (!pgaSeasonId) return { predictions: null, tournamentPhase: 'pre-tournament' };
 
