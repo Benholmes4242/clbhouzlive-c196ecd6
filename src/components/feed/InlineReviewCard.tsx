@@ -131,7 +131,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        padding: '18px 18px 16px',
+        padding: '22px 18px 16px',
         margin: 0,
         borderRadius: 24,
         background: FROST.glass,
