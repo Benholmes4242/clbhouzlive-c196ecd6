@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * Design tokens for the Frost Panel visual system.
  * Used across review post surfaces (InlineReviewCard, ReviewBottomSheet,
@@ -54,7 +56,7 @@ export const FROST_BLUR = {
  * If contrast becomes borderline against bright photo backdrops, raise the
  * lower stop from 0.75 to 0.85.
  */
-export const FROST_SCORE_GRADIENT: React.CSSProperties = {
+export const FROST_SCORE_GRADIENT: CSSProperties = {
   background: 'linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.75) 100%)',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
@@ -79,9 +81,6 @@ export function splitCourseName(courseName: string): { name: string; subtitle: s
   if (!match) return { name: courseName, subtitle: null };
   const [, base, inner] = match;
   const trimmed = inner.trim();
-  // If it already contains "Course", don't double-suffix
   const subtitle = /course/i.test(trimmed) ? `The ${trimmed}` : `The ${trimmed} Course`;
   return { name: base.trim(), subtitle };
 }
-
-import type React from 'react';
