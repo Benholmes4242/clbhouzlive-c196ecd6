@@ -54,6 +54,12 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
       courseCountry: row.review_course_country || null,
       courseSubCountry: row.review_course_sub_country || null,
       reviewText: row.review_text ?? null,
+      breakdown: {
+        design: row.review_design_score != null ? Number(row.review_design_score) : null,
+        conditions: row.review_condition_score != null ? Number(row.review_condition_score) : null,
+        clubhouse: row.review_clubhouse_score != null ? Number(row.review_clubhouse_score) : null,
+        facilities: row.review_facilities_score != null ? Number(row.review_facilities_score) : null,
+      },
     };
   }
 
