@@ -14,7 +14,6 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 import {
   FROST,
   FROST_BLUR,
@@ -56,10 +55,10 @@ export interface InlineReviewCardProps {
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
 const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
-  design: 'DESI',
-  conditions: 'COND',
-  clubhouse: 'CLUB',
-  facilities: 'FACI',
+  design: 'DESIGN',
+  conditions: 'CONDITIONS',
+  clubhouse: 'CLUBHOUSE',
+  facilities: 'FACILITIES',
 };
 
 function formatDateShort(input: string | Date): string {
@@ -82,6 +81,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   reviewerStats,
   courseSubtitle,
   reviewDate,
+  reviewText,
 }) => {
   const initials = useMemo(
     () =>
@@ -95,7 +95,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   );
 
   const formattedRating = formatFrostRating(rating);
-  const tierLabel = getRatingTierLabel(rating);
 
   // Resolve course title + subtitle
   const { name: titleName, subtitle: derivedSubtitle } = useMemo(
