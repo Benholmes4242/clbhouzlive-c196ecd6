@@ -681,15 +681,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
           className={cn(
             'overflow-hidden',
-            // Both modes use rounded-xl for consistency with ReviewOverlayCore
-            'rounded-xl'
+            isReview ? 'rounded-3xl' : 'rounded-xl'
           )}
-          style={{ 
-            background: isReview ? 'rgba(20, 13, 4, 0.95)' : 'rgba(0, 0, 0, 0.35)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: `1px solid ${borderColor}`,
-            
+          style={{
+            background: isReview ? FROST.glass : 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: isReview ? FROST_BLUR.panel : 'blur(20px)',
+            WebkitBackdropFilter: isReview ? FROST_BLUR.panel : 'blur(20px)',
+            border: `1px solid ${isReview ? FROST.border : borderColor}`,
+            boxShadow: isReview ? `${FROST.dropShadow}, ${FROST.innerHighlight}` : undefined,
+            transform: isReview ? 'translateZ(0)' : undefined,
+            willChange: isReview ? 'backdrop-filter' : undefined,
           }}
         >
           {/* Collapsed State - mode-dependent, crossfade on post change */}
