@@ -207,6 +207,7 @@ interface PostStudioContextValue {
   removeMedia: (id: string) => void;
   reorderMedia: (fromIndex: number, toIndex: number) => void;
   setActiveMedia: (index: number) => void;
+  setCoverMedia: (mediaId: string | null) => void;
   updateTrim: (id: string, trimStart: number, trimEnd: number) => void;
   updatePoster: (id: string, posterTimestamp: number, posterPreviewUrl: string | null) => void;
   updateMediaEdits: (id: string, edits: StudioEdits) => void;
@@ -260,6 +261,7 @@ export function PostStudioProvider({
   const removeMedia = useCallback((id: string) => dispatch({ type: 'REMOVE_MEDIA', payload: id }), []);
   const reorderMedia = useCallback((fromIndex: number, toIndex: number) => dispatch({ type: 'REORDER_MEDIA', payload: { fromIndex, toIndex } }), []);
   const setActiveMedia = useCallback((index: number) => dispatch({ type: 'SET_ACTIVE_MEDIA', payload: index }), []);
+  const setCoverMedia = useCallback((mediaId: string | null) => dispatch({ type: 'SET_COVER_MEDIA', payload: mediaId }), []);
   const updateTrim = useCallback((id: string, trimStart: number, trimEnd: number) => dispatch({ type: 'UPDATE_MEDIA_TRIM', payload: { id, trimStart, trimEnd } }), []);
   const updatePoster = useCallback((id: string, posterTimestamp: number, posterPreviewUrl: string | null) => dispatch({ type: 'UPDATE_MEDIA_POSTER', payload: { id, posterTimestamp, posterPreviewUrl } }), []);
   const updateMediaEdits = useCallback(
@@ -291,6 +293,7 @@ export function PostStudioProvider({
       removeMedia,
       reorderMedia,
       setActiveMedia,
+      setCoverMedia,
       updateTrim,
       updatePoster,
       updateMediaEdits,
@@ -318,6 +321,7 @@ export function PostStudioProvider({
       removeMedia,
       reorderMedia,
       setActiveMedia,
+      setCoverMedia,
       updateTrim,
       updatePoster,
       updateMediaEdits,
