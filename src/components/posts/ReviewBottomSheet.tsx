@@ -1,10 +1,12 @@
 /**
- * ReviewBottomSheet — Frost Panel sheet (PR 2 visual redesign).
+ * ReviewBottomSheet — Frost Panel sheet (PR 7 editorial layout).
  *
- * Driven by the unified store (PR 1) via ReviewBottomSheetPortal.
- * Visual: glass-strong background, two atmospheric glow orbs, big rating card
- * with radial dial, optional breakdown bars, full review body, author card,
- * two CTAs (Visit Course + Full Review).
+ * Three-zone layout (PR 6):
+ *   - Pinned header: drag handle + title + location + (divider) + score | 2×2 breakdown grid
+ *   - Scrollable middle: review body with amber Georgia drop cap on first paragraph
+ *   - Pinned footer: author card + Visit Course / Full Review CTAs
+ *
+ * Driven by the unified store via ReviewBottomSheetPortal.
  */
 
 import React, { useCallback, useMemo } from 'react';
@@ -38,14 +40,12 @@ export interface ReviewBottomSheetProps {
   courseSubCountry?: string | null;
   reviewText?: string | null;
 
-  /** Optional breakdown sub-scores. Renders breakdown rows when present. */
   breakdown?: {
     design?: number | null;
     conditions?: number | null;
     clubhouse?: number | null;
     facilities?: number | null;
   } | null;
-  /** Optional reviewer stats. Renders sub-line below author name when present. */
   reviewerStats?: {
     coursesRated?: number | null;
     averageRating?: number | null;
@@ -56,10 +56,10 @@ export interface ReviewBottomSheetProps {
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
 const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
-  design: 'Design',
-  conditions: 'Conditions',
-  clubhouse: 'Clubhouse',
-  facilities: 'Facilities',
+  design: 'DESIGN',
+  conditions: 'CONDITIONS',
+  clubhouse: 'CLUBHOUSE',
+  facilities: 'FACILITIES',
 };
 
 const SR_ONLY: React.CSSProperties = {
@@ -144,8 +144,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
       const noun = reviewerStats.coursesRated === 1 ? 'course' : 'courses';
       segs.push(`${reviewerStats.coursesRated} ${noun}`);
     }
-    // Hide the average when fewer than 3 courses — a single low rating would produce
-    // a misleading headline average.
     if (
       reviewerStats.averageRating != null &&
       (reviewerStats.coursesRated ?? 0) >= 3
@@ -158,10 +156,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     return segs.join(' · ');
   }, [reviewerStats]);
 
-  // Radial dial — r=34, c = 2π·34 ≈ 213.6 (ring only, no label)
-  const DIAL_RADIUS = 34;
-  const DIAL_CIRC = 2 * Math.PI * DIAL_RADIUS;
-  const dialOffset = DIAL_CIRC * (1 - Math.max(0, Math.min(1, rating / 10)));
+  // Split review into paragraphs on double-newline
+  const paragraphs = useMemo(() => {
+    if (!reviewText) return [];
+    return reviewText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+  }, [reviewText]);
 
   const content = (
     <AnimatePresence>
@@ -231,7 +230,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               Review of {courseName} by {user.name}
             </span>
 
-            {/* Glow orbs — atmospheric, behind everything */}
+            {/* Glow orbs — atmospheric */}
             <div
               aria-hidden
               style={{
@@ -263,7 +262,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             <div
               style={{
                 flex: '0 0 auto',
-                padding: '0 22px',
+                padding: '0 22px 18px',
                 position: 'relative',
                 zIndex: 1,
               }}
@@ -280,16 +279,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 />
               </div>
 
-              {/* Title block — inline name + subtitle */}
+              {/* Title — inline name + subtitle */}
               <h1
                 style={{
-                  fontSize: 32,
+                  fontSize: 28,
                   fontWeight: 800,
-                  letterSpacing: '-1.0px',
-                  lineHeight: 1.05,
+                  letterSpacing: '-0.8px',
+                  lineHeight: 1.1,
                   color: FROST.ink,
                   wordBreak: 'break-word',
-                  marginTop: 14,
+                  marginTop: 12,
                   marginBottom: 0,
                 }}
               >
@@ -308,200 +307,185 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     fontWeight: 500,
                     color: FROST.inkMuter,
                     letterSpacing: '0.2px',
-                    marginTop: 8,
+                    marginTop: 6,
                   }}
                 >
                   {locationStr}
                 </div>
               ) : null}
 
-              {/* Rating card */}
+              {/* Score + 2×2 breakdown side-by-side */}
               <div
                 style={{
-                  marginTop: 20,
-                  borderRadius: 20,
-                  padding: 22,
-                  background: FROST.glassSoft,
-                  border: `1px solid ${FROST.borderNested}`,
-                  position: 'relative',
-                  overflow: 'hidden',
+                  marginTop: 18,
+                  paddingTop: 16,
+                  borderTop: `1px solid ${FROST.borderSoft}`,
                 }}
               >
-                {/* Subtle radial glow */}
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'radial-gradient(circle at 85% 30%, rgba(247,147,30,0.2), transparent 50%)',
-                    pointerEvents: 'none',
-                  }}
-                />
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 16,
-                    position: 'relative',
-                  }}
-                >
-                  {/* Left — big number */}
-                  <div>
-                    <div
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
+                  {/* Score on left */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      flexShrink: 0,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    <span
                       style={{
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        gap: 4,
-                        fontVariantNumeric: 'tabular-nums',
+                        ...FROST_SCORE_GRADIENT,
+                        fontSize: 68,
+                        fontWeight: 800,
+                        lineHeight: 0.85,
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: 84,
-                          fontWeight: 800,
-                          lineHeight: 0.85,
-                          ...FROST_SCORE_GRADIENT,
-                        }}
-                      >
-                        <span style={{ letterSpacing: '-4px' }}>
-                          {formattedRating.split('.')[0]}
-                        </span>
-                        {formattedRating.includes('.') && (
-                          <span style={{ letterSpacing: '-1px' }}>
-                            .{formattedRating.split('.')[1]}
-                          </span>
-                        )}
+                      <span style={{ letterSpacing: '-3.2px' }}>
+                        {formattedRating.split('.')[0]}
                       </span>
-                    </div>
-                  </div>
-
-                  {/* Right — radial dial (ring only, no label) */}
-                  <div style={{ position: 'relative', width: 74, height: 74, flexShrink: 0 }}>
-                    <svg width={74} height={74} viewBox="0 0 74 74">
-                      <defs>
-                        <linearGradient id="frostRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor={FROST.amber} />
-                          <stop offset="100%" stopColor={FROST.amberSoft} />
-                        </linearGradient>
-                      </defs>
-                      <circle
-                        cx={37}
-                        cy={37}
-                        r={DIAL_RADIUS}
-                        fill="none"
-                        stroke="rgba(255,255,255,0.10)"
-                        strokeWidth={5}
-                      />
-                      <circle
-                        cx={37}
-                        cy={37}
-                        r={DIAL_RADIUS}
-                        fill="none"
-                        stroke="url(#frostRingGrad)"
-                        strokeWidth={5}
-                        strokeLinecap="round"
-                        strokeDasharray={DIAL_CIRC}
-                        strokeDashoffset={dialOffset}
-                        transform="rotate(-90 37 37)"
-                      />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Breakdown rows (conditional) */}
-                {breakdownEntries.length > 0 && (
-                  <div style={{ position: 'relative', marginTop: 18 }}>
-                    {breakdownEntries.map(({ key, label, value }) => (
-                      <div
-                        key={key}
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '80px 1fr 36px',
-                          gap: 12,
-                          alignItems: 'center',
-                          marginBottom: 9,
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 600,
-                            color: FROST.inkMute,
-                          }}
-                        >
-                          {label}
+                      {formattedRating.includes('.') && (
+                        <span style={{ letterSpacing: '-0.8px' }}>
+                          .{formattedRating.split('.')[1]}
                         </span>
+                      )}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 18,
+                        color: FROST.inkFaint,
+                        fontWeight: 500,
+                        marginLeft: 4,
+                        marginBottom: 6,
+                        letterSpacing: '-0.3px',
+                      }}
+                    >
+                      /10
+                    </span>
+                  </div>
+
+                  {/* 2×2 breakdown on right */}
+                  {breakdownEntries.length > 0 && (
+                    <div
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        columnGap: 16,
+                        rowGap: 8,
+                        alignSelf: 'center',
+                      }}
+                    >
+                      {breakdownEntries.map(({ key, label, value }) => (
                         <div
+                          key={key}
                           style={{
-                            height: 4,
-                            background: 'rgba(255,255,255,0.08)',
-                            borderRadius: 2,
-                            overflow: 'hidden',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'baseline',
+                            gap: 6,
+                            minWidth: 0,
                           }}
                         >
-                          <div
+                          <span
                             style={{
-                              width: `${Math.max(0, Math.min(100, value * 10))}%`,
-                              height: '100%',
-                              background: `linear-gradient(90deg, ${FROST.amber}, ${FROST.amberSoft})`,
-                              boxShadow: '0 0 8px rgba(247,147,30,0.5)',
+                              fontSize: 10,
+                              fontWeight: 700,
+                              letterSpacing: '0.8px',
+                              textTransform: 'uppercase',
+                              color: FROST.inkMuter,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
                             }}
-                          />
+                          >
+                            {label}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 700,
+                              color: FROST.ink,
+                              fontVariantNumeric: 'tabular-nums',
+                              letterSpacing: '-0.2px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {value.toFixed(1)}
+                          </span>
                         </div>
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            letterSpacing: '-0.3px',
-                            color: FROST.ink,
-                            fontVariantNumeric: 'tabular-nums',
-                            textAlign: 'right',
-                          }}
-                        >
-                          {value.toFixed(1)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-
-              {/* Spacer before scroll divider */}
-              <div style={{ height: 16 }} />
             </div>
 
-            {/* ─── SCROLLABLE MIDDLE (review body only) ──────── */}
+            {/* ─── SCROLLABLE MIDDLE (review body with drop cap) ──────── */}
             <div
               style={{
                 flex: '1 1 auto',
                 overflow: 'auto',
                 overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
-                padding: '0 22px',
+                padding: '20px 22px 20px',
+                minHeight: 0,
                 position: 'relative',
                 zIndex: 1,
-                minHeight: 0,
               }}
             >
-              {reviewText && (
+              {paragraphs.length === 0 && (
                 <div
                   style={{
-                    fontSize: 15,
-                    fontWeight: 400,
-                    lineHeight: 1.55,
-                    color: FROST.inkSoft,
-                    letterSpacing: '-0.1px',
-                    whiteSpace: 'pre-wrap',
-                    paddingTop: 4,
-                    paddingBottom: 20,
+                    fontSize: 13,
+                    fontStyle: 'italic',
+                    color: FROST.inkFaint,
+                    padding: '12px 0',
                   }}
                 >
-                  {reviewText}
+                  No written review — the score speaks for itself.
                 </div>
               )}
+              {paragraphs.map((para, i) => {
+                const isFirst = i === 0;
+                const firstChar = para.charAt(0);
+                const eligibleForDropCap = isFirst && /^[A-Za-z]$/.test(firstChar);
+                return (
+                  <p
+                    key={i}
+                    style={{
+                      fontSize: 15,
+                      lineHeight: 1.6,
+                      color: FROST.inkSoft,
+                      letterSpacing: '-0.1px',
+                      margin: 0,
+                      marginBottom: i === paragraphs.length - 1 ? 0 : 14,
+                    }}
+                  >
+                    {eligibleForDropCap ? (
+                      <>
+                        <span
+                          style={{
+                            float: 'left',
+                            fontSize: 48,
+                            fontWeight: 800,
+                            lineHeight: 0.9,
+                            paddingTop: 4,
+                            paddingRight: 8,
+                            color: FROST.amber,
+                            fontFamily: 'Georgia, "Times New Roman", serif',
+                          }}
+                        >
+                          {firstChar}
+                        </span>
+                        {para.slice(1)}
+                      </>
+                    ) : (
+                      para
+                    )}
+                  </p>
+                );
+              })}
             </div>
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
@@ -564,7 +548,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     </div>
                   )}
                 </div>
-                {/* TODO: wire follow action — out of scope for PR 2 */}
+                {/* TODO: wire follow action — out of scope */}
                 <button
                   type="button"
                   onClick={(e) => e.stopPropagation()}
