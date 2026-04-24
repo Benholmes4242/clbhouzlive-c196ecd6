@@ -4,11 +4,10 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { FeedActionRail } from './FeedActionRail';
 import { Z } from '@/config/zIndex';
-import { InlineReviewCard } from './InlineReviewCard';
+import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 interface FeedOverlayLayerProps {
   posts: FeedPost[];
@@ -36,12 +35,6 @@ interface FeedOverlayLayerProps {
     courseRegion?: string | null;
     courseSubCountry?: string | null;
     reviewText?: string | null;
-    breakdown?: {
-      design: number | null;
-      conditions: number | null;
-      clubhouse: number | null;
-      facilities: number | null;
-    } | null;
   } | null;
   isActiveReview?: boolean;
   activeIndexOverride?: number;
@@ -150,14 +143,29 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
     >
       {/* Mute toggle now lives inside FeedActionRail (top of rail) */}
 
-      {/* Inline Review Card — renders in the bottom slot for review posts */}
+      {/* Inline Review Card — renders in the bottom slot for review posts.
+          Subcomponent isolates the useReviewerStats hook so it never fires
+          on non-review posts. */}
       {activePost.isReview && activePost.review && (
-        <ReviewOverlaySlot
-          activePost={activePost}
-          overlayVisible={overlayVisible}
-          bottomOffset={bottomOffset}
-          onReviewTap={onReviewTap}
-        />
+        <div
+          style={{
+            position: 'fixed',
+            left: 16,
+            right: 80, // leave room for action rail
+            bottom:
+              bottomOffset !== undefined
+                ? `${bottomOffset + 20}px`
+                : 'calc(var(--bottom-nav-height, 88px) + 20px)',
+            zIndex: Z.echo,
+            pointerEvents: overlayVisible ? 'auto' : 'none',
+          }}
+        >
+          <ReviewOverlaySlot
+            activePost={activePost}
+            onReviewTap={() => onReviewTap?.()}
+            isVisible={overlayVisible}
+          />
+        </div>
       )}
 
       {/* Bottom-left content slot (regular posts) — author + caption + course pill.
@@ -218,58 +226,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
         </div>
       )}
-    </div>
-  );
-});
-
-/**
- * Inline subcomponent: review overlay slot.
- * Extracted so we only call useReviewerStats when the active post is actually a review.
- */
-const ReviewOverlaySlot = memo(function ReviewOverlaySlot({
-  activePost,
-  overlayVisible,
-  bottomOffset,
-  onReviewTap,
-}: {
-  activePost: FeedPost;
-  overlayVisible: boolean;
-  bottomOffset?: number;
-  onReviewTap: () => void;
-}) {
-  const { data: reviewerStats } = useReviewerStats(activePost.userId);
-  if (!activePost.review) return null;
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        left: 16,
-        right: 80,
-        bottom:
-          bottomOffset !== undefined
-            ? `${bottomOffset + 20}px`
-            : 'calc(var(--bottom-nav-height, 88px) + 20px)',
-        zIndex: Z.echo,
-        pointerEvents: overlayVisible ? 'auto' : 'none',
-      }}
-    >
-      <InlineReviewCard
-        courseName={activePost.review.courseName}
-        rating={activePost.review.rating}
-        courseRegion={activePost.review.courseRegion}
-        courseCountry={activePost.review.courseCountry}
-        courseSubCountry={activePost.review.courseSubCountry}
-        reviewText={activePost.review.reviewText ?? null}
-        reviewer={{
-          name: activePost.displayName,
-          avatar: activePost.avatarUrl,
-        }}
-        breakdown={activePost.review.breakdown ?? null}
-        reviewerStats={reviewerStats ?? null}
-        reviewDate={activePost.createdAt}
-        isVisible={overlayVisible}
-        onTap={() => onReviewTap?.()}
-      />
     </div>
   );
 });

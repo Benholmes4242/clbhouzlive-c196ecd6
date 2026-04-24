@@ -1,6 +1,6 @@
 /**
  * Rating tier taxonomy for Clbhouz reviews.
- * Used by feedMapper and the review post surfaces (InlineReviewCard, ReviewBottomSheet, etc.).
+ * Canonical tier taxonomy used across review post surfaces.
  */
 
 export type RatingTier =

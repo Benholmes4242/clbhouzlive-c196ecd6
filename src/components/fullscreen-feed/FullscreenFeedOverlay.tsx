@@ -101,15 +101,21 @@ export function FullscreenFeedOverlay() {
       courseRegion: activeReview.courseRegion,
       courseSubCountry: activeReview.courseSubCountry,
       reviewText: activeReview.reviewText,
-      breakdown: activeReview.breakdown ?? null,
+      breakdown: (activeReview as any).breakdown ?? null,
       reviewerStats: reviewerStats ?? null,
     });
   }, [activeReview, activePost, openReviewSheet, reviewerStats]);
 
-  // ESC to close
+  // ESC to close — but defer to the review sheet if it's open on top.
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      // If the review sheet is open on top of this overlay, let IT handle ESC first.
+      const sheetIsOpen = useReviewSheetStore.getState().isOpen;
+      if (sheetIsOpen) return;
+      close();
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [isOpen, close]);

@@ -99,6 +99,9 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
       courseRegion,
       courseSubCountry,
       reviewText,
+      // Breakdown not available in ReviewPostViewer's prop surface — leave null.
+      // Upstream callers can extend later if needed.
+      breakdown: null,
       reviewerStats: reviewerStats ?? null,
     });
   }, [
