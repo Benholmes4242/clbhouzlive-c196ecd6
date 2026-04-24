@@ -328,11 +328,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
             {/* ─── PINNED HEADER ─────────────────────────────── */}
             <div
+              onPointerDown={(e) => dragControls.start(e)}
               style={{
                 flex: '0 0 auto',
                 padding: '0 22px 18px',
                 position: 'relative',
                 zIndex: 1,
+                touchAction: 'none',
               }}
             >
               {/* Drag handle */}
