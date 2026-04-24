@@ -255,10 +255,9 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
             }}
           />
 
-          {/* Tier pill + optional preview badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10, position: 'relative' }}>
-            <TierPill tier={tierLabel} />
-            {showPreviewBadge && (
+          {/* Tier pill removed (PR 5) — keep optional preview badge */}
+          {showPreviewBadge && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10, position: 'relative' }}>
               <span
                 style={{
                   padding: '3px 8px',
@@ -273,8 +272,8 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
               >
                 Preview
               </span>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Title row */}
           <div
