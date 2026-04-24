@@ -191,6 +191,50 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-5">
+      {/* Attribution kicker — clarifies the list authorship */}
+      <div className="px-4 pt-1 pb-0 flex flex-col items-center">
+        <div className="inline-flex items-center gap-2">
+          <span
+            style={{
+              width: 4,
+              height: 4,
+              borderRadius: '50%',
+              background: '#F7931E',
+            }}
+          />
+          <span
+            style={{
+              fontSize: 10,
+              letterSpacing: '1.4px',
+              textTransform: 'uppercase',
+              color: '#C97211',
+              fontWeight: 600,
+            }}
+          >
+            Official World Ranking
+          </span>
+          <span
+            style={{
+              width: 4,
+              height: 4,
+              borderRadius: '50%',
+              background: '#F7931E',
+            }}
+          />
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: '#64748B',
+            marginTop: 4,
+            fontWeight: 400,
+            textAlign: 'center',
+          }}
+        >
+          Courses ranked by the world's leading golf publications
+        </div>
+      </div>
+
       {/* Top 100 Journey Hero - Premium progress module */}
       {user && (
         <div className="px-4">
