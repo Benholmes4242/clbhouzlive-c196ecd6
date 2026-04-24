@@ -186,7 +186,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 20,
+              fontSize: titleSize,
               fontWeight: 800,
               letterSpacing: '-0.4px',
               lineHeight: 1.1,
@@ -214,7 +214,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         >
           <span
             style={{
-              fontSize: 44,
+              fontSize: scoreSize,
               fontWeight: 800,
               lineHeight: 0.85,
               ...FROST_SCORE_GRADIENT,
