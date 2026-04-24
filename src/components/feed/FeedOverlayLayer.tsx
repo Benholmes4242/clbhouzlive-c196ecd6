@@ -71,6 +71,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
   const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
+  const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
 
   const handleToggleMute = useCallback(() => {
     if (isMuted) markUserGestureUnmute();
@@ -101,7 +102,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
   const isFollowed = getFollowState(activePost);
-  const isVideo = activePost.mediaItems?.[0]?.type === 'video';
+  // Read the currently-viewed media index for this post so the rail reflects
+  // the active slide (photo vs video), not just the first media item.
+  const activeMediaIndex = carouselPositions.get(activeIndex) ?? 0;
+  const isVideo = activePost.mediaItems?.[activeMediaIndex]?.type === 'video';
 
   const tags = activePost.tags ?? [];
 
