@@ -43,6 +43,7 @@ export function FullscreenFeedOverlay() {
   const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
   const isOwnPost = !!(userId && activePost?.userId === userId);
   const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const { data: reviewerStats } = useReviewerStats(activePost?.userId);
 
   // Watch-progress tracking lives inside SnapFeed (the actual video host),
   // which the overlay renders below. Mounting it here as well would
