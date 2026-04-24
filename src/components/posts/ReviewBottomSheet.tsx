@@ -143,9 +143,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const statsSubLine = useMemo(() => {
     if (!reviewerStats) return '';
     const segs: string[] = [];
-    if (reviewerStats.coursesRated != null) segs.push(`${reviewerStats.coursesRated} courses`);
-    if (reviewerStats.averageRating != null) segs.push(`Avg ${reviewerStats.averageRating.toFixed(1)}`);
-    if (reviewerStats.memberSince) segs.push(`Since ${reviewerStats.memberSince}`);
+    if (reviewerStats.coursesRated != null) {
+      const noun = reviewerStats.coursesRated === 1 ? 'course' : 'courses';
+      segs.push(`${reviewerStats.coursesRated} ${noun}`);
+    }
+    // Hide the average when fewer than 3 courses — a single low rating would produce
+    // a misleading headline average.
+    if (
+      reviewerStats.averageRating != null &&
+      (reviewerStats.coursesRated ?? 0) >= 3
+    ) {
+      segs.push(`Avg ${reviewerStats.averageRating.toFixed(1)}`);
+    }
+    if (reviewerStats.memberSince) {
+      segs.push(`Reviewing since ${reviewerStats.memberSince}`);
+    }
     return segs.join(' · ');
   }, [reviewerStats]);
 

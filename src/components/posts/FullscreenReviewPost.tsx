@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -107,6 +106,10 @@ export function FullscreenReviewPost({
       rating,
       reviewId,
       reviewText,
+      // Preview mode — breakdown not wired to wizard state yet. Follow-up.
+      breakdown: null,
+      // Preview mode — no stats fetch (user hasn't published yet).
+      reviewerStats: null,
     });
   }, [openReviewSheet, user, courseId, courseName, rating, reviewId, reviewText]);
   
@@ -160,7 +163,6 @@ export function FullscreenReviewPost({
   const hasMultipleMedia = sortedMedia.length > 1;
   const currentMedia = sortedMedia[currentIndex];
   const tierData = getScoreTier(rating);
-  const theme = getReviewOverlayTheme(rating);
   
   // Video playback - only when renderMedia=true (we own the video element)
   useEffect(() => {
