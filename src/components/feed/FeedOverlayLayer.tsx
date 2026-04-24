@@ -4,7 +4,6 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { FeedActionRail } from './FeedActionRail';
 import { Z } from '@/config/zIndex';
-import { InlineReviewCard } from './InlineReviewCard';
 import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
