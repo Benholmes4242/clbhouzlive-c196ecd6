@@ -549,7 +549,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   >
                     {user.name}
                   </div>
-                  {statsSubLine && (
+                  {statsSubLine ? (
                     <div
                       style={{
                         marginTop: 2,
@@ -563,7 +563,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     >
                       {statsSubLine}
                     </div>
-                  )}
+                  ) : statsLoading ? (
+                    /* Stats sub-line shimmer placeholder while live query resolves */
+                    <div
+                      className="clb-shimmer-dark"
+                      aria-hidden
+                      style={{
+                        marginTop: 6,
+                        width: 140,
+                        height: 10,
+                        borderRadius: 4,
+                        background: 'rgba(255,255,255,0.06)',
+                        overflow: 'hidden',
+                      }}
+                    />
+                  ) : null}
                 </div>
                 {/* TODO: wire follow action — out of scope */}
                 <button
