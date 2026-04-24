@@ -339,20 +339,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     position: 'relative',
                   }}
                 >
-                  {/* Left — eyebrow + big number */}
+                  {/* Left — big number */}
                   <div>
-                    <div
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        letterSpacing: '1.5px',
-                        textTransform: 'uppercase',
-                        color: FROST.inkMuter,
-                        marginBottom: 6,
-                      }}
-                    >
-                      Overall
-                    </div>
                     <div
                       style={{
                         display: 'flex',
@@ -376,7 +364,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     </div>
                   </div>
 
-                  {/* Right — radial dial */}
+                  {/* Right — radial dial (ring only, no label) */}
                   <div style={{ position: 'relative', width: 74, height: 74, flexShrink: 0 }}>
                     <svg width={74} height={74} viewBox="0 0 74 74">
                       <defs>
@@ -406,21 +394,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         transform="rotate(-90 37 37)"
                       />
                     </svg>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: FROST.amberSoft,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {dialPercent}%
-                    </div>
                   </div>
                 </div>
 
