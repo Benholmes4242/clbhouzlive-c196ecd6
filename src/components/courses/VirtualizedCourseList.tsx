@@ -29,6 +29,7 @@ interface Course {
   longitude?: number | null;
   website_url?: string | null;
   average_rating?: number | null;
+  displayRank?: number;
 }
 
 interface VirtualizedCourseListProps {
@@ -81,7 +82,9 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   const cardModelMap = useMemo(() => {
     const map = new Map<string, ReturnType<typeof fromGolfCourse>>();
     for (const course of courses) {
-      map.set(course.id, fromGolfCourse(course));
+      const model = fromGolfCourse(course);
+      if (course.displayRank != null) model.displayRank = course.displayRank;
+      map.set(course.id, model);
     }
     return map;
   }, [courses]);
