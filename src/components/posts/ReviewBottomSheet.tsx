@@ -94,6 +94,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
           {/* Sheet */}
           <motion.div
             key="review-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="review-sheet-title"
             drag="y"
             dragConstraints={{ top: 0 }}
             dragElastic={{ top: 0, bottom: 0.3 }}
@@ -121,6 +124,24 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               borderBottom: 'none',
             }}
           >
+            {/* Visually-hidden accessible title for screen readers */}
+            <span
+              id="review-sheet-title"
+              style={{
+                position: 'absolute',
+                width: 1,
+                height: 1,
+                padding: 0,
+                margin: -1,
+                overflow: 'hidden',
+                clip: 'rect(0,0,0,0)',
+                whiteSpace: 'nowrap',
+                border: 0,
+              }}
+            >
+              Review of {courseName} by {user.name}
+            </span>
+
             {/* Amber accent bar */}
             <div style={{
               height: 2.5,
