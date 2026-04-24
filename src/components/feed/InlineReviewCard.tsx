@@ -253,16 +253,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               ...FROST_SCORE_GRADIENT,
             }}
           >
-            {formattedRating}
-          </span>
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: FROST.inkFaint,
-            }}
-          >
-            /10
+          {formattedRating}
           </span>
         </div>
       </div>

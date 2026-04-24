@@ -415,9 +415,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       >
                         {formattedRating}
                       </span>
-                      <span style={{ fontSize: 20, color: FROST.inkFaint, fontWeight: 500 }}>
-                        /10
-                      </span>
                     </div>
                   </div>
 
