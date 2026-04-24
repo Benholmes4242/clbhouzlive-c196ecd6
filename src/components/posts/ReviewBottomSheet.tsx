@@ -257,6 +257,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             aria-modal="true"
             aria-labelledby="review-sheet-title"
             drag="y"
+            dragListener={false}
+            dragControls={dragControls}
             dragConstraints={{ top: 0 }}
             dragElastic={{ top: 0, bottom: 0.3 }}
             onDragEnd={(_, info) => {
