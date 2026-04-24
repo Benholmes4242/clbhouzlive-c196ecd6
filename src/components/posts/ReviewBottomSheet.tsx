@@ -11,8 +11,10 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { UserCheck } from 'lucide-react';
+import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   FROST,
@@ -23,6 +25,10 @@ import {
 } from '@/lib/frostPanel';
 import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useIsFollowingUser } from '@/hooks/useIsFollowingUser';
+import { useFollowStore } from '@/store/followStore';
+import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
@@ -100,6 +106,57 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   // Same React Query key dedupes with any earlier fetch (e.g. tile mount).
   const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
+
+  // ─── Follow wiring ────────────────────────────────────────────
+  const { user: viewer } = useSupabaseSession();
+  const isOwnReview = !!viewer?.id && viewer.id === user.id;
+  const followEnabled = !isOwnReview && user.id !== 'preview' && !!viewer?.id;
+
+  const { data: serverIsFollowing } = useIsFollowingUser(
+    followEnabled ? viewer?.id : undefined,
+    followEnabled ? user.id : undefined,
+  );
+
+  const isFollowing = useFollowStore((s) => s.getFollowing(user.id, serverIsFollowing ?? false));
+  const setFollowing = useFollowStore((s) => s.setFollowing);
+
+  const followMutation = useFollowMutation();
+
+  const handleToggleFollow = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (isOwnReview || user.id === 'preview') return;
+      if (!viewer?.id) {
+        toast.error('Please sign in to follow users');
+        return;
+      }
+      if (followMutation.isPending) return;
+
+      const wasFollowing = isFollowing;
+      // Optimistic store update so all surfaces reflect the change immediately.
+      setFollowing(user.id, !wasFollowing);
+
+      followMutation.mutate(
+        {
+          targetUserId: user.id,
+          targetActorType: 'personal',
+          targetActorId: user.id,
+          currentUserId: viewer.id,
+          isFollowed: wasFollowing,
+        },
+        {
+          onError: () => {
+            setFollowing(user.id, wasFollowing);
+          },
+        },
+      );
+    },
+    [isFollowing, isOwnReview, user.id, viewer?.id, setFollowing, followMutation],
+  );
+
+  // ─── Drag scoping ─────────────────────────────────────────────
+  // Scope drag to header only so the scrollable middle scrolls without dismissing.
+  const dragControls = useDragControls();
 
   const handleVisitCourse = useCallback(() => {
     if (!courseId) return;
@@ -200,6 +257,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             aria-modal="true"
             aria-labelledby="review-sheet-title"
             drag="y"
+            dragListener={false}
+            dragControls={dragControls}
             dragConstraints={{ top: 0 }}
             dragElastic={{ top: 0, bottom: 0.3 }}
             onDragEnd={(_, info) => {
@@ -269,11 +328,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
             {/* ─── PINNED HEADER ─────────────────────────────── */}
             <div
+              onPointerDown={(e) => dragControls.start(e)}
               style={{
                 flex: '0 0 auto',
                 padding: '0 22px 18px',
                 position: 'relative',
                 zIndex: 1,
+                touchAction: 'none',
               }}
             >
               {/* Drag handle */}
@@ -579,24 +640,37 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     />
                   ) : null}
                 </div>
-                {/* TODO: wire follow action — out of scope */}
-                <button
-                  type="button"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: 99,
-                    background: 'rgba(255,255,255,0.10)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    color: FROST.ink,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  Follow
-                </button>
+                {!isOwnReview && user.id !== 'preview' && (
+                  <button
+                    type="button"
+                    onClick={handleToggleFollow}
+                    disabled={followMutation.isPending}
+                    aria-label={isFollowing ? `Unfollow ${user.name}` : `Follow ${user.name}`}
+                    aria-pressed={isFollowing}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 99,
+                      background: isFollowing
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(255,255,255,0.10)',
+                      border: `1px solid ${isFollowing ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.15)'}`,
+                      color: isFollowing ? FROST.inkMute : FROST.ink,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: followMutation.isPending ? 'default' : 'pointer',
+                      opacity: followMutation.isPending ? 0.6 : 1,
+                      fontFamily: 'inherit',
+                      flexShrink: 0,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      transition: 'background 150ms ease, color 150ms ease, border-color 150ms ease',
+                    }}
+                  >
+                    {isFollowing && <UserCheck size={12} strokeWidth={2.5} />}
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                )}
               </div>
 
               {/* CTAs */}
