@@ -164,7 +164,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             courseRegion={activePost.review.courseRegion}
             courseCountry={activePost.review.courseCountry}
             courseSubCountry={activePost.review.courseSubCountry}
-            reviewText={activePost.review.reviewText ?? activePost.caption ?? null}
+            reviewText={activePost.review.reviewText ?? null}
             reviewer={{
               name: activePost.displayName,
               avatar: activePost.avatarUrl,

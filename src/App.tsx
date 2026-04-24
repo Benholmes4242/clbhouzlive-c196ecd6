@@ -43,6 +43,7 @@ import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { GlobalPostStudio } from '@/components/post-studio/GlobalPostStudio';
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
+import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPortal';
 import { CourseMediaViewer } from '@/components/course-media-tab/CourseMediaViewer';
 import { MediaViewerOverlay } from '@/components/shared/MediaViewerOverlay';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
@@ -695,6 +696,8 @@ const AppInner: React.FC = () => {
                                             <FullscreenFeedOverlay />
                                             <CourseMediaViewer />
                                             <MediaViewerOverlay />
+                                            {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
+                                            <ReviewBottomSheetPortal />
                                           </UploadResilienceProvider>
                                           </MessagingProvider>
                                         </AuthWrapper>

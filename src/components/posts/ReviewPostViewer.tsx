@@ -8,13 +8,14 @@
  *
  * Renders:
  * - Media carousel (if renderMedia=true)
- * - Bottom inline review capsule (tap → opens ReviewBottomSheet)
+ * - Bottom inline review capsule (tap → opens ReviewBottomSheet via store)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { FullscreenReviewPost, FullscreenReviewPostProps, ReviewMediaItem } from './FullscreenReviewPost';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
-import { ReviewBottomSheet } from './ReviewBottomSheet';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 
 interface ReviewCreator {
   id: string;
@@ -78,10 +79,37 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
   rating,
   ...fullscreenProps
 }) => {
-  const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
 
-  const handleOpenSheet = useCallback(() => setIsReviewSheetOpen(true), []);
-  const handleCloseSheet = useCallback(() => setIsReviewSheetOpen(false), []);
+  const handleOpenSheet = useCallback(() => {
+    openReviewSheet({
+      user: {
+        id: creator.id,
+        name: creator.name,
+        username: creator.username,
+        avatar: creator.avatar,
+      },
+      courseId,
+      courseName,
+      rating,
+      reviewId: sourceReviewId,
+      courseCountry,
+      courseRegion,
+      courseSubCountry,
+      reviewText,
+    });
+  }, [
+    openReviewSheet,
+    creator,
+    courseId,
+    courseName,
+    rating,
+    sourceReviewId,
+    courseCountry,
+    courseRegion,
+    courseSubCountry,
+    reviewText,
+  ]);
 
   // Build review data for capsule
   const reviewData = {
@@ -89,7 +117,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
     courseName,
     courseLocation: heroSubtitle || '',
     rating,
-    tierLabel: '',
+    tierLabel: getRatingTierLabel(rating),
     sourceReviewId: sourceReviewId || '',
     reviewText: reviewText || null,
     courseCountry,
@@ -98,50 +126,34 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
   };
 
   return (
-    <>
-      <FullscreenReviewPost
-        mode={mode}
-        courseId={courseId}
-        courseName={courseName}
-        heroSubtitle={heroSubtitle}
-        rating={rating}
-        user={creator}
-        {...fullscreenProps}
-      >
-        {/* Bottom review capsule - only show in live mode when enabled */}
-        {showReviewCapsule && mode === 'live' && (
-          <CreatorCapsule
-            user={creator}
-            isReview={true}
-            reviewData={reviewData as any}
-            onReviewTap={handleOpenSheet}
-            isVisible={true}
-            // Required props (not shown in review mode)
-            caption=""
-            golfCourse={null}
-            isFollowing={false}
-            isOwnPost={false}
-          />
-        )}
+    <FullscreenReviewPost
+      mode={mode}
+      courseId={courseId}
+      courseName={courseName}
+      heroSubtitle={heroSubtitle}
+      rating={rating}
+      user={creator}
+      {...fullscreenProps}
+    >
+      {/* Bottom review capsule - only show in live mode when enabled */}
+      {showReviewCapsule && mode === 'live' && (
+        <CreatorCapsule
+          user={creator}
+          isReview={true}
+          reviewData={reviewData as any}
+          onReviewTap={handleOpenSheet}
+          isVisible={true}
+          // Required props (not shown in review mode)
+          caption=""
+          golfCourse={null}
+          isFollowing={false}
+          isOwnPost={false}
+        />
+      )}
 
-        {/* Custom children (e.g., preview CTA bar) */}
-        {children}
-      </FullscreenReviewPost>
-
-      <ReviewBottomSheet
-        isOpen={isReviewSheetOpen}
-        onClose={handleCloseSheet}
-        user={creator}
-        courseId={courseId}
-        courseName={courseName}
-        rating={rating}
-        reviewId={sourceReviewId}
-        courseCountry={courseCountry}
-        courseRegion={courseRegion}
-        courseSubCountry={courseSubCountry}
-        reviewText={reviewText}
-      />
-    </>
+      {/* Custom children (e.g., preview CTA bar) */}
+      {children}
+    </FullscreenReviewPost>
   );
 };
 

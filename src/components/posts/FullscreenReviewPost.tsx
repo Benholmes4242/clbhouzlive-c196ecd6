@@ -1,18 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RatingPill } from '@/components/ui/RatingPill';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
-import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 // Respect reduced motion preference
 const prefersReducedMotion = typeof window !== 'undefined' 
   ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
@@ -96,38 +92,23 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
-  
-  const navigate = useNavigate();
-  
-  // Controlled sheet state for review bottom sheet
-  const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
 
-  const handleOpenReviewSheet = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    setIsReviewSheetOpen(true);
-  }, [courseId, courseName, reviewId]);
-  
-  const handleCloseReviewSheet = useCallback(() => {
-    
-    setIsReviewSheetOpen(false);
-    // No navigation - user stays on Clubhouse
-  }, []);
-  
-  const handleViewCourse = useCallback(() => {
-    handleCloseReviewSheet();
-    navigate(`/courses/${courseId}`);
-  }, [courseId, navigate, handleCloseReviewSheet]);
-  
-  const handleReadFullReview = useCallback(() => {
-    handleCloseReviewSheet();
-    // Navigate to course reviews tab with reviewId for deep linking (same as CreatorCapsule)
-    if (reviewId) {
-      navigate(`/courses/${courseId}?tab=reviews&review=${reviewId}`);
-    } else {
-      navigate(`/courses/${courseId}?tab=reviews`);
-    }
-  }, [courseId, reviewId, navigate, handleCloseReviewSheet]);
+  const handleOpenReviewSheet = useCallback(() => {
+    openReviewSheet({
+      user: {
+        id: 'preview',
+        name: user?.name ?? 'You',
+        username: user?.username,
+        avatar: user?.avatar,
+      },
+      courseId,
+      courseName,
+      rating,
+      reviewId,
+      reviewText,
+    });
+  }, [openReviewSheet, user, courseId, courseName, rating, reviewId, reviewText]);
   
   // All ratings now use amber/gold styling (unified system)
   
@@ -349,7 +330,7 @@ export function FullscreenReviewPost({
             tierLabel: tierData.label,
             sourceReviewId: reviewId || '',
           }}
-          onReviewTap={() => handleOpenReviewSheet({} as React.MouseEvent)}
+          onReviewTap={handleOpenReviewSheet}
           isVisible={true}
           caption={reviewText ?? ''}
           golfCourse={null}
@@ -358,134 +339,7 @@ export function FullscreenReviewPost({
           bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 56px)"
         />
       ) : null}
-      
-      {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
-      <BottomSheet 
-        open={isReviewSheetOpen} 
-        onClose={handleCloseReviewSheet}
-        className="h-[70vh]"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
-          backdropFilter: 'blur(50px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(50px) saturate(180%)',
-          border: '0.5px solid rgba(255,255,255,0.2)',
-          boxShadow: '0 -8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
-        }}
-      >
-        <div className="flex flex-col h-full px-6 pb-6 overflow-hidden">
-          {/* Header: Course info */}
-          <div className="flex flex-col gap-1 mb-5 pt-2">
-            <h2 className="text-xl font-semibold text-white truncate">{courseName}</h2>
-            {heroSubtitle && (
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
-                <span className="text-sm text-white/50 truncate">{heroSubtitle}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Rating - large centered number with dynamic color */}
-          <div className="flex flex-col items-center justify-center mb-4">
-            <span 
-              className="text-5xl font-bold"
-              style={{ color: '#f59e0b' }}
-            >
-              {rating === 10 ? '10' : rating.toFixed(1)}
-            </span>
-            <span 
-              className="text-sm font-semibold uppercase tracking-wider mt-1"
-              style={{ color: 'rgba(245, 158, 11, 0.8)' }}
-            >
-              {tierData.label}
-            </span>
-          </div>
-
-          {/* Review Text - Scrollable with glass card and fade effect */}
-          {reviewText && (
-            <div 
-              className="flex-1 min-h-0 mb-4 overflow-hidden"
-              style={{
-                maskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
-              }}
-            >
-              <ScrollArea className="h-full">
-                <div 
-                  className="rounded-2xl p-4"
-                  style={{
-                    background: 'rgba(0,0,0,0.15)',
-                    border: '0.5px solid rgba(255,255,255,0.1)',
-                  }}
-                >
-                  <p className="text-white/90 text-base leading-relaxed whitespace-pre-wrap">
-                    "{reviewText}"
-                  </p>
-                </div>
-                {/* Bottom spacer so text can scroll above the fade */}
-                <div className="h-8" />
-              </ScrollArea>
-            </div>
-          )}
-          
-          {/* No review text placeholder */}
-          {!reviewText && (
-            <div className="flex-1 min-h-0 mb-4 flex items-center justify-center">
-              <p className="text-white/40 text-sm italic">No written review</p>
-            </div>
-          )}
-
-          {/* CTAs - Glass style buttons */}
-          <div className="flex gap-3 mb-4" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
-            <button
-              onClick={handleViewCourse}
-              className="flex-1 py-3.5 rounded-xl font-medium text-sm text-white/80 transition-all active:scale-[0.98]"
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                border: '0.5px solid rgba(255,255,255,0.15)',
-              }}
-            >
-              View Course
-            </button>
-            <button
-              onClick={handleReadFullReview}
-              className="flex-1 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 transition-all active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
-                boxShadow: '0 4px 14px rgba(251,191,36,0.25)',
-                color: '#000',
-              }}
-            >
-              Read Full Review
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Attribution */}
-          {user && (
-            <div className="flex items-center justify-center gap-2 text-white/40 text-sm">
-              {user.avatar && (
-                <SquircleAvatar
-                  size={20}
-                  src={user.avatar}
-                  alt={user.name || 'Golfer'}
-                  fallback={(user.name || 'G').charAt(0)}
-                  hideRing
-                />
-              )}
-              <span>Review by {user.name || 'Golfer'}</span>
-            </div>
-          )}
-          
-          {/* Preview mode helper text */}
-          {mode === 'preview' && (
-            <div className="pt-3 border-t border-white/10 mt-2">
-              <p className="text-xs text-white/40 text-center">
-                This is how your post will look in Clubhouse + Profile.
-              </p>
-            </div>
-          )}
-        </div>
-      </BottomSheet>
+      {/* Inner review bottom sheet removed — now rendered via root-level ReviewBottomSheetPortal */}
       
       {/* Bottom-left user capsule - matches CreatorCapsule styling from Clubhouse (hidden in preview mode) */}
       {user && mode !== 'preview' && !hideUserCapsule && (

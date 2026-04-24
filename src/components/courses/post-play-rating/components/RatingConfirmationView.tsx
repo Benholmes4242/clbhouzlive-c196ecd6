@@ -6,7 +6,6 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { FullscreenReviewPost, type ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
-import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { PreviewCTAButtons } from '@/components/ratings/PreviewCTAButtons';
 import type { RatingConfirmationViewProps, ExistingMedia, ShareState } from '../types';
 
@@ -120,17 +119,7 @@ const RatingConfirmationView = React.memo(function RatingConfirmationView(props:
           onBack={onBack}
           dotsBottomOffset={80}
         >
-          {/* Bottom panel */}
-          <ReviewBottomPanel
-            user={{ 
-              id: userProfile?.id || user?.id || 'me', 
-              name: userProfile?.display_name || userProfile?.username || user?.user_metadata?.full_name || user?.user_metadata?.name || 'You',
-              username: userProfile?.username || user?.user_metadata?.username,
-              avatar: userProfile?.profile_photo_url ?? user?.user_metadata?.avatar_url,
-            }}
-            courseId={courseId}
-            rating={userRating}
-          />
+          {/* ReviewBottomPanel removed — was a no-op stub. Sheet now rendered via root-level ReviewBottomSheetPortal. */}
           
           {/* CTA buttons */}
           <PreviewCTAButtons
