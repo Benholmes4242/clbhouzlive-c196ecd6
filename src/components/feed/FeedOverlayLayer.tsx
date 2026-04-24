@@ -71,6 +71,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
   const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
+  const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
 
   const handleToggleMute = useCallback(() => {
     if (isMuted) markUserGestureUnmute();
