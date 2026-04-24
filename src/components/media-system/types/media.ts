@@ -466,6 +466,11 @@ export interface FeedRpcRow {
   creator_show_handicap?: boolean | null;
   creator_home_club?: string | null;
   creator_home_club_visibility?: string | null;
+  // Review breakdown sub-scores (PR 3 — optional, null when missing)
+  review_design_score?: number | null;
+  review_condition_score?: number | null;
+  review_facilities_score?: number | null;
+  review_clubhouse_score?: number | null;
 }
 
 /** Timing constants */
