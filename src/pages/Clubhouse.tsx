@@ -274,6 +274,7 @@ const ClubhouseContent = () => {
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = useState(false);
   const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const { data: reviewerStats } = useReviewerStats(activePost?.userId);
 
   useEffect(() => {
     if (seasonRecap) {
@@ -301,8 +302,10 @@ const ClubhouseContent = () => {
       courseRegion: activeReview.courseRegion,
       courseSubCountry: activeReview.courseSubCountry,
       reviewText: activeReview.reviewText,
+      breakdown: activeReview.breakdown ?? null,
+      reviewerStats: reviewerStats ?? null,
     });
-  }, [activeReview, activePost, openReviewSheet]);
+  }, [activeReview, activePost, openReviewSheet, reviewerStats]);
 
   const showRehydrationSkeleton = isRehydrating;
 
