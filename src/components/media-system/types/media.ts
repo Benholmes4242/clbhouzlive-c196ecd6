@@ -25,6 +25,13 @@ export interface ReviewData {
   courseCountry?: string | null;
   courseSubCountry?: string | null;
   reviewText?: string | null;
+  /** Optional breakdown sub-scores. Each may be null if the user skipped that breakdown. */
+  breakdown?: {
+    design: number | null;
+    conditions: number | null;
+    clubhouse: number | null;
+    facilities: number | null;
+  } | null;
 }
 
 /** Creator relationship to current user */
