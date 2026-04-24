@@ -160,11 +160,8 @@ export function useSubmitRating({
       });
 
       // Invalidate all related queries via shared helper
+      // (profile-posts and actor-posts are now in the helper too)
       invalidateCourseRatingCaches(queryClient);
-
-      // Invalidate profile posts so new reviews appear immediately
-      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
 
       // Force immediate refetch of active profile queries
       await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
