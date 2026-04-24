@@ -225,7 +225,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             </span>
             {formattedRating.includes('.') && (
               <span style={{ letterSpacing: '-0.5px' }}>
-                .{formattedRating.split('.')[1]}
+                <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
+                {formattedRating.split('.')[1]}
               </span>
             )}
           </span>
