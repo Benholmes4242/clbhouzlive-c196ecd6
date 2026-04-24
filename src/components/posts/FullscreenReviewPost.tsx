@@ -107,6 +107,8 @@ export function FullscreenReviewPost({
       rating,
       reviewId,
       reviewText,
+      // Preview mode: no reviewer stats fetch (the user hasn't published yet).
+      reviewerStats: null,
     });
   }, [openReviewSheet, user, courseId, courseName, rating, reviewId, reviewText]);
   

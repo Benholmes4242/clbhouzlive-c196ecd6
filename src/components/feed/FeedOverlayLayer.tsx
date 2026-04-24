@@ -8,6 +8,7 @@ import { InlineReviewCard } from './InlineReviewCard';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 interface FeedOverlayLayerProps {
   posts: FeedPost[];
@@ -35,6 +36,12 @@ interface FeedOverlayLayerProps {
     courseRegion?: string | null;
     courseSubCountry?: string | null;
     reviewText?: string | null;
+    breakdown?: {
+      design: number | null;
+      conditions: number | null;
+      clubhouse: number | null;
+      facilities: number | null;
+    } | null;
   } | null;
   isActiveReview?: boolean;
   activeIndexOverride?: number;
@@ -145,34 +152,12 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
       {/* Inline Review Card — renders in the bottom slot for review posts */}
       {activePost.isReview && activePost.review && (
-        <div
-          style={{
-            position: 'fixed',
-            left: 16,
-            right: 80, // leave room for action rail
-            bottom:
-              bottomOffset !== undefined
-                ? `${bottomOffset + 20}px`
-                : 'calc(var(--bottom-nav-height, 88px) + 20px)',
-            zIndex: Z.echo,
-            pointerEvents: overlayVisible ? 'auto' : 'none',
-          }}
-        >
-          <InlineReviewCard
-            courseName={activePost.review.courseName}
-            rating={activePost.review.rating}
-            courseRegion={activePost.review.courseRegion}
-            courseCountry={activePost.review.courseCountry}
-            courseSubCountry={activePost.review.courseSubCountry}
-            reviewText={activePost.review.reviewText ?? null}
-            reviewer={{
-              name: activePost.displayName,
-              avatar: activePost.avatarUrl,
-            }}
-            isVisible={overlayVisible}
-            onTap={() => onReviewTap?.()}
-          />
-        </div>
+        <ReviewOverlaySlot
+          activePost={activePost}
+          overlayVisible={overlayVisible}
+          bottomOffset={bottomOffset}
+          onReviewTap={onReviewTap}
+        />
       )}
 
       {/* Bottom-left content slot (regular posts) — author + caption + course pill.

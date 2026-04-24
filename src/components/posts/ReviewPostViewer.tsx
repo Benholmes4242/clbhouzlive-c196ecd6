@@ -15,6 +15,7 @@ import React, { useCallback } from 'react';
 import { FullscreenReviewPost, FullscreenReviewPostProps, ReviewMediaItem } from './FullscreenReviewPost';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 
 interface ReviewCreator {
