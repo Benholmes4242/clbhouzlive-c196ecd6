@@ -410,6 +410,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           fontWeight: 800,
                           letterSpacing: '-4px',
                           lineHeight: 0.85,
+                          paddingRight: 6,
                           ...FROST_SCORE_GRADIENT,
                         }}
                       >
