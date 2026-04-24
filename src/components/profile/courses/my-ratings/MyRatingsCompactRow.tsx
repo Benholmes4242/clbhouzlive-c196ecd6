@@ -50,16 +50,23 @@ const MyRatingsCompactRow: React.FC<MyRatingsCompactRowProps> = ({
   rank,
   onCourseClick,
 }) => {
+  const navigate = useNavigate();
   const dateIso = course.review_date ?? course.last_played_at ?? null;
   const dateText = formatDate(dateIso);
   const country = course.country ?? '';
   const { int, dec } = splitRating(course.rating_value);
 
-  const tierBits: { key: string; label: string; tier: string }[] = [
-    { key: 'd', label: 'Design', tier: getCategoryTierLabel(course.design_score) },
-    { key: 'c', label: 'Cond.', tier: getCategoryTierLabel(course.condition_score) },
-    { key: 'k', label: 'Club.', tier: getCategoryTierLabel(course.clubhouse_score) },
-    { key: 'f', label: 'Fac.', tier: getCategoryTierLabel(course.facilities_score) },
+  const hasAnyBreakdown =
+    course.design_score != null ||
+    course.condition_score != null ||
+    course.clubhouse_score != null ||
+    course.facilities_score != null;
+
+  const breakdownCells: { key: string; label: string; score: number | null }[] = [
+    { key: 'd', label: 'DESIGN', score: course.design_score },
+    { key: 'c', label: 'COND.', score: course.condition_score },
+    { key: 'k', label: 'CLUB.', score: course.clubhouse_score },
+    { key: 'f', label: 'FAC.', score: course.facilities_score },
   ];
 
   return (
