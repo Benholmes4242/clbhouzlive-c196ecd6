@@ -4,7 +4,7 @@
  * PR 2 (Frost Panel redesign): glass morphism + amber accents + tier pill.
  * Composition (top → bottom):
  *   1. Tier pill (replaces ★ COURSE REVIEW chip)
- *   2. Title row — course name + subtitle / score + "/10"
+ *   2. Title row — course name + subtitle / score
  *   3. Breakdown bars (conditional, when `breakdown` prop populated by PR 3)
  *   4. Author row — avatar + name + "N rated" (conditional) / date
  *
@@ -253,16 +253,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               ...FROST_SCORE_GRADIENT,
             }}
           >
-            {formattedRating}
-          </span>
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: FROST.inkFaint,
-            }}
-          >
-            /10
+          {formattedRating}
           </span>
         </div>
       </div>
