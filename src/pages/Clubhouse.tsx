@@ -44,7 +44,7 @@ import type { FeedPost, PGACardFeedPost, CourseOfWeekCardFeedPost } from '@/comp
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
-import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -273,7 +273,7 @@ const ClubhouseContent = () => {
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = useState(false);
-  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
 
   useEffect(() => {
     if (seasonRecap) {
@@ -285,9 +285,24 @@ const ClubhouseContent = () => {
 
   // ── Review tap handler ──
   const handleReviewTap = useCallback(() => {
-    if (!activeReview) return;
-    setReviewSheetOpen(true);
-  }, [activeReview]);
+    if (!activeReview || !activePost) return;
+    openReviewSheet({
+      user: {
+        id: activePost.userId ?? '',
+        name: activePost.displayName ?? '',
+        username: activePost.username,
+        avatar: activePost.avatarUrl,
+      },
+      courseId: activeReview.courseId ?? '',
+      courseName: activeReview.courseName ?? '',
+      rating: activeReview.rating ?? 0,
+      reviewId: activeReview.reviewId,
+      courseCountry: activeReview.courseCountry,
+      courseRegion: activeReview.courseRegion,
+      courseSubCountry: activeReview.courseSubCountry,
+      reviewText: activeReview.reviewText,
+    });
+  }, [activeReview, activePost, openReviewSheet]);
 
   const showRehydrationSkeleton = isRehydrating;
 
@@ -532,25 +547,7 @@ const ClubhouseContent = () => {
         />
       )}
 
-      {/* Review Bottom Sheet */}
-      <ReviewBottomSheet
-        isOpen={reviewSheetOpen}
-        onClose={() => setReviewSheetOpen(false)}
-        user={{
-          id: activePost?.userId ?? '',
-          name: activePost?.displayName ?? '',
-          username: activePost?.username,
-          avatar: activePost?.avatarUrl,
-        }}
-        courseId={activeReview?.courseId ?? ''}
-        courseName={activeReview?.courseName ?? ''}
-        rating={activeReview?.rating ?? 0}
-        reviewId={activeReview?.reviewId}
-        courseCountry={activeReview?.courseCountry}
-        courseRegion={activeReview?.courseRegion}
-        courseSubCountry={activeReview?.courseSubCountry}
-        reviewText={activeReview?.reviewText}
-      />
+      {/* Review Bottom Sheet now renders via root-level ReviewBottomSheetPortal */}
     </PageRoot>
   );
 };
