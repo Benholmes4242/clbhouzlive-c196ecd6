@@ -730,7 +730,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           {/* C9 — Summary meta row: [RegionPill (popover trigger)] ··· [X of 100 · Y%] */}
           <div className="flex items-center justify-between">
             {/* C5 — Region selector popover */}
-            <Popover open={regionPopoverOpen} onOpenChange={setRegionPopoverOpen}>
+            <Popover open={regionPopoverOpen} onOpenChange={setRegionPopoverOpen} modal>
               <PopoverTrigger asChild>
                 <button
                   aria-label={`Region: ${({ global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' } as Record<Top100MapScope, string>)[scope]}. Tap to change.`}
