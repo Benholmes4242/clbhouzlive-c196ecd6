@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
