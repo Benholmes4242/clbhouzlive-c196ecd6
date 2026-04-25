@@ -162,13 +162,14 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         }}
       />
 
-      {/* Atmospheric watermark — Playfair score behind content */}
+      {/* Atmospheric watermark — Playfair score behind content, vertically centered */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
           right: -12,
-          bottom: -56,
+          top: '50%',
+          transform: 'translateY(-50%)',
           fontFamily: FONTS.serifDisplay,
           fontSize: 200,
           fontWeight: 900,
