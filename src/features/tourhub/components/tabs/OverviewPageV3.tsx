@@ -20,7 +20,7 @@ import {
   LiveRightNow,
 } from '../overview-v3';
 import { ComingUpCalendar } from '../ComingUpCalendar';
-import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
+import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
 import { AllToursTicker } from '../AllToursTicker';
 import { IntelligenceHero } from '../IntelligenceHero';
@@ -105,7 +105,7 @@ export function OverviewPageV3() {
               <StatOfTheWeek />
             </LazySection>
             <LazySection minHeight={350}>
-              <CollegeRankingsPreview />
+              <CollegeRivalry />
             </LazySection>
           </div>
         </div>
