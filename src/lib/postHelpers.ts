@@ -6,6 +6,7 @@
 
 import { getRatingTheme, type RatingTheme, COURSE_RATING_THEMES } from './globalAchievementMilestoneSystem';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { getRatingTier, type RatingTier } from '@/lib/ratingTier';
 
 /**
  * Determines if a post is a review post (created via Review Wizard with rating).
@@ -66,20 +67,30 @@ const amberOverlay: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   overlayText: '#FFFFFF',
 };
 
-const tierOverlayThemes: Record<string, Omit<ReviewOverlayTheme, keyof RatingTheme>> = {
+const tierOverlayThemes = {
+  exceptional: amberOverlay,
   outstanding: amberOverlay,
   excellent: amberOverlay,
   veryGood: amberOverlay,
   good: amberOverlay,
   fair: amberOverlay,
+} satisfies Record<string, Omit<ReviewOverlayTheme, keyof RatingTheme>>;
+
+// Canonical tier → overlay key mapping. TypeScript exhaustiveness on
+// Record<RatingTier, …> guarantees every canonical tier has an overlay row,
+// eliminating silent demotion (the Phase 1.5 audit bug where >= 9 capped at
+// 'outstanding' and dropped Exceptional ratings).
+const RATING_TIER_TO_OVERLAY_KEY: Record<RatingTier, keyof typeof tierOverlayThemes> = {
+  'EXCEPTIONAL': 'exceptional',
+  'OUTSTANDING': 'outstanding',
+  'EXCELLENT': 'excellent',
+  'VERY GOOD': 'veryGood',
+  'GOOD': 'good',
+  'FAIR': 'fair',
 };
 
-function getTierKey(score: number): string {
-  if (score >= 9) return 'outstanding';
-  if (score >= 8) return 'excellent';
-  if (score >= 7) return 'veryGood';
-  if (score >= 6) return 'good';
-  return 'fair';
+function getTierKey(score: number): keyof typeof tierOverlayThemes {
+  return RATING_TIER_TO_OVERLAY_KEY[getRatingTier(score)];
 }
 
 /**
