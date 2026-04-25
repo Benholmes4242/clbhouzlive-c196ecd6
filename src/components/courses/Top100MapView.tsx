@@ -9,7 +9,7 @@ import {
   Top100MapCourse,
   CourseJourneyStatus,
 } from '@/hooks/useTop100MapCourses';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
@@ -600,67 +600,53 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Back button — matches Course Details style */}
+        {/* Back button — 44px circle with optional progress ring */}
         <button
           onClick={() => onClose ? onClose() : navigate(-1)}
-          className="fixed left-4 z-40 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all"
+          className="fixed left-4 z-40 flex items-center justify-center active:scale-95 transition-transform"
           style={{
             top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
-            borderRadius: '12px',
-            background: 'rgba(0, 0, 0, 0.28)',
-            backdropFilter: 'blur(22px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: 'rgba(15,23,42,0.55)',
+            backdropFilter: 'blur(14px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(14px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+            position: 'fixed' as const,
           }}
           aria-label="Go back"
         >
-          <svg className="h-[18px] w-[18px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-
-        {/* Legend badges — dynamic season color */}
-        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[calc(max(env(safe-area-inset-top,0px),47px)+12px)]">
-          <div 
-            className="pointer-events-auto flex items-center gap-2 w-fit ml-auto"
-            role="group"
-            aria-label="Map legend"
-          >
-            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span 
-                className="inline-block h-2.5 w-2.5 rounded-full shadow-sm" 
-                style={{ backgroundColor: PLAYED_COLOR }}
-                aria-hidden="true" 
+          {/* Progress ring — SVG circle, only renders when user has progress */}
+          {progressPercent > 0 && (
+            <svg
+              width="50"
+              height="50"
+              style={{ position: 'absolute' as const, inset: -3, pointerEvents: 'none' as const }}
+              aria-hidden="true"
+            >
+              <circle
+                cx="25"
+                cy="25"
+                r="23"
+                fill="none"
+                stroke={seasonColor}
+                strokeWidth="2"
+                strokeDasharray={`${(progressPercent / 100) * 144.51} 144.51`}
+                strokeLinecap="round"
+                transform="rotate(-90 25 25)"
               />
-              <span className="text-[11px] font-medium text-white/90">Played</span>
-            </div>
-            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: WANT_TO_PLAY_COLOR }} aria-hidden="true" />
-              <span className="text-[11px] font-medium text-white/90">Want to Play</span>
-            </div>
-            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/65 bg-transparent" aria-hidden="true" />
-              <span className="text-[11px] font-medium text-white/90">Not Played</span>
-            </div>
-          </div>
-        </div>
+            </svg>
+          )}
+          <ChevronLeft className="h-[20px] w-[20px] text-white" strokeWidth={2.4} />
+        </button>
 
         {/* Bottom-right control stack — hides when course sheet is open */}
         <div className={cn(
           "pointer-events-none absolute right-3 bottom-52 z-20 flex flex-col items-center gap-2.5 transition-all duration-300",
           selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
         )}>
-          <div className="pointer-events-auto">
-            <MapProgressOrb
-              playedCount={ratedCount}
-              totalCount={officialTotal}
-              scope={scope}
-              seasonColor={seasonColor}
-              onMilestoneClick={() => navigate('/top100?tab=my-progress')}
-            />
-          </div>
-          
           <div className="pointer-events-auto flex flex-col gap-2">
             <div 
               className="glass-card flex flex-col rounded-xl overflow-hidden"
