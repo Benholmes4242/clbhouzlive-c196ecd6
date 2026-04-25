@@ -63,8 +63,8 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
         padding: '12px 18px',
         borderRight: isLast ? 'none' : '1px solid rgba(255,255,255,0.06)',
         textAlign: 'left',
-        background: isActive ? 'rgba(247,147,30,0.10)' : 'transparent',
-        outline: isActive ? '1.5px solid #F7931E' : '1px solid transparent',
+        background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
+        outline: isActive ? '1.5px solid #FFFFFF' : '1px solid transparent',
         outlineOffset: -1,
         color: 'inherit',
         cursor: 'pointer',
@@ -73,24 +73,6 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
       }}
       aria-pressed={isActive}
     >
-      {/* "NOW SHOWING" label — top-right of active card */}
-      {isActive && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 12,
-            fontSize: 8,
-            fontWeight: 900,
-            color: '#F7931E',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            lineHeight: 1,
-          }}
-        >
-          Now Showing
-        </div>
-      )}
 
       {/* Tour pill + tournament name */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
