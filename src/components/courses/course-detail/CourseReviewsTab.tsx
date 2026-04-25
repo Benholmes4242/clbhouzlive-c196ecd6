@@ -265,6 +265,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     if (!ratingFilter) return reviews;
     return reviews.filter((r) => {
       const tierData = getScoreTier(r.rating);
+      // The Outstanding chip covers both Outstanding (9.0-9.4) and Exceptional (≥9.5),
+      // matching the server-side range filter '10-9' on useCourseReviews.
+      if (ratingFilter === 'outstanding') {
+        return tierData.tier === 'outstanding' || tierData.tier === 'exceptional';
+      }
       return tierData.tier === ratingFilter;
     });
   }, [reviews, ratingFilter]);
