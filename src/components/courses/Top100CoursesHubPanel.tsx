@@ -6,7 +6,7 @@ import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/u
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Search, Award, X, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
