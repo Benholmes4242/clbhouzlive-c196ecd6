@@ -13,7 +13,7 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
@@ -30,6 +30,7 @@ import { StatOfTheWeek } from '../StatOfTheWeek';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useLiveRightNow } from '../../hooks/useOverviewModules';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -47,6 +48,33 @@ export function OverviewPageV3() {
 
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
+
+  // ── Phase A: Hero ↔ Ticker shared active-tournament state ──
+  // The Ticker now drives the Hero (tap a live tournament card → Hero swaps).
+  // Auto-rotation continues until the user makes an explicit Ticker selection,
+  // which terminally pauses rotation until the page is left and re-entered.
+  const { data: liveTournaments } = useLiveRightNow();
+  const [activeTournamentId, setActiveTournamentId] = useState<string | null>(null);
+  const [autoRotate, setAutoRotate] = useState(true);
+
+  // Initial active tournament — first live tournament once data loads
+  useEffect(() => {
+    if (!activeTournamentId && liveTournaments && liveTournaments.length > 0) {
+      setActiveTournamentId(liveTournaments[0].id);
+    }
+  }, [liveTournaments, activeTournamentId]);
+
+  // Ticker tap: swap Hero + terminally pause auto-rotation (no resume)
+  const handleTickerSelect = useCallback((tournamentId: string) => {
+    setActiveTournamentId(tournamentId);
+    setAutoRotate(false);
+  }, []);
+
+  // Hero auto-rotate / swipe: keep Ticker "NOW SHOWING" in sync (do NOT touch autoRotate)
+  const handleHeroActiveChange = useCallback((tournamentId: string) => {
+    setActiveTournamentId(tournamentId);
+  }, []);
+
 
   return (
     <>
