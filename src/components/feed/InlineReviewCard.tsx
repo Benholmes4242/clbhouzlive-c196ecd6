@@ -162,13 +162,14 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         }}
       />
 
-      {/* Atmospheric watermark — Playfair score behind content */}
+      {/* Atmospheric watermark — Playfair score behind content, vertically centered */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
           right: -12,
-          bottom: -56,
+          top: '50%',
+          transform: 'translateY(-50%)',
           fontFamily: FONTS.serifDisplay,
           fontSize: 200,
           fontWeight: 900,
@@ -301,7 +302,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           </div>
         )}
 
-        {/* Compressed breakdown row — abbreviated labels */}
+        {/* Compressed breakdown row — abbreviated labels, evenly spaced */}
         {breakdownEntries.length > 0 && (
           <div
             style={{
@@ -313,45 +314,40 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               marginBottom: 12,
               display: 'flex',
               alignItems: 'baseline',
-              flexWrap: 'wrap',
-              gap: 0,
+              justifyContent: 'space-between',
+              gap: 8,
               fontSize: 11,
               color: FROST.inkMute,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '0.3px',
             }}
           >
-            {breakdownEntries.map(({ key, value }, i) => (
-              <React.Fragment key={key}>
-                <span style={{ display: 'inline-flex', gap: 5, alignItems: 'baseline' }}>
-                  <span
-                    style={{
-                      fontWeight: 700,
-                      color: FROST.inkMuter,
-                      letterSpacing: '0.5px',
-                      textTransform: 'uppercase',
-                      fontSize: 10,
-                    }}
-                  >
-                    {TILE_LABELS_SHORT[key]}
-                  </span>
-                  <span style={{ fontWeight: 700, color: FROST.ink, fontSize: 12 }}>
-                    {value.toFixed(1)}
-                  </span>
+            {breakdownEntries.map(({ key, value }) => (
+              <span
+                key={key}
+                style={{
+                  display: 'inline-flex',
+                  gap: 5,
+                  alignItems: 'baseline',
+                  flex: 1,
+                  justifyContent: 'center',
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: 700,
+                    color: FROST.inkMuter,
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                    fontSize: 10,
+                  }}
+                >
+                  {TILE_LABELS_SHORT[key]}
                 </span>
-                {i < breakdownEntries.length - 1 && (
-                  <span
-                    aria-hidden
-                    style={{
-                      color: FROST.inkFaint,
-                      padding: '0 8px',
-                      fontSize: 11,
-                    }}
-                  >
-                    ·
-                  </span>
-                )}
-              </React.Fragment>
+                <span style={{ fontWeight: 700, color: FROST.ink, fontSize: 12 }}>
+                  {value.toFixed(1)}
+                </span>
+              </span>
             ))}
           </div>
         )}
