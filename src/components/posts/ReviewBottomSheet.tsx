@@ -745,27 +745,27 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 )}
               </div>
 
-              {/* CTAs */}
-              {courseId && (
-                <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-                  <button
-                    type="button"
-                    onClick={handleVisitCourse}
-                    style={{
-                      flex: 1,
-                      padding: 14,
-                      borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      color: FROST.ink,
-                      fontSize: 14,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    Visit Course
-                  </button>
+              {/* CTAs — Visit Profile + Full Review */}
+              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                <button
+                  type="button"
+                  onClick={handleVisitProfile}
+                  style={{
+                    flex: 1,
+                    padding: 14,
+                    borderRadius: 14,
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    color: FROST.ink,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  Visit Profile
+                </button>
+                {courseId && (
                   <button
                     type="button"
                     onClick={handleGoToReview}
@@ -781,12 +781,17 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       cursor: 'pointer',
                       boxShadow: '0 4px 20px rgba(247,147,30,0.4)',
                       fontFamily: 'inherit',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
                     }}
                   >
-                    Full Review →
+                    Full Review
+                    <ChevronRight size={16} strokeWidth={2.5} />
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </motion.div>
         </>
