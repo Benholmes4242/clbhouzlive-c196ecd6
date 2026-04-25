@@ -145,6 +145,7 @@ const CreateProfileRedirect = lazy(() => import("./components/redirects/CreatePr
 
 const Top100Hub = lazy(() => import("./pages/Top100Hub"));
 const Top100JourneyPage = lazy(() => import("./pages/Top100JourneyPage"));
+const Top100NetworkPage = lazy(() => import("./pages/Top100NetworkPage"));
 const Top100List = lazy(() => import("./pages/Top100List"));
 
 const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
