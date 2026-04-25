@@ -106,6 +106,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   const navigate = useNavigate();
 
   const {
+    data: activePredictions,
     activeTournamentId,
     nextTournamentPredictions,
   } = useAIPredictions();
@@ -116,6 +117,13 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     seasonId: null,
     timeFilter: 'all_time',
   });
+
+  // Live tracker — gated to active state only (per Phase C decision 1)
+  const trackerEnabled = state === 'active' && !!activePredictions;
+  const { data: tracker, isLoading: trackerLoading } = usePredictionTracker(
+    trackerEnabled ? activeTournamentId : null,
+    trackerEnabled ? activePredictions : null,
+  );
 
   // ─── Computed record ───────────────────────────────────────────────────────
   const { wins, topFives, accuracy, lastWin, lastResult } = useMemo(() => {
@@ -154,6 +162,10 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     return <IntelligenceHeroSkeleton />;
   }
 
+  const isActive = state === 'active';
+  const topPickTracked = tracker?.predictions?.find((p) => p.predictedRank === 1) ?? null;
+  const secondPickTracked = tracker?.predictions?.find((p) => p.predictedRank === 2) ?? null;
+
   return (
     <section
       aria-label="Clbhouz Intelligence"
@@ -166,14 +178,31 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     >
       <Masthead issueNumber={issueNumber} dateLabel={issueDate} />
 
-      <EditorialHeadline wins={wins} topFives={topFives} />
+      {isActive ? (
+        <ActiveHeadline
+          topPick={topPickTracked}
+          contender={secondPickTracked}
+          tournamentName={activePredictions?.tournament.name ?? null}
+          loading={trackerLoading}
+        />
+      ) : (
+        <EditorialHeadline wins={wins} topFives={topFives} />
+      )}
 
       <Standfirst text={idleStandfirst} />
 
       <TrackRecord wins={wins} topFives={topFives} accuracy={accuracy} />
 
-      {state === 'active' && <ActiveStateStub />}
-      {state === 'idle' && (
+      {isActive && activePredictions && (
+        <ActiveStateBlock
+          tournament={activePredictions.tournament}
+          picks={activePredictions.topContenders.slice(0, 3)}
+          tracker={tracker ?? null}
+          trackerLoading={trackerLoading}
+          editorialSnapshot={editorial?.snapshotData}
+        />
+      )}
+      {!isActive && (
         <IdleStateBlock
           lastWin={lastWin}
           lastResult={lastResult}
