@@ -20,12 +20,13 @@ import {
   LiveRightNow,
   UnifiedWorldRankings,
 } from '../overview-v3';
-import { WhatsComing } from '../overview-v3/WhatsComing';
+import { ComingUpCalendar } from '../ComingUpCalendar';
 import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { LazySection } from '../overview-v3/LazySection';
 import { AllToursTicker } from '../AllToursTicker';
 import { IntelligenceHero } from '../IntelligenceHero';
+import { UpNextBroadcast } from '../UpNextBroadcast';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
@@ -80,7 +81,7 @@ export function OverviewPageV3() {
           className="relative w-full z-0 mx-auto"
           style={{ ...HERO_STYLES.containerNoHeader, maxWidth: 960, opacity: heroOpacity, scale: heroScale }}
         >
-          <HeroCarousel hasHeader={false} />
+          <HeroCarousel hasHeader={false} mode="overview" />
         </motion.div>
 
         {/* All Tours Ticker — flush below the hero, no top gap */}
@@ -92,10 +93,11 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
-            <WhatsComing />
             <LazySection minHeight={500}>
               <IntelligenceHero />
             </LazySection>
+            <UpNextBroadcast />
+            <ComingUpCalendar />
             <LazySection minHeight={400}>
               <UnifiedWorldRankings />
             </LazySection>
