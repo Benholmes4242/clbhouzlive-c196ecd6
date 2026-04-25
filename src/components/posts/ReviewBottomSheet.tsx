@@ -568,6 +568,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   letterSpacing: '-10px',
                   userSelect: 'none',
                   zIndex: 0,
+                  fontVariantNumeric: 'lining-nums tabular-nums',
                 }}
               >
                 {formattedRating}
