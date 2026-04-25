@@ -11,6 +11,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
+import { useCountdown } from '@/hooks/useCountdown';
 
 /** Score color — amber for under par, red for over, grey for even */
 export function getScoreColor(score: number | null): string {
@@ -56,27 +57,12 @@ export function getCurrentRoundLabel(
 }
 
 /**
- * UpcomingCountdown — live countdown to tournament start
+ * UpcomingCountdown — live countdown to tournament start.
+ * Consumes the shared `useCountdown` hook (extracted Apr 2026 — Tour Hub redesign Phase A).
+ * Render is byte-identical to the prior inline implementation.
  */
 export function UpcomingCountdown({ startDate }: { startDate: string }) {
-  const [tick, setTick] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setTick(n => n + 1), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const countdown = useMemo(() => {
-    const normalized = startDate.includes('T') ? startDate : `${startDate}T12:00:00`;
-    const diff = new Date(normalized).getTime() - Date.now();
-    if (diff <= 0) return null;
-    return {
-      days:    Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours:   Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-      minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-      seconds: Math.floor((diff % (1000 * 60)) / 1000),
-    };
-  }, [startDate, tick]);
+  const countdown = useCountdown(startDate);
 
   if (!countdown) {
     return (
