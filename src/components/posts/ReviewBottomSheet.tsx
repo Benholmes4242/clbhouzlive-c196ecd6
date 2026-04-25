@@ -1,10 +1,10 @@
 /**
- * ReviewBottomSheet — Frost Panel sheet (PR 7 editorial layout).
+ * ReviewBottomSheet — Editorial Frost Panel sheet (PR 7 v2).
  *
- * Three-zone layout (PR 6):
- *   - Pinned header: drag handle + title + location + (divider) + score | 2×2 breakdown grid
- *   - Scrollable middle: review body with amber Georgia drop cap on first paragraph
- *   - Pinned footer: author card + Visit Course / Full Review CTAs
+ * Three-zone layout (PR 6) with editorial design (PR 7 v2):
+ *   - Pinned header: drag handle + prestige rule + Playfair headline + location + 50px score | 2×2 FULL-label grid
+ *   - Scrollable middle: atmospheric "X.X" watermark + body paragraphs with Playfair amber drop cap
+ *   - Pinned footer: author card + Visit Profile + Full Review CTAs
  *
  * Driven by the unified store via ReviewBottomSheetPortal.
  */
@@ -13,7 +13,7 @@ import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { UserCheck } from 'lucide-react';
+import { UserCheck, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
@@ -29,6 +29,12 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsFollowingUser } from '@/hooks/useIsFollowingUser';
 import { useFollowStore } from '@/store/followStore';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
+
+const FONTS = {
+  geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+  serifDisplay: "'Playfair Display', Georgia, 'Times New Roman', serif",
+  serifSystem: "Georgia, 'Times New Roman', serif",
+};
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
