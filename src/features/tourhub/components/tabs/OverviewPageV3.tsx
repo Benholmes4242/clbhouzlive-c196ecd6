@@ -30,7 +30,6 @@ import { StatOfTheWeek } from '../StatOfTheWeek';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { useLiveRightNow } from '../../hooks/useOverviewModules';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -50,19 +49,13 @@ export function OverviewPageV3() {
   useMedianStatusBar("dark", "transparent", true, false);
 
   // ── Phase A: Hero ↔ Ticker shared active-tournament state ──
-  // The Ticker now drives the Hero (tap a live tournament card → Hero swaps).
-  // Auto-rotation continues until the user makes an explicit Ticker selection,
-  // which terminally pauses rotation until the page is left and re-entered.
-  const { data: liveTournaments } = useLiveRightNow();
+  // SINGLE SOURCE OF TRUTH: HeroCarousel emits its current slide id upward via
+  // onActiveChange (fires on mount + every auto-rotate / swipe). The parent
+  // never seeds activeTournamentId — that prevents the two-source ping-pong
+  // loop that crashed the page (>100 history.pushState in 10s).
+  // Initial state is null; Ticker treats null as "no active card" cleanly.
   const [activeTournamentId, setActiveTournamentId] = useState<string | null>(null);
   const [autoRotate, setAutoRotate] = useState(true);
-
-  // Initial active tournament — first live tournament once data loads
-  useEffect(() => {
-    if (!activeTournamentId && liveTournaments && liveTournaments.length > 0) {
-      setActiveTournamentId(liveTournaments[0].id);
-    }
-  }, [liveTournaments, activeTournamentId]);
 
   // Ticker tap: swap Hero + terminally pause auto-rotation (no resume)
   const handleTickerSelect = useCallback((tournamentId: string) => {
