@@ -15,12 +15,13 @@ import {
   Top100ListLeaderboard,
   Top100ListFilterChips,
   Top100ListCourseCard,
-  Top100ListProgressCard,
+  Top100ListProgressCard, // TODO: delete in Phase E
   JourneyInsightCard,
   generateJourneyInsights,
   type Top100FilterChip,
 } from '@/components/top100/list';
 import type { Top100SortMode } from '@/components/top100/list/Top100ListFilterChips';
+import { getRegionTheme } from '@/lib/regionTheme';
 
 /**
  * Canonical slug → rank field mapping (LOCKED).
@@ -391,31 +392,73 @@ const Top100List = () => {
   const filterPlayedCount = courses?.filter(c => playedCourseIds.has(c.id)).length || 0;
   const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
 
+  // Region theme color for the compact progress strip (Phase B)
+  const regionRingColor = getRegionTheme((slug || 'global') as 'global' | 'gb-i' | 'usa' | 'europe').ringColor;
+  const compactPercent = totalCount > 0 ? Math.round((playedCount / totalCount) * 100) : 0;
+
   return (
     <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
-      {/* 1. Full-bleed Hero + Progress Slab - MUST be direct child of PageRoot */}
+      {/* 1. Full-bleed Hero - MUST be direct child of PageRoot */}
       {listSummary && (
         <Top100HeroShell
           list={listSummary}
           playedCount={playedCount}
           totalCount={totalCount}
           listDisplayName={listDisplayName}
-          showProgress={!!session}
         />
       )}
 
       <main>
 
-        {/* 2. Progress Card with next milestone + motivational copy */}
-        {/* Spacing: Progress bar → Next milestone = 16px (M) */}
-        {session && (
-          <Top100ListProgressCard
-            playedCount={playedCount}
-            totalCount={totalCount}
-            listSlug={slug || 'global'}
-            listDisplayName={listDisplayName}
-            userId={user?.id}
-          />
+        {/* 2. Compact progress strip — replaces both the hero progress slab and the milestone card (Phase B) */}
+        {session && totalCount > 0 && (
+          <div
+            className="mx-4 mt-4 rounded-2xl bg-white"
+            style={{
+              border: '1px solid rgba(15,23,42,0.07)',
+              borderLeftWidth: '3px',
+              borderLeftColor: regionRingColor,
+              padding: '12px 14px',
+            }}
+          >
+            <div className="flex items-baseline justify-between gap-3">
+              <div className="flex items-baseline gap-1">
+                <span
+                  className="tabular-nums leading-none"
+                  style={{ color: regionRingColor, fontSize: 26, fontWeight: 900, letterSpacing: '-0.02em' }}
+                >
+                  {playedCount}
+                </span>
+                <span className="text-[13px] text-muted-foreground font-normal">
+                  of {totalCount}
+                </span>
+              </div>
+              <span
+                className="text-[12px] font-semibold tabular-nums"
+                style={{ color: regionRingColor }}
+              >
+                {compactPercent}%
+              </span>
+            </div>
+            <div
+              className="mt-2 h-1 w-full rounded-full overflow-hidden"
+              style={{ background: 'rgba(15,23,42,0.08)' }}
+              role="progressbar"
+              aria-valuenow={compactPercent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${playedCount} of ${totalCount} courses complete`}
+            >
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${compactPercent}%`,
+                  backgroundColor: regionRingColor,
+                  transition: 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              />
+            </div>
+          </div>
         )}
 
         {/* 3. Social Leaderboard */}
