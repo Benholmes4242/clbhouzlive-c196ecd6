@@ -64,11 +64,11 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
         borderRight: isLast ? 'none' : '1px solid rgba(255,255,255,0.06)',
         textAlign: 'left',
         background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
-        outline: isActive ? '1.5px solid #FFFFFF' : '1px solid transparent',
-        outlineOffset: -1,
+        border: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+        borderRadius: 12,
         color: 'inherit',
         cursor: 'pointer',
-        transition: 'background 0.25s ease, outline-color 0.25s ease',
+        transition: 'background 0.25s ease, border-color 0.25s ease',
         position: 'relative',
       }}
       aria-pressed={isActive}
