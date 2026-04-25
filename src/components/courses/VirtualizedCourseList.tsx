@@ -139,8 +139,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     const rafId = requestAnimationFrame(() => {
       if (!sampleCardRef.current) return;
       const height = sampleCardRef.current.offsetHeight;
-      // Tailwind: gap-2 (8px) on mobile, gap-6 (24px) at sm+
-      const gap = window.innerWidth >= 640 ? 24 : 8;
+      // Tailwind: gap-3 (12px) on mobile, gap-6 (24px) at sm+
+      const gap = window.innerWidth >= 640 ? 24 : 12;
       const measured = height + gap;
       if (measured > 0 && Math.abs(measured - rowHeight) > 4) {
         setRowHeight(measured);
@@ -233,7 +233,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   if (courses.length < 25) {
     return (
       <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {courses.map((course, i) => (
             <div key={course.id} className="mb-0" ref={i === 0 ? sampleCardRef : undefined}>
               <UnifiedCourseCard
@@ -262,7 +262,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     >
       <div style={{ height: totalHeight, position: 'relative', zIndex: 0 }}>
         <div
-          className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6 will-change-transform"
+          className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 will-change-transform"
           style={{ transform: `translateY(${offsetY}px)` }}
         >
           {visibleCourses.map((course, i) => (
