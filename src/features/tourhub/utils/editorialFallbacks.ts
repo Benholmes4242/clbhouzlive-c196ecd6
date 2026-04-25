@@ -37,26 +37,25 @@ export const STAT_OF_WEEK_FALLBACK = {
   categories: ['Earnings', 'SG Total', 'Scoring', 'Putting', 'GIR', 'Sand'],
 };
 
+/**
+ * SAFETY-ONLY fallback. Live data drives the entire rivalry section in production.
+ * These generic placeholders only render if useCollegeSeasonStats returns empty/error
+ * — they are intentionally obvious as placeholders, not fictional content.
+ */
 export const COLLEGE_RIVALRY_FALLBACK = {
   eyebrow: "🥊 THIS WEEK'S RIVALRY",
-  headlineLine1: 'Texas leads.',
-  headlineLine2: 'Georgia is closing.',
-  leftCollege: 'Texas',
-  leftEarnings: '$13.2M',
-  leftRecord: '1 WIN · 13 ON TOUR',
-  leftCaptain: 'Scottie Scheffler',
-  rightCollege: 'Georgia',
-  rightEarnings: '$11.0M',
-  rightRecord: '0 WINS · 17 ON TOUR',
-  rightCaptain: 'Sepp Straka',
-  marginLabel: '−$2.2M',
-  standings: [
-    { rank: 1, name: 'Texas', earnings: '$13.2M' },
-    { rank: 2, name: 'Georgia', earnings: '$11.0M' },
-    { rank: 3, name: 'Northwestern', earnings: '$9.8M' },
-    { rank: 4, name: 'California', earnings: '$8.4M' },
-    { rank: 5, name: 'Wake Forest', earnings: '$7.9M' },
-  ],
+  headlineLine1: 'Loading rivalry…',
+  headlineLine2: null as string | null,
+  leftCollege: '—',
+  leftEarnings: '$0',
+  leftRecord: '— ON TOUR',
+  leftCaptain: '—',
+  rightCollege: '—',
+  rightEarnings: '$0',
+  rightRecord: '— ON TOUR',
+  rightCaptain: '—',
+  marginLabel: '—',
+  standings: [] as Array<{ rank: number; name: string; earnings: string }>,
 };
 
 export const INTELLIGENCE_QUOTE_FALLBACK = {
