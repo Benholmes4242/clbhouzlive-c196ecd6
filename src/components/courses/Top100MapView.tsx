@@ -83,6 +83,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [trayExpanded, setTrayExpanded] = useState(true);
+  const [regionPopoverOpen, setRegionPopoverOpen] = useState(false);
 
   // Played markers always use amber per design system (not season-themed)
   const seasonColor = '#F7931E';
