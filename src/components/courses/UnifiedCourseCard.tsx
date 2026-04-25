@@ -340,10 +340,10 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             )}
           </div>
 
-          {/* Right: community rating pill — simplified, no logomark, larger score */}
+          {/* Right: community rating pill — Clbhouz logomark + score */}
           {showRating && course.communityRating != null && (
             <div
-              className="flex items-baseline flex-shrink-0"
+              className="flex items-center flex-shrink-0 gap-1.5"
               style={{
                 background: 'rgba(15,23,42,0.62)',
                 border: '0.5px solid rgba(255,255,255,0.20)',
@@ -353,6 +353,12 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 padding: '5px 11px',
               }}
             >
+              <img
+                src="/assets/logomark-orange.png"
+                alt=""
+                aria-hidden="true"
+                style={{ width: 12, height: 12, objectFit: 'contain', display: 'block' }}
+              />
               <span
                 style={{
                   fontSize: 15, fontWeight: 800, color: '#fff',
