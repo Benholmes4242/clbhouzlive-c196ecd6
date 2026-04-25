@@ -42,31 +42,51 @@ const Top100Hub = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
   
-  // View mode state for toggle highlight
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  
   // Map modal state — auto-open if ?view=map
   const [isMapModalOpen, setIsMapModalOpen] = useState(viewFromUrl === 'map');
   
   const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
 
-  // Toggle handlers
-  const handleListClick = () => {
-    setViewMode('list');
-    setIsMapModalOpen(false);
-  };
-
   const handleMapClick = () => {
-    setViewMode('map');
     setIsMapModalOpen(true);
   };
 
   const handleMapModalClose = (open: boolean) => {
     if (!open) {
       setIsMapModalOpen(false);
-      setViewMode('list');
     }
   };
+
+  // Per-list sub-line for the editorial header (GB&I → Global → USA → Europe)
+  const perListSubline = useMemo(() => {
+    if (!listSummaries || listSummaries.length === 0) return null;
+
+    const order: Array<{ slug: string; label: string }> = [
+      { slug: 'gb-i', label: 'GB&I' },
+      { slug: 'global', label: 'GLOBAL' },
+      { slug: 'usa', label: 'USA' },
+      { slug: 'europe', label: 'EUROPE' },
+    ];
+
+    const parts = order.map(({ slug, label }) => {
+      const summary = listSummaries.find(s => s.slug === slug);
+      const count = summary?.played_count ?? 0;
+      return { count, label };
+    });
+
+    return (
+      <>
+        {parts.map((p, i) => (
+          <React.Fragment key={p.label}>
+            {i > 0 && <span style={{ color: '#94A3B8' }}> · </span>}
+            <span style={{ color: p.count > 0 ? '#F7931E' : '#94A3B8', fontWeight: 700 }}>{p.count}</span>
+            {' '}
+            {p.label}
+          </React.Fragment>
+        ))}
+      </>
+    );
+  }, [listSummaries]);
 
   // Guard against invalid data
   if (!lists && !listsLoading) {
