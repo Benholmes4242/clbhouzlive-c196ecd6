@@ -168,7 +168,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         style={{
           position: 'absolute',
           right: 6,
-          top: -8,
+          top: 6,
           fontFamily: FONTS.serifDisplay,
           fontSize: 110,
           fontWeight: 900,
