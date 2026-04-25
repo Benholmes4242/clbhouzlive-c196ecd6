@@ -27,6 +27,7 @@ import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import SuggestEditModal from './SuggestEditModal';
 import ClaimCourseCTA from './ClaimCourseCTA';
+import { SectionLabel } from './SectionLabel';
 
 interface Course {
   id: string;
@@ -147,7 +148,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           {userRating ? (
             <button
               onClick={handleRateClick}
-              style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', border: '1.5px solid rgba(15,23,42,0.1)', fontSize: 13, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
+              style={{ width: '100%', padding: '13px 0', borderRadius: 14, background: '#FFFFFF', border: '1.5px solid #F7931E', fontSize: 14, fontWeight: 800, color: '#c97a10', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               ✏️ Edit Your Rating
             </button>
