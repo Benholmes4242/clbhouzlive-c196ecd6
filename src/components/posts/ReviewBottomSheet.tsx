@@ -451,7 +451,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       display: 'flex',
                       alignItems: 'flex-end',
                       flexShrink: 0,
-                      fontVariantNumeric: 'tabular-nums',
+                      fontVariantNumeric: 'lining-nums tabular-nums',
                     }}
                   >
                     <span
@@ -459,18 +459,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         ...FROST_SCORE_GRADIENT,
                         fontSize: 50,
                         fontWeight: 800,
-                        lineHeight: 0.85,
+                        lineHeight: 1,
+                        letterSpacing: '-2px',
+                        fontVariantNumeric: 'lining-nums tabular-nums',
                       }}
                     >
-                      <span style={{ letterSpacing: '-2.4px' }}>
-                        {formattedRating.split('.')[0]}
-                      </span>
-                      {formattedRating.includes('.') && (
-                        <span style={{ letterSpacing: '-0.6px' }}>
-                          <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
-                          {formattedRating.split('.')[1]}
-                        </span>
-                      )}
+                      {formattedRating}
                     </span>
                     <span
                       style={{
