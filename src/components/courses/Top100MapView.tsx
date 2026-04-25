@@ -600,24 +600,46 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Back button — matches Course Details style */}
+        {/* Back button — 44px circle with optional progress ring */}
         <button
           onClick={() => onClose ? onClose() : navigate(-1)}
-          className="fixed left-4 z-40 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all"
+          className="fixed left-4 z-40 flex items-center justify-center active:scale-95 transition-transform"
           style={{
             top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
-            borderRadius: '12px',
-            background: 'rgba(0, 0, 0, 0.28)',
-            backdropFilter: 'blur(22px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: 'rgba(15,23,42,0.55)',
+            backdropFilter: 'blur(14px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(14px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+            position: 'fixed' as const,
           }}
           aria-label="Go back"
         >
-          <svg className="h-[18px] w-[18px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          {/* Progress ring — SVG circle, only renders when user has progress */}
+          {progressPercent > 0 && (
+            <svg
+              width="50"
+              height="50"
+              style={{ position: 'absolute' as const, inset: -3, pointerEvents: 'none' as const }}
+              aria-hidden="true"
+            >
+              <circle
+                cx="25"
+                cy="25"
+                r="23"
+                fill="none"
+                stroke={seasonColor}
+                strokeWidth="2"
+                strokeDasharray={`${(progressPercent / 100) * 144.51} 144.51`}
+                strokeLinecap="round"
+                transform="rotate(-90 25 25)"
+              />
+            </svg>
+          )}
+          <ChevronLeft className="h-[20px] w-[20px] text-white" strokeWidth={2.4} />
         </button>
 
         {/* Legend badges — dynamic season color */}
