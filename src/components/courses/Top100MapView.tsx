@@ -666,9 +666,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <RotateCcw className="h-4 w-4 text-white/85" aria-hidden="true" />
         </button>
 
-        {/* Empty state */}
+        {/* Empty state — bottom value follows tray collapse state */}
         {ratedCount === 0 && !isLoading && mapLoaded && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-44 z-10 flex justify-center">
+          <div
+            className="pointer-events-none absolute inset-x-0 z-10 flex justify-center"
+            style={{
+              bottom: trayExpanded ? 200 : 100,
+              transition: 'bottom 300ms ease-out',
+            }}
+          >
             <div className="glass-card pointer-events-auto px-4 py-3 rounded-xl text-center">
               <p className="text-sm font-medium text-white/90">
                 ⛳ Tap a course to start your journey
