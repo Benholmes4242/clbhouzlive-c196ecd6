@@ -14,7 +14,7 @@ import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Search, X, Pencil } from 'lucide-react';
+import { Search, X, Pencil, Filter, ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { 
@@ -328,10 +328,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (isLoading) {
     return (
       <div style={{ background: '#F8FAFC', minHeight: '100%', paddingBottom: 40 }}>
-        {/* Community score skeleton */}
+        {/* Community score skeleton — stacked */}
         <div style={{ padding: '18px 16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-9 w-24" />
+          <Skeleton className="h-12 w-20" />
+          <Skeleton className="h-3 w-24" />
           <Skeleton className="h-3 w-20" />
         </div>
         <Divider />
@@ -339,17 +340,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <div style={{ padding: '10px 16px 0' }}>
           <Skeleton className="h-10 w-full rounded-[10px]" />
         </div>
-        {/* Sort skeleton */}
-        <div style={{ display: 'flex', gap: 6, padding: '10px 16px 8px' }}>
-          <Skeleton className="h-7 w-24 rounded-lg" />
-          <Skeleton className="h-7 w-28 rounded-lg" />
-          <Skeleton className="h-7 w-24 rounded-lg" />
-        </div>
-        {/* Filter skeleton */}
-        <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px' }}>
-          <Skeleton className="h-7 w-32 rounded-full" />
+        {/* Compressed control bar skeleton — single row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px 12px' }}>
           <Skeleton className="h-7 w-28 rounded-full" />
+          <div style={{ width: 1, height: 20, background: 'rgba(15,23,42,0.1)' }} />
           <Skeleton className="h-7 w-24 rounded-full" />
+          <Skeleton className="h-7 w-28 rounded-full" />
         </div>
         <Divider />
         {/* Review row skeletons */}
@@ -447,18 +443,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div style={{ paddingBottom: 40, background: '#F8FAFC', minHeight: '100%' }}>
-      {/* Community score header */}
+      {/* Community score header — stacked & centered */}
       <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
-        <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 8 }}>⚡ Community Score</div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
-          <span style={{ fontSize: 34, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums' }}>
-            {communityScore.toFixed(1)}
-          </span>
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#0F172A', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
-            {getScoreTier(communityScore).label}
-          </span>
+        <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 10 }}>⚡ Community Score</div>
+        <div style={{ fontSize: 56, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+          {communityScore.toFixed(1)}
         </div>
-        <div style={{ fontSize: 11, color: '#94A3B8' }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: '#c97a10', letterSpacing: '0.15em', textTransform: 'uppercase' as const, marginTop: 6 }}>
+          {getScoreTier(communityScore).label}
+        </div>
+        <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 8 }}>
           {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
           {myReview && (
             <>
@@ -492,25 +486,58 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         </div>
       </div>
 
-      {/* Sort buttons */}
-      <div className="scrollbar-hide" style={{ display: 'flex', gap: 6, padding: '12px 16px 8px', overflowX: 'auto', scrollbarWidth: 'none', justifyContent: 'center' }}>
-        {sortOptions.map((option) => {
-          const isActive = sortBy === option.value;
+      {/* Compressed control bar: sort pill (cycle-on-tap) + divider + tier filter chips */}
+      <div
+        className="scrollbar-hide"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '12px 16px 12px',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {(() => {
+          const currentSortLabel = sortOptions.find((o) => o.value === sortBy)?.label ?? 'Sort';
+          const cycleSort = () => {
+            const idx = sortOptions.findIndex((o) => o.value === sortBy);
+            const next = sortOptions[(idx + 1) % sortOptions.length];
+            setSortBy(next.value as ReviewsSortBy);
+          };
           return (
             <button
-              key={option.value}
-              onClick={() => setSortBy(option.value as SortOption)}
-              style={{ padding: '6px 13px', borderRadius: 8, fontSize: 11.5, fontWeight: isActive ? 800 : 600, background: isActive ? '#0F172A' : 'transparent', color: isActive ? '#fff' : '#94A3B8', border: isActive ? 'none' : '1px solid rgba(15,23,42,0.1)', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' as const }}
+              type="button"
+              onClick={cycleSort}
+              aria-label={`Sort: ${currentSortLabel}. Tap to change.`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                borderRadius: 999,
+                background: '#0F172A',
+                color: '#fff',
+                fontSize: 11.5,
+                fontWeight: 800,
+                border: 'none',
+                cursor: 'pointer',
+                flexShrink: 0,
+                whiteSpace: 'nowrap' as const,
+              }}
             >
-              {option.label}
+              <Filter className="w-3 h-3" />
+              {currentSortLabel}
+              <ChevronDown className="w-3 h-3" />
             </button>
           );
-        })}
-      </div>
+        })()}
 
-      {/* Rating filter chips */}
-      <div style={{ padding: '2px 16px 12px' }}>
-        <RatingFilterChips value={ratingFilter} onChange={setRatingFilter} />
+        <div style={{ width: 1, height: 20, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <RatingFilterChips value={ratingFilter} onChange={setRatingFilter} />
+        </div>
       </div>
 
       <Divider />
