@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
-import { getScoreTier } from '@/utils/getScoreTier';
+import { getScoreTier, isGoldTier } from '@/utils/getScoreTier';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 import { useOptimisticRatingUpdate } from '@/hooks/useOptimisticRatingUpdate';
 
@@ -176,10 +176,10 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
                 value={rating}
                 onValueChange={setRating}
                 className="w-full rating-slider-primary"
-                data-tier={getScoreTier(rating[0]).tier === 'outstanding' ? 'outstanding' : undefined}
+                data-tier={isGoldTier(getScoreTier(rating[0]).tier) ? 'outstanding' : undefined}
               />
               <div className={`text-center text-2xl font-bold ${
-                getScoreTier(rating[0]).tier === 'outstanding' 
+                isGoldTier(getScoreTier(rating[0]).tier)
                   ? 'text-[#C9A94A]' 
                   : 'text-slate-800'
               }`}>
