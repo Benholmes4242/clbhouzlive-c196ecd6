@@ -18,15 +18,15 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import {
   HeroCarousel,
   LiveRightNow,
-  UnifiedWorldRankings,
 } from '../overview-v3';
 import { ComingUpCalendar } from '../ComingUpCalendar';
 import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
-import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { LazySection } from '../overview-v3/LazySection';
 import { AllToursTicker } from '../AllToursTicker';
 import { IntelligenceHero } from '../IntelligenceHero';
 import { UpNextBroadcast } from '../UpNextBroadcast';
+import { WorldRankingsHero } from '../WorldRankingsHero';
+import { StatOfTheWeek } from '../StatOfTheWeek';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
@@ -99,10 +99,10 @@ export function OverviewPageV3() {
             <UpNextBroadcast />
             <ComingUpCalendar />
             <LazySection minHeight={400}>
-              <UnifiedWorldRankings />
+              <WorldRankingsHero />
             </LazySection>
-            <LazySection minHeight={300}>
-              <SeasonLeaderboards />
+            <LazySection minHeight={400}>
+              <StatOfTheWeek />
             </LazySection>
             <LazySection minHeight={350}>
               <CollegeRankingsPreview />
