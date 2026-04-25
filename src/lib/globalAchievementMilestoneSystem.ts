@@ -104,7 +104,7 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fr
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export type RatingTier = 'POOR' | 'FAIR' | 'GOOD' | 'EXCELLENT' | 'EXCEPTIONAL';
-...
+
 const poorTheme = amberTheme;
 const fairTheme = amberTheme;
 const goodTheme = amberTheme;
