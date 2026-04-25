@@ -79,17 +79,15 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
         <span
           style={{
             display: 'inline-block',
-            padding: '2px 6px',
-            border: `1px solid ${isActive ? 'rgba(247,147,30,0.85)' : 'rgba(247,147,30,0.45)'}`,
-            background: isActive ? 'rgba(247,147,30,0.08)' : 'transparent',
+            padding: '2px 7px',
+            background: '#fff',
             borderRadius: 4,
             fontSize: 9,
             fontWeight: 900,
-            letterSpacing: '0.14em',
-            color: '#F7931E',
+            letterSpacing: '0.1em',
+            color: '#000',
             textTransform: 'uppercase',
             lineHeight: 1.2,
-            transition: 'border-color 0.25s ease, background 0.25s ease',
           }}
         >
           {tourPillLabel(tournament.tourSlug)}
