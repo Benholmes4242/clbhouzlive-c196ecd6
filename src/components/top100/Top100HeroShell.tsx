@@ -57,17 +57,45 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   };
 
   const displayLabel = getDisplayLabel(list.short_label || list.name, list.slug);
+  const regionFullName = REGION_FULL_NAMES[listSlug] || 'Worldwide';
 
   return (
     <>
-      {/* HERO IMAGE SECTION - full-bleed immersive, extends behind notch */}
-      <div 
+      {/* HERO IMAGE SECTION - full-bleed immersive, extends behind notch. Compressed to 200px (Phase A). */}
+      <div
         className="relative overflow-hidden bg-background"
         style={{
-          height: '45dvh',
+          height: '200px',
           marginTop: 0,
         }}
       >
+          {/* Floating glass back button — single-state dark glass, scrolls away with hero (Phase A) */}
+          <button
+            onClick={() => navigate(-1)}
+            type="button"
+            aria-label="Back"
+            style={{
+              position: 'absolute',
+              top: 'max(env(safe-area-inset-top, 0px), 47px)',
+              left: 16,
+              zIndex: 11,
+              width: 36,
+              height: 36,
+              borderRadius: 12,
+              background: 'rgba(15,23,42,0.55)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '0.5px solid rgba(255,255,255,0.18)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+            className="active:scale-[0.95] transition-transform"
+          >
+            <ChevronLeft size={20} color="#ffffff" />
+          </button>
+
           {/* Background image with gradient overlay for text legibility */}
           {hero?.cover_image_url ? (
             <>
@@ -96,32 +124,39 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-foreground/70 to-foreground" />
           )}
-          
-          {/* Glass back button removed — text link below hero */}
-          
-          {/* Title at bottom of hero */}
-          <motion.div 
+
+          {/* Eyebrow + headline at bottom of hero */}
+          <motion.div
             className="absolute bottom-3 left-4 right-4 z-10"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <h1 className="text-white text-[22px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
+            <div
+              className="flex items-center gap-1.5 mb-1"
+              style={{ opacity: 0.92 }}
+            >
+              <FlagChip slug={listSlug} size={14} />
+              <span
+                className="text-white"
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                }}
+              >
+                {regionFullName}
+              </span>
+            </div>
+            <h1
+              className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]"
+              style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.05 }}
+            >
               {displayLabel}
             </h1>
           </motion.div>
-      </div>
-
-      {/* ← Back text link below hero, above progress */}
-      <div className="px-4 pt-3 pb-0">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
-        >
-          <ChevronLeft size={14} />
-          Back
-        </button>
       </div>
 
       {/* PROGRESS SECTION - on page background with semantic text */}
