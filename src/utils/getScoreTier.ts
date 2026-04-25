@@ -15,7 +15,7 @@
 
 import { getRatingTheme, type RatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 
-export type ScoreTier = 'exceptional' | 'outstanding' | 'excellent' | 'veryGood' | 'good' | 'fair';
+export type ScoreTier = 'exceptional' | 'excellent' | 'good' | 'fair' | 'poor';
 
 export interface ScoreTierData {
   tier: ScoreTier;
@@ -33,30 +33,29 @@ export interface ScoreTierData {
 // Map RatingTheme key to ScoreTier
 const tierKeyMap: Record<string, ScoreTier> = {
   'EXCEPTIONAL': 'exceptional',
-  'OUTSTANDING': 'outstanding',
   'EXCELLENT': 'excellent',
-  'VERY_GOOD': 'veryGood',
   'GOOD': 'good',
   'FAIR': 'fair',
+  'POOR': 'poor',
 };
 
 /**
  * Returns true if the given tier should render with gold (amber) styling.
- * Both Outstanding (9.0–9.4) and Exceptional (≥9.5) qualify.
+ * Only Exceptional (≥9.0) qualifies under the 5-tier system.
  */
 export const isGoldTier = (tier: ScoreTier | undefined): boolean =>
-  tier === 'outstanding' || tier === 'exceptional';
+  tier === 'exceptional';
 
 /**
  * Get the score tier data for a given rating score.
- * Returns consistent styling tokens - gray for Fair→Excellent, amber for Outstanding/Exceptional.
+ * All tiers currently use unified amber styling per the all-amber decision.
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);
   const tier = tierKeyMap[theme.key];
-  // isOutstanding now covers the full gold tier (Outstanding + Exceptional) so
-  // any consumer using it for "render gold?" decisions stays correct for ≥9.5.
-  const isOutstanding = theme.key === 'OUTSTANDING' || theme.key === 'EXCEPTIONAL';
+  // isOutstanding is the legacy "render gold?" flag — under the 5-tier
+  // system only EXCEPTIONAL qualifies. Field name retained for back-compat.
+  const isOutstanding = theme.key === 'EXCEPTIONAL';
   
   return {
     tier,
