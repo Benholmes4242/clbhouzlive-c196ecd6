@@ -1,13 +1,14 @@
 /**
- * InlineReviewCard — Frost Panel review tile (PR 7 editorial layout).
+ * InlineReviewCard — Editorial Frost Panel review tile (PR 7 v2).
  *
  * Composition (top → bottom):
- *   1. Title row — course name + subtitle inline / score on right
- *   2. Location line
- *   3. Breakdown 2×2 grid (DESIGN / CONDITIONS / CLUBHOUSE / FACILITIES) — conditional
- *   4. Italic 2-line excerpt in curly quotes — conditional
- *   5. Author row (avatar + name + N rated + date, all inline)
- *   6. "READ FULL REVIEW →" amber affordance band (edge-to-edge)
+ *   1. Atmospheric "X.X" watermark (Playfair, 4% opacity, behind content)
+ *   2. Prestige rule eyebrow — "REVIEW ────"
+ *   3. Title row — Playfair headline + gradient-masked Geist score
+ *   4. Location line
+ *   5. Compressed breakdown row (single line, abbreviated labels)
+ *   6. Italic Georgia excerpt in curly quotes (2-line clamp)
+ *   7. Author row — avatar + name + "N rated" + inline `Read review →`
  *
  * Tap → opens unified ReviewBottomSheet via store.
  */
@@ -23,7 +24,12 @@ import {
   formatFrostRating,
   splitCourseName,
 } from '@/lib/frostPanel';
-import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
+
+const FONTS = {
+  geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+  serifDisplay: "'Playfair Display', Georgia, 'Times New Roman', serif",
+  serifSystem: "Georgia, 'Times New Roman', serif",
+};
 
 export interface InlineReviewCardProps {
   courseName: string;
@@ -53,22 +59,12 @@ export interface InlineReviewCardProps {
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
-const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
-  design: 'DESIGN',
-  conditions: 'CONDITIONS',
-  clubhouse: 'CLUBHOUSE',
-  facilities: 'FACILITIES',
+const TILE_LABELS_SHORT: Record<typeof BREAKDOWN_KEYS[number], string> = {
+  design: 'Des',
+  conditions: 'Cond',
+  clubhouse: 'Club',
+  facilities: 'Fac',
 };
-
-function formatDateShort(input: string | Date): string {
-  try {
-    const d = typeof input === 'string' ? new Date(input) : input;
-    if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  } catch {
-    return '';
-  }
-}
 
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseName,
@@ -82,14 +78,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   breakdown,
   reviewerStats,
   courseSubtitle,
-  reviewDate,
   reviewText,
 }) => {
-  const viewportWidth = useViewportWidth();
-  const isCompact = viewportWidth < COMPACT_VIEWPORT_MAX;
-  const titleSize = isCompact ? 18 : 20;
-  const scoreSize = isCompact ? 38 : 44;
-
   const initials = useMemo(
     () =>
       (reviewer.name || 'G')
@@ -112,11 +102,10 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
     if (!breakdown) return [];
     return BREAKDOWN_KEYS.flatMap((k) => {
       const v = breakdown[k];
-      return v == null || Number.isNaN(v) ? [] : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
+      return v == null || Number.isNaN(v) ? [] : [{ key: k, value: v }];
     });
   }, [breakdown]);
 
-  const dateLabel = reviewDate ? formatDateShort(reviewDate) : '';
   const coursesRated = reviewerStats?.coursesRated ?? null;
 
   const locationParts = [courseSubCountry || courseRegion, courseCountry].filter(Boolean);
@@ -139,7 +128,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        padding: '18px 18px 14px',
+        padding: '16px 18px 14px',
         margin: 0,
         borderRadius: 24,
         background: FROST.glass,
@@ -151,7 +140,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         color: FROST.ink,
         cursor: 'pointer',
         pointerEvents: isVisible ? 'auto' : 'none',
-        fontFamily: 'Geist, system-ui, sans-serif',
+        fontFamily: FONTS.geist,
         WebkitTapHighlightColor: 'transparent',
         transform: 'translateZ(0)',
         willChange: 'backdrop-filter',
@@ -173,243 +162,287 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         }}
       />
 
-      {/* Row 1 — Title + score */}
+      {/* Atmospheric watermark — Playfair score behind content */}
       <div
+        aria-hidden
         style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          gap: 12,
-          position: 'relative',
+          position: 'absolute',
+          right: -12,
+          bottom: -56,
+          fontFamily: FONTS.serifDisplay,
+          fontSize: 200,
+          fontWeight: 900,
+          lineHeight: 0.85,
+          color: 'rgba(255,255,255,0.04)',
+          pointerEvents: 'none',
+          letterSpacing: '-6px',
+          userSelect: 'none',
         }}
       >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
+        {formattedRating}
+      </div>
+
+      {/* === Content (above watermark) === */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {/* Prestige rule eyebrow — "REVIEW ────" */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <span
             style={{
-              fontSize: titleSize,
-              fontWeight: 800,
-              letterSpacing: '-0.4px',
-              lineHeight: 1.1,
-              color: FROST.ink,
-              wordBreak: 'break-word',
+              fontFamily: FONTS.serifDisplay,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '2.5px',
+              textTransform: 'uppercase',
+              color: FROST.amberSoft,
+              flexShrink: 0,
             }}
           >
-            {titleName}
-            {derivedSubtitle && (
-              <>
-                <span style={{ color: FROST.inkMute, fontWeight: 500 }}> — </span>
-                <span style={{ color: FROST.inkMute, fontWeight: 500 }}>{derivedSubtitle}</span>
-              </>
-            )}
-          </div>
+            Review
+          </span>
+          <div
+            aria-hidden
+            style={{
+              flex: 1,
+              height: 1,
+              background: `linear-gradient(90deg, ${FROST.amberBorder}, transparent)`,
+            }}
+          />
         </div>
+
+        {/* Row 1 — Title + score */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'baseline',
-            gap: 2,
-            flexShrink: 0,
-            fontVariantNumeric: 'tabular-nums',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: 12,
           }}
         >
-          <span
-            style={{
-              fontSize: scoreSize,
-              fontWeight: 800,
-              lineHeight: 0.85,
-              ...FROST_SCORE_GRADIENT,
-            }}
-          >
-            <span style={{ letterSpacing: '-2.2px' }}>
-              {formattedRating.split('.')[0]}
-            </span>
-            {formattedRating.includes('.') && (
-              <span style={{ letterSpacing: '-0.5px' }}>
-                <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
-                {formattedRating.split('.')[1]}
-              </span>
-            )}
-          </span>
-          <span
-            style={{
-              fontSize: 13,
-              color: FROST.inkFaint,
-              fontWeight: 500,
-              marginLeft: 2,
-              letterSpacing: '-0.2px',
-            }}
-          >
-            /10
-          </span>
-        </div>
-      </div>
-
-      {/* Location line */}
-      {locationStr && (
-        <div
-          style={{
-            marginTop: 6,
-            fontSize: 11,
-            color: FROST.inkMuter,
-            letterSpacing: '0.2px',
-            position: 'relative',
-          }}
-        >
-          {locationStr}
-        </div>
-      )}
-
-      {/* Row 2 — Breakdown 2×2 grid (conditional) */}
-      {breakdownEntries.length > 0 && (
-        <div
-          style={{
-            marginTop: 14,
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            columnGap: 18,
-            rowGap: 10,
-            paddingTop: 12,
-            paddingBottom: 14,
-            borderTop: `1px solid ${FROST.borderSoft}`,
-            borderBottom: `1px solid ${FROST.borderSoft}`,
-            marginBottom: 12,
-            position: 'relative',
-          }}
-        >
-          {breakdownEntries.map(({ key, label, value }) => (
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div
-              key={key}
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'baseline',
-                gap: 6,
-                minWidth: 0,
+                fontFamily: FONTS.serifDisplay,
+                fontSize: 22,
+                fontWeight: 800,
+                letterSpacing: '-0.4px',
+                lineHeight: 1.05,
+                color: FROST.ink,
+                wordBreak: 'break-word',
               }}
             >
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.8px',
-                  textTransform: 'uppercase',
-                  color: FROST.inkMuter,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {label}
-              </span>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  letterSpacing: '-0.2px',
-                  color: FROST.ink,
-                  fontVariantNumeric: 'tabular-nums',
-                  flexShrink: 0,
-                }}
-              >
-                {value.toFixed(1)}
-              </span>
+              {titleName}
+              {derivedSubtitle && (
+                <>
+                  <span
+                    style={{
+                      color: FROST.inkMute,
+                      fontWeight: 500,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {' — '}{derivedSubtitle}
+                  </span>
+                </>
+              )}
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Row 4 — Author row (consolidated inline) */}
-      <div
-        style={{
-          marginTop: breakdownEntries.length > 0 ? 0 : 14,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          minWidth: 0,
-          position: 'relative',
-        }}
-      >
-        <SquircleAvatar
-          size={22}
-          src={reviewer.avatar || undefined}
-          alt={reviewer.name}
-          fallback={initials}
-          hideRing
-        />
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: FROST.ink,
-            lineHeight: 1.2,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            marginLeft: 2,
-          }}
-        >
-          {reviewer.name || 'Golfer'}
-        </span>
-        {coursesRated != null && (
-          <>
-            <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 2,
+              flexShrink: 0,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             <span
               style={{
-                fontSize: 12,
-                color: FROST.inkMuter,
-                fontVariantNumeric: 'tabular-nums',
-                whiteSpace: 'nowrap',
+                fontSize: 30,
+                fontWeight: 800,
+                lineHeight: 0.85,
+                ...FROST_SCORE_GRADIENT,
               }}
             >
-              {coursesRated} rated
+              <span style={{ letterSpacing: '-1.4px' }}>
+                {formattedRating.split('.')[0]}
+              </span>
+              {formattedRating.includes('.') && (
+                <span style={{ letterSpacing: '-0.4px' }}>
+                  <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
+                  {formattedRating.split('.')[1]}
+                </span>
+              )}
             </span>
-          </>
-        )}
-        {dateLabel && (
-          <>
-            <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
             <span
               style={{
                 fontSize: 11,
                 color: FROST.inkFaint,
-                fontVariantNumeric: 'tabular-nums',
-                whiteSpace: 'nowrap',
+                fontWeight: 500,
+                marginLeft: 2,
+                letterSpacing: '-0.2px',
               }}
             >
-              {dateLabel}
+              /10
             </span>
-          </>
-        )}
-      </div>
+          </div>
+        </div>
 
-      {/* Row 5 — "READ FULL REVIEW →" affordance band (edge-to-edge) */}
-      <div
-        style={{
-          marginLeft: -18,
-          marginRight: -18,
-          marginBottom: -14,
-          marginTop: 12,
-          padding: '10px 18px',
-          background: 'rgba(247, 147, 30, 0.08)',
-          borderTop: `1px solid ${FROST.amberBorder}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          position: 'relative',
-        }}
-      >
-        <span
+        {/* Location line */}
+        {locationStr && (
+          <div
+            style={{
+              marginTop: 4,
+              fontSize: 11,
+              color: FROST.inkMuter,
+              letterSpacing: '0.2px',
+            }}
+          >
+            {locationStr}
+          </div>
+        )}
+
+        {/* Compressed breakdown row — abbreviated labels */}
+        {breakdownEntries.length > 0 && (
+          <div
+            style={{
+              marginTop: 12,
+              paddingTop: 10,
+              paddingBottom: 10,
+              borderTop: `1px solid ${FROST.borderSoft}`,
+              borderBottom: `1px solid ${FROST.borderSoft}`,
+              marginBottom: 12,
+              display: 'flex',
+              alignItems: 'baseline',
+              flexWrap: 'wrap',
+              gap: 0,
+              fontSize: 11,
+              color: FROST.inkMute,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '0.3px',
+            }}
+          >
+            {breakdownEntries.map(({ key, value }, i) => (
+              <React.Fragment key={key}>
+                <span style={{ display: 'inline-flex', gap: 5, alignItems: 'baseline' }}>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      color: FROST.inkMuter,
+                      letterSpacing: '0.5px',
+                      textTransform: 'uppercase',
+                      fontSize: 10,
+                    }}
+                  >
+                    {TILE_LABELS_SHORT[key]}
+                  </span>
+                  <span style={{ fontWeight: 700, color: FROST.ink, fontSize: 12 }}>
+                    {value.toFixed(1)}
+                  </span>
+                </span>
+                {i < breakdownEntries.length - 1 && (
+                  <span
+                    aria-hidden
+                    style={{
+                      color: FROST.inkFaint,
+                      padding: '0 8px',
+                      fontSize: 11,
+                    }}
+                  >
+                    ·
+                  </span>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+
+        {/* Italic Georgia excerpt in curly quotes */}
+        {reviewText && (
+          <div
+            style={{
+              marginTop: breakdownEntries.length > 0 ? 0 : 12,
+              marginBottom: 12,
+              fontFamily: FONTS.serifSystem,
+              fontStyle: 'italic',
+              fontSize: 13.5,
+              lineHeight: 1.45,
+              color: FROST.inkMute,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              wordBreak: 'break-word',
+            }}
+          >
+            {`\u201C${reviewText}\u201D`}
+          </div>
+        )}
+
+        {/* Author row with inline Read review link */}
+        <div
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '1.2px',
-            textTransform: 'uppercase',
-            color: FROST.amberSoft,
+            marginTop: reviewText || breakdownEntries.length > 0 ? 0 : 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            minWidth: 0,
           }}
         >
-          Read full review
-        </span>
-        <ChevronRight size={14} color={FROST.amberSoft} />
+          <SquircleAvatar
+            size={22}
+            src={reviewer.avatar || undefined}
+            alt={reviewer.name}
+            fallback={initials}
+            hideRing
+          />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: FROST.ink,
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              marginLeft: 2,
+            }}
+          >
+            {reviewer.name || 'Golfer'}
+          </span>
+          {coursesRated != null && (
+            <>
+              <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: FROST.inkMuter,
+                  fontVariantNumeric: 'tabular-nums',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {coursesRated} rated
+              </span>
+            </>
+          )}
+          {/* Inline Read review serif link — replaces date AND old amber band */}
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              fontFamily: FONTS.serifDisplay,
+              fontStyle: 'italic',
+              fontSize: 13,
+              fontWeight: 500,
+              color: FROST.amberSoft,
+              flexShrink: 0,
+            }}
+          >
+            Read review
+            <ChevronRight size={13} color={FROST.amberSoft} strokeWidth={2.25} />
+          </span>
+        </div>
       </div>
     </motion.button>
   );
