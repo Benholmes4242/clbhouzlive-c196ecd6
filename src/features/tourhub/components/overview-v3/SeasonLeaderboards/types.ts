@@ -17,6 +17,9 @@ export interface LeaderboardPlayer {
   statUnit: string;
   skillLevel: number;
   skillProgress: number;
+  // Phase E — bio enrichment for StatOfTheWeek meta line
+  birthDate: string | null;   // ISO date (yyyy-mm-dd) when available
+  turnedPro: number | null;   // 4-digit year when available
 }
 
 export interface LeaderboardCategory {
