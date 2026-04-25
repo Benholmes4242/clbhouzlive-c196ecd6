@@ -477,17 +477,11 @@ const CourseExplorer = () => {
       <YourNetworkSection className="mt-2 px-4" />
 
       <div
-        className="sticky top-0 z-20 pb-3 space-y-5 -mx-4 px-4"
+        className="pb-3 space-y-5 -mx-4 px-4"
         style={{
           background: '#F8FAFC',
           borderBottom: 'none',
-          paddingTop: isScrolled
-            ? 'max(env(safe-area-inset-top, 0px), 47px)'
-            : '8px',
-          boxShadow: isScrolled
-            ? '0 1px 0 rgba(15,23,42,0.06), 0 8px 24px -16px rgba(15,23,42,0.18)'
-            : 'none',
-          transition: 'box-shadow 200ms ease, padding-top 200ms ease',
+          paddingTop: '8px',
         }}
       >
       {/* Search */}
