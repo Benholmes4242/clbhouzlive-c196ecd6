@@ -3360,10 +3360,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
     transform: none;
   }
   
-  .rating-slider-primary[data-tier="outstanding"][data-just-entered="true"] [data-radix-slider-range],
-  .rating-slider-breakdown[data-tier="outstanding"][data-just-entered="true"] [data-radix-slider-range] {
-    animation: none;
-  }
   
   .rating-label-transition {
     transition: none;
