@@ -93,6 +93,9 @@ const TickerCell: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boole
       {/* Leader row */}
       {tournament.leader ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {tournament.leader.country && (
+            <CountryFlag country={tournament.leader.country} size="sm" />
+          )}
           <span
             style={{
               fontSize: 12,
