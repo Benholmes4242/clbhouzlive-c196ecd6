@@ -1,20 +1,31 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 
-interface SectionHeadingProps {
-  title: string;
-  className?: string;
+interface SectionLabelProps {
+  text: string;
+  /** When true, use brand amber for the bar + label. Defaults to slate ink. */
+  accent?: boolean;
 }
 
 /**
- * Shared section heading with amber accent bar.
- * Used across Course Detail About tab for visual consistency.
+ * Canonical Course Detail section label.
+ * 3px×13 vertical bar + 9px / 900-weight uppercase eyebrow with 0.18em tracking.
+ * Used across the About tab (`| ABOUT`, `| YOUR JOURNEY`, `| COURSE DETAILS`, `| LOCATION`).
  */
-export const SectionHeading: React.FC<SectionHeadingProps> = ({ title, className }) => (
-  <div className={cn("flex items-center gap-3", className)}>
-    <div className="w-8 h-0.5 bg-gradient-to-r from-amber-400 to-transparent rounded-full" />
-    <h2 className="text-[22px] md:text-[24px] font-bold tracking-[-0.3px] text-foreground">{title}</h2>
+export const SectionLabel: React.FC<SectionLabelProps> = ({ text, accent = false }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', marginBottom: 14 }}>
+    <div style={{ width: 3, height: 13, background: accent ? '#F7931E' : '#0F172A', borderRadius: 1 }} />
+    <span
+      style={{
+        fontSize: 9,
+        fontWeight: 900,
+        color: accent ? '#F7931E' : '#0F172A',
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase' as const,
+      }}
+    >
+      {text}
+    </span>
   </div>
 );
 
-export default SectionHeading;
+export default SectionLabel;
