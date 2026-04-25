@@ -642,32 +642,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <ChevronLeft className="h-[20px] w-[20px] text-white" strokeWidth={2.4} />
         </button>
 
-        {/* Legend badges — dynamic season color */}
-        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[calc(max(env(safe-area-inset-top,0px),47px)+12px)]">
-          <div 
-            className="pointer-events-auto flex items-center gap-2 w-fit ml-auto"
-            role="group"
-            aria-label="Map legend"
-          >
-            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span 
-                className="inline-block h-2.5 w-2.5 rounded-full shadow-sm" 
-                style={{ backgroundColor: PLAYED_COLOR }}
-                aria-hidden="true" 
-              />
-              <span className="text-[11px] font-medium text-white/90">Played</span>
-            </div>
-            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: WANT_TO_PLAY_COLOR }} aria-hidden="true" />
-              <span className="text-[11px] font-medium text-white/90">Want to Play</span>
-            </div>
-            <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/65 bg-transparent" aria-hidden="true" />
-              <span className="text-[11px] font-medium text-white/90">Not Played</span>
-            </div>
-          </div>
-        </div>
-
         {/* Bottom-right control stack — hides when course sheet is open */}
         <div className={cn(
           "pointer-events-none absolute right-3 bottom-52 z-20 flex flex-col items-center gap-2.5 transition-all duration-300",
