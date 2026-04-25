@@ -89,9 +89,9 @@ export interface RatingFormState {
   isDeleted: boolean;
   isFadingOut: boolean;
   
-  // Outstanding tier animation tracking
-  justEnteredOutstanding: boolean;
-  breakdownOutstandingEntry: Record<string, boolean>;
+  // Exceptional tier (≥9.0) gold-glow animation tracking
+  justEnteredExceptional: boolean;
+  breakdownExceptionalEntry: Record<string, boolean>;
 }
 
 export type RatingFormAction =
@@ -116,8 +116,8 @@ export type RatingFormAction =
   | { type: 'SET_BUTTON_TEXT'; payload: string }
   | { type: 'SET_IS_DELETED'; payload: boolean }
   | { type: 'SET_IS_FADING_OUT'; payload: boolean }
-  | { type: 'SET_JUST_ENTERED_OUTSTANDING'; payload: boolean }
-  | { type: 'SET_BREAKDOWN_OUTSTANDING_ENTRY'; payload: Record<string, boolean> }
+  | { type: 'SET_JUST_ENTERED_EXCEPTIONAL'; payload: boolean }
+  | { type: 'SET_BREAKDOWN_EXCEPTIONAL_ENTRY'; payload: Record<string, boolean> }
   | { type: 'POPULATE_FROM_EXISTING'; payload: { rating: any; media: ExistingMedia[] } }
   | { type: 'CLEAR_LOCAL_MEDIA' }
   | { type: 'RESET_FORM'; payload?: { keepEditData?: boolean } };
