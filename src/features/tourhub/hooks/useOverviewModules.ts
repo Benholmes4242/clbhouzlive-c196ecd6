@@ -217,12 +217,14 @@ export function useLiveRightNow() {
               ? {
                   id: (leaderEntry.player as any).id,
                   name: `${leaderCountMap[t.id]} tied`,
+                  country: null,
                   score: leaderEntry.score,
                   scoreDisplay: formatScore(leaderEntry.score),
                 }
               : {
                   id: (leaderEntry.player as any).id,
                   name: `${(leaderEntry.player as any).first_name} ${(leaderEntry.player as any).last_name}`,
+                  country: (leaderEntry.player as any).country ?? null,
                   score: leaderEntry.score,
                   scoreDisplay: formatScore(leaderEntry.score),
                 }
