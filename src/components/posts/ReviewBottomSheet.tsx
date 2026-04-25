@@ -1,10 +1,10 @@
 /**
- * ReviewBottomSheet — Frost Panel sheet (PR 7 editorial layout).
+ * ReviewBottomSheet — Editorial Frost Panel sheet (PR 7 v2).
  *
- * Three-zone layout (PR 6):
- *   - Pinned header: drag handle + title + location + (divider) + score | 2×2 breakdown grid
- *   - Scrollable middle: review body with amber Georgia drop cap on first paragraph
- *   - Pinned footer: author card + Visit Course / Full Review CTAs
+ * Three-zone layout (PR 6) with editorial design (PR 7 v2):
+ *   - Pinned header: drag handle + prestige rule + Playfair headline + location + 50px score | 2×2 FULL-label grid
+ *   - Scrollable middle: atmospheric "X.X" watermark + body paragraphs with Playfair amber drop cap
+ *   - Pinned footer: author card + Visit Profile + Full Review CTAs
  *
  * Driven by the unified store via ReviewBottomSheetPortal.
  */
@@ -13,7 +13,7 @@ import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { UserCheck } from 'lucide-react';
+import { UserCheck, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
@@ -29,6 +29,12 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsFollowingUser } from '@/hooks/useIsFollowingUser';
 import { useFollowStore } from '@/store/followStore';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
+
+const FONTS = {
+  geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+  serifDisplay: "'Playfair Display', Georgia, 'Times New Roman', serif",
+  serifSystem: "Georgia, 'Times New Roman', serif",
+};
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
@@ -158,11 +164,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   // Scope drag to header only so the scrollable middle scrolls without dismissing.
   const dragControls = useDragControls();
 
-  const handleVisitCourse = useCallback(() => {
-    if (!courseId) return;
+  const handleVisitProfile = useCallback(() => {
+    if (!user.id) return;
     onClose();
-    navigate(`/courses/${courseId}`);
-  }, [courseId, navigate, onClose]);
+    const handle = user.username || user.id;
+    navigate(`/profile/${handle}`);
+  }, [user.id, user.username, navigate, onClose]);
 
   const handleGoToReview = useCallback(() => {
     if (!courseId) return;
@@ -172,6 +179,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
       : `/courses/${courseId}?tab=reviews`;
     navigate(url);
   }, [courseId, reviewId, navigate, onClose]);
+
+  const reviewDateLabel = useMemo(() => {
+    // Format as "Apr 2026". reviewDate isn't on payload yet; derive from memberSince fallback or omit.
+    // Per brief: if missing, render just "REVIEW ────" with no date.
+    return '';
+  }, []);
 
   const locationParts = [courseSubCountry || courseRegion, courseCountry].filter(Boolean);
   const locationStr = locationParts.join(', ');
@@ -293,10 +306,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               fontFamily: 'Geist, system-ui, sans-serif',
             }}
           >
-            {/* Visually-hidden accessible title */}
-            <span id="review-sheet-title" style={SR_ONLY}>
-              Review of {courseName} by {user.name}
-            </span>
+            {/* Sheet title id is set on the h1 inside the header */}
 
             {/* Glow orbs — atmospheric */}
             <div
@@ -349,24 +359,59 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 />
               </div>
 
-              {/* Title — inline name + subtitle */}
+              {/* Prestige rule eyebrow — "REVIEW · APR 2026 ────" */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+                <span
+                  style={{
+                    fontFamily: FONTS.serifDisplay,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '2.5px',
+                    textTransform: 'uppercase',
+                    color: FROST.amberSoft,
+                    flexShrink: 0,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Review{reviewDateLabel ? <><span style={{ padding: '0 6px', color: FROST.inkFaint }}>·</span>{reviewDateLabel}</> : null}
+                </span>
+                <div
+                  aria-hidden
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    background: `linear-gradient(90deg, ${FROST.amberBorder}, transparent)`,
+                  }}
+                />
+              </div>
+
+              {/* Title — Playfair headline + italic subtitle */}
               <h1
+                id="review-sheet-title"
                 style={{
-                  fontSize: isCompact ? 24 : 28,
+                  fontFamily: FONTS.serifDisplay,
+                  fontSize: isCompact ? 24 : 26,
                   fontWeight: 800,
-                  letterSpacing: '-0.8px',
+                  letterSpacing: '-0.6px',
                   lineHeight: 1.1,
                   color: FROST.ink,
                   wordBreak: 'break-word',
-                  marginTop: 12,
+                  marginTop: 10,
                   marginBottom: 0,
                 }}
               >
                 {titleName}
                 {derivedSubtitle && (
                   <>
-                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}> — </span>
-                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}>{derivedSubtitle}</span>
+                    <span
+                      style={{
+                        color: FROST.inkMute,
+                        fontWeight: 500,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {' — '}{derivedSubtitle}
+                    </span>
                   </>
                 )}
               </h1>
@@ -387,8 +432,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               {/* Score + 2×2 breakdown side-by-side */}
               <div
                 style={{
-                  marginTop: 18,
-                  paddingTop: 16,
+                  marginTop: 16,
+                  paddingTop: 14,
                   borderTop: `1px solid ${FROST.borderSoft}`,
                 }}
               >
@@ -396,11 +441,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   style={{
                     display: 'flex',
                     flexDirection: isCompact ? 'column' : 'row',
-                    alignItems: isCompact ? 'flex-start' : 'flex-start',
+                    alignItems: 'flex-start',
                     gap: isCompact ? 14 : 20,
                   }}
                 >
-                  {/* Score on left */}
+                  {/* Score on left — 50px */}
                   <div
                     style={{
                       display: 'flex',
@@ -412,16 +457,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <span
                       style={{
                         ...FROST_SCORE_GRADIENT,
-                        fontSize: 68,
+                        fontSize: 50,
                         fontWeight: 800,
                         lineHeight: 0.85,
                       }}
                     >
-                      <span style={{ letterSpacing: '-3.2px' }}>
+                      <span style={{ letterSpacing: '-2.4px' }}>
                         {formattedRating.split('.')[0]}
                       </span>
                       {formattedRating.includes('.') && (
-                        <span style={{ letterSpacing: '-0.8px' }}>
+                        <span style={{ letterSpacing: '-0.6px' }}>
                           <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
                           {formattedRating.split('.')[1]}
                         </span>
@@ -429,11 +474,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     </span>
                     <span
                       style={{
-                        fontSize: 18,
+                        fontSize: 14,
                         color: FROST.inkFaint,
                         fontWeight: 500,
                         marginLeft: 4,
-                        marginBottom: 6,
+                        marginBottom: 4,
                         letterSpacing: '-0.3px',
                       }}
                     >
@@ -441,7 +486,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     </span>
                   </div>
 
-                  {/* 2×2 breakdown on right */}
+                  {/* 2×2 breakdown on right — FULL labels */}
                   {breakdownEntries.length > 0 && (
                     <div
                       style={{
@@ -500,7 +545,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               </div>
             </div>
 
-            {/* ─── SCROLLABLE MIDDLE (review body with drop cap) ──────── */}
+            {/* ─── SCROLLABLE MIDDLE (review body with drop cap + watermark) ──── */}
             <div
               style={{
                 flex: '1 1 auto',
@@ -513,10 +558,34 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 zIndex: 1,
               }}
             >
+              {/* Atmospheric watermark — Playfair score behind body */}
+              <div
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  right: -20,
+                  bottom: -40,
+                  fontFamily: FONTS.serifDisplay,
+                  fontSize: 300,
+                  fontWeight: 900,
+                  lineHeight: 0.85,
+                  color: 'rgba(255,255,255,0.035)',
+                  pointerEvents: 'none',
+                  letterSpacing: '-10px',
+                  userSelect: 'none',
+                  zIndex: 0,
+                }}
+              >
+                {formattedRating}
+              </div>
+
               {paragraphs.length === 0 && (
                 <div
                   style={{
-                    fontSize: 13,
+                    position: 'relative',
+                    zIndex: 1,
+                    fontFamily: FONTS.serifSystem,
+                    fontSize: 14,
                     fontStyle: 'italic',
                     color: FROST.inkFaint,
                     padding: '12px 0',
@@ -533,6 +602,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   <p
                     key={i}
                     style={{
+                      position: 'relative',
+                      zIndex: 1,
                       fontSize: 15,
                       lineHeight: 1.6,
                       color: FROST.inkSoft,
@@ -546,11 +617,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         <span
                           style={{
                             float: 'left',
-                            fontSize: 48,
+                            fontFamily: FONTS.serifDisplay,
+                            fontSize: 54,
                             fontWeight: 800,
                             lineHeight: 0.9,
                             paddingTop: 4,
-                            paddingRight: 8,
+                            paddingRight: 10,
                             color: FROST.amber,
                           }}
                         >
@@ -673,27 +745,27 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 )}
               </div>
 
-              {/* CTAs */}
-              {courseId && (
-                <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-                  <button
-                    type="button"
-                    onClick={handleVisitCourse}
-                    style={{
-                      flex: 1,
-                      padding: 14,
-                      borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      color: FROST.ink,
-                      fontSize: 14,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    Visit Course
-                  </button>
+              {/* CTAs — Visit Profile + Full Review */}
+              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                <button
+                  type="button"
+                  onClick={handleVisitProfile}
+                  style={{
+                    flex: 1,
+                    padding: 14,
+                    borderRadius: 14,
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    color: FROST.ink,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  Visit Profile
+                </button>
+                {courseId && (
                   <button
                     type="button"
                     onClick={handleGoToReview}
@@ -709,12 +781,17 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       cursor: 'pointer',
                       boxShadow: '0 4px 20px rgba(247,147,30,0.4)',
                       fontFamily: 'inherit',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
                     }}
                   >
-                    Full Review →
+                    Full Review
+                    <ChevronRight size={16} strokeWidth={2.5} />
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </motion.div>
         </>
