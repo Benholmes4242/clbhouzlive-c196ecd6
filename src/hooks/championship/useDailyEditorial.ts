@@ -24,6 +24,15 @@ export interface EditorialCopy {
   storyType: string;
   generatedBy: 'template' | 'ai_claude' | 'ai_claude_validated' | 'human_edit';
   date: string;
+  /**
+   * Optional structured editorial data for surfaces that need richer copy
+   * than the headline/standfirst fields can carry (e.g. course fit chips,
+   * watching notes, miss notes for IntelligenceHero).
+   *
+   * Shape is surface-specific — IntelligenceHero treats this as a partial
+   * `IntelligenceQuoteSnapshot` (see editorialFallbacks.ts).
+   */
+  snapshotData: Record<string, unknown> | null;
 }
 
 function todayUtc(): string {
