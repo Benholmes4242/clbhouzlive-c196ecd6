@@ -139,7 +139,6 @@ const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProf
 const FollowersListPage = lazy(() => import("./pages/FollowersListPage"));
 const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
 const FriendsListPage = lazy(() => import("./pages/FriendsListPage"));
-const FriendsActivityPage = lazy(() => import("./pages/FriendsActivityPage"));
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
 
 
@@ -340,7 +339,6 @@ function AppRoutes() {
         
         <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
         <Route path="/map" element={<Suspense fallback={<GenericPageSkeleton />}><MapPage /></Suspense>} />
-        <Route path="/friends-activity" element={<Suspense fallback={<CoursesListSkeleton />}><FriendsActivityPage /></Suspense>} />
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
         {/* Post deep link for notifications */}
