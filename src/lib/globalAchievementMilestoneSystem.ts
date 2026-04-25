@@ -105,6 +105,37 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fr
 
 export type RatingTier = 'POOR' | 'FAIR' | 'GOOD' | 'EXCELLENT' | 'EXCEPTIONAL';
 
+export interface RatingTheme {
+  key: RatingTier;
+  label: string;
+  accent: string;    // Pure accent color (amber)
+  bgLight: string;   // Card/badge gradient start
+  bgDark: string;    // Card/badge gradient end
+  // CSS class equivalents for Tailwind usage
+  bgClass: string;
+  borderClass: string;
+  textClass: string;
+  barFillClass: string;
+  // Gradient
+  gradient?: string;
+}
+
+// Unified amber palette — all tiers share the same visual treatment per the
+// all-amber decision. Future briefs may reintroduce per-tier differentiation
+// (e.g., richer gold for EXCEPTIONAL); when that happens, swap the per-tier
+// constants below back to distinct theme objects.
+const RATING_AMBER = '#f59e0b';
+const amberTheme = {
+  accent: RATING_AMBER,
+  bgLight: '#f59e0b0D',
+  bgDark: '#f59e0b1A',
+  bgClass: 'bg-[#f59e0b]/10',
+  borderClass: 'border-[#f59e0b]/30',
+  textClass: 'text-[#d97706]',
+  barFillClass: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
+  gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+};
+
 const poorTheme = amberTheme;
 const fairTheme = amberTheme;
 const goodTheme = amberTheme;
