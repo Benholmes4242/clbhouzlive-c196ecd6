@@ -47,8 +47,9 @@ const ClubTagPill = ({ course, className, positioning = 'fixed' }: ClubTagPillPr
       } : undefined}
     >
       <div
-        className="inline-flex items-center gap-1 rounded-full px-2 py-1"
+        className="inline-flex items-center gap-1 px-2 py-1"
         style={{
+          borderRadius: '34%',
           background: FROST.glass,
           backdropFilter: FROST_BLUR.panel,
           WebkitBackdropFilter: FROST_BLUR.panel,
