@@ -8,6 +8,7 @@ import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
+import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
 
 interface PersonalSectionProps {
   courseId: string;
@@ -39,16 +40,14 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   }
 
   return (
-    <section style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Section header — plain bold, no icon */}
-      <div>
-        <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', margin: 0 }}>
-          Your Journey
-        </h3>
-      </div>
+    <section style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Section header — canonical SectionLabel for cross-page consistency */}
+      <SectionLabel text="Your Journey" />
 
       {/* Status toggle */}
-      <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
+      <div style={{ padding: '0 16px' }}>
+        <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
+      </div>
 
       {/* Personal review card — only if played */}
       {hasPlayed && userRating && (
