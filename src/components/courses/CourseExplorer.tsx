@@ -532,30 +532,24 @@ const CourseExplorer = () => {
       {/* Context row with sort — scrolls with content */}
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
-          <p className="text-sm text-muted-foreground flex-1" style={{ fontSize: 13 }}>
+          <span style={{
+            fontSize: 10, color: '#475569', flex: 1,
+            fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+          }}>
             {hasSearch ? (
-              <>
-                Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
-                  ? 'worldwide'
-                  : <>in <span className="font-medium text-foreground/90">{getRegionLabel()}</span></>}
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground/90">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
+              <>RESULTS · {totalCount.toLocaleString()} {totalCount === 1 ? 'COURSE' : 'COURSES'}</>
             ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              'Exploring all courses worldwide'
+              <>WORLDWIDE · {totalCount.toLocaleString()} COURSES</>
             ) : (
-              <>
-                Exploring courses in{' '}
-                <span className="font-medium text-foreground/90">{getRegionLabel()}</span>
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground/90">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
+              <>{getRegionLabel().toUpperCase()} · {totalCount.toLocaleString()} COURSES</>
             )}
-          </p>
+          </span>
           <AppSelect
             value={sortOption}
             onChange={(v) => setSortOption(v as SortOption)}
             options={sortOptions}
             ariaLabel="Sort courses"
-            triggerClassName="h-11 text-[11px] active:scale-[0.98]"
+            triggerClassName="h-8 text-[12px] px-3 active:scale-[0.98]"
           />
         </div>
       )}

@@ -36,7 +36,12 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
   // Don't render if no active friends
   if (activeFriends.length === 0) return null;
 
-  const visibleFriends = activeFriends;
+  // Stable secondary sort: photographed friends first, preserving upstream activity-recency order
+  const visibleFriends = activeFriends.slice().sort((a, b) => {
+    const aHas = a.profile_photo_url ? 1 : 0;
+    const bHas = b.profile_photo_url ? 1 : 0;
+    return bHas - aHas;
+  });
   const remainingCount = 0;
 
   const handleAvatarClick = (friendId: string) => {
