@@ -1,58 +1,39 @@
-import { courseDetailTokens, TierKey } from '@/styles/course-detail-tokens';
+import { courseDetailTokens } from '@/styles/course-detail-tokens';
+import { getRatingTier } from '@/lib/ratingTier';
 
 /**
- * Get tier styles based on a numeric score (0-10 scale)
- * NEW: Gray for Fair→Excellent, Amber for Outstanding
+ * Score ring color helpers — the only surviving export of this module.
+ *
+ * History: this file previously housed bucketing helpers (useTierStyles,
+ * getTierKeyFromScore, getTierLabel, getTierFromLabel) that duplicated
+ * canonical tier logic. They had zero consumers and were silently broken
+ * for scores ≥ 9.5 (capped at "Outstanding"). Deleted Apr 2026.
+ *
+ * For score → tier mapping, use canonical helpers from `@/lib/ratingTier`
+ * (`getRatingTier`, `getRatingTierLabel`) directly. Do NOT reintroduce
+ * bucketing helpers here.
  */
-export const useTierStyles = (score: number) => {
-  if (score >= 9) return courseDetailTokens.tiers.outstanding;
-  if (score >= 8) return courseDetailTokens.tiers.excellent;
-  if (score >= 7) return courseDetailTokens.tiers.veryGood;
-  if (score >= 6) return courseDetailTokens.tiers.good;
-  return courseDetailTokens.tiers.fair;
+
+// Local mapping from canonical RatingTier strings → the keys used by
+// courseDetailTokens.scoreRing. Keeping this explicit gives us TypeScript
+// exhaustiveness checking and a single edit point if scoreRing keys change.
+const RATING_TIER_TO_RING_KEY: Record<
+  ReturnType<typeof getRatingTier>,
+  keyof typeof courseDetailTokens.scoreRing
+> = {
+  EXCEPTIONAL: 'exceptional',
+  OUTSTANDING: 'outstanding',
+  EXCELLENT: 'excellent',
+  'VERY GOOD': 'veryGood',
+  GOOD: 'good',
+  FAIR: 'fair',
 };
 
 /**
- * Get tier key from score (useful for dynamic class building)
- */
-export const getTierKeyFromScore = (score: number): TierKey => {
-  if (score >= 9) return 'outstanding';
-  if (score >= 8) return 'excellent';
-  if (score >= 7) return 'veryGood';
-  if (score >= 6) return 'good';
-  return 'fair';
-};
-
-/**
- * Get tier styles from a label string
- */
-export const getTierFromLabel = (label: string) => {
-  const map: Record<string, TierKey> = {
-    'Outstanding': 'outstanding',
-    'Excellent': 'excellent',
-    'Very Good': 'veryGood',
-    'Good': 'good',
-    'Fair': 'fair',
-  };
-  return courseDetailTokens.tiers[map[label] || 'good'];
-};
-
-/**
- * Get tier label from score
- */
-export const getTierLabel = (score: number): string => {
-  if (score >= 9) return 'Outstanding';
-  if (score >= 8) return 'Excellent';
-  if (score >= 7) return 'Very Good';
-  if (score >= 6) return 'Good';
-  return 'Fair';
-};
-
-/**
- * Get score ring gradient colors for SVG
- * NEW: Amber gradient for Outstanding, Gray for rest
+ * Get score ring gradient colors (from/to) for SVG rendering.
+ * Consumed by PersonalReviewCard.tsx.
  */
 export const getScoreRingColors = (score: number) => {
-  const key = getTierKeyFromScore(score);
+  const key = RATING_TIER_TO_RING_KEY[getRatingTier(score)];
   return courseDetailTokens.scoreRing[key];
 };
