@@ -61,7 +61,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Determine routes
   const isEditProfileRoute = location.pathname === '/edit-profile';
-  const isFriendsActivityRoute = location.pathname === '/friends-activity';
   const isAchievementsRoute = location.pathname === '/achievements' || location.pathname.startsWith('/achievements/') || location.pathname === '/profile/quest';
   const isMessagesRoute = location.pathname.startsWith('/messages');
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
@@ -86,7 +85,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTop100Route = isTop100HubPage || isTop100SubPage;
   
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isAchievementsRoute || isMessagesRoute;
   
   // Search overlay always uses light mode app-wide
   const useLightTheme = true;
@@ -100,8 +99,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         handleTop100Back();
       } else if (isEditProfileRoute) {
         navigate('/profile');
-      } else if (isFriendsActivityRoute) {
-        navigate(-1);
       } else if (isAchievementsRoute) {
         navigate(-1);
       } else if (isMessagesConversationRoute) {

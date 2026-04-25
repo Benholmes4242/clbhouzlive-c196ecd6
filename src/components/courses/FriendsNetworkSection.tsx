@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Users, TrendingUp } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { FriendsActivitySheet } from './network/FriendsActivitySheet';
 
 interface FriendsNetworkSectionProps {
   className?: string;
@@ -11,6 +12,7 @@ interface FriendsNetworkSectionProps {
 
 const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className = '' }) => {
   const navigate = useNavigate();
+  const [activitySheetOpen, setActivitySheetOpen] = useState(false);
   const { user } = useSupabaseSession();
   
   const { data: friendsData, isLoading } = useFriendsCourses(user?.id, '30d');
@@ -81,7 +83,7 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
   const { totalFriendsActive, totalCourses, totalRounds, trendingCourse, recentFriends } = processedData;
 
   const handleViewNetwork = () => {
-    navigate('/friends-activity');
+    setActivitySheetOpen(true);
   };
 
   const handleCourseClick = (courseId: string) => {
@@ -92,6 +94,7 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
 
 
   return (
+    <>
     <section className={`mb-4 ${className}`}>
       {/* Header row */}
       <div className="px-4 mb-2 flex items-center justify-between">
@@ -226,6 +229,8 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
         </div>
       )}
     </section>
+    <FriendsActivitySheet open={activitySheetOpen} onOpenChange={setActivitySheetOpen} />
+    </>
   );
 };
 
