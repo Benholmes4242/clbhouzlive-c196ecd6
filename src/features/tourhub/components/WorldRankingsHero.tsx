@@ -20,14 +20,14 @@ import { ChevronDown, TrendingUp, TrendingDown, Trophy } from 'lucide-react';
 import {
   useRankingMovers,
   useWorldRankingsFull,
-} from '../../hooks/useOverviewModules';
-import { usePlayerRankHistory } from '../../hooks/usePlayerRankHistory';
-import { SectionErrorState } from '../SectionErrorState';
+} from '../hooks/useOverviewModules';
+import { usePlayerRankHistory } from '../hooks/usePlayerRankHistory';
+import { SectionErrorState } from './SectionErrorState';
 import CountryFlag from '@/components/ui/country-flag';
-import { toTitleCase } from '../../hooks/useWorldRankings';
-import { getTourLogo } from '../../utils/tourLogos';
+import { toTitleCase } from '../hooks/useWorldRankings';
+import { getTourLogo } from '../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { PlayerAvatar } from '../PlayerAvatar';
+import { PlayerAvatar } from './PlayerAvatar';
 
 // ─── Tour selector options (mirrors UnifiedWorldRankings) ────────────────────
 const RANKING_TOUR_OPTIONS = [
