@@ -6,12 +6,12 @@ import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/u
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Search, Award, X, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import { type AppSelectOption } from '@/components/ui/AppSelect';
+import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
 
 type Top100SortOption = 'official' | 'user_rating';
 
@@ -51,6 +51,40 @@ const Top100CoursesHubPanel = () => {
 
   // Scroll restoration ref
   const hasRestoredScroll = useRef(false);
+
+  // Sticky filter bar elevation on scroll. Mirrors CourseExplorer's resolver
+  // so the listener and VirtualizedCourseList share the same source of truth.
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const resolveScroller = (): HTMLElement | Window => {
+      const root = document.getElementById('root');
+      if (root) {
+        const style = window.getComputedStyle(root);
+        if ((style.overflowY === 'scroll' || style.overflowY === 'auto') && root.scrollHeight > root.clientHeight) {
+          return root;
+        }
+      }
+      let element: HTMLElement | null = document.body;
+      while (element) {
+        const style = window.getComputedStyle(element);
+        const hasScroll = style.overflowY === 'scroll' || style.overflowY === 'auto';
+        if (hasScroll && element.scrollHeight > element.clientHeight) return element;
+        element = element.parentElement;
+      }
+      return window;
+    };
+
+    const scroller = resolveScroller();
+    const onScroll = () => {
+      const y = scroller instanceof Window
+        ? (window.scrollY || document.documentElement.scrollTop || 0)
+        : (scroller as HTMLElement).scrollTop;
+      setIsScrolled(y > 8);
+    };
+    scroller.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => scroller.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Fetch data
   const { data: progress } = useTop100ProgressForUser(user?.id);
@@ -190,6 +224,16 @@ const Top100CoursesHubPanel = () => {
     setSortOption('official');
   };
 
+  // Active list short label (used for placeholder + meta row)
+  const activeListShortLabel = (() => {
+    const opt = listOptions.find(o => o.value === selectedList);
+    if (!opt) return 'Top 100';
+    return opt.label.replace(/\s*Top 100\s*$/, '').trim();
+  })();
+  // Total courses in the active list — pulled from the per-list summaries
+  const totalCoursesInActiveList =
+    listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
+
   return (
     <div className="space-y-4">
       {/* Editorial header — left-aligned, mirrors Explore's Your Network pattern */}
@@ -271,13 +315,16 @@ const Top100CoursesHubPanel = () => {
         </div>
       </div>
 
-      {/* Controls Section - sticky search + sort */}
+      {/* Controls Section - sticky search bar with elevation on scroll */}
       <div
-        className="sticky top-0 z-20 pb-3 space-y-3 -mx-4 px-4"
+        className="sticky top-0 z-20 pb-3 -mx-4 px-4"
         style={{
           background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          boxShadow: isScrolled
+            ? '0 1px 0 rgba(15,23,42,0.06), 0 8px 24px -16px rgba(15,23,42,0.18)'
+            : 'none',
+          transition: 'box-shadow 200ms ease',
         }}
       >
         {/* Search */}
@@ -286,7 +333,7 @@ const Top100CoursesHubPanel = () => {
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search within this Top 100 list"
+            placeholder={`Search the ${activeListShortLabel} Top 100`}
             aria-label="Search within Top 100 list"
             className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
             style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
@@ -302,27 +349,30 @@ const Top100CoursesHubPanel = () => {
             </button>
           )}
         </div>
-
-        {/* Sort selector (list selector now lives in the pill row above) */}
-        <div>
-          <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
-            <SelectTrigger 
-              aria-label="Sort courses" 
-              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
-            >
-              <SelectValue placeholder="Official ranking" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50 rounded-2xl shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
-              {sortOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
+
+      {/* Meta row — small-caps tracked label + sort selector, mirrors Explore */}
+      {!isLoading && allCourses.length > 0 && (
+        <div className="flex items-center justify-between gap-3 pt-2 px-4">
+          <span style={{
+            fontSize: 10, color: '#475569', flex: 1,
+            fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+          }}>
+            {searchTerm ? (
+              <>RESULTS · {allCourses.length} {allCourses.length === 1 ? 'COURSE' : 'COURSES'}</>
+            ) : (
+              <>{activeListShortLabel.toUpperCase()} · {totalCoursesInActiveList} COURSES</>
+            )}
+          </span>
+          <AppSelect
+            value={sortOption}
+            onChange={(v) => setSortOption(v as Top100SortOption)}
+            options={sortOptions}
+            ariaLabel="Sort courses"
+            triggerClassName="h-8 text-[12px] px-3 active:scale-[0.98]"
+          />
+        </div>
+      )}
 
       {/* Rankings List */}
       <div className="px-4">
