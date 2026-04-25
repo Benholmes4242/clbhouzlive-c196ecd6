@@ -22,7 +22,7 @@ interface YourNetworkSectionProps {
  * - Network highlight carousel (landscape tiles)
  */
 export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ className }) => {
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   const { data, isLoading } = useNetworkActivity(user?.id);
 
@@ -35,7 +35,10 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
   const { friends, highlights, pulse, hasActivity } = data;
 
   const handleViewAll = () => {
-    navigate('/friends-activity');
+    const params = new URLSearchParams(searchParams);
+    params.set('network', 'open');
+    // push (not replace) so the OS back button closes the sheet
+    setSearchParams(params, { replace: false });
   };
 
   // Edge case: Friends but no recent activity
