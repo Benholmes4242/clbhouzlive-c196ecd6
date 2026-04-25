@@ -1849,7 +1849,7 @@ export function HeroCarousel({
   const touchMoveRef = React.useRef<number>(0);
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const isScorecardOpenRef = React.useRef(false);
-  const railRef = React.useRef<HTMLDivElement>(null);
+  // (Phase A: railRef removed alongside the deleted pill rail)
 
   const scheduleResume = useCallback(() => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
@@ -1918,17 +1918,7 @@ export function HeroCarousel({
     }
   }, [safeSlides.length, currentIndex]);
 
-  // Auto-scroll the tour pill rail so the active pill is centered (rail-only, never the page)
-  useEffect(() => {
-    if (!railRef.current) return;
-    const rail = railRef.current;
-    const card = rail.children[currentIndex] as HTMLElement | undefined;
-    if (!card) return;
-    const railRect = rail.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    const offset = cardRect.left - railRect.left - (railRect.width / 2) + (cardRect.width / 2);
-    rail.scrollBy({ left: offset, behavior: 'smooth' });
-  }, [currentIndex]);
+  // (Phase A: pill-rail auto-scroll effect removed alongside the deleted rail)
 
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
