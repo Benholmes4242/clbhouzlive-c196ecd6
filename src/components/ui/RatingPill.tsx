@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { getRatingTheme, type RatingTier } from '@/lib/globalAchievementMilestoneSystem';
+import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
+import type { RatingTier } from '@/lib/ratingTier';
 
 interface RatingPillProps {
   /** Rating score (0-10) OR a RatingTier key */
@@ -21,15 +22,18 @@ interface RatingPillProps {
  * Includes smooth tier change transitions.
  */
 export function RatingPill({ score, tier, label, showRatingInPill = false, className }: RatingPillProps) {
+  // Midpoint per canonical 5-tier banding (see src/lib/ratingTier.ts).
+  // Record<RatingTier, number> gives compile-time exhaustiveness — future
+  // RatingTier additions will fail here until a midpoint is provided.
+  const TIER_TO_MIDPOINT: Record<RatingTier, number> = {
+    EXCEPTIONAL: 9.5, // midpoint of ≥9.0
+    EXCELLENT: 8.2,   // midpoint of 7.5-8.9
+    GOOD: 6.7,        // midpoint of 6.0-7.4
+    FAIR: 5.0,        // midpoint of 4.0-5.9
+    POOR: 2.0,        // midpoint of 0-3.9
+  };
   const theme = tier
-    ? getRatingTheme(
-        tier === 'EXCEPTIONAL' ? 9.7 :   // midpoint of 9.5-10
-        tier === 'OUTSTANDING' ? 9.25 :  // midpoint of 9.0-9.4
-        tier === 'EXCELLENT' ? 8.5 :     // midpoint of 8.0-8.9
-        tier === 'VERY_GOOD' ? 7.5 :     // midpoint of 7.0-7.9
-        tier === 'GOOD' ? 6.5 :          // midpoint of 6.0-6.9
-        5                                 // fallback for FAIR
-      )
+    ? getRatingTheme(TIER_TO_MIDPOINT[tier])
     : getRatingTheme(score ?? 0);
 
   const displayLabel = label ?? theme.label;

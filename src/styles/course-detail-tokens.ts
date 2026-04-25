@@ -110,14 +110,13 @@ export const courseDetailTokens = {
     chipActive: 'ring-2 ring-offset-2',
   },
 
-  // Score ring gradient colors - AMBER FOR OUTSTANDING ONLY, Gray for rest
+  // Score ring gradient colors - all amber per unified rating system
   scoreRing: {
-    exceptional: { from: '#f59e0b', to: '#fbbf24' }, // Amber gradient
-    outstanding: { from: '#f59e0b', to: '#fbbf24' },
+    exceptional: { from: '#f59e0b', to: '#fbbf24' },
     excellent: { from: '#f59e0b', to: '#fbbf24' },
-    veryGood: { from: '#f59e0b', to: '#fbbf24' },
     good: { from: '#f59e0b', to: '#fbbf24' },
     fair: { from: '#f59e0b', to: '#fbbf24' },
+    poor: { from: '#f59e0b', to: '#fbbf24' },
   },
 } as const;
 
