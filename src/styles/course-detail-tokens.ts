@@ -1,8 +1,8 @@
 /**
  * Course Detail Page Design Tokens
  * Premium, world-class golf course profile styling
- * 
- * NEW COLOR SYSTEM (Jan 2026): Gray for Fair→Excellent, Amber/Orange gradient for Outstanding
+ *
+ * 5-TIER COLOR SYSTEM (Apr 2026): Gray for Excellent→Poor, Amber/Orange gradient for Exceptional (≥9.0)
  */
 
 export const courseDetailTokens = {

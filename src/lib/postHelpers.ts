@@ -56,7 +56,7 @@ export interface ReviewOverlayTheme extends RatingTheme {
 
 // Per-tier overlay themes for dark backgrounds
 // Maps course-detail tier palette to overlay-safe colors (light-on-dark)
-// Outstanding: Amber (#f59e0b), then graduated slate scale for visibility on glass
+// Exceptional: Amber (#f59e0b), then graduated slate scale for visibility on glass
 // All tiers now use the same amber overlay theme (unified rating system)
 const amberOverlay: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   pillBg: 'rgba(245, 158, 11, 0.15)',
@@ -92,7 +92,7 @@ function getTierKey(score: number): keyof typeof tierOverlayThemes {
 /**
  * Get overlay-safe rating colors for a score.
  * Returns per-tier colors adapted for dark glass backgrounds.
- * Matches course-detail tier palette: Outstanding (amber), Excellent→Fair (graduated slate).
+ * Matches course-detail tier palette: Exceptional (amber), Excellent→Poor (graduated slate).
  */
 export function getOverlayRatingColors(score: number): { main: string; sub: string } {
   // ALL tiers now use amber — consistent with course detail page
@@ -120,7 +120,7 @@ export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
 /**
  * Get review overlay theme by tier label.
  * 
- * @param tierLabel - Tier label string (e.g., 'OUTSTANDING', 'EXCELLENT')
+ * @param tierLabel - Tier label string (e.g., 'EXCEPTIONAL', 'EXCELLENT')
  * @returns Complete theme with overlay-specific colors
  */
 export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTheme {

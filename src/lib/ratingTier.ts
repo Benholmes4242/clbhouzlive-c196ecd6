@@ -9,7 +9,7 @@
  *   FAIR        4.0-5.9 (width 2.0)
  *   POOR        <4.0    (width 4.0)
  *
- * "Outstanding" and "Very Good" no longer exist. ≥9.0 is now Exceptional;
+ * Legacy "Outstanding" and "Very Good" no longer exist. ≥9.0 is now Exceptional;
  * 7.5–7.9 ratings promote to Excellent; 7.0–7.4 ratings demote to Good.
  * `null` ratings map to POOR (semantically the worst case — no rating exists).
  */

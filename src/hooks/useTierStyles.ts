@@ -7,7 +7,7 @@ import { getRatingTier } from '@/lib/ratingTier';
  * History: this file previously housed bucketing helpers (useTierStyles,
  * getTierKeyFromScore, getTierLabel, getTierFromLabel) that duplicated
  * canonical tier logic. They had zero consumers and were silently broken
- * for scores ≥ 9.5 (capped at "Outstanding"). Deleted Apr 2026.
+ * for scores ≥ 9.5 (capped at "Outstanding" under the legacy 6-tier system). Deleted Apr 2026.
  *
  * For score → tier mapping, use canonical helpers from `@/lib/ratingTier`
  * (`getRatingTier`, `getRatingTierLabel`) directly. Do NOT reintroduce

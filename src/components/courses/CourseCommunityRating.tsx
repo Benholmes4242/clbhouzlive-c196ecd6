@@ -15,9 +15,9 @@ interface CourseCommunityRatingProps {
  * Displays the community rating score.
  * This is the SINGLE source of truth for rating display in course cards.
  * 
- * Rating tier colors:
- * - Outstanding (9.0+): amber-500 (brand accent) — unless forceNeutral is set
- * - Standard (< 9.0): foreground (neutral)
+ * Rating tier colors (5-tier system, Apr 2026):
+ * - Exceptional (≥9.0): amber-500 (brand accent) — unless forceNeutral is set
+ * - Excellent / Good / Fair / Poor (< 9.0): foreground (neutral)
  */
 export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   rating,
