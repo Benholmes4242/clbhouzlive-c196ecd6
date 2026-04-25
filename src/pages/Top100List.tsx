@@ -6,6 +6,7 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
@@ -69,6 +70,7 @@ const Top100List = () => {
   const { data: lists } = useTop100Lists();
   const { data: progressData } = useTop100ProgressForUser(user?.id);
   const { data: userActivity } = useUserCourseActivity(user?.id);
+  const { data: currentUserProfile } = useUserProfile(user?.id);
 
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
@@ -470,6 +472,11 @@ const Top100List = () => {
               totalInList={totalCount}
               listName={listDisplayName}
               currentUserPlayed={playedCount}
+              currentUserId={user?.id}
+              currentUserName={currentUserProfile?.display_name || currentUserProfile?.username || 'You'}
+              currentUserUsername={currentUserProfile?.username || undefined}
+              currentUserAvatarUrl={currentUserProfile?.profile_photo_url}
+              regionAccentColor={regionRingColor}
             />
           </div>
         )}
