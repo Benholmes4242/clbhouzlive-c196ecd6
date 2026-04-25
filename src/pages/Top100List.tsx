@@ -472,6 +472,11 @@ const Top100List = () => {
               totalInList={totalCount}
               listName={listDisplayName}
               currentUserPlayed={playedCount}
+              currentUserId={user?.id}
+              currentUserName={currentUserProfile?.display_name || currentUserProfile?.username || 'You'}
+              currentUserUsername={currentUserProfile?.username || undefined}
+              currentUserAvatarUrl={currentUserProfile?.profile_photo_url}
+              regionAccentColor={regionRingColor}
             />
           </div>
         )}
