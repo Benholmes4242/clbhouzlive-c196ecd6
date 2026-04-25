@@ -51,12 +51,16 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
 
       {/* Personal review card — only if played */}
       {hasPlayed && userRating && (
-        <PersonalReviewCard courseId={courseId} rating={userRating} />
+        <div style={{ padding: '0 16px' }}>
+          <PersonalReviewCard courseId={courseId} rating={userRating} />
+        </div>
       )}
 
       {/* Course moments — only if played */}
       {hasPlayed && (
-        <CourseMoments courseId={courseId} courseName={courseName} />
+        <div style={{ padding: '0 16px' }}>
+          <CourseMoments courseId={courseId} courseName={courseName} />
+        </div>
       )}
     </section>
   );
