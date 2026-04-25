@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Sparkles } from 'lucide-react';
+import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
@@ -16,23 +16,6 @@ interface CommunityScoreCardProps {
 }
 
 const formatScore = (score: number) => score.toFixed(1);
-
-const SectionHeader: React.FC = () => (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
-    <div style={{ width: 3, height: 13, background: '#F7931E', borderRadius: 1 }} />
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 900,
-        color: '#F7931E',
-        letterSpacing: '0.18em',
-        textTransform: 'uppercase' as const,
-      }}
-    >
-      Community Rating
-    </span>
-  </div>
-);
 
 const TIERS: { key: keyof RatingTierDistributionData; label: string }[] = [
   { key: 'exceptional', label: 'Exceptional' },
@@ -163,14 +146,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     { id: 'facilities', label: 'Facilities', score: ratingAggregates?.avg_facilities_score },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
 
-  const highlights = (() => {
-    if (categories.length === 0) return [] as string[];
-    return [...categories]
-      .filter((c) => (c.score || 0) >= 9.0)
-      .sort((a, b) => (b.score || 0) - (a.score || 0))
-      .map((c) => c.label);
-  })();
-
   // Distribution counts (fallback to zeros)
   const distCounts: Record<string, number> = {
     exceptional: distribution?.exceptional ?? 0,
@@ -183,11 +158,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   return (
     <div>
-      {/* Score row — flat */}
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
-        <span
+      {/* Score block — stacked & centered (number above tier label) */}
+      <div style={{ textAlign: 'center' as const, marginBottom: 6 }}>
+        <div
           style={{
-            fontSize: 40,
+            fontSize: 56,
             fontWeight: 900,
             color: '#0F172A',
             letterSpacing: '-0.05em',
@@ -196,41 +171,25 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           }}
         >
           {formatScore(communityAverage)}
-        </span>
-        <span style={{ fontSize: 12, fontWeight: 900, color: '#0F172A', letterSpacing: '0.08em' }}>
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 800,
+            color: '#c97a10',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase' as const,
+            marginTop: 6,
+          }}
+        >
           {tierLabel}
-        </span>
+        </div>
       </div>
 
       <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 14, textAlign: 'center' as const }}>
         Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
         {onlyUserHasRated ? ' · Only you have rated this course so far.' : ''}
       </div>
-
-      {/* Highlights pills */}
-      {highlights.length > 0 && (
-        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 12 }}>
-          {highlights.map((h) => (
-            <span
-              key={h}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                fontSize: 10,
-                color: '#64748B',
-                background: 'rgba(15,23,42,0.05)',
-                borderRadius: 20,
-                padding: '3px 10px',
-                border: '1px solid rgba(15,23,42,0.08)',
-              }}
-            >
-              <Sparkles className="w-3 h-3" style={{ color: '#F7931E' }} />
-              {h}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* User vs community comparison */}
       {comparisonMessage}
@@ -273,52 +232,68 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         })}
       </div>
 
-      {/* Category breakdown — score rings */}
+      {/* Category breakdown — eyebrow + score rings */}
       {categories.length > 0 && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${categories.length}, 1fr)`,
-            gap: 8,
-            paddingTop: 16,
-            borderTop: '0.5px solid rgba(15,23,42,0.07)',
-          }}
-        >
-          {categories.map((cat) => (
-            <div key={cat.id} style={{ textAlign: 'center' as const }}>
-              <ScoreRing score={cat.score || 0} size={50} />
-              <div
-                style={{
-                  fontSize: 8,
-                  fontWeight: 700,
-                  color: '#94A3B8',
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase' as const,
-                  marginTop: 6,
-                }}
-              >
-                {cat.label}
+        <>
+          {/* Eyebrow tying breakdown to histogram */}
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#94A3B8',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase' as const,
+              textAlign: 'center' as const,
+              marginTop: 8,
+              paddingTop: 16,
+              borderTop: '0.5px solid rgba(15,23,42,0.07)',
+              marginBottom: 10,
+            }}
+          >
+            Category Scores
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${categories.length}, 1fr)`,
+              gap: 8,
+            }}
+          >
+            {categories.map((cat) => (
+              <div key={cat.id} style={{ textAlign: 'center' as const }}>
+                <ScoreRing score={cat.score || 0} size={50} />
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 700,
+                    color: '#94A3B8',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase' as const,
+                    marginTop: 6,
+                  }}
+                >
+                  {cat.label}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
-      {/* See all reviews */}
+      {/* See all reviews — quiet text link */}
       {onSeeAllReviews && (
         <button
           type="button"
           onClick={onSeeAllReviews}
           style={{
             width: '100%',
-            padding: '10px 0 0',
+            padding: '14px 0 4px',
             background: 'none',
             border: 'none',
             fontSize: 13,
-            fontWeight: 700,
-            color: '#64748B',
+            fontWeight: 600,
+            color: '#94A3B8',
             cursor: 'pointer',
-            marginTop: 14,
           }}
         >
           See all reviews →
