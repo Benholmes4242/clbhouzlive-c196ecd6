@@ -5,40 +5,78 @@
  * on the Tour Hub. Auto-detects tournament lifecycle (live / results / upcoming)
  * via `useIntelligenceLifecycleState` (mirrors HeroCarousel's 1.5-day window).
  *
- * Phase A: persistent shell (Masthead + TrackRecord + CTA) wraps state-conditional
- * stub blocks. Phase B fills the stubs with full content. Phase C wires the CTA
- * to open IntelligenceAllPicksSheet (currently a no-op).
+ * Phase A: persistent shell (Masthead + TrackRecord + CTA).
+ * Phase B (this commit): full content blocks for each lifecycle state.
+ *   - Live    → performance band + 3 picks with live position + reasoning
+ *   - Results → "WE CALLED IT" recap when Top Pick wins, else final standings
+ *   - Upcoming → venue card with course-fit chips + 3 picks with reasoning
+ * Phase C: wires the CTA to open IntelligenceAllPicksSheet.
  *
- * Editorial copy reads from championship_editorial_daily (surface =
- * 'intelligence_quote') with INTELLIGENCE_QUOTE_FALLBACK as the V1 fallback.
+ * Editorial copy reads from INTELLIGENCE_HERO_FALLBACK (V1 hardcoded). V2 will
+ * move to a Claude-driven daily pipeline via championship_editorial_daily.
  */
 
 import { memo, useMemo } from 'react';
-import { Brain, ChevronRight } from 'lucide-react';
-import { useIntelligenceLifecycleState, type IntelligenceLifecycleState } from '../hooks/useIntelligenceLifecycleState';
+import { Brain, ChevronRight, Check } from 'lucide-react';
+import {
+  useIntelligenceLifecycleState,
+  type IntelligenceLifecycleState,
+} from '../hooks/useIntelligenceLifecycleState';
 import { usePickHistory } from '../hooks/usePickHistory';
-import type { AIPredictionData } from '../hooks/useAIPredictions';
+import { usePredictionTracker } from '../hooks/usePredictionTracker';
+import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions';
+import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
+import { PlayerAvatar } from './PlayerAvatar';
+import { INTELLIGENCE_HERO_FALLBACK } from '../utils/editorialFallbacks';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const WEEKDAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 
+const PURPLE_ACCENT = '#A78BFA';
+const AMBER_ACCENT = '#F7931E';
+
+function formatPosition(p: TrackedPrediction): string {
+  if (p.performanceStatus === 'cut') return 'MC';
+  if (p.performanceStatus === 'withdrawn') return 'WD';
+  if (p.actualPosition === null) return '—';
+  return `${p.actualPositionTied ? 'T' : ''}${p.actualPosition}`;
+}
+
+function formatScore(score: number | null): string {
+  if (score === null || score === undefined) return 'E';
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : `${score}`;
+}
+
+/** Reasoning playing-out heuristic per Phase B brief: actualPos ≤ predictedRank × 5. */
+function isReasoningPlayingOut(p: TrackedPrediction): boolean {
+  if (p.actualPosition === null) return false;
+  if (p.performanceStatus === 'cut' || p.performanceStatus === 'withdrawn') return false;
+  return p.actualPosition <= p.predictedRank * 5;
+}
+
 function formatStateLabel(
   state: IntelligenceLifecycleState,
   data: AIPredictionData | null | undefined,
   nextTournamentPredictions: AIPredictionData | null,
+  tracker: PredictionTrackerData | undefined,
 ): string {
   if (state === 'live') {
-    // Round number isn't on AIPredictionData yet; render generic "LIVE" until
-    // Phase B wires usePredictionTracker (which exposes currentRound).
-    return 'LIVE';
+    const lead = tracker?.predictions[0];
+    const noScoresYet =
+      !!lead &&
+      (lead.thru === null || lead.thru === 0) &&
+      (lead.currentRound === null || lead.currentRound === 1);
+    if (noScoresYet) return 'TEES OFF SOON';
+    const round = lead?.currentRound ?? 1;
+    return `LIVE · ROUND ${round}`;
   }
   if (state === 'results' && data?.tournament?.endDate) {
     const d = new Date(data.tournament.endDate);
     return `FINAL · ${MONTHS[d.getMonth()]} ${d.getDate()}`;
   }
-  // upcoming
   const startIso = nextTournamentPredictions?.tournament?.startDate ?? data?.tournament?.startDate;
   if (startIso) {
     const d = new Date(startIso);
@@ -52,11 +90,20 @@ function formatStateLabel(
 export const IntelligenceHero = memo(function IntelligenceHero() {
   const {
     state,
+    activeTournamentId,
     data,
     nextTournamentPredictions,
     isLoading,
   } = useIntelligenceLifecycleState();
   const { data: pickHistory = [] } = usePickHistory();
+
+  // Tracker is needed for both live AND results states (per Phase B audit).
+  // Upcoming skips it — there is nothing to track.
+  const trackerEnabled = state === 'live' || state === 'results';
+  const { data: tracker } = usePredictionTracker(
+    trackerEnabled ? activeTournamentId : null,
+    trackerEnabled ? data : null,
+  );
 
   // ─── Computed track record ────────────────────────────────────────────────
   const { wins, topFives, topFiveRate } = useMemo(() => {
@@ -70,12 +117,11 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   }, [pickHistory]);
 
   const stateLabel = useMemo(
-    () => formatStateLabel(state, data, nextTournamentPredictions),
-    [state, data, nextTournamentPredictions],
+    () => formatStateLabel(state, data, nextTournamentPredictions, tracker),
+    [state, data, nextTournamentPredictions, tracker],
   );
 
   const handleOpenSheet = () => {
-    // Phase C wires this to open IntelligenceAllPicksSheet.
     if (process.env.NODE_ENV !== 'production') {
       // eslint-disable-next-line no-console
       console.log('[IntelligenceHero] CTA tapped — sheet wiring lands in Phase C');
@@ -129,29 +175,25 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
           }}
         />
 
-        {/* Grid pattern overlay deleted per Phase A refinement (was lines 146-158). */}
-
         <div style={{ position: 'relative', zIndex: 1 }}>
           <Masthead stateLabel={stateLabel} />
 
-          {/* ── Divider ── */}
-          <div
-            style={{
-              height: 1,
-              background: 'rgba(255,255,255,0.1)',
-              marginTop: 14,
-              marginBottom: 16,
-            }}
-          />
+          <Divider top={14} bottom={16} />
 
           {/* ── State-conditional content ── */}
           {isLoading ? (
-            <StateStub label="Loading Intelligence…" />
+            <StateMessage label="Loading Intelligence…" />
           ) : (
             <>
-              {state === 'live' && <LiveStateStub />}
-              {state === 'results' && <ResultsStateStub />}
-              {state === 'upcoming' && <UpcomingStateStub />}
+              {state === 'live' && (
+                <LiveStateBlock data={data} tracker={tracker} />
+              )}
+              {state === 'results' && (
+                <ResultsStateBlock data={data} tracker={tracker} />
+              )}
+              {state === 'upcoming' && (
+                <UpcomingStateBlock data={nextTournamentPredictions ?? data ?? null} />
+              )}
             </>
           )}
 
@@ -203,7 +245,7 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: '#A78BFA',
+            color: PURPLE_ACCENT,
             textShadow: '0 0 12px rgba(167, 139, 250, 0.5)',
           }}
         >
@@ -281,21 +323,546 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
   );
 }
 
-// ─── Phase A state stubs (Phase B replaces with full content blocks) ────────
+// ─── State blocks ────────────────────────────────────────────────────────────
 
-function LiveStateStub() {
-  return <StateStub label="Live tournament in progress." />;
+function LiveStateBlock({
+  data,
+  tracker,
+}: {
+  data: AIPredictionData | null | undefined;
+  tracker: PredictionTrackerData | undefined;
+}) {
+  const editorial = INTELLIGENCE_HERO_FALLBACK.live;
+  const picks = tracker?.predictions ?? [];
+  const accuracy = tracker?.accuracy;
+
+  return (
+    <div>
+      <Eyebrow>{editorial.eyebrow}</Eyebrow>
+      <Headline>{editorial.headline}</Headline>
+      <Standfirst>{editorial.standfirst}</Standfirst>
+
+      {/* Performance band — honest zeros pre-tee-off (per refinement) */}
+      {accuracy && (
+        <div
+          style={{
+            marginTop: 14,
+            display: 'flex',
+            gap: 10,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.6)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          <PerformanceChip label={`${accuracy.inTop5} IN T5`} />
+          <PerformanceChip label={`${accuracy.inTop10} IN T10`} />
+        </div>
+      )}
+
+      {/* Picks list */}
+      <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {picks.length === 0 && data?.topContenders.slice(0, 3).map((p) => (
+          <UpcomingPickRow key={p.playerId} contender={p} />
+        ))}
+        {picks.slice(0, 3).map((p) => (
+          <LivePickRow key={p.playerId} pick={p} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
-function ResultsStateStub() {
-  return <StateStub label="Recent results." />;
+function ResultsStateBlock({
+  data,
+  tracker,
+}: {
+  data: AIPredictionData | null | undefined;
+  tracker: PredictionTrackerData | undefined;
+}) {
+  const picks = tracker?.predictions ?? [];
+  const topPick = picks[0];
+  const topPickWon = !!topPick && topPick.actualPosition === 1;
+
+  // "WE CALLED IT" recap — only when our Top Pick actually won.
+  if (topPickWon && topPick) {
+    const editorial = INTELLIGENCE_HERO_FALLBACK.results.win;
+    return (
+      <div>
+        <Eyebrow color={AMBER_ACCENT} glow>{editorial.eyebrow}</Eyebrow>
+        <Headline>{editorial.headline}</Headline>
+        <Standfirst>{editorial.standfirst}</Standfirst>
+
+        {/* Hero slot — 56px squircle wrapper around lg avatar with amber ring */}
+        <div
+          style={{
+            marginTop: 16,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+          }}
+        >
+          <div
+            style={{
+              padding: 2,
+              borderRadius: '38%',
+              background:
+                'linear-gradient(135deg, rgba(247,147,30,1) 0%, rgba(247,147,30,0.4) 100%)',
+              boxShadow: '0 0 18px rgba(247,147,30,0.5)',
+              flexShrink: 0,
+            }}
+          >
+            <PlayerAvatar
+              playerId={topPick.playerId}
+              playerName={topPick.playerName}
+              tourCode="pga"
+              size="md"
+            />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                fontSize: 17,
+                fontWeight: 800,
+                color: '#ffffff',
+                letterSpacing: '-0.3px',
+                lineHeight: 1.1,
+              }}
+            >
+              {topPick.playerName}
+            </div>
+            <div
+              style={{
+                marginTop: 4,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: AMBER_ACCENT,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              WINNER · {formatScore(topPick.score)}
+            </div>
+          </div>
+        </div>
+
+        {/* Other picks — compact rows */}
+        {picks.length > 1 && (
+          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {picks.slice(1, 3).map((p) => (
+              <ResultsPickRow key={p.playerId} pick={p} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Honest "FINAL STANDINGS" — Top Pick did not win.
+  const editorial = INTELLIGENCE_HERO_FALLBACK.results.standings;
+  return (
+    <div>
+      <Eyebrow>{editorial.eyebrow}</Eyebrow>
+      <Headline>{editorial.headline}</Headline>
+      <Standfirst>{editorial.standfirst}</Standfirst>
+
+      <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {picks.slice(0, 3).map((p) => (
+          <ResultsPickRow key={p.playerId} pick={p} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
-function UpcomingStateStub() {
-  return <StateStub label="Next tournament preview." />;
+function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
+  const editorial = INTELLIGENCE_HERO_FALLBACK.upcoming;
+  const venueName = data?.tournament?.venueName ?? 'Venue TBC';
+  const tournamentName = data?.tournament?.name ?? 'Next Tournament';
+  const courseChips = (() => {
+    const liveStats = data?.courseAnalysis?.keyStats ?? [];
+    if (liveStats.length > 0) return liveStats.slice(0, 3);
+    return editorial.courseFitChips.slice(0, 3);
+  })();
+
+  return (
+    <div>
+      <Eyebrow>{editorial.eyebrow}</Eyebrow>
+      <Headline>{editorial.headline}</Headline>
+      <Standfirst>{editorial.standfirst}</Standfirst>
+
+      {/* Venue card */}
+      <div
+        style={{
+          marginTop: 14,
+          padding: '12px 14px',
+          borderRadius: 12,
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: PURPLE_ACCENT,
+          }}
+        >
+          {tournamentName}
+        </div>
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 14,
+            fontWeight: 800,
+            color: '#ffffff',
+            letterSpacing: '-0.2px',
+          }}
+        >
+          {venueName}
+        </div>
+        <div
+          style={{
+            marginTop: 10,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 6,
+          }}
+        >
+          {courseChips.map((chip, i) => (
+            <span
+              key={`${chip}-${i}`}
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                padding: '4px 9px',
+                borderRadius: 999,
+                background: 'rgba(167, 139, 250, 0.12)',
+                border: '1px solid rgba(167, 139, 250, 0.28)',
+                color: PURPLE_ACCENT,
+              }}
+            >
+              {chip}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Picks list */}
+      {data?.topContenders && data.topContenders.length > 0 && (
+        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {data.topContenders.slice(0, 3).map((p) => (
+            <UpcomingPickRow key={p.playerId} contender={p} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
-function StateStub({ label }: { label: string }) {
+// ─── Pick rows ───────────────────────────────────────────────────────────────
+
+function LivePickRow({ pick }: { pick: TrackedPrediction }) {
+  const reasoningHit = isReasoningPlayingOut(pick);
+  const positionStr = formatPosition(pick);
+  const scoreStr = formatScore(pick.score);
+  const reasonText = pick.reasons[0] ?? '';
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <PlayerAvatar
+        playerId={pick.playerId}
+        playerName={pick.playerName}
+        tourCode="pga"
+        size="sm"
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#ffffff',
+              letterSpacing: '-0.2px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+            }}
+          >
+            {pick.playerName}
+          </span>
+          {reasoningHit && (
+            <Check
+              size={11}
+              color={AMBER_ACCENT}
+              strokeWidth={3}
+              aria-label="Reasoning playing out"
+            />
+          )}
+        </div>
+        {reasonText && (
+          <div
+            style={{
+              marginTop: 2,
+              fontSize: 11,
+              color: 'rgba(255,255,255,0.55)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {reasonText}
+          </div>
+        )}
+      </div>
+      <div
+        style={{
+          textAlign: 'right',
+          fontVariantNumeric: 'tabular-nums',
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ fontSize: 12, fontWeight: 800, color: '#ffffff' }}>
+          {positionStr}
+        </div>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+          {scoreStr}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResultsPickRow({ pick }: { pick: TrackedPrediction }) {
+  const positionStr = formatPosition(pick);
+  const scoreStr = formatScore(pick.score);
+  const won = pick.actualPosition === 1;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <PlayerAvatar
+        playerId={pick.playerId}
+        playerName={pick.playerName}
+        tourCode="pga"
+        size="sm"
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#ffffff',
+            letterSpacing: '-0.2px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {pick.playerName}
+        </div>
+        <div
+          style={{
+            marginTop: 2,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.5)',
+          }}
+        >
+          PICK {pick.predictedRank}
+        </div>
+      </div>
+      <div
+        style={{
+          textAlign: 'right',
+          fontVariantNumeric: 'tabular-nums',
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 800,
+            color: won ? AMBER_ACCENT : '#ffffff',
+          }}
+        >
+          {positionStr}
+        </div>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.55)',
+          }}
+        >
+          {scoreStr}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UpcomingPickRow({ contender }: { contender: AITopContender }) {
+  const reasonText = contender.reasons[0] ?? '';
+  const fitScore = contender.courseFitScore;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <PlayerAvatar
+        playerId={contender.playerId}
+        playerName={contender.playerName}
+        tourCode="pga"
+        size="sm"
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#ffffff',
+            letterSpacing: '-0.2px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {contender.playerName}
+        </div>
+        {reasonText && (
+          <div
+            style={{
+              marginTop: 2,
+              fontSize: 11,
+              color: 'rgba(255,255,255,0.55)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {reasonText}
+          </div>
+        )}
+      </div>
+      {!!fitScore && (
+        <div
+          style={{
+            flexShrink: 0,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.06em',
+            padding: '4px 8px',
+            borderRadius: 8,
+            background: 'rgba(167, 139, 250, 0.14)',
+            color: PURPLE_ACCENT,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          FIT {Math.round(fitScore)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Atoms ───────────────────────────────────────────────────────────────────
+
+function Eyebrow({
+  children,
+  color = PURPLE_ACCENT,
+  glow,
+}: {
+  children: React.ReactNode;
+  color?: string;
+  glow?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        color,
+        textShadow: glow ? `0 0 14px ${color}80` : undefined,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Headline({ children }: { children: React.ReactNode }) {
+  return (
+    <h2
+      style={{
+        margin: '6px 0 0',
+        fontSize: 22,
+        fontWeight: 900,
+        lineHeight: 1.1,
+        letterSpacing: '-0.5px',
+        color: '#ffffff',
+      }}
+    >
+      {children}
+    </h2>
+  );
+}
+
+function Standfirst({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        margin: '8px 0 0',
+        fontSize: 13,
+        lineHeight: 1.4,
+        color: 'rgba(255,255,255,0.7)',
+        letterSpacing: '-0.1px',
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function PerformanceChip({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        padding: '4px 9px',
+        borderRadius: 999,
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.1)',
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+function Divider({ top = 0, bottom = 0 }: { top?: number; bottom?: number }) {
+  return (
+    <div
+      style={{
+        height: 1,
+        background: 'rgba(255,255,255,0.1)',
+        marginTop: top,
+        marginBottom: bottom,
+      }}
+    />
+  );
+}
+
+function StateMessage({ label }: { label: string }) {
   return (
     <div
       style={{
@@ -310,8 +877,6 @@ function StateStub({ label }: { label: string }) {
     </div>
   );
 }
-
-// ─── Atoms ───────────────────────────────────────────────────────────────────
 
 function StatPill({
   value,
@@ -340,7 +905,7 @@ function StatPill({
         style={{
           fontSize: 24,
           fontWeight: 900,
-          color: highlight ? '#F7931E' : '#ffffff',
+          color: highlight ? AMBER_ACCENT : '#ffffff',
           letterSpacing: '-0.6px',
           fontVariantNumeric: 'tabular-nums',
           lineHeight: 1,
@@ -355,7 +920,7 @@ function StatPill({
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: highlight ? '#F7931E' : 'rgba(255,255,255,0.55)',
+          color: highlight ? AMBER_ACCENT : 'rgba(255,255,255,0.55)',
         }}
       >
         {label}
