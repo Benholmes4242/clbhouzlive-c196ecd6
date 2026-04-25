@@ -643,7 +643,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               style={{
                 flex: '0 0 auto',
                 padding: '14px 22px 20px',
-                background: FROST.glassStrong,
+                background: FROST.glass,
                 borderTop: `1px solid ${FROST.borderSoft}`,
                 position: 'relative',
                 zIndex: 1,
