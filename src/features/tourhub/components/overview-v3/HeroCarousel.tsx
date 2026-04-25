@@ -2044,123 +2044,13 @@ export function HeroCarousel({
         ))}
       </AnimatePresence>
 
-      {/* ── TOUR PILL RAIL — fixed footer band at bottom of hero ── */}
-      {!isExpanded && safeSlides.length > 1 && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 30,
-            paddingTop: 12,
-            paddingBottom: 14,
-            background: '#141d2e',
-            borderTop: '0.5px solid rgba(255,255,255,0.07)',
-          }}
-        >
-          {/* Rail label */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 6px' }}>
-            <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
-              All Tours
-            </span>
-            <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
-              {safeSlides.filter(s => s.type === 'live').length} Live Now
-            </span>
-          </div>
-
-          {/* Scrollable pill strip */}
-          <div
-            ref={railRef}
-            style={{
-              display: 'flex',
-              gap: 5,
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-              padding: '0 16px',
-            }}
-            className="[&::-webkit-scrollbar]:hidden"
-          >
-            {safeSlides.map((slide, i) => {
-              const isActive = i === currentIndex;
-              const isLive = slide.type === 'live';
-              const tourLabel = TOUR_SHORT[slide.tournament.tourSlug] ?? slide.tournament.tourSlug.toUpperCase();
-              // Score from leadersWinnersMap for this tournament
-              const leaderData = leadersWinnersMap?.get(slide.tournament.id);
-              const rawScore = leaderData?.score;
-              const scoreStr = rawScore !== null && rawScore !== undefined
-                ? (rawScore === 0 ? 'E' : rawScore < 0 ? String(rawScore) : `+${rawScore}`)
-                : leaderData?.displayScore ?? null;
-              const scoreColor = !scoreStr || scoreStr === 'E' ? '#ffffff'
-                : scoreStr.startsWith('+') ? '#EF4444' : '#22C55E';
-              return (
-                <button
-                  key={slide.tournament.id}
-                  onClick={() => {
-                    setCurrentIndex(i);
-                    resetAutoAdvance();
-                    setIsPaused(true);
-                    scheduleResume();
-                  }}
-                  className="active:opacity-70 transition-opacity"
-                  style={{
-                    flexShrink: 0,
-                    width: isActive ? 160 : 80,
-                    height: 44,
-                    background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.3)',
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    border: `1px solid ${isActive ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)'}`,
-                    borderRadius: 7,
-                    padding: '0 11px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    transition: 'all 0.3s ease',
-                    gap: 6,
-                    overflow: 'hidden',
-                  }}
-                >
-                  {/* Left — two lines: tour name + tournament name */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, overflow: 'hidden' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{
-                        fontSize: '8px', fontWeight: 900,
-                        color: isActive ? '#ffffff' : 'rgba(255,255,255,0.45)',
-                        letterSpacing: '0.06em', textTransform: 'uppercase' as const,
-                        whiteSpace: 'nowrap' as const,
-                      }}>
-                        {tourLabel}
-                      </span>
-                    </div>
-                    <span style={{
-                      fontSize: '8.5px', fontWeight: 600,
-                      color: isActive ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.25)',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-                      paddingLeft: 8,
-                    }}>
-                      {slide.tournament.name}
-                    </span>
-                  </div>
-                  {/* Right — score or status */}
-                  {isLive && scoreStr ? (
-                    <span style={{ fontSize: '12px', fontWeight: 900, color: scoreColor, flexShrink: 0, letterSpacing: '-0.02em' }}>
-                      {scoreStr}
-                    </span>
-                  ) : isLive ? (
-                    <span style={{ fontSize: '7px', fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>LIVE</span>
-                  ) : slide.type === 'upcoming' ? (
-                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>SOON</span>
-                  ) : (
-                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>FINAL</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/*
+       * Phase A — TOUR PILL RAIL DELETED.
+       * The Hero's bottom mini-card switcher row was retired in favor of the
+       * AllToursTicker, which now serves as the canonical Hero switcher on the
+       * Overview page (live tournaments only — completed/upcoming surfaces are
+       * handled by Tournament Results / UpNextBroadcast / ComingUpCalendar).
+       */}
     </div>
   );
 }
