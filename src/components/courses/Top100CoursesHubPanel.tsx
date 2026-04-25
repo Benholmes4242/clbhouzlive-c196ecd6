@@ -52,39 +52,8 @@ const Top100CoursesHubPanel = () => {
   // Scroll restoration ref
   const hasRestoredScroll = useRef(false);
 
-  // Sticky filter bar elevation on scroll. Mirrors CourseExplorer's resolver
-  // so the listener and VirtualizedCourseList share the same source of truth.
-  const [isScrolled, setIsScrolled] = useState(false);
-  useEffect(() => {
-    const resolveScroller = (): HTMLElement | Window => {
-      const root = document.getElementById('root');
-      if (root) {
-        const style = window.getComputedStyle(root);
-        if ((style.overflowY === 'scroll' || style.overflowY === 'auto') && root.scrollHeight > root.clientHeight) {
-          return root;
-        }
-      }
-      let element: HTMLElement | null = document.body;
-      while (element) {
-        const style = window.getComputedStyle(element);
-        const hasScroll = style.overflowY === 'scroll' || style.overflowY === 'auto';
-        if (hasScroll && element.scrollHeight > element.clientHeight) return element;
-        element = element.parentElement;
-      }
-      return window;
-    };
 
-    const scroller = resolveScroller();
-    const onScroll = () => {
-      const y = scroller instanceof Window
-        ? (window.scrollY || document.documentElement.scrollTop || 0)
-        : (scroller as HTMLElement).scrollTop;
-      setIsScrolled(y > 8);
-    };
-    scroller.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => scroller.removeEventListener('scroll', onScroll);
-  }, []);
+
 
   // Fetch data
   const { data: progress } = useTop100ProgressForUser(user?.id);
