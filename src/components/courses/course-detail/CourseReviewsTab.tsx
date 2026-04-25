@@ -71,9 +71,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
   
-  const hookRatingFilter = ratingFilter === 'outstanding' ? '10-9' 
-    : ratingFilter === 'excellent' ? '8-7'
-    : ratingFilter === 'good' ? '6-5'
+  const hookRatingFilter = ratingFilter === 'exceptional' ? '10-9'
+    : ratingFilter === 'excellent' ? '8.9-7.5'
+    : ratingFilter === 'good' ? '7.4-5'
     : 'all';
   
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
@@ -265,11 +265,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     if (!ratingFilter) return reviews;
     return reviews.filter((r) => {
       const tierData = getScoreTier(r.rating);
-      // The Outstanding chip covers both Outstanding (9.0-9.4) and Exceptional (≥9.5),
-      // matching the server-side range filter '10-9' on useCourseReviews.
-      if (ratingFilter === 'outstanding') {
-        return tierData.tier === 'outstanding' || tierData.tier === 'exceptional';
-      }
       return tierData.tier === ratingFilter;
     });
   }, [reviews, ratingFilter]);
