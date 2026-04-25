@@ -1,14 +1,13 @@
 import React from 'react';
 
-export type RatingTierKey = 'EXCEPTIONAL' | 'OUTSTANDING' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'FAIR';
+export type RatingTierKey = 'EXCEPTIONAL' | 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
 
 export interface RatingTierDistributionData {
   exceptional: number;
-  outstanding: number;
   excellent: number;
-  veryGood: number;
   good: number;
   fair: number;
+  poor: number;
 }
 
 interface RatingTierDistributionProps {
@@ -19,11 +18,10 @@ interface RatingTierDistributionProps {
 
 const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistributionData; label: string }> = [
   { key: 'EXCEPTIONAL', dataKey: 'exceptional', label: 'Exceptional' },
-  { key: 'OUTSTANDING', dataKey: 'outstanding', label: 'Outstanding' },
   { key: 'EXCELLENT', dataKey: 'excellent', label: 'Excellent' },
-  { key: 'VERY_GOOD', dataKey: 'veryGood', label: 'Very Good' },
   { key: 'GOOD', dataKey: 'good', label: 'Good' },
   { key: 'FAIR', dataKey: 'fair', label: 'Fair' },
+  { key: 'POOR', dataKey: 'poor', label: 'Poor' },
 ];
 
 export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
