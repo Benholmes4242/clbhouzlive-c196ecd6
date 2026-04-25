@@ -16,7 +16,7 @@
  * move to a Claude-driven daily pipeline via championship_editorial_daily.
  */
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Brain, ChevronRight, Check } from 'lucide-react';
 import {
   useIntelligenceLifecycleState,
@@ -28,6 +28,7 @@ import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions
 import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
 import { PlayerAvatar } from './PlayerAvatar';
 import { INTELLIGENCE_HERO_FALLBACK } from '../utils/editorialFallbacks';
+import { IntelligenceAllPicksSheet } from './IntelligenceAllPicksSheet';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
