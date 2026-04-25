@@ -334,9 +334,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             if (isRatingSort) {
               // Tier counts across the *entire* filtered+sorted list.
               const tierCounts: Record<MyRatingsBucket, number> = {
-                exceptional: 0,
-                outstanding: 0,
-                excellent: 0,
+                top: 0,
+                rest: 0,
               };
               tieAnnotated.forEach((c) => {
                 if (c.has_rating && c.rating_value != null) {
