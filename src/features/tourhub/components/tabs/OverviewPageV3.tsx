@@ -109,11 +109,20 @@ export function OverviewPageV3() {
           className="relative w-full z-0 mx-auto"
           style={{ ...HERO_STYLES.containerNoHeader, maxWidth: 960, opacity: heroOpacity, scale: heroScale }}
         >
-          <HeroCarousel hasHeader={false} mode="overview" />
+          <HeroCarousel
+            hasHeader={false}
+            mode="overview"
+            activeTournamentId={activeTournamentId}
+            onActiveChange={handleHeroActiveChange}
+            autoRotate={autoRotate}
+          />
         </motion.div>
 
-        {/* All Tours Ticker — flush below the hero, no top gap */}
-        <AllToursTicker />
+        {/* All Tours Ticker — flush below the hero, no top gap. Now drives the Hero (tap to switch). */}
+        <AllToursTicker
+          activeId={activeTournamentId}
+          onSelect={handleTickerSelect}
+        />
 
         {/* Content sections */}
         <div 
