@@ -164,11 +164,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   // Scope drag to header only so the scrollable middle scrolls without dismissing.
   const dragControls = useDragControls();
 
-  const handleVisitCourse = useCallback(() => {
-    if (!courseId) return;
+  const handleVisitProfile = useCallback(() => {
+    if (!user.id) return;
     onClose();
-    navigate(`/courses/${courseId}`);
-  }, [courseId, navigate, onClose]);
+    const handle = user.username || user.id;
+    navigate(`/profile/${handle}`);
+  }, [user.id, user.username, navigate, onClose]);
 
   const handleGoToReview = useCallback(() => {
     if (!courseId) return;
@@ -178,6 +179,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
       : `/courses/${courseId}?tab=reviews`;
     navigate(url);
   }, [courseId, reviewId, navigate, onClose]);
+
+  const reviewDateLabel = useMemo(() => {
+    // Format as "Apr 2026". reviewDate isn't on payload yet; derive from memberSince fallback or omit.
+    // Per brief: if missing, render just "REVIEW ────" with no date.
+    return '';
+  }, []);
 
   const locationParts = [courseSubCountry || courseRegion, courseCountry].filter(Boolean);
   const locationStr = locationParts.join(', ');
