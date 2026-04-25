@@ -6,6 +6,7 @@ import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import Top100LeaderboardPanel from './Top100LeaderboardPanel';
+import NetworkCoursesSheet from './network/NetworkCoursesSheet';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
