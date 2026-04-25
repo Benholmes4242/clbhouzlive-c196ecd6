@@ -120,16 +120,17 @@ export function useCourseReviews(
         query = query.ilike('review', `%${filters.searchQuery.trim()}%`);
       }
 
-      // Rating range filter
+      // Rating range filter — aligned with new 5-tier taxonomy
+      // Chip ranges: '10-9' (Exceptional), '8.9-7.5' (Excellent), '7.4-5' (Good)
       switch (ratingFilter) {
         case '10-9':
           query = query.gte('rating', 9).lte('rating', 10);
           break;
-        case '8-7':
-          query = query.gte('rating', 7).lt('rating', 9);
+        case '8.9-7.5':
+          query = query.gte('rating', 7.5).lt('rating', 9);
           break;
-        case '6-5':
-          query = query.gte('rating', 5).lt('rating', 7);
+        case '7.4-5':
+          query = query.gte('rating', 5).lt('rating', 7.5);
           break;
         case '<5':
           query = query.lt('rating', 5);

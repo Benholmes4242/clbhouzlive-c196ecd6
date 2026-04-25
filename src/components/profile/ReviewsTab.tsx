@@ -361,11 +361,14 @@ function formatDate(iso: string) {
 }
 
 function sentimentFromAvg(avg: number) {
-  if (avg >= 8.5) return "Exceptional";
-  if (avg >= 8.0) return "Very Positive";
-  if (avg >= 7.0) return "Positive";
-  if (avg >= 6.0) return "Mixed";
-  return "Needs Improvement";
+  // Sentiment labels — describe community tone, intentionally distinct from
+  // rating tier vocabulary (Exceptional / Excellent / Good / Fair / Poor)
+  // to avoid collision with the canonical tier taxonomy.
+  if (avg >= 8.5) return "Universally Loved";
+  if (avg >= 8.0) return "Glowing";
+  if (avg >= 7.0) return "Strong";
+  if (avg >= 5.0) return "Mixed";
+  return "Critical";
 }
 
 function needsClamp(text: string) {
