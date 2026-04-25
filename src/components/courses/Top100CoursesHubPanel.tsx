@@ -30,6 +30,7 @@ function readSavedFilters(): { list?: string; sort?: string; searchTerm?: string
 
 const Top100CoursesHubPanel = () => {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   
   // State — initialised from sessionStorage when available
   const [selectedList, setSelectedList] = useState(() => {
@@ -190,63 +191,87 @@ const Top100CoursesHubPanel = () => {
   };
 
   return (
-    <div className="space-y-5">
-      {/* Attribution kicker — clarifies the list authorship */}
-      <div className="px-4 pt-1 pb-0 flex flex-col items-center">
-        <div className="inline-flex items-center gap-2">
-          <span
-            style={{
-              width: 4,
-              height: 4,
-              borderRadius: '50%',
-              background: '#F7931E',
-            }}
-          />
-          <span
-            style={{
-              fontSize: 10,
-              letterSpacing: '1.4px',
-              textTransform: 'uppercase',
-              color: '#C97211',
-              fontWeight: 600,
-            }}
-          >
-            Official World Ranking
-          </span>
-          <span
-            style={{
-              width: 4,
-              height: 4,
-              borderRadius: '50%',
-              background: '#F7931E',
-            }}
-          />
-        </div>
-        <div
-          style={{
-            fontSize: 12,
-            color: '#64748B',
-            marginTop: 4,
-            fontWeight: 400,
-            textAlign: 'center',
-          }}
-        >
-          Courses ranked by the world's leading golf publications
+    <div className="space-y-4">
+      {/* Editorial header — left-aligned, mirrors Explore's Your Network pattern */}
+      <div className="px-4 pt-1">
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                Official World Ranking
+              </span>
+            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+              The world's best
+            </h2>
+            {user && totalCoursesInStartedLists > 0 && (
+              <p style={{
+                fontSize: 11, color: '#64748B', margin: '6px 0 0',
+                fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase' as const,
+              }}>
+                <span style={{ color: '#F7931E' }}>
+                  {totalRated} of {totalCoursesInStartedLists}
+                </span>
+                {' '}COMPLETED · {listsCount} {listsCount === 1 ? 'LIST' : 'LISTS'}
+              </p>
+            )}
+          </div>
+          {user && (
+            <button
+              type="button"
+              onClick={() => navigate('/top100?tab=my-progress')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 2,
+                fontSize: 12, fontWeight: 600, color: '#c97a10',
+                background: 'transparent', border: 'none',
+                cursor: 'pointer', padding: '6px 0 8px', flexShrink: 0,
+                letterSpacing: '-0.005em',
+              }}
+              className="active:opacity-70 transition-opacity"
+            >
+              Your journey <ChevronRight size={13} strokeWidth={2.5} />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Top 100 Journey Hero - Premium progress module */}
-      {user && (
-        <div className="px-4">
-          <Top100JourneyHero
-            completedCourses={totalRated}
-            totalCoursesInStartedLists={totalCoursesInStartedLists}
-            listCount={listsCount}
-          />
+      {/* List filter — horizontal pill row, scrollable on overflow */}
+      <div className="-mx-4 px-4 overflow-x-auto" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+        <style>{`.top100-pill-row::-webkit-scrollbar { display: none; }`}</style>
+        <div className="top100-pill-row" style={{ display: 'flex', gap: 6, paddingBottom: 2 }}>
+          {listOptions.map((option) => {
+            const isActive = option.value === selectedList;
+            const pillLabel = option.label.replace(/\s*Top 100\s*$/, '').trim() || option.label;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setSelectedList(option.value)}
+                aria-pressed={isActive}
+                style={{
+                  flexShrink: 0,
+                  padding: '8px 14px',
+                  borderRadius: 999,
+                  fontSize: 13, fontWeight: 700,
+                  background: isActive ? '#0F172A' : '#ffffff',
+                  color: isActive ? '#ffffff' : '#475569',
+                  border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
+                  cursor: 'pointer',
+                  transition: 'all 150ms',
+                  letterSpacing: '-0.005em',
+                  whiteSpace: 'nowrap',
+                }}
+                className="active:scale-[0.97]"
+              >
+                {pillLabel}
+              </button>
+            );
+          })}
         </div>
-      )}
+      </div>
 
-      {/* Controls Section - sticky search + filters */}
+      {/* Controls Section - sticky search + sort */}
       <div
         className="sticky top-0 z-20 pb-3 space-y-3 -mx-4 px-4"
         style={{
@@ -278,47 +303,24 @@ const Top100CoursesHubPanel = () => {
           )}
         </div>
 
-        {/* List + Sort selectors */}
-        <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
-          {/* List selector */}
-          <div className="flex-1">
-            <Select value={selectedList} onValueChange={setSelectedList}>
-              <SelectTrigger 
-                aria-label="Select Top 100 list" 
-                className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
-              >
-                <SelectValue placeholder="Global Top 100" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50 rounded-2xl shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
-                {listOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Sort selector */}
-          <div className="flex-1">
-            <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
-              <SelectTrigger 
-                aria-label="Sort courses" 
-                className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
-              >
-                <SelectValue placeholder="Official ranking" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50 rounded-2xl shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
-                {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Sort selector (list selector now lives in the pill row above) */}
+        <div>
+          <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
+            <SelectTrigger 
+              aria-label="Sort courses" 
+              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
+            >
+              <SelectValue placeholder="Official ranking" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border z-50 rounded-2xl shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
