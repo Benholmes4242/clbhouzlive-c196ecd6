@@ -161,7 +161,10 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
 
             {/* Progress bar + percentage - 4px white fill */}
             <div className="flex items-center gap-2.5">
-              <div className="flex-1 h-1 bg-white/25 rounded-full overflow-hidden">
+              <div
+                className="flex-1 h-1 bg-white/25 rounded-full overflow-hidden"
+                style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.25)' }}
+              >
                 <div
                   className="h-full bg-white rounded-full transition-all duration-700 ease-out"
                   style={{ width: `${completion}%` }}
