@@ -62,7 +62,7 @@ export function useDailyEditorial({
     queryFn: async (): Promise<EditorialCopy | null> => {
       let query = supabase
         .from('championship_editorial_daily')
-        .select('eyebrow, headline, headline_two, standfirst, story_type, generated_by, date')
+        .select('eyebrow, headline, headline_two, standfirst, story_type, generated_by, date, snapshot_data')
         .eq('surface', surface)
         .eq('time_filter', timeFilter)
         .lte('date', today)
