@@ -3,14 +3,43 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import type { CategoryId } from '../components/overview-v3/SeasonLeaderboards/StatCategoryIcons';
-import type { LeaderboardPlayer } from '../components/overview-v3/SeasonLeaderboards/types';
 
 // ============================================
-// TYPES (hook-specific)
+// TYPES (hook-owned — previously imported from the deleted
+// overview-v3/SeasonLeaderboards folder; inlined here as the
+// hook is now the canonical source for these types)
 // ============================================
 
-export type { CategoryId, LeaderboardPlayer };
+export type CategoryId =
+  | 'sg_total'
+  | 'scoring_avg'
+  | 'earnings'
+  | 'distance'
+  | 'accuracy'
+  | 'gir_pct'
+  | 'putting'
+  | 'scrambling'
+  | 'sand_saves';
+
+export interface LeaderboardPlayer {
+  rank: number;
+  playerId: string;
+  playerName: string;
+  firstName: string;
+  lastName: string;
+  countryCode: string;
+  photoUrl: string | null;
+  tourCode?: string;
+  initials: string;
+  statValue: number;
+  statDisplayValue: string;
+  statUnit: string;
+  skillLevel: number;
+  skillProgress: number;
+  // Phase E — bio enrichment for StatOfTheWeek meta line
+  birthDate: string | null;   // ISO date (yyyy-mm-dd) when available
+  turnedPro: number | null;   // 4-digit year when available
+}
 
 export interface LeaderboardCategory {
   id: CategoryId;

@@ -96,8 +96,12 @@ export function OverviewPageV3() {
             <LazySection minHeight={500}>
               <IntelligenceHero />
             </LazySection>
-            <UpNextBroadcast />
-            <ComingUpCalendar />
+            <LazySection minHeight={400}>
+              <UpNextBroadcast />
+            </LazySection>
+            <LazySection minHeight={400}>
+              <ComingUpCalendar />
+            </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsHero />
             </LazySection>

@@ -109,7 +109,8 @@ function buildSubhead(category: LeaderboardCategory): string {
   const leader = category.players[0];
   if (!leader || !margin) return STAT_OF_WEEK_FALLBACK.subhead;
   const lastName = leader.lastName || leader.playerName;
-  return `${lastName} leads the field by ${margin} — the largest margin in any 2026 statistical category.`;
+  const year = new Date().getFullYear();
+  return `${lastName} leads the field by ${margin} — the largest margin in any ${year} statistical category.`;
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
