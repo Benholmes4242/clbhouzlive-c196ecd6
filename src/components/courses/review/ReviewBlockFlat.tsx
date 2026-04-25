@@ -295,10 +295,12 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              padding: '5px 10px',
+              padding: isHelpful ? '5px 10px' : '4px 8px',
               borderRadius: 8,
               background: isHelpful ? 'rgba(15,23,42,0.06)' : 'transparent',
-              border: `1px solid ${isHelpful ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.07)'}`,
+              border: isHelpful
+                ? '1px solid rgba(15,23,42,0.12)'
+                : '0.5px solid rgba(15,23,42,0.05)',
               fontSize: 11,
               fontWeight: isHelpful ? 700 : 500,
               color: isHelpful ? '#0F172A' : '#94A3B8',
@@ -306,7 +308,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            👍 {helpfulCount}
+            <span aria-hidden>👍</span>{helpfulCount > 0 && <> {helpfulCount}</>}
           </button>
           <button
             type="button"
@@ -316,10 +318,12 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              padding: '5px 10px',
+              padding: isUnhelpful ? '5px 10px' : '4px 8px',
               borderRadius: 8,
               background: isUnhelpful ? 'rgba(15,23,42,0.06)' : 'transparent',
-              border: `1px solid ${isUnhelpful ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.07)'}`,
+              border: isUnhelpful
+                ? '1px solid rgba(15,23,42,0.12)'
+                : '0.5px solid rgba(15,23,42,0.05)',
               fontSize: 11,
               fontWeight: isUnhelpful ? 700 : 500,
               color: isUnhelpful ? '#0F172A' : '#94A3B8',
@@ -327,7 +331,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            👎 {review.unhelpfulCount}
+            <span aria-hidden>👎</span>{review.unhelpfulCount > 0 && <> {review.unhelpfulCount}</>}
           </button>
         </div>
       )}
