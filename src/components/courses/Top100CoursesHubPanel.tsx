@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import { type AppSelectOption } from '@/components/ui/AppSelect';
+import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
 
 type Top100SortOption = 'official' | 'user_rating';
 
