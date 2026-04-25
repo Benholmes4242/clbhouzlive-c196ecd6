@@ -18,7 +18,6 @@
 @import './styles/vertical-spacing.css';
 @import './styles/dark-golf-passport.css';
 @import './styles/create-moment-light.css';
-@import './styles/review-wizard.css';
 @import './styles/tour-hub-tokens.css';
 @tailwind base;
 @tailwind components;
