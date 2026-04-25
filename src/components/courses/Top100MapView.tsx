@@ -9,12 +9,13 @@ import {
   Top100MapCourse,
   CourseJourneyStatus,
 } from '@/hooks/useTop100MapCourses';
-import { RotateCcw, ChevronLeft } from 'lucide-react';
+import { RotateCcw, ChevronLeft, ChevronDown, Check } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
 import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
 
