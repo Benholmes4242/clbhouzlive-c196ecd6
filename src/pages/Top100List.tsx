@@ -70,6 +70,7 @@ const Top100List = () => {
   const { data: lists } = useTop100Lists();
   const { data: progressData } = useTop100ProgressForUser(user?.id);
   const { data: userActivity } = useUserCourseActivity(user?.id);
+  const { data: currentUserProfile } = useUserProfile(user?.id);
 
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
