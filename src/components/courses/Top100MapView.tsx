@@ -642,58 +642,27 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <ChevronLeft className="h-[20px] w-[20px] text-white" strokeWidth={2.4} />
         </button>
 
-        {/* Bottom-right control stack — hides when course sheet is open */}
-        <div className={cn(
-          "pointer-events-none absolute right-3 bottom-52 z-20 flex flex-col items-center gap-2.5 transition-all duration-300",
-          selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
-        )}>
-          <div className="pointer-events-auto flex flex-col gap-2">
-            <div 
-              className="glass-card flex flex-col rounded-xl overflow-hidden"
-              role="group"
-              aria-label="Map zoom controls"
-            >
-              <button
-                onClick={() => mapRef.current?.zoomIn({ duration: 300 })}
-                className={cn(
-                  'flex items-center justify-center w-11 h-11',
-                  'text-white/80',
-                  'active:bg-white/20 active:scale-[0.92]',
-                  'transition-all duration-150',
-                  'border-b border-white/10'
-                )}
-                aria-label="Zoom in"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-              </button>
-              <button
-                onClick={() => mapRef.current?.zoomOut({ duration: 300 })}
-                className={cn(
-                  'flex items-center justify-center w-11 h-11',
-                  'text-white/80',
-                  'active:bg-white/20 active:scale-[0.92]',
-                  'transition-all duration-150'
-                )}
-                aria-label="Zoom out"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-              </button>
-            </div>
-            
-            <button
-              onClick={handleResetView}
-              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/80 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
-              aria-label="Reset map view"
-            >
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+        {/* Reset view button — sole right-side floating control. Preserves course-sheet fade contract. */}
+        {/* TODO Phase C: bottom value will react to trayExpanded state (220 expanded, ~96 collapsed) */}
+        <button
+          onClick={handleResetView}
+          className={cn(
+            "fixed right-3 z-20 flex items-center justify-center transition-all duration-300 active:scale-[0.92]",
+            selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
+          )}
+          style={{
+            bottom: 220,
+            width: 40, height: 40, borderRadius: 12,
+            background: 'rgba(15,23,42,0.55)',
+            backdropFilter: 'blur(14px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(14px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+          }}
+          aria-label="Reset map view"
+        >
+          <RotateCcw className="h-4 w-4 text-white/85" aria-hidden="true" />
+        </button>
 
         {/* Empty state */}
         {ratedCount === 0 && !isLoading && mapLoaded && (
