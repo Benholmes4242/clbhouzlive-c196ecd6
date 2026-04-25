@@ -6,6 +6,7 @@ import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import Top100LeaderboardPanel from './Top100LeaderboardPanel';
+import NetworkCoursesSheet from './network/NetworkCoursesSheet';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
@@ -355,6 +356,15 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         <ScrollToTopGlass />
         {/* Rate sheet portal */}
         <RateCourseSheet open={rateSheetOpen} onClose={() => setRateSheetOpen(false)} />
+        {/* Network Courses sheet — driven by ?network=open */}
+        <NetworkCoursesSheet
+          open={searchParams.get('network') === 'open'}
+          onClose={() => {
+            const params = new URLSearchParams(searchParams);
+            params.delete('network');
+            setSearchParams(params, { replace: true });
+          }}
+        />
       </div>
     </CoursesErrorBoundary>
   );

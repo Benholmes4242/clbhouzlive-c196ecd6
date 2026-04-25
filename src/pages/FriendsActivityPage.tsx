@@ -1,28 +1,15 @@
 import React from 'react';
-import { PageRoot } from '@/components/layout/PageRoot';
-import FriendsCoursesPanel from '@/components/courses/FriendsCoursesPanel';
-import FriendsCoursesSignedOutEmpty from '@/components/courses/FriendsCoursesSignedOutEmpty';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { Navigate } from 'react-router-dom';
 
+/**
+ * /friends-activity is preserved as a redirect for legacy deep links.
+ *
+ * The Friends Activity surface was migrated to NetworkCoursesSheet — a
+ * bottom sheet that opens from the Your Network section on Courses › Explore.
+ * Direct visits to /friends-activity teleport users to the sheet's open state.
+ */
 const FriendsActivityPage: React.FC = () => {
-  const { user } = useSupabaseSession();
-
-  if (!user) {
-    return (
-      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }} hasBottomNav>
-        <FriendsCoursesSignedOutEmpty />
-        <ScrollToTopGlass />
-      </PageRoot>
-    );
-  }
-
-  return (
-    <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }} hasBottomNav>
-      <FriendsCoursesPanel />
-      <ScrollToTopGlass />
-    </PageRoot>
-  );
+  return <Navigate to="/courses?network=open" replace />;
 };
 
 export default FriendsActivityPage;
