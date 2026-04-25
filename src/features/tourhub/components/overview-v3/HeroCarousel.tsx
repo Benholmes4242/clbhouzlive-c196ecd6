@@ -1774,11 +1774,20 @@ interface HeroCarouselProps {
   hasHeader?: boolean;
   /** Called when scorecard open/close state changes */
   onScorecardStateChange?: (isOpen: boolean) => void;
+  /**
+   * Carousel mode:
+   * - 'overview' filters out upcoming slides (UpNextBroadcast handles upcoming separately)
+   * - 'schedule' (default) renders live + completed + upcoming
+   */
+  mode?: 'overview' | 'schedule';
 }
 
-export function HeroCarousel({ hasHeader = false, onScorecardStateChange }: HeroCarouselProps) {
+export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode = 'schedule' }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
-  const safeSlides = Array.isArray(slides) ? slides : [];
+  const rawSlides = Array.isArray(slides) ? slides : [];
+  const safeSlides = mode === 'overview'
+    ? rawSlides.filter((s) => s.type !== 'upcoming')
+    : rawSlides;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
