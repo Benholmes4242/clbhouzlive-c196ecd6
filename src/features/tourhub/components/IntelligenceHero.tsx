@@ -22,6 +22,8 @@ import {
   AlertCircle,
   MapPin,
   CheckCircle2,
+  Activity,
+  Eye,
 } from 'lucide-react';
 import {
   useAIPredictions,
@@ -30,6 +32,8 @@ import {
 } from '../hooks/useAIPredictions';
 import { usePickHistory, type PickHistoryEntry } from '../hooks/usePickHistory';
 import { useIntelligenceState } from '../hooks/useIntelligenceState';
+import { usePredictionTracker } from '../hooks/usePredictionTracker';
+import type { TrackedPrediction } from './tournament-insights/types';
 import { useDailyEditorial } from '@/hooks/championship/useDailyEditorial';
 import {
   INTELLIGENCE_QUOTE_FALLBACK,
