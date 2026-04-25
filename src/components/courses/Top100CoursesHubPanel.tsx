@@ -52,39 +52,8 @@ const Top100CoursesHubPanel = () => {
   // Scroll restoration ref
   const hasRestoredScroll = useRef(false);
 
-  // Sticky filter bar elevation on scroll. Mirrors CourseExplorer's resolver
-  // so the listener and VirtualizedCourseList share the same source of truth.
-  const [isScrolled, setIsScrolled] = useState(false);
-  useEffect(() => {
-    const resolveScroller = (): HTMLElement | Window => {
-      const root = document.getElementById('root');
-      if (root) {
-        const style = window.getComputedStyle(root);
-        if ((style.overflowY === 'scroll' || style.overflowY === 'auto') && root.scrollHeight > root.clientHeight) {
-          return root;
-        }
-      }
-      let element: HTMLElement | null = document.body;
-      while (element) {
-        const style = window.getComputedStyle(element);
-        const hasScroll = style.overflowY === 'scroll' || style.overflowY === 'auto';
-        if (hasScroll && element.scrollHeight > element.clientHeight) return element;
-        element = element.parentElement;
-      }
-      return window;
-    };
 
-    const scroller = resolveScroller();
-    const onScroll = () => {
-      const y = scroller instanceof Window
-        ? (window.scrollY || document.documentElement.scrollTop || 0)
-        : (scroller as HTMLElement).scrollTop;
-      setIsScrolled(y > 8);
-    };
-    scroller.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => scroller.removeEventListener('scroll', onScroll);
-  }, []);
+
 
   // Fetch data
   const { data: progress } = useTop100ProgressForUser(user?.id);
@@ -315,19 +284,8 @@ const Top100CoursesHubPanel = () => {
         </div>
       </div>
 
-      {/* Controls Section - sticky search bar with elevation on scroll */}
-      <div
-        className="sticky top-0 z-20 pb-3 -mx-4 px-4"
-        style={{
-          background: '#F8FAFC',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          boxShadow: isScrolled
-            ? '0 1px 0 rgba(15,23,42,0.06), 0 8px 24px -16px rgba(15,23,42,0.18)'
-            : 'none',
-          transition: 'box-shadow 200ms ease',
-        }}
-      >
-        {/* Search */}
+      {/* Search bar — scrolls with content (no sticky behaviour) */}
+      <div className="-mx-4 px-4" style={{ paddingTop: 8 }}>
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
