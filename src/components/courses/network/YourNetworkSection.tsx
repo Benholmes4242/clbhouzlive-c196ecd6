@@ -1,5 +1,4 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -7,6 +6,7 @@ import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import { NetworkAvatarStrip } from './NetworkAvatarStrip';
 // NetworkPulseCopy intentionally not imported — replaced by inline meta byline (deferred dead code; file retained for follow-up cleanup)
 import { NetworkHighlightCarousel } from './NetworkHighlightCarousel';
+import { FriendsActivitySheet } from './FriendsActivitySheet';
 
 interface YourNetworkSectionProps {
   className?: string;
@@ -22,7 +22,7 @@ interface YourNetworkSectionProps {
  * - Network highlight carousel (landscape tiles)
  */
 export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ className }) => {
-  const navigate = useNavigate();
+  const [activitySheetOpen, setActivitySheetOpen] = useState(false);
   const { user } = useSupabaseSession();
   const { data, isLoading } = useNetworkActivity(user?.id);
 
@@ -35,13 +35,14 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
   const { friends, highlights, pulse, hasActivity } = data;
 
   const handleViewAll = () => {
-    navigate('/friends-activity');
+    setActivitySheetOpen(true);
   };
 
   // Edge case: Friends but no recent activity
   const showEmptyActivityState = !hasActivity && friends.length > 0;
 
   return (
+    <>
     <section 
       className={cn(
         'mb-5 max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300',
@@ -105,6 +106,8 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
         )
       )}
     </section>
+    <FriendsActivitySheet open={activitySheetOpen} onOpenChange={setActivitySheetOpen} />
+    </>
   );
 };
 
