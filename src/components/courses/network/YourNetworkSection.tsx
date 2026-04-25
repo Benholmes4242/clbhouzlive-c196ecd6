@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import { NetworkAvatarStrip } from './NetworkAvatarStrip';
-import { NetworkPulseCopy } from './NetworkPulseCopy';
+// NetworkPulseCopy intentionally not imported — replaced by inline meta byline (deferred dead code; file retained for follow-up cleanup)
 import { NetworkHighlightCarousel } from './NetworkHighlightCarousel';
 
 interface YourNetworkSectionProps {
