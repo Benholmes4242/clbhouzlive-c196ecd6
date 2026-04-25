@@ -198,7 +198,7 @@ const LoadingSkeleton = () => (
 );
 
 const InlineLoadingSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6 animate-in fade-in duration-150">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 animate-in fade-in duration-150">
     {[1, 2, 3].map((i) => (
       <div key={i} className="bg-card sm:border sm:border-border/60 sm:rounded-sq-md overflow-hidden">
         <Skeleton className="w-full aspect-[16/9] rounded-none" />
@@ -286,6 +286,44 @@ const CourseExplorer = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<SortOption>('official_rating');
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Sticky filter bar elevation on scroll.
+  // Mirrors VirtualizedCourseList.getScrollContainer() so the listener and
+  // the virtualization scroll handler share the same source of truth.
+  // On engines where #root is the scroller, window.scrollY stays at 0,
+  // so we resolve the actual scroll element first and fall back to window.
+  useEffect(() => {
+    const resolveScroller = (): HTMLElement | Window => {
+      const root = document.getElementById('root');
+      if (root) {
+        const style = window.getComputedStyle(root);
+        if ((style.overflowY === 'scroll' || style.overflowY === 'auto') && root.scrollHeight > root.clientHeight) {
+          return root;
+        }
+      }
+      // Walk ancestors for any other auto/scroll container — matches VCL fallback
+      let element: HTMLElement | null = document.body;
+      while (element) {
+        const style = window.getComputedStyle(element);
+        const hasScroll = style.overflowY === 'scroll' || style.overflowY === 'auto';
+        if (hasScroll && element.scrollHeight > element.clientHeight) return element;
+        element = element.parentElement;
+      }
+      return window;
+    };
+
+    const scroller = resolveScroller();
+    const onScroll = () => {
+      const y = scroller instanceof Window
+        ? (window.scrollY || document.documentElement.scrollTop || 0)
+        : (scroller as HTMLElement).scrollTop;
+      setIsScrolled(y > 8);
+    };
+    scroller.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => scroller.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Save filters to sessionStorage whenever they change
   useEffect(() => {
@@ -442,8 +480,12 @@ const CourseExplorer = () => {
         className="sticky top-0 z-20 pb-3 space-y-5 -mx-4 px-4"
         style={{
           background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+          borderBottom: 'none',
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          boxShadow: isScrolled
+            ? '0 1px 0 rgba(15,23,42,0.06), 0 8px 24px -16px rgba(15,23,42,0.18)'
+            : 'none',
+          transition: 'box-shadow 200ms ease',
         }}
       >
       {/* Search */}
