@@ -1780,9 +1780,26 @@ interface HeroCarouselProps {
    * - 'schedule' (default) renders live + completed + upcoming
    */
   mode?: 'overview' | 'schedule';
+  /**
+   * Phase A — externally-driven active tournament id.
+   * When provided, the carousel syncs its internal currentIndex to the matching slide.
+   * Optional — when omitted, the carousel manages its own active slide internally (Schedule behavior preserved).
+   */
+  activeTournamentId?: string | null;
+  /** Called when the carousel's internal currentIndex advances (auto-rotate or swipe). */
+  onActiveChange?: (tournamentId: string) => void;
+  /** When false, auto-rotation is disabled entirely. Default true. */
+  autoRotate?: boolean;
 }
 
-export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode = 'schedule' }: HeroCarouselProps) {
+export function HeroCarousel({
+  hasHeader = false,
+  onScorecardStateChange,
+  mode = 'schedule',
+  activeTournamentId,
+  onActiveChange,
+  autoRotate = true,
+}: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
   const safeSlides = mode === 'overview'
@@ -1793,6 +1810,26 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode =
   const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
   const resetAutoAdvance = () => setAutoAdvanceKey(k => k + 1);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Phase A — sync external activeTournamentId → internal currentIndex (one-way, parent-driven)
+  useEffect(() => {
+    if (!activeTournamentId || safeSlides.length === 0) return;
+    const idx = safeSlides.findIndex(s => s.tournament.id === activeTournamentId);
+    if (idx >= 0 && idx !== currentIndex) {
+      setCurrentIndex(idx);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTournamentId, safeSlides.length]);
+
+  // Phase A — emit currentIndex changes upward (so the Ticker's "NOW SHOWING" follows auto-rotate / swipe)
+  useEffect(() => {
+    if (!onActiveChange) return;
+    const slide = safeSlides[currentIndex];
+    if (slide && slide.tournament.id !== activeTournamentId) {
+      onActiveChange(slide.tournament.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, safeSlides.length]);
 
   const handleToggleExpand = useCallback(() => {
     setIsExpanded(prev => !prev);
