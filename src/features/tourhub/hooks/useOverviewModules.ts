@@ -28,6 +28,7 @@ export interface LiveTournamentWithLeader {
   leader: {
     id: string;
     name: string;
+    country: string | null;
     score: number;
     scoreDisplay: string;
   } | null;
