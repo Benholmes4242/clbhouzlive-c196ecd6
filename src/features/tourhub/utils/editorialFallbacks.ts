@@ -74,3 +74,48 @@ export const INTELLIGENCE_QUOTE_FALLBACK = {
     { rank: 3, name: 'Tommy Fleetwood', tier: 'In Contention', position: '−2', positionLabel: 'T11' },
   ],
 };
+
+/**
+ * IntelligenceHero state-specific editorial templates.
+ *
+ * V1 fallbacks for the deep-purple Clbhouz Intelligence card. Used when no
+ * championship_editorial_daily row exists for surface = 'intelligence_hero'.
+ * V2 will move these to the daily Claude pipeline.
+ *
+ * Each block carries an `eyebrow`, a single `headline`, and a short
+ * `standfirst` line. Course fit chips are short adjectival phrases (3–4 words)
+ * shown only in the upcoming state.
+ */
+export const INTELLIGENCE_HERO_FALLBACK = {
+  live: {
+    eyebrow: 'LIVE INTELLIGENCE',
+    headline: 'Our picks are on the board.',
+    standfirst:
+      'Tracking how the board is reacting to our pre-tournament reads in real time.',
+  },
+  results: {
+    win: {
+      eyebrow: 'WE CALLED IT',
+      headline: 'Top Pick wins.',
+      standfirst:
+        'The pre-tournament read held up — our Top Pick took the trophy.',
+    },
+    standings: {
+      eyebrow: 'FINAL STANDINGS',
+      headline: 'How our picks closed out the week.',
+      standfirst:
+        'Trophy went elsewhere — here is where our pre-tournament reads finished.',
+    },
+  },
+  upcoming: {
+    eyebrow: 'NEXT UP',
+    headline: 'Reading the next venue.',
+    standfirst:
+      'Three names we like before a single ball is struck — and what the course is asking for.',
+    courseFitChips: [
+      'Rewards driving distance',
+      'Premium on approach',
+      'Greens favour bombers',
+    ] as string[],
+  },
+};
