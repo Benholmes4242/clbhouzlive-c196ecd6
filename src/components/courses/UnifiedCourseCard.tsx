@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
-import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { CourseCommunityRating } from './CourseCommunityRating';
+import { FlagChip } from './FlagChip';
 import { format } from 'date-fns';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 
