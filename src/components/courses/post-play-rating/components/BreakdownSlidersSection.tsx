@@ -11,10 +11,10 @@ interface BreakdownSlidersSectionProps {
     clubhouse: number | null;
     facilities: number | null;
   };
-  outstandingEntry: Record<string, boolean>;
+  exceptionalEntry: Record<string, boolean>;
   onScoreChange: (key: 'design' | 'condition' | 'clubhouse' | 'facilities', value: number) => void;
   onTouchChange: (key: 'design' | 'condition' | 'clubhouse' | 'facilities', touched: boolean) => void;
-  onOutstandingEntry: (entry: Record<string, boolean>) => void;
+  onExceptionalEntry: (entry: Record<string, boolean>) => void;
   prevBreakdownTiersRef: React.MutableRefObject<Record<string, string>>;
   disabled?: boolean;
 }
@@ -22,10 +22,10 @@ interface BreakdownSlidersSectionProps {
 const BreakdownSlidersSection = React.memo(function BreakdownSlidersSection({
   isEditMode,
   scores,
-  outstandingEntry,
+  exceptionalEntry,
   onScoreChange,
   onTouchChange,
-  onOutstandingEntry,
+  onExceptionalEntry,
   prevBreakdownTiersRef,
   disabled = false,
 }: BreakdownSlidersSectionProps) {
@@ -34,12 +34,12 @@ const BreakdownSlidersSection = React.memo(function BreakdownSlidersSection({
     const newTier = getScoreTier(newValue).tier;
     const oldTier = prevBreakdownTiersRef.current[key] as ScoreTier | undefined;
     
-    // Detect crossing into the gold tier (Outstanding OR Exceptional) from below.
+    // Detect crossing into the gold tier (Exceptional, ≥9.0) from below.
     if (isGoldTier(newTier) && !isGoldTier(oldTier)) {
-      onOutstandingEntry({ ...outstandingEntry, [key]: true });
+      onExceptionalEntry({ ...exceptionalEntry, [key]: true });
       setTimeout(() => {
-        onOutstandingEntry({ ...outstandingEntry, [key]: false });
-      }, ANIMATION_TIMINGS.outstandingGlow);
+        onExceptionalEntry({ ...exceptionalEntry, [key]: false });
+      }, ANIMATION_TIMINGS.exceptionalGlow);
     }
     
     prevBreakdownTiersRef.current[key] = newTier;
@@ -84,8 +84,7 @@ const BreakdownSlidersSection = React.memo(function BreakdownSlidersSection({
                 step={RATING_SLIDER_CONFIG.step}
                 disabled={disabled}
                 className="w-full rating-slider-breakdown"
-                data-tier={score != null && isGoldTier(getScoreTier(score).tier) ? 'outstanding' : undefined}
-                data-just-entered={outstandingEntry[key] ? 'true' : undefined}
+                data-just-entered={exceptionalEntry[key] ? 'true' : undefined}
               />
             </div>
           </div>

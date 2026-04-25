@@ -23,7 +23,7 @@ export const RATING_SLIDER_CONFIG = {
 
 // Animation timings
 export const ANIMATION_TIMINGS = {
-  outstandingGlow: 600,
+  exceptionalGlow: 600,
   successButtonDelay: 1500,
   deleteSuccessFadeStart: 1800,
   deleteSuccessClose: 2200,

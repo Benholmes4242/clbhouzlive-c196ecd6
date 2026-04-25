@@ -10,9 +10,9 @@ interface OverallRatingSectionProps {
   rating: number | null;
   isEditMode: boolean;
   isSubmitting: boolean;
-  justEnteredOutstanding: boolean;
+  justEnteredExceptional: boolean;
   onRatingChange: (value: number) => void;
-  onOutstandingEntered: () => void;
+  onExceptionalEntered: () => void;
   prevTierRef: React.MutableRefObject<string | null>;
 }
 
@@ -22,9 +22,9 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
   rating,
   isEditMode,
   isSubmitting,
-  justEnteredOutstanding,
+  justEnteredExceptional,
   onRatingChange,
-  onOutstandingEntered,
+  onExceptionalEntered,
   prevTierRef,
 }: OverallRatingSectionProps) {
   const handleValueChange = (values: number[]) => {
@@ -32,11 +32,11 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
     const newTier = getScoreTier(newValue).tier;
     const oldTier = prevTierRef.current as ScoreTier | null;
     
-    // Detect crossing into the gold tier (Outstanding OR Exceptional) from below.
-    // Within-gold-zone slides (e.g. 9.2 → 9.7) and downward transitions do not fire.
+    // Detect crossing into the gold tier (Exceptional, ≥9.0) from below.
+    // Within-gold-zone slides and downward transitions do not fire.
     if (isGoldTier(newTier) && !isGoldTier(oldTier ?? undefined)) {
-      onOutstandingEntered();
-      setTimeout(() => onOutstandingEntered(), ANIMATION_TIMINGS.outstandingGlow);
+      onExceptionalEntered();
+      setTimeout(() => onExceptionalEntered(), ANIMATION_TIMINGS.exceptionalGlow);
     }
     
     prevTierRef.current = newTier;
@@ -79,8 +79,7 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
           step={RATING_SLIDER_CONFIG.step}
           disabled={isSubmitting}
           className="w-full rating-slider-primary"
-          data-tier={isGoldTier(getScoreTier(rating ?? 0.5).tier) ? 'outstanding' : undefined}
-          data-just-entered={justEnteredOutstanding ? 'true' : undefined}
+          data-just-entered={justEnteredExceptional ? 'true' : undefined}
         />
       </div>
 
