@@ -1,49 +1,45 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Trophy } from 'lucide-react';
+import { format } from 'date-fns';
+import { Trophy, Calendar, Flame, Plus, ChevronRight, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser, type Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
-import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
-import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
-import { Top100RecentRoundsCarousel } from '@/components/top100/Top100RecentRoundsCarousel';
 import { UnifiedAchievementSheet, type AchievementData } from '@/components/top100/UnifiedAchievementSheet';
-import {
-  Top100ProgressHeroSkeleton,
-  Top100YearSummarySkeleton,
-  Top100MilestonesCarouselSkeleton,
-  Top100RecentRoundsSkeleton,
-  Top100TimelineSkeleton,
-  Top100StreakSkeleton,
-} from '@/components/top100/Top100ProgressSkeletons';
-import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
-
-
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
-import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
-import { buildYearSummary } from '@/lib/top100ProgressSelectors';
-import { Top100ProgressTimeline } from '@/components/top100/Top100ProgressTimeline';
-import { Top100LoggingStreak } from '@/components/top100/Top100LoggingStreak';
-import { SimplifiedMilestoneLadder } from '@/components/top100/SimplifiedMilestoneLadder';
-import { MasteryTrack } from '@/components/top100/MasteryTrack';
-import { type RegionProgress } from '@/components/quest/RegionalJourneySummary';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { buildStreakSummary } from '@/lib/top100StreakSummary';
 
-// Tier colors for next milestone chip - derived from global MILESTONE_THEMES
-const TIER_COLORS: Record<string, string> = {
-  none: '#94a3b8',
-  rookie: MILESTONE_THEMES[5].bgDark,
-  fairway: MILESTONE_THEMES[10].bgDark,
-  founders: MILESTONE_THEMES[20].bgDark,
-  heritage: MILESTONE_THEMES[50].bgDark,
-  century: MILESTONE_THEMES[100].bgDark,
-  elite: MILESTONE_THEMES[200].bgDark,
-  legendary: MILESTONE_THEMES[300].bgDark,
-  grandslam: MILESTONE_THEMES[400].bgDark,
-};
+// ----- Phase D cleanup: legacy imports retained for reference, no longer rendered -----
+// import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
+// import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
+// import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
+// import { Top100RecentRoundsCarousel } from '@/components/top100/Top100RecentRoundsCarousel';
+// import { Top100ProgressTimeline } from '@/components/top100/Top100ProgressTimeline';
+// import { Top100LoggingStreak } from '@/components/top100/Top100LoggingStreak';
+// import { SimplifiedMilestoneLadder } from '@/components/top100/SimplifiedMilestoneLadder';
+// import { MasteryTrack } from '@/components/top100/MasteryTrack';
+// import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
+// import {
+//   Top100ProgressHeroSkeleton,
+//   Top100YearSummarySkeleton,
+//   Top100MilestonesCarouselSkeleton,
+//   Top100RecentRoundsSkeleton,
+//   Top100TimelineSkeleton,
+//   Top100StreakSkeleton,
+// } from '@/components/top100/Top100ProgressSkeletons';
+// import { buildYearSummary } from '@/lib/top100ProgressSelectors';
+// import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
+// import { type RegionProgress } from '@/components/quest/RegionalJourneySummary';
 
 // Stable empty array constant - module level to avoid new reference each render
 const EMPTY_ROUNDS: Top100RecentRound[] = [];
+
+// Course tile fallback (existing project asset). If the SVG is missing, the
+// gradient overlay falls back onto a slate background so the tile still reads
+// as intentional rather than broken.
+const FALLBACK_COURSE_IMAGE = '/placeholder.svg';
 
 interface Top100MyProgressPanelProps {
   userId?: string | null;
@@ -59,43 +55,23 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const isOwnProfile = !userId || userId === session?.user?.id;
   const prevTotalRef = useRef<number | null>(null);
 
-  // Removed disruptive window.scrollTo — tab scroll is managed by parent
   const [achievementSheetData, setAchievementSheetData] = useState<AchievementData | null>(null);
   const [isAchievementSheetOpen, setIsAchievementSheetOpen] = useState(false);
 
-  // Open milestone achievement sheet
-  const openMilestoneSheet = useCallback((threshold: number) => {
-    setAchievementSheetData({
-      type: 'milestone',
-      threshold,
-      totalPlayed: data?.totalTop100Played ?? 0,
-    });
-    setIsAchievementSheetOpen(true);
-  }, [data?.totalTop100Played]);
-
-  // Open regional achievement sheet
-  const openRegionalSheet = useCallback((slug: string, played: number, total: number) => {
-    setAchievementSheetData({
-      type: 'regional',
-      listSlug: slug as 'global' | 'gb-i' | 'usa' | 'europe',
-      played,
-      total,
-    });
-    setIsAchievementSheetOpen(true);
-  }, []);
-
+  // Sheet still mounted — sub-page (Phase B) reuses it but the main page no
+  // longer triggers `openMilestoneSheet` / `openRegionalSheet` directly.
   const closeAchievementSheet = useCallback(() => {
     setIsAchievementSheetOpen(false);
   }, []);
 
-  // Milestone tracking - keeping ref update for future use
+  // Milestone tracking ref (kept for future use)
   useEffect(() => {
     if (!data || !isOwnProfile) return;
     prevTotalRef.current = data.totalTop100Played;
   }, [data?.totalTop100Played, isOwnProfile]);
 
-  // Calculate next milestone progress percentage
-  const nextMilestoneProgress = React.useMemo(() => {
+  // Next-milestone progress percentage for the inline pill
+  const nextMilestoneProgress = useMemo(() => {
     if (!data?.next_milestone) return 0;
     const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
     const currentThreshold = thresholds.find(t => t > (data?.totalTop100Played ?? 0)) || 400;
@@ -105,57 +81,18 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     return Math.min(100, Math.round((progress / range) * 100));
   }, [data?.next_milestone, data?.totalTop100Played]);
 
-  const yearRounds = data?.year_rounds ?? EMPTY_ROUNDS;
-
-  // Derive year summary from year-scoped data (not recent_rounds)
-  // MUST be called before any early returns to satisfy React hooks rules
-  const yearSummary = useMemo(() => buildYearSummary(yearRounds), [yearRounds]);
-  
-  // Count regions active this year (for Year Summary)
-  // MUST be called before any early returns to satisfy React hooks rules
-  const yearRegionsCount = useMemo(() => {
-    const regions = new Set<string>();
-    for (const round of yearRounds) {
-      for (const slug of round.list_slugs ?? []) {
-        regions.add(slug);
-      }
-    }
-    return regions.size;
-  }, [yearRounds]);
-
-  // Map Top100ProgressForUser list data to RegionProgress format for Journey Map
-  // MUST be called before any early returns to satisfy React hooks rules
-  const regionProgress: RegionProgress[] = useMemo(() => {
-    if (!data?.lists) return [];
-    
-    const slugToRegion: Record<string, { name: string; shortName: string }> = {
-      'gb-i': { name: 'GB&I Top 100', shortName: 'GB&I' },
-      'europe': { name: 'Europe Top 100', shortName: 'EUR' },
-      'usa': { name: 'USA Top 100', shortName: 'USA' },
-      'global': { name: 'Global Top 100', shortName: 'WLD' },
-    };
-    
-    const orderedSlugs = ['gb-i', 'europe', 'usa', 'global'];
-    
-    return orderedSlugs
-      .map(slug => {
-        const list = data.lists.find(l => l.listSlug === slug);
-        const region = slugToRegion[slug];
-        if (!list || !region) return null;
-        
-        return {
-          id: slug,
-          name: region.name,
-          shortName: region.shortName,
-          played: list.played,
-          total: list.total,
-        };
-      })
-      .filter((r): r is RegionProgress => r !== null);
-  }, [data?.lists]);
+  // Streak summary derived from the dedicated 18-month window
+  const streakSummary = useMemo(() => {
+    const rounds = data?.all_rounds_for_streak ?? EMPTY_ROUNDS;
+    return buildStreakSummary(rounds, {
+      isOwnProfile,
+      firstName: (profile?.display_name ?? session?.user?.user_metadata?.full_name ?? '')
+        .split(' ')[0] || undefined,
+    });
+  }, [data?.all_rounds_for_streak, isOwnProfile, profile?.display_name, session?.user?.user_metadata?.full_name]);
 
   // ===== EARLY RETURNS AFTER ALL HOOKS =====
-  
+
   if (!effectiveUserId) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-6 text-center gap-4">
@@ -177,231 +114,452 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     );
   }
 
-  // Skeleton loading state (G2) - with smooth fade-in transition
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
-      <div className="w-full max-w-full pb-8 animate-fade-in">
-        <Top100ProgressHeroSkeleton />
-        <Top100YearSummarySkeleton />
-        <div className="px-4 mb-4">
-          <Top100TimelineSkeleton />
+      <div className="w-full max-w-full animate-fade-in space-y-6 px-4 pt-2 pb-8">
+        {/* Hero skeleton */}
+        <div>
+          <Skeleton className="h-3 w-24 mb-2" />
+          <Skeleton className="h-7 w-48" />
+          <div className="flex items-center gap-4 mt-4">
+            <Skeleton className="w-[76px] h-[76px] rounded-2xl" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-14 w-full mt-3 rounded-xl" />
         </div>
-        <div className="px-4 mb-6">
-          <Top100StreakSkeleton />
+        {/* Momentum skeleton */}
+        <div>
+          <Skeleton className="h-3 w-20 mb-2" />
+          <Skeleton className="h-[72px] w-full rounded-2xl" />
         </div>
-        <Top100MilestonesCarouselSkeleton />
-        <div className="mt-6">
-          <Top100RecentRoundsSkeleton />
+        {/* Recent rounds skeleton */}
+        <div>
+          <Skeleton className="h-3 w-28 mb-2" />
+          <Skeleton className="h-5 w-44 mb-3" />
+          <div className="flex gap-2.5">
+            {[1, 2, 3].map(i => <Skeleton key={i} className="w-[220px] h-[160px] rounded-2xl flex-shrink-0" />)}
+          </div>
+        </div>
+        {/* Footer links skeleton */}
+        <div className="space-y-3">
+          <Skeleton className="h-16 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
         </div>
       </div>
     );
   }
 
-  if (!data) return null;
-
+  // ----- Derivations that depend on data -----
   const lastPlayedDate = data.recent_rounds[0]?.played_at || null;
+  const formattedLastPlayedShort = lastPlayedDate
+    ? format(new Date(lastPlayedDate), 'd MMM')
+    : null;
 
-  // Avatar URL - prioritize profile photo over session metadata
-  const avatarUrl = 
-    profile?.profile_photo_url ?? 
-    session?.user?.user_metadata?.avatar_url ?? 
+  const avatarUrl =
+    profile?.profile_photo_url ??
+    session?.user?.user_metadata?.avatar_url ??
     null;
 
-  const displayName = 
-    profile?.display_name ?? 
-    session?.user?.user_metadata?.full_name ?? 
+  const displayName =
+    profile?.display_name ??
+    session?.user?.user_metadata?.full_name ??
     null;
+
+  const initials =
+    displayName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 
   // Friends comparison logic - real data only
-  const myCount = data?.totalTop100Played ?? 0;
+  const myCount = data.totalTop100Played ?? 0;
   const friends = friendsSnapshot?.friends ?? [];
 
-  // Filter to only friends who have played at least 1 Top 100 course
   const topFriends = friends
     .filter(f => (f.total_top100_played ?? 0) > 0)
     .sort((a, b) => (b.total_top100_played ?? 0) - (a.total_top100_played ?? 0))
     .slice(0, 10);
 
-  let friendMessage: string | null = null;
-
-  if (friendsSnapshot?.me && friends.length > 0) {
-    const bestFriend = topFriends[0];
-
-    if (bestFriend && bestFriend.total_top100_played > myCount) {
-      const diff = bestFriend.total_top100_played - myCount;
-      friendMessage = `${bestFriend.display_name} is ahead by ${diff} course${diff === 1 ? '' : 's'}.`;
-    } else {
-      friendMessage = "You're leading your friends – keep your edge.";
+  // Friends footer link copy. Tied count counts as "leading" (intentional,
+  // matches existing behaviour).
+  const friendMessageShort = (() => {
+    const top = topFriends[0];
+    if (!top || top.total_top100_played <= myCount) {
+      return "You're leading your friends";
     }
-  }
+    const firstName = top.display_name?.split(' ')[0] ?? 'They';
+    const diff = top.total_top100_played - myCount;
+    return `${firstName} is ahead by ${diff}`;
+  })();
+
+  // Achievements footer link sub-line
+  const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
+  const unlockedCount = thresholds.filter(t => myCount >= t).length;
+  const remainingCount = thresholds.length - unlockedCount;
+  const achievementsSubline = `${unlockedCount} unlocked · ${remainingCount} to chase · regional progress`;
 
   return (
-    <div className="w-full max-w-full animate-fade-in">
-      {/* ============================================
-          SECTION A: HERO / IDENTITY - section band, no card
-          Background: bg-slate-50, pt-8 pb-10
-          ============================================ */}
-      <section className="pt-8 pb-10">
-        <Top100ProgressHero
-          displayName={displayName}
-          avatarUrl={avatarUrl}
-          tierId={data.club_ring || 'none'}
-          tierLabel={data.club_tier_name || null}
-          totalTop100Played={data.totalTop100Played}
-          regionsCount={data.regions_count}
-          lastRoundAt={lastPlayedDate}
-          isOwnProfile={isOwnProfile}
-        />
-        
-        {/* B) Stats Row - mt-6 from hero */}
-        <div className="mt-6 px-4">
-          <Top100YearSummary summary={yearSummary} regionsCount={yearRegionsCount} />
+    <div className="w-full max-w-full animate-fade-in pb-8">
+      {/* ============ Editorial hero ============ */}
+      <div className="px-4 pt-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Your Progress
+          </span>
         </div>
-      </section>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+          The Top 100 chase
+        </h2>
 
-      {/* ============================================
-          SECTION C: MOMENTUM
-          ============================================ */}
-      <section className="bg-card px-4 py-8 border-t border-border/30">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-4">
-          Momentum
-        </h3>
-        <div className="space-y-4">
-          {/* H) Progress Timeline */}
-          <Top100ProgressTimeline
-            rounds={data.year_rounds ?? []}
-            year={new Date().getFullYear()}
-            onViewAll={() => navigate('/rounds?filter=top100')}
-          />
-
-          {/* I) Logging Streak */}
-          <Top100LoggingStreak
-            rounds={data.all_rounds_for_streak ?? data.recent_rounds}
-            onLogRound={() => navigate('/courses?action=log')}
-            isOwnProfile={isOwnProfile}
-            firstName={displayName?.split(' ')[0]}
-          />
-        </div>
-      </section>
-
-      {/* ============================================
-          SECTION D: ACHIEVEMENTS (CELEBRATION LAYER)
-          Divider above, mt-10
-          ============================================ */}
-      <section className="mt-8 border-t border-border/30 pt-8">
-        {/* D.1 Milestone Achievements Carousel */}
-        <div className="mb-5">
-          <Top100MilestonesCarousel 
-            totalPlayed={data.totalTop100Played} 
-            onMilestoneClick={(milestone) => openMilestoneSheet(milestone.threshold)}
-          />
-        </div>
-
-        {/* D.2 Next achievement line - interactive */}
-        {data?.next_milestone && (() => {
-          const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
-          return (
-            <div className="flex justify-center mb-4 mt-5 px-4">
-              <button
-                type="button"
-                onClick={() => openMilestoneSheet(data.next_milestone!.threshold)}
-                className="w-full max-w-sm bg-card border border-border/60 rounded-2xl py-2.5 px-4 flex flex-col gap-2 active:scale-[0.98] active:opacity-80 transition-all"
-              >
-                <p className="text-sm font-medium text-center text-foreground whitespace-nowrap">
-                  <span className="font-semibold">
-                    {data.next_milestone.remaining} more to{' '}
-                  </span>
-                  <span className="font-bold" style={{ color: nextTierColor }}>
-                    {data.next_milestone.tierName}
-                  </span>
-                </p>
-                {/* 8px progress bar with shimmer */}
-                <div className="h-2 rounded-full bg-muted overflow-hidden w-full">
-                  <div
-                    className="h-full rounded-full transition-all relative overflow-hidden"
-                    style={{ 
-                      width: `${nextMilestoneProgress}%`, 
-                      background: `linear-gradient(90deg, ${nextTierColor}, ${nextTierColor}CC)`,
-                    }}
-                  >
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
-                        animation: 'shimmer 2.5s ease-in-out infinite',
-                      }}
-                    />
-                  </div>
-                </div>
-              </button>
+        {/* Avatar + big stat row */}
+        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0' }}>
+          <div style={{ position: 'relative' }}>
+            <SquircleAvatar
+              size={76}
+              src={avatarUrl}
+              alt={displayName ?? 'You'}
+              fallback={initials}
+              thinRing
+              ringColor="#F7931E"
+            />
+            {data.club_tier_name && (
+              <div style={{
+                position: 'absolute', bottom: -4, right: -4,
+                padding: '3px 7px', borderRadius: 8,
+                background: '#0F172A', color: '#F7931E',
+                fontSize: 9, fontWeight: 900, letterSpacing: '0.04em',
+                border: '2px solid #F8FAFC',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                textTransform: 'uppercase' as const,
+              }}>{data.club_tier_name}</div>
+            )}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <span style={{
+                fontSize: 44, fontWeight: 900, color: '#F7931E',
+                lineHeight: 1, letterSpacing: '-0.04em',
+                fontVariantNumeric: 'tabular-nums' as const,
+              }}>
+                {data.totalTop100Played}
+              </span>
+              <span style={{ fontSize: 16, fontWeight: 600, color: '#64748B' }}>of 100</span>
             </div>
-          );
-        })()}
-      </section>
+            {formattedLastPlayedShort && (
+              <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Calendar size={11} /> Last logged {formattedLastPlayedShort}
+              </div>
+            )}
+          </div>
+        </div>
 
-      {/* ============================================
-          SECTION 3: SOCIAL CONTEXT (SECONDARY)
-          ============================================ */}
+        {/* Inline next-milestone progress pill */}
+        {data.next_milestone && (
+          <button
+            type="button"
+            onClick={() => navigate('/top100/journey')}
+            style={{
+              width: '100%', marginTop: 4,
+              padding: '12px 14px', borderRadius: 12,
+              background: 'rgba(247,147,30,0.05)',
+              border: '1px solid rgba(247,147,30,0.18)',
+              textAlign: 'left' as const, cursor: 'pointer',
+            }}
+            className="active:scale-[0.98] transition-transform"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>
+                <span style={{ color: '#c97a10', fontWeight: 800 }}>{data.next_milestone.remaining} more</span>
+                {' '}to {data.next_milestone.tierName}
+              </span>
+              <span style={{
+                fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.02em',
+                fontVariantNumeric: 'tabular-nums' as const,
+              }}>
+                {data.totalTop100Played} / {data.next_milestone.threshold}
+              </span>
+            </div>
+            <div style={{ height: 6, borderRadius: 3, background: 'rgba(15,23,42,0.06)', overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                width: `${nextMilestoneProgress}%`,
+                background: 'linear-gradient(90deg, #F7931E, #FBBC2E)',
+                borderRadius: 3,
+              }} />
+            </div>
+          </button>
+        )}
+      </div>
+
+      {/* ============ Momentum ============ */}
+      <div className="px-4 pt-6">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Momentum
+          </span>
+        </div>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '14px 16px', background: '#ffffff',
+          border: '1px solid rgba(15,23,42,0.10)', borderRadius: 14,
+        }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: 14,
+            background: 'rgba(247,147,30,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <Flame size={20} color="#F7931E" strokeWidth={2.2} fill="#F7931E" fillOpacity={0.2} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>
+              {streakSummary.monthsCount > 0 ? (
+                <>
+                  <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' as const }}>
+                    {streakSummary.monthsCount} month{streakSummary.monthsCount === 1 ? '' : 's'}
+                  </span>{' '}streak
+                </>
+              ) : (
+                <span style={{ color: '#0F172A' }}>Start a streak</span>
+              )}
+            </div>
+            <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 1 }}>
+              {streakSummary.subline}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 4 }}>
+            {streakSummary.last6Months.map((m, i) => (
+              <div key={i} title={m.label} style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: m.logged ? '#F7931E' : 'rgba(15,23,42,0.10)',
+              }} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ============ Recent rounds ============ */}
+      <div className="pt-6">
+        <div className="px-4 pb-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              Recent rounds
+            </span>
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
+            {data.recent_rounds.length > 0
+              ? `Your last ${Math.min(data.recent_rounds.length, 5)} Top 100${Math.min(data.recent_rounds.length, 5) === 1 ? '' : 's'}`
+              : 'No Top 100 rounds yet'}
+          </div>
+        </div>
+        <style>{`.recent-rounds-row::-webkit-scrollbar { display: none; }`}</style>
+        <div
+          className="recent-rounds-row flex gap-2.5 px-4 pb-1 overflow-x-auto"
+          style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+        >
+          {data.recent_rounds.slice(0, 5).map((round) => (
+            <RecentRoundTile
+              key={round.course_id}
+              round={round}
+              onClick={() => navigate(`/courses/${round.course_id}`)}
+            />
+          ))}
+          {/* Add round CTA tile */}
+          {isOwnProfile && (
+            <button
+              type="button"
+              onClick={() => navigate('/courses?action=log')}
+              style={{
+                flex: '0 0 100px', height: 160, borderRadius: 14,
+                background: '#ffffff',
+                border: '1.5px dashed rgba(15,23,42,0.10)',
+                display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center',
+                gap: 8, cursor: 'pointer', padding: 0,
+              }}
+              className="active:scale-[0.97] transition-transform"
+            >
+              <div style={{
+                width: 36, height: 36, borderRadius: 12,
+                background: 'rgba(247,147,30,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Plus size={18} color="#F7931E" strokeWidth={2.4} />
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#475569', textAlign: 'center' as const, padding: '0 10px' }}>
+                Log another round
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ============ Achievements & Mastery link ============ */}
+      <div className="px-4 pt-6">
+        <button
+          type="button"
+          onClick={() => navigate('/top100/journey')}
+          style={{
+            width: '100%',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 16px', borderRadius: 14,
+            background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)',
+            cursor: 'pointer',
+          }}
+          className="active:scale-[0.98] transition-transform"
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 10,
+              background: 'rgba(15,23,42,0.05)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Trophy size={16} color="#475569" strokeWidth={2} />
+            </div>
+            <div style={{ textAlign: 'left' as const }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>Achievements & Mastery</div>
+              <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 1 }}>{achievementsSubline}</div>
+            </div>
+          </div>
+          <ChevronRight size={16} color="#64748B" strokeWidth={2.2} />
+        </button>
+      </div>
+
+      {/* ============ Friends footer link ============ */}
       {isOwnProfile && topFriends.length > 0 && (
-        <div className="mt-8 px-4">
-          <Top100FriendsActivityCard
-            friends={topFriends}
-            friendMessage={friendMessage}
-            onViewLeaderboard={() => navigate('/top100?tab=leaderboard&view=players')}
-          />
+        <div className="px-4 pt-3">
+          <button
+            type="button"
+            onClick={() => navigate('/top100/network')}
+            style={{
+              width: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '14px 16px', borderRadius: 14,
+              background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)',
+              cursor: 'pointer',
+            }}
+            className="active:scale-[0.98] transition-transform"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex' }}>
+                {topFriends.slice(0, 3).map((f, i) => {
+                  const fInitials =
+                    f.display_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
+                  return (
+                    <div
+                      key={f.friend_id}
+                      style={{
+                        marginLeft: i === 0 ? 0 : -8,
+                        zIndex: 3 - i,
+                        borderRadius: 9,
+                        border: '1.5px solid rgba(255,255,255,0.95)',
+                        overflow: 'hidden',
+                        display: 'inline-flex',
+                      }}
+                    >
+                      <SquircleAvatar
+                        size={26}
+                        src={f.profile_photo_url}
+                        alt={f.display_name ?? 'Friend'}
+                        fallback={fInitials}
+                        hideRing
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ textAlign: 'left' as const }}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>{friendMessageShort}</div>
+                <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 1 }}>See where your network stands</div>
+              </div>
+            </div>
+            <ChevronRight size={16} color="#64748B" strokeWidth={2.2} />
+          </button>
         </div>
       )}
 
-      {/* ============================================
-          SECTION E: JOURNEY MAP (Simplified - 2 badges only)
-          Most recent earned + next to unlock
-          ============================================ */}
-      <section className="mt-8 px-4">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-4">Journey Map</h2>
-        <SimplifiedMilestoneLadder
-          totalPlayed={data.totalTop100Played}
-          onMilestoneClick={openMilestoneSheet}
-        />
-      </section>
-
-      {/* ============================================
-          SECTION F: MASTERY TRACK (No card wrapper)
-          Regional badges on page background
-          ============================================ */}
-      <section className="mt-8 px-4">
-        <MasteryTrack
-          regionCompletions={regionProgress.map(r => ({
-            slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
-            name: r.name,
-            played: r.played,
-            total: r.total,
-          }))}
-          totalPlayed={data.totalTop100Played}
-          onRegionClick={(slug, played, total) => openRegionalSheet(slug, played, total)}
-        />
-      </section>
-
-      {/* ============================================
-          SECTION H: RECENT TOP 100 ROUNDS
-          Divider above, pt-8
-          ============================================ */}
-      <section className="border-t border-border/30 pt-8 mt-8 -mx-4 sm:mx-0">
-        <Top100RecentRoundsCarousel
-          rounds={data.recent_rounds}
-          isOwnProfile={isOwnProfile}
-          onAddRound={() => navigate('/courses?action=log')}
-        />
-      </section>
-
-      {/* Unified Achievement Sheet - handles both milestone and regional */}
+      {/* Unified Achievement Sheet (mounted; sub-page in Phase B drives it) */}
       <UnifiedAchievementSheet
         isOpen={isAchievementSheetOpen}
         onClose={closeAchievementSheet}
         data={achievementSheetData}
       />
-
     </div>
   );
 };
 
 export default Top100MyProgressPanel;
+
+// ============ Local components ============
+
+interface RecentRoundTileProps {
+  round: Top100RecentRound;
+  onClick: () => void;
+}
+
+const RecentRoundTile: React.FC<RecentRoundTileProps> = ({ round, onClick }) => {
+  const formattedDate = format(new Date(round.played_at), 'd MMM yyyy');
+  const imageUrl = round.image_url || FALLBACK_COURSE_IMAGE;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        flex: '0 0 220px', height: 160, borderRadius: 14, overflow: 'hidden',
+        backgroundColor: '#475569',
+        backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.78) 0%, transparent 50%), url(${imageUrl})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        position: 'relative', border: 'none', padding: 0, cursor: 'pointer',
+        textAlign: 'left' as const,
+      }}
+      className="active:scale-[0.98] transition-transform"
+    >
+      {/* Combined rank pill — global + regional */}
+      {(round.global_rank || round.regional_rank) && (
+        <div style={{ position: 'absolute', top: 10, left: 10 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'rgba(15,23,42,0.62)', backdropFilter: 'blur(8px)',
+            border: '0.5px solid rgba(255,255,255,0.12)',
+            padding: '4px 8px', borderRadius: 9999,
+            fontSize: 10, fontWeight: 700, color: '#ffffff',
+            fontVariantNumeric: 'tabular-nums' as const,
+          }}>
+            {round.global_rank && (
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Globe size={9} strokeWidth={2.4} /> #{round.global_rank}
+              </span>
+            )}
+            {round.global_rank && round.regional_rank && (
+              <span style={{ width: 1, height: 8, background: 'rgba(255,255,255,0.20)' }} />
+            )}
+            {round.regional_rank && (
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                {/* TODO follow-up: swap Globe → FlagChip once Top 100 tab Phase C2 lands */}
+                <Globe size={9} strokeWidth={2.4} /> #{round.regional_rank}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '8px 10px 10px' }}>
+        <div style={{
+          fontSize: 13, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.01em',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>{round.course_name}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 3 }}>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)' }}>{formattedDate}</span>
+          {round.rating != null && (
+            <span style={{
+              fontSize: 12, fontWeight: 800, color: '#F7931E',
+              fontVariantNumeric: 'tabular-nums' as const,
+            }}>{round.rating.toFixed(1)}</span>
+          )}
+        </div>
+      </div>
+    </button>
+  );
+};
