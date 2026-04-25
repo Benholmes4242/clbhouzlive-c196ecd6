@@ -32,7 +32,7 @@ export interface EditorialCopy {
    * Shape is surface-specific — IntelligenceHero treats this as a partial
    * `IntelligenceQuoteSnapshot` (see editorialFallbacks.ts).
    */
-  snapshotData: Record<string, unknown> | null;
+  snapshotData?: Record<string, unknown> | null;
 }
 
 function todayUtc(): string {
