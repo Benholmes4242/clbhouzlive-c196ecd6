@@ -355,3 +355,60 @@
     min-height: auto;
   }
 }
+
+/* ============================================================================
+   TOUR HUB REDESIGN — Brand tokens & motion primitives
+   ============================================================================
+   Intelligence Violet is the AI brand color going forward — distinct from
+   amber (tournament/brand) and green (live).
+   ============================================================================ */
+
+:root {
+  --th-intelligence: #7C3AED;
+  --th-intelligence-glow: #A78BFA;
+  --th-intelligence-soft: #F3EEFF;
+  --th-intelligence-dark: #5B21B6;
+}
+
+/* Pulsing live dot — used by AllToursTicker eyebrow + per-event score dots */
+@keyframes thLivePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.4); }
+}
+
+/* Tick flash — momentary amber-to-ink colour wipe on counter increment */
+@keyframes thTickFlash {
+  0% { color: #F7931E; }
+  100% { color: #0F172A; }
+}
+
+/* Amber shimmer line — bottom of AllToursTicker */
+@keyframes thShimmerLine {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.th-live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: thLivePulse 1.6s ease-in-out infinite;
+}
+
+.th-shimmer-line {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(247, 147, 30, 0.0) 30%,
+    rgba(247, 147, 30, 0.85) 50%,
+    rgba(247, 147, 30, 0.0) 70%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: thShimmerLine 3.2s linear infinite;
+}

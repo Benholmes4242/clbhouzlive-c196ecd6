@@ -25,6 +25,7 @@ import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { TournamentInsights } from '../tournament-insights';
 import { LazySection } from '../overview-v3/LazySection';
+import { AllToursTicker } from '../AllToursTicker';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
@@ -82,13 +83,15 @@ export function OverviewPageV3() {
           <HeroCarousel hasHeader={false} />
         </motion.div>
 
+        {/* All Tours Ticker — flush below the hero, no top gap */}
+        <AllToursTicker />
+
         {/* Content sections */}
         <div 
           id="content-below-hero"
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
-            <LiveRightNow />
             <WhatsComing />
             <LazySection minHeight={250}>
               <TournamentInsights />
