@@ -22,11 +22,10 @@ const RATING_TIER_TO_RING_KEY: Record<
   keyof typeof courseDetailTokens.scoreRing
 > = {
   EXCEPTIONAL: 'exceptional',
-  OUTSTANDING: 'outstanding',
   EXCELLENT: 'excellent',
-  'VERY GOOD': 'veryGood',
   GOOD: 'good',
   FAIR: 'fair',
+  POOR: 'poor',
 };
 
 /**

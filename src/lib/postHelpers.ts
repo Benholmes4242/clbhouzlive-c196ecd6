@@ -69,24 +69,20 @@ const amberOverlay: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
 
 const tierOverlayThemes = {
   exceptional: amberOverlay,
-  outstanding: amberOverlay,
   excellent: amberOverlay,
-  veryGood: amberOverlay,
   good: amberOverlay,
   fair: amberOverlay,
+  poor: amberOverlay,
 } satisfies Record<string, Omit<ReviewOverlayTheme, keyof RatingTheme>>;
 
 // Canonical tier → overlay key mapping. TypeScript exhaustiveness on
-// Record<RatingTier, …> guarantees every canonical tier has an overlay row,
-// eliminating silent demotion (the Phase 1.5 audit bug where >= 9 capped at
-// 'outstanding' and dropped Exceptional ratings).
+// Record<RatingTier, …> guarantees every canonical tier has an overlay row.
 const RATING_TIER_TO_OVERLAY_KEY: Record<RatingTier, keyof typeof tierOverlayThemes> = {
   'EXCEPTIONAL': 'exceptional',
-  'OUTSTANDING': 'outstanding',
   'EXCELLENT': 'excellent',
-  'VERY GOOD': 'veryGood',
   'GOOD': 'good',
   'FAIR': 'fair',
+  'POOR': 'poor',
 };
 
 function getTierKey(score: number): keyof typeof tierOverlayThemes {
@@ -130,25 +126,21 @@ export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
 export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTheme {
   const labelToKey: Record<string, keyof typeof tierOverlayThemes> = {
     'EXCEPTIONAL': 'exceptional',
-    'OUTSTANDING': 'outstanding',
     'EXCELLENT': 'excellent',
-    'VERY GOOD': 'veryGood',
     'GOOD': 'good',
     'FAIR': 'fair',
+    'POOR': 'poor',
   };
   const key = labelToKey[tierLabel.toUpperCase()] || 'good';
 
-  // Explicit tier → canonical theme mapping. Replaces a binary
-  // outstanding/excellent ternary that silently demoted Exceptional and
-  // every non-outstanding tier to the EXCELLENT theme. The Record makes all
-  // 6 tiers explicit and gives future visual differentiation a clean home.
+  // Explicit tier → canonical theme mapping. Exhaustive Record over the
+  // 5-tier system per src/lib/ratingTier.ts.
   const OVERLAY_KEY_TO_THEME: Record<keyof typeof tierOverlayThemes, RatingTheme> = {
     exceptional: COURSE_RATING_THEMES.EXCEPTIONAL,
-    outstanding: COURSE_RATING_THEMES.OUTSTANDING,
     excellent: COURSE_RATING_THEMES.EXCELLENT,
-    veryGood: COURSE_RATING_THEMES.VERY_GOOD,
     good: COURSE_RATING_THEMES.GOOD,
     fair: COURSE_RATING_THEMES.FAIR,
+    poor: COURSE_RATING_THEMES.POOR,
   };
   const baseTheme = OVERLAY_KEY_TO_THEME[key] ?? COURSE_RATING_THEMES.GOOD;
 
