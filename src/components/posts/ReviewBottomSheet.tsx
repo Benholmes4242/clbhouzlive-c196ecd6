@@ -543,7 +543,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             <div
               style={{
                 flex: '1 1 auto',
-                overflow: 'auto',
+                overflowY: 'auto',
+                overflowX: 'hidden',
                 overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
                 padding: '20px 22px 20px',
