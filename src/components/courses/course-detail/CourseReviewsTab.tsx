@@ -328,10 +328,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (isLoading) {
     return (
       <div style={{ background: '#F8FAFC', minHeight: '100%', paddingBottom: 40 }}>
-        {/* Community score skeleton */}
+        {/* Community score skeleton — stacked */}
         <div style={{ padding: '18px 16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-9 w-24" />
+          <Skeleton className="h-12 w-20" />
+          <Skeleton className="h-3 w-24" />
           <Skeleton className="h-3 w-20" />
         </div>
         <Divider />
@@ -339,17 +340,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <div style={{ padding: '10px 16px 0' }}>
           <Skeleton className="h-10 w-full rounded-[10px]" />
         </div>
-        {/* Sort skeleton */}
-        <div style={{ display: 'flex', gap: 6, padding: '10px 16px 8px' }}>
-          <Skeleton className="h-7 w-24 rounded-lg" />
-          <Skeleton className="h-7 w-28 rounded-lg" />
-          <Skeleton className="h-7 w-24 rounded-lg" />
-        </div>
-        {/* Filter skeleton */}
-        <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px' }}>
-          <Skeleton className="h-7 w-32 rounded-full" />
+        {/* Compressed control bar skeleton — single row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px 12px' }}>
           <Skeleton className="h-7 w-28 rounded-full" />
+          <div style={{ width: 1, height: 20, background: 'rgba(15,23,42,0.1)' }} />
           <Skeleton className="h-7 w-24 rounded-full" />
+          <Skeleton className="h-7 w-28 rounded-full" />
         </div>
         <Divider />
         {/* Review row skeletons */}
