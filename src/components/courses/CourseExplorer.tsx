@@ -481,11 +481,13 @@ const CourseExplorer = () => {
         style={{
           background: '#F8FAFC',
           borderBottom: 'none',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingTop: isScrolled
+            ? 'max(env(safe-area-inset-top, 0px), 47px)'
+            : '8px',
           boxShadow: isScrolled
             ? '0 1px 0 rgba(15,23,42,0.06), 0 8px 24px -16px rgba(15,23,42,0.18)'
             : 'none',
-          transition: 'box-shadow 200ms ease',
+          transition: 'box-shadow 200ms ease, padding-top 200ms ease',
         }}
       >
       {/* Search */}
