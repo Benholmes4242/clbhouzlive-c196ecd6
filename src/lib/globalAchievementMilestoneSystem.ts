@@ -98,50 +98,24 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fr
 ) as Record<MilestoneTier, MilestoneTheme>;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// COURSE RATING THEMES (Fair → Outstanding)
-// NEW COLOR SYSTEM (Jan 2026): Gray for Fair→Excellent, Amber/Orange gradient for Outstanding
+// COURSE RATING THEMES (Poor → Exceptional) — 5-tier system (April 2026 rebalance)
+// All tiers render amber per the unified single-color rating decision.
+// Bandings: EXCEPTIONAL ≥9.0 · EXCELLENT 7.5–8.9 · GOOD 6.0–7.4 · FAIR 4.0–5.9 · POOR <4.0
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING' | 'EXCEPTIONAL';
-
-export interface RatingTheme {
-  key: RatingTier;
-  label: string;
-  accent: string;    // Pure accent color (gray or amber)
-  bgLight: string;   // Card/badge gradient start
-  bgDark: string;    // Card/badge gradient end
-  // CSS class equivalents for Tailwind usage
-  bgClass: string;
-  borderClass: string;
-  textClass: string;
-  barFillClass: string;
-  // Gradient for Outstanding
-  gradient?: string;
-}
-
-// NEW: Slate blue scale for Fair→Excellent, Amber for Outstanding
-const RATING_AMBER = '#f59e0b';    // amber-500 for Outstanding
-const RATING_AMBER_LIGHT = '#fbbf24'; // amber-400 for gradient end
-
-// Outstanding uses Amber/Orange gradient styling
-const amberTheme = {
-  accent: RATING_AMBER,
-  bgLight: '#f59e0b0D',
-  bgDark: '#f59e0b1A',
-  bgClass: 'bg-[#f59e0b]/10',
-  borderClass: 'border-[#f59e0b]/30',
-  textClass: 'text-[#d97706]',
-  barFillClass: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
-};
-
-// All tiers now use amber — unified single-color rating system
+export type RatingTier = 'POOR' | 'FAIR' | 'GOOD' | 'EXCELLENT' | 'EXCEPTIONAL';
+...
+const poorTheme = amberTheme;
 const fairTheme = amberTheme;
 const goodTheme = amberTheme;
-const veryGoodTheme = amberTheme;
 const excellentTheme = amberTheme;
 
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
+  POOR: {
+    key: 'POOR',
+    label: 'Poor',
+    ...poorTheme,
+  },
   FAIR: {
     key: 'FAIR',
     label: 'Fair',
@@ -152,20 +126,10 @@ export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
     label: 'Good',
     ...goodTheme,
   },
-  VERY_GOOD: {
-    key: 'VERY_GOOD',
-    label: 'Very Good',
-    ...veryGoodTheme,
-  },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
     ...excellentTheme,
-  },
-  OUTSTANDING: {
-    key: 'OUTSTANDING',
-    label: 'Outstanding',
-    ...amberTheme,
   },
   EXCEPTIONAL: {
     key: 'EXCEPTIONAL',
@@ -180,12 +144,11 @@ export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
  * @returns RatingTheme with all color values
  */
 export function getRatingTheme(score: number): RatingTheme {
-  if (score >= 9.5) return COURSE_RATING_THEMES.EXCEPTIONAL;
-  if (score >= 9.0) return COURSE_RATING_THEMES.OUTSTANDING;
-  if (score >= 8.0) return COURSE_RATING_THEMES.EXCELLENT;
-  if (score >= 7.0) return COURSE_RATING_THEMES.VERY_GOOD;
+  if (score >= 9.0) return COURSE_RATING_THEMES.EXCEPTIONAL;
+  if (score >= 7.5) return COURSE_RATING_THEMES.EXCELLENT;
   if (score >= 6.0) return COURSE_RATING_THEMES.GOOD;
-  return COURSE_RATING_THEMES.FAIR;
+  if (score >= 4.0) return COURSE_RATING_THEMES.FAIR;
+  return COURSE_RATING_THEMES.POOR;
 }
 
 /**
@@ -446,11 +409,10 @@ export function getThresholdTierId(threshold: number): string {
 
 export const RATING_CSS_VARS = {
   '--rating-band-exceptional': COURSE_RATING_THEMES.EXCEPTIONAL.accent,
-  '--rating-band-outstanding': COURSE_RATING_THEMES.OUTSTANDING.accent,
-  '--rating-band-excellent': COURSE_RATING_THEMES.EXCELLENT.accent,
-  '--rating-band-very-good': COURSE_RATING_THEMES.VERY_GOOD.accent,
-  '--rating-band-good': COURSE_RATING_THEMES.GOOD.accent,
-  '--rating-band-fair': COURSE_RATING_THEMES.FAIR.accent,
+  '--rating-band-excellent':   COURSE_RATING_THEMES.EXCELLENT.accent,
+  '--rating-band-good':        COURSE_RATING_THEMES.GOOD.accent,
+  '--rating-band-fair':        COURSE_RATING_THEMES.FAIR.accent,
+  '--rating-band-poor':        COURSE_RATING_THEMES.POOR.accent,
 } as const;
 
 // Re-export palette and helpers
