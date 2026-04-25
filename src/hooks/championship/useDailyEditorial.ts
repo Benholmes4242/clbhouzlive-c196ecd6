@@ -91,6 +91,9 @@ export function useDailyEditorial({
         storyType: data.story_type,
         generatedBy: data.generated_by as EditorialCopy['generatedBy'],
         date: data.date,
+        snapshotData:
+          (data as { snapshot_data?: Record<string, unknown> | null })
+            .snapshot_data ?? null,
       };
     },
   });
