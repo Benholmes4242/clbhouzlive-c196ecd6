@@ -17,8 +17,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../hooks/useOverviewModules';
-// CountryFlag intentionally omitted — useLiveRightNow's leader payload doesn't carry country.
-// When the data layer is widened we can re-introduce the flag here.
+import CountryFlag from '@/components/ui/country-flag';
 
 function abbreviateName(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
@@ -94,6 +93,9 @@ const TickerCell: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boole
       {/* Leader row */}
       {tournament.leader ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {tournament.leader.country && (
+            <CountryFlag country={tournament.leader.country} size="sm" />
+          )}
           <span
             style={{
               fontSize: 12,

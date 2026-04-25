@@ -28,6 +28,7 @@ export interface LiveTournamentWithLeader {
   leader: {
     id: string;
     name: string;
+    country: string | null;
     score: number;
     scoreDisplay: string;
   } | null;
@@ -155,7 +156,7 @@ export function useLiveRightNow() {
           round_2,
           round_3,
           round_4,
-          player:sr_players!sr_leaderboards_player_id_fkey(id, first_name, last_name, full_name),
+          player:sr_players!sr_leaderboards_player_id_fkey(id, first_name, last_name, full_name, country),
           team:sr_teams!sr_leaderboards_team_id_fkey(id, display_name, abbr_name)
         `)
         .in('tournament_id', tournamentIds)
@@ -216,12 +217,14 @@ export function useLiveRightNow() {
               ? {
                   id: (leaderEntry.player as any).id,
                   name: `${leaderCountMap[t.id]} tied`,
+                  country: null,
                   score: leaderEntry.score,
                   scoreDisplay: formatScore(leaderEntry.score),
                 }
               : {
                   id: (leaderEntry.player as any).id,
                   name: `${(leaderEntry.player as any).first_name} ${(leaderEntry.player as any).last_name}`,
+                  country: (leaderEntry.player as any).country ?? null,
                   score: leaderEntry.score,
                   scoreDisplay: formatScore(leaderEntry.score),
                 }
