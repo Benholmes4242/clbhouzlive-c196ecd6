@@ -11,18 +11,18 @@
  */
 
 export const AVATAR_FALLBACK_PALETTE = [
-  '#1F3A5F', // deep navy
-  '#2E5266', // teal-slate
-  '#3D5A3D', // forest
-  '#5B4B3A', // warm taupe
-  '#6B3838', // rust
-  '#5B3A5B', // plum
-  '#3A4A6B', // indigo-slate
-  '#4A5B3D', // olive
-  '#6B4A2E', // cognac
-  '#3D4A5B', // steel
-  '#5B3D4A', // mulberry
-  '#2E4A4A', // pine-teal
+  '#3A4654', // slate
+  '#3D4A52', // slate-teal
+  '#475158', // graphite
+  '#4A4F58', // gunmetal
+  '#52545C', // ash
+  '#3F4A56', // steel
+  '#444B54', // dusk
+  '#4E5159', // pewter
+  '#3D4750', // shadow
+  '#48505A', // basalt
+  '#414C57', // anthracite
+  '#3F4853', // midnight-grey
 ] as const;
 
 /**
