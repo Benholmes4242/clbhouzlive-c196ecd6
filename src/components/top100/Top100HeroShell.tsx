@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
-import { getRegionTheme } from '@/lib/regionTheme';
-import { AnimatedNumber } from '@/components/ui/motion';
 import { FlagChip } from '@/components/courses/FlagChip';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
@@ -19,35 +17,27 @@ const REGION_FULL_NAMES: Record<string, string> = {
 
 interface Top100HeroShellProps {
   list: Top100ListSummary;
-  playedCount: number;
-  totalCount: number;
-  listDisplayName: string;
-  showProgress?: boolean;
+  /** @deprecated unused after Phase B; kept on type only if future consumers need them */
+  playedCount?: number;
+  totalCount?: number;
+  listDisplayName?: string;
 }
 
 /**
- * Top100HeroShell - Unified hero image + full-bleed attached progress slab
- * Uses regional color theming for progress bar.
+ * Top100HeroShell - Compressed full-bleed hero (200px) with eyebrow + headline + glass back button.
+ * Progress is now rendered as a separate compact strip in Top100List.tsx (Phase B).
  * Full-bleed immersive: hero extends behind notch, back button below safe area.
  */
 export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   list,
-  playedCount,
-  totalCount,
-  showProgress = true,
 }) => {
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
   const hero = list.hero_course;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
-  
-  // Get regional theme for progress bar color
-  const theme = getRegionTheme(listSlug);
-  
-  // Progress calculation
-  const percent = totalCount > 0 ? (playedCount / totalCount) * 100 : 0;
-  
+
   // Map short labels to full display names for hero title
+
   const getDisplayLabel = (shortLabel: string, slug: string) => {
     if (slug === 'global' || shortLabel === 'Global') return 'Global Top 100';
     if (shortLabel === 'GB&I') return 'GB&I Top 100';
@@ -159,61 +149,6 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </motion.div>
       </div>
 
-      {/* PROGRESS SECTION - on page background with semantic text */}
-      {showProgress && (
-        <div className="w-full px-4 py-4">
-          {/* Top row: X / total (primary) + % complete (secondary) */}
-          <div className="flex items-baseline justify-between gap-4">
-            <div className="flex items-baseline">
-              <span style={{ color: theme.ringColor, fontWeight: 900 }}>
-                <AnimatedNumber 
-                  value={playedCount}
-                  minCh={1}
-                  className="text-[34px] leading-none tabular-nums"
-                />
-              </span>
-              <span className="text-muted-foreground/60 text-base ml-0.5 font-normal">/{totalCount}</span>
-            </div>
-
-            <div className="flex items-baseline gap-1.5 text-foreground">
-              <AnimatedNumber 
-                value={Math.round(percent)}
-                suffix="%"
-                minCh={1}
-                delay={0.1}
-                className="text-lg font-semibold tabular-nums"
-              />
-              <span className="text-[11px] text-muted-foreground font-medium">
-                complete
-              </span>
-            </div>
-          </div>
-
-          {/* Progress bar - uses regional accent color with glow */}
-          <div className="mt-2.5">
-            <div 
-              className="h-2 w-full rounded-full overflow-hidden"
-              style={{ background: 'rgba(15,23,42,0.08)' }}
-              role="progressbar"
-              aria-valuenow={Math.round(percent)}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={`${playedCount} of ${totalCount} courses complete`}
-            >
-              <motion.div
-                className="h-full rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${percent}%` }}
-                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
-                style={{ 
-                  backgroundColor: theme.ringColor,
-                  boxShadow: percent > 0 ? `0 0 12px ${theme.ringColor}, 0 0 4px ${theme.ringColor}` : 'none',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
