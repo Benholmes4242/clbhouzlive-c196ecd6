@@ -4,7 +4,18 @@ import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import { getRegionTheme } from '@/lib/regionTheme';
 import { AnimatedNumber } from '@/components/ui/motion';
+import { FlagChip } from '@/components/courses/FlagChip';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
+
+// Local slug → full proper-name map for the eyebrow.
+// Intentionally NOT reusing REGION_DISPLAY_NAMES from Top100List.tsx —
+// keeps concerns local. Consolidation brief will deduplicate later.
+const REGION_FULL_NAMES: Record<string, string> = {
+  global: 'Worldwide',
+  'gb-i': 'Great Britain & Ireland',
+  usa: 'United States',
+  europe: 'Continental Europe',
+};
 
 interface Top100HeroShellProps {
   list: Top100ListSummary;
