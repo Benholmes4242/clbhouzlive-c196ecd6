@@ -1068,13 +1068,501 @@ function RingedSquircleAvatar({
   );
 }
 
-// ─── Active state stub (Phase C will fill) ──────────────────────────────────
+// ─── Active state ───────────────────────────────────────────────────────────
 
-function ActiveStateStub() {
-  // Phase C fills: LivePerformanceBand, ActiveHeadline, ActiveStandfirst,
-  // VenueCard (in-progress eyebrow), CourseFitChips, PicksList (mode="live"),
-  // WatchingNote.
-  return null;
+interface ActiveStateBlockProps {
+  tournament: AIPredictionData['tournament'];
+  picks: AITopContender[];
+  tracker: import('./tournament-insights/types').PredictionTrackerData | null;
+  trackerLoading: boolean;
+  editorialSnapshot: Record<string, unknown> | null | undefined;
+}
+
+function ActiveStateBlock({
+  tournament,
+  picks,
+  tracker,
+  trackerLoading,
+  editorialSnapshot,
+}: ActiveStateBlockProps) {
+  const courseFitChips =
+    readCourseFitChips(editorialSnapshot, 'active_course_fit_chips') ??
+    INTELLIGENCE_QUOTE_FALLBACK.activeCourseFitChips;
+
+  const watchingNote =
+    readSnapshotString(editorialSnapshot, 'watching_note') ??
+    INTELLIGENCE_QUOTE_FALLBACK.watchingNote;
+
+  // Round number for venue card eyebrow — derive from any tracked pick
+  const currentRound =
+    tracker?.predictions.find((p) => p.currentRound !== null)?.currentRound ?? null;
+  const venueEyebrow = currentRound
+    ? `In Progress · Round ${currentRound}`
+    : 'In Progress';
+
+  // Build live positions map keyed by predictedRank for PicksList reuse
+  const livePositions = useMemo(() => {
+    const map = new Map<number, { position: number; scoreDisplay: string }>();
+    if (!tracker) return map;
+    for (const tp of tracker.predictions) {
+      const scoreDisplay =
+        tp.performanceStatus === 'cut'
+          ? 'MC'
+          : tp.performanceStatus === 'withdrawn'
+            ? 'WD'
+            : formatScoreToPar(tp.score);
+      map.set(tp.predictedRank, {
+        position: tp.actualPosition ?? 0,
+        scoreDisplay,
+      });
+    }
+    return map;
+  }, [tracker]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginTop: 4 }}>
+      <LivePerformanceBand
+        tracker={tracker}
+        loading={trackerLoading}
+        currentRound={currentRound}
+      />
+
+      <ActiveSectionHeader />
+
+      <VenueCard tournament={tournament} eyebrow={venueEyebrow} />
+
+      <CourseFitChips chips={courseFitChips} />
+
+      {trackerLoading && !tracker ? (
+        <PicksRowsSkeleton count={picks.length || 3} />
+      ) : (
+        <PicksList picks={picks} livePositions={livePositions} />
+      )}
+
+      <WatchingNote text={watchingNote} />
+    </div>
+  );
+}
+
+// ─── ActiveHeadline ─────────────────────────────────────────────────────────
+
+function ActiveHeadline({
+  topPick,
+  contender,
+  tournamentName,
+  loading,
+}: {
+  topPick: TrackedPrediction | null;
+  contender: TrackedPrediction | null;
+  tournamentName: string | null;
+  loading: boolean;
+}) {
+  // While loading, render a neutral live-flavored headline.
+  if (loading || !topPick) {
+    return (
+      <h2
+        style={{
+          fontSize: 30,
+          lineHeight: 1.05,
+          letterSpacing: '-1px',
+          fontWeight: 900,
+          color: '#0F172A',
+          margin: '0 0 10px',
+        }}
+      >
+        Live now.
+        <br />
+        <span
+          style={{
+            background: 'linear-gradient(135deg, #10B981 0%, #7C3AED 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          {tournamentName ?? 'Tracking the field.'}
+        </span>
+      </h2>
+    );
+  }
+
+  const positionLabel = formatPositionLabel(topPick);
+  const sub = buildContenderSub(contender);
+
+  return (
+    <h2
+      style={{
+        fontSize: 30,
+        lineHeight: 1.05,
+        letterSpacing: '-1px',
+        fontWeight: 900,
+        color: '#0F172A',
+        margin: '0 0 10px',
+      }}
+    >
+      {topPick.playerName.split(' ').slice(-1)[0]} sits {positionLabel}.
+      {sub && (
+        <>
+          <br />
+          <span
+            style={{
+              background: 'linear-gradient(135deg, #10B981 0%, #7C3AED 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            {sub}
+          </span>
+        </>
+      )}
+    </h2>
+  );
+}
+
+function formatPositionLabel(tp: TrackedPrediction): string {
+  if (tp.performanceStatus === 'cut') return 'MC';
+  if (tp.performanceStatus === 'withdrawn') return 'WD';
+  if (tp.actualPosition === null) return '—';
+  return `${tp.actualPositionTied ? 'T' : ''}${tp.actualPosition}`;
+}
+
+function buildContenderSub(contender: TrackedPrediction | null): string | null {
+  if (!contender) return null;
+  if (contender.performanceStatus === 'cut') return null;
+  if (contender.performanceStatus === 'withdrawn') return null;
+  if (contender.actualPosition === null) return null;
+
+  const lastName = contender.playerName.split(' ').slice(-1)[0];
+  const pos = `${contender.actualPositionTied ? 'T' : ''}${contender.actualPosition}`;
+  return `${lastName} ${pos}.`;
+}
+
+// ─── LivePerformanceBand ────────────────────────────────────────────────────
+
+function LivePerformanceBand({
+  tracker,
+  loading,
+  currentRound,
+}: {
+  tracker: import('./tournament-insights/types').PredictionTrackerData | null;
+  loading: boolean;
+  currentRound: number | null;
+}) {
+  const eyebrowLabel = currentRound ? `LIVE · ROUND ${currentRound}` : 'LIVE';
+
+  return (
+    <div
+      style={{
+        background: '#ffffff',
+        border: '1px solid rgba(16, 185, 129, 0.25)',
+        borderRadius: 14,
+        overflow: 'hidden',
+        boxShadow: '0 4px 16px -8px rgba(16, 185, 129, 0.2)',
+      }}
+    >
+      {/* Eyebrow row with pulsing dot */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '10px 14px 0',
+        }}
+      >
+        <span
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: '50%',
+            background: '#10B981',
+            boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.2)',
+            animation: 'intelligencePulse 2s infinite',
+            flexShrink: 0,
+          }}
+        />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 900,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: '#10B981',
+          }}
+        >
+          {eyebrowLabel}
+        </span>
+        <Activity
+          size={11}
+          color="#10B981"
+          strokeWidth={2.5}
+          style={{ marginLeft: 'auto' }}
+        />
+      </div>
+
+      {/* Cells row OR loading line */}
+      {loading && !tracker ? (
+        <div
+          style={{
+            padding: '14px',
+            textAlign: 'center',
+            fontSize: 12,
+            fontWeight: 600,
+            color: '#94A3B8',
+          }}
+        >
+          Loading live data…
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            marginTop: 10,
+          }}
+        >
+          <LiveStatCell
+            value={String(tracker?.accuracy.inTop5 ?? 0)}
+            label="in T5"
+            tone={tracker && tracker.accuracy.inTop5 > 0 ? 'live' : 'muted'}
+          />
+          <LiveStatCell
+            value={String(tracker?.accuracy.inTop10 ?? 0)}
+            label="in T10"
+            tone={tracker && tracker.accuracy.inTop10 > 0 ? 'live' : 'muted'}
+            divider
+          />
+          <TopPickCell tracker={tracker} divider />
+        </div>
+      )}
+
+      <style>{`
+        @keyframes intelligencePulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function LiveStatCell({
+  value,
+  label,
+  tone,
+  divider,
+}: {
+  value: string;
+  label: string;
+  tone: 'live' | 'muted';
+  divider?: boolean;
+}) {
+  const color = tone === 'live' ? '#10B981' : '#94A3B8';
+  return (
+    <div
+      style={{
+        padding: '10px 8px 14px',
+        textAlign: 'center',
+        borderLeft: divider ? '1px solid rgba(16, 185, 129, 0.12)' : 'none',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 24,
+          fontWeight: 900,
+          color,
+          letterSpacing: '-0.6px',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          marginTop: 6,
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color,
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function TopPickCell({
+  tracker,
+  divider,
+}: {
+  tracker: import('./tournament-insights/types').PredictionTrackerData | null;
+  divider?: boolean;
+}) {
+  const top = tracker?.predictions.find((p) => p.predictedRank === 1) ?? null;
+
+  let value = '—';
+  let tone: 'live' | 'muted' | 'down' = 'muted';
+
+  if (top) {
+    if (top.performanceStatus === 'cut') {
+      value = 'MC';
+      tone = 'down';
+    } else if (top.performanceStatus === 'withdrawn') {
+      value = 'WD';
+      tone = 'down';
+    } else if (top.actualPosition !== null) {
+      value = `${top.actualPositionTied ? 'T' : ''}${top.actualPosition}`;
+      tone = top.actualPosition <= 10 ? 'live' : 'muted';
+    }
+  }
+
+  const color = tone === 'live' ? '#10B981' : tone === 'down' ? '#94A3B8' : '#94A3B8';
+
+  return (
+    <div
+      style={{
+        padding: '10px 8px 14px',
+        textAlign: 'center',
+        borderLeft: divider ? '1px solid rgba(16, 185, 129, 0.12)' : 'none',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 24,
+          fontWeight: 900,
+          color,
+          letterSpacing: '-0.6px',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          marginTop: 6,
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color,
+        }}
+      >
+        Top Pick
+      </div>
+    </div>
+  );
+}
+
+// ─── ActiveSectionHeader / WatchingNote / Skeleton ──────────────────────────
+
+function ActiveSectionHeader() {
+  return (
+    <div
+      style={{
+        fontSize: 10,
+        fontWeight: 900,
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        color: '#0F172A',
+        marginTop: 4,
+        marginBottom: -6,
+      }}
+    >
+      Our Picks · Live
+    </div>
+  );
+}
+
+function WatchingNote({ text }: { text: string }) {
+  return (
+    <div
+      style={{
+        background: 'rgba(124, 58, 237, 0.04)',
+        border: '1px solid rgba(124, 58, 237, 0.15)',
+        borderRadius: 12,
+        padding: '12px 14px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <Eye size={11} color="#7C3AED" strokeWidth={2.5} />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 900,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: '#7C3AED',
+          }}
+        >
+          What We're Watching
+        </span>
+      </div>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 12,
+          lineHeight: 1.5,
+          fontStyle: 'italic',
+          color: '#475569',
+          fontWeight: 500,
+        }}
+      >
+        {text}
+      </p>
+    </div>
+  );
+}
+
+function PicksRowsSkeleton({ count }: { count: number }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          style={{
+            background: '#ffffff',
+            border: '1px solid #E2E8F0',
+            borderRadius: 12,
+            padding: 12,
+            height: 86,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+          }}
+        >
+          <div
+            style={{ width: 22, height: 22, borderRadius: 7, background: '#F1F5F9' }}
+          />
+          <div
+            style={{ width: 32, height: 32, borderRadius: 8, background: '#F1F5F9' }}
+          />
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                width: '60%',
+                height: 12,
+                borderRadius: 4,
+                background: '#F1F5F9',
+                marginBottom: 6,
+              }}
+            />
+            <div
+              style={{
+                width: '40%',
+                height: 9,
+                borderRadius: 4,
+                background: '#F1F5F9',
+              }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 // ─── Skeleton ───────────────────────────────────────────────────────────────
