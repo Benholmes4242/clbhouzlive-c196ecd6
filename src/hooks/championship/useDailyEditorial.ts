@@ -24,15 +24,6 @@ export interface EditorialCopy {
   storyType: string;
   generatedBy: 'template' | 'ai_claude' | 'ai_claude_validated' | 'human_edit';
   date: string;
-  /**
-   * Optional structured editorial data for surfaces that need richer copy
-   * than the headline/standfirst fields can carry (e.g. course fit chips,
-   * watching notes, miss notes for IntelligenceHero).
-   *
-   * Shape is surface-specific — IntelligenceHero treats this as a partial
-   * `IntelligenceQuoteSnapshot` (see editorialFallbacks.ts).
-   */
-  snapshotData?: Record<string, unknown> | null;
 }
 
 function todayUtc(): string {
@@ -62,7 +53,7 @@ export function useDailyEditorial({
     queryFn: async (): Promise<EditorialCopy | null> => {
       let query = supabase
         .from('championship_editorial_daily')
-        .select('eyebrow, headline, headline_two, standfirst, story_type, generated_by, date, snapshot_data')
+        .select('eyebrow, headline, headline_two, standfirst, story_type, generated_by, date')
         .eq('surface', surface)
         .eq('time_filter', timeFilter)
         .lte('date', today)
@@ -91,9 +82,6 @@ export function useDailyEditorial({
         storyType: data.story_type,
         generatedBy: data.generated_by as EditorialCopy['generatedBy'],
         date: data.date,
-        snapshotData:
-          (data as { snapshot_data?: Record<string, unknown> | null })
-            .snapshot_data ?? null,
       };
     },
   });

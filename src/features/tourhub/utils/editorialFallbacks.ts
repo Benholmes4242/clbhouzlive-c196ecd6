@@ -59,7 +59,6 @@ export const COLLEGE_RIVALRY_FALLBACK = {
 };
 
 export const INTELLIGENCE_QUOTE_FALLBACK = {
-  // Legacy fields (kept for back-compat with any leftover consumers)
   eventName: 'RBC Heritage',
   eventDate: 'Apr 19',
   pickName: 'Matt Fitzpatrick',
@@ -74,68 +73,4 @@ export const INTELLIGENCE_QUOTE_FALLBACK = {
     { rank: 2, name: 'Rory McIlroy', tier: 'Strong Contender', position: '−3', positionLabel: 'T6' },
     { rank: 3, name: 'Tommy Fleetwood', tier: 'In Contention', position: '−2', positionLabel: 'T11' },
   ],
-
-  // ── V1 redesign — idle state ───────────────────────────────────────────────
-  /**
-   * "We Called It" recap reasoning. Used when no archived pre-round-one
-   * reasoning exists (V1 — Flag 1 fallback path). Substitutes {winnerName}
-   * if available; falls back to "the eventual winner" when name is unknown.
-   *
-   * NOTE: When this fallback is active, the consumer MUST NOT render the
-   * "POSTED PRE-ROUND ONE" eyebrow — it would lie about provenance.
-   */
-  calledItReasoning:
-    'Our model identified {winnerName} as Top Pick based on course fit, recent form, and historical performance at this venue.',
-
-  /**
-   * Honesty layer text — generic, never defensive. Per brief editorial voice
-   * rules. Renders only when last completed result was a miss (not a win).
-   */
-  missNote:
-    'The most recent Top Pick missed the projection — every cycle teaches us something about course conditions, model calibration, and player form.',
-
-  /**
-   * Course fit chips for the upcoming tournament's venue card. V1 fallback
-   * is intentionally generic. V1.2 wires from championship_editorial_daily
-   * snapshot_data.course_fit_chips.
-   */
-  upcomingCourseFitChips: ['Editorial pending', 'Tour course', 'Stroke play'],
-
-  // ── V1 redesign — active state (Phase C will use these) ────────────────────
-  /**
-   * Inline editorial line beneath the Live Performance Band.
-   */
-  livePerformanceNote:
-    'Tracking how our picks are performing live.',
-
-  /**
-   * "What Intelligence is watching" behind-the-scenes editorial note.
-   */
-  watchingNote:
-    'Monitoring the field for shifts in form and course conditions.',
-
-  /**
-   * Tournament-specific headline templates. {topPick} / {position} / {contender} / {gap}
-   * substitute from live leaderboard data (Phase C).
-   */
-  activeHeadlineTemplate: '{topPick} sits {position}.',
-  activeHeadlineSubTemplate: '{contender} {gap} back.',
-
-  /**
-   * Course fit chips for the active tournament. Same V1.2 path as
-   * upcomingCourseFitChips.
-   */
-  activeCourseFitChips: ['Editorial pending', 'Tour course', 'Stroke play'],
 };
-
-/**
- * Substitute the {winnerName} placeholder in the calledItReasoning fallback.
- * Returns the generic phrasing when name is missing.
- */
-export function formatCalledItReasoningFallback(winnerName?: string | null): string {
-  const phrase = INTELLIGENCE_QUOTE_FALLBACK.calledItReasoning;
-  if (winnerName && winnerName.trim().length > 0) {
-    return phrase.replace('{winnerName}', winnerName.trim());
-  }
-  return phrase.replace('{winnerName}', 'the eventual winner');
-}
