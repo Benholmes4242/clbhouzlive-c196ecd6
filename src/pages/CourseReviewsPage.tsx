@@ -162,12 +162,12 @@ const CourseReviewsPage: React.FC = () => {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           {/* Rating filter pills */}
           <div className="flex flex-wrap gap-1.5 text-xs">
-            {(['all', '10-9', '8-7', '6-5', '<5'] as ReviewsRatingFilter[]).map((value) => {
+            {(['all', '10-9', '8.9-7.5', '7.4-5', '<5'] as ReviewsRatingFilter[]).map((value) => {
               const labelMap: Record<ReviewsRatingFilter, string> = {
                 all: 'All ratings',
                 '10-9': '10–9',
-                '8-7': '8–7',
-                '6-5': '6–5',
+                '8.9-7.5': '8.9–7.5',
+                '7.4-5': '7.4–5',
                 '<5': '< 5',
               };
               const active = ratingFilter === value;

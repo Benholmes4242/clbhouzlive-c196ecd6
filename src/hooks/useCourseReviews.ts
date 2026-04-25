@@ -43,7 +43,7 @@ export type CourseReview = {
 };
 
 export type ReviewsSortBy = 'recent' | 'highest' | 'lowest' | 'helpful';
-export type ReviewsRatingFilter = 'all' | '10-9' | '8-7' | '6-5' | '<5';
+export type ReviewsRatingFilter = 'all' | '10-9' | '8.9-7.5' | '7.4-5' | '<5';
 
 export interface ReviewsFilters {
   hasMedia?: boolean;
