@@ -281,7 +281,7 @@ const EditRatingModal = ({
                 value={[displayRating]}
                 onValueChange={(values) => setRating(values[0])}
                 className="w-full rating-slider-primary"
-                data-tier={rating !== null && getScoreTier(rating).tier === 'outstanding' ? 'outstanding' : undefined}
+                data-tier={rating !== null && isGoldTier(getScoreTier(rating).tier) ? 'outstanding' : undefined}
               />
 
               {/* tick labels */}
@@ -299,7 +299,7 @@ const EditRatingModal = ({
             <div className="mt-2 flex justify-center">
               <span className={cn(
                 "inline-flex items-center rounded-full px-3 py-1 text-xs",
-                rating !== null && getScoreTier(rating).tier === 'outstanding'
+                rating !== null && isGoldTier(getScoreTier(rating).tier)
                   ? "bg-[#C9A94A] text-white"
                   : "bg-slate-900 text-white"
               )}>
@@ -365,7 +365,7 @@ const EditRatingModal = ({
                     value={[displayValue]}
                     onValueChange={(values) => setScore(values[0])}
                     className="w-full rating-slider-breakdown"
-                    data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
+                    data-tier={score != null && isGoldTier(getScoreTier(score).tier) ? 'outstanding' : undefined}
                   />
 
                   <div className="flex justify-between text-[11px] text-muted-foreground">
