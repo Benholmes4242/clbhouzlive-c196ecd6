@@ -3,7 +3,12 @@
  * 
  * NEW COLOR SYSTEM (Jan 2026):
  * - Fair → Excellent: All use gray styling
- * - Outstanding: Uses amber/orange styling
+ * - Outstanding / Exceptional: Both use amber/orange (gold tier) styling
+ * 
+ * Outstanding (9.0–9.4) and Exceptional (≥9.5) share identical amber visual
+ * treatment per the unified gold-tier decision. The `isOutstanding` flag and
+ * `isGoldTier` helper both return true for either tier — use them anywhere
+ * a "should this render gold?" check is needed.
  * 
  * All rating colors come from COURSE_RATING_THEMES.
  */
@@ -36,13 +41,22 @@ const tierKeyMap: Record<string, ScoreTier> = {
 };
 
 /**
+ * Returns true if the given tier should render with gold (amber) styling.
+ * Both Outstanding (9.0–9.4) and Exceptional (≥9.5) qualify.
+ */
+export const isGoldTier = (tier: ScoreTier | undefined): boolean =>
+  tier === 'outstanding' || tier === 'exceptional';
+
+/**
  * Get the score tier data for a given rating score.
- * Returns consistent styling tokens - gray for Fair→Excellent, amber for Outstanding.
+ * Returns consistent styling tokens - gray for Fair→Excellent, amber for Outstanding/Exceptional.
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);
   const tier = tierKeyMap[theme.key];
-  const isOutstanding = theme.key === 'OUTSTANDING';
+  // isOutstanding now covers the full gold tier (Outstanding + Exceptional) so
+  // any consumer using it for "render gold?" decisions stays correct for ≥9.5.
+  const isOutstanding = theme.key === 'OUTSTANDING' || theme.key === 'EXCEPTIONAL';
   
   return {
     tier,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { getScoreTier } from '@/utils/getScoreTier';
+import { getScoreTier, isGoldTier } from '@/utils/getScoreTier';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RATING_SLIDER_CONFIG, ANIMATION_TIMINGS } from '../constants';
 
@@ -30,10 +30,11 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
   const handleValueChange = (values: number[]) => {
     const newValue = values[0];
     const newTier = getScoreTier(newValue).tier;
-    const oldTier = prevTierRef.current;
+    const oldTier = prevTierRef.current as ScoreTier | null;
     
-    // Detect crossing into Outstanding
-    if (newTier === 'outstanding' && oldTier !== 'outstanding') {
+    // Detect crossing into the gold tier (Outstanding OR Exceptional) from below.
+    // Within-gold-zone slides (e.g. 9.2 → 9.7) and downward transitions do not fire.
+    if (isGoldTier(newTier) && !isGoldTier(oldTier ?? undefined)) {
       onOutstandingEntered();
       setTimeout(() => onOutstandingEntered(), ANIMATION_TIMINGS.outstandingGlow);
     }
@@ -78,7 +79,7 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
           step={RATING_SLIDER_CONFIG.step}
           disabled={isSubmitting}
           className="w-full rating-slider-primary"
-          data-tier={getScoreTier(rating ?? 0.5).tier === 'outstanding' ? 'outstanding' : undefined}
+          data-tier={isGoldTier(getScoreTier(rating ?? 0.5).tier) ? 'outstanding' : undefined}
           data-just-entered={justEnteredOutstanding ? 'true' : undefined}
         />
       </div>

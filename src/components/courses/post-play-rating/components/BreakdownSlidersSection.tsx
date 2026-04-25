@@ -1,6 +1,6 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { getScoreTier } from '@/utils/getScoreTier';
+import { getScoreTier, isGoldTier } from '@/utils/getScoreTier';
 import { BREAKDOWN_CATEGORIES, RATING_SLIDER_CONFIG, ANIMATION_TIMINGS } from '../constants';
 
 interface BreakdownSlidersSectionProps {
@@ -32,10 +32,10 @@ const BreakdownSlidersSection = React.memo(function BreakdownSlidersSection({
   const handleSliderChange = (key: 'design' | 'condition' | 'clubhouse' | 'facilities', values: number[]) => {
     const newValue = values[0];
     const newTier = getScoreTier(newValue).tier;
-    const oldTier = prevBreakdownTiersRef.current[key];
+    const oldTier = prevBreakdownTiersRef.current[key] as ScoreTier | undefined;
     
-    // Detect crossing into Outstanding
-    if (newTier === 'outstanding' && oldTier !== 'outstanding') {
+    // Detect crossing into the gold tier (Outstanding OR Exceptional) from below.
+    if (isGoldTier(newTier) && !isGoldTier(oldTier)) {
       onOutstandingEntry({ ...outstandingEntry, [key]: true });
       setTimeout(() => {
         onOutstandingEntry({ ...outstandingEntry, [key]: false });
@@ -84,7 +84,7 @@ const BreakdownSlidersSection = React.memo(function BreakdownSlidersSection({
                 step={RATING_SLIDER_CONFIG.step}
                 disabled={disabled}
                 className="w-full rating-slider-breakdown"
-                data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
+                data-tier={score != null && isGoldTier(getScoreTier(score).tier) ? 'outstanding' : undefined}
                 data-just-entered={outstandingEntry[key] ? 'true' : undefined}
               />
             </div>
