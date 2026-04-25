@@ -11,7 +11,7 @@
  * ║                                                                                          ║
  * ║  Three key maps:                                                                          ║
  * ║    • MILESTONE_THEMES – tiers 5, 10, 20, 50, 100, 200, 300, 400                          ║
- * ║    • COURSE_RATING_THEMES – FAIR, GOOD, VERY_GOOD, EXCELLENT, OUTSTANDING                 ║
+ * ║    • COURSE_RATING_THEMES – POOR, FAIR, GOOD, EXCELLENT, EXCEPTIONAL (5-tier, Apr 2026)   ║
  * ║    • REGION_THEMES – WORLD, GB&I, USA, EUROPE                                            ║
  * ║                                                                                          ║
  * ║  Components should only use these helpers:                                                ║

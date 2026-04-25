@@ -353,9 +353,9 @@ const PostPlayRatingModal = ({
               rating={state.overallRating}
               isEditMode={isEditMode}
               isSubmitting={state.isSubmitting}
-              justEnteredOutstanding={state.justEnteredOutstanding}
+              justEnteredExceptional={state.justEnteredExceptional}
               onRatingChange={formState.setOverallRating}
-              onOutstandingEntered={() => formState.setJustEnteredOutstanding(!state.justEnteredOutstanding)}
+              onExceptionalEntered={() => formState.setJustEnteredExceptional(!state.justEnteredExceptional)}
               prevTierRef={prevTierRef}
             />
 
@@ -373,10 +373,10 @@ const PostPlayRatingModal = ({
                 clubhouse: state.clubhouseScore,
                 facilities: state.facilitiesScore,
               }}
-              outstandingEntry={state.breakdownOutstandingEntry}
+              exceptionalEntry={state.breakdownExceptionalEntry}
               onScoreChange={formState.setBreakdownScore}
               onTouchChange={formState.setBreakdownTouched}
-              onOutstandingEntry={formState.setBreakdownOutstandingEntry}
+              onExceptionalEntry={formState.setBreakdownExceptionalEntry}
               prevBreakdownTiersRef={prevBreakdownTiersRef}
               disabled={state.isSubmitting}
             />

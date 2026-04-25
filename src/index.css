@@ -18,7 +18,6 @@
 @import './styles/vertical-spacing.css';
 @import './styles/dark-golf-passport.css';
 @import './styles/create-moment-light.css';
-@import './styles/review-wizard.css';
 @import './styles/tour-hub-tokens.css';
 @tailwind base;
 @tailwind components;
@@ -3320,97 +3319,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Outstanding Tier - Amber Styling (9.0+) - UNIFIED COLOR SYSTEM
-   Triggered by data-tier="outstanding" attribute on Slider root
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Outstanding: Amber filled range - UNIFIED COLOR - High specificity override */
-.rating-slider-primary[data-tier="outstanding"] > span > span[data-radix-slider-range],
-.rating-slider-breakdown[data-tier="outstanding"] > span > span[data-radix-slider-range],
-.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-range],
-.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-range] {
-  background-color: #f59e0b !important; /* amber-500 */
-  background: linear-gradient(to right, #f59e0b, #fbbf24) !important; /* amber-500 to amber-400 */
-}
-
-/* Outstanding: Thumb stays white — no amber override */
-/* Only the border gets a subtle amber tint for cohesion */
-.rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb],
-.rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb],
-.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb],
-.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb] {
-  background-color: #ffffff !important;
-  border-color: #f59e0b !important; /* amber-500 border hint */
-}
-
-/* Outstanding: Thumb hover — white with amber border */
-.rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb]:hover,
-.rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb]:hover,
-.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:hover,
-.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:hover {
-  background-color: #fffbeb !important; /* amber-50 warmth */
-  border-color: #d97706 !important; /* amber-600 */
-}
-
-/* Outstanding: Amber focus ring */
-.rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb]:focus,
-.rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb]:focus,
-.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:focus,
-.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:focus {
-  box-shadow: 
-    0 2px 6px rgba(0, 0, 0, 0.15),
-    0 0 0 3px rgba(245, 158, 11, 0.3) !important; /* Amber focus ring */
-}
-
-/* Phase 3A: Outstanding glow pulse animation (one-time) */
-@keyframes outstanding-glow-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 12px 4px rgba(245, 158, 11, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-  }
-}
-
-.rating-slider-primary[data-tier="outstanding"][data-just-entered="true"] [data-radix-slider-range],
-.rating-slider-breakdown[data-tier="outstanding"][data-just-entered="true"] [data-radix-slider-range] {
-  animation: outstanding-glow-pulse 0.6s ease-out forwards;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   Wizard Slider — Amber fill for Review Wizard breakdown sliders
-   .wizard-slider overrides the default slate fill with muted amber
-   Outstanding tier (data-tier="outstanding") already handles ≥9.0
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Muted amber fill for touched, non-outstanding wizard sliders */
-.wizard-slider:not([data-tier="outstanding"]):not([data-untouched="true"]) [data-radix-slider-range] {
-  background-color: hsl(38, 92%, 70%) !important;
-  background: hsl(38, 92%, 70%) !important;
-}
-
-/* Amber-tinted thumb border for wizard sliders */
-.wizard-slider:not([data-untouched="true"]) [data-radix-slider-thumb] {
-  border-color: hsl(38, 92%, 60%) !important;
-}
-
-/* Wizard slider thumb hover — warm amber border */
-.wizard-slider:not([data-untouched="true"]) [data-radix-slider-thumb]:hover {
-  border-color: hsl(38, 92%, 50%) !important;
-  background-color: hsl(48, 100%, 97%) !important;
-}
-
-/* Wizard slider thumb focus — amber ring */
-.wizard-slider:not([data-untouched="true"]) [data-radix-slider-thumb]:focus {
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.15),
-    0 0 0 3px hsla(38, 92%, 50%, 0.25) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    Phase 3A: Rating Label Transition
    Applied to RatingPill for smooth tier changes
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -3451,10 +3359,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
     transform: none;
   }
   
-  .rating-slider-primary[data-tier="outstanding"][data-just-entered="true"] [data-radix-slider-range],
-  .rating-slider-breakdown[data-tier="outstanding"][data-just-entered="true"] [data-radix-slider-range] {
-    animation: none;
-  }
   
   .rating-label-transition {
     transition: none;

@@ -3,14 +3,12 @@ import { cn } from '@/lib/utils';
 
 /**
  * RatingBar Component
- * 
- * COLOR SYSTEM (Mar 2026):
- * - Fair: Slate-400 (#94a3b8)
- * - Good: Slate-500 (#64748b)
- * - Very Good: Slate-600 (#475569)
- * - Excellent: Slate-800 (#1e293b)
- * - Outstanding (9.0+): Amber gradient (#f59e0b → #fbbf24)
- * 
+ *
+ * 5-TIER COLOR SYSTEM (Apr 2026):
+ * - All tiers render with the unified amber gradient fill (#f59e0b → #fbbf24).
+ * - Exceptional (≥9.0) is the canonical gold tier; the gradient is shared
+ *   across tiers for visual consistency in compact bar contexts.
+ *
  * Track matches surrounding background (bg-muted).
  */
 
@@ -19,8 +17,9 @@ interface RatingBarProps {
   value: number;
   /** Max value (default 10) */
   max?: number;
-  /** If true and value >= 9.0, uses amber gradient fill instead of slate */
-  showOutstandingGold?: boolean;
+  /** Reserved: when true and value ≥ 9.0, uses amber gradient fill. Currently
+   *  all tiers use the amber gradient — flag retained for future variants. */
+  showExceptionalGold?: boolean;
   /** Extra classes for width/margins etc. */
   className?: string;
 }
@@ -28,7 +27,7 @@ interface RatingBarProps {
 export function RatingBar({
   value,
   max = 10,
-  showOutstandingGold = true,
+  showExceptionalGold = true,
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));

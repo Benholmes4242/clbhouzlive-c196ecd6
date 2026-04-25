@@ -34,8 +34,8 @@ const initialState: RatingFormState = {
   isFadingOut: false,
   
   // Animation tracking
-  justEnteredOutstanding: false,
-  breakdownOutstandingEntry: {},
+  justEnteredExceptional: false,
+  breakdownExceptionalEntry: {},
 };
 
 function ratingFormReducer(state: RatingFormState, action: RatingFormAction): RatingFormState {
@@ -90,10 +90,10 @@ function ratingFormReducer(state: RatingFormState, action: RatingFormAction): Ra
       return { ...state, isDeleted: action.payload };
     case 'SET_IS_FADING_OUT':
       return { ...state, isFadingOut: action.payload };
-    case 'SET_JUST_ENTERED_OUTSTANDING':
-      return { ...state, justEnteredOutstanding: action.payload };
-    case 'SET_BREAKDOWN_OUTSTANDING_ENTRY':
-      return { ...state, breakdownOutstandingEntry: action.payload };
+    case 'SET_JUST_ENTERED_EXCEPTIONAL':
+      return { ...state, justEnteredExceptional: action.payload };
+    case 'SET_BREAKDOWN_EXCEPTIONAL_ENTRY':
+      return { ...state, breakdownExceptionalEntry: action.payload };
     case 'POPULATE_FROM_EXISTING': {
       const { rating, media } = action.payload;
       return {
@@ -149,7 +149,7 @@ export function useRatingFormState(options: UseRatingFormStateOptions = {}) {
   const { isEditMode = false, existingRating } = options;
   const [state, dispatch] = useReducer(ratingFormReducer, initialState);
   
-  // Track previous tier for outstanding animation
+  // Track previous tier for exceptional gold-glow animation
   const prevTierRef = useRef<string | null>(null);
   const prevBreakdownTiersRef = useRef<Record<string, string>>({});
   
@@ -259,12 +259,12 @@ export function useRatingFormState(options: UseRatingFormStateOptions = {}) {
     dispatch({ type: 'SET_IS_FADING_OUT', payload: fading });
   }, []);
   
-  const setJustEnteredOutstanding = useCallback((entered: boolean) => {
-    dispatch({ type: 'SET_JUST_ENTERED_OUTSTANDING', payload: entered });
+  const setJustEnteredExceptional = useCallback((entered: boolean) => {
+    dispatch({ type: 'SET_JUST_ENTERED_EXCEPTIONAL', payload: entered });
   }, []);
   
-  const setBreakdownOutstandingEntry = useCallback((entry: Record<string, boolean>) => {
-    dispatch({ type: 'SET_BREAKDOWN_OUTSTANDING_ENTRY', payload: entry });
+  const setBreakdownExceptionalEntry = useCallback((entry: Record<string, boolean>) => {
+    dispatch({ type: 'SET_BREAKDOWN_EXCEPTIONAL_ENTRY', payload: entry });
   }, []);
   
   const populateFromExisting = useCallback((rating: any, media: ExistingMedia[]) => {
@@ -321,8 +321,8 @@ export function useRatingFormState(options: UseRatingFormStateOptions = {}) {
     setButtonText,
     setIsDeleted,
     setIsFadingOut,
-    setJustEnteredOutstanding,
-    setBreakdownOutstandingEntry,
+    setJustEnteredExceptional,
+    setBreakdownExceptionalEntry,
     populateFromExisting,
     clearLocalMedia,
     resetForm,

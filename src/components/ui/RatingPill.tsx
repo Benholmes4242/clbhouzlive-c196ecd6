@@ -18,7 +18,7 @@ interface RatingPillProps {
 /**
  * Unified Rating Pill Component
  * 
- * Uses slate blue scale for Fair→Excellent, amber for Outstanding.
+ * Uses slate scale for Excellent→Poor, amber for Exceptional (≥9.0).
  * Includes smooth tier change transitions.
  */
 export function RatingPill({ score, tier, label, showRatingInPill = false, className }: RatingPillProps) {

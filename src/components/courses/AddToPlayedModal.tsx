@@ -176,7 +176,6 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
                 value={rating}
                 onValueChange={setRating}
                 className="w-full rating-slider-primary"
-                data-tier={isGoldTier(getScoreTier(rating[0]).tier) ? 'outstanding' : undefined}
               />
               <div className={`text-center text-2xl font-bold ${
                 isGoldTier(getScoreTier(rating[0]).tier)
