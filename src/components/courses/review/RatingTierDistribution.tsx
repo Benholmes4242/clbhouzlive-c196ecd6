@@ -1,8 +1,9 @@
 import React from 'react';
 
-export type RatingTierKey = 'OUTSTANDING' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'FAIR';
+export type RatingTierKey = 'EXCEPTIONAL' | 'OUTSTANDING' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'FAIR';
 
 export interface RatingTierDistributionData {
+  exceptional: number;
   outstanding: number;
   excellent: number;
   veryGood: number;
@@ -17,6 +18,7 @@ interface RatingTierDistributionProps {
 }
 
 const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistributionData; label: string }> = [
+  { key: 'EXCEPTIONAL', dataKey: 'exceptional', label: 'Exceptional' },
   { key: 'OUTSTANDING', dataKey: 'outstanding', label: 'Outstanding' },
   { key: 'EXCELLENT', dataKey: 'excellent', label: 'Excellent' },
   { key: 'VERY_GOOD', dataKey: 'veryGood', label: 'Very Good' },

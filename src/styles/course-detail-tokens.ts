@@ -9,6 +9,17 @@ export const courseDetailTokens = {
   // Rating tier colors - AMBER/ORANGE RESERVED FOR OUTSTANDING (9+) ONLY
   // All other tiers use GRAY for a clean, neutral feel
   tiers: {
+    exceptional: {
+      bg: 'bg-[#f59e0b]/10',
+      border: 'border-[#f59e0b]/30',
+      text: 'text-[#d97706]',
+      fill: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
+      badge: 'bg-[#f59e0b] text-white',
+      activeBg: 'bg-[#f59e0b]',
+      activeText: 'text-white',
+      chipBg: 'bg-[#f59e0b]/10',
+      chipText: 'text-[#d97706]',
+    },
     outstanding: {
       bg: 'bg-[#f59e0b]/10',
       border: 'border-[#f59e0b]/30',
@@ -101,7 +112,8 @@ export const courseDetailTokens = {
 
   // Score ring gradient colors - AMBER FOR OUTSTANDING ONLY, Gray for rest
   scoreRing: {
-    outstanding: { from: '#f59e0b', to: '#fbbf24' }, // Amber gradient
+    exceptional: { from: '#f59e0b', to: '#fbbf24' }, // Amber gradient
+    outstanding: { from: '#f59e0b', to: '#fbbf24' },
     excellent: { from: '#f59e0b', to: '#fbbf24' },
     veryGood: { from: '#f59e0b', to: '#fbbf24' },
     good: { from: '#f59e0b', to: '#fbbf24' },
@@ -111,6 +123,7 @@ export const courseDetailTokens = {
 
 // Tier gradient mapping for distribution bars - AMBER FOR OUTSTANDING ONLY, Gray for rest
 export const tierGradients: Record<string, string> = {
+  Exceptional: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   Outstanding: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   Excellent: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   'Very Good': 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
