@@ -36,11 +36,10 @@ const SectionHeader: React.FC = () => (
 
 const TIERS: { key: keyof RatingTierDistributionData; label: string }[] = [
   { key: 'exceptional', label: 'Exceptional' },
-  { key: 'outstanding', label: 'Outstanding' },
   { key: 'excellent', label: 'Excellent' },
-  { key: 'veryGood', label: 'Very Good' },
   { key: 'good', label: 'Good' },
   { key: 'fair', label: 'Fair' },
+  { key: 'poor', label: 'Poor' },
 ];
 
 const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 50 }) => {
@@ -175,11 +174,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   // Distribution counts (fallback to zeros)
   const distCounts: Record<string, number> = {
     exceptional: distribution?.exceptional ?? 0,
-    outstanding: distribution?.outstanding ?? 0,
     excellent: distribution?.excellent ?? 0,
-    veryGood: distribution?.veryGood ?? 0,
     good: distribution?.good ?? 0,
     fair: distribution?.fair ?? 0,
+    poor: distribution?.poor ?? 0,
   };
   const maxCount = Math.max(...Object.values(distCounts), 1);
 

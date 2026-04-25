@@ -14,7 +14,7 @@ export function useCourseRatingDistribution(courseId: string | undefined) {
     enabled: !!courseId,
     queryFn: async (): Promise<RatingTierDistributionData> => {
       if (!courseId) {
-        return { exceptional: 0, outstanding: 0, excellent: 0, veryGood: 0, good: 0, fair: 0 };
+        return { exceptional: 0, excellent: 0, good: 0, fair: 0, poor: 0 };
       }
 
       let query = supabase
@@ -33,11 +33,10 @@ export function useCourseRatingDistribution(courseId: string | undefined) {
       // Calculate distribution using unified tier system
       const dist: RatingTierDistributionData = { 
         exceptional: 0,
-        outstanding: 0, 
         excellent: 0, 
-        veryGood: 0, 
         good: 0, 
-        fair: 0 
+        fair: 0,
+        poor: 0,
       };
 
       (data || []).forEach((r: { rating: number }) => {

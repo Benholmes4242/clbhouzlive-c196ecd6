@@ -45,11 +45,11 @@ export const MOCK_CYPRESS_POINT_REVIEWS = {
   totalReviews: 100,
   averageRating: 8.2,
   distribution: {
-    outstanding: 20,
+    exceptional: 20,
     excellent: 20,
-    veryGood: 20,
     good: 20,
     fair: 20,
+    poor: 20,
   },
   categoryAverages: {
     design: 8.5,

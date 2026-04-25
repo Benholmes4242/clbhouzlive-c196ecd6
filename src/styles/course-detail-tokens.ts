@@ -6,7 +6,7 @@
  */
 
 export const courseDetailTokens = {
-  // Rating tier colors - AMBER/ORANGE RESERVED FOR OUTSTANDING (9+) ONLY
+  // Rating tier colors - AMBER/ORANGE RESERVED FOR EXCEPTIONAL (≥9.0) ONLY
   // All other tiers use GRAY for a clean, neutral feel
   tiers: {
     exceptional: {
@@ -20,29 +20,7 @@ export const courseDetailTokens = {
       chipBg: 'bg-[#f59e0b]/10',
       chipText: 'text-[#d97706]',
     },
-    outstanding: {
-      bg: 'bg-[#f59e0b]/10',
-      border: 'border-[#f59e0b]/30',
-      text: 'text-[#d97706]',
-      fill: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-      badge: 'bg-[#f59e0b] text-white',
-      activeBg: 'bg-[#f59e0b]',
-      activeText: 'text-white',
-      chipBg: 'bg-[#f59e0b]/10',
-      chipText: 'text-[#d97706]',
-    },
     excellent: {
-      bg: 'bg-[#f59e0b]/10',
-      border: 'border-[#f59e0b]/30',
-      text: 'text-[#d97706]',
-      fill: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-      badge: 'bg-[#f59e0b] text-white',
-      activeBg: 'bg-[#f59e0b]',
-      activeText: 'text-white',
-      chipBg: 'bg-[#f59e0b]/10',
-      chipText: 'text-[#d97706]',
-    },
-    veryGood: {
       bg: 'bg-[#f59e0b]/10',
       border: 'border-[#f59e0b]/30',
       text: 'text-[#d97706]',
@@ -65,6 +43,17 @@ export const courseDetailTokens = {
       chipText: 'text-[#d97706]',
     },
     fair: {
+      bg: 'bg-[#f59e0b]/10',
+      border: 'border-[#f59e0b]/30',
+      text: 'text-[#d97706]',
+      fill: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
+      badge: 'bg-[#f59e0b] text-white',
+      activeBg: 'bg-[#f59e0b]',
+      activeText: 'text-white',
+      chipBg: 'bg-[#f59e0b]/10',
+      chipText: 'text-[#d97706]',
+    },
+    poor: {
       bg: 'bg-[#f59e0b]/10',
       border: 'border-[#f59e0b]/30',
       text: 'text-[#d97706]',
@@ -120,14 +109,13 @@ export const courseDetailTokens = {
   },
 } as const;
 
-// Tier gradient mapping for distribution bars - AMBER FOR OUTSTANDING ONLY, Gray for rest
+// Tier gradient mapping for distribution bars - AMBER FOR EXCEPTIONAL ONLY (visual stays unified amber)
 export const tierGradients: Record<string, string> = {
   Exceptional: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Outstanding: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   Excellent: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  'Very Good': 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   Good: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   Fair: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
+  Poor: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
 };
 
 export type TierKey = keyof typeof courseDetailTokens.tiers;
