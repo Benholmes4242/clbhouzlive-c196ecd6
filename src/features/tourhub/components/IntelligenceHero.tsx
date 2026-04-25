@@ -122,12 +122,9 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     [state, data, nextTournamentPredictions, tracker],
   );
 
-  const handleOpenSheet = () => {
-    if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log('[IntelligenceHero] CTA tapped — sheet wiring lands in Phase C');
-    }
-  };
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const handleOpenSheet = () => setSheetOpen(true);
+  const handleCloseSheet = () => setSheetOpen(false);
 
   return (
     <section
@@ -207,6 +204,9 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
           <CTA onOpenSheet={handleOpenSheet} />
         </div>
       </div>
+
+      {/* ── Phase C bottom sheet (portal-rendered by BottomSheet primitive) ── */}
+      <IntelligenceAllPicksSheet open={sheetOpen} onClose={handleCloseSheet} />
     </section>
   );
 });
