@@ -3,6 +3,7 @@ import { MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { FROST, FROST_BLUR } from '@/lib/frostPanel';
 
 interface GolfCourse {
   id: string;
@@ -46,17 +47,20 @@ const ClubTagPill = ({ course, className, positioning = 'fixed' }: ClubTagPillPr
       } : undefined}
     >
       <div
-        className={cn(
-          // Canonical glass pill styling (matches GlassPill component)
-          "inline-flex items-center gap-1 rounded-full px-2 py-1",
-          "bg-black/70 backdrop-blur-sm",
-          "border border-white/10",
-          "shadow-sm",
-          "hover:bg-black/80 transition-colors"
-        )}
+        className="inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors"
+        style={{
+          background: FROST.glass,
+          backdropFilter: FROST_BLUR.tile,
+          WebkitBackdropFilter: FROST_BLUR.tile,
+          border: `1px solid ${FROST.border}`,
+          boxShadow: `${FROST.innerHighlight}, 0 4px 14px rgba(0,0,0,0.25)`,
+        }}
       >
-        <MapPin className="w-3 h-3 flex-shrink-0 text-white" />
-        <span className="text-[10px] leading-none font-semibold text-white truncate">
+        <MapPin className="w-3 h-3 flex-shrink-0" style={{ color: FROST.ink }} />
+        <span
+          className="text-[10px] leading-none font-semibold truncate"
+          style={{ color: FROST.ink }}
+        >
           {course.name}
         </span>
       </div>
