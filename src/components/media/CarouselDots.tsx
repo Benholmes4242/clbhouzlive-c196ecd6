@@ -225,7 +225,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
       role="group"
       aria-label="Media carousel position"
       className={`flex gap-[6px] justify-center items-center ${className}`}
-      style={containerStyle}
+      style={{ ...containerStyle, transform: 'translateZ(0)' }}
     >
       <span className="sr-only" aria-live="polite">
         Image {safeActive + 1} of {count}
@@ -235,14 +235,18 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
         return (
           <div
             key={i}
-            className="h-[6px] rounded-full"
+            className="h-[8px] rounded-full"
             style={{
-              width: isCurrent ? 20 : 6,
+              width: isCurrent ? 24 : 8,
               background: isCurrent
-                ? 'rgba(255, 255, 255, 0.98)'
-                : 'rgba(255, 255, 255, 0.42)',
-              boxShadow: isCurrent ? '0 1px 3px rgba(0,0,0,0.3)' : undefined,
-              transition: 'all 300ms ease-out',
+                ? 'rgb(255, 255, 255)'
+                : 'rgba(255, 255, 255, 0.5)',
+              boxShadow: isCurrent
+                ? '0 1px 2px rgba(0,0,0,0.35)'
+                : '0 1px 1px rgba(0,0,0,0.2)',
+              transition: 'width 300ms ease-out, background 300ms ease-out',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
             }}
           />
         );
