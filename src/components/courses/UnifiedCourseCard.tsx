@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
-import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { CourseCommunityRating } from './CourseCommunityRating';
+import { FlagChip } from './FlagChip';
 import { format } from 'date-fns';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 
@@ -226,15 +226,38 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
           );
         })()}
 
-        {/* Rank badges — top-left, stacked vertically */}
-        {showRankBadges && (
-          <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
-            {(!activeListSlug || activeListSlug === 'global') && course.ranks?.global && (
-              <Top100RankBadge listSlug="global" rank={course.ranks.global} />
-            )}
-            {(!activeListSlug || activeListSlug === regionalBadgeSlug) && regionalRank && regionalBadgeSlug && (
-              <Top100RankBadge listSlug={regionalBadgeSlug} rank={regionalRank} />
-            )}
+        {/* Combined rank pill — single horizontal capsule with internal divider */}
+        {showRankBadges && (course.ranks?.global || regionalRank) && (
+          <div className="absolute top-3 left-3">
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                background: 'rgba(15,23,42,0.62)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: '0.5px solid rgba(255,255,255,0.12)',
+                padding: '5px 10px',
+                borderRadius: 9999,
+                fontSize: 11, fontWeight: 700, color: '#fff',
+                letterSpacing: '-0.005em',
+              }}
+            >
+              {(!activeListSlug || activeListSlug === 'global') && course.ranks?.global && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <FlagChip slug="global" size={10} />
+                  <span>#{course.ranks.global}</span>
+                </span>
+              )}
+              {(!activeListSlug || activeListSlug === 'global') && course.ranks?.global && regionalRank && regionalBadgeSlug && (
+                <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
+              )}
+              {(!activeListSlug || activeListSlug === regionalBadgeSlug) && regionalRank && regionalBadgeSlug && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <FlagChip slug={regionalBadgeSlug} size={10} />
+                  <span>#{regionalRank}</span>
+                </span>
+              )}
+            </div>
           </div>
         )}
 
@@ -317,33 +340,31 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             )}
           </div>
 
-          {/* Right: community rating pill — only when data exists */}
+          {/* Right: community rating pill — simplified, no logomark, larger score */}
           {showRating && course.communityRating != null && (
             <div
-              className="flex items-center gap-1.5 flex-shrink-0"
+              className="flex items-baseline flex-shrink-0"
               style={{
-                background: 'rgba(15,23,42,0.55)',
+                background: 'rgba(15,23,42,0.62)',
                 border: '0.5px solid rgba(255,255,255,0.20)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
                 borderRadius: 9999,
-                padding: '4px 8px',
+                padding: '5px 11px',
               }}
             >
-              <img
-                src="/assets/logomark-orange.png"
-                alt=""
-                className="w-4 h-4 object-contain"
-                aria-hidden="true"
-              />
-              <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1 }}>
+              <span
+                style={{
+                  fontSize: 15, fontWeight: 800, color: '#fff',
+                  lineHeight: 1, letterSpacing: '-0.02em',
+                }}
+              >
                 {course.communityRating.toFixed(1)}
               </span>
             </div>
           )}
         </div>
       </div>
-
-      {/* Hairline separator — replaces the grey spacer block */}
-      <div style={{ height: '0.5px', background: 'rgba(0,0,0,0.08)' }} />
     </button>
   );
 };
