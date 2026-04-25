@@ -224,6 +224,16 @@ const Top100CoursesHubPanel = () => {
     setSortOption('official');
   };
 
+  // Active list short label (used for placeholder + meta row)
+  const activeListShortLabel = (() => {
+    const opt = listOptions.find(o => o.value === selectedList);
+    if (!opt) return 'Top 100';
+    return opt.label.replace(/\s*Top 100\s*$/, '').trim();
+  })();
+  // Total courses in the active list — pulled from the per-list summaries
+  const totalCoursesInActiveList =
+    listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
+
   return (
     <div className="space-y-4">
       {/* Editorial header — left-aligned, mirrors Explore's Your Network pattern */}
