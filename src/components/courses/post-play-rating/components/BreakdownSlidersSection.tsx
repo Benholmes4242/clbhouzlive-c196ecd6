@@ -1,6 +1,6 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { getScoreTier, isGoldTier } from '@/utils/getScoreTier';
+import { getScoreTier, isGoldTier, type ScoreTier } from '@/utils/getScoreTier';
 import { BREAKDOWN_CATEGORIES, RATING_SLIDER_CONFIG, ANIMATION_TIMINGS } from '../constants';
 
 interface BreakdownSlidersSectionProps {
