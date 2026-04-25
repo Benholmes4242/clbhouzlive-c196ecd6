@@ -9,11 +9,11 @@ interface ScorePillProps {
 
 /**
  * Score pill component
- * Uses slate blue scale for Fair→Excellent, amber for Outstanding.
+ * Uses slate blue scale for Excellent→Poor, amber for Exceptional (≥9.0).
  */
 export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
   const tierData = getScoreTier(score);
-  const isOutstanding = tierData.isOutstanding;
+  const isExceptional = tierData.isExceptional;
   
   const baseClasses =
     size === 'sm'
@@ -25,11 +25,11 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
       className={cn(
         'inline-flex items-center rounded-sq-sm border transition-colors',
         baseClasses,
-        isOutstanding 
+        isExceptional 
           ? 'bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#d97706]'
           : ''
       )}
-      style={!isOutstanding ? {
+      style={!isExceptional ? {
         backgroundColor: `${tierData.accent}1A`,
         borderColor: `${tierData.accent}33`,
         color: tierData.accent,

@@ -1,14 +1,12 @@
 /**
  * Score Tier Utility
  * 
- * NEW COLOR SYSTEM (Jan 2026):
- * - Fair → Excellent: All use gray styling
- * - Outstanding / Exceptional: Both use amber/orange (gold tier) styling
+ * 5-TIER SYSTEM (Apr 2026):
+ * - Exceptional (≥9.0): Amber/orange (gold tier) styling — the only gold tier
+ * - Excellent (7.5-8.9), Good (6.0-7.4), Fair (4.0-5.9), Poor (<4.0): gray styling
  * 
- * Outstanding (9.0–9.4) and Exceptional (≥9.5) share identical amber visual
- * treatment per the unified gold-tier decision. The `isOutstanding` flag and
- * `isGoldTier` helper both return true for either tier — use them anywhere
- * a "should this render gold?" check is needed.
+ * The `isExceptional` flag and `isGoldTier` helper both return true ONLY for
+ * Exceptional — use them anywhere a "should this render gold?" check is needed.
  * 
  * All rating colors come from COURSE_RATING_THEMES.
  */
@@ -27,7 +25,7 @@ export interface ScoreTierData {
   accent: string;
   bgLight: string;
   bgDark: string;
-  isOutstanding: boolean;
+  isExceptional: boolean;
 }
 
 // Map RatingTheme key to ScoreTier
@@ -48,14 +46,13 @@ export const isGoldTier = (tier: ScoreTier | undefined): boolean =>
 
 /**
  * Get the score tier data for a given rating score.
- * All tiers currently use unified amber styling per the all-amber decision.
+ * Only Exceptional renders with amber styling; all others use gray.
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);
   const tier = tierKeyMap[theme.key];
-  // isOutstanding is the legacy "render gold?" flag — under the 5-tier
-  // system only EXCEPTIONAL qualifies. Field name retained for back-compat.
-  const isOutstanding = theme.key === 'EXCEPTIONAL';
+  // True only for the Exceptional tier (≥9.0) — the sole gold tier.
+  const isExceptional = theme.key === 'EXCEPTIONAL';
   
   return {
     tier,
@@ -67,7 +64,7 @@ export function getScoreTier(score: number): ScoreTierData {
     accent: theme.accent,
     bgLight: theme.bgLight,
     bgDark: theme.bgDark,
-    isOutstanding,
+    isExceptional,
   };
 }
 
