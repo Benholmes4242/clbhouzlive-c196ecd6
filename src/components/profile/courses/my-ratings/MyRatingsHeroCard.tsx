@@ -2,7 +2,7 @@ import React from 'react';
 import { Flag, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { getTierName } from './myRatingsTiering';
+import { getTierName } from './myRatingsHeroTiers';
 
 /**
  * Hero card for the stratified My Ratings list (rating ≥9.0).
