@@ -9,7 +9,7 @@ import {
   Top100MapCourse,
   CourseJourneyStatus,
 } from '@/hooks/useTop100MapCourses';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
