@@ -1865,17 +1865,19 @@ export function HeroCarousel({
     };
   }, []);
 
-  // Auto-advance every 12 seconds, resets on user interaction
+  // Auto-advance every 12 seconds, resets on user interaction.
+  // Phase A — `autoRotate` prop allows the parent (OverviewPageV3) to terminally pause
+  // rotation when the user explicitly picks a tournament from the Ticker.
   useEffect(() => {
-    if (safeSlides.length <= 1 || isPaused || isExpanded) return;
-    
+    if (!autoRotate || safeSlides.length <= 1 || isPaused || isExpanded) return;
+
     const interval = setInterval(() => {
       if (isScorecardOpenRef.current) return;
       setCurrentIndex(prev => (prev + 1) % safeSlides.length);
     }, 12000);
 
     return () => clearInterval(interval);
-  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey]);
+  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey, autoRotate]);
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
