@@ -396,6 +396,7 @@ function AppRoutes() {
         
         <Route path="/top100" element={<Suspense fallback={<CoursesListSkeleton />}><Top100Hub /></Suspense>} />
         <Route path="/top100/journey" element={<Suspense fallback={<CoursesListSkeleton />}><Top100JourneyPage /></Suspense>} />
+        <Route path="/top100/network" element={<Suspense fallback={<CoursesListSkeleton />}><Top100NetworkPage /></Suspense>} />
         <Route path="/top100/:slug" element={<Suspense fallback={<CoursesListSkeleton />}><Top100List /></Suspense>} />
         <Route path="/achievementshub" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsHubPage /></Suspense>} />
         <Route path="/achievements" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
