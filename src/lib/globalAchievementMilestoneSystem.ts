@@ -77,7 +77,7 @@ export interface MilestoneTheme {
  * 
  * The mapping:
  *   5 → FAIR, 10 → MILD, 20 → STEADY, 50 → RESPECTABLE,
- *   100 → GOOD, 200 → VERY_GOOD, 300 → EXCELLENT, 400 → OUTSTANDING
+ *   100 → GOOD, 200 → STRONG, 300 → EXCELLENT, 400 → EXCEPTIONAL
  */
 export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fromEntries(
   MILESTONE_TIER_META.map(meta => {

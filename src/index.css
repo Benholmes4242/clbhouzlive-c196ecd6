@@ -279,12 +279,12 @@ html.lightbox-open {
   /* Tracks - visible grey for white backgrounds */
   --rating-bar-track: #D7DDE3;       /* slate-300 equivalent */
   
-  /* NEW COLOR SYSTEM (Jan 2026):
-     - Fair → Excellent: All use slate
-     - Outstanding only: Uses gold
+  /* RATING BAR COLOR SYSTEM (Apr 2026 — 5-tier rebanding):
+     - Poor → Excellent: All use slate
+     - Exceptional (≥9.0): Uses gold (the sole gold tier)
      Old green progression colors have been decommissioned. */
-  --rating-bar-fill-neutral: #64748B;     /* slate-500 - used for Fair → Excellent */
-  --rating-bar-fill-outstanding: #D2B461; /* Warm trophy gold - Outstanding only */
+  --rating-bar-fill-neutral: #64748B;       /* slate-500 - used for Poor → Excellent */
+  --rating-bar-fill-exceptional: #D2B461;   /* Warm trophy gold - Exceptional only */
   --rating-track: #E2E7EC;                /* Neutral grey for bar tracks */
   
   /* ========================================
@@ -3214,9 +3214,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* ═══════════════════════════════════════════════════════════════════════════
    Rating Slider Styles (Primary & Breakdown)
    
-   Design: Clbhouz-quality sliders with slate (Fair→Excellent) or gold (Outstanding)
-   Usage: Applied via className on Radix Slider in PostPlayRatingModal
-   Tier switching: data-tier="outstanding" triggers gold styling
+   Design: Clbhouz-quality sliders — unified slate styling under the 5-tier
+   system (Apr 2026). Gold styling for Exceptional (≥9.0) is applied at the
+   component level via tier-aware fill tokens, not via data-tier attribute.
+   Usage: Applied via className on Radix Slider in PostPlayRatingModal.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Shared slider track styling - UNIFIED COLOR SYSTEM */
