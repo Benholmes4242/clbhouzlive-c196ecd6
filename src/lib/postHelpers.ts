@@ -128,7 +128,8 @@ export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
  * @returns Complete theme with overlay-specific colors
  */
 export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTheme {
-  const labelToKey: Record<string, string> = {
+  const labelToKey: Record<string, keyof typeof tierOverlayThemes> = {
+    'EXCEPTIONAL': 'exceptional',
     'OUTSTANDING': 'outstanding',
     'EXCELLENT': 'excellent',
     'VERY GOOD': 'veryGood',
@@ -136,10 +137,21 @@ export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTh
     'FAIR': 'fair',
   };
   const key = labelToKey[tierLabel.toUpperCase()] || 'good';
-  const baseTheme = key === 'outstanding' 
-    ? COURSE_RATING_THEMES.OUTSTANDING 
-    : COURSE_RATING_THEMES.EXCELLENT;
-  
+
+  // Explicit tier → canonical theme mapping. Replaces a binary
+  // outstanding/excellent ternary that silently demoted Exceptional and
+  // every non-outstanding tier to the EXCELLENT theme. The Record makes all
+  // 6 tiers explicit and gives future visual differentiation a clean home.
+  const OVERLAY_KEY_TO_THEME: Record<keyof typeof tierOverlayThemes, RatingTheme> = {
+    exceptional: COURSE_RATING_THEMES.EXCEPTIONAL,
+    outstanding: COURSE_RATING_THEMES.OUTSTANDING,
+    excellent: COURSE_RATING_THEMES.EXCELLENT,
+    veryGood: COURSE_RATING_THEMES.VERY_GOOD,
+    good: COURSE_RATING_THEMES.GOOD,
+    fair: COURSE_RATING_THEMES.FAIR,
+  };
+  const baseTheme = OVERLAY_KEY_TO_THEME[key] ?? COURSE_RATING_THEMES.GOOD;
+
   return {
     ...baseTheme,
     ...tierOverlayThemes[key],
