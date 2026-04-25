@@ -1780,9 +1780,26 @@ interface HeroCarouselProps {
    * - 'schedule' (default) renders live + completed + upcoming
    */
   mode?: 'overview' | 'schedule';
+  /**
+   * Phase A — externally-driven active tournament id.
+   * When provided, the carousel syncs its internal currentIndex to the matching slide.
+   * Optional — when omitted, the carousel manages its own active slide internally (Schedule behavior preserved).
+   */
+  activeTournamentId?: string | null;
+  /** Called when the carousel's internal currentIndex advances (auto-rotate or swipe). */
+  onActiveChange?: (tournamentId: string) => void;
+  /** When false, auto-rotation is disabled entirely. Default true. */
+  autoRotate?: boolean;
 }
 
-export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode = 'schedule' }: HeroCarouselProps) {
+export function HeroCarousel({
+  hasHeader = false,
+  onScorecardStateChange,
+  mode = 'schedule',
+  activeTournamentId,
+  onActiveChange,
+  autoRotate = true,
+}: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
   const safeSlides = mode === 'overview'
@@ -1793,6 +1810,26 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode =
   const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
   const resetAutoAdvance = () => setAutoAdvanceKey(k => k + 1);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Phase A — sync external activeTournamentId → internal currentIndex (one-way, parent-driven)
+  useEffect(() => {
+    if (!activeTournamentId || safeSlides.length === 0) return;
+    const idx = safeSlides.findIndex(s => s.tournament.id === activeTournamentId);
+    if (idx >= 0 && idx !== currentIndex) {
+      setCurrentIndex(idx);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTournamentId, safeSlides.length]);
+
+  // Phase A — emit currentIndex changes upward (so the Ticker's "NOW SHOWING" follows auto-rotate / swipe)
+  useEffect(() => {
+    if (!onActiveChange) return;
+    const slide = safeSlides[currentIndex];
+    if (slide && slide.tournament.id !== activeTournamentId) {
+      onActiveChange(slide.tournament.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, safeSlides.length]);
 
   const handleToggleExpand = useCallback(() => {
     setIsExpanded(prev => !prev);
@@ -1812,7 +1849,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode =
   const touchMoveRef = React.useRef<number>(0);
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const isScorecardOpenRef = React.useRef(false);
-  const railRef = React.useRef<HTMLDivElement>(null);
+  // (Phase A: railRef removed alongside the deleted pill rail)
 
   const scheduleResume = useCallback(() => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
@@ -1828,17 +1865,19 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode =
     };
   }, []);
 
-  // Auto-advance every 12 seconds, resets on user interaction
+  // Auto-advance every 12 seconds, resets on user interaction.
+  // Phase A — `autoRotate` prop allows the parent (OverviewPageV3) to terminally pause
+  // rotation when the user explicitly picks a tournament from the Ticker.
   useEffect(() => {
-    if (safeSlides.length <= 1 || isPaused || isExpanded) return;
-    
+    if (!autoRotate || safeSlides.length <= 1 || isPaused || isExpanded) return;
+
     const interval = setInterval(() => {
       if (isScorecardOpenRef.current) return;
       setCurrentIndex(prev => (prev + 1) % safeSlides.length);
     }, 12000);
 
     return () => clearInterval(interval);
-  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey]);
+  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey, autoRotate]);
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
@@ -1879,17 +1918,7 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode =
     }
   }, [safeSlides.length, currentIndex]);
 
-  // Auto-scroll the tour pill rail so the active pill is centered (rail-only, never the page)
-  useEffect(() => {
-    if (!railRef.current) return;
-    const rail = railRef.current;
-    const card = rail.children[currentIndex] as HTMLElement | undefined;
-    if (!card) return;
-    const railRect = rail.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    const offset = cardRect.left - railRect.left - (railRect.width / 2) + (cardRect.width / 2);
-    rail.scrollBy({ left: offset, behavior: 'smooth' });
-  }, [currentIndex]);
+  // (Phase A: pill-rail auto-scroll effect removed alongside the deleted rail)
 
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
@@ -2005,123 +2034,13 @@ export function HeroCarousel({ hasHeader = false, onScorecardStateChange, mode =
         ))}
       </AnimatePresence>
 
-      {/* ── TOUR PILL RAIL — fixed footer band at bottom of hero ── */}
-      {!isExpanded && safeSlides.length > 1 && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 30,
-            paddingTop: 12,
-            paddingBottom: 14,
-            background: '#141d2e',
-            borderTop: '0.5px solid rgba(255,255,255,0.07)',
-          }}
-        >
-          {/* Rail label */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 6px' }}>
-            <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
-              All Tours
-            </span>
-            <span style={{ fontSize: '7.5px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
-              {safeSlides.filter(s => s.type === 'live').length} Live Now
-            </span>
-          </div>
-
-          {/* Scrollable pill strip */}
-          <div
-            ref={railRef}
-            style={{
-              display: 'flex',
-              gap: 5,
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-              padding: '0 16px',
-            }}
-            className="[&::-webkit-scrollbar]:hidden"
-          >
-            {safeSlides.map((slide, i) => {
-              const isActive = i === currentIndex;
-              const isLive = slide.type === 'live';
-              const tourLabel = TOUR_SHORT[slide.tournament.tourSlug] ?? slide.tournament.tourSlug.toUpperCase();
-              // Score from leadersWinnersMap for this tournament
-              const leaderData = leadersWinnersMap?.get(slide.tournament.id);
-              const rawScore = leaderData?.score;
-              const scoreStr = rawScore !== null && rawScore !== undefined
-                ? (rawScore === 0 ? 'E' : rawScore < 0 ? String(rawScore) : `+${rawScore}`)
-                : leaderData?.displayScore ?? null;
-              const scoreColor = !scoreStr || scoreStr === 'E' ? '#ffffff'
-                : scoreStr.startsWith('+') ? '#EF4444' : '#22C55E';
-              return (
-                <button
-                  key={slide.tournament.id}
-                  onClick={() => {
-                    setCurrentIndex(i);
-                    resetAutoAdvance();
-                    setIsPaused(true);
-                    scheduleResume();
-                  }}
-                  className="active:opacity-70 transition-opacity"
-                  style={{
-                    flexShrink: 0,
-                    width: isActive ? 160 : 80,
-                    height: 44,
-                    background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.3)',
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    border: `1px solid ${isActive ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)'}`,
-                    borderRadius: 7,
-                    padding: '0 11px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    transition: 'all 0.3s ease',
-                    gap: 6,
-                    overflow: 'hidden',
-                  }}
-                >
-                  {/* Left — two lines: tour name + tournament name */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, overflow: 'hidden' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{
-                        fontSize: '8px', fontWeight: 900,
-                        color: isActive ? '#ffffff' : 'rgba(255,255,255,0.45)',
-                        letterSpacing: '0.06em', textTransform: 'uppercase' as const,
-                        whiteSpace: 'nowrap' as const,
-                      }}>
-                        {tourLabel}
-                      </span>
-                    </div>
-                    <span style={{
-                      fontSize: '8.5px', fontWeight: 600,
-                      color: isActive ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.25)',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-                      paddingLeft: 8,
-                    }}>
-                      {slide.tournament.name}
-                    </span>
-                  </div>
-                  {/* Right — score or status */}
-                  {isLive && scoreStr ? (
-                    <span style={{ fontSize: '12px', fontWeight: 900, color: scoreColor, flexShrink: 0, letterSpacing: '-0.02em' }}>
-                      {scoreStr}
-                    </span>
-                  ) : isLive ? (
-                    <span style={{ fontSize: '7px', fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>LIVE</span>
-                  ) : slide.type === 'upcoming' ? (
-                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(247,147,30,0.5)', flexShrink: 0 }}>SOON</span>
-                  ) : (
-                    <span style={{ fontSize: '7px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>FINAL</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/*
+       * Phase A — TOUR PILL RAIL DELETED.
+       * The Hero's bottom mini-card switcher row was retired in favor of the
+       * AllToursTicker, which now serves as the canonical Hero switcher on the
+       * Overview page (live tournaments only — completed/upcoming surfaces are
+       * handled by Tournament Results / UpNextBroadcast / ComingUpCalendar).
+       */}
     </div>
   );
 }

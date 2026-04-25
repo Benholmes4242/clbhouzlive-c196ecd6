@@ -5,19 +5,26 @@
  * Replaces the brighter "Live Right Now" strip on the Overview page only.
  * (LiveRightNow remains in use on the Schedule tab.)
  *
+ * Phase A — Hero+Ticker Unification:
+ *   - Background gradient now matches the dark-card system
+ *     (linear-gradient 135deg #0a1628 → #1e293b — same as UpNextBroadcast)
+ *   - Each cell is now a Hero switcher (tap = swap Hero, no navigation)
+ *   - Active cell: amber 1.5px border + amber-tinted bg + "NOW SHOWING" label
+ *   - Eyebrow shows "{N} LIVE NOW · TAP TO SWITCH" hint
+ *
  * Visual identity:
- *   - Dark navy background (#0F172A)
  *   - Pulsing green dot + "LIVE · ALL TOURS" tracked-caps eyebrow
- *   - Right-aligned "N LIVE NOW" count
+ *   - Right-aligned "{N} LIVE NOW · TAP TO SWITCH" hint
  *   - Horizontal scroll of tour cells separated by hairline dividers
  *   - Each cell: amber tour pill + event name + flag + leader name + score (with live pulse dot)
  *   - Bottom amber shimmer line via `th-shimmer-line` keyframe
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
+
+const TICKER_GRADIENT = 'linear-gradient(135deg, #0a1628 0%, #1e293b 100%)';
 
 function abbreviateName(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
@@ -37,32 +44,62 @@ function tourPillLabel(slug?: string | null): string {
   }
 }
 
-const TickerCell: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boolean }> = ({ tournament, isLast }) => {
-  const navigate = useNavigate();
+interface TickerCellProps {
+  tournament: LiveTournamentWithLeader;
+  isLast: boolean;
+  isActive: boolean;
+  onSelect: (id: string) => void;
+}
 
+const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, onSelect }) => {
   return (
     <button
       type="button"
-      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="active:opacity-70 transition-opacity"
+      onClick={() => onSelect(tournament.id)}
+      className="active:opacity-80"
       style={{
         flexShrink: 0,
         minWidth: 220,
         padding: '12px 18px',
         borderRight: isLast ? 'none' : '1px solid rgba(255,255,255,0.06)',
         textAlign: 'left',
-        background: 'transparent',
+        background: isActive ? 'rgba(247,147,30,0.10)' : 'transparent',
+        outline: isActive ? '1.5px solid #F7931E' : '1px solid transparent',
+        outlineOffset: -1,
         color: 'inherit',
         cursor: 'pointer',
+        transition: 'background 0.25s ease, outline-color 0.25s ease',
+        position: 'relative',
       }}
+      aria-pressed={isActive}
     >
+      {/* "NOW SHOWING" label — top-right of active card */}
+      {isActive && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 12,
+            fontSize: 8,
+            fontWeight: 900,
+            color: '#F7931E',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}
+        >
+          Now Showing
+        </div>
+      )}
+
       {/* Tour pill + tournament name */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
         <span
           style={{
             display: 'inline-block',
             padding: '2px 6px',
-            border: '1px solid rgba(247,147,30,0.45)',
+            border: `1px solid ${isActive ? 'rgba(247,147,30,0.85)' : 'rgba(247,147,30,0.45)'}`,
+            background: isActive ? 'rgba(247,147,30,0.08)' : 'transparent',
             borderRadius: 4,
             fontSize: 9,
             fontWeight: 900,
@@ -70,6 +107,7 @@ const TickerCell: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boole
             color: '#F7931E',
             textTransform: 'uppercase',
             lineHeight: 1.2,
+            transition: 'border-color 0.25s ease, background 0.25s ease',
           }}
         >
           {tourPillLabel(tournament.tourSlug)}
@@ -78,7 +116,7 @@ const TickerCell: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boole
           style={{
             fontSize: 12,
             fontWeight: 700,
-            color: 'rgba(255,255,255,0.92)',
+            color: isActive ? 'white' : 'rgba(255,255,255,0.85)',
             letterSpacing: '-0.01em',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -131,12 +169,20 @@ const TickerCell: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boole
   );
 };
 
-export function AllToursTicker() {
+interface AllToursTickerProps {
+  /** Currently-active tournament id (drives "NOW SHOWING" highlight). Optional — falls back to no highlight. */
+  activeId?: string | null;
+  /** Called when user taps a ticker cell. Optional — falls back to no-op (legacy / standalone). */
+  onSelect?: (tournamentId: string) => void;
+}
+
+export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {}) {
   const { data: liveTournaments, isLoading } = useLiveRightNow();
+  const handleSelect = onSelect ?? (() => {});
 
   if (isLoading) {
     return (
-      <div style={{ background: '#0F172A', padding: '14px 0 16px' }}>
+      <div style={{ background: TICKER_GRADIENT, padding: '14px 0 16px' }}>
         <div style={{ padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span className="th-live-dot" aria-hidden />
@@ -160,7 +206,7 @@ export function AllToursTicker() {
     <section
       aria-label="Live tournaments across all tours"
       style={{
-        background: '#0F172A',
+        background: TICKER_GRADIENT,
         position: 'relative',
         paddingTop: 14,
         paddingBottom: 14,
@@ -194,14 +240,14 @@ export function AllToursTicker() {
         <span
           style={{
             fontSize: 9,
-            fontWeight: 800,
-            color: 'rgba(255,255,255,0.55)',
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.4)',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {liveTournaments.length} Live Now
+          {liveTournaments.length} Live Now · Tap to Switch
         </span>
       </div>
 
@@ -217,7 +263,13 @@ export function AllToursTicker() {
         }}
       >
         {liveTournaments.map((t, i) => (
-          <TickerCell key={t.id} tournament={t} isLast={i === liveTournaments.length - 1} />
+          <TickerCell
+            key={t.id}
+            tournament={t}
+            isLast={i === liveTournaments.length - 1}
+            isActive={activeId === t.id}
+            onSelect={handleSelect}
+          />
         ))}
       </div>
 
