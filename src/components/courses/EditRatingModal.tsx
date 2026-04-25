@@ -281,7 +281,6 @@ const EditRatingModal = ({
                 value={[displayRating]}
                 onValueChange={(values) => setRating(values[0])}
                 className="w-full rating-slider-primary"
-                data-tier={rating !== null && isGoldTier(getScoreTier(rating).tier) ? 'outstanding' : undefined}
               />
 
               {/* tick labels */}
@@ -365,7 +364,6 @@ const EditRatingModal = ({
                     value={[displayValue]}
                     onValueChange={(values) => setScore(values[0])}
                     className="w-full rating-slider-breakdown"
-                    data-tier={score != null && isGoldTier(getScoreTier(score).tier) ? 'outstanding' : undefined}
                   />
 
                   <div className="flex justify-between text-[11px] text-muted-foreground">
