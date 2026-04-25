@@ -12,7 +12,7 @@ import {
 import { RotateCcw, ChevronLeft, ChevronDown, Check } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
-import { MapCourseSheet, MapProgressOrb } from './map';
+import { MapCourseSheet } from './map';
 import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
