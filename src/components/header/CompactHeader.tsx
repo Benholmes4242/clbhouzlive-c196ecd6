@@ -99,8 +99,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         handleTop100Back();
       } else if (isEditProfileRoute) {
         navigate('/profile');
-      } else if (isFriendsActivityRoute) {
-        navigate(-1);
       } else if (isAchievementsRoute) {
         navigate(-1);
       } else if (isMessagesConversationRoute) {
