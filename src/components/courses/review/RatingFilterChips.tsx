@@ -11,7 +11,7 @@ interface RatingFilterChipsProps {
 const FILTER_OPTIONS: { key: ScoreTier; label: string }[] = [
   { key: 'exceptional', label: 'Exceptional 9–10' },
   { key: 'excellent', label: 'Excellent 7.5–8.9' },
-  { key: 'good', label: 'Good 5–7.4' },
+  { key: 'good', label: 'Good 6–7.4' },
 ];
 
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
