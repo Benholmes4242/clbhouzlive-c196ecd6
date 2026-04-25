@@ -124,11 +124,16 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
         </div>
       </div>
 
-      {/* Stat tiles */}
+      {/* Stat tiles — user progress through each Top 100 list this course appears in */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, position: 'relative' }}>
         {data.list_memberships.map((list) => {
           const progress = progressBySlug.get(list.list_slug);
-          const value = progress ? `${progress.played}/${progress.total}` : '—';
+          // Logged-in (progress data exists): show played count + "of N played" caption
+          // Logged-out (no progress): show em-dash + "Tap to view list" CTA hint
+          const bigValue = progress ? `${progress.played}` : '—';
+          const caption = progress
+            ? `of ${progress.total} played`
+            : 'Tap to view list';
 
           return (
             <button
@@ -147,7 +152,10 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
               }}
             >
               <div style={{ fontSize: 20, fontWeight: 900, color: '#F7931E', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
-                {value}
+                {bigValue}
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: '#94A3B8', marginTop: 3, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>
+                {caption}
               </div>
               <div style={{ fontSize: 10, fontWeight: 600, color: '#CBD5E1', marginTop: 4, lineHeight: 1.3 }}>
                 {list.list_name}
