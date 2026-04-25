@@ -340,33 +340,31 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             )}
           </div>
 
-          {/* Right: community rating pill — only when data exists */}
+          {/* Right: community rating pill — simplified, no logomark, larger score */}
           {showRating && course.communityRating != null && (
             <div
-              className="flex items-center gap-1.5 flex-shrink-0"
+              className="flex items-baseline flex-shrink-0"
               style={{
-                background: 'rgba(15,23,42,0.55)',
+                background: 'rgba(15,23,42,0.62)',
                 border: '0.5px solid rgba(255,255,255,0.20)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
                 borderRadius: 9999,
-                padding: '4px 8px',
+                padding: '5px 11px',
               }}
             >
-              <img
-                src="/assets/logomark-orange.png"
-                alt=""
-                className="w-4 h-4 object-contain"
-                aria-hidden="true"
-              />
-              <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1 }}>
+              <span
+                style={{
+                  fontSize: 15, fontWeight: 800, color: '#fff',
+                  lineHeight: 1, letterSpacing: '-0.02em',
+                }}
+              >
                 {course.communityRating.toFixed(1)}
               </span>
             </div>
           )}
         </div>
       </div>
-
-      {/* Hairline separator — replaces the grey spacer block */}
-      <div style={{ height: '0.5px', background: 'rgba(0,0,0,0.08)' }} />
     </button>
   );
 };
