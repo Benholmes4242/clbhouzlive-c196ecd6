@@ -69,13 +69,6 @@ const Divider = () => (
   <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px' }} />
 );
 
-const SectionLabel = ({ text, accent = false }: { text: string; accent?: boolean }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', marginBottom: 14 }}>
-    <div style={{ width: 3, height: 13, background: accent ? '#F7931E' : '#0F172A', borderRadius: 1 }} />
-    <span style={{ fontSize: 9, fontWeight: 900, color: accent ? '#F7931E' : '#0F172A', letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>{text}</span>
-  </div>
-);
-
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
