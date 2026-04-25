@@ -236,7 +236,9 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
         last_name,
         photo_url,
         country,
-        pga_tour_id
+        pga_tour_id,
+        birth_date,
+        turned_pro
       )
     `)
     .eq('season_id', seasonData.id);
@@ -263,6 +265,8 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
           photo_url: string | null;
           country: string | null;
           pga_tour_id: string | null;
+          birth_date: string | null;
+          turned_pro: number | null;
         } | null;
 
         if (typeof statValue !== 'number' || !player) {
@@ -286,6 +290,8 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
           statUnit: config.unit,
           skillLevel: level,
           skillProgress: progress,
+          birthDate: player.birth_date ?? null,
+          turnedPro: player.turned_pro ?? null,
         };
       })
       .filter((p): p is NonNullable<typeof p> => p !== null);
