@@ -362,24 +362,59 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 />
               </div>
 
-              {/* Title — inline name + subtitle */}
+              {/* Prestige rule eyebrow — "REVIEW · APR 2026 ────" */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+                <span
+                  style={{
+                    fontFamily: FONTS.serifDisplay,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '2.5px',
+                    textTransform: 'uppercase',
+                    color: FROST.amberSoft,
+                    flexShrink: 0,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Review{reviewDateLabel ? <><span style={{ padding: '0 6px', color: FROST.inkFaint }}>·</span>{reviewDateLabel}</> : null}
+                </span>
+                <div
+                  aria-hidden
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    background: `linear-gradient(90deg, ${FROST.amberBorder}, transparent)`,
+                  }}
+                />
+              </div>
+
+              {/* Title — Playfair headline + italic subtitle */}
               <h1
+                id="review-sheet-title"
                 style={{
-                  fontSize: isCompact ? 24 : 28,
+                  fontFamily: FONTS.serifDisplay,
+                  fontSize: isCompact ? 24 : 26,
                   fontWeight: 800,
-                  letterSpacing: '-0.8px',
+                  letterSpacing: '-0.6px',
                   lineHeight: 1.1,
                   color: FROST.ink,
                   wordBreak: 'break-word',
-                  marginTop: 12,
+                  marginTop: 10,
                   marginBottom: 0,
                 }}
               >
                 {titleName}
                 {derivedSubtitle && (
                   <>
-                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}> — </span>
-                    <span style={{ color: FROST.inkMute, fontWeight: 500 }}>{derivedSubtitle}</span>
+                    <span
+                      style={{
+                        color: FROST.inkMute,
+                        fontWeight: 500,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {' — '}{derivedSubtitle}
+                    </span>
                   </>
                 )}
               </h1>
@@ -400,8 +435,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               {/* Score + 2×2 breakdown side-by-side */}
               <div
                 style={{
-                  marginTop: 18,
-                  paddingTop: 16,
+                  marginTop: 16,
+                  paddingTop: 14,
                   borderTop: `1px solid ${FROST.borderSoft}`,
                 }}
               >
@@ -409,11 +444,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   style={{
                     display: 'flex',
                     flexDirection: isCompact ? 'column' : 'row',
-                    alignItems: isCompact ? 'flex-start' : 'flex-start',
+                    alignItems: 'flex-start',
                     gap: isCompact ? 14 : 20,
                   }}
                 >
-                  {/* Score on left */}
+                  {/* Score on left — 50px */}
                   <div
                     style={{
                       display: 'flex',
@@ -425,16 +460,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <span
                       style={{
                         ...FROST_SCORE_GRADIENT,
-                        fontSize: 68,
+                        fontSize: 50,
                         fontWeight: 800,
                         lineHeight: 0.85,
                       }}
                     >
-                      <span style={{ letterSpacing: '-3.2px' }}>
+                      <span style={{ letterSpacing: '-2.4px' }}>
                         {formattedRating.split('.')[0]}
                       </span>
                       {formattedRating.includes('.') && (
-                        <span style={{ letterSpacing: '-0.8px' }}>
+                        <span style={{ letterSpacing: '-0.6px' }}>
                           <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
                           {formattedRating.split('.')[1]}
                         </span>
@@ -442,11 +477,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     </span>
                     <span
                       style={{
-                        fontSize: 18,
+                        fontSize: 14,
                         color: FROST.inkFaint,
                         fontWeight: 500,
                         marginLeft: 4,
-                        marginBottom: 6,
+                        marginBottom: 4,
                         letterSpacing: '-0.3px',
                       }}
                     >
@@ -454,7 +489,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     </span>
                   </div>
 
-                  {/* 2×2 breakdown on right */}
+                  {/* 2×2 breakdown on right — FULL labels */}
                   {breakdownEntries.length > 0 && (
                     <div
                       style={{
