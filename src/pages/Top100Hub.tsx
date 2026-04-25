@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { List, Map as MapIcon } from 'lucide-react';
+import { Map as MapIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100MapModal from '@/components/top100/Top100MapModal';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
-import { Top100ProgressSummary } from '@/components/top100/Top100ProgressSummary';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -43,31 +42,51 @@ const Top100Hub = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
   
-  // View mode state for toggle highlight
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  
   // Map modal state — auto-open if ?view=map
   const [isMapModalOpen, setIsMapModalOpen] = useState(viewFromUrl === 'map');
   
   const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
 
-  // Toggle handlers
-  const handleListClick = () => {
-    setViewMode('list');
-    setIsMapModalOpen(false);
-  };
-
   const handleMapClick = () => {
-    setViewMode('map');
     setIsMapModalOpen(true);
   };
 
   const handleMapModalClose = (open: boolean) => {
     if (!open) {
       setIsMapModalOpen(false);
-      setViewMode('list');
     }
   };
+
+  // Per-list sub-line for the editorial header (GB&I → Global → USA → Europe)
+  const perListSubline = useMemo(() => {
+    if (!listSummaries || listSummaries.length === 0) return null;
+
+    const order: Array<{ slug: string; label: string }> = [
+      { slug: 'gb-i', label: 'GB&I' },
+      { slug: 'global', label: 'GLOBAL' },
+      { slug: 'usa', label: 'USA' },
+      { slug: 'europe', label: 'EUROPE' },
+    ];
+
+    const parts = order.map(({ slug, label }) => {
+      const summary = listSummaries.find(s => s.slug === slug);
+      const count = summary?.played_count ?? 0;
+      return { count, label };
+    });
+
+    return (
+      <>
+        {parts.map((p, i) => (
+          <React.Fragment key={p.label}>
+            {i > 0 && <span style={{ color: '#94A3B8' }}> · </span>}
+            <span style={{ color: p.count > 0 ? '#F7931E' : '#94A3B8', fontWeight: 700 }}>{p.count}</span>
+            {' '}
+            {p.label}
+          </React.Fragment>
+        ))}
+      </>
+    );
+  }, [listSummaries]);
 
   // Guard against invalid data
   if (!lists && !listsLoading) {
@@ -138,53 +157,45 @@ const Top100Hub = () => {
             </TabsList>
 
             <TabsContent value="courses" className="mt-0">
-              {/* Progress Summary */}
-              {session && progress && (() => {
-                const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
-                const listsWithProgress = listSummaries?.filter(list => list.played_count > 0) || [];
-                const listsCount = listsWithProgress.length;
-                const totalCourses = listsWithProgress.reduce((sum, list) => sum + (list.total_courses || 0), 0);
-                
-                if (totalRated === 0) return null;
-                
-                return (
-                  <Top100ProgressSummary
-                    ratedCount={totalRated}
-                    listCount={listsCount}
-                    totalCourses={totalCourses}
-                  />
-                );
-              })()}
-              
-              {/* View Mode Toggle - Pill toggle style */}
-              <div className="flex justify-center py-4">
-                <div className="flex p-1 rounded-xl overflow-hidden" style={{ background: 'rgba(15,23,42,0.05)' }}>
-                  <button
-                    type="button"
-                    onClick={handleListClick}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]"
-                    style={viewMode === 'list'
-                      ? { background: '#ffffff', color: '#0F172A', border: '1px solid rgba(15,23,42,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
-                      : { background: 'transparent', color: '#64748B', border: 'none' }
-                    }
-                  >
-                    <List className="h-3.5 w-3.5" />
-                    List
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleMapClick}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]"
-                    style={viewMode === 'map'
-                      ? { background: '#ffffff', color: '#0F172A', border: '1px solid rgba(15,23,42,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
-                      : { background: 'transparent', color: '#64748B', border: 'none' }
-                    }
-                  >
-                    <MapIcon className="h-3.5 w-3.5" />
-                    Map
-                  </button>
+              {/* Editorial header — mirrors Explore + My Progress patterns */}
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                    <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                    <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                      Your Lists
+                    </span>
+                  </div>
+                  <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+                    Pick your list
+                  </h2>
+                  {session && perListSubline && (
+                    <p style={{
+                      fontSize: 11, color: '#64748B', margin: '10px 0 0',
+                      fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
+                    }}>
+                      {perListSubline}
+                    </p>
+                  )}
                 </div>
+
+                {/* Map pill — labelled, right-aligned */}
+                <button
+                  type="button"
+                  onClick={handleMapClick}
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-[0.97]"
+                  style={{
+                    background: '#ffffff',
+                    color: '#0F172A',
+                    border: '1px solid rgba(15,23,42,0.10)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                    marginTop: 2,
+                  }}
+                  aria-label="Open courses map"
+                >
+                  <MapIcon className="h-3.5 w-3.5" />
+                  Map
+                </button>
               </div>
 
               {/* Always render List view - Map is shown in modal */}
