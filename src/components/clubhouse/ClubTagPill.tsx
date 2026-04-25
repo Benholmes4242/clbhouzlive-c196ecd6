@@ -47,14 +47,13 @@ const ClubTagPill = ({ course, className, positioning = 'fixed' }: ClubTagPillPr
       } : undefined}
     >
       <div
-        className="inline-flex items-center gap-1 px-2.5 py-1.5"
+        className="inline-flex items-center gap-1 rounded-full px-2 py-1"
         style={{
           background: FROST.glass,
           backdropFilter: FROST_BLUR.panel,
           WebkitBackdropFilter: FROST_BLUR.panel,
           border: `1px solid ${FROST.border}`,
           boxShadow: `${FROST.dropShadow}, ${FROST.innerHighlight}`,
-          borderRadius: 10,
           transform: 'translateZ(0)',
           willChange: 'backdrop-filter',
         }}
