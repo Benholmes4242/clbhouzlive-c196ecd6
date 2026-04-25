@@ -35,6 +35,7 @@ const SectionHeader: React.FC = () => (
 );
 
 const TIERS: { key: keyof RatingTierDistributionData; label: string }[] = [
+  { key: 'exceptional', label: 'Exceptional' },
   { key: 'outstanding', label: 'Outstanding' },
   { key: 'excellent', label: 'Excellent' },
   { key: 'veryGood', label: 'Very Good' },
@@ -173,6 +174,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   // Distribution counts (fallback to zeros)
   const distCounts: Record<string, number> = {
+    exceptional: distribution?.exceptional ?? 0,
     outstanding: distribution?.outstanding ?? 0,
     excellent: distribution?.excellent ?? 0,
     veryGood: distribution?.veryGood ?? 0,
