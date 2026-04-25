@@ -12,7 +12,7 @@ import {
   formatEditorialDate,
   splitRating,
 } from './myRatingsTokens';
-import { getCategoryTierLabel } from './myRatingsTiering';
+import { getCategoryTierLabel } from './myRatingsCardTiers';
 import type { MyRatingsTierCardProps } from './types';
 
 /**

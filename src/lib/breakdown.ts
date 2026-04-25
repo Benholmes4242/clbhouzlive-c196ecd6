@@ -3,9 +3,11 @@
  *
  * - getBreakdownSum: sum of the four breakdown scores (or null if none provided)
  * - hasAnyBreakdown / hasFullBreakdown: presence checks
- * - getTier: tier label from overall rating (EXCEPTIONAL > OUTSTANDING > ...)
  * - annotateTies: side-effect of the canonical sort, attaches `tiedAbove`
  *   metadata so cards can explain why one course beats the next.
+ *
+ * Tier-label bucketing has moved to the canonical `@/lib/ratingTier`
+ * (`getRatingTier` / `getRatingTierLabel`) — do not re-add here.
  */
 
 export type BreakdownScores = {
@@ -42,21 +44,6 @@ export function getBreakdownSum(b: BreakdownScores): number | null {
     (b.clubhouse_score ?? 0) +
     (b.facilities_score ?? 0)
   );
-}
-
-export type RatingTier =
-  | 'EXCEPTIONAL'
-  | 'OUTSTANDING'
-  | 'EXCELLENT'
-  | 'VERY GOOD'
-  | 'GOOD';
-
-export function getTier(rating: number): RatingTier {
-  if (rating >= 9.5) return 'EXCEPTIONAL';
-  if (rating >= 9.0) return 'OUTSTANDING';
-  if (rating >= 8.0) return 'EXCELLENT';
-  if (rating >= 7.0) return 'VERY GOOD';
-  return 'GOOD';
 }
 
 export type TiedAbove = {

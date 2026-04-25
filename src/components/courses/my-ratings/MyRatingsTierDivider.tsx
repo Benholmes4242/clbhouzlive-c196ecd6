@@ -9,7 +9,7 @@ import {
 import {
   getSectionHeaderName,
   type MyRatingsCardTier,
-} from './myRatingsTiering';
+} from './myRatingsCardTiers';
 
 interface MyRatingsTierDividerProps {
   tier: MyRatingsCardTier;
