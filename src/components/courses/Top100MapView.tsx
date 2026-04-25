@@ -648,8 +648,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
         )}>
           <div className="pointer-events-auto flex flex-col gap-2">
-
-          <div className="pointer-events-auto flex flex-col gap-2">
             <div 
               className="glass-card flex flex-col rounded-xl overflow-hidden"
               role="group"
