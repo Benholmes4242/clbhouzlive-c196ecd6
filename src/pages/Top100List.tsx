@@ -6,6 +6,7 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
