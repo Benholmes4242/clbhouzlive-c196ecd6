@@ -9,12 +9,13 @@ import {
   Top100MapCourse,
   CourseJourneyStatus,
 } from '@/hooks/useTop100MapCourses';
-import { RotateCcw, ChevronLeft } from 'lucide-react';
+import { RotateCcw, ChevronLeft, ChevronDown, Check } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
 import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
 
@@ -82,6 +83,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [trayExpanded, setTrayExpanded] = useState(true);
+  const [regionPopoverOpen, setRegionPopoverOpen] = useState(false);
 
   // Played markers always use amber per design system (not season-themed)
   const seasonColor = '#F7931E';
@@ -642,8 +645,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <ChevronLeft className="h-[20px] w-[20px] text-white" strokeWidth={2.4} />
         </button>
 
-        {/* Reset view button — sole right-side floating control. Preserves course-sheet fade contract. */}
-        {/* TODO Phase C: bottom value will react to trayExpanded state (220 expanded, ~96 collapsed) */}
+        {/* Reset view button — sole right-side floating control. Bound to trayExpanded for smooth bottom animation. */}
         <button
           onClick={handleResetView}
           className={cn(
@@ -651,7 +653,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
           )}
           style={{
-            bottom: 220,
+            bottom: trayExpanded ? 220 : 96,
             width: 40, height: 40, borderRadius: 12,
             background: 'rgba(15,23,42,0.55)',
             backdropFilter: 'blur(14px) saturate(180%)',
@@ -664,9 +666,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <RotateCcw className="h-4 w-4 text-white/85" aria-hidden="true" />
         </button>
 
-        {/* Empty state */}
+        {/* Empty state — bottom value follows tray collapse state */}
         {ratedCount === 0 && !isLoading && mapLoaded && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-44 z-10 flex justify-center">
+          <div
+            className="pointer-events-none absolute inset-x-0 z-10 flex justify-center"
+            style={{
+              bottom: trayExpanded ? 200 : 100,
+              transition: 'bottom 300ms ease-out',
+            }}
+          >
             <div className="glass-card pointer-events-auto px-4 py-3 rounded-xl text-center">
               <p className="text-sm font-medium text-white/90">
                 ⛳ Tap a course to start your journey
@@ -683,28 +691,34 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         scope={scope}
       />
 
-      {/* Filter tray — canonical glass, hides when course sheet is open */}
+      {/* Filter tray — outer wrapper always visible (handle, progress, summary). Inner block (status pills) collapses. */}
       <div 
         className={cn(
-          "glass-card fixed bottom-0 left-0 right-0 z-30 !rounded-t-3xl !rounded-b-none !overflow-visible px-5 pt-4 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)] transition-all duration-300",
+          "glass-card fixed bottom-0 left-0 right-0 z-30 !rounded-t-3xl !rounded-b-none !overflow-visible px-5 pt-2 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)] transition-all duration-300",
           selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
         )}
         style={{ borderBottom: 'none', position: 'fixed' }}
       >
+        {/* C3 — Drag handle / collapse toggle */}
+        <button
+          onClick={() => setTrayExpanded((v) => !v)}
+          className="mx-auto mb-2 flex items-center justify-center active:opacity-70 transition-opacity"
+          style={{ width: 44, height: 24 }}
+          aria-label={trayExpanded ? 'Collapse filters' : 'Expand filters'}
+          aria-expanded={trayExpanded}
+        >
+          <span
+            className="block rounded-full"
+            style={{ width: 36, height: 4, background: 'rgba(255,255,255,0.30)' }}
+          />
+        </button>
+
         <div className="space-y-3">
-          {/* Progress bar — season color */}
+          {/* C4 — Flat 4px progress bar (blur glow dropped) */}
           <div className="relative">
-            <div className="h-1.5 bg-white/15 rounded-full overflow-hidden">
+            <div className="h-1 bg-white/15 rounded-full overflow-hidden">
               <div 
-                className="absolute inset-0 rounded-full blur-sm opacity-60"
-                style={{
-                  background: PLAYED_COLOR,
-                  width: `${progressPercent}%`,
-                  transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-              />
-              <div 
-                className="h-full rounded-full relative z-10 transition-all duration-700 ease-out"
+                className="h-full rounded-full transition-all duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`,
                   background: PLAYED_COLOR
@@ -713,69 +727,123 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             </div>
           </div>
 
-          {/* Status filter row — dark glass pills */}
-          <div 
-            className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.08]"
-            role="group"
-            aria-label="Filter courses by status"
-          >
-            {(['all', 'played', 'want_to_play', 'not_played'] as StatusFilter[]).map((filter) => {
-              const isActive = statusFilter === filter;
-              const labels: Record<StatusFilter, string> = {
-                all: 'All',
-                played: 'Played',
-                want_to_play: 'Want to Play',
-                not_played: 'Not Played',
-              };
-              return (
+          {/* C9 — Summary meta row: [RegionPill (popover trigger)] ··· [X of 100 · Y%] */}
+          <div className="flex items-center justify-between">
+            {/* C5 — Region selector popover */}
+            <Popover open={regionPopoverOpen} onOpenChange={setRegionPopoverOpen}>
+              <PopoverTrigger asChild>
                 <button
-                  key={filter}
-                  onClick={() => setStatusFilter(filter)}
-                  aria-pressed={isActive}
-                  aria-label={`Show ${labels[filter].toLowerCase()} courses`}
-                  className={cn(
-                    'flex-1 px-3 py-2.5 rounded-lg text-xs font-medium',
-                    'transition-all duration-200',
-                    'active:scale-[0.96]',
-                    isActive
-                      ? 'bg-white/90 text-foreground'
-                      : 'text-white/60 active:text-white/80 active:bg-white/[0.08]'
-                  )}
+                  aria-label={`Region: ${({ global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' } as Record<Top100MapScope, string>)[scope]}. Tap to change.`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-[0.96]"
+                  style={{
+                    background: 'rgba(255,255,255,0.10)',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                    color: 'rgba(255,255,255,0.92)',
+                  }}
                 >
-                  {labels[filter]}
+                  <span>{({ global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' } as Record<Top100MapScope, string>)[scope]}</span>
+                  <ChevronDown className="h-3 w-3 opacity-70" />
                 </button>
-              );
-            })}
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                align="start"
+                sideOffset={8}
+                className="w-56 p-1 border-0"
+                style={{
+                  background: 'rgba(15,23,42,0.92)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
+                }}
+              >
+                {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((regionScope) => {
+                  const isActive = scope === regionScope;
+                  const fullLabel = REGION_CONFIG[regionScope].label;
+                  return (
+                    <button
+                      key={regionScope}
+                      onClick={() => {
+                        onScopeChange?.(regionScope);
+                        setRegionPopoverOpen(false);
+                      }}
+                      className={cn(
+                        'w-full flex items-center justify-between px-3 py-2.5 rounded-md text-sm transition-colors text-left',
+                        isActive ? 'bg-white/15 text-white font-semibold' : 'text-white/80 hover:bg-white/8'
+                      )}
+                    >
+                      <span>{fullLabel}</span>
+                      {isActive && <Check className="h-4 w-4 text-white" />}
+                    </button>
+                  );
+                })}
+              </PopoverContent>
+            </Popover>
+
+            {/* Right side: count · percent */}
+            <div className="flex items-center gap-1.5 text-xs font-medium">
+              <span style={{ color: 'rgba(255,255,255,0.70)' }}>
+                {ratedCount} of {officialTotal}
+              </span>
+              <span style={{ color: 'rgba(255,255,255,0.30)' }}>·</span>
+              <span style={{ color: PLAYED_COLOR }}>{progressPercent}%</span>
+            </div>
           </div>
 
-          {/* Region chips row — dark glass pills */}
-          <div 
-            className="flex items-center gap-1.5"
-            role="group"
-            aria-label="Filter by region"
+          {/* C2 — Inner collapsible block: status pills only */}
+          <div
+            className={cn(
+              'transition-all duration-300 ease-out overflow-hidden',
+              trayExpanded
+                ? 'opacity-100 max-h-[120px]'
+                : 'opacity-0 max-h-0 pointer-events-none'
+            )}
           >
-            {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((regionScope) => {
-              const isActive = scope === regionScope;
-              const labels = { global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' };
-              return (
-                <button
-                  key={regionScope}
-                  onClick={() => onScopeChange?.(regionScope)}
-                  aria-pressed={isActive}
-                  aria-label={`Show ${labels[regionScope]} Top 100`}
-                  className={cn(
-                    'flex-1 px-3 py-2.5 rounded-lg text-xs font-medium',
-                    'transition-all duration-200 border',
-                    'active:scale-[0.96]',
-                    isActive
-                      ? 'bg-white/90 text-foreground border-white/50'
-                      : 'bg-white/[0.08] border-white/12 text-white/60 active:border-white/30 active:bg-white/[0.12]'
-                  )}
-                >
-                  {labels[regionScope]}
-                </button>
-              );
-            })}
+            {/* C6 — Status filter row: 3 pills, toggle-to-clear, 'Wishlist' relabel, dot indicator */}
+            <div 
+              className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.08]"
+              role="group"
+              aria-label="Filter courses by status"
+            >
+              {(['played', 'want_to_play', 'not_played'] as Exclude<StatusFilter, 'all'>[]).map((filter) => {
+                const isActive = statusFilter === filter;
+                const labels: Record<Exclude<StatusFilter, 'all'>, string> = {
+                  played: 'Played',
+                  want_to_play: 'Wishlist',
+                  not_played: 'Not Played',
+                };
+                const dotColor: Record<Exclude<StatusFilter, 'all'>, string> = {
+                  played: PLAYED_COLOR,
+                  want_to_play: WANT_TO_PLAY_COLOR,
+                  not_played: 'rgba(255,255,255,0.45)',
+                };
+                return (
+                  <button
+                    key={filter}
+                    // Toggle-to-clear: tapping active pill resets to 'all'
+                    onClick={() => setStatusFilter(isActive ? 'all' : filter)}
+                    aria-pressed={isActive}
+                    aria-label={`${isActive ? 'Clear' : 'Show'} ${labels[filter].toLowerCase()} filter`}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium',
+                      'transition-all duration-200',
+                      'active:scale-[0.96]',
+                      isActive
+                        ? 'bg-white/90 text-foreground'
+                        : 'text-white/60 active:text-white/80 active:bg-white/[0.08]'
+                    )}
+                  >
+                    <span
+                      className="block rounded-full"
+                      style={{ width: 6, height: 6, background: dotColor[filter] }}
+                      aria-hidden="true"
+                    />
+                    <span>{labels[filter]}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
