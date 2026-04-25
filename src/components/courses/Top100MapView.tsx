@@ -645,8 +645,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <ChevronLeft className="h-[20px] w-[20px] text-white" strokeWidth={2.4} />
         </button>
 
-        {/* Reset view button — sole right-side floating control. Preserves course-sheet fade contract. */}
-        {/* TODO Phase C: bottom value will react to trayExpanded state (220 expanded, ~96 collapsed) */}
+        {/* Reset view button — sole right-side floating control. Bound to trayExpanded for smooth bottom animation. */}
         <button
           onClick={handleResetView}
           className={cn(
@@ -654,7 +653,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
           )}
           style={{
-            bottom: 220,
+            bottom: trayExpanded ? 220 : 96,
             width: 40, height: 40, borderRadius: 12,
             background: 'rgba(15,23,42,0.55)',
             backdropFilter: 'blur(14px) saturate(180%)',
