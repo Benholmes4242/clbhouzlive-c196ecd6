@@ -563,8 +563,16 @@ function ResultsStateBlock({
       <Standfirst>{editorial.standfirst}</Standfirst>
 
       <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {picks.slice(0, 3).map((p) => (
-          <ResultsPickRow key={p.playerId} pick={p} />
+        {picks.slice(0, 3).map((p, i) => (
+          <ExpandablePickRow
+            key={p.playerId}
+            playerId={p.playerId}
+            playerName={p.playerName}
+            reasons={p.reasons}
+            defaultExpanded={i === 0}
+            tier={i === 0 ? 'TOP PICK' : i === 1 ? 'STRONG' : 'CONTENTION'}
+            trailing={<ResultsTrailing pick={p} />}
+          />
         ))}
       </div>
     </div>
