@@ -113,16 +113,16 @@ const TIER_ROWS: TierRow[] = [
   },
   {
     label: 'STRONG',
-    tint: 'rgba(124, 58, 237, 0.12)',
-    border: 'rgba(124, 58, 237, 0.30)',
-    text: VIOLET,
+    tint: 'rgba(45, 187, 120, 0.12)',
+    border: 'rgba(45, 187, 120, 0.30)',
+    text: GREEN_ACCENT,
     body: 'Solid case across multiple signals. A realistic alternative to the Top Pick.',
   },
   {
     label: 'CONTENTION',
-    tint: 'rgba(124, 58, 237, 0.06)',
-    border: 'rgba(124, 58, 237, 0.18)',
-    text: VIOLET,
+    tint: 'rgba(15, 23, 42, 0.06)',
+    border: 'rgba(15, 23, 42, 0.10)',
+    text: SLATE_500,
     body: 'In the conversation. Right profile for the venue with at least one strong signal.',
   },
 ];
