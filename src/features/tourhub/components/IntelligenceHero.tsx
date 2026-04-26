@@ -887,8 +887,8 @@ function UpcomingPickRow({ contender }: { contender: AITopContender }) {
             letterSpacing: '0.06em',
             padding: '4px 8px',
             borderRadius: 8,
-            background: 'rgba(167, 139, 250, 0.14)',
-            color: PURPLE_ACCENT,
+            background: 'rgba(45,187,120,0.18)',
+            color: GREEN_ACCENT,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
