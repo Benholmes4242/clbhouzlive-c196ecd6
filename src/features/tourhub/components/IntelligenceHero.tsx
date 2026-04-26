@@ -998,8 +998,8 @@ function ExpandablePickRow({
             width: 22,
             height: 22,
             borderRadius: 999,
-            background: 'rgba(255,255,255,0.05)',
-            color: 'rgba(255,255,255,0.6)',
+            background: 'rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.65)',
           }}
         >
           {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
