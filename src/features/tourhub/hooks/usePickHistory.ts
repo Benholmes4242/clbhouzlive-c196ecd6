@@ -6,6 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { isMajor } from '../utils/majorScope';
+import { classifyOutcome } from '../utils/outcomeClassifier';
 
 export interface PickHistoryEntry {
   tournamentId: string;
@@ -120,14 +121,15 @@ export function usePickHistory() {
         const maps = lbByTournament.get(row.tournament_id);
         if (!maps) continue;
 
-        // Check ALL picks against leaderboard, find the best finisher
+        // Collect all rank ≤ 3 picks (for shared outcome classifier) and
+        // simultaneously track the best finisher (for display fields).
+        const classifierPicks: { rank: number; actualPosition: number | null }[] = [];
         let bestPick: {
           playerName: string;
           playerId: string;
           predictedRank: number;
           actualPosition: number | null;
           actualPositionTied: boolean;
-          isWinner: boolean;
           scoreToPar: number | null;
         } | null = null;
 
@@ -143,8 +145,9 @@ export function usePickHistory() {
 
           const actualPosition = lbEntry?.position ?? null;
           const actualPositionTied = lbEntry?.tied ?? false;
-          const isWinner = actualPosition === 1;
           const scoreToPar = lbEntry?.score ?? null;
+
+          classifierPicks.push({ rank: predictedRank, actualPosition });
 
           // Keep this pick if it finished better than current best
           // Null positions (MC/WD) are treated as worst
@@ -152,11 +155,15 @@ export function usePickHistory() {
             bestPick === null ||
             (actualPosition !== null && (bestPick.actualPosition === null || actualPosition < bestPick.actualPosition))
           ) {
-            bestPick = { playerName, playerId, predictedRank, actualPosition, actualPositionTied, isWinner, scoreToPar };
+            bestPick = { playerName, playerId, predictedRank, actualPosition, actualPositionTied, scoreToPar };
           }
         }
 
         if (!bestPick) continue;
+
+        // Outcome derivation goes through the shared classifier so card and
+        // bottom sheet never disagree (any-pick-wins semantics).
+        const isWinner = classifyOutcome(classifierPicks) === 'win';
 
         entries.push({
           tournamentId: row.tournament_id,
@@ -167,7 +174,7 @@ export function usePickHistory() {
           predictedRank: bestPick.predictedRank,
           actualPosition: bestPick.actualPosition,
           actualPositionTied: bestPick.actualPositionTied,
-          isWinner: bestPick.isWinner,
+          isWinner,
           scoreToPar: bestPick.scoreToPar,
           year: tournament.start_date
             ? new Date(tournament.start_date).getFullYear().toString()
