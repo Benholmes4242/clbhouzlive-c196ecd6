@@ -377,7 +377,7 @@ function TrackRecord({
       }}
     >
       <StatPill value={String(wins)} label="Wins" highlight />
-      <StatPill value={String(topFives)} label="Top-5" />
+      <StatPill value={String(topFives)} label="Top-5s" />
       <StatPill value={`${topFiveRate}%`} label="Top-5 Rate" />
     </div>
   );
