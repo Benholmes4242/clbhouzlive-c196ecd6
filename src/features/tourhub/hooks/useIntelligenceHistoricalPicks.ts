@@ -24,8 +24,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { isMajor } from '../utils/majorScope';
+import { classifyOutcome, type IntelligenceOutcome } from '../utils/outcomeClassifier';
 
-export type IntelligenceOutcome = 'win' | 'top5' | 'partial' | 'miss';
+// Back-compat re-export so existing consumers (e.g. IntelligenceAllPicksSheet)
+// can keep importing the type from this hook.
+export type { IntelligenceOutcome };
 
 export interface IntelligenceHistoricalPick {
   rank: 1 | 2 | 3;
@@ -34,6 +37,8 @@ export interface IntelligenceHistoricalPick {
   tourCode: string;
   actualPosition: number | null;
   actualPositionTied: boolean;
+  /** Raw leaderboard status (e.g. 'CUT', 'WD', 'DQ', 'active'). Source of truth for MC display. */
+  status: string | null;
   /** Pre-formatted display string: "1", "T8", "MC", "WD", "—". */
   finalPosition: string;
 }
@@ -45,6 +50,8 @@ export interface IntelligenceHistoricalTournament {
   startDate: string;
   endDate: string;
   tour: string;
+  /** True for cross-tour majors (Masters, US Open, PGA Champ, The Open). */
+  isMajor: boolean;
   outcome: IntelligenceOutcome;
   picks: IntelligenceHistoricalPick[];
 }
