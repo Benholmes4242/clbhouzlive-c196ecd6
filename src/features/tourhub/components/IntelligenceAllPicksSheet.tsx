@@ -20,7 +20,7 @@
 
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Brain, X, ChevronRight } from 'lucide-react';
+import { Brain, X, ChevronRight, Trophy } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
 import {
