@@ -26,6 +26,7 @@ export function useTournamentStatusRealtime() {
             queryClient.invalidateQueries({ queryKey: ['ai-predictions'] });
             queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders'] });
             queryClient.invalidateQueries({ queryKey: ['tourhub'] });
+            queryClient.invalidateQueries({ queryKey: ['tourhub', 'pick-history'] });
             queryClient.invalidateQueries({ queryKey: ['prediction-tracker'] });
             queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
             queryClient.invalidateQueries({ queryKey: ['live-arena'] });

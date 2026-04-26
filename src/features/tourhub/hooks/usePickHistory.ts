@@ -22,9 +22,12 @@ export interface PickHistoryEntry {
 
 /** Major tournament name matching (sr_tournaments has no is_major column) */
 const MAJOR_NAMES = ['masters tournament', 'u.s. open', 'pga championship', 'the open championship'];
+/** Exclude senior/women/junior/amateur events that would otherwise match MAJOR_NAMES via substring */
+const MAJOR_EXCLUSIONS = ['senior', 'women', 'junior', 'amateur'];
 
 function isMajor(name: string): boolean {
   const lower = name.toLowerCase();
+  if (MAJOR_EXCLUSIONS.some(ex => lower.includes(ex))) return false;
   return MAJOR_NAMES.some(k => lower.includes(k));
 }
 
