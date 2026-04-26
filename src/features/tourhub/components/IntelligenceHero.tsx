@@ -39,8 +39,7 @@ import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const WEEKDAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const PURPLE_ACCENT = '#A78BFA';
 const AMBER_ACCENT = '#F7931E';
@@ -65,6 +64,41 @@ function isReasoningPlayingOut(p: TrackedPrediction): boolean {
   return p.actualPosition <= p.predictedRank * 5;
 }
 
+/** Date range for masthead state label. Always includes month on both sides for clarity. */
+function formatDateRange(startIso: string, endIso: string): string {
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  return `${start.getDate()} ${MONTHS_ABBR[start.getMonth()]} – ${end.getDate()} ${MONTHS_ABBR[end.getMonth()]}`;
+}
+
+/**
+ * Location line for venue card. Three formats:
+ *   - US:                          "Doral, Florida · USA"
+ *   - International with region:   "Hamilton, Ontario · Canada"
+ *   - International without region: "Wentworth · United Kingdom"
+ */
+function formatLocation(t: AIPredictionData['tournament']): string {
+  const left: string[] = [];
+  if (t.venueCity) left.push(t.venueCity);
+  if (t.venueState) left.push(t.venueState);
+  const leftStr = left.join(', ');
+  if (t.venueCountry) {
+    return leftStr ? `${leftStr} · ${t.venueCountry}` : t.venueCountry;
+  }
+  return leftStr;
+}
+
+function getVenueBullets(t: AIPredictionData['tournament']): string[] {
+  const bullets: string[] = [];
+  if (t.par && t.yardage) {
+    bullets.push(`Par ${t.par} · ${t.yardage.toLocaleString()} yards`);
+  }
+  const fallback = getVenueRequirements(t.name);
+  if (fallback?.surface) bullets.push(fallback.surface);
+  if (fallback?.demands) bullets.push(fallback.demands);
+  return bullets;
+}
+
 function formatStateLabel(
   state: IntelligenceLifecycleState,
   data: AIPredictionData | null | undefined,
@@ -81,14 +115,12 @@ function formatStateLabel(
     const round = lead?.currentRound ?? 1;
     return `LIVE · ROUND ${round}`;
   }
-  if (state === 'results' && data?.tournament?.endDate) {
-    const d = new Date(data.tournament.endDate);
-    return `FINAL · ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+  if (state === 'results' && data?.tournament?.startDate && data?.tournament?.endDate) {
+    return formatDateRange(data.tournament.startDate, data.tournament.endDate);
   }
-  const startIso = nextTournamentPredictions?.tournament?.startDate ?? data?.tournament?.startDate;
-  if (startIso) {
-    const d = new Date(startIso);
-    return `TEES OFF ${WEEKDAYS[d.getDay()]}`;
+  const t = nextTournamentPredictions?.tournament ?? data?.tournament;
+  if (t?.startDate && t?.endDate) {
+    return formatDateRange(t.startDate, t.endDate);
   }
   return 'UPCOMING';
 }
