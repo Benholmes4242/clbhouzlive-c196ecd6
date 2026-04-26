@@ -20,7 +20,7 @@
 
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Brain, X, ChevronRight } from 'lucide-react';
+import { Brain, X, ChevronRight, Trophy } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
 import {
@@ -74,6 +74,16 @@ function outcomeChipStyle(outcome: IntelligenceOutcome): { bg: string; fg: strin
     case 'partial': return { bg: 'rgba(15,23,42,0.04)',   fg: SLATE_500, label: 'PARTIAL'};
     case 'miss':    return { bg: 'rgba(15,23,42,0.04)',   fg: SLATE_500, label: 'MISS'   };
   }
+}
+
+// Sort picks so the best actual finisher renders first; MC/WD/null sink to bottom.
+function sortPicksByFinish<T extends { actualPosition: number | null }>(picks: T[]): T[] {
+  return [...picks].sort((a, b) => {
+    if (a.actualPosition === null && b.actualPosition === null) return 0;
+    if (a.actualPosition === null) return 1;
+    if (b.actualPosition === null) return -1;
+    return a.actualPosition - b.actualPosition;
+  });
 }
 
 export interface IntelligenceAllPicksSheetProps {
@@ -249,6 +259,8 @@ function TournamentCard({
 }) {
   const chip = outcomeChipStyle(tournament.outcome);
   const dateRange = formatDateRange(tournament.startDate, tournament.endDate);
+  const isWin = tournament.outcome === 'win';
+  const sortedPicks = useMemo(() => sortPicksByFinish(tournament.picks), [tournament.picks]);
 
   return (
     <button
@@ -259,12 +271,15 @@ function TournamentCard({
         width: '100%',
         padding: '14px 14px 12px',
         borderRadius: 14,
-        border: `1px solid ${SLATE_200}`,
+        border: isWin ? '1.5px solid rgba(247,147,30,0.3)' : `1px solid ${SLATE_200}`,
         background: '#ffffff',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
+        boxShadow: isWin
+          ? '0 4px 16px -4px rgba(247,147,30,0.15)'
+          : '0 2px 8px -2px rgba(15,23,42,0.04)',
       }}
     >
       {/* Header row */}
@@ -305,10 +320,13 @@ function TournamentCard({
         </div>
       </div>
 
-      {/* Picks rail */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {tournament.picks.map(pick => (
-          <PickMiniRow key={`${tournament.id}-${pick.rank}`} pick={pick} isWinner={pick.actualPosition === 1} />
+      {/* Picks rail (sorted by actual finish; MC/WD sink to bottom) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {sortedPicks.map(pick => (
+          <PickMiniRow
+            key={pick.playerId || `${tournament.id}-${pick.rank}`}
+            pick={pick}
+          />
         ))}
       </div>
     </button>
@@ -317,53 +335,66 @@ function TournamentCard({
 
 function PickMiniRow({
   pick,
-  isWinner,
 }: {
-  pick: { rank: 1 | 2 | 3; playerName: string; playerId: string; tourCode: string; finalPosition: string };
-  isWinner: boolean;
+  pick: {
+    rank: 1 | 2 | 3;
+    playerName: string;
+    playerId: string;
+    tourCode: string;
+    finalPosition: string;
+    actualPosition: number | null;
+  };
 }) {
+  const isWinner = pick.actualPosition === 1;
+  const isMissedCut = pick.actualPosition === null;
+
+  // Layer 3: position colour coding — amber for winner, slate for MC/WD, ink otherwise.
+  const positionColor = isWinner ? AMBER : isMissedCut ? SLATE_500 : SLATE_900;
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <span
-        style={{
-          width: 18,
-          fontSize: 10,
-          fontWeight: 800,
-          color: SLATE_400,
-          letterSpacing: '0.04em',
-          fontVariantNumeric: 'tabular-nums',
-          flexShrink: 0,
-        }}
-      >
-        #{pick.rank}
-      </span>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '6px 8px 6px 9px',
+        borderRadius: 8,
+        // Layer 1: amber tint + 3px amber left border on winning row.
+        // Transparent border on non-winners keeps row heights identical.
+        background: isWinner ? 'rgba(247,147,30,0.05)' : 'transparent',
+        borderLeft: isWinner ? `3px solid ${AMBER}` : '3px solid transparent',
+      }}
+    >
       <PlayerAvatar
         playerId={pick.playerId}
         playerName={pick.playerName}
         tourCode={pick.tourCode}
         size="sm"
       />
-      <span
-        style={{
-          flex: 1,
-          minWidth: 0,
-          fontSize: 13,
-          fontWeight: 600,
-          color: SLATE_900,
-          letterSpacing: '-0.1px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {pick.playerName}
-      </span>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: SLATE_900,
+            letterSpacing: '-0.1px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {pick.playerName}
+        </span>
+        {isWinner && (
+          <Trophy size={13} color={AMBER} fill={AMBER} style={{ flexShrink: 0 }} />
+        )}
+      </div>
       <span
         style={{
           flexShrink: 0,
           fontSize: 12,
           fontWeight: 800,
-          color: isWinner ? AMBER : SLATE_500,
+          color: positionColor,
           fontVariantNumeric: 'tabular-nums',
           minWidth: 28,
           textAlign: 'right',
