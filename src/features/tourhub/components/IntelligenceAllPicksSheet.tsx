@@ -204,9 +204,9 @@ export function IntelligenceAllPicksSheet({ open, onClose }: IntelligenceAllPick
                 style={{
                   padding: '6px 12px',
                   borderRadius: 999,
-                  border: active ? `1px solid ${PURPLE}` : `1px solid ${SLATE_200}`,
-                  background: active ? 'rgba(167, 139, 250, 0.12)' : '#ffffff',
-                  color: active ? PURPLE_DEEP : SLATE_500,
+                  border: active ? `1px solid ${GREEN_DEEP}` : `1px solid ${SLATE_200}`,
+                  background: active ? 'rgba(10, 90, 60, 0.08)' : '#ffffff',
+                  color: active ? GREEN_DEEP : SLATE_500,
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: '-0.05px',
