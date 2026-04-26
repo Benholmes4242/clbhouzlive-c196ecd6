@@ -23,6 +23,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { isMajor } from '../utils/majorScope';
 
 export type IntelligenceOutcome = 'win' | 'top5' | 'partial' | 'miss';
 
@@ -86,14 +87,24 @@ function classifyOutcome(picks: IntelligenceHistoricalPick[]): IntelligenceOutco
   return 'miss';
 }
 
-async function getPgaSeasonId(): Promise<string | null> {
-  const { data } = await supabase
-    .from('sr_seasons')
-    .select('id')
-    .ilike('tour_name', 'pga')
-    .order('year', { ascending: false })
-    .limit(1);
-  return data?.[0]?.id ?? null;
+async function getScopedSeasonIds(): Promise<{ all: string[]; euro: string[] }> {
+  const [pgaSeasons, euroSeasons] = await Promise.all([
+    supabase
+      .from('sr_seasons')
+      .select('id')
+      .ilike('tour_name', 'pga')
+      .order('year', { ascending: false })
+      .limit(3),
+    supabase
+      .from('sr_seasons')
+      .select('id')
+      .ilike('tour_name', 'EURO')
+      .order('year', { ascending: false })
+      .limit(3),
+  ]);
+  const pgaIds = (pgaSeasons.data ?? []).map((s: any) => s.id);
+  const euroIds = (euroSeasons.data ?? []).map((s: any) => s.id);
+  return { all: [...pgaIds, ...euroIds], euro: euroIds };
 }
 
 export function useIntelligenceHistoricalPicks() {
@@ -102,10 +113,11 @@ export function useIntelligenceHistoricalPicks() {
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     queryFn: async (): Promise<IntelligenceHistoricalTournament[]> => {
-      const pgaSeasonId = await getPgaSeasonId();
-      if (!pgaSeasonId) return [];
+      const { all: allSeasonIds, euro: euroSeasonIds } = await getScopedSeasonIds();
+      if (!allSeasonIds.length) return [];
 
       // Step 1: completed tournaments with predictions, most recent first, capped 50.
+      // Includes PGA + EURO seasons so cross-tour majors (e.g. The Masters) are in scope.
       const { data: predRows, error: predError } = await supabase
         .from('ai_predictions')
         .select(`
@@ -116,7 +128,7 @@ export function useIntelligenceHistoricalPicks() {
           )
         `)
         .in('sr_tournaments.status', ['closed', 'complete'])
-        .eq('sr_tournaments.season_id', pgaSeasonId)
+        .in('sr_tournaments.season_id', allSeasonIds)
         .order('sr_tournaments(end_date)', { ascending: false })
         .limit(50);
 
@@ -160,6 +172,10 @@ export function useIntelligenceHistoricalPicks() {
       for (const row of predRows) {
         const t = (row as any).sr_tournaments;
         if (!t?.start_date || !t?.end_date) continue;
+
+        // For EURO season tournaments, only include majors (e.g. The Masters).
+        // Mirrors usePickHistory's cross-tour majors fold-back so card + sheet stay scope-aligned.
+        if (euroSeasonIds.includes(t.season_id) && !isMajor(t.name || '')) continue;
 
         const rawPredictions = (row.predictions as any[]) ?? [];
         const maps = lbByTournament.get(row.tournament_id);

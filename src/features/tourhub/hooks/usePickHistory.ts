@@ -5,6 +5,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { isMajor } from '../utils/majorScope';
 
 export interface PickHistoryEntry {
   tournamentId: string;
@@ -18,17 +19,6 @@ export interface PickHistoryEntry {
   isWinner: boolean;
   scoreToPar: number | null;
   year: string;
-}
-
-/** Major tournament name matching (sr_tournaments has no is_major column) */
-const MAJOR_NAMES = ['masters tournament', 'u.s. open', 'pga championship', 'the open championship'];
-/** Exclude senior/women/junior/amateur events that would otherwise match MAJOR_NAMES via substring */
-const MAJOR_EXCLUSIONS = ['senior', 'women', 'junior', 'amateur'];
-
-function isMajor(name: string): boolean {
-  const lower = name.toLowerCase();
-  if (MAJOR_EXCLUSIONS.some(ex => lower.includes(ex))) return false;
-  return MAJOR_NAMES.some(k => lower.includes(k));
 }
 
 /** Extract a short display name from a full tournament name */
@@ -185,7 +175,7 @@ export function usePickHistory() {
         });
       }
 
-      return entries.filter(e => e.topPickName).slice(0, 10);
+      return entries.filter(e => e.topPickName);
     },
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
