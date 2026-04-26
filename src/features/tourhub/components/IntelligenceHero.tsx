@@ -1,23 +1,25 @@
 /**
  * IntelligenceHero — Tour Hub focal point
  *
- * Deep-purple magazine card establishing Clbhouz Intelligence as the AI brand
+ * Deep-purple magazine card establishing clbhouz Intelligence as the AI brand
  * on the Tour Hub. Auto-detects tournament lifecycle (live / results / upcoming)
  * via `useIntelligenceLifecycleState` (mirrors HeroCarousel's 1.5-day window).
  *
  * Phase A: persistent shell (Masthead + TrackRecord + CTA).
- * Phase B (this commit): full content blocks for each lifecycle state.
+ * Phase B: full content blocks for each lifecycle state.
  *   - Live    → performance band + 3 picks with live position + reasoning
  *   - Results → "WE CALLED IT" recap when Top Pick wins, else final standings
- *   - Upcoming → venue card with course-fit chips + 3 picks with reasoning
+ *   - Upcoming → venue card with par/yardage bullets + 3 picks with chevron-expand reasoning
  * Phase C: wires the CTA to open IntelligenceAllPicksSheet.
+ * v2 Polish: date-range state labels, About sheet, chevron-expand pick rows,
+ *            location line on venue card, FIT badge removed, brand casing.
  *
- * Editorial copy reads from INTELLIGENCE_HERO_FALLBACK (V1 hardcoded). V2 will
- * move to a Claude-driven daily pipeline via championship_editorial_daily.
+ * Editorial copy reads from INTELLIGENCE_HERO_FALLBACK (V1 hardcoded). V1.2 will
+ * move per-tournament copy to a Claude-driven daily pipeline.
  */
 
 import { memo, useMemo, useState } from 'react';
-import { Brain, ChevronRight, Check } from 'lucide-react';
+import { Brain, ChevronRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
@@ -27,13 +29,17 @@ import { usePredictionTracker } from '../hooks/usePredictionTracker';
 import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions';
 import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
 import { PlayerAvatar } from './PlayerAvatar';
-import { INTELLIGENCE_HERO_FALLBACK } from '../utils/editorialFallbacks';
+import {
+  INTELLIGENCE_HERO_FALLBACK,
+  buildUpcomingHeadline,
+  getVenueRequirements,
+} from '../utils/editorialFallbacks';
 import { IntelligenceAllPicksSheet } from './IntelligenceAllPicksSheet';
+import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const WEEKDAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const PURPLE_ACCENT = '#A78BFA';
 const AMBER_ACCENT = '#F7931E';
@@ -58,6 +64,41 @@ function isReasoningPlayingOut(p: TrackedPrediction): boolean {
   return p.actualPosition <= p.predictedRank * 5;
 }
 
+/** Date range for masthead state label. Always includes month on both sides for clarity. */
+function formatDateRange(startIso: string, endIso: string): string {
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  return `${start.getDate()} ${MONTHS_ABBR[start.getMonth()]} – ${end.getDate()} ${MONTHS_ABBR[end.getMonth()]}`;
+}
+
+/**
+ * Location line for venue card. Three formats:
+ *   - US:                          "Doral, Florida · USA"
+ *   - International with region:   "Hamilton, Ontario · Canada"
+ *   - International without region: "Wentworth · United Kingdom"
+ */
+function formatLocation(t: AIPredictionData['tournament']): string {
+  const left: string[] = [];
+  if (t.venueCity) left.push(t.venueCity);
+  if (t.venueState) left.push(t.venueState);
+  const leftStr = left.join(', ');
+  if (t.venueCountry) {
+    return leftStr ? `${leftStr} · ${t.venueCountry}` : t.venueCountry;
+  }
+  return leftStr;
+}
+
+function getVenueBullets(t: AIPredictionData['tournament']): string[] {
+  const bullets: string[] = [];
+  if (t.par && t.yardage) {
+    bullets.push(`Par ${t.par} · ${t.yardage.toLocaleString()} yards`);
+  }
+  const fallback = getVenueRequirements(t.name);
+  if (fallback?.surface) bullets.push(fallback.surface);
+  if (fallback?.demands) bullets.push(fallback.demands);
+  return bullets;
+}
+
 function formatStateLabel(
   state: IntelligenceLifecycleState,
   data: AIPredictionData | null | undefined,
@@ -74,14 +115,12 @@ function formatStateLabel(
     const round = lead?.currentRound ?? 1;
     return `LIVE · ROUND ${round}`;
   }
-  if (state === 'results' && data?.tournament?.endDate) {
-    const d = new Date(data.tournament.endDate);
-    return `FINAL · ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+  if (state === 'results' && data?.tournament?.startDate && data?.tournament?.endDate) {
+    return formatDateRange(data.tournament.startDate, data.tournament.endDate);
   }
-  const startIso = nextTournamentPredictions?.tournament?.startDate ?? data?.tournament?.startDate;
-  if (startIso) {
-    const d = new Date(startIso);
-    return `TEES OFF ${WEEKDAYS[d.getDay()]}`;
+  const t = nextTournamentPredictions?.tournament ?? data?.tournament;
+  if (t?.startDate && t?.endDate) {
+    return formatDateRange(t.startDate, t.endDate);
   }
   return 'UPCOMING';
 }
@@ -123,12 +162,15 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   );
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const handleOpenSheet = () => setSheetOpen(true);
   const handleCloseSheet = () => setSheetOpen(false);
+  const handleOpenAbout = () => setAboutOpen(true);
+  const handleCloseAbout = () => setAboutOpen(false);
 
   return (
     <section
-      aria-label="Clbhouz Intelligence"
+      aria-label="clbhouz Intelligence"
       style={{ paddingLeft: 16, paddingRight: 16 }}
     >
       <div
@@ -174,7 +216,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <Masthead stateLabel={stateLabel} />
+          <Masthead stateLabel={stateLabel} onInfoTap={handleOpenAbout} />
 
           <Divider top={14} bottom={16} />
 
@@ -207,13 +249,26 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
 
       {/* ── Phase C bottom sheet (portal-rendered by BottomSheet primitive) ── */}
       <IntelligenceAllPicksSheet open={sheetOpen} onClose={handleCloseSheet} />
+
+      {/* ── v2 Polish: About sheet (also portal-rendered) ── */}
+      <IntelligenceAboutSheet
+        open={aboutOpen}
+        onClose={handleCloseAbout}
+        trackRecord={{ wins, topFives }}
+      />
     </section>
   );
 });
 
 // ─── Persistent shell sub-components ────────────────────────────────────────
 
-function Masthead({ stateLabel }: { stateLabel: string }) {
+function Masthead({
+  stateLabel,
+  onInfoTap,
+}: {
+  stateLabel: string;
+  onInfoTap: () => void;
+}) {
   return (
     <div
       style={{
@@ -223,12 +278,19 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
         gap: 8,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        {/* Brain icon — tappable, opens About sheet */}
+        <button
+          type="button"
+          onClick={onInfoTap}
+          aria-label="About clbhouz Intelligence"
           style={{
             width: 28,
             height: 28,
             borderRadius: '50%',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
             background:
               'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
             display: 'flex',
@@ -239,7 +301,7 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
           }}
         >
           <Brain size={15} color="#ffffff" strokeWidth={2.4} />
-        </div>
+        </button>
         <span
           style={{
             fontSize: 11,
@@ -250,8 +312,35 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
             textShadow: '0 0 12px rgba(167, 139, 250, 0.5)',
           }}
         >
-          Clbhouz Intelligence
+          clbhouz Intelligence
         </span>
+        {/* "i" info icon — also tappable, opens About sheet */}
+        <button
+          type="button"
+          onClick={onInfoTap}
+          aria-label="About clbhouz Intelligence"
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,0.32)',
+            background: 'transparent',
+            color: 'rgba(255,255,255,0.75)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
+            flexShrink: 0,
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontStyle: 'italic',
+            fontSize: 10,
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          i
+        </button>
       </div>
       <span
         style={{
@@ -261,6 +350,7 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.55)',
           fontVariantNumeric: 'tabular-nums',
+          flexShrink: 0,
         }}
       >
         {stateLabel}
@@ -287,7 +377,7 @@ function TrackRecord({
       }}
     >
       <StatPill value={String(wins)} label="Wins" highlight />
-      <StatPill value={String(topFives)} label="Top-5" />
+      <StatPill value={String(topFives)} label="Top-5s" />
       <StatPill value={`${topFiveRate}%`} label="Top-5 Rate" />
     </div>
   );
@@ -473,8 +563,16 @@ function ResultsStateBlock({
       <Standfirst>{editorial.standfirst}</Standfirst>
 
       <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {picks.slice(0, 3).map((p) => (
-          <ResultsPickRow key={p.playerId} pick={p} />
+        {picks.slice(0, 3).map((p, i) => (
+          <ExpandablePickRow
+            key={p.playerId}
+            playerId={p.playerId}
+            playerName={p.playerName}
+            reasons={p.reasons}
+            defaultExpanded={i === 0}
+            tier={i === 0 ? 'TOP PICK' : i === 1 ? 'STRONG' : 'CONTENTION'}
+            trailing={<ResultsTrailing pick={p} />}
+          />
         ))}
       </div>
     </div>
@@ -483,18 +581,17 @@ function ResultsStateBlock({
 
 function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
   const editorial = INTELLIGENCE_HERO_FALLBACK.upcoming;
-  const venueName = data?.tournament?.venueName ?? 'Venue TBC';
-  const tournamentName = data?.tournament?.name ?? 'Next Tournament';
-  const courseChips = (() => {
-    const liveStats = data?.courseAnalysis?.keyStats ?? [];
-    if (liveStats.length > 0) return liveStats.slice(0, 3);
-    return editorial.courseFitChips.slice(0, 3);
-  })();
+  const tournament = data?.tournament;
+  const venueName = tournament?.venueName ?? 'Venue TBC';
+  const tournamentName = tournament?.name ?? 'Next Tournament';
+  const headline = buildUpcomingHeadline(tournamentName);
+  const locationLine = tournament ? formatLocation(tournament) : '';
+  const bullets = tournament ? getVenueBullets(tournament) : [];
 
   return (
     <div>
       <Eyebrow>{editorial.eyebrow}</Eyebrow>
-      <Headline>{editorial.headline}</Headline>
+      <Headline>{headline}</Headline>
       <Standfirst>{editorial.standfirst}</Standfirst>
 
       {/* Venue card */}
@@ -521,47 +618,71 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
         <div
           style={{
             marginTop: 4,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 800,
             color: '#ffffff',
             letterSpacing: '-0.2px',
+            lineHeight: 1.2,
           }}
         >
           {venueName}
         </div>
-        <div
-          style={{
-            marginTop: 10,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 6,
-          }}
-        >
-          {courseChips.map((chip, i) => (
-            <span
-              key={`${chip}-${i}`}
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                padding: '4px 9px',
-                borderRadius: 999,
-                background: 'rgba(167, 139, 250, 0.12)',
-                border: '1px solid rgba(167, 139, 250, 0.28)',
-                color: PURPLE_ACCENT,
-              }}
-            >
-              {chip}
-            </span>
-          ))}
-        </div>
+        {locationLine && (
+          <div
+            style={{
+              marginTop: 2,
+              fontSize: 11,
+              color: 'rgba(255,255,255,0.55)',
+              letterSpacing: '-0.05px',
+            }}
+          >
+            {locationLine}
+          </div>
+        )}
+        {bullets.length > 0 && (
+          <ul
+            style={{
+              margin: '10px 0 0',
+              padding: 0,
+              listStyle: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+            }}
+          >
+            {bullets.map((b, i) => (
+              <li
+                key={i}
+                style={{
+                  fontSize: 11,
+                  color: 'rgba(255,255,255,0.65)',
+                  letterSpacing: '-0.05px',
+                  lineHeight: 1.4,
+                  display: 'flex',
+                  gap: 6,
+                }}
+              >
+                <span style={{ color: PURPLE_ACCENT, flexShrink: 0 }}>·</span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {/* Picks list */}
+      {/* Picks list — chevron-expand, Top Pick auto-expanded */}
       {data?.topContenders && data.topContenders.length > 0 && (
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {data.topContenders.slice(0, 3).map((p) => (
-            <UpcomingPickRow key={p.playerId} contender={p} />
+          {data.topContenders.slice(0, 3).map((p, i) => (
+            <ExpandablePickRow
+              key={p.playerId}
+              playerId={p.playerId}
+              playerName={p.playerName}
+              reasons={p.reasons}
+              defaultExpanded={i === 0}
+              tier={i === 0 ? 'TOP PICK' : i === 1 ? 'STRONG' : 'CONTENTION'}
+              collapsedReasonPreview={p.reasons[0]}
+            />
           ))}
         </div>
       )}

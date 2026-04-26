@@ -78,13 +78,13 @@ export const INTELLIGENCE_QUOTE_FALLBACK = {
 /**
  * IntelligenceHero state-specific editorial templates.
  *
- * V1 fallbacks for the deep-purple Clbhouz Intelligence card. Used when no
+ * V1 fallbacks for the deep-purple clbhouz Intelligence card. Used when no
  * championship_editorial_daily row exists for surface = 'intelligence_hero'.
  * V2 will move these to the daily Claude pipeline.
  *
  * Each block carries an `eyebrow`, a single `headline`, and a short
- * `standfirst` line. Course fit chips are short adjectival phrases (3–4 words)
- * shown only in the upcoming state.
+ * `standfirst` line. Copy is intentionally safe / generic — never a
+ * tournament-specific claim that might not match the picks.
  */
 export const INTELLIGENCE_HERO_FALLBACK = {
   live: {
@@ -109,13 +109,52 @@ export const INTELLIGENCE_HERO_FALLBACK = {
   },
   upcoming: {
     eyebrow: 'NEXT UP',
-    headline: 'Reading the next venue.',
-    standfirst:
-      'Three names we like before a single ball is struck — and what the course is asking for.',
-    courseFitChips: [
-      'Rewards driving distance',
-      'Premium on approach',
-      'Greens favour bombers',
-    ] as string[],
+    headlineFallback: 'Three intelligence picks.',
+    standfirst: "Here's who intelligence is backing this week.",
   },
 };
+
+/**
+ * Builds the upcoming-state headline. Conditioning on a tournament name keeps
+ * the line specific without making any venue-fit claim that might not match
+ * the actual picks. V1.2 cron will replace this with model-generated copy.
+ */
+export function buildUpcomingHeadline(tournamentName?: string | null): string {
+  if (!tournamentName) return INTELLIGENCE_HERO_FALLBACK.upcoming.headlineFallback;
+  // Strip year + sponsor noise heuristically — keep it short.
+  const cleaned = tournamentName
+    .replace(/\b20\d{2}\b/g, '')
+    .replace(/\s+presented by[^,]*$/i, '')
+    .trim();
+  return `Three for the ${cleaned}.`;
+}
+
+/**
+ * Per-tournament venue requirement bullets shown beneath the par + yardage
+ * line on the upcoming-state venue card.
+ *
+ * V1: ship empty. Only par + yardage bullet renders for tournaments not in
+ * the lookup. Honest fallback beats wrong claims.
+ * V1.2: model generates `surface` and `demands` per tournament during the
+ * daily editorial cron pass.
+ *
+ * Keys are matched against `tournament.name` (case-insensitive contains).
+ */
+export const VENUE_REQUIREMENTS_FALLBACK: Record<
+  string,
+  { surface?: string; demands?: string }
+> = {
+  // Intentionally empty for V1.
+};
+
+export function getVenueRequirements(
+  tournamentName?: string | null,
+): { surface?: string; demands?: string } | null {
+  if (!tournamentName) return null;
+  const lower = tournamentName.toLowerCase();
+  for (const [key, value] of Object.entries(VENUE_REQUIREMENTS_FALLBACK)) {
+    if (lower.includes(key.toLowerCase())) return value;
+  }
+  return null;
+}
+

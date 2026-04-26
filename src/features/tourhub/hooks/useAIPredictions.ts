@@ -58,6 +58,7 @@ export interface AIPredictionData {
     venueName: string;
     venueCity: string;
     venueState: string;
+    venueCountry: string;
     startDate: string;
     endDate: string;
     purse: number;
@@ -575,7 +576,8 @@ function formatPredictions(
       name: tournament.name,
       venueName: tournament.venue_name,
       venueCity: tournament.venue_city,
-      venueState: tournament.venue_state || tournament.venue_country,
+      venueState: tournament.venue_state || '',
+      venueCountry: tournament.venue_country || '',
       startDate: tournament.start_date,
       endDate: tournament.end_date,
       purse: tournament.purse,
