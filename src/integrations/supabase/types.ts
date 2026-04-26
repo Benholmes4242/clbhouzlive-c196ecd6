@@ -10240,6 +10240,42 @@ export type Database = {
           },
         ]
       }
+      stat_of_week_copy: {
+        Row: {
+          category_key: string
+          generated_at: string
+          generated_by: string
+          leader_player_id: string | null
+          leader_player_name: string | null
+          leader_value: number | null
+          leader_value_display: string | null
+          prompt_version: string
+          standfirst_text: string
+        }
+        Insert: {
+          category_key: string
+          generated_at?: string
+          generated_by?: string
+          leader_player_id?: string | null
+          leader_player_name?: string | null
+          leader_value?: number | null
+          leader_value_display?: string | null
+          prompt_version?: string
+          standfirst_text: string
+        }
+        Update: {
+          category_key?: string
+          generated_at?: string
+          generated_by?: string
+          leader_player_id?: string | null
+          leader_player_name?: string | null
+          leader_value?: number | null
+          leader_value_display?: string | null
+          prompt_version?: string
+          standfirst_text?: string
+        }
+        Relationships: []
+      }
       streaks: {
         Row: {
           daily_streak: number | null

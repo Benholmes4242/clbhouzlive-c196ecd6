@@ -25,6 +25,18 @@ export interface LeaderCategory {
   key: string;
   label: string;
   shortLabel: string;
+  /**
+   * Canonical clbhouz gamified title for this category.
+   * Used by StatOfTheWeek and any future surface displaying these stats.
+   */
+  gamifiedTitle: string;
+  /**
+   * Verb-voice phrases for AI standfirst generation prompts.
+   * Pipe-separated; the LLM picks the best fit.
+   */
+  verbVoice: string;
+  /** Picker grouping (matches the Leaders page taxonomy). */
+  group: 'general' | 'ball_striking' | 'short_game';
   section: 'performance' | 'stats';
   icon: LucideIcon;
   emoji: string;
