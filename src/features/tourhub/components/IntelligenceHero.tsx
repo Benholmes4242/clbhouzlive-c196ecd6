@@ -162,12 +162,15 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   );
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const handleOpenSheet = () => setSheetOpen(true);
   const handleCloseSheet = () => setSheetOpen(false);
+  const handleOpenAbout = () => setAboutOpen(true);
+  const handleCloseAbout = () => setAboutOpen(false);
 
   return (
     <section
-      aria-label="Clbhouz Intelligence"
+      aria-label="clbhouz Intelligence"
       style={{ paddingLeft: 16, paddingRight: 16 }}
     >
       <div
@@ -213,7 +216,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <Masthead stateLabel={stateLabel} />
+          <Masthead stateLabel={stateLabel} onInfoTap={handleOpenAbout} />
 
           <Divider top={14} bottom={16} />
 
@@ -246,6 +249,13 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
 
       {/* ── Phase C bottom sheet (portal-rendered by BottomSheet primitive) ── */}
       <IntelligenceAllPicksSheet open={sheetOpen} onClose={handleCloseSheet} />
+
+      {/* ── v2 Polish: About sheet (also portal-rendered) ── */}
+      <IntelligenceAboutSheet
+        open={aboutOpen}
+        onClose={handleCloseAbout}
+        trackRecord={{ wins, topFives }}
+      />
     </section>
   );
 });
