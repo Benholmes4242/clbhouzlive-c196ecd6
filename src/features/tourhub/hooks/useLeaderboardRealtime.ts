@@ -35,6 +35,7 @@ export function useLeaderboardRealtime(tournamentId: string | null | undefined) 
           // Invalidate all queries that depend on this tournament's leaderboard
           queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders', tournamentId] });
           queryClient.invalidateQueries({ queryKey: ['tourhub', 'leaderboard', tournamentId] });
+          queryClient.invalidateQueries({ queryKey: ['tourhub', 'pick-history'] });
           queryClient.invalidateQueries({ queryKey: ['prediction-tracker', tournamentId] });
           queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
           queryClient.invalidateQueries({ queryKey: ['live-arena'] });
@@ -87,6 +88,7 @@ export function useMultiLeaderboardRealtime(tournamentIds: (string | null | unde
           if (tid && validIds.includes(tid)) {
             queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders', tid] });
             queryClient.invalidateQueries({ queryKey: ['tourhub', 'leaderboard', tid] });
+            queryClient.invalidateQueries({ queryKey: ['tourhub', 'pick-history'] });
             queryClient.invalidateQueries({ queryKey: ['prediction-tracker', tid] });
             queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
             queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
