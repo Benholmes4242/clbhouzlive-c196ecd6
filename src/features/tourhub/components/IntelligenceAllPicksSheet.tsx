@@ -453,14 +453,14 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           width: 56,
           height: 56,
           borderRadius: '50%',
-          background: `linear-gradient(135deg, ${PURPLE_DEEP} 0%, ${PURPLE} 100%)`,
+          background: AMBER,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 0 24px rgba(167, 139, 250, 0.35)',
+          boxShadow: '0 4px 18px rgba(247,147,30,0.35)',
         }}
       >
-        <Brain size={26} color="#ffffff" strokeWidth={2.2} />
+        <Brain size={26} color={GREEN_DEEP} strokeWidth={2.6} />
       </div>
       <h3
         style={{
