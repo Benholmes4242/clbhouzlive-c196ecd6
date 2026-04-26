@@ -711,6 +711,108 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
   );
 }
 
+// ─── Venue tile countdown (Upcoming state only) ──────────────────────────────
+
+const PAD2 = (n: number) => String(n).padStart(2, '0');
+
+/**
+ * VenueTileCountdown — compact right-column countdown for the UpcomingStateBlock
+ * venue tile. Above 24h: D / H / M with M highlighted. Below 24h: H / M / S
+ * with S highlighted (live energy follows the most-granular visible unit).
+ *
+ * Memoised so the parent IntelligenceHero card does not re-render every tick —
+ * only this component re-renders.
+ */
+const VenueTileCountdown = memo(function VenueTileCountdown({
+  startDate,
+}: {
+  startDate: string;
+}) {
+  const countdown = useCountdown(startDate);
+  if (!countdown) return null;
+
+  const showSeconds = countdown.totalMs < 24 * 60 * 60 * 1000;
+
+  return (
+    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+      <div
+        style={{
+          fontSize: 8,
+          fontWeight: 900,
+          color: AMBER_ACCENT,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          marginBottom: 4,
+        }}
+      >
+        Tees Off In
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 8,
+          justifyContent: 'flex-end',
+        }}
+      >
+        {showSeconds ? (
+          <>
+            <CountdownUnit value={countdown.hours} label="H" />
+            <CountdownUnit value={countdown.minutes} label="M" />
+            <CountdownUnit value={countdown.seconds} label="S" highlight />
+          </>
+        ) : (
+          <>
+            <CountdownUnit value={countdown.days} label="D" />
+            <CountdownUnit value={countdown.hours} label="H" />
+            <CountdownUnit value={countdown.minutes} label="M" highlight />
+          </>
+        )}
+      </div>
+    </div>
+  );
+});
+
+function CountdownUnit({
+  value,
+  label,
+  highlight,
+}: {
+  value: number;
+  label: string;
+  highlight?: boolean;
+}) {
+  const color = highlight ? AMBER_ACCENT : '#ffffff';
+  const labelColor = highlight ? AMBER_ACCENT : 'rgba(255,255,255,0.55)';
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+      <span
+        style={{
+          fontSize: 18,
+          fontWeight: 900,
+          color,
+          letterSpacing: '-0.4px',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {PAD2(value)}
+      </span>
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 800,
+          color: labelColor,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
 // ─── Pick rows ───────────────────────────────────────────────────────────────
 
 function LivePickRow({ pick }: { pick: TrackedPrediction }) {
