@@ -76,6 +76,16 @@ function outcomeChipStyle(outcome: IntelligenceOutcome): { bg: string; fg: strin
   }
 }
 
+// Sort picks so the best actual finisher renders first; MC/WD/null sink to bottom.
+function sortPicksByFinish<T extends { actualPosition: number | null }>(picks: T[]): T[] {
+  return [...picks].sort((a, b) => {
+    if (a.actualPosition === null && b.actualPosition === null) return 0;
+    if (a.actualPosition === null) return 1;
+    if (b.actualPosition === null) return -1;
+    return a.actualPosition - b.actualPosition;
+  });
+}
+
 export interface IntelligenceAllPicksSheetProps {
   open: boolean;
   onClose: () => void;
