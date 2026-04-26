@@ -20,6 +20,7 @@
 
 import { memo, useMemo, useState } from 'react';
 import { Brain, ChevronRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { useCountdown } from '@/hooks/useCountdown';
 import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
@@ -619,6 +620,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
         <div
           style={{
             marginTop: 4,
+            marginBottom: 4,
             fontSize: 16,
             fontWeight: 800,
             color: '#ffffff',
@@ -628,47 +630,65 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
         >
           {venueName}
         </div>
-        {locationLine && (
-          <div
-            style={{
-              marginTop: 2,
-              fontSize: 11,
-              color: 'rgba(255,255,255,0.55)',
-              letterSpacing: '-0.05px',
-            }}
-          >
-            {locationLine}
-          </div>
-        )}
-        {bullets.length > 0 && (
-          <ul
-            style={{
-              margin: '10px 0 0',
-              padding: 0,
-              listStyle: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4,
-            }}
-          >
-            {bullets.map((b, i) => (
-              <li
-                key={i}
+
+        {/* Two-column row: location + bullets on the left, countdown on the right */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          {/* Left column — location + spec bullets */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {locationLine && (
+              <div
                 style={{
                   fontSize: 11,
-                  color: 'rgba(255,255,255,0.65)',
+                  color: 'rgba(255,255,255,0.55)',
                   letterSpacing: '-0.05px',
-                  lineHeight: 1.4,
-                  display: 'flex',
-                  gap: 6,
                 }}
               >
-                <span style={{ color: GREEN_ACCENT, flexShrink: 0 }}>·</span>
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+                {locationLine}
+              </div>
+            )}
+            {bullets.length > 0 && (
+              <ul
+                style={{
+                  margin: '8px 0 0',
+                  padding: 0,
+                  listStyle: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                }}
+              >
+                {bullets.map((b, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      fontSize: 11,
+                      color: 'rgba(255,255,255,0.65)',
+                      letterSpacing: '-0.05px',
+                      lineHeight: 1.4,
+                      display: 'flex',
+                      gap: 6,
+                    }}
+                  >
+                    <span style={{ color: GREEN_ACCENT, flexShrink: 0 }}>·</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Right column — countdown (only when start date is available) */}
+          {tournament?.startDate && (
+            <VenueTileCountdown startDate={tournament.startDate} />
+          )}
+        </div>
       </div>
 
       {/* Picks list — chevron-expand, Top Pick auto-expanded */}
