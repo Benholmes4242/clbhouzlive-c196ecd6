@@ -60,7 +60,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
       style={{
         flexShrink: 0,
         minWidth: 220,
-        padding: '12px 18px',
+        padding: '9px 18px',
         borderRight: isLast ? 'none' : '1px solid rgba(255,255,255,0.06)',
         textAlign: 'left',
         background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
@@ -75,7 +75,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
     >
 
       {/* Tour pill + tournament name */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
         <span
           style={{
             display: 'inline-block',
@@ -188,8 +188,8 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
       style={{
         background: TICKER_GRADIENT,
         position: 'relative',
-        paddingTop: 14,
-        paddingBottom: 14,
+        paddingTop: 12,
+        paddingBottom: 12,
         borderTop: '1px solid rgba(255,255,255,0.04)',
       }}
     >
@@ -200,7 +200,7 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 20px',
-          marginBottom: 10,
+          marginBottom: 8,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
