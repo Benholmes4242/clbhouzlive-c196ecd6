@@ -919,15 +919,18 @@ function ExpandablePickRow({
   trailing?: React.ReactNode;
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const tierColor = tier === 'TOP PICK' ? AMBER_ACCENT : PURPLE_ACCENT;
+  const tierColor =
+    tier === 'TOP PICK' ? AMBER_ACCENT
+    : tier === 'STRONG' ? GREEN_ACCENT
+    : 'rgba(255,255,255,0.65)';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
   return (
     <div
       style={{
         borderRadius: 12,
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.10)',
         overflow: 'hidden',
       }}
     >
