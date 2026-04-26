@@ -194,15 +194,15 @@ function Header({ onClose }: { onClose: () => void }) {
             width: 36,
             height: 36,
             borderRadius: '50%',
-            background: `linear-gradient(135deg, ${VIOLET} 0%, ${VIOLET_LIGHT} 100%)`,
+            background: AMBER,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 0 14px ${VIOLET_LIGHT}55`,
+            boxShadow: '0 2px 10px rgba(247,147,30,0.35)',
             flexShrink: 0,
           }}
         >
-          <Brain size={18} color="#ffffff" strokeWidth={2.4} />
+          <Brain size={18} color={GREEN_DEEP} strokeWidth={2.8} />
         </div>
         <div style={{ minWidth: 0 }}>
           <h2
