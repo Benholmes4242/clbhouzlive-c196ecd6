@@ -581,18 +581,17 @@ function ResultsStateBlock({
 
 function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
   const editorial = INTELLIGENCE_HERO_FALLBACK.upcoming;
-  const venueName = data?.tournament?.venueName ?? 'Venue TBC';
-  const tournamentName = data?.tournament?.name ?? 'Next Tournament';
-  const courseChips = (() => {
-    const liveStats = data?.courseAnalysis?.keyStats ?? [];
-    if (liveStats.length > 0) return liveStats.slice(0, 3);
-    return editorial.courseFitChips.slice(0, 3);
-  })();
+  const tournament = data?.tournament;
+  const venueName = tournament?.venueName ?? 'Venue TBC';
+  const tournamentName = tournament?.name ?? 'Next Tournament';
+  const headline = buildUpcomingHeadline(tournamentName);
+  const locationLine = tournament ? formatLocation(tournament) : '';
+  const bullets = tournament ? getVenueBullets(tournament) : [];
 
   return (
     <div>
       <Eyebrow>{editorial.eyebrow}</Eyebrow>
-      <Headline>{editorial.headline}</Headline>
+      <Headline>{headline}</Headline>
       <Standfirst>{editorial.standfirst}</Standfirst>
 
       {/* Venue card */}
@@ -619,47 +618,71 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
         <div
           style={{
             marginTop: 4,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 800,
             color: '#ffffff',
             letterSpacing: '-0.2px',
+            lineHeight: 1.2,
           }}
         >
           {venueName}
         </div>
-        <div
-          style={{
-            marginTop: 10,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 6,
-          }}
-        >
-          {courseChips.map((chip, i) => (
-            <span
-              key={`${chip}-${i}`}
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                padding: '4px 9px',
-                borderRadius: 999,
-                background: 'rgba(167, 139, 250, 0.12)',
-                border: '1px solid rgba(167, 139, 250, 0.28)',
-                color: PURPLE_ACCENT,
-              }}
-            >
-              {chip}
-            </span>
-          ))}
-        </div>
+        {locationLine && (
+          <div
+            style={{
+              marginTop: 2,
+              fontSize: 11,
+              color: 'rgba(255,255,255,0.55)',
+              letterSpacing: '-0.05px',
+            }}
+          >
+            {locationLine}
+          </div>
+        )}
+        {bullets.length > 0 && (
+          <ul
+            style={{
+              margin: '10px 0 0',
+              padding: 0,
+              listStyle: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+            }}
+          >
+            {bullets.map((b, i) => (
+              <li
+                key={i}
+                style={{
+                  fontSize: 11,
+                  color: 'rgba(255,255,255,0.65)',
+                  letterSpacing: '-0.05px',
+                  lineHeight: 1.4,
+                  display: 'flex',
+                  gap: 6,
+                }}
+              >
+                <span style={{ color: PURPLE_ACCENT, flexShrink: 0 }}>·</span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {/* Picks list */}
+      {/* Picks list — chevron-expand, Top Pick auto-expanded */}
       {data?.topContenders && data.topContenders.length > 0 && (
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {data.topContenders.slice(0, 3).map((p) => (
-            <UpcomingPickRow key={p.playerId} contender={p} />
+          {data.topContenders.slice(0, 3).map((p, i) => (
+            <ExpandablePickRow
+              key={p.playerId}
+              playerId={p.playerId}
+              playerName={p.playerName}
+              reasons={p.reasons}
+              defaultExpanded={i === 0}
+              tier={i === 0 ? 'TOP PICK' : i === 1 ? 'STRONG' : 'CONTENTION'}
+              collapsedReasonPreview={p.reasons[0]}
+            />
           ))}
         </div>
       )}
