@@ -41,7 +41,10 @@ import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-const PURPLE_ACCENT = '#A78BFA';
+const GREEN_DEEP = '#0A5A3C';
+const GREEN_MID = '#0D7A4F';
+const GREEN_DARK = '#063A26';
+const GREEN_ACCENT = '#2DBB78';
 const AMBER_ACCENT = '#F7931E';
 
 function formatPosition(p: TrackedPrediction): string {
@@ -180,9 +183,9 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
           borderRadius: 20,
           padding: '24px 18px 18px',
           background:
-            'linear-gradient(135deg, #1a0f2e 0%, #2d1b4e 50%, #1e1138 100%)',
+            `linear-gradient(135deg, ${GREEN_DEEP} 0%, ${GREEN_MID} 50%, ${GREEN_DARK} 100%)`,
           boxShadow:
-            '0 12px 40px -8px rgba(124, 58, 237, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25)',
+            '0 8px 30px -10px rgba(6,58,38,0.55), inset 0 1px 0 rgba(255,255,255,0.10)',
         }}
       >
         {/* ── Decorative orbs (preserved per Phase A refinement) ── */}
@@ -196,7 +199,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 220,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(167, 139, 250, 0.35) 0%, transparent 70%)',
+              'radial-gradient(circle, rgba(45,187,120,0.18) 0%, transparent 60%)',
             pointerEvents: 'none',
           }}
         />
@@ -210,7 +213,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 240,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(247, 147, 30, 0.18) 0%, transparent 70%)',
+              'radial-gradient(circle, rgba(247,147,30,0.10) 0%, transparent 60%)',
             pointerEvents: 'none',
           }}
         />
@@ -291,16 +294,15 @@ function Masthead({
             border: 'none',
             padding: 0,
             cursor: 'pointer',
-            background:
-              'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
+            background: AMBER_ACCENT,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 16px rgba(167, 139, 250, 0.55)',
+            boxShadow: '0 2px 8px rgba(247,147,30,0.35)',
             flexShrink: 0,
           }}
         >
-          <Brain size={15} color="#ffffff" strokeWidth={2.4} />
+          <Brain size={15} color={GREEN_DEEP} strokeWidth={2.8} />
         </button>
         <span
           style={{
@@ -308,8 +310,8 @@ function Masthead({
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: PURPLE_ACCENT,
-            textShadow: '0 0 12px rgba(167, 139, 250, 0.5)',
+            color: AMBER_ACCENT,
+            textShadow: '0 0 12px rgba(247,147,30,0.5)',
           }}
         >
           clbhouz Intelligence
@@ -323,7 +325,7 @@ function Masthead({
             width: 16,
             height: 16,
             borderRadius: '50%',
-            border: '1px solid rgba(255,255,255,0.32)',
+            border: '1px solid rgba(255,255,255,0.4)',
             background: 'transparent',
             color: 'rgba(255,255,255,0.75)',
             cursor: 'pointer',
@@ -393,23 +395,22 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
         width: '100%',
         padding: '13px 16px',
         borderRadius: 12,
-        border: '1px solid rgba(255,255,255,0.12)',
+        border: 'none',
         cursor: 'pointer',
-        background: 'rgba(255,255,255,0.06)',
-        color: '#ffffff',
+        background: AMBER_ACCENT,
+        color: GREEN_DEEP,
         fontSize: 13,
-        fontWeight: 700,
+        fontWeight: 900,
         letterSpacing: '-0.1px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 2px 12px rgba(247,147,30,0.25)',
       }}
     >
       <span>See all Intelligence picks</span>
-      <ChevronRight size={15} strokeWidth={2.4} />
+      <ChevronRight size={15} strokeWidth={3} />
     </button>
   );
 }
@@ -590,7 +591,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
 
   return (
     <div>
-      <Eyebrow>{editorial.eyebrow}</Eyebrow>
+      <Eyebrow color={AMBER_ACCENT}>{editorial.eyebrow}</Eyebrow>
       <Headline>{headline}</Headline>
       <Standfirst>{editorial.standfirst}</Standfirst>
 
@@ -600,8 +601,8 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
           marginTop: 14,
           padding: '12px 14px',
           borderRadius: 12,
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.10)',
         }}
       >
         <div
@@ -610,7 +611,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: PURPLE_ACCENT,
+            color: GREEN_ACCENT,
           }}
         >
           {tournamentName}
@@ -662,7 +663,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
                   gap: 6,
                 }}
               >
-                <span style={{ color: PURPLE_ACCENT, flexShrink: 0 }}>·</span>
+                <span style={{ color: GREEN_ACCENT, flexShrink: 0 }}>·</span>
                 <span>{b}</span>
               </li>
             ))}
@@ -884,8 +885,8 @@ function UpcomingPickRow({ contender }: { contender: AITopContender }) {
             letterSpacing: '0.06em',
             padding: '4px 8px',
             borderRadius: 8,
-            background: 'rgba(167, 139, 250, 0.14)',
-            color: PURPLE_ACCENT,
+            background: 'rgba(45,187,120,0.18)',
+            color: GREEN_ACCENT,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -916,15 +917,18 @@ function ExpandablePickRow({
   trailing?: React.ReactNode;
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const tierColor = tier === 'TOP PICK' ? AMBER_ACCENT : PURPLE_ACCENT;
+  const tierColor =
+    tier === 'TOP PICK' ? AMBER_ACCENT
+    : tier === 'STRONG' ? GREEN_ACCENT
+    : 'rgba(255,255,255,0.65)';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
   return (
     <div
       style={{
         borderRadius: 12,
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.10)',
         overflow: 'hidden',
       }}
     >
@@ -992,8 +996,8 @@ function ExpandablePickRow({
             width: 22,
             height: 22,
             borderRadius: 999,
-            background: 'rgba(255,255,255,0.05)',
-            color: 'rgba(255,255,255,0.6)',
+            background: 'rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.65)',
           }}
         >
           {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
@@ -1074,7 +1078,7 @@ function ResultsTrailing({ pick }: { pick: TrackedPrediction }) {
 
 function Eyebrow({
   children,
-  color = PURPLE_ACCENT,
+  color = GREEN_ACCENT,
   glow,
 }: {
   children: React.ReactNode;
@@ -1191,10 +1195,10 @@ function StatPill({
         textAlign: 'center',
         background: highlight
           ? 'rgba(247, 147, 30, 0.12)'
-          : 'rgba(255,255,255,0.04)',
+          : 'rgba(255,255,255,0.05)',
         border: highlight
           ? '1px solid rgba(247, 147, 30, 0.35)'
-          : '1px solid rgba(255,255,255,0.06)',
+          : '1px solid rgba(255,255,255,0.10)',
       }}
     >
       <div
@@ -1216,7 +1220,7 @@ function StatPill({
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: highlight ? AMBER_ACCENT : 'rgba(255,255,255,0.55)',
+          color: highlight ? AMBER_ACCENT : 'rgba(255,255,255,0.65)',
         }}
       >
         {label}

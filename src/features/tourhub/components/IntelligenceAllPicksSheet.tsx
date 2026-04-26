@@ -29,8 +29,8 @@ import {
   type IntelligenceOutcome,
 } from '../hooks/useIntelligenceHistoricalPicks';
 
-const PURPLE = '#A78BFA';
-const PURPLE_DEEP = '#7C3AED';
+const GREEN_DEEP = '#0A5A3C';
+const GREEN_ACCENT = '#2DBB78';
 const AMBER = '#F7931E';
 const SLATE_900 = '#0F172A';
 const SLATE_500 = '#64748B';
@@ -129,15 +129,15 @@ export function IntelligenceAllPicksSheet({ open, onClose }: IntelligenceAllPick
                 width: 28,
                 height: 28,
                 borderRadius: '50%',
-                background: `linear-gradient(135deg, ${PURPLE_DEEP} 0%, ${PURPLE} 100%)`,
+                background: AMBER,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 0 14px rgba(167, 139, 250, 0.45)',
+                boxShadow: '0 2px 10px rgba(247,147,30,0.35)',
                 flexShrink: 0,
               }}
             >
-              <Brain size={15} color="#ffffff" strokeWidth={2.4} />
+              <Brain size={15} color={GREEN_DEEP} strokeWidth={2.8} />
             </div>
             <h2
               id="intelligence-all-picks-title"
@@ -204,9 +204,9 @@ export function IntelligenceAllPicksSheet({ open, onClose }: IntelligenceAllPick
                 style={{
                   padding: '6px 12px',
                   borderRadius: 999,
-                  border: active ? `1px solid ${PURPLE}` : `1px solid ${SLATE_200}`,
-                  background: active ? 'rgba(167, 139, 250, 0.12)' : '#ffffff',
-                  color: active ? PURPLE_DEEP : SLATE_500,
+                  border: active ? `1px solid ${GREEN_DEEP}` : `1px solid ${SLATE_200}`,
+                  background: active ? 'rgba(10, 90, 60, 0.08)' : '#ffffff',
+                  color: active ? GREEN_DEEP : SLATE_500,
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: '-0.05px',
@@ -453,14 +453,14 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           width: 56,
           height: 56,
           borderRadius: '50%',
-          background: `linear-gradient(135deg, ${PURPLE_DEEP} 0%, ${PURPLE} 100%)`,
+          background: AMBER,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 0 24px rgba(167, 139, 250, 0.35)',
+          boxShadow: '0 4px 18px rgba(247,147,30,0.35)',
         }}
       >
-        <Brain size={26} color="#ffffff" strokeWidth={2.2} />
+        <Brain size={26} color={GREEN_DEEP} strokeWidth={2.6} />
       </div>
       <h3
         style={{

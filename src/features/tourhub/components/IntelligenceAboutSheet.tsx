@@ -33,11 +33,12 @@ interface IntelligenceAboutSheetProps {
   trackRecord: { wins: number; topFives: number };
 }
 
-const VIOLET = '#7C3AED';
-const VIOLET_LIGHT = '#A78BFA';
+const GREEN_DEEP = '#0A5A3C';
+const GREEN_ACCENT = '#2DBB78';
 const AMBER = '#F7931E';
 const SLATE_900 = '#0F172A';
 const SLATE_600 = '#475569';
+const SLATE_500 = '#64748B';
 const SLATE_400 = '#94A3B8';
 const HAIRLINE = 'rgba(15, 23, 42, 0.08)';
 
@@ -52,8 +53,8 @@ interface AnalyseRow {
 const ANALYSE_ROWS: AnalyseRow[] = [
   {
     icon: TrendingUp,
-    iconColor: VIOLET,
-    iconBg: 'rgba(124, 58, 237, 0.10)',
+    iconColor: GREEN_ACCENT,
+    iconBg: 'rgba(45, 187, 120, 0.12)',
     title: 'Player form',
     body: 'Last 12 starts weighted by recency, finish quality, and field strength.',
   },
@@ -66,15 +67,15 @@ const ANALYSE_ROWS: AnalyseRow[] = [
   },
   {
     icon: Award,
-    iconColor: '#10B981',
-    iconBg: 'rgba(16, 185, 129, 0.10)',
+    iconColor: GREEN_ACCENT,
+    iconBg: 'rgba(45, 187, 120, 0.12)',
     title: 'Statistical fit',
     body: 'Strokes-gained categories matched to what the course actually rewards.',
   },
   {
     icon: Cpu,
-    iconColor: VIOLET_LIGHT,
-    iconBg: 'rgba(167, 139, 250, 0.12)',
+    iconColor: AMBER,
+    iconBg: 'rgba(247, 147, 30, 0.10)',
     title: 'World ranking trajectory',
     body: 'Ranking direction over the past 12 weeks, not just the snapshot.',
   },
@@ -112,16 +113,16 @@ const TIER_ROWS: TierRow[] = [
   },
   {
     label: 'STRONG',
-    tint: 'rgba(124, 58, 237, 0.12)',
-    border: 'rgba(124, 58, 237, 0.30)',
-    text: VIOLET,
+    tint: 'rgba(45, 187, 120, 0.12)',
+    border: 'rgba(45, 187, 120, 0.30)',
+    text: GREEN_ACCENT,
     body: 'Solid case across multiple signals. A realistic alternative to the Top Pick.',
   },
   {
     label: 'CONTENTION',
-    tint: 'rgba(124, 58, 237, 0.06)',
-    border: 'rgba(124, 58, 237, 0.18)',
-    text: VIOLET,
+    tint: 'rgba(15, 23, 42, 0.06)',
+    border: 'rgba(15, 23, 42, 0.10)',
+    text: SLATE_500,
     body: 'In the conversation. Right profile for the venue with at least one strong signal.',
   },
 ];
@@ -193,15 +194,15 @@ function Header({ onClose }: { onClose: () => void }) {
             width: 36,
             height: 36,
             borderRadius: '50%',
-            background: `linear-gradient(135deg, ${VIOLET} 0%, ${VIOLET_LIGHT} 100%)`,
+            background: AMBER,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 0 14px ${VIOLET_LIGHT}55`,
+            boxShadow: '0 2px 10px rgba(247,147,30,0.35)',
             flexShrink: 0,
           }}
         >
-          <Brain size={18} color="#ffffff" strokeWidth={2.4} />
+          <Brain size={18} color={GREEN_DEEP} strokeWidth={2.8} />
         </div>
         <div style={{ minWidth: 0 }}>
           <h2
@@ -303,7 +304,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
         fontWeight: 800,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
-        color: VIOLET,
+        color: GREEN_DEEP,
       }}
     >
       {children}
