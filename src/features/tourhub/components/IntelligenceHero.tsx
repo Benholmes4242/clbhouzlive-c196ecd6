@@ -41,8 +41,13 @@ import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-const PURPLE_ACCENT = '#A78BFA';
+const GREEN_DEEP = '#0A5A3C';
+const GREEN_MID = '#0D7A4F';
+const GREEN_DARK = '#063A26';
+const GREEN_ACCENT = '#2DBB78';
 const AMBER_ACCENT = '#F7931E';
+// Legacy alias retained to minimise diff churn — points at the new green accent.
+const PURPLE_ACCENT = GREEN_ACCENT;
 
 function formatPosition(p: TrackedPrediction): string {
   if (p.performanceStatus === 'cut') return 'MC';
