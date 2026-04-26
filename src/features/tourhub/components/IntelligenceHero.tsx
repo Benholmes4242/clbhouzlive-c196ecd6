@@ -20,6 +20,7 @@
 
 import { memo, useMemo, useState } from 'react';
 import { Brain, ChevronRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { useCountdown } from '@/hooks/useCountdown';
 import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
@@ -619,6 +620,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
         <div
           style={{
             marginTop: 4,
+            marginBottom: 4,
             fontSize: 16,
             fontWeight: 800,
             color: '#ffffff',
@@ -628,47 +630,65 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
         >
           {venueName}
         </div>
-        {locationLine && (
-          <div
-            style={{
-              marginTop: 2,
-              fontSize: 11,
-              color: 'rgba(255,255,255,0.55)',
-              letterSpacing: '-0.05px',
-            }}
-          >
-            {locationLine}
-          </div>
-        )}
-        {bullets.length > 0 && (
-          <ul
-            style={{
-              margin: '10px 0 0',
-              padding: 0,
-              listStyle: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4,
-            }}
-          >
-            {bullets.map((b, i) => (
-              <li
-                key={i}
+
+        {/* Two-column row: location + bullets on the left, countdown on the right */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          {/* Left column — location + spec bullets */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {locationLine && (
+              <div
                 style={{
                   fontSize: 11,
-                  color: 'rgba(255,255,255,0.65)',
+                  color: 'rgba(255,255,255,0.55)',
                   letterSpacing: '-0.05px',
-                  lineHeight: 1.4,
-                  display: 'flex',
-                  gap: 6,
                 }}
               >
-                <span style={{ color: GREEN_ACCENT, flexShrink: 0 }}>·</span>
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+                {locationLine}
+              </div>
+            )}
+            {bullets.length > 0 && (
+              <ul
+                style={{
+                  margin: '8px 0 0',
+                  padding: 0,
+                  listStyle: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                }}
+              >
+                {bullets.map((b, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      fontSize: 11,
+                      color: 'rgba(255,255,255,0.65)',
+                      letterSpacing: '-0.05px',
+                      lineHeight: 1.4,
+                      display: 'flex',
+                      gap: 6,
+                    }}
+                  >
+                    <span style={{ color: GREEN_ACCENT, flexShrink: 0 }}>·</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Right column — countdown (only when start date is available) */}
+          {tournament?.startDate && (
+            <VenueTileCountdown startDate={tournament.startDate} />
+          )}
+        </div>
       </div>
 
       {/* Picks list — chevron-expand, Top Pick auto-expanded */}
@@ -687,6 +707,108 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Venue tile countdown (Upcoming state only) ──────────────────────────────
+
+const PAD2 = (n: number) => String(n).padStart(2, '0');
+
+/**
+ * VenueTileCountdown — compact right-column countdown for the UpcomingStateBlock
+ * venue tile. Above 24h: D / H / M with M highlighted. Below 24h: H / M / S
+ * with S highlighted (live energy follows the most-granular visible unit).
+ *
+ * Memoised so the parent IntelligenceHero card does not re-render every tick —
+ * only this component re-renders.
+ */
+const VenueTileCountdown = memo(function VenueTileCountdown({
+  startDate,
+}: {
+  startDate: string;
+}) {
+  const countdown = useCountdown(startDate);
+  if (!countdown) return null;
+
+  const showSeconds = countdown.totalMs < 24 * 60 * 60 * 1000;
+
+  return (
+    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+      <div
+        style={{
+          fontSize: 8,
+          fontWeight: 900,
+          color: AMBER_ACCENT,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          marginBottom: 4,
+        }}
+      >
+        Tees Off In
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 8,
+          justifyContent: 'flex-end',
+        }}
+      >
+        {showSeconds ? (
+          <>
+            <CountdownUnit value={countdown.hours} label="H" />
+            <CountdownUnit value={countdown.minutes} label="M" />
+            <CountdownUnit value={countdown.seconds} label="S" highlight />
+          </>
+        ) : (
+          <>
+            <CountdownUnit value={countdown.days} label="D" />
+            <CountdownUnit value={countdown.hours} label="H" />
+            <CountdownUnit value={countdown.minutes} label="M" highlight />
+          </>
+        )}
+      </div>
+    </div>
+  );
+});
+
+function CountdownUnit({
+  value,
+  label,
+  highlight,
+}: {
+  value: number;
+  label: string;
+  highlight?: boolean;
+}) {
+  const color = highlight ? AMBER_ACCENT : '#ffffff';
+  const labelColor = highlight ? AMBER_ACCENT : 'rgba(255,255,255,0.55)';
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+      <span
+        style={{
+          fontSize: 18,
+          fontWeight: 900,
+          color,
+          letterSpacing: '-0.4px',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {PAD2(value)}
+      </span>
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 800,
+          color: labelColor,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+        }}
+      >
+        {label}
+      </span>
     </div>
   );
 }
