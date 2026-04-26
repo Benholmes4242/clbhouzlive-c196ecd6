@@ -397,23 +397,22 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
         width: '100%',
         padding: '13px 16px',
         borderRadius: 12,
-        border: '1px solid rgba(255,255,255,0.12)',
+        border: 'none',
         cursor: 'pointer',
-        background: 'rgba(255,255,255,0.06)',
-        color: '#ffffff',
+        background: AMBER_ACCENT,
+        color: GREEN_DEEP,
         fontSize: 13,
-        fontWeight: 700,
+        fontWeight: 900,
         letterSpacing: '-0.1px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 2px 12px rgba(247,147,30,0.25)',
       }}
     >
       <span>See all Intelligence picks</span>
-      <ChevronRight size={15} strokeWidth={2.4} />
+      <ChevronRight size={15} strokeWidth={3} />
     </button>
   );
 }
