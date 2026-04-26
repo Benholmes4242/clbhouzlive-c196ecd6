@@ -25,6 +25,18 @@ export interface LeaderCategory {
   key: string;
   label: string;
   shortLabel: string;
+  /**
+   * Canonical clbhouz gamified title for this category.
+   * Used by StatOfTheWeek and any future surface displaying these stats.
+   */
+  gamifiedTitle: string;
+  /**
+   * Verb-voice phrases for AI standfirst generation prompts.
+   * Pipe-separated; the LLM picks the best fit.
+   */
+  verbVoice: string;
+  /** Picker grouping (matches the Leaders page taxonomy). */
+  group: 'general' | 'ball_striking' | 'short_game';
   section: 'performance' | 'stats';
   icon: LucideIcon;
   emoji: string;
@@ -43,6 +55,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'world_rank',
     label: 'World Ranking',
     shortLabel: 'World Rankings',
+    gamifiedTitle: 'WORLD #1',
+    verbVoice: 'holds the throne | sits atop the world | rules the rankings',
+    group: 'general',
     section: 'performance',
     icon: Globe,
     emoji: '🌍',
@@ -58,6 +73,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'events_played',
     label: 'Events Played',
     shortLabel: 'Events Played',
+    gamifiedTitle: 'THE GRINDER',
+    verbVoice: 'grinds | shows up week in, week out | never sits a week out',
+    group: 'general',
     section: 'performance',
     icon: Calendar,
     emoji: '📅',
@@ -73,6 +91,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'cuts_made',
     label: 'Cuts Made',
     shortLabel: 'Cuts Made',
+    gamifiedTitle: 'THE WEEKEND WARRIOR',
+    verbVoice: 'plays every weekend | never misses the cut | always around for Sunday',
+    group: 'general',
     section: 'performance',
     icon: Scissors,
     emoji: '✂️',
@@ -88,6 +109,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'top_10',
     label: 'Top 10 Finishes',
     shortLabel: 'Top 10s',
+    gamifiedTitle: 'CONSISTENCY KING',
+    verbVoice: 'shows up when it matters | always in the mix | a fixture on the leaderboard',
+    group: 'general',
     section: 'performance',
     icon: Trophy,
     emoji: '🏆',
@@ -103,6 +127,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'earnings',
     label: 'Season Earnings',
     shortLabel: 'Earnings',
+    gamifiedTitle: 'THE MONEY LIST',
+    verbVoice: 'printing money | collecting cheques | cashing in week after week',
+    group: 'general',
     section: 'performance',
     icon: DollarSign,
     emoji: '💰',
@@ -123,6 +150,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'strokes_gained_total',
     label: 'Strokes Gained Total',
     shortLabel: 'SG Total',
+    gamifiedTitle: 'MOST COMPLETE GOLFER',
+    verbVoice: 'dominating across the board | no weakness in his game | the best all-rounder out there',
+    group: 'general',
     section: 'stats',
     icon: Trophy,
     emoji: '⚡',
@@ -138,6 +168,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'scoring_avg',
     label: 'Scoring Average',
     shortLabel: 'Scoring Average',
+    gamifiedTitle: 'LOWEST OF THE LOW',
+    verbVoice: 'shooting the lowest scores | posting numbers nobody else can | running cards through the floor',
+    group: 'general',
     section: 'stats',
     icon: Gauge,
     emoji: '📊',
@@ -153,6 +186,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'drive_avg',
     label: 'Driving Distance',
     shortLabel: 'Driving Distance',
+    gamifiedTitle: 'BIG DOG',
+    verbVoice: 'bombing it | bombing the field | crushing drives nobody else can hit',
+    group: 'ball_striking',
     section: 'stats',
     icon: Zap,
     emoji: '💪',
@@ -168,6 +204,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'drive_acc',
     label: 'Driving Accuracy',
     shortLabel: 'Driving Accuracy',
+    gamifiedTitle: 'STRAIGHT SHOOTER',
+    verbVoice: 'finding fairways | hitting it straight | painting the short grass',
+    group: 'ball_striking',
     section: 'stats',
     icon: Crosshair,
     emoji: '🎯',
@@ -183,6 +222,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'gir_pct',
     label: 'Greens in Regulation',
     shortLabel: 'GIR',
+    gamifiedTitle: 'DARTS',
+    verbVoice: 'sticking it close | hitting greens | throwing darts at every flag',
+    group: 'ball_striking',
     section: 'stats',
     icon: Circle,
     emoji: '⛳',
@@ -198,6 +240,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'putt_avg',
     label: 'Putting Average',
     shortLabel: 'Putting',
+    gamifiedTitle: 'PUTTING GOD',
+    verbVoice: 'bewitching greens | draining everything | making the hole look like a bucket',
+    group: 'short_game',
     section: 'stats',
     icon: Flag,
     emoji: '🕳️',
@@ -213,6 +258,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'sand_saves_pct',
     label: 'Sand Saves',
     shortLabel: 'Sand Saves',
+    gamifiedTitle: 'BUNKER BOSS',
+    verbVoice: 'escaping bunkers | never afraid of sand | making bunker shots look like chip-ins',
+    group: 'short_game',
     section: 'stats',
     icon: Sun,
     emoji: '🏖️',
@@ -228,6 +276,9 @@ export const LEADER_CATEGORIES: LeaderCategory[] = [
     key: 'scrambling_pct',
     label: 'Scrambling %',
     shortLabel: 'Scrambling',
+    gamifiedTitle: 'THE ESCAPE ARTIST',
+    verbVoice: 'getting up and down | saving par from anywhere | turning bogeys into pars',
+    group: 'short_game',
     section: 'stats',
     icon: RefreshCw,
     emoji: '🔀',
