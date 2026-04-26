@@ -603,8 +603,8 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
           marginTop: 14,
           padding: '12px 14px',
           borderRadius: 12,
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.10)',
         }}
       >
         <div
