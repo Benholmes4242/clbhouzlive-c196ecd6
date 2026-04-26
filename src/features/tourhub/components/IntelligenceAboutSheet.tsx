@@ -33,7 +33,7 @@ interface IntelligenceAboutSheetProps {
   trackRecord: { wins: number; topFives: number };
 }
 
-const GREEN_DEEP = '#0A5A3C';
+const GREEN_DEEP = '#073D2A';
 const GREEN_ACCENT = '#2DBB78';
 const AMBER = '#F7931E';
 const SLATE_900 = '#0F172A';

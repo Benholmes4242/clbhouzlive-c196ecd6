@@ -41,9 +41,9 @@ import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-const GREEN_DEEP = '#0A5A3C';
-const GREEN_MID = '#0D7A4F';
-const GREEN_DARK = '#063A26';
+const GREEN_DEEP = '#073D2A';
+const GREEN_MID = '#0A5238';
+const GREEN_DARK = '#042418';
 const GREEN_ACCENT = '#2DBB78';
 const AMBER_ACCENT = '#F7931E';
 
