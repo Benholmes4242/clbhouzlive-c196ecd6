@@ -53,8 +53,8 @@ interface AnalyseRow {
 const ANALYSE_ROWS: AnalyseRow[] = [
   {
     icon: TrendingUp,
-    iconColor: VIOLET,
-    iconBg: 'rgba(124, 58, 237, 0.10)',
+    iconColor: GREEN_ACCENT,
+    iconBg: 'rgba(45, 187, 120, 0.12)',
     title: 'Player form',
     body: 'Last 12 starts weighted by recency, finish quality, and field strength.',
   },
@@ -67,15 +67,15 @@ const ANALYSE_ROWS: AnalyseRow[] = [
   },
   {
     icon: Award,
-    iconColor: '#10B981',
-    iconBg: 'rgba(16, 185, 129, 0.10)',
+    iconColor: GREEN_ACCENT,
+    iconBg: 'rgba(45, 187, 120, 0.12)',
     title: 'Statistical fit',
     body: 'Strokes-gained categories matched to what the course actually rewards.',
   },
   {
     icon: Cpu,
-    iconColor: VIOLET_LIGHT,
-    iconBg: 'rgba(167, 139, 250, 0.12)',
+    iconColor: AMBER,
+    iconBg: 'rgba(247, 147, 30, 0.10)',
     title: 'World ranking trajectory',
     body: 'Ranking direction over the past 12 weeks, not just the snapshot.',
   },
