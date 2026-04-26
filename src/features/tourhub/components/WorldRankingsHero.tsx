@@ -1,22 +1,25 @@
 /**
- * WorldRankingsHero — Phase E redesign of the Overview rankings module.
+ * WorldRankingsHero — Three-tier World Rankings surface.
  *
- * Replaces UnifiedWorldRankings on the Tour Hub Overview only. The legacy
- * UnifiedWorldRankings file and its ScheduleTab consumer remain untouched.
+ * Lives directly on the page background (no card wrappers). Three tiers:
+ *   1. Headline #1   — editorial framing of the world #1 with WORLD #1 · N WEEKS tenure.
+ *   2. Chasing list  — ranks 2-5 as scannable rows with movement indicator on every row.
+ *   3. Movers block  — 2 risers + 2 fallers in a parallel two-column layout.
  *
- * Composition:
- *  • Tour selector strip (BottomSheet — same pattern as the legacy report)
- *  • #1 hero card with amber border + radial wash + 12-week sparkline
- *    powered by usePlayerRankHistory (real OWGR weekly snapshots)
- *  • Ranked list 2–5
- *  • Riser of Week + Faller of Week strip (singular framing)
- *
- * Per Tour Hub redesign brief Phase E.
+ * Tour selector strip + section header sit above tier 1.
+ * Movers block does not render for non-PGA tours (data layer returns []).
  */
 
 import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, TrendingUp, TrendingDown, Trophy } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Minus,
+  TrendingUp,
+  TrendingDown,
+  Trophy,
+} from 'lucide-react';
 import {
   useRankingMovers,
   useWorldRankingsFull,
@@ -29,7 +32,19 @@ import { getTourLogo } from '../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
 
-// ─── Tour selector options (mirrors UnifiedWorldRankings) ────────────────────
+// ─── Tokens ─────────────────────────────────────────────────────────────────
+const INK = '#0F172A';
+const SLATE_700 = '#334155';
+const SLATE_500 = '#64748B';
+const SLATE_400 = '#94A3B8';
+const SLATE_300 = '#CBD5E1';
+const SLATE_200 = '#E2E8F0';
+const SLATE_150 = '#EDF1F5';
+const AMBER = '#F7931E';
+const GREEN = '#16A34A';
+const RED = '#DC2626';
+
+// ─── Tour selector options ──────────────────────────────────────────────────
 const RANKING_TOUR_OPTIONS = [
   { code: 'pga',  label: 'PGA Tour',     description: 'Official World Golf Ranking' },
   { code: 'euro', label: 'DP World Tour', description: 'DP World Tour ranking' },
@@ -38,87 +53,183 @@ const RANKING_TOUR_OPTIONS = [
   { code: 'pgad', label: 'Korn Ferry',    description: 'Korn Ferry Tour ranking' },
 ];
 
-// ─── "Updated N days ago" helper ────────────────────────────────────────────
-function formatUpdated(rankingDate: string | null | undefined): string {
-  if (!rankingDate) return 'Updated weekly';
+// ─── "Updated Xd ago" helper (no "Updated " prefix — header renders that) ──
+function formatUpdatedSuffix(rankingDate: string | null | undefined): string {
+  if (!rankingDate) return 'WEEKLY';
   const diffDays = Math.floor(
-    (new Date().getTime() - new Date(rankingDate + 'T00:00:00').getTime()) /
-      86_400_000,
+    (new Date().getTime() - new Date(rankingDate + 'T00:00:00').getTime()) / 86_400_000,
   );
-  if (diffDays <= 0) return 'Updated today';
-  if (diffDays === 1) return 'Updated yesterday';
-  if (diffDays <= 7) return `Updated ${diffDays}d ago`;
-  return `Updated ${rankingDate}`;
+  if (diffDays <= 0) return 'TODAY';
+  if (diffDays === 1) return 'YESTERDAY';
+  if (diffDays <= 7) return `${diffDays}D AGO`;
+  return rankingDate.toUpperCase();
 }
 
-// ─── Sparkline (68 × 24) ────────────────────────────────────────────────────
-interface SparklineProps {
-  history: { rank: number; date: string }[];
+/**
+ * Tolerant weeks-at-#1 count.
+ * Walks history newest → oldest, increments on rank===1, stops only on an explicit
+ * snapshot where rank > 1. Missing weeks (sync gaps) do NOT break the chain.
+ * Returns null if no usable history.
+ */
+function computeWeeksAtNumberOne(
+  history: { rank: number; date: string }[],
+): number | null {
+  if (!history.length) return null;
+  // History from the hook is sorted ascending; walk descending here.
+  const sortedDesc = [...history].sort((a, b) => (a.date < b.date ? 1 : -1));
+  let count = 0;
+  for (const snap of sortedDesc) {
+    if (snap.rank === 1) count++;
+    else break;
+  }
+  return count > 0 ? count : null;
 }
 
-function Sparkline({ history }: SparklineProps) {
-  const W = 68;
-  const H = 24;
-
-  if (history.length < 3) {
-    // Single dot fallback — never render a fake/broken line
+// ─── Movement indicator (Chasing rows) ──────────────────────────────────────
+function MovementIndicator({ change }: { change: number }) {
+  if (change === 0) {
     return (
-      <svg width={W} height={H} aria-hidden="true">
-        <circle cx={W - 4} cy={H / 2} r={3} fill="#F7931E" />
-      </svg>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          color: SLATE_400,
+          fontSize: 11,
+          fontWeight: 700,
+        }}
+      >
+        <Minus size={12} strokeWidth={3} />
+      </div>
     );
   }
-
-  const ranks = history.map((p) => p.rank);
-  const min = Math.min(...ranks);
-  const max = Math.max(...ranks);
-  const range = Math.max(1, max - min);
-
-  // y inverted: rank 1 (best) at top
-  const points = history.map((p, i) => {
-    const x = (i / (history.length - 1)) * (W - 4) + 2;
-    const y = ((p.rank - min) / range) * (H - 6) + 3;
-    return { x, y };
-  });
-
-  const linePath = points
-    .map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`)
-    .join(' ');
-  const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(2)} ${H} L ${points[0].x.toFixed(2)} ${H} Z`;
-  const last = points[points.length - 1];
-
-  const gradientId = `sparkfill-${Math.random().toString(36).slice(2, 8)}`;
-
+  if (change > 0) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          color: GREEN,
+          fontSize: 11,
+          fontWeight: 800,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        <TrendingUp size={11} strokeWidth={3} />
+        {change}
+      </div>
+    );
+  }
   return (
-    <svg width={W} height={H} aria-hidden="true">
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#F7931E" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#F7931E" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={areaPath} fill={`url(#${gradientId})`} />
-      <path
-        d={linePath}
-        fill="none"
-        stroke="#F7931E"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx={last.x} cy={last.y} r={2.5} fill="#F7931E" />
-    </svg>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        color: RED,
+        fontSize: 11,
+        fontWeight: 800,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      <TrendingDown size={11} strokeWidth={3} />
+      {Math.abs(change)}
+    </div>
   );
 }
 
-// ─── Trajectory status text from history ────────────────────────────────────
-function trajectoryStatus(history: { rank: number; date: string }[]): string {
-  if (history.length < 3) return 'Holding #1';
-  const first = history[0].rank;
-  const last = history[history.length - 1].rank;
-  if (last < first) return 'Climbing';
-  if (last > first) return 'Falling';
-  return 'Holding #1';
+// ─── Mover row (used in Movers block) ───────────────────────────────────────
+interface MoverRowProps {
+  mover: {
+    playerId: string;
+    firstName: string;
+    lastName: string;
+    country: string | null;
+    tourCode: string;
+    rank: number;
+    rankChange: number;
+  };
+  direction: 'up' | 'down';
+  isLast: boolean;
+}
+
+function MoverRow({ mover, direction, isLast }: MoverRowProps) {
+  const navigate = useNavigate();
+  const isUp = direction === 'up';
+  const color = isUp ? GREEN : RED;
+  const chipBg = isUp ? 'rgba(22,163,74,0.07)' : 'rgba(220,38,38,0.06)';
+  const Icon = isUp ? TrendingUp : TrendingDown;
+  const sign = isUp ? '+' : '−';
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(`/tourhub/player/${mover.playerId}`)}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '10px 0',
+        background: 'none',
+        border: 'none',
+        borderBottom: isLast ? 'none' : `1px solid ${SLATE_150}`,
+        cursor: 'pointer',
+        textAlign: 'left' as const,
+      }}
+      className="active:opacity-70 transition-opacity"
+    >
+      <PlayerAvatar
+        playerId={mover.playerId}
+        playerName={`${mover.firstName} ${mover.lastName}`}
+        tourCode={mover.tourCode}
+        size="sm"
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 800,
+            color: INK,
+            letterSpacing: '-0.01em',
+            marginBottom: 2,
+            whiteSpace: 'nowrap' as const,
+            overflow: 'hidden' as const,
+            textOverflow: 'ellipsis' as const,
+          }}
+        >
+          {mover.firstName} {mover.lastName}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <CountryFlag country={mover.country ?? ''} size="sm" />
+          <span style={{ fontSize: 11, fontWeight: 600, color: SLATE_500 }}>
+            now #{mover.rank}
+          </span>
+        </div>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          padding: '4px 8px',
+          background: chipBg,
+          borderRadius: 6,
+          fontSize: 12,
+          fontWeight: 900,
+          color,
+          letterSpacing: '-0.01em',
+          fontVariantNumeric: 'tabular-nums',
+          flexShrink: 0,
+        }}
+      >
+        <Icon size={11} strokeWidth={3} />
+        {sign}
+        {Math.abs(mover.rankChange)}
+      </div>
+      <ChevronRight size={14} strokeWidth={2.4} color={SLATE_400} style={{ flexShrink: 0 }} />
+    </button>
+  );
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
@@ -146,49 +257,43 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
   const top = rankings?.[0];
   const restOfTop5 = rankings?.slice(1, 5) ?? [];
 
-  const { data: rankHistory = [] } = usePlayerRankHistory(top?.player.id, 12);
+  // Fetch up to 200 weeks of #1 history for the tenure derivation.
+  const { data: rankHistory = [] } = usePlayerRankHistory(top?.player.id, 200);
+  const weeksAtNo1 = useMemo(() => computeWeeksAtNumberOne(rankHistory), [rankHistory]);
 
-  const status = useMemo(() => trajectoryStatus(rankHistory), [rankHistory]);
-
-  const topRiser = useMemo(
+  // Top 2 risers + top 2 fallers (data layer already returns top 8 of each).
+  const topRisers = useMemo(
     () =>
       (movers ?? [])
         .filter((m) => m.rankChange > 0)
-        .sort((a, b) => b.rankChange - a.rankChange)[0] ?? null,
+        .sort((a, b) => b.rankChange - a.rankChange)
+        .slice(0, 2),
     [movers],
   );
-  const topFaller = useMemo(
+  const topFallers = useMemo(
     () =>
       (movers ?? [])
         .filter((m) => m.rankChange < 0)
-        .sort((a, b) => a.rankChange - b.rankChange)[0] ?? null,
+        .sort((a, b) => a.rankChange - b.rankChange)
+        .slice(0, 2),
     [movers],
   );
+  const hasMovers = topRisers.length > 0 || topFallers.length > 0;
 
   const activeTourLabel =
     RANKING_TOUR_OPTIONS.find((t) => t.code === activeTour)?.label ?? 'PGA Tour';
-  const updatedText = formatUpdated((rankings as any)?.[0]?.ranking_date);
+  const updatedSuffix = formatUpdatedSuffix((rankings as any)?.[0]?.ranking_date);
 
   // ─── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <section className="px-4" aria-label="World Golf Rankings">
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: 14,
-            border: '1px solid rgba(15,23,42,0.08)',
-            padding: 16,
-            minHeight: 220,
-          }}
-        >
-          <div className="h-4 w-40 rounded bg-muted animate-pulse mb-3" />
-          <div className="h-20 w-full rounded bg-muted animate-pulse mb-4" />
-          <div className="space-y-2">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-8 w-full rounded bg-muted animate-pulse" />
-            ))}
-          </div>
+        <div className="h-4 w-40 rounded bg-muted animate-pulse mb-3" />
+        <div className="h-20 w-full rounded bg-muted animate-pulse mb-4" />
+        <div className="space-y-2">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="h-8 w-full rounded bg-muted animate-pulse" />
+          ))}
         </div>
       </section>
     );
@@ -210,15 +315,67 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
 
   return (
     <section className="px-4" aria-label="World Golf Rankings">
+      {/* ─── Section header ─────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+          <div
+            style={{
+              width: 3,
+              height: 14,
+              background: AMBER,
+              borderRadius: 1,
+              flexShrink: 0,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 900,
+              color: AMBER,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Official World Golf Ranking
+          </span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <h2
+            style={{
+              fontSize: 26,
+              fontWeight: 900,
+              color: INK,
+              letterSpacing: '-0.025em',
+              margin: 0,
+              lineHeight: 1.05,
+            }}
+          >
+            World Rankings
+          </h2>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: SLATE_500,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              flexShrink: 0,
+            }}
+          >
+            UPDATED {updatedSuffix}
+          </span>
+        </div>
+      </div>
+
       {/* ─── Tour selector strip ────────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 12,
-        }}
-      >
+      <div style={{ marginBottom: 14 }}>
         <button
           onClick={() => setSheetOpen(true)}
           style={{
@@ -232,14 +389,11 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
           }}
           className="active:opacity-70 transition-opacity"
         >
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>
             Showing {activeTourLabel}
           </span>
-          <ChevronDown style={{ width: 14, height: 14, color: '#94A3B8' }} />
+          <ChevronDown style={{ width: 14, height: 14, color: SLATE_400 }} />
         </button>
-        <span style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.04em' }}>
-          {updatedText}
-        </span>
       </div>
 
       <BottomSheet
@@ -252,7 +406,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
             style={{
               fontSize: 8.5,
               fontWeight: 900,
-              color: '#F7931E',
+              color: AMBER,
               letterSpacing: '0.16em',
               textTransform: 'uppercase' as const,
               marginBottom: 4,
@@ -262,7 +416,12 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
           </div>
           <div
             id="rankings-hero-tour-sheet-title"
-            style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}
+            style={{
+              fontSize: 20,
+              fontWeight: 900,
+              color: INK,
+              letterSpacing: '-0.03em',
+            }}
           >
             Rankings by Tour
           </div>
@@ -286,7 +445,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   padding: '12px 20px',
                   background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
-                  borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                  borderLeft: isActive ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: '0.5px solid rgba(15,23,42,0.07)',
                   cursor: 'pointer',
                   textAlign: 'left' as const,
@@ -311,10 +470,10 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: '#0F172A' }}>
+                  <div style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: INK }}>
                     {tour.label}
                   </div>
-                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: SLATE_400, marginTop: 2 }}>
                     {tour.description}
                   </div>
                 </div>
@@ -324,7 +483,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                       width: 6,
                       height: 6,
                       borderRadius: '50%',
-                      background: '#F7931E',
+                      background: AMBER,
                       flexShrink: 0,
                     }}
                   />
@@ -338,7 +497,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
         />
       </BottomSheet>
 
-      {/* ─── #1 hero card ───────────────────────────────────────────────── */}
+      {/* ─── Tier 1 — Headline #1 ───────────────────────────────────────── */}
       {top && (
         <button
           type="button"
@@ -346,49 +505,38 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
           style={{
             width: '100%',
             display: 'block',
-            textAlign: 'left',
-            position: 'relative',
-            background:
-              'radial-gradient(circle at 100% 0%, rgba(247,147,30,0.08) 0%, rgba(255,255,255,1) 60%)',
-            border: '1.5px solid #F7931E',
-            borderRadius: 14,
-            padding: '14px 16px',
-            marginBottom: 12,
-            boxShadow: '0 4px 20px -4px rgba(247,147,30,0.2)',
+            textAlign: 'left' as const,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            marginBottom: 18,
+            paddingBottom: 18,
+            borderBottom: `1px solid ${SLATE_200}`,
             cursor: 'pointer',
-            overflow: 'hidden',
           }}
-          className="active:scale-[0.99] transition-transform"
+          className="active:opacity-70 transition-opacity"
         >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-            {/* Rank badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div
               style={{
-                width: 42,
-                height: 42,
+                width: 56,
+                height: 56,
                 borderRadius: '50%',
-                background: '#F7931E',
+                background: 'rgba(247,147,30,0.10)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                boxShadow: '0 4px 12px rgba(247,147,30,0.4)',
+                overflow: 'hidden',
               }}
             >
-              <span
-                style={{
-                  fontSize: 20,
-                  fontWeight: 900,
-                  color: '#ffffff',
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1,
-                }}
-              >
-                1
-              </span>
+              <PlayerAvatar
+                playerId={top.player.id}
+                playerName={`${top.player.first_name} ${top.player.last_name}`}
+                tourCode={top.player.tour_codes?.[0] ?? 'pga'}
+                size="lg"
+              />
             </div>
-
-            {/* Player info */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
@@ -398,107 +546,71 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   marginBottom: 4,
                 }}
               >
-                <Trophy style={{ width: 10, height: 10, color: '#F7931E' }} />
+                <Trophy size={11} strokeWidth={1.5} fill={AMBER} color={AMBER} />
                 <span
                   style={{
-                    fontSize: 8.5,
+                    fontSize: 10,
                     fontWeight: 900,
-                    color: '#F7931E',
-                    letterSpacing: '0.14em',
+                    color: AMBER,
+                    letterSpacing: '0.12em',
                     textTransform: 'uppercase' as const,
                   }}
                 >
-                  WORLD #1
+                  WORLD #1{weeksAtNo1 != null ? ` · ${weeksAtNo1} WEEKS` : ''}
                 </span>
               </div>
               <div
                 style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: '#0F172A',
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1.05,
+                  fontSize: 22,
+                  fontWeight: 900,
+                  color: INK,
+                  letterSpacing: '-0.025em',
+                  lineHeight: 1.1,
                   marginBottom: 4,
+                  whiteSpace: 'nowrap' as const,
+                  overflow: 'hidden' as const,
+                  textOverflow: 'ellipsis' as const,
                 }}
               >
                 {top.player.first_name} {top.player.last_name}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <CountryFlag country={top.player.country ?? ''} size="sm" />
-                <span style={{ fontSize: 10, color: '#94A3B8' }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: SLATE_500 }}>
                   {toTitleCase(top.player.country ?? '')}
                 </span>
-                <span style={{ fontSize: 11, color: '#E2E8F0', margin: '0 2px' }}>·</span>
+                <span style={{ fontSize: 12, color: SLATE_300 }}>·</span>
                 <span
                   style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: '#475569',
+                    fontSize: 12,
+                    fontWeight: 800,
+                    color: INK,
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  {top.avg_points ? top.avg_points.toFixed(2) : '—'}
-                </span>
-                <span style={{ fontSize: 8.5, color: '#94A3B8', letterSpacing: '0.06em' }}>
-                  AVG
+                  {top.avg_points ? top.avg_points.toFixed(2) : '—'} pts
                 </span>
               </div>
-            </div>
-
-            {/* Sparkline */}
-            <div
-              style={{
-                flexShrink: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                gap: 2,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 7.5,
-                  fontWeight: 900,
-                  color: '#94A3B8',
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase' as const,
-                }}
-              >
-                LAST 12 WKS
-              </span>
-              <Sparkline history={rankHistory} />
-              <span
-                style={{
-                  fontSize: 9,
-                  fontWeight: 700,
-                  color:
-                    status === 'Climbing'
-                      ? '#16A34A'
-                      : status === 'Falling'
-                        ? '#DC2626'
-                        : '#475569',
-                  letterSpacing: '0.02em',
-                }}
-              >
-                {status}
-              </span>
             </div>
           </div>
         </button>
       )}
 
-      {/* ─── Ranked list 2–5 ───────────────────────────────────────────── */}
+      {/* ─── Tier 2 — Chasing list (ranks 2-5) ──────────────────────────── */}
       {restOfTop5.length > 0 && (
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: 14,
-            border: '1px solid rgba(15,23,42,0.08)',
-            padding: '4px 14px',
-            marginBottom: 12,
-            boxShadow: '0 1px 4px rgba(15,23,42,0.04)',
-          }}
-        >
+        <div>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 900,
+              color: SLATE_500,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase' as const,
+              marginBottom: 10,
+            }}
+          >
+            Chasing
+          </div>
           {restOfTop5.map((entry, i) => {
             const isLast = i === restOfTop5.length - 1;
             return (
@@ -510,22 +622,25 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '10px 0',
+                  padding: '12px 0',
                   background: 'none',
                   border: 'none',
-                  borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.06)',
+                  borderBottom: isLast ? 'none' : `1px solid ${SLATE_150}`,
                   cursor: 'pointer',
                   textAlign: 'left' as const,
                 }}
+                className="active:opacity-70 transition-opacity"
               >
                 <div
                   style={{
-                    width: 22,
-                    fontSize: 13,
-                    fontWeight: 800,
-                    color: '#475569',
+                    width: 24,
+                    fontSize: 16,
+                    fontWeight: 900,
+                    color: SLATE_700,
+                    letterSpacing: '-0.025em',
                     fontVariantNumeric: 'tabular-nums',
                     textAlign: 'center' as const,
+                    flexShrink: 0,
                   }}
                 >
                   {entry.rank}
@@ -539,10 +654,11 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: '#0F172A',
+                      fontSize: 15,
+                      fontWeight: 800,
+                      color: INK,
                       letterSpacing: '-0.01em',
+                      marginBottom: 2,
                       whiteSpace: 'nowrap' as const,
                       overflow: 'hidden' as const,
                       textOverflow: 'ellipsis' as const,
@@ -550,168 +666,142 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   >
                     {entry.player.first_name} {entry.player.last_name}
                   </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      marginTop: 1,
-                    }}
-                  >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <CountryFlag country={entry.player.country ?? ''} size="sm" />
-                    <span style={{ fontSize: 10, color: '#94A3B8' }}>
-                      {entry.avg_points ? entry.avg_points.toFixed(2) : '—'} avg
+                    <span style={{ fontSize: 12, fontWeight: 600, color: SLATE_500 }}>
+                      {entry.avg_points ? entry.avg_points.toFixed(2) : '—'} pts avg
                     </span>
                   </div>
                 </div>
-                {entry.rank_change !== 0 && (
-                  <div
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      color: entry.rank_change > 0 ? '#16A34A' : '#DC2626',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {entry.rank_change > 0 ? '▲' : '▼'}
-                    {Math.abs(entry.rank_change)}
-                  </div>
-                )}
+                <MovementIndicator change={entry.rank_change} />
+                <ChevronRight
+                  size={16}
+                  strokeWidth={2.4}
+                  color={SLATE_400}
+                  style={{ flexShrink: 0 }}
+                />
               </button>
             );
           })}
         </div>
       )}
 
-      {/* ─── Riser/Faller of Week ──────────────────────────────────────── */}
-      {(topRiser || topFaller) && (
-        <div style={{ display: 'flex', gap: 10 }}>
-          {topRiser && (
-            <button
-              onClick={() => navigate(`/tourhub/player/${topRiser.playerId}`)}
-              style={{
-                flex: 1,
-                background: '#ffffff',
-                border: '1px solid rgba(22,163,74,0.18)',
-                borderRadius: 12,
-                padding: '10px 12px',
-                textAlign: 'left' as const,
-                cursor: 'pointer',
-              }}
-              className="active:scale-[0.98] transition-transform"
-            >
+      {/* ─── Tier 3 — Movers block (only when data available) ───────────── */}
+      {hasMovers && (
+        <div style={{ marginTop: 28 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 900,
+              color: SLATE_500,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase' as const,
+              marginBottom: 14,
+            }}
+          >
+            Week's Biggest Movers
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 16,
+            }}
+          >
+            {/* Risers column */}
+            <div>
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 4,
-                  marginBottom: 4,
+                  gap: 5,
+                  paddingBottom: 8,
+                  borderBottom: `2px solid ${GREEN}`,
+                  marginBottom: 2,
                 }}
               >
-                <TrendingUp style={{ width: 11, height: 11, color: '#16A34A' }} />
+                <TrendingUp size={12} strokeWidth={2.5} color={GREEN} />
                 <span
                   style={{
-                    fontSize: 8.5,
+                    fontSize: 10,
                     fontWeight: 900,
-                    color: '#16A34A',
-                    letterSpacing: '0.14em',
+                    color: GREEN,
+                    letterSpacing: '0.10em',
                     textTransform: 'uppercase' as const,
                   }}
                 >
-                  RISER OF WEEK
+                  Risers
                 </span>
               </div>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 800,
-                  color: '#0F172A',
-                  letterSpacing: '-0.01em',
-                  whiteSpace: 'nowrap' as const,
-                  overflow: 'hidden' as const,
-                  textOverflow: 'ellipsis' as const,
-                }}
-              >
-                {topRiser.firstName} {topRiser.lastName}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                <span
+              {topRisers.length === 0 ? (
+                <div
                   style={{
+                    padding: '14px 0',
                     fontSize: 11,
-                    fontWeight: 800,
-                    color: '#16A34A',
-                    fontVariantNumeric: 'tabular-nums',
+                    color: SLATE_400,
                   }}
                 >
-                  +{Math.abs(topRiser.rankChange)}
-                </span>
-                <span style={{ fontSize: 10, color: '#94A3B8' }}>now #{topRiser.rank}</span>
-              </div>
-            </button>
-          )}
-          {topFaller && (
-            <button
-              onClick={() => navigate(`/tourhub/player/${topFaller.playerId}`)}
-              style={{
-                flex: 1,
-                background: '#ffffff',
-                border: '1px solid rgba(220,38,38,0.18)',
-                borderRadius: 12,
-                padding: '10px 12px',
-                textAlign: 'left' as const,
-                cursor: 'pointer',
-              }}
-              className="active:scale-[0.98] transition-transform"
-            >
+                  None this week
+                </div>
+              ) : (
+                topRisers.map((m, i) => (
+                  <MoverRow
+                    key={m.playerId}
+                    mover={m}
+                    direction="up"
+                    isLast={i === topRisers.length - 1}
+                  />
+                ))
+              )}
+            </div>
+
+            {/* Fallers column */}
+            <div>
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 4,
-                  marginBottom: 4,
+                  gap: 5,
+                  paddingBottom: 8,
+                  borderBottom: `2px solid ${RED}`,
+                  marginBottom: 2,
                 }}
               >
-                <TrendingDown style={{ width: 11, height: 11, color: '#DC2626' }} />
+                <TrendingDown size={12} strokeWidth={2.5} color={RED} />
                 <span
                   style={{
-                    fontSize: 8.5,
+                    fontSize: 10,
                     fontWeight: 900,
-                    color: '#DC2626',
-                    letterSpacing: '0.14em',
+                    color: RED,
+                    letterSpacing: '0.10em',
                     textTransform: 'uppercase' as const,
                   }}
                 >
-                  FALLER OF WEEK
+                  Fallers
                 </span>
               </div>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 800,
-                  color: '#0F172A',
-                  letterSpacing: '-0.01em',
-                  whiteSpace: 'nowrap' as const,
-                  overflow: 'hidden' as const,
-                  textOverflow: 'ellipsis' as const,
-                }}
-              >
-                {topFaller.firstName} {topFaller.lastName}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                <span
+              {topFallers.length === 0 ? (
+                <div
                   style={{
+                    padding: '14px 0',
                     fontSize: 11,
-                    fontWeight: 800,
-                    color: '#DC2626',
-                    fontVariantNumeric: 'tabular-nums',
+                    color: SLATE_400,
                   }}
                 >
-                  −{Math.abs(topFaller.rankChange)}
-                </span>
-                <span style={{ fontSize: 10, color: '#94A3B8' }}>now #{topFaller.rank}</span>
-              </div>
-            </button>
-          )}
+                  None this week
+                </div>
+              ) : (
+                topFallers.map((m, i) => (
+                  <MoverRow
+                    key={m.playerId}
+                    mover={m}
+                    direction="down"
+                    isLast={i === topFallers.length - 1}
+                  />
+                ))
+              )}
+            </div>
+          </div>
         </div>
       )}
     </section>
