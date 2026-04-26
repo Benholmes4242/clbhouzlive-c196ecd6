@@ -593,7 +593,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
 
   return (
     <div>
-      <Eyebrow>{editorial.eyebrow}</Eyebrow>
+      <Eyebrow color={AMBER_ACCENT}>{editorial.eyebrow}</Eyebrow>
       <Headline>{headline}</Headline>
       <Standfirst>{editorial.standfirst}</Standfirst>
 
