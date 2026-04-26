@@ -327,7 +327,7 @@ function Masthead({
             width: 16,
             height: 16,
             borderRadius: '50%',
-            border: '1px solid rgba(255,255,255,0.32)',
+            border: '1px solid rgba(255,255,255,0.4)',
             background: 'transparent',
             color: 'rgba(255,255,255,0.75)',
             cursor: 'pointer',
