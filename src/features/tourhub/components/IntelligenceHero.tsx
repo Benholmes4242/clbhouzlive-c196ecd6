@@ -611,7 +611,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: PURPLE_ACCENT,
+            color: GREEN_ACCENT,
           }}
         >
           {tournamentName}
@@ -663,7 +663,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
                   gap: 6,
                 }}
               >
-                <span style={{ color: PURPLE_ACCENT, flexShrink: 0 }}>·</span>
+                <span style={{ color: GREEN_ACCENT, flexShrink: 0 }}>·</span>
                 <span>{b}</span>
               </li>
             ))}
@@ -1078,7 +1078,7 @@ function ResultsTrailing({ pick }: { pick: TrackedPrediction }) {
 
 function Eyebrow({
   children,
-  color = PURPLE_ACCENT,
+  color = GREEN_ACCENT,
   glow,
 }: {
   children: React.ReactNode;
