@@ -896,6 +896,180 @@ function UpcomingPickRow({ contender }: { contender: AITopContender }) {
   );
 }
 
+// ─── Expandable pick row (Upcoming + Results) ──────────────────────────────
+
+function ExpandablePickRow({
+  playerId,
+  playerName,
+  reasons,
+  defaultExpanded = false,
+  tier,
+  collapsedReasonPreview,
+  trailing,
+}: {
+  playerId: string;
+  playerName: string;
+  reasons: string[];
+  defaultExpanded?: boolean;
+  tier: 'TOP PICK' | 'STRONG' | 'CONTENTION';
+  collapsedReasonPreview?: string;
+  trailing?: React.ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const tierColor = tier === 'TOP PICK' ? AMBER_ACCENT : PURPLE_ACCENT;
+  const visibleReasons = reasons.filter(Boolean).slice(0, 3);
+
+  return (
+    <div
+      style={{
+        borderRadius: 12,
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        overflow: 'hidden',
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+        aria-expanded={expanded}
+        style={{
+          width: '100%',
+          background: 'transparent',
+          border: 'none',
+          padding: '10px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          cursor: 'pointer',
+          textAlign: 'left',
+          color: 'inherit',
+        }}
+      >
+        <PlayerAvatar
+          playerId={playerId}
+          playerName={playerName}
+          tourCode="pga"
+          size="sm"
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#ffffff',
+              letterSpacing: '-0.2px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {playerName}
+          </div>
+          <div
+            style={{
+              marginTop: 2,
+              fontSize: expanded ? 9 : 11,
+              fontWeight: expanded ? 800 : 500,
+              letterSpacing: expanded ? '0.14em' : '-0.05px',
+              textTransform: expanded ? 'uppercase' : 'none',
+              color: expanded ? tierColor : 'rgba(255,255,255,0.55)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {expanded ? tier : (collapsedReasonPreview ?? visibleReasons[0] ?? '')}
+          </div>
+        </div>
+        {trailing}
+        <span
+          aria-hidden
+          style={{
+            flexShrink: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 22,
+            height: 22,
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.05)',
+            color: 'rgba(255,255,255,0.6)',
+          }}
+        >
+          {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+        </span>
+      </button>
+
+      {expanded && visibleReasons.length > 0 && (
+        <div
+          style={{
+            padding: '4px 14px 12px 56px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          {visibleReasons.map((r, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                gap: 8,
+                fontSize: 12,
+                lineHeight: 1.5,
+                color: 'rgba(255,255,255,0.78)',
+                letterSpacing: '-0.05px',
+              }}
+            >
+              <span
+                style={{
+                  flexShrink: 0,
+                  color: tierColor,
+                  fontWeight: 800,
+                  marginTop: 1,
+                }}
+              >
+                ·
+              </span>
+              <span>{r}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ResultsTrailing({ pick }: { pick: TrackedPrediction }) {
+  const positionStr = formatPosition(pick);
+  const scoreStr = formatScore(pick.score);
+  const won = pick.actualPosition === 1;
+
+  return (
+    <div
+      style={{
+        textAlign: 'right',
+        fontVariantNumeric: 'tabular-nums',
+        flexShrink: 0,
+        marginRight: 4,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 800,
+          color: won ? AMBER_ACCENT : '#ffffff',
+        }}
+      >
+        {positionStr}
+      </div>
+      <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+        {scoreStr}
+      </div>
+    </div>
+  );
+}
+
 // ─── Atoms ───────────────────────────────────────────────────────────────────
 
 function Eyebrow({
