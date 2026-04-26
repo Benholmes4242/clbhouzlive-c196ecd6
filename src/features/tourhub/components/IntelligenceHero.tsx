@@ -296,16 +296,15 @@ function Masthead({
             border: 'none',
             padding: 0,
             cursor: 'pointer',
-            background:
-              'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
+            background: AMBER_ACCENT,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 16px rgba(167, 139, 250, 0.55)',
+            boxShadow: '0 2px 8px rgba(247,147,30,0.35)',
             flexShrink: 0,
           }}
         >
-          <Brain size={15} color="#ffffff" strokeWidth={2.4} />
+          <Brain size={15} color={GREEN_DEEP} strokeWidth={2.8} />
         </button>
         <span
           style={{
@@ -313,8 +312,8 @@ function Masthead({
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: PURPLE_ACCENT,
-            textShadow: '0 0 12px rgba(167, 139, 250, 0.5)',
+            color: AMBER_ACCENT,
+            textShadow: '0 0 12px rgba(247,147,30,0.5)',
           }}
         >
           clbhouz Intelligence
