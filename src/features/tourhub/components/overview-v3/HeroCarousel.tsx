@@ -1776,7 +1776,7 @@ interface HeroCarouselProps {
   onScorecardStateChange?: (isOpen: boolean) => void;
   /**
    * Carousel mode:
-   * - 'overview' filters out upcoming slides (UpNextBroadcast handles upcoming separately)
+   * - 'overview' filters out upcoming slides (IntelligenceHero's UpcomingState handles upcoming inline)
    * - 'schedule' (default) renders live + completed + upcoming
    */
   mode?: 'overview' | 'schedule';
@@ -2038,8 +2038,9 @@ export function HeroCarousel({
        * Phase A — TOUR PILL RAIL DELETED.
        * The Hero's bottom mini-card switcher row was retired in favor of the
        * AllToursTicker, which now serves as the canonical Hero switcher on the
-       * Overview page (live tournaments only — completed/upcoming surfaces are
-       * handled by Tournament Results / UpNextBroadcast / ComingUpCalendar).
+       * Overview page (live tournaments only — completed surfaces handled by
+       * Tournament Results, upcoming inline within IntelligenceHero, and the
+       * full schedule via ComingUpCalendar).
        */}
     </div>
   );
