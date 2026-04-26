@@ -1197,10 +1197,10 @@ function StatPill({
         textAlign: 'center',
         background: highlight
           ? 'rgba(247, 147, 30, 0.12)'
-          : 'rgba(255,255,255,0.04)',
+          : 'rgba(255,255,255,0.05)',
         border: highlight
           ? '1px solid rgba(247, 147, 30, 0.35)'
-          : '1px solid rgba(255,255,255,0.06)',
+          : '1px solid rgba(255,255,255,0.10)',
       }}
     >
       <div
@@ -1222,7 +1222,7 @@ function StatPill({
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: highlight ? AMBER_ACCENT : 'rgba(255,255,255,0.55)',
+          color: highlight ? AMBER_ACCENT : 'rgba(255,255,255,0.65)',
         }}
       >
         {label}
