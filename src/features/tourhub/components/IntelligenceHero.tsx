@@ -185,9 +185,9 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
           borderRadius: 20,
           padding: '24px 18px 18px',
           background:
-            'linear-gradient(135deg, #1a0f2e 0%, #2d1b4e 50%, #1e1138 100%)',
+            `linear-gradient(135deg, ${GREEN_DEEP} 0%, ${GREEN_MID} 50%, ${GREEN_DARK} 100%)`,
           boxShadow:
-            '0 12px 40px -8px rgba(124, 58, 237, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25)',
+            '0 8px 30px -10px rgba(6,58,38,0.55), inset 0 1px 0 rgba(255,255,255,0.10)',
         }}
       >
         {/* ── Decorative orbs (preserved per Phase A refinement) ── */}
@@ -201,7 +201,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 220,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(167, 139, 250, 0.35) 0%, transparent 70%)',
+              'radial-gradient(circle, rgba(45,187,120,0.18) 0%, transparent 60%)',
             pointerEvents: 'none',
           }}
         />
@@ -215,7 +215,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 240,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(247, 147, 30, 0.18) 0%, transparent 70%)',
+              'radial-gradient(circle, rgba(247,147,30,0.10) 0%, transparent 60%)',
             pointerEvents: 'none',
           }}
         />
