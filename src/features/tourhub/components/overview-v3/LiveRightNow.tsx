@@ -56,7 +56,7 @@ const LiveEventRow: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boo
       }}
     >
       {/* Tour · Round */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
         <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>
           {tourLabel}
         </span>
@@ -67,19 +67,19 @@ const LiveEventRow: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boo
       </div>
 
       {/* Tournament name */}
-      <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+      <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
         {tournament.name}
       </div>
 
       {/* Course + city */}
       {venue && (
-        <div style={{ fontSize: 10, color: '#94A3B8', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+        <div style={{ fontSize: 10, color: '#94A3B8', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
           {venue}
         </div>
       )}
 
       {/* Hairline */}
-      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', marginBottom: 6 }} />
+      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', marginBottom: 8 }} />
 
       {/* Leader */}
       {tournament.leader ? (
@@ -135,7 +135,7 @@ export function LiveRightNow() {
   return (
     <div style={{ padding: '0 20px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
         <div
           className="animate-live-pulse"
           style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }}
