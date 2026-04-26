@@ -28,19 +28,12 @@ const AMBER = '#F7931E';
 const GREEN_DEEP = '#0A5A3C';
 const MAJOR_TINT = 'rgba(247,147,30,0.08)';
 
-// Compact tour labels per design decision Q1 (custom mapping).
-const TOUR_LABEL_MAP: Record<string, string> = {
-  'PGA TOUR': 'PGA TOUR',
-  'DP WORLD TOUR': 'DP WORLD',
-  'CHAMPIONS TOUR': 'CHAMPIONS',
-  'KORN FERRY TOUR': 'KORN FERRY',
-  'LPGA TOUR': 'LPGA',
-  'LIV GOLF': 'LIV',
-};
-
+// Compact tour labels — strip trailing " TOUR" suffix.
+// "PGA TOUR" → "PGA", "CHAMPIONS TOUR" → "CHAMPIONS",
+// "DP WORLD TOUR" → "DP WORLD", "LPGA TOUR" → "LPGA",
+// "KORN FERRY TOUR" → "KORN FERRY", "LIV GOLF" → "LIV GOLF" (unchanged).
 function compactTourLabel(tourName: string): string {
-  const key = tourName.toUpperCase();
-  return TOUR_LABEL_MAP[key] || key;
+  return tourName.toUpperCase().replace(/ TOUR$/, '');
 }
 
 // ── Date helpers ────────────────────────────────────────────────────────────
