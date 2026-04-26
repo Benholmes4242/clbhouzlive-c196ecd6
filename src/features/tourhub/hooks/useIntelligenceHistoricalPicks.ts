@@ -83,17 +83,6 @@ function formatFinalPosition(
   return `${actualPositionTied ? 'T' : ''}${actualPosition}`;
 }
 
-function classifyOutcome(picks: IntelligenceHistoricalPick[]): IntelligenceOutcome {
-  const top = picks.find(p => p.rank === 1);
-  if (top?.actualPosition === 1) return 'win';
-  if (top?.actualPosition !== null && top?.actualPosition !== undefined && top.actualPosition >= 2 && top.actualPosition <= 5) {
-    return 'top5';
-  }
-  const anyTop15 = picks.some(p => p.actualPosition !== null && p.actualPosition <= 15);
-  if (anyTop15) return 'partial';
-  return 'miss';
-}
-
 async function getScopedSeasonIds(): Promise<{ all: string[]; euro: string[] }> {
   const [pgaSeasons, euroSeasons] = await Promise.all([
     supabase
@@ -210,6 +199,7 @@ export function useIntelligenceHistoricalPicks() {
             tourCode: 'pga',
             actualPosition,
             actualPositionTied,
+            status,
             finalPosition: formatFinalPosition(actualPosition, actualPositionTied, status),
           });
         }
@@ -223,6 +213,7 @@ export function useIntelligenceHistoricalPicks() {
           startDate: t.start_date,
           endDate: t.end_date,
           tour: 'PGA',
+          isMajor: isMajor(t.name ?? ''),
           outcome: classifyOutcome(picks),
           picks,
         });
