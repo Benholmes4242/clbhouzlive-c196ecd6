@@ -262,7 +262,13 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
 
 // ─── Persistent shell sub-components ────────────────────────────────────────
 
-function Masthead({ stateLabel }: { stateLabel: string }) {
+function Masthead({
+  stateLabel,
+  onInfoTap,
+}: {
+  stateLabel: string;
+  onInfoTap: () => void;
+}) {
   return (
     <div
       style={{
@@ -272,12 +278,19 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
         gap: 8,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        {/* Brain icon — tappable, opens About sheet */}
+        <button
+          type="button"
+          onClick={onInfoTap}
+          aria-label="About clbhouz Intelligence"
           style={{
             width: 28,
             height: 28,
             borderRadius: '50%',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
             background:
               'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
             display: 'flex',
@@ -288,7 +301,7 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
           }}
         >
           <Brain size={15} color="#ffffff" strokeWidth={2.4} />
-        </div>
+        </button>
         <span
           style={{
             fontSize: 11,
@@ -299,8 +312,35 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
             textShadow: '0 0 12px rgba(167, 139, 250, 0.5)',
           }}
         >
-          Clbhouz Intelligence
+          clbhouz Intelligence
         </span>
+        {/* "i" info icon — also tappable, opens About sheet */}
+        <button
+          type="button"
+          onClick={onInfoTap}
+          aria-label="About clbhouz Intelligence"
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,0.32)',
+            background: 'transparent',
+            color: 'rgba(255,255,255,0.75)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
+            flexShrink: 0,
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontStyle: 'italic',
+            fontSize: 10,
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          i
+        </button>
       </div>
       <span
         style={{
@@ -310,6 +350,7 @@ function Masthead({ stateLabel }: { stateLabel: string }) {
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.55)',
           fontVariantNumeric: 'tabular-nums',
+          flexShrink: 0,
         }}
       >
         {stateLabel}
