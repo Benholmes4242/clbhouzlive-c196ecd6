@@ -13,11 +13,23 @@ export interface CountdownValue {
  * Live-ticking countdown to a target ISO date.
  * Ticks once per second. Returns null when expired or when no startDate provided.
  *
- * NOTE: Uses local-time parsing for date-only strings (legacy behavior preserved
- * from the inline implementation in TourHeroHelpers.UpcomingCountdown).
- * TZ-drift bug for date-only inputs is preserved in this extraction —
- * fix is logged as a separate hotfix brief.
+ * Date parsing rules:
+ *   - Date-only ISO (e.g. "2026-04-30")     → parsed as UTC midnight.
+ *   - Full ISO with time/tz                 → passed to `new Date()` unchanged.
+ *
+ * The UTC-midnight rule eliminates a long-standing TZ-drift bug where date-only
+ * inputs were parsed in local time, causing the countdown to jump around
+ * midnight depending on the viewer's timezone.
  */
+function parseTournamentStart(isoString: string): Date {
+  // Date-only string (e.g. "2026-04-30") — parse as UTC midnight.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(isoString)) {
+    return new Date(`${isoString}T00:00:00.000Z`);
+  }
+  // Full ISO datetime — parse normally.
+  return new Date(isoString);
+}
+
 export function useCountdown(startDate: string | null | undefined): CountdownValue | null {
   const [tick, setTick] = useState(0);
 
@@ -29,8 +41,7 @@ export function useCountdown(startDate: string | null | undefined): CountdownVal
 
   return useMemo(() => {
     if (!startDate) return null;
-    const normalized = startDate.includes('T') ? startDate : `${startDate}T12:00:00`;
-    const diff = new Date(normalized).getTime() - Date.now();
+    const diff = parseTournamentStart(startDate).getTime() - Date.now();
     if (diff <= 0) return null;
     return {
       days: Math.floor(diff / (1000 * 60 * 60 * 24)),
