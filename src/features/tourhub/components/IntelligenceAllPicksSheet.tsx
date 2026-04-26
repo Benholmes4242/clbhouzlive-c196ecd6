@@ -260,7 +260,21 @@ function TournamentCard({
   const chip = outcomeChipStyle(tournament.outcome);
   const dateRange = formatDateRange(tournament.startDate, tournament.endDate);
   const isWin = tournament.outcome === 'win';
+  const isMajorTournament = tournament.isMajor;
   const sortedPicks = useMemo(() => sortPicksByFinish(tournament.picks), [tournament.picks]);
+
+  // Border + shadow precedence: MAJOR > WIN > default. Both major + win use
+  // amber so no colour conflict — majors just look slightly more prominent.
+  const cardBorder = isMajorTournament
+    ? '1.5px solid rgba(247,147,30,0.55)'
+    : isWin
+      ? '1.5px solid rgba(247,147,30,0.3)'
+      : `1px solid ${SLATE_200}`;
+  const cardShadow = isMajorTournament
+    ? '0 4px 14px -6px rgba(247,147,30,0.18)'
+    : isWin
+      ? '0 4px 16px -4px rgba(247,147,30,0.15)'
+      : '0 2px 8px -2px rgba(15,23,42,0.04)';
 
   return (
     <button
@@ -271,15 +285,13 @@ function TournamentCard({
         width: '100%',
         padding: '14px 14px 12px',
         borderRadius: 14,
-        border: isWin ? '1.5px solid rgba(247,147,30,0.3)' : `1px solid ${SLATE_200}`,
+        border: cardBorder,
         background: '#ffffff',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
-        boxShadow: isWin
-          ? '0 4px 16px -4px rgba(247,147,30,0.15)'
-          : '0 2px 8px -2px rgba(15,23,42,0.04)',
+        boxShadow: cardShadow,
       }}
     >
       {/* Header row */}
@@ -343,10 +355,13 @@ function PickMiniRow({
     tourCode: string;
     finalPosition: string;
     actualPosition: number | null;
+    status: string | null;
   };
 }) {
   const isWinner = pick.actualPosition === 1;
-  const isMissedCut = pick.actualPosition === null;
+  // Cut players have non-null positions in sr_leaderboards (status = 'CUT'),
+  // so derive MC display from status — not from actualPosition === null.
+  const isMissedCut = pick.status?.toLowerCase() === 'cut';
 
   // Layer 3: position colour coding — amber for winner, slate for MC/WD, ink otherwise.
   const positionColor = isWinner ? AMBER : isMissedCut ? SLATE_500 : SLATE_900;
