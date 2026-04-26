@@ -2,14 +2,20 @@
  * CollegeRivalry — Tour Hub Overview college section (Phase F).
  *
  * Renders this week's #1 vs #2 college rivalry from LIVE earnings data, with
- * a top-5 standings rail beneath. All copy + standings derive from live data;
- * COLLEGE_RIVALRY_FALLBACK is safety-only and only renders if data is empty.
+ * a top-5 standings list beneath. Standings render on the bare page background
+ * (hairline dividers + tier-accent for rank #1) — the matchup card is the
+ * section's hero, the standings are the list, matching the broader
+ * "card for hero, bare for list" pattern across Tour Hub Overview.
  *
  * Headline rules:
  * - gap < $5M     → two-line "{Leader} leads. / {Chaser} is closing."
  * - gap >= $5M    → single-line "{Leader} runs away with it."
  * - DB editorial row (championship_editorial_daily, surface='college_rivalry')
  *   overrides computed copy when available.
+ *
+ * Eyebrow rules (when no DB editorial override present):
+ * - gap < $5M  → "🥊 CLOSEST RACE THIS WEEK"
+ * - gap >= $5M → "🥊 TIGHTEST AT THE TOP"
  */
 
 import { useMemo } from 'react';
@@ -26,10 +32,14 @@ import { COLLEGE_RIVALRY_FALLBACK } from '../utils/editorialFallbacks';
 
 const AMBER = '#F7931E';
 const AMBER_INK = '#D97706';
+const AMBER_SOFT_BG = 'rgba(247,147,30,0.08)';
+const AMBER_SOFT_BORDER = 'rgba(247,147,30,0.30)';
 const INK = '#0F172A';
 const SLATE = '#94A3B8';
+const SLATE_500 = '#64748B';
+const SLATE_700 = '#334155';
 const SLATE_LIGHT = '#CBD5E1';
-const SLATE_BG = '#F8FAFC';
+const SLATE_150 = '#EDF1F5';
 const SLATE_ALPHA = 'rgba(15,23,42,0.08)';
 const HAIRLINE = 'rgba(15,23,42,0.07)';
 
@@ -53,9 +63,9 @@ function abbreviateName(name: string): string {
 function CollegeRivalrySkeleton() {
   return (
     <section aria-label="College rivalry" style={{ padding: '0 16px' }}>
-      <div style={{ height: 14, width: 240, background: SLATE_BG, borderRadius: 6, marginBottom: 16 }} />
-      <div style={{ height: 280, background: '#fff', border: `1px solid ${SLATE_ALPHA}`, borderRadius: 18, marginBottom: 12 }} />
-      <div style={{ height: 220, background: '#fff', border: `1px solid ${SLATE_ALPHA}`, borderRadius: 14 }} />
+      <div style={{ height: 14, width: 240, background: '#F8FAFC', borderRadius: 6, marginBottom: 16 }} />
+      <div style={{ height: 280, background: '#fff', border: `1px solid ${SLATE_ALPHA}`, borderRadius: 18, marginBottom: 20 }} />
+      <div style={{ height: 220 }} />
     </section>
   );
 }
@@ -104,8 +114,12 @@ export function CollegeRivalry() {
   const leaderCaptain = leader ? captainMap?.get(leader.normalized_name) : undefined;
   const chaserCaptain = chaser ? captainMap?.get(chaser.normalized_name) : undefined;
 
-  // Editorial DB > live-derived > generic fallback
-  const eyebrow = editorial.data?.eyebrow ?? COLLEGE_RIVALRY_FALLBACK.eyebrow;
+  // Eyebrow: DB editorial override > data-driven framing > generic fallback
+  const eyebrow = useMemo(() => {
+    if (editorial.data?.eyebrow) return editorial.data.eyebrow;
+    if (!leader || !chaser) return COLLEGE_RIVALRY_FALLBACK.eyebrow;
+    return isClosingRace ? 'CLOSEST RACE THIS WEEK' : 'TIGHTEST AT THE TOP';
+  }, [editorial.data, leader, chaser, isClosingRace]);
 
   const headline = useMemo(() => {
     if (editorial.data?.headline) {
@@ -136,6 +150,10 @@ export function CollegeRivalry() {
   const leaderLogo = getCollegeLogoUrl(leaderFull);
   const chaserLogo = getCollegeLogoUrl(chaserFull);
 
+  // The chaser franchise IS the matchup's rival — RIVAL pill follows this dynamically,
+  // so if matchup-selection logic ever evolves beyond rank-2, the pill follows.
+  const rivalNormalizedName = chaser?.normalized_name ?? null;
+
   return (
     <section aria-label="This week's college rivalry">
       {/* Section eyebrow */}
@@ -156,25 +174,25 @@ export function CollegeRivalry() {
         </div>
       </div>
 
-      {/* Rivalry hero card */}
-      <div style={{ padding: '0 16px', marginBottom: 12 }}>
+      {/* Rivalry hero card — matchup row sits DIRECTLY on the outer card (no inner card) */}
+      <div style={{ padding: '0 16px', marginBottom: 24 }}>
         <div
           style={{
             background: '#fff',
             border: `1px solid ${SLATE_ALPHA}`,
             borderRadius: 18,
             overflow: 'hidden',
-            boxShadow: '0 1px 4px rgba(15,23,42,0.05)',
+            boxShadow: '0 2px 16px -8px rgba(15,23,42,0.08)',
           }}
         >
           {/* Eyebrow + headline */}
-          <div style={{ padding: '18px 18px 16px' }}>
+          <div style={{ padding: '20px 18px 14px' }}>
             <div style={{
-              fontSize: 10, fontWeight: 900, color: AMBER_INK,
-              letterSpacing: '0.14em', textTransform: 'uppercase',
-              marginBottom: 8,
+              fontSize: 11, fontWeight: 900, color: AMBER_INK,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              marginBottom: 12,
             }}>
-              {eyebrow}
+              🥊 {eyebrow}
             </div>
             <h2 style={{
               fontSize: 22, fontWeight: 900, lineHeight: 1.15,
@@ -190,117 +208,130 @@ export function CollegeRivalry() {
             </h2>
           </div>
 
-          {/* Versus block */}
-          <div style={{ padding: '0 14px 14px' }}>
-            <div
+          {/* Matchup row — NO inner card, sits directly on the outer white card */}
+          <div
+            style={{
+              padding: '4px 18px 18px',
+              marginBottom: 0,
+              display: 'grid',
+              gridTemplateColumns: '1fr auto 1fr',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            {/* Leader */}
+            <button
+              onClick={() => navigate(`/tourhub/college-golf/${leader.normalized_name}`)}
               style={{
-                background: SLATE_BG,
-                borderRadius: 14,
-                padding: '14px 12px',
-                display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
-                alignItems: 'center',
-                gap: 8,
+                background: 'transparent', border: 'none', padding: 0,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                cursor: 'pointer',
               }}
             >
-              {/* Leader */}
+              {leaderLogo && (
+                <img
+                  src={leaderLogo}
+                  alt={leaderShort}
+                  style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))' }}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              )}
+              <div style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px' }}>
+                {leaderShort}
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: AMBER_INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
+                {formatCurrency(leader.earnings_total)}
+              </div>
+              <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                {leader.wins_total} {leader.wins_total === 1 ? 'WIN' : 'WINS'} · {leader.player_count} ON TOUR
+              </div>
+            </button>
+
+            {/* VS divider */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <div style={{
+                fontSize: 11, fontWeight: 900, color: SLATE_LIGHT,
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+              }}>
+                VS
+              </div>
+              <div style={{
+                background: 'rgba(247,147,30,0.12)',
+                color: AMBER_INK,
+                fontSize: 10, fontWeight: 900,
+                padding: '4px 8px',
+                borderRadius: 999,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.2px',
+                whiteSpace: 'nowrap',
+              }}>
+                {marginLabel}
+              </div>
+            </div>
+
+            {/* Chaser */}
+            {chaser ? (
               <button
-                onClick={() => navigate(`/tourhub/college-golf/${leader.normalized_name}`)}
+                onClick={() => navigate(`/tourhub/college-golf/${chaser.normalized_name}`)}
                 style={{
                   background: 'transparent', border: 'none', padding: 0,
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                   cursor: 'pointer',
                 }}
               >
-                {leaderLogo && (
+                {chaserLogo && (
                   <img
-                    src={leaderLogo}
-                    alt={leaderShort}
-                    style={{ width: 44, height: 44, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.12))' }}
+                    src={chaserLogo}
+                    alt={chaserShort}
+                    style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))' }}
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 )}
                 <div style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px' }}>
-                  {leaderShort}
+                  {chaserShort}
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 900, color: AMBER_INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.3px' }}>
-                  {formatCurrency(leader.earnings_total)}
+                <div style={{ fontSize: 18, fontWeight: 900, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
+                  {formatCurrency(chaser.earnings_total)}
                 </div>
                 <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  {leader.wins_total} {leader.wins_total === 1 ? 'WIN' : 'WINS'} · {leader.player_count} ON TOUR
+                  {chaser.wins_total} {chaser.wins_total === 1 ? 'WIN' : 'WINS'} · {chaser.player_count} ON TOUR
                 </div>
               </button>
-
-              {/* VS divider */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <div style={{
-                  fontSize: 11, fontWeight: 900, color: SLATE_LIGHT,
-                  letterSpacing: '0.16em', textTransform: 'uppercase',
-                }}>
-                  VS
-                </div>
-                <div style={{
-                  background: 'rgba(247,147,30,0.12)',
-                  color: AMBER_INK,
-                  fontSize: 10, fontWeight: 900,
-                  padding: '4px 8px',
-                  borderRadius: 999,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.2px',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {marginLabel}
-                </div>
-              </div>
-
-              {/* Chaser */}
-              {chaser ? (
-                <button
-                  onClick={() => navigate(`/tourhub/college-golf/${chaser.normalized_name}`)}
-                  style={{
-                    background: 'transparent', border: 'none', padding: 0,
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {chaserLogo && (
-                    <img
-                      src={chaserLogo}
-                      alt={chaserShort}
-                      style={{ width: 44, height: 44, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.12))' }}
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                    />
-                  )}
-                  <div style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px' }}>
-                    {chaserShort}
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.3px' }}>
-                    {formatCurrency(chaser.earnings_total)}
-                  </div>
-                  <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    {chaser.wins_total} {chaser.wins_total === 1 ? 'WIN' : 'WINS'} · {chaser.player_count} ON TOUR
-                  </div>
-                </button>
-              ) : (
-                <div />
-              )}
-            </div>
+            ) : (
+              <div />
+            )}
           </div>
 
-          {/* Captains row */}
+          {/* Captains row — tappable, contextualized */}
           {(leaderCaptain || chaserCaptain) && (
             <div
               style={{
-                borderTop: `0.5px solid ${HAIRLINE}`,
-                padding: '12px 14px',
+                borderTop: `1px solid ${SLATE_150}`,
+                padding: '14px 14px',
                 display: 'grid',
                 gridTemplateColumns: '1fr 1px 1fr',
                 gap: 12,
                 alignItems: 'center',
               }}
             >
-              {/* Leader captain */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {/* Leader captain — tappable */}
+              <button
+                onClick={() => leaderCaptain && navigate(`/tourhub/player/${leaderCaptain.playerId}`)}
+                disabled={!leaderCaptain}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 8px',
+                  borderRadius: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  cursor: leaderCaptain ? 'pointer' : 'default',
+                  textAlign: 'left',
+                  width: '100%',
+                  minWidth: 0,
+                }}
+              >
                 <SquircleAvatar
                   size={32}
                   src={leaderCaptain ? getPlayerHeadshotUrl(leaderCaptain.fullName, leaderCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
@@ -308,40 +339,77 @@ export function CollegeRivalry() {
                   hideRing
                   fallback={leaderCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
                 />
-                <div style={{ minWidth: 0 }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{
-                    fontSize: 8, fontWeight: 900, color: SLATE,
-                    letterSpacing: '0.12em', textTransform: 'uppercase',
+                    fontSize: 9, fontWeight: 800, color: SLATE_500,
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
                   }}>
                     {leaderShort} CAPTAIN
                   </div>
                   <div style={{
-                    fontSize: 12, fontWeight: 700, color: INK,
+                    fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    marginTop: 1,
                   }}>
                     {leaderCaptain ? abbreviateName(leaderCaptain.fullName) : '—'}
                   </div>
+                  {leaderCaptain && (
+                    <div style={{
+                      fontSize: 10, fontWeight: 600, color: SLATE_500, lineHeight: 1.3,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      marginTop: 2,
+                    }}>
+                      Top earner · {formatCurrency(leaderCaptain.earnings)}
+                    </div>
+                  )}
                 </div>
-              </div>
+              </button>
 
               {/* Vertical divider */}
-              <div style={{ background: HAIRLINE, height: 36, width: 1 }} />
+              <div style={{ background: SLATE_150, height: 44, width: 1 }} />
 
-              {/* Chaser captain */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
-                <div style={{ minWidth: 0, textAlign: 'right' }}>
+              {/* Chaser captain — tappable */}
+              <button
+                onClick={() => chaserCaptain && navigate(`/tourhub/player/${chaserCaptain.playerId}`)}
+                disabled={!chaserCaptain}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 8px',
+                  borderRadius: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  cursor: chaserCaptain ? 'pointer' : 'default',
+                  textAlign: 'right',
+                  width: '100%',
+                  minWidth: 0,
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <div style={{ minWidth: 0, flex: 1, textAlign: 'right' }}>
                   <div style={{
-                    fontSize: 8, fontWeight: 900, color: SLATE,
-                    letterSpacing: '0.12em', textTransform: 'uppercase',
+                    fontSize: 9, fontWeight: 800, color: SLATE_500,
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
                   }}>
                     {chaserShort} CAPTAIN
                   </div>
                   <div style={{
-                    fontSize: 12, fontWeight: 700, color: INK,
+                    fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    marginTop: 1,
                   }}>
                     {chaserCaptain ? abbreviateName(chaserCaptain.fullName) : '—'}
                   </div>
+                  {chaserCaptain && (
+                    <div style={{
+                      fontSize: 10, fontWeight: 600, color: SLATE_500, lineHeight: 1.3,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      marginTop: 2,
+                    }}>
+                      Top earner · {formatCurrency(chaserCaptain.earnings)}
+                    </div>
+                  )}
                 </div>
                 <SquircleAvatar
                   size={32}
@@ -350,92 +418,101 @@ export function CollegeRivalry() {
                   hideRing
                   fallback={chaserCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
                 />
-              </div>
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Standings rail */}
+      {/* Standings list — bare page background, no wrapping card */}
       {top5.length > 0 && (
         <div style={{ padding: '0 16px' }}>
-          <div
-            style={{
-              background: '#fff',
-              border: `1px solid ${SLATE_ALPHA}`,
-              borderRadius: 14,
-              overflow: 'hidden',
-              boxShadow: '0 1px 4px rgba(15,23,42,0.04)',
-            }}
-          >
-            {/* Standings header */}
-            <div
-              style={{
-                background: SLATE_BG,
-                padding: '8px 14px',
-                fontSize: 10, fontWeight: 800, color: SLATE,
-                letterSpacing: '0.1em', textTransform: 'uppercase',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              }}
-            >
-              <span>Standings</span>
-              <span style={{ fontSize: 9, color: SLATE_LIGHT, letterSpacing: '0.08em' }}>
-                Top 5 · Earnings on Tour
-              </span>
-            </div>
+          {/* Section label row */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            marginBottom: 10,
+            padding: '0 4px',
+          }}>
+            <span style={{
+              fontSize: 10, fontWeight: 900, color: SLATE_500,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+            }}>
+              Standings
+            </span>
+            <span style={{
+              fontSize: 10, fontWeight: 700, color: SLATE_500,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+            }}>
+              Top 5 · Earnings on Tour
+            </span>
+          </div>
 
-            {top5.map((stats, i) => {
-              const media = mediaMap?.get(stats.normalized_name);
-              const name = displayName(stats, media);
-              const logo = getCollegeLogoUrl(fullName(stats, media));
-              const rank = i + 1;
-              const isLeader = rank === 1;
+          {top5.map((stats, i) => {
+            const media = mediaMap?.get(stats.normalized_name);
+            const name = displayName(stats, media);
+            const logo = getCollegeLogoUrl(fullName(stats, media));
+            const rank = i + 1;
+            const isLeader = rank === 1;
+            const isRival = rivalNormalizedName === stats.normalized_name;
 
-              return (
-                <button
-                  key={stats.id}
-                  onClick={() => navigate(`/tourhub/college-golf/${stats.normalized_name}`)}
+            return (
+              <button
+                key={stats.id}
+                onClick={() => navigate(`/tourhub/college-golf/${stats.normalized_name}`)}
+                style={{
+                  width: '100%',
+                  background: isLeader ? AMBER_SOFT_BG : 'transparent',
+                  border: 'none',
+                  borderLeft: isLeader ? `3px solid ${AMBER}` : '3px solid transparent',
+                  borderBottom: i < top5.length - 1 ? `1px solid ${SLATE_150}` : 'none',
+                  borderRadius: isLeader ? '0 6px 6px 0' : 0,
+                  padding: '13px 12px 13px 11px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span
                   style={{
-                    width: '100%',
-                    background: isLeader ? 'linear-gradient(90deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0) 100%)' : 'transparent',
-                    border: 'none',
-                    borderBottom: i < top5.length - 1 ? `0.5px solid ${HAIRLINE}` : 'none',
-                    padding: '12px 14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    cursor: 'pointer',
-                    textAlign: 'left',
+                    width: 24,
+                    fontSize: 16,
+                    fontWeight: 900,
+                    color: isLeader ? AMBER : SLATE,
+                    letterSpacing: '-0.4px',
+                    fontVariantNumeric: 'tabular-nums',
+                    flexShrink: 0,
+                    textAlign: 'center',
                   }}
                 >
+                  {rank}
+                </span>
+                {logo ? (
+                  <img
+                    src={logo}
+                    alt={name}
+                    style={{ width: 28, height: 28, objectFit: 'contain', flexShrink: 0 }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <div style={{ width: 28, height: 28, flexShrink: 0 }} />
+                )}
+                <div style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  minWidth: 0,
+                }}>
                   <span
                     style={{
-                      width: 22,
-                      fontSize: 16,
-                      fontWeight: 900,
-                      color: isLeader ? AMBER : 'rgba(15,23,42,0.18)',
-                      fontVariantNumeric: 'tabular-nums',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {rank}
-                  </span>
-                  {logo ? (
-                    <img
-                      src={logo}
-                      alt={name}
-                      style={{ width: 28, height: 28, objectFit: 'contain', flexShrink: 0 }}
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                    />
-                  ) : (
-                    <div style={{ width: 28, height: 28, flexShrink: 0 }} />
-                  )}
-                  <span
-                    style={{
-                      flex: 1,
-                      fontSize: 14,
-                      fontWeight: 700,
+                      fontSize: 15,
+                      fontWeight: 800,
                       color: INK,
+                      letterSpacing: '-0.2px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -443,22 +520,39 @@ export function CollegeRivalry() {
                   >
                     {name}
                   </span>
-                  <span
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 800,
-                      color: isLeader ? AMBER_INK : INK,
-                      fontVariantNumeric: 'tabular-nums',
-                      letterSpacing: '-0.2px',
+                  {isRival && (
+                    <span style={{
+                      padding: '2px 6px',
+                      background: AMBER_SOFT_BG,
+                      border: `1px solid ${AMBER_SOFT_BORDER}`,
+                      borderRadius: 4,
+                      fontSize: 8,
+                      fontWeight: 900,
+                      color: AMBER_INK,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       flexShrink: 0,
-                    }}
-                  >
-                    {formatCurrency(stats.earnings_total)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                      lineHeight: 1.2,
+                    }}>
+                      Rival
+                    </span>
+                  )}
+                </div>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: isLeader ? AMBER_INK : SLATE_700,
+                    fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '-0.2px',
+                    flexShrink: 0,
+                  }}
+                >
+                  {formatCurrency(stats.earnings_total)}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
     </section>
