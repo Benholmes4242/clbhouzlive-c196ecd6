@@ -129,15 +129,15 @@ export function IntelligenceAllPicksSheet({ open, onClose }: IntelligenceAllPick
                 width: 28,
                 height: 28,
                 borderRadius: '50%',
-                background: `linear-gradient(135deg, ${PURPLE_DEEP} 0%, ${PURPLE} 100%)`,
+                background: AMBER,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 0 14px rgba(167, 139, 250, 0.45)',
+                boxShadow: '0 2px 10px rgba(247,147,30,0.35)',
                 flexShrink: 0,
               }}
             >
-              <Brain size={15} color="#ffffff" strokeWidth={2.4} />
+              <Brain size={15} color={GREEN_DEEP} strokeWidth={2.8} />
             </div>
             <h2
               id="intelligence-all-picks-title"
