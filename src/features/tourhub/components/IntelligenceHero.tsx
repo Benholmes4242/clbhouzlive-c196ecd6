@@ -1,23 +1,25 @@
 /**
  * IntelligenceHero — Tour Hub focal point
  *
- * Deep-purple magazine card establishing Clbhouz Intelligence as the AI brand
+ * Deep-purple magazine card establishing clbhouz Intelligence as the AI brand
  * on the Tour Hub. Auto-detects tournament lifecycle (live / results / upcoming)
  * via `useIntelligenceLifecycleState` (mirrors HeroCarousel's 1.5-day window).
  *
  * Phase A: persistent shell (Masthead + TrackRecord + CTA).
- * Phase B (this commit): full content blocks for each lifecycle state.
+ * Phase B: full content blocks for each lifecycle state.
  *   - Live    → performance band + 3 picks with live position + reasoning
  *   - Results → "WE CALLED IT" recap when Top Pick wins, else final standings
- *   - Upcoming → venue card with course-fit chips + 3 picks with reasoning
+ *   - Upcoming → venue card with par/yardage bullets + 3 picks with chevron-expand reasoning
  * Phase C: wires the CTA to open IntelligenceAllPicksSheet.
+ * v2 Polish: date-range state labels, About sheet, chevron-expand pick rows,
+ *            location line on venue card, FIT badge removed, brand casing.
  *
- * Editorial copy reads from INTELLIGENCE_HERO_FALLBACK (V1 hardcoded). V2 will
- * move to a Claude-driven daily pipeline via championship_editorial_daily.
+ * Editorial copy reads from INTELLIGENCE_HERO_FALLBACK (V1 hardcoded). V1.2 will
+ * move per-tournament copy to a Claude-driven daily pipeline.
  */
 
 import { memo, useMemo, useState } from 'react';
-import { Brain, ChevronRight, Check } from 'lucide-react';
+import { Brain, ChevronRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
@@ -27,8 +29,13 @@ import { usePredictionTracker } from '../hooks/usePredictionTracker';
 import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions';
 import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
 import { PlayerAvatar } from './PlayerAvatar';
-import { INTELLIGENCE_HERO_FALLBACK } from '../utils/editorialFallbacks';
+import {
+  INTELLIGENCE_HERO_FALLBACK,
+  buildUpcomingHeadline,
+  getVenueRequirements,
+} from '../utils/editorialFallbacks';
 import { IntelligenceAllPicksSheet } from './IntelligenceAllPicksSheet';
+import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
