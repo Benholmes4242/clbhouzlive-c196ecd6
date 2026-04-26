@@ -460,7 +460,7 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           boxShadow: '0 4px 18px rgba(247,147,30,0.35)',
         }}
       >
-        <Brain size={26} color={GREEN_DEEP} strokeWidth={2.6} />
+        <Brain size={26} color={GREEN_DEEP} strokeWidth={2.8} />
       </div>
       <h3
         style={{
