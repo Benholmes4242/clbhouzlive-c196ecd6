@@ -433,7 +433,7 @@ export function ScheduleTab() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 2 }}>
-                    {TOUR_LABELS[nextUpTournament.tour_code ?? ''] ?? nextUpTournament.tour_code ?? 'Tour'}
+                    {getTourLabel(nextUpTournament.tour_code)}
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                     {nextUpTournament.name}
@@ -630,7 +630,7 @@ export function ScheduleTab() {
               >
                 <ScheduleEmptyMessage 
                   variant={filter === 'upcoming' ? 'no-upcoming' : 'no-results'}
-                  tourName={activeTour !== 'all' ? TOUR_LABELS[activeTour] : undefined}
+                  tourName={activeTour !== 'all' ? getTourLabel(activeTour) : undefined}
                   onResetTour={() => setActiveTour('all')}
                 />
               </motion.div>
