@@ -25,7 +25,9 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
     queryFn: async () => {
       if (!playerId) return [];
       
-      // Query leaderboards for this player, joined with tournament info
+      // Query leaderboards for this player, joined with tournament info.
+      // Order by the joined tournament's end_date (most recently played first)
+      // — D19 fix. Previously ordered by created_at which tracks ingest order.
       const { data, error } = await supabase
         .from('sr_leaderboards')
         .select(`
@@ -44,8 +46,7 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
           )
         `)
         .eq('player_id', playerId)
-        // TODO: order by tournament.end_date when Supabase supports ordering by joined column
-        .order('created_at', { ascending: false })
+        .order('end_date', { foreignTable: 'sr_tournaments', ascending: false })
         .limit(limit);
       
       if (error) {
