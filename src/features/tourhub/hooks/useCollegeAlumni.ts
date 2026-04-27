@@ -17,6 +17,9 @@ export interface CollegeAlumnus {
   wins?: number;
   cuts_made?: number;
   top_10s?: number;
+  /** Events played in the current season. Defaults to 0 when null/missing.
+   *  Used by the 4-tier alumni model to gate Rising vs Legacy ("inactive"). */
+  events_played?: number;
 }
 
 /**
@@ -53,7 +56,7 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
       const playerIds = players.map(p => p.id);
       const { data: stats, error: statsError } = await supabase
         .from('sr_player_statistics')
-        .select('player_id, cuts_made, wins, raw_data')
+        .select('player_id, cuts_made, wins, events_played, raw_data')
         .eq('season_id', seasonId)
         .in('player_id', playerIds);
       
@@ -83,6 +86,7 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
           wins: typeof s?.wins === 'number' ? s.wins : (typeof statistics.first_place === 'number' ? statistics.first_place : 0),
           cuts_made: typeof s?.cuts_made === 'number' ? s.cuts_made : (typeof statistics.cuts_made === 'number' ? statistics.cuts_made : 0),
           top_10s: typeof statistics.top_10 === 'number' ? statistics.top_10 : 0,
+          events_played: typeof s?.events_played === 'number' ? s.events_played : 0,
         };
       });
       
