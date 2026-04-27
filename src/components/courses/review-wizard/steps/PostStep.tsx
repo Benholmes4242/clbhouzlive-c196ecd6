@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { Plus, AlertCircle, Images, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -35,6 +35,7 @@ interface PostStepProps {
   onSetCover: (id: string) => void;
   onRetryMedia: (id: string) => void;
   onReorderMedia: (from: number, to: number) => void;
+  onSetMediaOrder: (items: ReviewMediaItem[]) => void;
   onGoToStep: (step: 1 | 2) => void;
   onSubmit: () => void;
 }
@@ -44,7 +45,7 @@ const MAX_MEDIA_ITEMS = 10;
 const BREAKDOWN_LABELS: Record<keyof ReviewBreakdowns, string> = {
   design: 'Design',
   condition: 'Condition',
-  clubhouse: 'clubhouse',
+  clubhouse: 'Clubhouse',
   facilities: 'Facilities',
 };
 
@@ -66,6 +67,7 @@ export function PostStep({
   onSetCover,
   onRetryMedia,
   onReorderMedia,
+  onSetMediaOrder,
   onGoToStep,
   onSubmit,
 }: PostStepProps) {
