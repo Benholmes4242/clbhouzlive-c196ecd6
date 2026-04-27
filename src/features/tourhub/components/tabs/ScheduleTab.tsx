@@ -433,13 +433,12 @@ export function ScheduleTab() {
         )}
       </AnimatePresence>
       
-      {/* ── SCHEDULE MASTHEAD ── */}
-      {!search && (
+      {/* ── SCHEDULE MASTHEAD — All tab only ── */}
+      {!search && filter === 'all' && (
         <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
 
           {/* Eyebrow */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, paddingTop: 8 }}>
-            
             <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
               ⚡ Clbhouz · Tour Hub
             </span>
@@ -460,10 +459,7 @@ export function ScheduleTab() {
             )}
           </div>
 
-
-
-
-          {/* Next Up — flat, no card */}
+          {/* Next Up — full header */}
           {nextUpTournament && daysUntilNext !== null && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
@@ -474,8 +470,8 @@ export function ScheduleTab() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 2 }}>
-                    {getTourLabel(nextUpTournament.tour_code)}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <TourPill tourCode={nextUpTournament.tour_code} />
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                     {nextUpTournament.name}
@@ -498,12 +494,22 @@ export function ScheduleTab() {
             </div>
           )}
 
-          {/* Live Now — reuse the Tour Overview component */}
+          {/* Live Now — All tab only */}
           <div style={{ paddingBottom: 12 }}>
             <LiveRightNow />
           </div>
 
         </div>
+      )}
+
+      {/* Compact Next Up — filtered tabs */}
+      {!search && filter !== 'all' && nextUpTournament && daysUntilNext !== null && (
+        <CompactNextUp
+          tournamentId={nextUpTournament.id}
+          tourCode={nextUpTournament.tour_code}
+          name={nextUpTournament.name}
+          daysUntil={daysUntilNext}
+        />
       )}
       {/* Sentinel for sticky detection */}
       <div ref={stickysentinelRef} style={{ height: 1, marginTop: -1 }} />
