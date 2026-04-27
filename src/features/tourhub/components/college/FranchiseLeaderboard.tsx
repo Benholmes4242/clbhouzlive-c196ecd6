@@ -146,9 +146,9 @@ export function FranchiseLeaderboard({
               ) : sortedStats.length > 0 ? (
                 <>
                   {sortedStats.map((collegeStats, index) => {
-                    // Data layer convention: negative earnings_rank_change = rank
-                    // worsened (e.g. #5 → #8 = -3). Row inverts the sign before
-                    // passing to MovementIndicator (positive = improved).
+                    // Data layer and component conventions agree: positive
+                    // earnings_rank_change = rank improved. Passed through
+                    // unchanged to MovementIndicator.
                     const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
                     const earningsRankChange = moverData?.rankChange ?? null;
                     const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
