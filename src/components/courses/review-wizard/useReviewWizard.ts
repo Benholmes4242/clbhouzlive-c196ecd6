@@ -99,7 +99,7 @@ const INITIAL_BREAKDOWNS: ReviewBreakdowns = {
 
 const INITIAL_STATE: WizardState = {
   step: 1,
-  rating: 5,
+  rating: null,
   breakdowns: INITIAL_BREAKDOWNS,
   title: '',
   review: '',
@@ -107,6 +107,34 @@ const INITIAL_STATE: WizardState = {
   coverMediaId: null,
   selectedTags: [],
 };
+
+/**
+ * D28: Derive overall verdict from category breakdowns.
+ * Returns null if no breakdowns are set; otherwise the mean of set categories,
+ * clamped to [0, 10] and rounded to 1 decimal.
+ */
+function deriveVerdict(breakdowns: ReviewBreakdowns): number | null {
+  const values = Object.values(breakdowns).filter((v): v is number => v !== null);
+  if (values.length === 0) return null;
+  const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+  const clamped = Math.max(0, Math.min(10, avg));
+  return parseFloat(clamped.toFixed(1));
+}
+
+/**
+ * D33: A legacy ratings-only review has an overall rating but no category breakdowns.
+ * On edit-mount we force the user to re-rate categories.
+ */
+function isLegacyRatingsOnly(existing: ExistingRating | undefined): boolean {
+  if (!existing) return false;
+  if (existing.rating == null) return false;
+  return (
+    existing.design_score == null &&
+    existing.condition_score == null &&
+    existing.clubhouse_score == null &&
+    existing.facilities_score == null
+  );
+}
 
 export function useReviewWizard({
   course,
