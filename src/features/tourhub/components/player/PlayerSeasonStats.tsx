@@ -6,6 +6,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
+const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
+type StatTab = (typeof STAT_TABS)[number];
+
 // Tour averages — 2026 PGA Tour season
 const TOUR_AVG = {
   drivingDistance: 301.8,
