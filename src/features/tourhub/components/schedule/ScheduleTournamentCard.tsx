@@ -84,6 +84,7 @@ export function ScheduleTournamentCard({
   className,
   compact = false,
   leaderWinner,
+  defendingChampion,
 }: ScheduleTournamentCardProps) {
   const navigate = useNavigate();
 
