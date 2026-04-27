@@ -701,7 +701,8 @@ export function ScheduleTab() {
                       <div style={{ height: '1px', background: 'rgba(15,23,42,0.1)' }} />
                     )}
                 </div>
-              ))}
+                );
+              })}
             </motion.div>
           ) : (
             filter === 'live' && filterStats.live === 0 ? null : (
