@@ -16,6 +16,7 @@ interface RateStepProps {
   rating: number | null;
   breakdowns: ReviewBreakdowns;
   course: ReviewWizardCourse | null;
+  isLegacyMigration?: boolean;
   onRatingChange: (rating: number) => void;
   onBreakdownChange: (key: keyof ReviewBreakdowns, value: number | null) => void;
 }
