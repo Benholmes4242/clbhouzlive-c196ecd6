@@ -15,13 +15,25 @@ import { useNavigate } from 'react-router-dom';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
-import { getContextLabel } from '../../utils/tournamentClassification';
+import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
 import { TOUR_COLORS } from '../../constants/colors';
 import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { formatPurse } from '../shared/TourHeroHelpers';
 import { TourPill } from '../shared/TourPill';
 import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { WinnerPill } from '../shared/WinnerPill';
+
+// SeasonTournament has no tour_code; derive from its display tourName.
+// TOUR_NAME_TO_SLUG returns lowercase slugs (pga, liv, euro, etc.) — translate
+// to our DB-cased TourMap keys.
+const SLUG_TO_DB_CODE: Record<string, string> = {
+  pga: 'pga',
+  liv: 'LIV',
+  euro: 'EURO',
+  pgad: 'PGAD',
+  champ: 'CHAMP',
+  lpga: 'LPGA',
+};
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
@@ -76,7 +88,7 @@ export function ScheduleTournamentCard({
   const startDate = isSeasonTournament(tournament) ? tournament.startDate : tournament.start_date;
   const tourName = isSeasonTournament(tournament) ? tournament.tourName : tournament.tour_full_name;
   const tourCode = isSeasonTournament(tournament)
-    ? (tournament as SeasonTournament).tourCode ?? null
+    ? (SLUG_TO_DB_CODE[TOUR_NAME_TO_SLUG[tournament.tourName] ?? ''] ?? null)
     : (tournament as TourTournament).tour_code ?? null;
 
   const winnerFirstName = isSeasonTournament(tournament) ? tournament.winnerFirstName : null;
