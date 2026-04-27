@@ -2,7 +2,7 @@ import { useState, useCallback, memo } from 'react';
 import SearchOverlay from '@/components/shared/SearchOverlay';
 import { useRecentSearches } from '@/hooks/useRecentSearches';
 import { useFriendsFeed } from './hooks/useFriendsFeed';
-import { FriendsCard } from './FriendsCard';
+import { LoopCard } from '@/components/loop-tab/LoopCard';
 import { FriendsFeedSkeleton } from './FriendsFeedSkeleton';
 
 interface FriendsSearchOverlayProps {
@@ -67,7 +67,7 @@ function FriendsSearchOverlayInner({ isOpen, onClose, userId }: FriendsSearchOve
         ) : (
           <div className="flex flex-col gap-3 px-3 pb-4">
             {posts.map((post, i) => (
-              <FriendsCard key={post.id} post={post} userId={userId} cardIndex={i} allPosts={posts} />
+              <LoopCard key={post.id} post={post} userId={userId} cardIndex={i} allPosts={posts} />
             ))}
           </div>
         )}
