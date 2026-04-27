@@ -114,14 +114,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
             </button>
           )}
         </>
-      ) : (
-        <div className="py-12 text-center">
-          <p style={{ fontWeight: 500, color: '#64748B' }}>No tournament results yet</p>
-          <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '4px' }}>
-            Results will appear as tournaments are completed
-          </p>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
