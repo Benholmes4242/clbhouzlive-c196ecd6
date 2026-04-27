@@ -559,16 +559,16 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={!draft.trim()}
+                disabled={!draft.trim() || isAddingComment}
                 aria-label="Send comment"
                 style={{
                   width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
-                  background: draft.trim() ? AMBER : 'rgba(15,23,42,0.1)',
-                  color: draft.trim() ? '#ffffff' : INK_SUBTLE,
+                  background: draft.trim() && !isAddingComment ? AMBER : 'rgba(15,23,42,0.1)',
+                  color: draft.trim() && !isAddingComment ? '#ffffff' : INK_SUBTLE,
                   border: 'none',
-                  cursor: draft.trim() ? 'pointer' : 'not-allowed',
+                  cursor: draft.trim() && !isAddingComment ? 'pointer' : 'not-allowed',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: draft.trim() ? '0 2px 6px rgba(247,147,30,0.35)' : 'none',
+                  boxShadow: draft.trim() && !isAddingComment ? '0 2px 6px rgba(247,147,30,0.35)' : 'none',
                   transition: 'background 150ms, box-shadow 150ms',
                 }}
               >
@@ -595,7 +595,9 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
               ? 'Comments are turned off'
               : isOwnProfile
               ? "You can't react to your own picks"
-              : 'Sign in to comment'}
+              : !user
+              ? 'Sign in to comment'
+              : null}
           </div>
         )}
       </SheetContent>
