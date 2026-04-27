@@ -316,49 +316,10 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
   return (
     <section className="px-4" aria-label="World Golf Rankings">
       {/* ─── Section header ─────────────────────────────────────────────── */}
-      <div style={{ marginBottom: 18 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-          <div
-            style={{
-              width: 3,
-              height: 14,
-              background: AMBER,
-              borderRadius: 1,
-              flexShrink: 0,
-            }}
-          />
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 900,
-              color: AMBER,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Official World Golf Ranking
-          </span>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            gap: 12,
-          }}
-        >
-          <h2
-            style={{
-              fontSize: 26,
-              fontWeight: 900,
-              color: INK,
-              letterSpacing: '-0.025em',
-              margin: 0,
-              lineHeight: 1.05,
-            }}
-          >
-            World Rankings
-          </h2>
+      <SectionHeader
+        eyebrow="Official World Golf Ranking"
+        title="World Rankings"
+        action={
           <span
             style={{
               fontSize: 11,
@@ -366,13 +327,12 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
               color: SLATE_500,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
-              flexShrink: 0,
             }}
           >
             UPDATED {updatedSuffix}
           </span>
-        </div>
-      </div>
+        }
+      />
 
       {/* ─── Tour selector strip ────────────────────────────────────────── */}
       <div style={{ marginBottom: 14 }}>
