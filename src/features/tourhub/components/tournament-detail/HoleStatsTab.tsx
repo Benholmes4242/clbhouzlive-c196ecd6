@@ -224,7 +224,8 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>H</span>
             <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>PAR</span>
-            <span style={{ width: '44px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>YDS</span>
+            {/* YDS column dropped Phase 1 — sr_hole_statistics.yardage is 100% NULL.
+                See audit B10. Re-introduce when ingestion populates this field. */}
             <span style={{ flex: 1, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>SCORING DIST.</span>
             <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>AVG</span>
           </div>
@@ -248,7 +249,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div key={hole.holeNumber} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                   <span style={{ width: '28px', fontSize: '14px', fontWeight: 900, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
                   <span style={{ width: '28px', fontSize: '12px', color: '#64748B', flexShrink: 0 }}>{hole.par}</span>
-                  <span style={{ width: '44px', fontSize: '12px', color: '#94A3B8', flexShrink: 0 }}>{hole.yardage ?? '—'}</span>
+                  {/* yardage column dropped — see header comment */}
                   <div style={{ flex: 1, height: '6px', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
                     <div style={{ width: `${bPct}%`, background: '#F7931E' }} />
                     <div style={{ width: `${pPct}%`, background: 'rgba(15,23,42,0.08)' }} />
@@ -278,7 +279,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div key={hole.holeNumber} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                   <span style={{ width: '28px', fontSize: '14px', fontWeight: 900, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
                   <span style={{ width: '28px', fontSize: '12px', color: '#64748B', flexShrink: 0 }}>{hole.par}</span>
-                  <span style={{ width: '44px', fontSize: '12px', color: '#94A3B8', flexShrink: 0 }}>{hole.yardage ?? '—'}</span>
+                  {/* yardage column dropped — see header comment */}
                   <div style={{ flex: 1, height: '6px', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
                     <div style={{ width: `${bPct}%`, background: '#F7931E' }} />
                     <div style={{ width: `${pPct}%`, background: 'rgba(15,23,42,0.08)' }} />
