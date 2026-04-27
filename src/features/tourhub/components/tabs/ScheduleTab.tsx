@@ -574,6 +574,31 @@ export function ScheduleTab() {
             Tour Overview
           </button>
           <div className="flex items-center gap-2">
+            {/* Today jump pill — All tab only, when current week not visible */}
+            {filter === 'all' && !isThisWeekVisible && (
+              <button
+                onClick={scrollToThisWeek}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '7px 11px',
+                  background: '#F7931E',
+                  color: '#FFFFFF',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 900,
+                  border: 'none',
+                  boxShadow: '0 2px 8px rgba(247,147,30,0.3)',
+                  cursor: 'pointer',
+                }}
+                className="active:scale-[0.97] transition-transform"
+                aria-label="Jump to this week"
+              >
+                <Clock size={12} strokeWidth={2.8} color="#FFFFFF" />
+                Today
+              </button>
+            )}
             <button
               onClick={() => setSearchExpanded(v => !v)}
               className={cn(
@@ -600,7 +625,7 @@ export function ScheduleTab() {
                 : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
               }
               <span className="text-[12px] font-semibold text-foreground">
-                {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
+                {activeTour === 'all' ? 'All Tours' : (getTourMeta(activeTour)?.short ?? activeTour)}
               </span>
               <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
             </button>
@@ -632,34 +657,43 @@ export function ScheduleTab() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {monthGroups.map((group, groupIndex) => (
-                // B42 FIX 5: plain div, no staggered entrance
+              {monthGroups.map((group, groupIndex) => {
+                const isCurrentMonth = group.monthKey === currentMonthKey;
+                // Find first tournament in current week to anchor the THIS WEEK band
+                const currentWeekIdx = isCurrentMonth && filter === 'all'
+                  ? group.tournaments.findIndex(t => isInCurrentWeek(t.start_date))
+                  : -1;
+                return (
                 <div
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
                   className=""
                 >
-                  {/* B44 FIX 3: suppress month header on live tab */}
                   {filter !== 'live' && (
-                    // B42 FIX 7: remove redundant wrapper div
-                    <ScheduleMonthHeader 
+                    <ScheduleMonthHeader
                       monthLabel={group.monthLabel}
                       eventCount={group.tournaments.length}
                       tourBreakdown={group.tourBreakdown}
+                      isCurrentMonth={isCurrentMonth}
                     />
                   )}
 
                   {/* Tournament list — flat rows with hairline dividers */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                     {group.tournaments.map((tournament, idx) => (
-                      <InViewCard key={tournament.id}>
-                        <div style={{ borderBottom: idx < group.tournaments.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
-                          <ScheduleTournamentCard 
-                            tournament={tournament}
-                            leaderWinner={leadersWinnersMap?.get(tournament.id)}
-                          />
-                        </div>
-                      </InViewCard>
+                      <div key={tournament.id}>
+                        {currentWeekIdx === idx && (
+                          <ThisWeekAnchor ref={thisWeekAnchorRef} label={currentWeek.label} />
+                        )}
+                        <InViewCard>
+                          <div style={{ borderBottom: idx < group.tournaments.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+                            <ScheduleTournamentCard
+                              tournament={tournament}
+                              leaderWinner={leadersWinnersMap?.get(tournament.id)}
+                            />
+                          </div>
+                        </InViewCard>
+                      </div>
                     ))}
                    </div>
                     {/* Heavier rule between date groups */}
