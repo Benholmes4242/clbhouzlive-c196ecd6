@@ -10,10 +10,12 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
+import { playerRoute } from '../../routes';
 
 interface SummaryTabProps {
   tournamentId: string;
   tournamentSrId: string | null;
+  tournamentName?: string;
   isLive: boolean;
   isCompleted: boolean;
   leaderboard: any[] | null;
