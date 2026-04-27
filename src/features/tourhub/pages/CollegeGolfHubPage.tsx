@@ -12,6 +12,8 @@ import { CollegeCard } from '../components/college/CollegeCard';
 import { useCollegeSeasonStats, useCollegeSearch, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
+import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
+import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
