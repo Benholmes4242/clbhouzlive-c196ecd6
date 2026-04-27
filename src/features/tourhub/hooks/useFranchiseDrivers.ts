@@ -144,6 +144,10 @@ export function useFranchiseDrivers(slugs: string[], weekStart: string | undefin
       return result;
     },
     enabled: slugs.length > 0 && !!weekStart,
-    staleTime: 5 * 60 * 1000,
+    // Driver data only meaningfully changes when a tournament completes (Sunday).
+    // Intra-tournament (Thu-Sun), the leader can shuffle as positions change.
+    // 1h staleTime balances freshness during live windows against cache reuse
+    // off-tournament. Leaderboard cron runs daily; data is week-stable otherwise.
+    staleTime: 60 * 60 * 1000,
   });
 }

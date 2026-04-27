@@ -5,10 +5,10 @@
  * tap-through to the H2H comparison page.
  *
  * Data source: useCollegeRivalries — already implements the spec's
- * earnings-proximity fallback (E28(c)). Subtitle is derived as a prop:
- *   - real college_rivalries row → "Conference rival" (placeholder until
- *     a context_label column is added in Phase 2)
- *   - earnings-proximity fallback row → "Top program"
+ * earnings-proximity fallback (E28(c)). Subtitle is derived in priority order:
+ *   1. college_rivalries.context_label (editorial, e.g. "In-state rival")
+ *   2. real rivalry row without label → "Conference rival"
+ *   3. earnings-proximity fallback row → "Top program"
  *
  * Layout: 3 rival cards + a "Browse all" terminal card. Tap a card to
  * route to the H2H page with the rival pre-selected.
@@ -64,9 +64,9 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
           const college = r.college;
           const displayName = college?.short_name || college?.college_name || r.rivalNormalizedName;
           const logoUrl = getCollegeLogoUrl(college?.college_name || displayName);
-          // Spec subtitle: real rivalry → "Conference rival" (until context_label
-          // ships in Phase 2); fallback row → "Top program".
-          const subtitle = r.isFallback ? 'Top program' : 'Conference rival';
+          // Editorial label from college_rivalries.context_label when present;
+          // fall back to generic copy distinguishing real vs proximity-fallback rows.
+          const subtitle = r.context_label ?? (r.isFallback ? 'Top program' : 'Conference rival');
 
           return (
             <Link

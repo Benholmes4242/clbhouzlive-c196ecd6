@@ -16,8 +16,9 @@
  * Data caveats handled:
  *   - world_ranking === 0 is treated as NULL (stale Sportradar default)
  *   - Cross-tour rankings unavailable → LPGA/DPWT alumni surface as Rising
- *     unless they're in LEGACY_ALUMNI_IDS
- *   - career_major_wins column doesn't exist → Legacy is editorial allow-list
+ *     unless they're in the legacy_alumni table
+ *   - career_major_wins column doesn't exist → Legacy is editorially curated
+ *     in public.legacy_alumni (queried via useLegacyAlumni)
  */
 
 import { useState, useMemo } from 'react';
@@ -25,15 +26,12 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
+import { useLegacyAlumni } from '../../hooks/useLegacyAlumni';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { getPlayerTourTag } from '../../utils/playerTourTag';
-import {
-  LEGACY_ALUMNI_IDS,
-  LEGACY_ALUMNI_CONTEXT,
-  TIER_SUBTITLES,
-} from '../../constants/legacyAlumni';
+import { TIER_SUBTITLES } from '../../constants/legacyAlumni';
 
 interface AlumniDepthChartProps {
   normalizedName: string;
@@ -62,9 +60,10 @@ interface AlumniRowProps {
   alumnus: CollegeAlumnus;
   index: number;
   tier: TierKey;
+  legacyContextLabel?: string | null;
 }
 
-function AlumniRow({ alumnus, index, tier }: AlumniRowProps) {
+function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps) {
   const fullName = `${alumnus.first_name} ${alumnus.last_name}`;
   const hasWins = (alumnus.wins || 0) > 0;
   const hasEarnings = (alumnus.earnings || 0) > 0;
@@ -75,10 +74,10 @@ function AlumniRow({ alumnus, index, tier }: AlumniRowProps) {
   const photoUrl = getPlayerHeadshotUrl(fullName, alumnus.tour_codes?.[0] ?? 'pga');
   const tourTag = getPlayerTourTag(alumnus.tour_codes);
 
-  // Legacy rows show editorial context line; others show OWGR when available.
-  const legacyContext = tier === 'legacy' ? LEGACY_ALUMNI_CONTEXT[alumnus.id] : null;
+  // Legacy rows show editorial context line (from legacy_alumni table);
+  // others show OWGR when available.
   const subline = tier === 'legacy'
-    ? (legacyContext ?? 'Major champion · Program history')
+    ? (legacyContextLabel ?? 'Major champion · Program history')
     : liveRank ? `#${liveRank} OWGR` : null;
 
   return (
@@ -170,9 +169,10 @@ interface SectionProps {
   tier: TierKey;
   alumni: CollegeAlumnus[];
   defaultExpanded?: boolean;
+  legacyMap?: ReadonlyMap<string, string>;
 }
 
-function Section({ tier, alumni, defaultExpanded = true }: SectionProps) {
+function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const COLLAPSED_COUNT = 3;
 
@@ -207,7 +207,13 @@ function Section({ tier, alumni, defaultExpanded = true }: SectionProps) {
       {isExpanded && (
         <>
           {displayedAlumni.map((alumnus, index) => (
-            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tier={tier} />
+            <AlumniRow
+              key={alumnus.id}
+              alumnus={alumnus}
+              index={index}
+              tier={tier}
+              legacyContextLabel={tier === 'legacy' ? legacyMap?.get(alumnus.id) ?? null : null}
+            />
           ))}
 
           {hasMore && (
@@ -230,12 +236,12 @@ function Section({ tier, alumni, defaultExpanded = true }: SectionProps) {
 
 /* ─── Classifier ────────────────────────────────────────────────────────── */
 
-function classifyTier(a: CollegeAlumnus): TierKey {
+function classifyTier(a: CollegeAlumnus, legacyMap: ReadonlyMap<string, string>): TierKey {
   // Sportradar uses 0 as "no rank" sentinel; treat as null
   const rank = a.world_ranking && a.world_ranking > 0 ? a.world_ranking : null;
   const wins = a.wins ?? 0;
   const events = a.events_played ?? 0;
-  const isMajorChamp = LEGACY_ALUMNI_IDS.has(a.id);
+  const isMajorChamp = legacyMap.has(a.id);
 
   // Legacy is mutually exclusive: major champ AND inactive this season
   if (isMajorChamp && events === 0) return 'legacy';
@@ -257,11 +263,14 @@ function classifyTier(a: CollegeAlumnus): TierKey {
 
 /* ─── Component ─────────────────────────────────────────────────────────── */
 
+const EMPTY_LEGACY_MAP: ReadonlyMap<string, string> = new Map();
+
 export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChartProps) {
   const { data: alumni, isLoading, error } = useCollegeAlumni(normalizedName, {
     orderBy: 'earnings',
     limit: 50,
   });
+  const { data: legacyMap = EMPTY_LEGACY_MAP } = useLegacyAlumni();
 
   const tiers = useMemo(() => {
     const buckets: Record<TierKey, CollegeAlumnus[]> = {
@@ -269,10 +278,10 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     };
     if (!alumni) return buckets;
     for (const a of alumni) {
-      buckets[classifyTier(a)].push(a);
+      buckets[classifyTier(a, legacyMap)].push(a);
     }
     return buckets;
-  }, [alumni]);
+  }, [alumni, legacyMap]);
 
   if (isLoading) {
     return (
@@ -301,7 +310,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
       <Section tier="stars"    alumni={tiers.stars}    defaultExpanded />
       <Section tier="regulars" alumni={tiers.regulars} defaultExpanded={tiers.regulars.length <= 5} />
       <Section tier="rising"   alumni={tiers.rising}   defaultExpanded={false} />
-      <Section tier="legacy"   alumni={tiers.legacy}   defaultExpanded />
+      <Section tier="legacy"   alumni={tiers.legacy}   defaultExpanded legacyMap={legacyMap} />
     </div>
   );
 }

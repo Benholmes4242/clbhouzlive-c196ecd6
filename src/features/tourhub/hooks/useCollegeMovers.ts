@@ -185,6 +185,9 @@ export function useCollegeRivalries(normalizedName: string | undefined) {
         college_b: c.normalized_name,
         weight: 1,
         created_at: new Date().toISOString(),
+        // Fallback rows have no editorial label — UI consumer falls back to
+        // generic copy via the isFallback flag.
+        context_label: null as string | null,
         rivalNormalizedName: c.normalized_name,
         college: collegeMap?.get(c.normalized_name) || null,
         isFallback: true,
