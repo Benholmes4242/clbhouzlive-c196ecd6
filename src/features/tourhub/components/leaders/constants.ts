@@ -44,6 +44,12 @@ export interface LeaderCategory {
   unit: string;
   description: string;
   tourAverage: string;
+  /** Numeric tour average for vs Avg pill computation. Null when no meaningful field average exists (counting stats, leader-relative scores). */
+  tourAverageNumeric: number | null;
+  /** True for higher-is-better stats (almost all). False for lower-is-better stats (Putting Average, Scoring Average). */
+  higherIsBetter: boolean;
+  /** True only for World Ranking — the only stat with weekly snapshot history powering streak tracking. */
+  showStreak: boolean;
   accentColor: string;
   accessor: (stats: TourPlayerStatistics) => number | null;
   format: (value: number) => string;
