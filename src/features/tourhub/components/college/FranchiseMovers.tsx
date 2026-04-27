@@ -17,6 +17,7 @@ import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
+import { useFranchiseDrivers } from '../../hooks/useFranchiseDrivers';
 import { SectionHeader } from '../shared/SectionHeader';
 import { FranchiseCard } from './FranchiseCard';
 import { format } from 'date-fns';
@@ -47,6 +48,8 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
 
   const slugs = useMemo(() => enrichedMovers.map(m => m.normalized_name), [enrichedMovers]);
   const { data: alumniMap } = useBatchCollegeAlumni(slugs, 3);
+  // Single batched query for driver lines — one per Movers tab render.
+  const { data: driverMap } = useFranchiseDrivers(slugs, movers?.[0]?.week_start);
 
   const weekStart = movers?.[0]?.week_start;
   const weekLabel = weekStart
@@ -109,7 +112,9 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
           <span style={{ flex: 1, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
           <span style={{ width: 40, textAlign: 'center' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>MOVE</span>
-          <span style={{ width: 72, textAlign: 'right' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARNINGS Δ</span>
+          <span style={{ width: 72, textAlign: 'right' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
+            {direction === 'down' ? 'RANK Δ' : 'EARNINGS Δ'}
+          </span>
         </div>
 
         <AnimatePresence mode="wait">
@@ -128,6 +133,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
               enrichedMovers.map((mover, idx) => {
                 if (!mover.stats) return null;
                 const alumni = alumniMap?.get(mover.normalized_name) || undefined;
+                const driver = driverMap?.get(mover.normalized_name) ?? null;
                 return (
                   <FranchiseCard
                     key={mover.id}
@@ -135,6 +141,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                     college={mover.college}
                     activeMetric="earnings"
                     alumni={alumni}
+                    driverText={driver?.displayText ?? null}
                     animationDelay={idx * 0.03}
                     isDelta
                     deltas={{
