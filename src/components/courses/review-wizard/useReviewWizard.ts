@@ -961,6 +961,9 @@ export function useReviewWizard({
   // Check if any uploads are in progress (always false with upload-on-submit)
   const hasUploadsInProgress = isSubmitting;
 
+  // D33: Surface legacy-migration notice for the Rate step
+  const isLegacyMigration = isEditMode && isLegacyRatingsOnly(existingRating);
+
   return {
     state,
     allMedia,
@@ -970,6 +973,7 @@ export function useReviewWizard({
     isLoadingUser: effectiveLoadingUser,
     isDeleting: deleteMutation.isPending,
     submittedRatingId,
+    isLegacyMigration,
     uploadStatus: { total: pendingFiles.length, ready: 0, uploading: 0, failed: 0, overallPercent: 0 },
     
     // Navigation
