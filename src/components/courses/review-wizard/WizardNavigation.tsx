@@ -1,6 +1,6 @@
 /**
  * Wizard Navigation Buttons
- * Hidden on post-submit screens (success, share-success)
+ * Hidden on post-submit screens (success)
  */
 
 import { ArrowLeft, ArrowRight, Loader2, Check, Trash2 } from 'lucide-react';
@@ -32,7 +32,7 @@ export function WizardNavigation({
   onRemoveReview,
 }: WizardNavigationProps) {
   // Hide navigation on post-submit screens
-  if (currentStep === 'success' || currentStep === 'share-success') {
+  if (currentStep === 'success') {
     return null;
   }
 

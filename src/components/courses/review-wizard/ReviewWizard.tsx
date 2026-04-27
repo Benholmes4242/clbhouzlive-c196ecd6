@@ -195,8 +195,7 @@ export function ReviewWizard({
     wizard.state.review.length > 0 ||
     wizard.allMedia.length > 0;
 
-  const isPostSubmit = wizard.state.step === 'success' || 
-    wizard.state.step === 'share-success';
+  const isPostSubmit = wizard.state.step === 'success';
 
   useNavigationGuard({
     active: wizard.isSubmitting || (hasUnsavedChanges && !isPostSubmit),
