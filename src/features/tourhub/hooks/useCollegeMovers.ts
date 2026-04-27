@@ -93,6 +93,15 @@ export function useCollegeWeeklyMovers(options?: {
       
       if (direction === 'up') {
         query = query.gt(deltaColumn, 0).order(deltaColumn, { ascending: false });
+      } else if (metric === 'earnings') {
+        // ASYMMETRIC CASE — DO NOT "TIDY". Season earnings are cumulative and
+        // structurally non-negative: a franchise can't lose money, only fail to
+        // earn while peers do. So `earnings_delta < 0` is essentially never true
+        // and would render an empty Falling tab. The honest fall signal is rank
+        // change: a franchise rises in $ but falls in rank when peers earn more.
+        // Wins/Top 10s are not cumulative in the same way (a voided result can
+        // decrement) so they keep the *_delta < 0 filter below.
+        query = query.lt('earnings_rank_change', 0).order('earnings_rank_change', { ascending: true });
       } else {
         query = query.lt(deltaColumn, 0).order(deltaColumn, { ascending: true });
       }
