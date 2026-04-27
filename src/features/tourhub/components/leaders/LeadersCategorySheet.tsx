@@ -111,7 +111,7 @@ export function LeadersCategorySheet({
               LEADERBOARDS
             </div>
             <div id="leaders-category-sheet-title" style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
-              Performance Rankings
+              Stat Watch
             </div>
           </div>
 
