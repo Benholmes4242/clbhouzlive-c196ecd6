@@ -1,30 +1,79 @@
 /**
- * AllToursTicker — Tour Hub redesign Phase B
+ * AllToursTicker — Persistent rail beneath the Hero on Tour Hub Overview.
  *
- * Dark navy stock-ticker treatment that sits flush below the Live Hero.
- * Replaces the brighter "Live Right Now" strip on the Overview page only.
- * (LiveRightNow remains in use on the Schedule tab.)
+ * Renders in four states (always visible — never returns null):
  *
- * Phase A — Hero+Ticker Unification:
- *   - Background gradient now matches the dark-card system
- *     (linear-gradient 135deg #0a1628 → #1e293b — same as UpNextBroadcast)
- *   - Each cell is now a Hero switcher (tap = swap Hero, no navigation)
- *   - Active cell: amber 1.5px border + amber-tinted bg + "NOW SHOWING" label
- *   - Eyebrow shows "{N} LIVE NOW · TAP TO SWITCH" hint
+ *   1. ALL LIVE        eyebrow "LIVE · ALL TOURS",           green pulsing dot
+ *   2. MIXED           eyebrow "LIVE & RESULTS · ALL TOURS", green pulsing dot
+ *   3. ALL RESULTS     eyebrow "RESULTS · ALL TOURS",        static slate dot
+ *   4. DEEP OFF-SEASON eyebrow "UP NEXT · ALL TOURS",        muted amber dot
  *
- * Visual identity:
- *   - Pulsing green dot + "LIVE · ALL TOURS" tracked-caps eyebrow
- *   - Right-aligned "{N} LIVE NOW · TAP TO SWITCH" hint
- *   - Horizontal scroll of tour cells separated by hairline dividers
- *   - Each cell: amber tour pill + event name + flag + leader name + score (with live pulse dot)
- *   - Bottom amber shimmer line via `th-shimmer-line` keyframe
+ * Cells:
+ *   - live      → tour pill + name + flag + leader + green score + pulse dot
+ *   - completed → tour pill + name + flag + winner + slate score + "FINAL" tag
+ *   - upcoming  → tour pill + name + flag + start date + "{N}d" until start
+ *
+ * Tap on any cell calls onSelect(tournamentId) → parent swaps Hero slide.
+ * HeroCarousel already supports live / completed / upcoming slide types so
+ * all three cell variants drive the Hero correctly.
  */
 
 import React from 'react';
-import { useLiveRightNow, type LiveTournamentWithLeader } from '../hooks/useOverviewModules';
+import {
+  useAllToursTickerData,
+  type TickerCellData,
+  type TickerCellStatus,
+} from '../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
 
 const TICKER_GRADIENT = 'linear-gradient(135deg, #0a1628 0%, #1e293b 100%)';
+const GREEN = '#10B981';
+const SLATE_300 = '#CBD5E1';
+const SLATE_500 = '#64748B';
+const SLATE_700 = '#334155';
+const AMBER = '#F7931E';
+
+type RailState = 'all-live' | 'mixed' | 'all-results' | 'deep-empty';
+
+interface MastheadConfig {
+  eyebrow: string;
+  hint: string;
+  dot: 'live' | 'static-slate' | 'muted-amber';
+}
+
+function resolveMasthead(
+  state: RailState,
+  liveCount: number,
+  resultsCount: number,
+  upcomingCount: number,
+): MastheadConfig {
+  switch (state) {
+    case 'all-live':
+      return {
+        eyebrow: 'Live · All Tours',
+        hint: `${liveCount} Live Now · Tap to Switch`,
+        dot: 'live',
+      };
+    case 'mixed':
+      return {
+        eyebrow: 'Live & Results · All Tours',
+        hint: `${liveCount} Live · ${resultsCount} Final · Tap to Switch`,
+        dot: 'live',
+      };
+    case 'all-results':
+      return {
+        eyebrow: 'Results · All Tours',
+        hint: `${resultsCount} Final · Tap to Switch`,
+        dot: 'static-slate',
+      };
+    case 'deep-empty':
+      return {
+        eyebrow: 'Up Next · All Tours',
+        hint: `${upcomingCount} Events Upcoming · Tap to Preview`,
+        dot: 'muted-amber',
+      };
+  }
+}
 
 function abbreviateName(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
@@ -44,18 +93,65 @@ function tourPillLabel(slug?: string | null): string {
   }
 }
 
+function formatStartDate(iso: string): string {
+  const d = new Date(iso + 'T12:00:00Z');
+  const month = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' }).format(d).toUpperCase();
+  const day = new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'UTC' }).format(d);
+  return `${month} ${day}`;
+}
+
+// ── Dot ─────────────────────────────────────────────────────────────────────
+const MastheadDot: React.FC<{ kind: MastheadConfig['dot'] }> = ({ kind }) => {
+  if (kind === 'live') {
+    return <span className="th-live-dot" aria-hidden />;
+  }
+  if (kind === 'muted-amber') {
+    return (
+      <span
+        aria-hidden
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: AMBER,
+          opacity: 0.6,
+          display: 'inline-block',
+        }}
+      />
+    );
+  }
+  // static-slate
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 6,
+        height: 6,
+        borderRadius: '50%',
+        background: SLATE_500,
+        display: 'inline-block',
+      }}
+    />
+  );
+};
+
+// ── Cell ────────────────────────────────────────────────────────────────────
 interface TickerCellProps {
-  tournament: LiveTournamentWithLeader;
+  cell: TickerCellData;
   isLast: boolean;
   isActive: boolean;
   onSelect: (id: string) => void;
 }
 
-const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, onSelect }) => {
+const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelect }) => {
+  const isLive = cell.status === 'live';
+  const isCompleted = cell.status === 'completed';
+  const isUpcoming = cell.status === 'upcoming';
+
   return (
     <button
       type="button"
-      onClick={() => onSelect(tournament.id)}
+      onClick={() => onSelect(cell.id)}
       className="active:opacity-80"
       style={{
         flexShrink: 0,
@@ -73,7 +169,6 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
       }}
       aria-pressed={isActive}
     >
-
       {/* Tour pill + tournament name */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <span
@@ -90,7 +185,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
             lineHeight: 1.2,
           }}
         >
-          {tourPillLabel(tournament.tourSlug)}
+          {tourPillLabel(cell.tourSlug)}
         </span>
         <span
           style={{
@@ -104,16 +199,14 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
             maxWidth: 160,
           }}
         >
-          {tournament.name}
+          {cell.name}
         </span>
       </div>
 
-      {/* Leader row */}
-      {tournament.leader ? (
+      {/* Detail row */}
+      {(isLive || isCompleted) && cell.personName && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {tournament.leader.country && (
-            <CountryFlag country={tournament.leader.country} size="sm" />
-          )}
+          {cell.country && <CountryFlag country={cell.country} size="sm" />}
           <span
             style={{
               fontSize: 12,
@@ -126,26 +219,129 @@ const TickerCell: React.FC<TickerCellProps> = ({ tournament, isLast, isActive, o
               maxWidth: 110,
             }}
           >
-            {abbreviateName(tournament.leader.name)}
+            {abbreviateName(cell.personName)}
           </span>
+          {cell.scoreDisplay && (
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 900,
+                color: isLive ? GREEN : SLATE_300,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
+                fontFeatureSettings: '"kern" 1, "liga" 1',
+              }}
+            >
+              {cell.scoreDisplay}
+            </span>
+          )}
+          {isLive ? (
+            <span className="th-live-dot" style={{ width: 6, height: 6, marginLeft: 2 }} aria-hidden />
+          ) : (
+            <span
+              style={{
+                fontSize: 8,
+                fontWeight: 900,
+                color: SLATE_500,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                marginLeft: 2,
+                padding: '2px 5px',
+                borderRadius: 3,
+                background: 'rgba(255,255,255,0.06)',
+              }}
+            >
+              Final
+            </span>
+          )}
+        </div>
+      )}
+
+      {(isLive || isCompleted) && !cell.personName && (
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+          {isLive ? 'Starting soon' : 'Final'}
+        </div>
+      )}
+
+      {isUpcoming && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {cell.country && <CountryFlag country={cell.country} size="sm" />}
           <span
             style={{
-              fontSize: 13,
-              fontWeight: 900,
-              color: '#10B981',
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
-              fontFeatureSettings: '"kern" 1, "liga" 1',
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.78)',
+              letterSpacing: '-0.005em',
+              whiteSpace: 'nowrap',
             }}
           >
-            {tournament.leader.scoreDisplay}
+            {formatStartDate(cell.startDate)}
           </span>
-          <span className="th-live-dot" style={{ width: 6, height: 6, marginLeft: 2 }} aria-hidden />
+          {cell.daysUntilStart != null && (
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: AMBER,
+                letterSpacing: '-0.005em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {cell.daysUntilStart === 0 ? 'today' : `${cell.daysUntilStart}d`}
+            </span>
+          )}
         </div>
-      ) : (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Starting soon</div>
       )}
     </button>
+  );
+};
+
+// ── Masthead (always renders) ───────────────────────────────────────────────
+const Masthead: React.FC<{ config: MastheadConfig }> = ({ config }) => {
+  const eyebrowColor =
+    config.dot === 'live'
+      ? GREEN
+      : config.dot === 'muted-amber'
+      ? AMBER
+      : SLATE_300;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 20px',
+        marginBottom: 6,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <MastheadDot kind={config.dot} />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 900,
+            color: eyebrowColor,
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {config.eyebrow}
+        </span>
+      </div>
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          color: 'rgba(255,255,255,0.4)',
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {config.hint}
+      </span>
+    </div>
   );
 };
 
@@ -157,34 +353,35 @@ interface AllToursTickerProps {
 }
 
 export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {}) {
-  const { data: liveTournaments, isLoading } = useLiveRightNow();
+  const { data, isLoading } = useAllToursTickerData();
   const handleSelect = onSelect ?? (() => {});
 
-  if (isLoading) {
-    return (
-      <div style={{ background: TICKER_GRADIENT, padding: '14px 0 16px' }}>
-        <div style={{ padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span className="th-live-dot" aria-hidden />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#10B981', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-              Live · All Tours
-            </span>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 12, padding: '0 20px', overflowX: 'hidden' }}>
-          {[0, 1, 2].map((i) => (
-            <div key={i} style={{ flexShrink: 0, width: 220, height: 56, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
-          ))}
-        </div>
-      </div>
-    );
+  const live = data?.live ?? [];
+  const completed = data?.completed ?? [];
+  const upcoming = data?.upcoming ?? [];
+
+  // Resolve cells + state
+  let cells: TickerCellData[];
+  let state: RailState;
+  if (live.length > 0 && completed.length > 0) {
+    state = 'mixed';
+    cells = [...live, ...completed]; // live first, then results
+  } else if (live.length > 0) {
+    state = 'all-live';
+    cells = live;
+  } else if (completed.length > 0) {
+    state = 'all-results';
+    cells = completed;
+  } else {
+    state = 'deep-empty';
+    cells = upcoming;
   }
 
-  if (!liveTournaments || liveTournaments.length === 0) return null;
+  const config = resolveMasthead(state, live.length, completed.length, upcoming.length);
 
   return (
     <section
-      aria-label="Live tournaments across all tours"
+      aria-label="Tournaments across all tours"
       style={{
         background: TICKER_GRADIENT,
         position: 'relative',
@@ -193,70 +390,71 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
         borderTop: '1px solid rgba(255,255,255,0.04)',
       }}
     >
-      {/* Eyebrow row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 20px',
-          marginBottom: 6,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="th-live-dot" aria-hidden />
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 900,
-              color: '#10B981',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Live · All Tours
-          </span>
+      <Masthead config={config} />
+
+      {/* Cell strip — skeletons during initial load, otherwise the resolved cells */}
+      {isLoading && cells.length === 0 ? (
+        <div style={{ display: 'flex', gap: 12, padding: '0 20px', overflowX: 'hidden' }}>
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                flexShrink: 0,
+                width: 220,
+                height: 56,
+                borderRadius: 8,
+                background: 'rgba(255,255,255,0.04)',
+              }}
+            />
+          ))}
         </div>
-        <span
+      ) : cells.length === 0 ? (
+        // Truly empty (no live, no recent, no upcoming) — show a quiet placeholder
+        <div
           style={{
-            fontSize: 9,
-            fontWeight: 700,
+            padding: '14px 20px',
+            fontSize: 11,
             color: 'rgba(255,255,255,0.4)',
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '0.04em',
           }}
         >
-          {liveTournaments.length} Live Now · Tap to Switch
-        </span>
-      </div>
+          No tournaments scheduled in this window.
+        </div>
+      ) : (
+        <div
+          className="[&::-webkit-scrollbar]:hidden"
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch' as any,
+            willChange: 'transform',
+          }}
+        >
+          {cells.map((c, i) => (
+            <TickerCell
+              key={c.id}
+              cell={c}
+              isLast={i === cells.length - 1}
+              isActive={activeId === c.id}
+              onSelect={handleSelect}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Horizontal scroll of cells */}
-      <div
-        className="[&::-webkit-scrollbar]:hidden"
-        style={{
-          display: 'flex',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch' as any,
-          willChange: 'transform',
-        }}
-      >
-        {liveTournaments.map((t, i) => (
-          <TickerCell
-            key={t.id}
-            tournament={t}
-            isLast={i === liveTournaments.length - 1}
-            isActive={activeId === t.id}
-            onSelect={handleSelect}
-          />
-        ))}
-      </div>
-
-      {/* Bottom amber shimmer line */}
-      <div className="th-shimmer-line" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} aria-hidden />
+      {/* Bottom amber shimmer line — only show when live action is present */}
+      {(state === 'all-live' || state === 'mixed') && (
+        <div className="th-shimmer-line" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} aria-hidden />
+      )}
     </section>
   );
 }
 
+// Re-export for backward compatibility (any old import path expecting LiveTournamentWithLeader)
+export type { TickerCellData, TickerCellStatus } from '../hooks/useOverviewModules';
+
 export default AllToursTicker;
+
+// Suppress unused-type warnings — referenced via re-export above
+export type _UnusedStatus = TickerCellStatus;
