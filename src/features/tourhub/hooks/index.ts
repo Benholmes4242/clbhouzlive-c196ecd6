@@ -15,7 +15,7 @@ export { useUpcomingEvents, useLiveEvents } from './useTourEvents';
 
 // Gamification Hooks - Power Ladder, Skill Trees, Live Arena, Predictions
 export * from './usePowerLadder';
-export * from './usePlayerSkillTree';
+
 export * from './useLiveArena';
 export * from './useTournamentPredictions';
 export * from './useAIPredictions';
