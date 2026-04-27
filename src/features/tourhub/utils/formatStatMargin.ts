@@ -97,7 +97,7 @@ export function formatStatMargin(input: StatMarginInput): StatMarginOutput {
   // If gap is negative the leader is on the wrong side of #2 (data anomaly);
   // use absolute and let direction be inferred from higherIsBetter.
   const absGap = Math.abs(gap);
-  const formatted = formatGap(absGap, unit, categoryKey, precision);
+  const formatted = formatStatMarginGap(absGap, unit, categoryKey, precision);
   const sign = higherIsBetter ? '+' : MINUS;
 
   return { copy: `${sign}${formatted}`, variant: 'highlight' };
