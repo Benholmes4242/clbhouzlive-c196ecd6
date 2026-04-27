@@ -44,6 +44,9 @@ interface FranchiseCardProps {
    *  Convention matches MovementIndicator's positive=improved, so passed through
    *  unchanged at the call site. */
   earningsRankChange?: number | null;
+  /** Movers-tab driver (highest-money finisher this week). Renders as
+   *  "{N} alumni · {driver}" in the isDelta subline. Null = fall back to "{N} alumni". */
+  driverText?: string | null;
   className?: string;
   animationDelay?: number;
   isDelta?: boolean;
@@ -74,7 +77,7 @@ function pluralize(count: number, singular: string, plural?: string): string {
 
 export function FranchiseCard({
   stats, college, rank, activeMetric = 'earnings',
-  alumni: _alumni, captain, earningsRankChange,
+  alumni: _alumni, captain, earningsRankChange, driverText,
   className, animationDelay = 0,
   isDelta = false, deltas,
 }: FranchiseCardProps) {
@@ -90,12 +93,17 @@ export function FranchiseCard({
     ? String(stats.top10_total)
     : formatCompact(stats.earnings_total);
 
-  // Captain context line. Falls back to "{N} alumni" when captain doesn't
-  // dominate by >20% margin (see captainAnchor.ts for edge-case handling).
+  // Captain context line (non-delta rows). Falls back to "{N} alumni" when
+  // captain doesn't dominate by >20% (see captainAnchor.ts).
+  // Movers (isDelta) rows use a separate driver-line rule below.
   const showCaptain = !isDelta && captain && captainDominates(captain);
-  const sublineText = showCaptain
-    ? `${captainShortName(captain!.fullName)} · ${formatCaptainEarnings(captain!.earnings)} season`
-    : `${stats.player_count} alumni`;
+  const sublineText = isDelta
+    ? (driverText
+        ? `${stats.player_count} alumni · ${driverText}`
+        : `${stats.player_count} alumni`)
+    : showCaptain
+      ? `${captainShortName(captain!.fullName)} · ${formatCaptainEarnings(captain!.earnings)} season`
+      : `${stats.player_count} alumni`;
 
   const ariaLabel = [
     rank !== undefined ? `Rank ${rank}` : null,
