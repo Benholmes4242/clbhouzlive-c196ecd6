@@ -1,22 +1,20 @@
 /**
- * AddCourseModal - Bottom sheet for adding courses to Top 10
- * 
- * Features:
- * - Proper bottom sheet with rounded corners, drag handle, slide-up animation
- * - Fixed search: searches user's played courses directly (not all courses)
- * - Two-path flow:
- *   A) Rated courses → Add immediately
- *   B) Unrated courses → Prompt to rate first
+ * AddCourseModal — Bottom sheet for managing the Personal Top 10.
+ *
+ * Two tabs:
+ *  - Manage: drag-to-reorder + chevrons + remove (preserves dnd-kit behavior)
+ *  - Add Course: search played courses, add rated, prompt to rate unrated
+ *
+ * Visual language: 'The Dispatch' editorial — serif titles, amber-bar eyebrows,
+ * #F8FAFC sheet shell with #FFFFFF rows, hairline dividers, podium-coloured rank badges.
  */
 import React, { useState, useMemo, useRef, useCallback } from 'react';
-import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical, Trophy, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { toast } from 'sonner';
 import {
@@ -38,6 +36,18 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
+// ---- Locked Dispatch tokens ----
+const INK = '#0F172A';
+const INK_SOFT = '#475569';
+const INK_SUBTLE = '#94A3B8';
+const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97A10';
+const AMBER_WASH = 'rgba(247,147,30,0.08)';
+const AMBER_BORDER = 'rgba(247,147,30,0.30)';
+const BORDER = 'rgba(15,23,42,0.07)';
+const BG_SURFACE = '#F8FAFC';
+const FONT_SERIF = 'Georgia, "Times New Roman", serif';
+
 interface AddCourseModalProps {
   userId: string;
   onClose: () => void;
@@ -56,41 +66,55 @@ interface CourseWithRating {
   has_rating: boolean;
 }
 
-// Position badge colors - Chartreus gold for #1
+// Position badge colors — gold/silver/bronze podium, slate for 4-10
 const getPositionBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
   switch (position) {
     case 1:
-      // Gold - Chartreus
-      return { 
-        bg: '#C1A84C', 
+      return {
+        bg: '#C1A84C',
         text: '#FFFFFF',
-        shadow: '0 2px 8px rgba(193, 168, 76, 0.4)'
+        shadow: '0 2px 8px rgba(193, 168, 76, 0.4)',
       };
     case 2:
-      // Silver
-      return { 
-        bg: 'linear-gradient(145deg, #94A3B8 0%, #64748B 100%)', 
+      return {
+        bg: 'linear-gradient(145deg, #94A3B8 0%, #64748B 100%)',
         text: '#FFFFFF',
-        shadow: '0 2px 6px rgba(100, 116, 139, 0.35)'
+        shadow: '0 2px 6px rgba(100, 116, 139, 0.35)',
       };
     case 3:
-      // Bronze
-      return { 
-        bg: 'linear-gradient(145deg, #D97706 0%, #B45309 100%)', 
+      return {
+        bg: 'linear-gradient(145deg, #D97706 0%, #B45309 100%)',
         text: '#FFFFFF',
-        shadow: '0 2px 6px rgba(217, 119, 6, 0.35)'
+        shadow: '0 2px 6px rgba(217, 119, 6, 0.35)',
       };
     default:
-      // Slate grey
-      return { 
-        bg: '#F1F5F9', 
+      return {
+        bg: '#F1F5F9',
         text: '#475569',
-        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
+        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)',
       };
   }
 };
 
-// Sortable list item component
+// Serif rating score with reduced decimal — matches Courses tab editorial language
+const SerifScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
+  const safe = Number.isFinite(value) ? value : 0;
+  const int = Math.floor(safe);
+  const dec = Math.round((safe * 10) % 10);
+  return (
+    <span style={{
+      fontFamily: FONT_SERIF,
+      color: INK,
+      lineHeight: 1,
+      letterSpacing: '-0.02em',
+    }}>
+      <span style={{ fontSize: size, fontWeight: 900 }}>{int}</span>
+      <span style={{ fontSize: size * 0.65, fontWeight: 700 }}>.{dec}</span>
+    </span>
+  );
+};
+
+// ---- Sortable Manage row ----
 interface SortableItemProps {
   course: any;
   index: number;
@@ -121,7 +145,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
     isDragging,
   } = useSortable({ id: course.course_id });
 
-  const style = {
+  const dragStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
@@ -130,106 +154,357 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
 
   const position = index + 1;
   const badgeStyle = getPositionBadgeStyle(position);
+  const ratingNum = typeof course.rating === 'number'
+    ? course.rating
+    : course.rating != null ? parseFloat(course.rating) : null;
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className={`flex items-center gap-3 p-3 bg-card rounded-xl border border-border/30 ${
-        isDragging ? 'shadow-lg' : ''
-      }`}
+      style={{
+        ...dragStyle,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '14px 20px',
+        background: '#FFFFFF',
+        borderBottom: `1px solid ${BORDER}`,
+        boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+      }}
     >
-      {/* Drag handle */}
-      <div 
+      {/* Drag handle — 32×44 hit target */}
+      <button
         {...attributes}
         {...listeners}
-        className="flex-shrink-0 cursor-grab active:cursor-grabbing touch-none"
+        style={{
+          width: 32,
+          height: 44,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'transparent',
+          border: 0,
+          cursor: 'grab',
+          color: INK_SUBTLE,
+          padding: 0,
+          flexShrink: 0,
+          touchAction: 'none',
+        }}
+        aria-label="Drag to reorder"
       >
-        <GripVertical className="w-5 h-5 text-muted-foreground/50" />
-      </div>
+        <GripVertical size={18} strokeWidth={2} />
+      </button>
 
-      {/* Thumbnail with rank badge overlay */}
-      <div className="relative flex-shrink-0">
+      {/* Thumbnail with podium badge overlap */}
+      <div style={{ position: 'relative', flexShrink: 0 }}>
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
             alt={course.name}
             loading="lazy"
             decoding="async"
-            className="w-14 h-14 object-cover rounded-[10px]"
+            style={{
+              width: 56,
+              height: 56,
+              objectFit: 'cover',
+              borderRadius: 12,
+              background: '#F1F5F9',
+              display: 'block',
+            }}
           />
         ) : (
-          <div className="w-14 h-14 rounded-[10px] bg-muted flex items-center justify-center">
-            <Trophy className="w-5 h-5 text-muted-foreground/40" />
+          <div style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            background: '#F1F5F9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <Trophy size={20} color={INK_SUBTLE} />
           </div>
         )}
-        {/* Rank badge - overlapping top-left */}
-        <div 
-          className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full flex items-center justify-center border-2 border-card"
-          style={{
-            background: badgeStyle.bg,
-            boxShadow: badgeStyle.shadow,
-          }}
-        >
-          <span 
-            className="text-[10px] font-bold leading-none"
-            style={{ color: badgeStyle.text }}
-          >
-            {position}
+        <div style={{
+          position: 'absolute',
+          top: -4,
+          left: -4,
+          width: 22,
+          height: 22,
+          borderRadius: '50%',
+          background: badgeStyle.bg,
+          color: badgeStyle.text,
+          boxShadow: badgeStyle.shadow,
+          border: '2px solid #FFFFFF',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 10,
+          fontWeight: 900,
+          letterSpacing: '-0.02em',
+        }}>
+          {position}
+        </div>
+      </div>
+
+      {/* Course info — serif name + dispatch caps + serif score */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontFamily: FONT_SERIF,
+          fontSize: 15,
+          fontWeight: 700,
+          color: INK,
+          lineHeight: 1.25,
+          marginBottom: 3,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {course.name}
+        </div>
+        <div style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 6,
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.14em',
+          color: INK_SUBTLE,
+          textTransform: 'uppercase',
+          overflow: 'hidden',
+        }}>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {course.sub_country || course.country}
           </span>
+          {ratingNum != null && (
+            <>
+              <span style={{ color: '#CBD5E1' }}>·</span>
+              <SerifScore value={ratingNum} size={13} />
+            </>
+          )}
         </div>
       </div>
 
-      {/* Course info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold truncate text-sm text-foreground">{course.name}</span>
-        </div>
-        <div className="text-xs text-muted-foreground truncate">
-          {course.sub_country || course.country}
-        </div>
-        {course.rating != null && (
-          <div className="flex items-center mt-0.5">
-            <span className="text-xs text-foreground font-medium">
-              {typeof course.rating === 'number' ? course.rating.toFixed(1) : course.rating}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Reorder buttons */}
-      <div className="flex flex-col gap-0.5">
+      {/* Reorder chevrons */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 0,
+        flexShrink: 0,
+      }}>
         <button
           onClick={() => onMoveUp(index)}
           disabled={index === 0 || isReordering}
-          className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
+          style={{
+            width: 32,
+            height: 22,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 0,
+            cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
+            color: INK_SUBTLE,
+            opacity: index === 0 || isReordering ? 0.3 : 1,
+            padding: 0,
+          }}
           aria-label="Move up"
         >
-          <ChevronUp className="w-4 h-4 text-muted-foreground" />
+          <ChevronUp size={16} strokeWidth={2.25} />
         </button>
         <button
           onClick={() => onMoveDown(index)}
           disabled={index === totalItems - 1 || isReordering}
-          className="min-h-[32px] min-w-[32px] flex items-center justify-center rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.95]"
+          style={{
+            width: 32,
+            height: 22,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 0,
+            cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
+            color: INK_SUBTLE,
+            opacity: index === totalItems - 1 || isReordering ? 0.3 : 1,
+            padding: 0,
+          }}
           aria-label="Move down"
         >
-          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          <ChevronDown size={16} strokeWidth={2.25} />
         </button>
       </div>
 
-      {/* Remove button */}
+      {/* Remove */}
       <button
         onClick={() => onRemove(course.course_id)}
         disabled={isRemoving}
-        className="min-h-[44px] min-w-[32px] flex items-center justify-center rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50 active:scale-[0.95]"
-        aria-label="Remove from Top 10"
+        style={{
+          width: 36,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'transparent',
+          border: 0,
+          cursor: isRemoving ? 'not-allowed' : 'pointer',
+          color: '#EF4444',
+          opacity: isRemoving ? 0.4 : 0.7,
+          padding: 0,
+          flexShrink: 0,
+        }}
+        aria-label={`Remove ${course.name} from Top 10`}
       >
-        <Trash2 className="w-4 h-4" />
+        <Trash2 size={18} strokeWidth={2} />
       </button>
     </div>
   );
 };
 
+// ---- Add Course row ----
+interface CourseRowProps {
+  course: CourseWithRating;
+  onAction: () => void;
+  actionIcon: React.ReactNode;
+  actionLabel: string;
+  isAtLimit?: boolean;
+  isSecondary?: boolean;
+}
+
+const CourseRow: React.FC<CourseRowProps> = ({
+  course,
+  onAction,
+  actionIcon,
+  actionLabel,
+  isAtLimit = false,
+  isSecondary = false,
+}) => (
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: '14px 20px',
+    background: '#FFFFFF',
+    borderBottom: `1px solid ${BORDER}`,
+    opacity: isAtLimit ? 0.4 : 1,
+  }}>
+    {course.thumbnail_image ? (
+      <img
+        src={course.thumbnail_image}
+        alt={course.name}
+        loading="lazy"
+        decoding="async"
+        style={{
+          width: 56,
+          height: 56,
+          objectFit: 'cover',
+          borderRadius: 12,
+          background: '#F1F5F9',
+          flexShrink: 0,
+          display: 'block',
+        }}
+      />
+    ) : (
+      <div style={{
+        width: 56,
+        height: 56,
+        borderRadius: 12,
+        background: '#F1F5F9',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}>
+        <Trophy size={20} color={INK_SUBTLE} />
+      </div>
+    )}
+
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{
+        fontFamily: FONT_SERIF,
+        fontSize: 15,
+        fontWeight: 700,
+        color: INK,
+        lineHeight: 1.25,
+        marginBottom: 3,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}>
+        {course.name}
+      </div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: 6,
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.14em',
+        color: INK_SUBTLE,
+        textTransform: 'uppercase',
+        overflow: 'hidden',
+      }}>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {course.sub_country || course.country}
+        </span>
+        {course.has_rating && course.rating_value != null && (
+          <>
+            <span style={{ color: '#CBD5E1' }}>·</span>
+            <SerifScore value={course.rating_value} size={13} />
+          </>
+        )}
+      </div>
+    </div>
+
+    <button
+      onClick={onAction}
+      disabled={isAtLimit}
+      style={{
+        width: 36,
+        height: 36,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: isAtLimit
+          ? '#F1F5F9'
+          : isSecondary
+            ? 'rgba(15,23,42,0.04)'
+            : AMBER_WASH,
+        border: `1px solid ${isAtLimit ? BORDER : isSecondary ? BORDER : AMBER_BORDER}`,
+        borderRadius: 10,
+        cursor: isAtLimit ? 'not-allowed' : 'pointer',
+        color: isAtLimit ? INK_SUBTLE : isSecondary ? INK_SOFT : AMBER_DEEP,
+        padding: 0,
+        flexShrink: 0,
+      }}
+      aria-label={actionLabel}
+    >
+      {actionIcon}
+    </button>
+  </div>
+);
+
+// Reusable section eyebrow with amber-bar prefix
+const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
+  <div style={{
+    padding: '12px 20px 8px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+  }}>
+    <div style={{ width: 3, height: 9, background: AMBER }} />
+    <span style={{
+      fontSize: 10,
+      fontWeight: 800,
+      letterSpacing: '0.22em',
+      color: INK_SUBTLE,
+      textTransform: 'uppercase',
+    }}>
+      {label}
+    </span>
+  </div>
+);
+
+// =====================================================================
 export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   userId,
   onClose,
@@ -241,17 +516,17 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   const { data: userActivity = [] } = useUserCourseActivity(userId);
   const { addCourse, removeCourse, reorderTopTen, topTen, isRemoving, isReordering } = useUserTopTenCourses(userId);
 
-  // Check if pre-selected course is already in Top 10
   const isPreSelectedInTop10 = preSelectedCourseId ? existingCourseIds.includes(preSelectedCourseId) : false;
+  const isAtLimit = topTen.length >= 10;
 
-  // Fetch pre-selected course details if provided
+  // Pre-selected course details
   const { data: preSelectedCourse } = useQuery({
     queryKey: ['course', preSelectedCourseId],
     queryFn: async () => {
@@ -266,26 +541,17 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
     enabled: !!preSelectedCourseId && !isPreSelectedInTop10,
   });
 
-  // DnD sensors
+  // DnD sensors — preserved verbatim
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  // Handle drag end
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
-
     if (over && active.id !== over.id) {
       const oldIndex = topTen.findIndex((c) => c.course_id === active.id);
       const newIndex = topTen.findIndex((c) => c.course_id === over.id);
-
       if (oldIndex !== -1 && newIndex !== -1) {
         const newOrder = arrayMove(topTen, oldIndex, newIndex);
         reorderTopTen(newOrder.map((c, i) => ({
@@ -297,14 +563,12 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
     }
   }, [topTen, reorderTopTen]);
 
-  // Get all played course IDs (not already in Top 10)
   const playedCourseIds = useMemo(() => {
     return userActivity
       .filter(a => !existingCourseIds.includes(a.course_id))
       .map(a => a.course_id);
   }, [userActivity, existingCourseIds]);
 
-  // Fetch course details for ALL played courses
   const { data: playedCourses = [], isLoading } = useQuery({
     queryKey: ['user-played-courses-for-top10', userId, playedCourseIds],
     enabled: playedCourseIds.length > 0,
@@ -313,10 +577,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         .from('golf_courses')
         .select('id, name, country, sub_country, thumbnail_image')
         .in('id', playedCourseIds);
-
       if (error) throw error;
-
-      // Merge with activity data to get ratings
       return (data || []).map(course => {
         const activity = userActivity.find(a => a.course_id === course.id);
         return {
@@ -329,25 +590,22 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
     staleTime: 60_000,
   });
 
-  // Filter courses by search query
   const filteredCourses = useMemo(() => {
     if (!searchQuery.trim()) return playedCourses;
-    
     const query = searchQuery.toLowerCase().trim();
-    return playedCourses.filter(course => 
+    return playedCourses.filter(course =>
       course.name.toLowerCase().includes(query) ||
       course.country?.toLowerCase().includes(query) ||
-      course.sub_country?.toLowerCase().includes(query)
+      course.sub_country?.toLowerCase().includes(query),
     );
   }, [playedCourses, searchQuery]);
 
-  // Separate rated and unrated courses
-  const ratedCourses = useMemo(() => 
-    filteredCourses.filter(c => c.has_rating).sort((a, b) => 
-      (b.rating_value || 0) - (a.rating_value || 0)
+  const ratedCourses = useMemo(() =>
+    filteredCourses.filter(c => c.has_rating).sort((a, b) =>
+      (b.rating_value || 0) - (a.rating_value || 0),
     ), [filteredCourses]);
-  
-  const unratedCourses = useMemo(() => 
+
+  const unratedCourses = useMemo(() =>
     filteredCourses.filter(c => !c.has_rating), [filteredCourses]);
 
   const handleAddCourse = (courseId: string) => {
@@ -355,7 +613,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       toast.error('Top 10 is full', { description: 'Remove a course to add another' });
       return;
     }
-
     addCourse(courseId);
     toast.success('Course added');
   };
@@ -393,15 +650,14 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
     })));
   };
 
+  // Reset preserves the actual delete + invalidate + onClose mechanism (Decision 2)
   const handleResetToAutoSort = async () => {
     if (!userId) return;
     setIsResetting(true);
     try {
       await supabase.from('user_top_ten_courses').delete().eq('user_id', userId);
       await supabase.from('user_top10_exclusions').delete().eq('user_id', userId);
-      
       await queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], refetchType: 'all' });
-      
       toast.success('Reset complete', { description: 'Your Top 10 now shows your highest-rated courses' });
       setShowResetConfirm(false);
       onClose();
@@ -420,322 +676,427 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       ariaLabelledBy="add-course-title"
       className="max-h-[85vh]"
     >
-      {/* Header with close button */}
-      <div className="flex justify-between px-5 pb-3">
-        <div>
-          <h2 id="add-course-title" className="text-lg font-semibold text-foreground">
+      {/* Flex column shell — header/status/tabs/search are natural height; scroll fills rest */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        background: BG_SURFACE,
+      }}>
+        {/* Header — editorial */}
+        <div style={{ padding: '0 20px 16px', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div style={{ width: 3, height: 10, background: AMBER }} />
+            <span style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.25em',
+              color: INK_SUBTLE,
+              textTransform: 'uppercase',
+            }}>
+              The Very Best You've Played
+            </span>
+          </div>
+          <h2
+            id="add-course-title"
+            style={{
+              fontFamily: FONT_SERIF,
+              fontSize: 26,
+              fontWeight: 900,
+              color: INK,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              lineHeight: 1.1,
+            }}
+          >
             Your Personal Top 10
           </h2>
-          <p className="text-sm text-muted-foreground">The very best you've played</p>
-        </div>
-        <button
-          onClick={onClose}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full transition-colors active:scale-[0.95]"
-          style={{ backgroundColor: '#F5F5F7' }}
-          aria-label="Close"
-        >
-          <X className="w-4 h-4" style={{ color: '#7A7A7A' }} />
-        </button>
-      </div>
-
-      {/* Tab Toggle - Hub Style */}
-      <div className="px-5 pb-4">
-        <div 
-          className="inline-flex items-center gap-1 p-1 w-full"
-        >
           <button
-            onClick={() => setActiveTab('manage')}
-            className={cn(
-              "flex-1 px-4 py-1.5 text-sm rounded-lg transition-all duration-150 active:scale-[0.98]",
-              activeTab === 'manage'
-                ? "bg-foreground text-background font-semibold shadow-sm"
-                : "text-muted-foreground font-medium hover:text-foreground"
-            )}
+            onClick={onClose}
+            style={{
+              position: 'absolute',
+              top: -4,
+              right: 16,
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: 'rgba(15,23,42,0.05)',
+              border: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: INK_SOFT,
+            }}
+            aria-label="Close"
           >
-            Manage ({topTen.length}/10)
-          </button>
-          <button
-            onClick={() => setActiveTab('add')}
-            className={cn(
-              "flex-1 px-4 py-1.5 text-sm rounded-lg transition-all duration-150 active:scale-[0.98]",
-              activeTab === 'add'
-                ? "bg-foreground text-background font-semibold shadow-sm"
-                : "text-muted-foreground font-medium hover:text-foreground"
-            )}
-          >
-            Add Course
+            <X size={18} strokeWidth={2.25} />
           </button>
         </div>
-      </div>
 
-      {/* Search input - only show in add tab */}
-      {activeTab === 'add' && (
-        <div className="px-5 pb-4">
-        <div className="relative">
-            <Search 
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors"
-              style={{ color: searchQuery ? '#f59e0b' : '#AEAEB2' }}
-            />
-            <input
-              ref={searchInputRef}
-              placeholder="Search your played courses..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 text-sm outline-none transition-all"
-              style={{
-                height: 44,
-                borderRadius: 12,
-                backgroundColor: '#F5F5F7',
-                border: '1.5px solid rgba(0,0,0,0.07)',
-                color: '#1A1A1A',
-                caretColor: '#f59e0b',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#f59e0b';
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.10)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(0,0,0,0.07)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            />
+        {/* 10 / 10 status line */}
+        {topTen.length === 10 && (
+          <div style={{
+            padding: '8px 20px 12px',
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 6,
+            fontSize: 11,
+            fontWeight: 600,
+            color: INK_SUBTLE,
+          }}>
+            <span style={{ color: AMBER_DEEP, fontWeight: 700 }}>10 / 10 list complete</span>
+            <span style={{ color: '#CBD5E1' }}>·</span>
+            <span style={{ fontStyle: 'italic' }}>Remove one to add another</span>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-5 pb-28" style={{ maxHeight: 'calc(85vh - 180px)' }}>
-        {activeTab === 'manage' ? (
-          /* Manage existing Top 10 */
-          topTen.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Your Top 10 is empty.</p>
-              <p className="text-sm mt-1">Switch to "Add Course" to get started.</p>
-            </div>
-          ) : (
-            <>
-              {/* Reset button - only show if at least 1 course is pinned */}
-              {topTen.some(c => c.is_pinned) && (
-                showResetConfirm ? (
-                  <div className="mb-3 p-3 rounded-xl border border-amber-500/30 bg-amber-500/5">
-                    <p className="text-sm text-foreground mb-3">
-                      Reset to highest rated? Your custom order will be replaced with your top-rated courses.
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleResetToAutoSort}
-                        disabled={isResetting}
-                        className="flex-1 py-2 text-sm font-medium rounded-lg bg-amber-500 text-white min-h-[44px] active:scale-[0.98] disabled:opacity-50"
-                      >
-                        {isResetting ? 'Resetting...' : 'Reset'}
-                      </button>
-                      <button
-                        onClick={() => setShowResetConfirm(false)}
-                        className="flex-1 py-2 text-sm font-medium rounded-lg border border-border text-foreground min-h-[44px] active:scale-[0.98]"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setShowResetConfirm(true)}
-                    className="w-full mb-3 py-2.5 text-sm font-medium rounded-xl border border-amber-500/30 text-amber-600 hover:bg-amber-500/5 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    Sort by highest rated
-                  </button>
-                )
-              )}
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-              modifiers={[restrictToVerticalAxis]}
-            >
-              <SortableContext
-                items={topTen.map(c => c.course_id)}
-                strategy={verticalListSortingStrategy}
+        {/* Tab strip */}
+        <div style={{
+          display: 'flex',
+          gap: 24,
+          padding: '0 20px',
+          borderBottom: `1px solid ${BORDER}`,
+        }}>
+          {(['manage', 'add'] as const).map(tab => {
+            const isActive = activeTab === tab;
+            const label = tab === 'manage' ? 'Manage' : 'Add Course';
+            const count = tab === 'manage' ? topTen.length : null;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  background: 'transparent',
+                  border: 0,
+                  padding: '12px 0 14px',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 6,
+                  minHeight: 44,
+                }}
               >
-                <div className="space-y-2">
-                  {topTen.map((course, index) => (
-                    <SortableManageItem
-                      key={course.course_id}
-                      course={course}
-                      index={index}
-                      onMoveUp={handleMoveUp}
-                      onMoveDown={handleMoveDown}
-                      onRemove={handleRemoveCourse}
-                      isRemoving={isRemoving}
-                      isReordering={isReordering}
-                      totalItems={topTen.length}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-            </>
-          )
-        ) : (
-          /* Add courses tab */
-          isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading your courses...
+                <span style={{
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: isActive ? INK : INK_SUBTLE,
+                  letterSpacing: '-0.01em',
+                }}>
+                  {label}
+                </span>
+                {count !== null && (
+                  <span style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: isActive ? INK_SOFT : INK_SUBTLE,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {count}
+                  </span>
+                )}
+                {isActive && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: -1,
+                    left: 0,
+                    width: 24,
+                    height: 2,
+                    background: AMBER,
+                    borderRadius: 1,
+                  }} />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search input — only on Add tab, natural height */}
+        {activeTab === 'add' && (
+          <div style={{ padding: '12px 20px 4px' }}>
+            <div style={{ position: 'relative' }}>
+              <Search
+                size={16}
+                style={{
+                  position: 'absolute',
+                  left: 14,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  color: searchQuery ? AMBER : INK_SUBTLE,
+                  transition: 'color 150ms',
+                }}
+              />
+              <input
+                ref={searchInputRef}
+                placeholder="Search your played courses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  height: 44,
+                  paddingLeft: 40,
+                  paddingRight: 16,
+                  fontSize: 14,
+                  borderRadius: 12,
+                  background: '#FFFFFF',
+                  border: `1px solid ${BORDER}`,
+                  color: INK,
+                  caretColor: AMBER,
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = AMBER;
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(247,147,30,0.10)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = BORDER;
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
             </div>
-          ) : filteredCourses.length === 0 && !preSelectedCourse ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {searchQuery
-                ? 'No matching courses found in your played courses'
-                : playedCourses.length === 0
-                  ? "You haven't played any courses yet. Play and rate courses to add them to your Top 10."
-                  : 'Start typing to search your played courses'}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Pre-selected course highlight (from Review Wizard) */}
-              {preSelectedCourse && !isPreSelectedInTop10 && (
-                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700">
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-2">Course you're reviewing:</p>
-                  <div className="flex items-center gap-3">
-                    {preSelectedCourse.thumbnail_image && (
-                      <img
-                        src={preSelectedCourse.thumbnail_image}
-                        alt={preSelectedCourse.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate text-sm text-foreground">{preSelectedCourse.name}</div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {preSelectedCourse.sub_country || preSelectedCourse.country}
+          </div>
+        )}
+
+        {/* Scroll container — fills remaining vertical space */}
+        <div style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+          willChange: 'transform',
+        }}>
+          {activeTab === 'manage' ? (
+            topTen.length === 0 ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '40px 20px',
+                color: INK_SUBTLE,
+                fontSize: 14,
+              }}>
+                <p style={{ margin: 0, color: INK_SOFT, fontWeight: 600 }}>Your Top 10 is empty.</p>
+                <p style={{ margin: '4px 0 0', fontSize: 13 }}>Switch to "Add Course" to get started.</p>
+              </div>
+            ) : (
+              <>
+                {/* Reset feature — editorial styling, behavior preserved verbatim */}
+                {topTen.some(c => c.is_pinned) && (
+                  showResetConfirm ? (
+                    <div style={{
+                      margin: '12px 20px',
+                      padding: 16,
+                      borderRadius: 12,
+                      border: `1px solid ${AMBER_BORDER}`,
+                      background: AMBER_WASH,
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        marginBottom: 8,
+                      }}>
+                        <div style={{ width: 3, height: 9, background: AMBER }} />
+                        <span style={{
+                          fontSize: 10,
+                          fontWeight: 800,
+                          letterSpacing: '0.22em',
+                          color: INK_SUBTLE,
+                          textTransform: 'uppercase',
+                        }}>
+                          Reset Order
+                        </span>
+                      </div>
+                      <p style={{
+                        fontFamily: FONT_SERIF,
+                        fontSize: 14,
+                        fontWeight: 400,
+                        color: INK,
+                        lineHeight: 1.4,
+                        margin: 0,
+                        marginBottom: 12,
+                      }}>
+                        Replace your custom order with your highest-rated courses?
+                      </p>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button
+                          onClick={handleResetToAutoSort}
+                          disabled={isResetting}
+                          style={{
+                            flex: 1,
+                            minHeight: 44,
+                            background: AMBER,
+                            color: '#FFFFFF',
+                            border: 0,
+                            borderRadius: 10,
+                            fontSize: 13,
+                            fontWeight: 700,
+                            cursor: isResetting ? 'not-allowed' : 'pointer',
+                            opacity: isResetting ? 0.5 : 1,
+                          }}
+                        >
+                          {isResetting ? 'Resetting...' : 'Reset'}
+                        </button>
+                        <button
+                          onClick={() => setShowResetConfirm(false)}
+                          style={{
+                            flex: 1,
+                            minHeight: 44,
+                            background: '#FFFFFF',
+                            color: INK,
+                            border: `1px solid ${BORDER}`,
+                            borderRadius: 10,
+                            fontSize: 13,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      onClick={() => handleAddCourse(preSelectedCourse.id)}
-                      className="flex-shrink-0 gap-1.5 active:scale-[0.95]"
+                  ) : (
+                    <button
+                      onClick={() => setShowResetConfirm(true)}
+                      style={{
+                        margin: '12px 20px',
+                        padding: '10px 16px',
+                        background: '#FFFFFF',
+                        border: `1px solid ${AMBER_BORDER}`,
+                        borderRadius: 10,
+                        color: AMBER_DEEP,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        minHeight: 44,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        width: 'calc(100% - 40px)',
+                      }}
                     >
-                      <Plus className="w-4 h-4" />
-                      <span>Add</span>
-                    </Button>
-                  </div>
-                </div>
-              )}
+                      <RotateCcw size={14} strokeWidth={2.25} />
+                      Sort by highest rated
+                    </button>
+                  )
+                )}
 
-              {/* Rated courses section */}
-              {ratedCourses.length > 0 && (
-                <div>
-                  <h3 
-                    className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-3"
-                    style={{ color: '#AEAEB2' }}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                  modifiers={[restrictToVerticalAxis]}
+                >
+                  <SortableContext
+                    items={topTen.map(c => c.course_id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    Your rated courses
-                  </h3>
-                  <div className="space-y-2">
+                    <div>
+                      {topTen.map((course, index) => (
+                        <SortableManageItem
+                          key={course.course_id}
+                          course={course}
+                          index={index}
+                          onMoveUp={handleMoveUp}
+                          onMoveDown={handleMoveDown}
+                          onRemove={handleRemoveCourse}
+                          isRemoving={isRemoving}
+                          isReordering={isReordering}
+                          totalItems={topTen.length}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              </>
+            )
+          ) : (
+            isLoading ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '40px 20px',
+                color: INK_SUBTLE,
+                fontSize: 14,
+              }}>
+                Loading your courses...
+              </div>
+            ) : filteredCourses.length === 0 && !preSelectedCourse ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '40px 20px',
+                color: INK_SUBTLE,
+                fontSize: 14,
+              }}>
+                {searchQuery
+                  ? 'No matching courses found in your played courses'
+                  : playedCourses.length === 0
+                    ? "You haven't played any courses yet. Play and rate courses to add them to your Top 10."
+                    : 'Start typing to search your played courses'}
+              </div>
+            ) : (
+              <div>
+                {/* Pre-selected course highlight */}
+                {preSelectedCourse && !isPreSelectedInTop10 && (
+                  <>
+                    <SectionEyebrow label="Course You're Reviewing" />
+                    <CourseRow
+                      course={{
+                        id: preSelectedCourse.id,
+                        name: preSelectedCourse.name,
+                        country: preSelectedCourse.country,
+                        sub_country: preSelectedCourse.sub_country,
+                        thumbnail_image: preSelectedCourse.thumbnail_image,
+                        rating_value: null,
+                        has_rating: false,
+                      }}
+                      onAction={() => handleAddCourse(preSelectedCourse.id)}
+                      actionIcon={<Plus size={16} strokeWidth={2.25} />}
+                      actionLabel="Add to Top 10"
+                      isAtLimit={isAtLimit}
+                    />
+                  </>
+                )}
+
+                {ratedCourses.length > 0 && (
+                  <>
+                    <SectionEyebrow label="Your Rated Courses" />
                     {ratedCourses
-                      .filter(c => c.id !== preSelectedCourseId) // Don't show pre-selected again
+                      .filter(c => c.id !== preSelectedCourseId)
                       .map((course) => (
-                      <CourseRow
-                        key={course.id}
-                        course={course}
-                        onAction={() => handleAddCourse(course.id)}
-                        actionLabel="Add to Top 10"
-                        actionIcon={<Plus className="w-4 h-4" />}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+                        <CourseRow
+                          key={course.id}
+                          course={course}
+                          onAction={() => handleAddCourse(course.id)}
+                          actionIcon={<Plus size={16} strokeWidth={2.25} />}
+                          actionLabel="Add to Top 10"
+                          isAtLimit={isAtLimit}
+                        />
+                      ))}
+                  </>
+                )}
 
-              {/* Unrated courses section */}
-              {unratedCourses.length > 0 && (
-                <div>
-                  <h3 
-                    className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-3"
-                    style={{ color: '#AEAEB2' }}
-                  >
-                    Rate to add
-                  </h3>
-                  <div className="space-y-2">
+                {unratedCourses.length > 0 && (
+                  <>
+                    <SectionEyebrow label="Rate to Add" />
                     {unratedCourses.map((course) => (
                       <CourseRow
                         key={course.id}
                         course={course}
                         onAction={() => handleRateFirst(course.id)}
+                        actionIcon={<Star size={16} strokeWidth={2.25} />}
                         actionLabel="Rate first"
-                        actionIcon={<Star className="w-4 h-4" />}
                         isSecondary
+                        isAtLimit={isAtLimit}
                       />
                     ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        )}
+                  </>
+                )}
+              </div>
+            )
+          )}
+        </div>
       </div>
     </BottomSheet>
   );
 };
-
-// Course row component
-interface CourseRowProps {
-  course: CourseWithRating;
-  onAction: () => void;
-  actionLabel: string;
-  actionIcon: React.ReactNode;
-  isSecondary?: boolean;
-}
-
-const CourseRow: React.FC<CourseRowProps> = ({
-  course,
-  onAction,
-  actionLabel,
-  actionIcon,
-  isSecondary = false,
-}) => (
-  <div className="flex items-center gap-3 p-3 bg-card rounded-xl border border-border/30">
-    {course.thumbnail_image && (
-      <img
-        src={course.thumbnail_image}
-        alt={course.name}
-        loading="lazy"
-        decoding="async"
-        className="w-14 h-14 object-cover rounded-[10px] flex-shrink-0"
-      />
-    )}
-    <div className="flex-1 min-w-0">
-      <div className="font-semibold truncate text-sm text-foreground">{course.name}</div>
-      <div className="text-xs text-muted-foreground truncate">
-        {course.sub_country || course.country}
-      </div>
-      {course.has_rating && course.rating_value && (
-        <div className="flex items-center mt-0.5">
-          <span className="text-xs text-foreground font-medium">
-            {course.rating_value.toFixed(1)}
-          </span>
-        </div>
-      )}
-    </div>
-    <button
-      onClick={onAction}
-      className="flex-shrink-0 flex items-center justify-center active:scale-[0.95] transition-transform"
-      style={{
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        padding: 0,
-        border: '1.5px solid',
-        ...(isSecondary 
-          ? { borderColor: 'rgba(0,0,0,0.12)', backgroundColor: 'transparent', color: 'inherit' }
-          : { backgroundColor: 'rgba(245,158,11,0.08)', borderColor: 'rgba(245,158,11,0.3)', color: '#f59e0b' }
-        ),
-      }}
-      aria-label={actionLabel}
-    >
-      {actionIcon}
-    </button>
-  </div>
-);
