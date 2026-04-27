@@ -414,6 +414,7 @@ export function ReviewWizard({
                         rating={wizard.state.rating}
                         breakdowns={wizard.state.breakdowns}
                         course={activeCourse}
+                        isLegacyMigration={wizard.isLegacyMigration}
                         onRatingChange={wizard.setRating}
                         onBreakdownChange={wizard.setBreakdown}
                       />
