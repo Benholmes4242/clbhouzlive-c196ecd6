@@ -199,11 +199,16 @@ export function PlayerCardV2({
 
         {/* Player info */}
         <div style={{ flex: 1, minWidth: 0, padding: `${rowPaddingY}px 0` }}>
-          <div style={{
-            fontSize: `${nameSize}px`, fontWeight: nameWeight, color: '#0F172A', letterSpacing: tierAccent ? '-0.01em' : 0,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-          }}>
-            {player.fullName}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span style={{
+              fontSize: `${nameSize}px`, fontWeight: nameWeight, color: '#0F172A', letterSpacing: tierAccent ? '-0.01em' : 0,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, minWidth: 0, flex: '0 1 auto',
+            }}>
+              {player.fullName}
+            </span>
+            {recentResult && (
+              <RecentResultPill position={recentResult.position} tied={recentResult.tied} />
+            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />
