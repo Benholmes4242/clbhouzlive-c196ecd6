@@ -954,9 +954,9 @@ export function useReviewWizard({
     setPendingDeletions([]); // Discard deferred deletions on cancel
   }, [cleanupBlobUrls]);
 
-  // Check if can proceed to next step
-  // Step 1: requires rating; all other steps: always true
-  const canProceed = state.step === 1 ? state.rating !== null : true;
+  // D32: Step 1 requires at least one breakdown set; all other steps: always true
+  const hasAnyBreakdown = Object.values(state.breakdowns).some(v => v !== null);
+  const canProceed = state.step === 1 ? hasAnyBreakdown : true;
   
   // Check if any uploads are in progress (always false with upload-on-submit)
   const hasUploadsInProgress = isSubmitting;
