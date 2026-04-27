@@ -749,6 +749,11 @@ export function useReviewWizard({
       return;
     }
     
+    // D28(c): Commit the derived verdict to state so the success screen and
+    // optimistic cache writes (which read state.rating in the onSuccess closure)
+    // reflect the value we are about to persist, not the prefilled legacy value.
+    setState(prev => ({ ...prev, rating: derivedVerdict }));
+    
     submissionInProgressRef.current = true;
     setIsSubmitting(true);
     
