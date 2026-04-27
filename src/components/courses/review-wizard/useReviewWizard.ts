@@ -742,8 +742,10 @@ export function useReviewWizard({
       return;
     }
     
-    if (!state.rating) {
-      toast.error('Rating required');
+    // D32: gate on at least one breakdown being set; D28: derive verdict from breakdowns
+    const derivedVerdict = deriveVerdict(state.breakdowns);
+    if (derivedVerdict === null) {
+      toast.error('Rate at least one category to continue');
       return;
     }
     
@@ -765,11 +767,12 @@ export function useReviewWizard({
         ? [pendingFiles[coverFileIndex], ...pendingFiles.filter((_, i) => i !== coverFileIndex)]
         : pendingFiles;
 
+      // D28: persist the recomputed verdict, not the prefilled state.rating
       await submitReview({
         courseId: course.id,
         courseName: course.name,
         ratingId: isEditMode ? existingRating?.id : undefined,
-        overallRating: state.rating,
+        overallRating: derivedVerdict,
         breakdowns: {
           design: state.breakdowns.design ?? null,
           condition: state.breakdowns.condition ?? null,
