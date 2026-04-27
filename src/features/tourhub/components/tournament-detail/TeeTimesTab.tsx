@@ -91,7 +91,7 @@ interface TeeTimeGroup {
   }>;
 }
 
-function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; index: number; searchQuery: string }) {
+function TeeTimeGroupCard({ group, index, searchQuery, tournamentName }: { group: TeeTimeGroup; index: number; searchQuery: string; tournamentName?: string }) {
   const hasMatchingPlayer = searchQuery.trim() && group.players.some(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
@@ -111,7 +111,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
         {group.players.map((player, playerIdx) => (
           <Link
             key={player.id || playerIdx}
-            to={`/tourhub/player/${player.playerId || player.id}`}
+            {...playerRoute(player.playerId || player.id || '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', textDecoration: 'none' }}
             className="active:opacity-70 transition-opacity"
           >
