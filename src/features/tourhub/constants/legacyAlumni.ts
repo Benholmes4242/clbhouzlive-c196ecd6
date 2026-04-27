@@ -1,12 +1,13 @@
 /**
- * LEGACY_ALUMNI_IDS — editorial allow-list for the College Franchise
- * "Legacy" tier (4-tier alumni model).
+ * Seed source for the `legacy_alumni` Supabase table. The runtime source
+ * of truth is now the database (queried via `useLegacyAlumni`). This file
+ * is preserved as: (a) the canonical seed for fresh DB deployments, and
+ * (b) a documentation artifact mapping player_ids to context labels for
+ * engineering reference. Do NOT consume this constant in runtime code —
+ * use `useLegacyAlumni()` instead.
  *
  * Inclusion rule: ≥1 major championship win AND inactive this season
  * (events_played === 0 in current season).
- *
- * Data-layer reality: sr_players has no career_major_wins field. Until that
- * column is ingested (follow-up queue), Legacy is editorially curated.
  *
  * Seed (Phase 1, capped at 10–15, under-seed rather than mis-tier):
  *   - Justin Leonard      (Texas)         · 1998 Open Championship
