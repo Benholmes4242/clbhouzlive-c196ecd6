@@ -220,6 +220,15 @@ export function useReviewWizard({
   // Wizard state
   const [state, setState] = useState<WizardState>(() => {
     if (isEditMode && existingRating) {
+      // D33: Legacy ratings-only review → force re-rate (rating + breakdowns null)
+      if (isLegacyRatingsOnly(existingRating)) {
+        return {
+          ...INITIAL_STATE,
+          title: existingRating.title || '',
+          review: existingRating.review || '',
+        };
+      }
+      // D28(c): Prefill verdict from existing rating; recompute on save
       return {
         ...INITIAL_STATE,
         rating: existingRating.rating,
@@ -241,6 +250,18 @@ export function useReviewWizard({
     
     if (isEditMode && existingRating && !hasInitializedFromExisting.current) {
       hasInitializedFromExisting.current = true;
+      
+      if (isLegacyRatingsOnly(existingRating)) {
+        // D33: legacy ratings-only review → null state, force re-rate
+        setState(prev => ({
+          ...prev,
+          rating: null,
+          breakdowns: { ...INITIAL_BREAKDOWNS },
+          title: existingRating.title || '',
+          review: existingRating.review || '',
+        }));
+        return;
+      }
       
       setState(prev => ({
         ...prev,
