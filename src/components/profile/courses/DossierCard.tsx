@@ -1,8 +1,7 @@
 import React from 'react';
 import { Flag, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { getTierName } from './my-ratings/myRatingsHeroTiers';
-import type { RatedCourseData } from './my-ratings/MyRatingsHeroCard';
+import { getTierName, type RatedCourseData } from './my-ratings/myRatingsHeroTiers';
 
 /**
  * DossierCard — single primitive for rated-course display in the

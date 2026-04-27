@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import type { RatedCourseData } from './my-ratings/MyRatingsHeroCard';
+import type { RatedCourseData } from './my-ratings/myRatingsHeroTiers';
 
 interface BreakdownsPickerSheetProps {
   isOpen: boolean;
