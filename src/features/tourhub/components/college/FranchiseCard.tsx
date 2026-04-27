@@ -40,9 +40,9 @@ interface FranchiseCardProps {
   alumni?: AlumniFace[];
   /** Captain (top-earning alumnus) for this franchise. Used for context subline. */
   captain?: FranchiseCaptain | null;
-  /** Week-over-week earnings rank delta. Data layer convention: NEGATIVE = rank
-   *  worsened (e.g. #5 → #8 = -3). MovementIndicator convention: POSITIVE = improved.
-   *  Pass the raw value here — the row inverts the sign at the call site. */
+  /** Week-over-week earnings rank delta. Positive = rank improved (e.g. #8 → #5 = +3).
+   *  Convention matches MovementIndicator's positive=improved, so passed through
+   *  unchanged at the call site. */
   earningsRankChange?: number | null;
   className?: string;
   animationDelay?: number;
@@ -113,11 +113,10 @@ export function FranchiseCard({
   const rankNumberColor = isTopThree ? '#c97a10' : 'rgba(15,23,42,0.12)';
   const rankNumberWeight = isTopThree ? 900 : 800;
 
-  // Sign inversion for MovementIndicator. Data layer: negative
-  // earnings_rank_change = rank got worse (e.g. #5 → #8 = -3). Component
-  // expects POSITIVE = improved, so we invert. Visibility over indirection.
-  const movementDelta =
-    earningsRankChange == null ? null : -earningsRankChange;
+  // Data layer and component conventions agree: positive earnings_rank_change
+  // = rank improved (e.g. #8 → #5 = +3), MovementIndicator positive = improved.
+  // Pass through unchanged.
+  const movementDelta = earningsRankChange ?? null;
 
   return (
     <motion.div
