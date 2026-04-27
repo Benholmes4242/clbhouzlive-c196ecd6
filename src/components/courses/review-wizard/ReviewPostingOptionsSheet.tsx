@@ -28,7 +28,7 @@ const VISIBILITY_OPTIONS: VisibilityOption[] = [
   {
     value: 'anyone',
     label: 'Anyone',
-    description: 'Visible to everyone on Clbhouz',
+    description: 'Visible to everyone on clbhouz',
     icon: <Globe className="w-5 h-5" />,
     selectedColor: 'bg-amber-100 text-amber-600',
     defaultColor: 'bg-muted/50 text-muted-foreground',
