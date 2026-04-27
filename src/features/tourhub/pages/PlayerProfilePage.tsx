@@ -14,11 +14,10 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   PlayerHero,
   PlayerSeasonStats,
-  PlayerSkillTreeCard,
   PlayerTournamentHistory,
   PlayerInfoCard,
+  FormSection,
 } from '../components/player';
-import { PlayerRecentForm } from '../components/player/PlayerRecentForm';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
 
 const sectionVariants = {
@@ -251,8 +250,8 @@ export function PlayerProfilePage() {
           </div>
         </div>
 
-        {/* Momentum Strip */}
-        {playerId && <PlayerRecentForm playerId={playerId} />}
+        {/* Form section — three-branch render (Heating up / In form / Steady / Out of form). */}
+        {playerId && <FormSection playerId={playerId} />}
 
         {/* Content sections */}
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
@@ -280,19 +279,7 @@ export function PlayerProfilePage() {
             )}
           </motion.div>
 
-          {/* Skill Build */}
-          {playerId && (
-            <motion.div
-              style={{ marginTop: 8 }}
-              variants={sectionVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-            >
-              <PlayerSkillTreeCard playerId={playerId} />
-            </motion.div>
-          )}
+          {/* Skill Build — REMOVED in Phase 1 (D8). Metrics now covered by the four stats tabs. */}
 
           {/* Recent Tournaments */}
           {playerId && (
