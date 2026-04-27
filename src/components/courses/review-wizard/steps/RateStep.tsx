@@ -236,6 +236,20 @@ export function RateStep({
 
   const overallTier = displayVerdict !== null ? getScoreTier(displayVerdict) : null;
 
+  // D30: Sticky verdict bar — engages when hero verdict block scrolls offscreen
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowSticky(!entry.isIntersecting),
+      // WizardHeader: 48px row + max(safe-area, 47px) ≈ 95px on notched devices
+      { threshold: 0, rootMargin: '-95px 0px 0px 0px' }
+    );
+    observer.observe(heroRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 300 }}
