@@ -6,7 +6,7 @@
  * 
  * Coverage:
  * - Live/starting-soon tournaments
- * - Recently completed (last 7 days)
+ * - Recently completed (last 3 days — covers Sun→Tue/Wed viewing window)
  * - Upcoming (next 14 days, limit 20)
  */
 
@@ -57,7 +57,10 @@ export interface TournamentsCache {
 
 async function fetchTournamentsCache(): Promise<TournamentsCache> {
   const today = new Date().toISOString().split('T')[0];
-  const resultsWindowAgo = new Date(Date.now() - 1.5 * 86400000).toISOString();
+  // Rail + Hero results window — 3d covers Sun→Tue/Wed viewing rhythm.
+  // Single consumer of cache.completed (useHeroCarouselData) is robust to a
+  // wider window: it picks most-recent-per-tour and caps at 6 slides.
+  const resultsWindowAgo = new Date(Date.now() - 3 * 86400000).toISOString();
 
   const [liveRes, completedRes, upcomingRes] = await Promise.all([
     // Live + starting soon
@@ -68,7 +71,7 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .order('start_date', { ascending: true })
       .order('purse', { ascending: false }),
 
-    // Completed in last 7 days
+    // Completed in last 3 days
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
