@@ -136,8 +136,21 @@ export function FranchiseLeaderboard({
                     // Data layer and component conventions agree: positive
                     // earnings_rank_change = rank improved. Passed through
                     // unchanged to MovementIndicator.
+                    //
+                    // OWGR-style gating: MovementIndicator is only meaningful
+                    // when the rank-delta data corresponds to the active sort.
+                    // college_weekly_movers only tracks earnings_rank_change —
+                    // there is no wins_rank_change or top10s_rank_change. So
+                    // showing the indicator on Wins/Top 10s tabs would mix
+                    // axes (an earnings-rank improvement plotted next to a
+                    // wins-sorted row). Pattern mirrors PlayerCardV2's OWGR
+                    // gating where movement renders only on the World
+                    // Rankings sort. Pass null for non-Earnings tabs;
+                    // MovementIndicator already returns null for null input.
                     const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
-                    const earningsRankChange = moverData?.rankChange ?? null;
+                    const earningsRankChange = activeMetric === 'earnings'
+                      ? (moverData?.rankChange ?? null)
+                      : null;
                     const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
                     const captain = captainMap?.get(collegeStats.normalized_name) ?? null;
                     return (
