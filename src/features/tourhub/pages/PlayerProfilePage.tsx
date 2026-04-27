@@ -220,7 +220,7 @@ export function PlayerProfilePage() {
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
-              Back
+              {backLabel}
             </button>
           </div>
 
