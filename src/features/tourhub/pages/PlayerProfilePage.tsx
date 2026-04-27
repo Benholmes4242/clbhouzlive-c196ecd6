@@ -19,6 +19,7 @@ import {
   FormSection,
 } from '../components/player';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
+import { getPlayerReferrerLabel, type PlayerReferrer } from '../routes';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -91,6 +92,9 @@ export function PlayerProfilePage() {
       showHeader();
     };
   }, [hideHeader, showHeader]);
+
+  const referrer = (location.state as { referrer?: PlayerReferrer } | null)?.referrer;
+  const backLabel = getPlayerReferrerLabel(referrer);
 
   const handleBack = () => {
     if (location.key !== 'default') {
