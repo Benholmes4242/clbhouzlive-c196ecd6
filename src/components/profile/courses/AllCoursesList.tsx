@@ -172,6 +172,31 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     top100: courses.filter(c => c.is_top100).length,
   }), [courses]);
 
+  // Courses missing breakdown ratings (page-level prompt eligibility).
+  const missingBreakdownsCourses = useMemo<RatedCourseData[]>(
+    () =>
+      courses
+        .filter(
+          (c) =>
+            c.has_rating &&
+            c.rating_value != null &&
+            (c.design_score == null ||
+              c.condition_score == null ||
+              c.clubhouse_score == null ||
+              c.facilities_score == null),
+        )
+        .map((c) => toRatedCourseData(c as any)),
+    [courses],
+  );
+
+  const handleBreakdownsPromptTap = useCallback(() => {
+    if (missingBreakdownsCourses.length === 1) {
+      navigate(`/courses/${missingBreakdownsCourses[0].id}/rate`);
+    } else if (missingBreakdownsCourses.length >= 2) {
+      setShowBreakdownsPicker(true);
+    }
+  }, [missingBreakdownsCourses, navigate]);
+
   // Apply filters and sorting
   const filteredCourses = useMemo(() => {
     let result = [...courses];
