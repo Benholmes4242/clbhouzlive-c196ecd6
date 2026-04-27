@@ -170,10 +170,11 @@ export const LoopCard = React.memo(function LoopCard({
     return `${firstName(topFriendNames[0])} + ${friendPlayedCount - 1} friends played here`;
   }, [friendPlayedCount, topFriendNames]);
 
-  const showFriendChip = friendPlayedCount > 0;
-  const showNetworkRating = networkRatingAvg != null && networkRatingCount >= 2;
-  const showPlayedPill = selfHasPlayed && !!courseId;
+  const showFriendChip = showActivitySignals && friendPlayedCount > 0;
+  const showNetworkRating = showActivitySignals && networkRatingAvg != null && networkRatingCount >= 2;
+  const showPlayedPill = showActivitySignals && selfHasPlayed && !!courseId;
   const showReviewNudge =
+    showActivitySignals &&
     showNudge &&
     !nudgeDismissedLocal &&
     selfHasPlayed &&
