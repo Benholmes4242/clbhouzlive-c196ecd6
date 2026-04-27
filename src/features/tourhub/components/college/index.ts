@@ -6,8 +6,7 @@ export { AlumniDepthChart } from './AlumniDepthChart';
 
 export { FranchiseStoryStrip } from './FranchiseStoryStrip';
 export { FranchiseMovers } from './FranchiseMovers';
-export { CollegeRivalsCarousel } from './CollegeRivalsCarousel';
+export { H2HRivalStrip } from './H2HRivalStrip';
 export { FollowCollegeButton } from './FollowCollegeButton';
 export { CollegeCompareHero } from './CollegeCompareHero';
-export { CollegeCompareSheet } from './CollegeCompareSheet';
 export { CollegeMasthead } from './CollegeMasthead';
