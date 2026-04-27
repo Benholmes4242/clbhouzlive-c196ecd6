@@ -64,9 +64,10 @@ function lastNameOf(name: string): string {
  *   - earnings:              "$1.20M" / "$200K" / "$500"
  *   - putt_avg/scoring_avg:  "0.123"
  *   - strokes_gained_total:  "0.42"
- *   - drive_avg (yds):       "1.5"
- *   - drive_acc/gir/etc (%): "1.5"
+ *   - drive_avg (yds):       "1.5 yds"
+ *   - drive_acc/gir/etc (%): "1.5%"
  *   - events/cuts/top_10:    "2"
+ *   - generic:               "1.23"
  *   - generic:               "1.23"
  */
 function formatMarginValue(category: LeaderCategory, margin: number): string {
