@@ -44,7 +44,10 @@ export function TournamentDetailPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  
+  const location = useLocation();
+  const referrer = (location.state as { referrer?: TournamentReferrer } | null)?.referrer;
+  const backLabel = getReferrerLabel(referrer);
+
   const [activeTab, setActiveTab] = useState<TournamentTab>(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
     if (tabParam && VALID_TABS.includes(tabParam)) return tabParam;
@@ -109,7 +112,7 @@ export function TournamentDetailPage() {
   const isCompleted = tournament?.status === 'closed';
   const isUpcoming = tournament?.status === 'scheduled' || tournament?.status === 'created';
   
-  const { isConnected } = useLeaderboardRealtime(isLive ? tournamentId : null);
+  useLeaderboardRealtime(isLive ? tournamentId : null);
   
   const venueInput = useMemo(() => {
     if (!tournament) return null;
