@@ -22,36 +22,85 @@ interface MetricCompareRowProps {
 }
 
 function MetricCompareRow({ label, value1, value2, format = String, lowerIsBetter = false, isLast = false }: MetricCompareRowProps) {
-  const total = value1 + value2;
-  const pct1 = total > 0 ? (value1 / total) * 100 : 50;
-  const pct2 = total > 0 ? (value2 / total) * 100 : 50;
-
-  let isLeading1: boolean;
-  let isLeading2: boolean;
-  if (lowerIsBetter) {
-    isLeading1 = value1 > 0 && value2 > 0 ? value1 < value2 : false;
-    isLeading2 = value1 > 0 && value2 > 0 ? value2 < value1 : false;
+  // Determine leader (TIED when both sides have meaningful, equal values)
+  let isLeading1 = false;
+  let isLeading2 = false;
+  let isTied = false;
+  if (value1 === 0 && value2 === 0) {
+    // Both empty — neither leads, not "tied" (no data to tie on)
+  } else if (value1 === value2) {
+    isTied = true;
+  } else if (lowerIsBetter) {
+    if (value1 > 0 && value2 > 0) {
+      isLeading1 = value1 < value2;
+      isLeading2 = value2 < value1;
+    }
   } else {
     isLeading1 = value1 > value2;
     isLeading2 = value2 > value1;
   }
 
+  // Center-split bar: each side grows out from the center toward its own edge.
+  // Bar width is proportional to the side's share of the larger value (max = 100% of half).
+  const maxVal = Math.max(value1, value2);
+  const barPct1 = maxVal > 0 ? (value1 / maxVal) * 100 : 0;
+  const barPct2 = maxVal > 0 ? (value2 / maxVal) * 100 : 0;
+
+  // Canonical font weights: value 900 (leader) / 600 (non-leader), label 800
+  const value1Weight = isLeading1 ? 900 : 600;
+  const value2Weight = isLeading2 ? 900 : 600;
+  const value1Color = isLeading1 ? '#0F172A' : '#94A3B8';
+  const value2Color = isLeading2 ? '#0F172A' : '#94A3B8';
+
   return (
     <div style={{ padding: '9px 20px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
-        <span style={{ flex: 1, fontSize: '15px', fontWeight: isLeading1 ? 800 : 500, color: isLeading1 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'left' as const }}>
+        <span style={{ flex: 1, fontSize: '15px', fontWeight: value1Weight, color: value1Color, fontVariantNumeric: 'tabular-nums', textAlign: 'left' as const }}>
           {format(value1)}
         </span>
-        <span style={{ fontSize: '13px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
-          {label}
-        </span>
-        <span style={{ flex: 1, fontSize: '15px', fontWeight: isLeading2 ? 800 : 500, color: isLeading2 ? '#0F172A' : '#94A3B8', fontVariantNumeric: 'tabular-nums', textAlign: 'right' as const }}>
+        {isTied ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+            <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.12em' }}>
+              TIED
+            </span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
+              {label}
+            </span>
+          </span>
+        ) : (
+          <span style={{ fontSize: '13px', fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
+            {label}
+          </span>
+        )}
+        <span style={{ flex: 1, fontSize: '15px', fontWeight: value2Weight, color: value2Color, fontVariantNumeric: 'tabular-nums', textAlign: 'right' as const }}>
           {format(value2)}
         </span>
       </div>
-      <div style={{ display: 'flex', height: '3px', borderRadius: '2px', overflow: 'hidden' }}>
-        <div style={{ width: `${pct1}%`, background: isLeading1 ? '#F7931E' : 'rgba(15,23,42,0.08)', transition: 'width 0.4s' }} />
-        <div style={{ width: `${pct2}%`, background: isLeading2 ? '#F7931E' : 'rgba(15,23,42,0.08)', transition: 'width 0.4s' }} />
+      {/* Center-split bar: left bar grows leftward from centre, right bar grows rightward */}
+      <div style={{ display: 'flex', alignItems: 'center', height: '3px' }}>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', height: '100%' }}>
+          <div
+            style={{
+              width: `${barPct1}%`,
+              height: '100%',
+              borderRadius: '2px 0 0 2px',
+              background: isLeading1 ? '#F7931E' : isTied ? 'rgba(15,23,42,0.18)' : 'rgba(15,23,42,0.08)',
+              transition: 'width 0.4s',
+            }}
+          />
+        </div>
+        <div style={{ width: '1px', height: '100%', background: 'rgba(15,23,42,0.12)', flexShrink: 0 }} />
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', height: '100%' }}>
+          <div
+            style={{
+              width: `${barPct2}%`,
+              height: '100%',
+              borderRadius: '0 2px 2px 0',
+              background: isLeading2 ? '#F7931E' : isTied ? 'rgba(15,23,42,0.18)' : 'rgba(15,23,42,0.08)',
+              transition: 'width 0.4s',
+            }}
+          />
+        </div>
       </div>
     </div>
   );
