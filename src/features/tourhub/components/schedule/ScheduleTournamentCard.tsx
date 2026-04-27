@@ -22,6 +22,9 @@ import { formatPurse } from '../shared/TourHeroHelpers';
 import { TourPill } from '../shared/TourPill';
 import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { WinnerPill } from '../shared/WinnerPill';
+import { TournamentMeta } from '../shared/TournamentMeta';
+import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
+import type { DefendingChampionEntry } from '../../hooks/useScheduleDefendingChampionPhotos';
 
 // SeasonTournament has no tour_code; derive from its display tourName.
 // TOUR_NAME_TO_SLUG returns lowercase slugs (pga, liv, euro, etc.) — translate
