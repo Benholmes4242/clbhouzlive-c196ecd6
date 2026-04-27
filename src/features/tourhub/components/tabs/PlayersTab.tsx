@@ -656,7 +656,7 @@ export function PlayersTab() {
           </div>
         </div>
 
-        {/* Control row — back link + sort + search */}
+        {/* Control row — back link + search button (sort pill removed Phase 1 fix.1.2) */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: '6px' }}>
           <button
             type="button"
@@ -669,129 +669,76 @@ export function PlayersTab() {
 
           <div style={{ flex: 1 }} />
 
-          {/* Sort pill — only for specific tours */}
-          {(
+          {/* Search icon — only visible when search not expanded (count+search bar handles expanded state) */}
+          {!searchExpanded && (
             <button
-              onClick={() => setSortSheetOpen(true)}
+              onClick={() => setSearchExpanded(true)}
               style={{
-                display: 'flex', alignItems: 'center', gap: '5px',
-                padding: '5px 9px', borderRadius: '8px',
-                background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)',
-                boxShadow: '0 1px 3px rgba(15,23,42,0.05)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 10px', borderRadius: 8,
+                background: 'rgba(15,23,42,0.04)',
+                border: 'none', cursor: 'pointer',
               }}
-              className="active:scale-[0.97] transition-transform"
+              aria-label="Search players"
             >
-              <SlidersHorizontal className="w-3 h-3 shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#0F172A' }}>
-                {getSortShortLabel(sort, activeTour)}
-              </span>
-              <ChevronDown className="w-2.5 h-2.5 text-muted-foreground/60" strokeWidth={2.5} />
+              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
             </button>
           )}
-
-          {/* Search icon */}
-          <button
-            onClick={() => setSearchExpanded(v => !v)}
-            style={{
-              width: '32px', height: '32px', borderRadius: '8px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: searchExpanded ? 'rgba(247,147,30,0.08)' : 'transparent',
-              border: 'none', cursor: 'pointer',
-            }}
-          >
-            <Search
-              className="w-4 h-4 transition-colors"
-              style={{ color: searchExpanded ? '#F7931E' : undefined }}
-              strokeWidth={2.5}
-            />
-          </button>
         </div>
 
-        {/* Underline sort tabs */}
+        {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
-          {[
-                { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: activeTour === 'pga' ? 'World Ranking' : getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
-                ...(activeTour === 'pga' ? [{ value: 'fedex-points' as PlayerSortType, label: 'FedEx' }] : []),
-                ...(activeTour === 'pga' ? [{ value: 'highest-earnings' as PlayerSortType, label: 'Earnings' }] : []),
-                { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
-              ].filter((tab, i, arr) => i === arr.findIndex(t => t.value === tab.value))
-          .map(tab => {
-            const isActive = sort === tab.value;
-            return (
-              <button
-                key={tab.value}
-                onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
-                style={{
-                  flex: 1, padding: '8px 0',
-                  fontSize: '11px', fontWeight: isActive ? 800 : 500,
-                  color: isActive ? '#0F172A' : '#94A3B8',
-                  background: 'transparent', border: 'none',
-                  borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
-                  cursor: 'pointer', transition: 'all 0.15s',
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+          {(() => {
+            // Per-tour tab config — single source of truth.
+            const tabs: { value: PlayerSortType; label: string }[] =
+              activeTour === 'pga'
+                ? [
+                    { value: 'world-rank-desc', label: 'World Ranking' },
+                    { value: 'fedex-points', label: 'FedEx Cup' },
+                    { value: 'highest-earnings', label: 'Earnings' },
+                  ]
+              : activeTour === 'EURO' ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }]
+              : activeTour === 'LPGA' ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }]
+              : activeTour === 'PGAD' ? [{ value: 'points-list', label: 'Korn Ferry Points' }]
+              : activeTour === 'LIV' ? [{ value: 'liv-standings', label: 'Individual Standings' }]
+              : activeTour === 'CHAMP' ? [{ value: 'highest-earnings', label: 'Earnings' }]
+              : [{ value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) }];
+
+            return tabs.map(tab => {
+              const isActive = sort === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
+                  style={{
+                    flex: 1, padding: '8px 0',
+                    fontSize: '11px', fontWeight: isActive ? 800 : 500,
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    background: 'transparent', border: 'none',
+                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    cursor: 'pointer', transition: 'all 0.15s',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            });
+          })()}
         </div>
 
-        {/* Count line */}
-        <div style={{ padding: '5px 16px 8px' }}>
-          <span style={{ fontSize: '10px', color: '#94A3B8' }}>
-            {`${(tourCounts[activeTour] ?? 0).toLocaleString()} players`}
-          </span>
-        </div>
+        {/* Count+sort bar — toggles with search input (Phase 1 fix.1.7) */}
+        {!searchExpanded && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 8px', gap: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
+              {totalCount.toLocaleString()} {totalCount === 1 ? 'player' : 'players'}
+              <span style={{ color: '#CBD5E1' }}> · sorted by </span>
+              <span style={{ color: '#0F172A', fontWeight: 700 }}>{getSortShortLabel(sort, activeTour)}</span>
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Sort bottom sheet */}
-      <BottomSheet
-        open={sortSheetOpen}
-        onClose={() => setSortSheetOpen(false)}
-        ariaLabelledBy="players-sort-sheet-title"
-      >
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Sort</div>
-          <div id="players-sort-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Sort Players</div>
-        </div>
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-        {(() => {
-          const isPGA = activeTour === 'pga';
-          const isEuro = activeTour === 'EURO';
-          const isLPGA = activeTour === 'LPGA';
-          const isPGAD = activeTour === 'PGAD';
-          const isLIV = activeTour === 'LIV';
-          const opts: { value: PlayerSortType; label: string }[] =
-            isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isPGAD ? [{ value: 'points-list', label: 'Standings' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isPGA  ? [{ value: 'world-rank-desc', label: 'World Ranking' }, { value: 'fedex-points', label: 'FedEx Cup Points' }, { value: 'highest-earnings', label: 'Earnings' }, { value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }]
-            : [{ value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }];
-          return opts.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => { setSort(opt.value); setVisibleCount(PAGE_SIZE); setSortSheetOpen(false); }}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '12px 20px',
-                background: sort === opt.value ? 'rgba(247,147,30,0.04)' : 'transparent',
-                border: 'none',
-                borderLeft: sort === opt.value ? '3px solid #F7931E' : '3px solid transparent',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                cursor: 'pointer', textAlign: 'left' as const,
-              }}
-            >
-              <span style={{ fontSize: 14, fontWeight: sort === opt.value ? 800 : 500, color: '#0F172A' }}>
-                {opt.label}
-              </span>
-              {sort === opt.value && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
-            </button>
-          ));
-        })()}
-        </div>
-        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
-      </BottomSheet>
 
       {/* Tour filter bottom sheet */}
       <BottomSheet
