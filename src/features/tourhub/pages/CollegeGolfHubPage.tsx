@@ -12,6 +12,8 @@ import { CollegeCard } from '../components/college/CollegeCard';
 import { useCollegeSeasonStats, useCollegeSearch, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
+import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
+import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
@@ -109,13 +111,65 @@ export function CollegeGolfHubPage() {
     return () => document.removeEventListener('click', handler);
   }, [saveScroll]);
 
-  const topCollege = useMemo(() => {
-    if (!allStats?.length) return null;
-    return [...allStats].sort((a, b) => getMetricValue(b, activeMetric) - getMetricValue(a, activeMetric))[0];
-  }, [allStats, activeMetric]);
+  // Sort by active metric. For 'movers' tab the hero subject stays
+  // #1-by-earnings (locked decision #8) — only the pill set swaps.
+  const heroMetric: 'earnings' | 'wins' | 'top10s' =
+    activeMetric === 'movers' ? 'earnings' : activeMetric;
+
+  const { sortedForHero, topCollege, runnerUp, isTiedAtOne } = useMemo(() => {
+    if (!allStats?.length) {
+      return { sortedForHero: [] as CollegeSeasonStats[], topCollege: null, runnerUp: null, isTiedAtOne: false };
+    }
+    const getValue = (s: CollegeSeasonStats) => getMetricValue(s, heroMetric);
+    const sorted = [...allStats].sort((a, b) => getValue(b) - getValue(a));
+    const top = sorted[0] ?? null;
+    const second = sorted[1] ?? null;
+    const tied = !!(top && second && getValue(top) === getValue(second));
+    return { sortedForHero: sorted, topCollege: top, runnerUp: second, isTiedAtOne: tied };
+  }, [allStats, heroMetric]);
+  void sortedForHero;
 
   const topCollegeMedia = topCollege ? collegeMap?.get(topCollege.normalized_name) ?? null : null;
   const { data: heroAlumni } = useHeroAlumni(topCollege?.normalized_name);
+
+  // Captain for the #1 franchise — drives hero captain pill.
+  const captainSlugs = useMemo(
+    () => (topCollege ? [topCollege.normalized_name] : []),
+    [topCollege]
+  );
+  const { data: heroCaptainMap } = useFranchiseCaptains(captainSlugs);
+  const heroCaptain = topCollege ? heroCaptainMap?.get(topCollege.normalized_name) ?? null : null;
+
+  // Movers context — only fetched for the Movers tab.
+  const { data: weeklyRisers } = useCollegeWeeklyMovers({
+    direction: 'up',
+    limit: 50,
+  });
+  const moversContext = useMemo(() => {
+    if (activeMetric !== 'movers' || !weeklyRisers || weeklyRisers.length === 0) return null;
+    const climberCount = weeklyRisers.length;
+    const topByDelta = [...weeklyRisers].sort((a, b) => b.earnings_delta - a.earnings_delta)[0];
+    // Data layer: positive earnings_rank_change = rank improved here.
+    // (See useCollegeMovers — direction:'up' filter sorts by earnings_delta DESC.
+    // The rank_change sign is the raw data layer value.)
+    const topByRank = [...weeklyRisers]
+      .filter(m => (m.earnings_rank_change ?? 0) > 0)
+      .sort((a, b) => (b.earnings_rank_change ?? 0) - (a.earnings_rank_change ?? 0))[0];
+    const nameOf = (slug: string) => collegeMap?.get(slug)?.short_name
+      || collegeMap?.get(slug)?.college_name
+      || slug;
+    return {
+      climberCount,
+      biggestJump: topByDelta ? {
+        displayName: nameOf(topByDelta.normalized_name),
+        earningsDelta: topByDelta.earnings_delta,
+      } : null,
+      biggestRankMove: topByRank ? {
+        displayName: nameOf(topByRank.normalized_name),
+        rankDelta: topByRank.earnings_rank_change ?? 0,
+      } : null,
+    };
+  }, [activeMetric, weeklyRisers, collegeMap]);
 
   const showSearchResults = searchExpanded && debouncedSearch.length >= 2;
 
@@ -152,8 +206,12 @@ export function CollegeGolfHubPage() {
           <CollegeMasthead
             stats={topCollege}
             college={topCollegeMedia}
-            activeMetric={activeMetric === 'movers' ? 'earnings' : activeMetric}
+            activeMetric={activeMetric}
             heroAlumni={heroAlumni ?? null}
+            captain={heroCaptain}
+            runnerUp={runnerUp}
+            isTiedAtOne={isTiedAtOne}
+            moversContext={moversContext}
           />
         ) : null}
 
@@ -225,7 +283,9 @@ export function CollegeGolfHubPage() {
             </button>
           </div>
 
-          {/* Underline metric tabs */}
+          {/* Underline metric tabs — College Franchise spec: active 800/13px, inactive 600/13px.
+              Intentionally diverges from PlayersTab (500/11px) per locked decision #2.
+              PlayersTab tab styling re-alignment logged as a follow-up. */}
           <div style={{ display: 'flex', marginTop: '4px' }}>
             {METRIC_TABS.map(tab => {
               const isActive = activeMetric === tab.value;
@@ -236,9 +296,10 @@ export function CollegeGolfHubPage() {
                   className="flex-shrink-0 active:scale-[0.97] transition-transform"
                   style={{
                     flex: 1,
-                    padding: '8px 0',
-                    fontSize: '11px',
-                    fontWeight: isActive ? 800 : 500,
+                    padding: '10px 0',
+                    fontSize: '13px',
+                    fontWeight: isActive ? 800 : 600,
+                    letterSpacing: '-0.1px',
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent', border: 'none',
                     borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,

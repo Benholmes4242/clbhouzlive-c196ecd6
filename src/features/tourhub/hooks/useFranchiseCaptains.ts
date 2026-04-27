@@ -12,6 +12,12 @@ export interface FranchiseCaptain {
   photoUrl: string | null;
   pgaTourId: string | null;
   earnings: number;
+  /** Earnings of the second-highest-earning alumnus on the same college.
+   *  Used to gate the captain context line: caller suppresses the captain
+   *  when (earnings - runnerUpEarnings) / earnings <= 0.20, falling back to
+   *  the {N} alumni subline. Null when the college has only one alumnus
+   *  (treat as full dominance — render the captain). */
+  runnerUpEarnings: number | null;
   collegeNormalized: string;
   tourCode: string;
 }
@@ -48,8 +54,12 @@ export function useFranchiseCaptains(collegeNames: string[]) {
         return new Map<string, FranchiseCaptain>();
       }
 
-      // Group by college, take the top earner for each
+      // Group by college. The query is already ordered earnings DESC, so the
+      // first row per college is the captain (top earner) and the second row
+      // is the runner-up used by the >20% margin gate. Colleges with only
+      // one alumnus get runnerUpEarnings = null.
       const captainMap = new Map<string, FranchiseCaptain>();
+      const runnerUpSet = new Set<string>();
 
       for (const row of data || []) {
         const player = row.player as any;
@@ -63,9 +73,15 @@ export function useFranchiseCaptains(collegeNames: string[]) {
             photoUrl: player.photo_url,
             pgaTourId: player.pga_tour_id || null,
             earnings: row.earnings || 0,
+            runnerUpEarnings: null,
             collegeNormalized: key,
             tourCode: player.tour_codes?.[0] ?? 'pga',
           });
+        } else if (!runnerUpSet.has(key)) {
+          // Second pass for this college — capture runner-up earnings.
+          const captain = captainMap.get(key)!;
+          captain.runnerUpEarnings = row.earnings || 0;
+          runnerUpSet.add(key);
         }
       }
 

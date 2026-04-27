@@ -49,7 +49,7 @@ interface LeadersMastheadProps {
   pills?: MastheadPill[];
 }
 
-function PillView({ pill }: { pill: MastheadPill }) {
+export function PillView({ pill }: { pill: MastheadPill }) {
   const isHighlight = pill.variant === 'highlight';
   const bg = isHighlight ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.06)';
   const border = isHighlight ? 'rgba(247,147,30,0.30)' : 'rgba(255,255,255,0.10)';
