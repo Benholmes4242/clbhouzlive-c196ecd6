@@ -12,10 +12,12 @@ import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
 import CountryFlag from '@/components/ui/country-flag';
+import { playerRoute } from '../../routes';
 
 interface TeeTimesTabProps {
   tournamentId: string;
   tournamentSrId: string | null;
+  tournamentName?: string;
   isLive: boolean;
   isCompleted?: boolean;
 }
