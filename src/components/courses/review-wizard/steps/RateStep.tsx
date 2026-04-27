@@ -273,8 +273,30 @@ export function RateStep({
     return () => observer.disconnect();
   }, []);
 
+  // D7: pulse the verdict number (1.0 → 1.06 → 1.0 over 200ms) when
+  // displayVerdict changes — fires in both hero and sticky bar.
+  const [isAnimatingVerdict, setIsAnimatingVerdict] = useState(false);
+  const prevVerdictRef = useRef<number | null>(displayVerdict);
+  useEffect(() => {
+    if (displayVerdict !== prevVerdictRef.current && displayVerdict !== null) {
+      setIsAnimatingVerdict(true);
+      const t = setTimeout(() => setIsAnimatingVerdict(false), 200);
+      prevVerdictRef.current = displayVerdict;
+      return () => clearTimeout(t);
+    }
+    prevVerdictRef.current = displayVerdict;
+  }, [displayVerdict]);
+
   return (
     <>
+      {/* D6: Keyframes for tier label fade-and-rise */}
+      <style>{`
+        @keyframes verdictLabelEnter {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
       {/* D30: Sticky compact verdict bar — engages on scroll past hero */}
       <AnimatePresence>
         {showSticky && displayVerdict !== null && (
