@@ -37,10 +37,11 @@ export function TournamentMeta({ defendingChampion, fieldStrengthLabel }: Tourna
         paddingTop: 8,
         marginTop: 8,
         borderTop: '1px dashed rgba(15,23,42,0.12)',
+        minWidth: 0,
       }}
     >
       {hasDefending && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0, flex: '1 1 auto', overflow: 'hidden' }}>
           <span
             style={{
               width: 16,
