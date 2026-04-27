@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useFriendsFeed, type FriendsMode } from '@/components/friends-tab/hooks/useFriendsFeed';
+import { useFriendsFeed } from '@/components/friends-tab/hooks/useFriendsFeed';
+import type { LoopMode } from './types';
 import { LoopHeader } from './LoopHeader';
 import { OnCourseNowStrip } from './OnCourseNowStrip';
 import { LoopFeed } from './LoopFeed';
@@ -13,7 +14,7 @@ interface LoopTabContentProps {
 
 export default function LoopTabContent({ embedded = false }: LoopTabContentProps) {
   const { user } = useSupabaseSession();
-  const [activeMode, setActiveMode] = useState<FriendsMode>('latest');
+  const [activeMode, setActiveMode] = useState<LoopMode>('latest');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const {
@@ -27,7 +28,7 @@ export default function LoopTabContent({ embedded = false }: LoopTabContentProps
     resetSeen,
   } = useFriendsFeed({ userId: user?.id, mode: activeMode });
 
-  const handleModeChange = (mode: FriendsMode) => {
+  const handleModeChange = (mode: LoopMode) => {
     setActiveMode(mode);
     resetSeen();
     window.scrollTo({ top: 0, behavior: 'smooth' });
