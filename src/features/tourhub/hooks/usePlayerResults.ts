@@ -92,6 +92,23 @@ export function formatPosition(position: number | null, tied: boolean | null, st
 }
 
 /**
+ * Format position WITHOUT ordinal suffix (e.g., "1", "T2", "T46", "MC").
+ * Use in dense tabular contexts (Recent Tournaments) where ordinals add visual noise.
+ *
+ * IMPORTANT (Rule 28 — format changes are interface changes): consumers must
+ * NOT string-match against this output to detect wins. Compare numeric
+ * `position === 1` directly instead.
+ */
+export function formatPositionShort(position: number | null, tied: boolean | null, status: string | null): string {
+  if (status === 'cut' || status === 'MC') return 'MC';
+  if (status === 'WD') return 'WD';
+  if (status === 'DQ') return 'DQ';
+  if (position === null) return '—';
+  const prefix = tied ? 'T' : '';
+  return `${prefix}${position}`;
+}
+
+/**
  * Format score relative to par (e.g., "-12", "E", "+3")
  */
 export function formatScore(score: number | null): string {

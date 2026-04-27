@@ -6,13 +6,16 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
-import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../../hooks/usePlayerResults';
+import { usePlayerResults, formatPositionShort, formatScore, formatMoney } from '../../hooks/usePlayerResults';
+import { tournamentRoute } from '../../routes';
 
 interface PlayerTournamentHistoryProps {
   playerId: string;
+  /** Player full name — drives the "Back to {Player}" label on the tournament page. */
+  playerName: string;
 }
 
-export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryProps) {
+export function PlayerTournamentHistory({ playerId, playerName }: PlayerTournamentHistoryProps) {
   const [showAll, setShowAll] = useState(false);
   const { data: allResults, isLoading } = usePlayerResults(playerId, 30);
 
@@ -55,15 +58,31 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
 
           <div>
             {results.map((result) => {
-              const pos = formatPosition(result.position, result.position_tied, result.status);
+              const status = result.status?.toUpperCase();
+              const isMissed = status === 'WD' || status === 'CUT' || status === 'MC' || status === 'DQ';
+              // P7 — win detection is numeric, not string-match against the formatter output.
+              // (Rule 28: format changes are interface changes — never string-match formatter output.)
+              const isWin = result.position === 1 && !isMissed;
+              const pos = formatPositionShort(result.position, result.position_tied, result.status);
               const score = result.score;
-              const scoreStr = formatScore(result.score);
-              const isWin = pos === '1st' || pos === 'T1st';
+              const scoreStr = formatScore(score);
+              const displayScore = isMissed ? '—' : scoreStr;
+              const scoreColor = isMissed
+                ? '#94A3B8'
+                : score !== null && score < 0 ? '#F7931E'
+                : score !== null && score > 0 ? '#DC2626'
+                : '#94A3B8';
+
+              const navTarget = tournamentRoute(result.tournament_id, {
+                kind: 'player',
+                playerName,
+              });
 
               return (
                 <Link
                   key={result.id}
-                  to={`/tourhub/tournament/${result.tournament_id}`}
+                  to={navTarget.to}
+                  state={navTarget.state}
                   style={{
                     display: 'flex', alignItems: 'center',
                     padding: '11px 16px',
@@ -80,7 +99,13 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                   </span>
 
                   {/* Tournament name */}
-                  <span style={{ flex: 1, fontSize: '13px', fontWeight: isWin ? 700 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                  <span style={{
+                    flex: 1, fontSize: '13px',
+                    fontWeight: isWin ? 800 : 600,
+                    letterSpacing: isWin ? '-0.01em' : 'normal',
+                    color: '#0F172A',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                  }}>
                     {result.tournament_name}
                   </span>
 
@@ -95,9 +120,9 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                   <span style={{
                     fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
                     width: '36px', textAlign: 'right' as const, flexShrink: 0,
-                    color: score !== null && score < 0 ? '#F7931E' : score !== null && score > 0 ? '#DC2626' : '#94A3B8',
+                    color: scoreColor,
                   }}>
-                    {scoreStr}
+                    {displayScore}
                   </span>
                 </Link>
               );

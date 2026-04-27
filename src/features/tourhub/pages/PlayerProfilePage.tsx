@@ -7,6 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
+// NOTE: ArrowLeft remains used in the error branch (L144). P3 (orphan import) is
+// out of scope this loop and remains in the resume queue.
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
@@ -27,9 +29,7 @@ const sectionVariants = {
 };
 
 const PULL_THRESHOLD = 50;
-
-const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
-type StatTab = (typeof STAT_TABS)[number];
+// STAT_TABS moved into PlayerSeasonStats (Fix 1 — segmented control now lives inside the card).
 
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -43,7 +43,7 @@ export function PlayerProfilePage() {
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
-  const [activeStatTab, setActiveStatTab] = useState<StatTab>('Overview');
+  // activeStatTab state moved into PlayerSeasonStats (Fix 1).
 
   // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -224,34 +224,7 @@ export function PlayerProfilePage() {
             </button>
           </div>
 
-          {/* Underline tab bar — flex:1 equal-width */}
-          <div style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}>
-            {STAT_TABS.map((tab) => {
-              const isActive = activeStatTab === tab;
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveStatTab(tab)}
-                  className="active:opacity-70 transition-opacity"
-                  style={{
-                    flex: 1,
-                    padding: '10px 4px 9px',
-                    fontSize: '13px',
-                    fontWeight: isActive ? 800 : 500,
-                    color: isActive ? '#0F172A' : '#94A3B8',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap' as const,
-                    textAlign: 'center' as const,
-                  }}
-                >
-                  {tab}
-                </button>
-              );
-            })}
-          </div>
+          {/* Stats segmented control now lives inside PlayerSeasonStats (Fix 1). */}
         </div>
 
         {/* Form section — three-branch render (Heating up / In form / Steady / Out of form). */}
@@ -269,7 +242,7 @@ export function PlayerProfilePage() {
             transition={{ duration: 0.4 }}
           >
             {playerStats ? (
-              <PlayerSeasonStats playerStats={playerStats} activeTab={activeStatTab} />
+              <PlayerSeasonStats playerStats={playerStats} />
             ) : (
               <div className="py-16 text-center">
                 <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
@@ -295,7 +268,7 @@ export function PlayerProfilePage() {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <PlayerTournamentHistory playerId={playerId} />
+              <PlayerTournamentHistory playerId={playerId} playerName={player.full_name} />
             </motion.div>
           )}
 
