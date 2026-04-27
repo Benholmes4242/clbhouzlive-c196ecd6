@@ -69,6 +69,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showBreakdownsPicker, setShowBreakdownsPicker] = useState(false);
 
   const handleCourseClick = useCallback(
     (courseId: string, ratingId: string | null) => {
@@ -76,6 +77,17 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         navigate(`/courses/${courseId}?tab=reviews&review=${ratingId}`);
       } else {
         navigate(`/courses/${courseId}`);
+      }
+    },
+    [navigate],
+  );
+
+  const handleFullReview = useCallback(
+    (courseId: string, ratingId: string | null) => {
+      if (ratingId) {
+        navigate(`/courses/${courseId}?tab=reviews&review=${ratingId}`);
+      } else {
+        navigate(`/courses/${courseId}?tab=reviews`);
       }
     },
     [navigate],
