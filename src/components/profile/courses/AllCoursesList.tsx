@@ -341,9 +341,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             const isLowHigh = activeSort === 'rating-low-high';
             const isRatingSort = isHighLow || isLowHigh;
 
-            // ── Rating-sorted: stratified hero + compact, with dividers ─────
+            // ── Rating-sorted: single primitive with tier dividers ─────
             if (isRatingSort) {
-              // Tier counts across the *entire* filtered+sorted list.
               const tierCounts: Record<MyRatingsBucket, number> = {
                 top: 0,
                 rest: 0,
@@ -357,32 +356,16 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               const elements: React.ReactNode[] = [];
               let currentBucket: MyRatingsBucket | null = null;
               let firstDividerRendered = false;
-              let compactBucket: React.ReactNode[] = [];
-              let compactKeySeed = 0;
-
-              const flushCompact = () => {
-                if (compactBucket.length === 0) return;
-                elements.push(
-                  <div
-                    key={`compact-bucket-${compactKeySeed++}`}
-                    style={{ padding: '0 16px' }}
-                  >
-                    {compactBucket}
-                  </div>,
-                );
-                compactBucket = [];
-              };
 
               displayedCourses.forEach((course, index) => {
                 const rank = index + 1;
                 const isRated = course.has_rating && course.rating_value != null;
-                if (!isRated) return; // unrated dropped from rating-sorted view
+                if (!isRated) return;
 
                 const rating = course.rating_value as number;
                 const bucket = getBucket(rating);
 
                 if (bucket !== currentBucket) {
-                  flushCompact();
                   elements.push(
                     <MyRatingsTierDivider
                       key={`divider-${bucket}`}
@@ -395,57 +378,43 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   currentBucket = bucket;
                 }
 
-                const heroTier = isHighLow ? getHeroTier(rating) : null;
-                // In low→high mode, render everything as compact rows even
-                // for ≥9.0 — the cinematic hero only fires in high→low.
-
-                if (heroTier !== null) {
-                  flushCompact();
-                  elements.push(
-                    // Negative horizontal margin escapes the parent's
-                    // 10px (px-2.5) padding, achieving true full-bleed.
-                    <div key={course.id} style={{ marginLeft: -10, marginRight: -10 }}>
-                      <MyRatingsHeroCard
-                        course={toRatedCourseData(course as any)}
-                        rank={rank}
-                        onCourseClick={handleCourseClick}
-                      />
-                    </div>,
-                  );
-                } else {
-                  compactBucket.push(
-                    <MyRatingsCompactRow
-                      key={course.id}
-                      course={toRatedCourseData(course as any)}
-                      rank={rank}
-                      onCourseClick={handleCourseClick}
-                    />,
-                  );
-                }
+                elements.push(
+                  <DossierCard
+                    key={course.id}
+                    course={toRatedCourseData(course as any)}
+                    rank={rank}
+                    onCourseClick={handleCourseClick}
+                    onFullReview={handleFullReview}
+                  />,
+                );
               });
 
-              flushCompact();
               return elements;
             }
 
-            // ── Recently-played: flat compact list, dividers off ────────────
+            // ── Recently-played: flat list, no dividers ────────────
             return (
-              <div style={{ padding: '0 16px' }}>
+              <>
                 {displayedCourses.map((course, index) => {
                   const rank = index + 1;
                   const isRated = course.has_rating && course.rating_value != null;
                   if (isRated) {
                     return (
-                      <MyRatingsCompactRow
+                      <DossierCard
                         key={course.id}
                         course={toRatedCourseData(course as any)}
                         rank={rank}
                         onCourseClick={handleCourseClick}
+                        onFullReview={handleFullReview}
                       />
                     );
                   }
                   return (
-                    <div key={course.id} className="mb-2">
+                    <div
+                      key={course.id}
+                      className="mb-2"
+                      style={{ padding: '0 16px' }}
+                    >
                       <TieredCourseCard
                         course={course}
                         isOwnProfile={isOwnProfile}
@@ -453,7 +422,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                     </div>
                   );
                 })}
-              </div>
+              </>
             );
           })()}
         </div>
