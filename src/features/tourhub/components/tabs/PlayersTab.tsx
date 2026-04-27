@@ -352,7 +352,12 @@ export function PlayersTab() {
   }, [debouncedSearch]);
 
   // Pipeline: tour → search → sort → pagination
-  const heroPlayerIds = useMemo(() => new Set(heroPlayers.map(p => p.playerId)), [heroPlayers]);
+  // Only the world #1 (champion) is excluded from the rendered list. Rows 2-5
+  // appear in the list directly below the hero per Phase 1 spec.
+  const heroPlayerIds = useMemo(
+    () => new Set(heroPlayers.slice(0, 1).map(p => p.playerId)),
+    [heroPlayers],
+  );
 
   const { rows, totalCount } = useMemo(() => {
     let filtered = tourFilteredPlayers.filter(p =>
