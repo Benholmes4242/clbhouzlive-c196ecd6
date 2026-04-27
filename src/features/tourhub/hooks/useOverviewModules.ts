@@ -1148,3 +1148,150 @@ export function useSeasonStats() {
     staleTime: 10 * 60 * 1000,
   });
 }
+
+// ============================================================================
+// All Tours Ticker — persistent rail data (live ∪ completed ∪ upcoming)
+// ============================================================================
+
+export type TickerCellStatus = 'live' | 'completed' | 'upcoming';
+
+export interface TickerCellData {
+  id: string;
+  name: string;
+  status: TickerCellStatus;
+  startDate: string;
+  endDate: string;
+  tourSlug: TourId;
+  /** Live: leader name. Completed: winner name. Upcoming: null. */
+  personName: string | null;
+  /** Live: country. Completed: country. Upcoming: venue country. */
+  country: string | null;
+  /** Live: e.g. "-14". Completed: final score. Upcoming: null. */
+  scoreDisplay: string | null;
+  /** Days until start (upcoming only). */
+  daysUntilStart: number | null;
+}
+
+export interface TickerData {
+  live: TickerCellData[];
+  completed: TickerCellData[];
+  upcoming: TickerCellData[];
+}
+
+export function useAllToursTickerData() {
+  const { data: cache, isLoading: cacheLoading } = useTournamentsCache();
+
+  return useQuery({
+    queryKey: ['all-tours-ticker', cache ? 'ready' : 'waiting'],
+    queryFn: async (): Promise<TickerData> => {
+      if (!cache) return { live: [], completed: [], upcoming: [] };
+
+      const liveIds = cache.live.map(t => t.id);
+      const completedIds = cache.completed.map(t => t.id);
+      const allIds = [...liveIds, ...completedIds];
+
+      // Single batched leaderboard query — fetches both live leaders + completed winners
+      const { data: allLeaders } = allIds.length > 0
+        ? await supabase
+            .from('sr_leaderboards')
+            .select(`
+              tournament_id, position, score, player_id, team_id, strokes,
+              player:sr_players!sr_leaderboards_player_id_fkey(id, first_name, last_name, full_name, country),
+              team:sr_teams!sr_leaderboards_team_id_fkey(id, display_name, abbr_name)
+            `)
+            .in('tournament_id', allIds)
+            .eq('position', 1)
+            .gt('strokes', 0)
+            .not('position', 'is', null)
+        : { data: [] as any[] };
+
+      const leaderMap: Record<string, any> = {};
+      const leaderCountMap: Record<string, number> = {};
+      for (const entry of (allLeaders || []) as any[]) {
+        leaderCountMap[entry.tournament_id] = (leaderCountMap[entry.tournament_id] ?? 0) + 1;
+        if (!leaderMap[entry.tournament_id]) {
+          if (!entry.player && entry.team) {
+            const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
+            entry.player = { id: entry.team.id, first_name: '', last_name: '', full_name: teamName };
+          }
+          leaderMap[entry.tournament_id] = entry;
+        }
+      }
+
+      const buildCell = (
+        t: CachedTournament,
+        status: TickerCellStatus,
+      ): TickerCellData => {
+        const leaderEntry = leaderMap[t.id] || null;
+        const tied = leaderEntry && leaderCountMap[t.id] > 1;
+        const personName = leaderEntry
+          ? tied
+            ? `${leaderCountMap[t.id]} tied`
+            : `${(leaderEntry.player as any).first_name} ${(leaderEntry.player as any).last_name}`.trim()
+          : null;
+        const country = leaderEntry && !tied ? ((leaderEntry.player as any).country ?? null) : null;
+        const scoreDisplay = leaderEntry ? formatScore(leaderEntry.score) : null;
+
+        return {
+          id: t.id,
+          name: t.name,
+          status,
+          startDate: t.start_date,
+          endDate: t.end_date,
+          tourSlug: mapTourSlug(t.season.tour_name),
+          personName,
+          country,
+          scoreDisplay,
+          daysUntilStart: null,
+        };
+      };
+
+      const buildUpcomingCell = (t: CachedTournament): TickerCellData => {
+        const start = new Date(t.start_date + 'T12:00:00Z').getTime();
+        const now = Date.now();
+        const daysUntilStart = Math.max(0, Math.ceil((start - now) / 86400000));
+        return {
+          id: t.id,
+          name: t.name,
+          status: 'upcoming',
+          startDate: t.start_date,
+          endDate: t.end_date,
+          tourSlug: mapTourSlug(t.season.tour_name),
+          personName: null,
+          country: t.venue_country,
+          scoreDisplay: null,
+          daysUntilStart,
+        };
+      };
+
+      // De-dup: if a tour already has a live cell, skip its completed cell.
+      // Per-tour cap: keep the most recent completed event per tour to prevent
+      // a single tour from monopolising the rail.
+      const live = cache.live.map(t => buildCell(t, 'live'));
+      const liveTourSlugs = new Set(live.map(c => c.tourSlug));
+
+      const completedByTour: Record<string, TickerCellData[]> = {};
+      for (const t of cache.completed) {
+        const cell = buildCell(t, 'completed');
+        if (liveTourSlugs.has(cell.tourSlug)) continue;
+        (completedByTour[cell.tourSlug] ??= []).push(cell);
+      }
+      const completed = Object.values(completedByTour)
+        .map(cells => cells.sort((a, b) => b.endDate.localeCompare(a.endDate))[0])
+        .filter((c): c is TickerCellData => !!c);
+
+      // Upcoming preview cells (only used for deep-empty fallback): top 3 by start date.
+      const upcoming = [...cache.upcoming]
+        .sort((a, b) => a.start_date.localeCompare(b.start_date))
+        .slice(0, 3)
+        .map(buildUpcomingCell);
+
+      return { live, completed, upcoming };
+    },
+    enabled: !cacheLoading,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+}
+
