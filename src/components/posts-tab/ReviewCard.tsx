@@ -60,8 +60,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         }}
       />
 
-      {/* Media — 16:10 */}
-      <div className="relative w-full bg-slate-700" style={{ aspectRatio: '2 / 1' }}>
+      {/* Media — 21:9 cinemascope */}
+      <div className="relative w-full bg-slate-700" style={{ aspectRatio: '21 / 9' }}>
         {courseImageUrl && (
           <img
             src={courseImageUrl}
@@ -143,7 +143,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       >
         {review.reviewText && (
           <div
-            className="text-white/70 italic line-clamp-1"
+            className="text-white/70 italic line-clamp-2"
             style={{ fontSize: 13, lineHeight: 1.5 }}
           >
             "{review.reviewText}"
