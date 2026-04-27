@@ -82,3 +82,62 @@ export function getReferrerLabel(referrer?: TournamentReferrer): string {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Player profile
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Discriminated union describing where the user came from when navigating to
+ * the player profile page. Drives the back-link label
+ * ("Back to Stat Watch", "Back to {Tournament Name}", etc.).
+ *
+ * Phase 1 migrates the top 5-8 entry points; remaining call sites fall back
+ * to plain "Back" via getPlayerReferrerLabel(undefined).
+ */
+export type PlayerReferrer =
+  | { kind: 'tour-hub' }
+  | { kind: 'stat-watch' }
+  | { kind: 'tournament'; tournamentName: string }
+  | { kind: 'college'; collegeName: string }
+  | { kind: 'search' };
+
+export interface PlayerNavTarget {
+  to: string;
+  state: { referrer?: PlayerReferrer };
+}
+
+/**
+ * Build a navigation target for the player profile page. Pass the result to
+ * <Link to={target.to} state={target.state}> or
+ * navigate(target.to, { state: target.state }).
+ */
+export function playerRoute(
+  playerId: string,
+  referrer?: PlayerReferrer,
+): PlayerNavTarget {
+  return {
+    to: `/tourhub/player/${playerId}`,
+    state: { referrer },
+  };
+}
+
+/**
+ * Resolve the back-link label from a player referrer. Returns "Back" when no
+ * referrer is supplied (deep-link visit, or non-migrated entry point).
+ */
+export function getPlayerReferrerLabel(referrer?: PlayerReferrer): string {
+  if (!referrer) return 'Back';
+  switch (referrer.kind) {
+    case 'tour-hub':
+      return 'Back to Tour Hub';
+    case 'stat-watch':
+      return 'Back to Stat Watch';
+    case 'tournament':
+      return `Back to ${referrer.tournamentName}`;
+    case 'college':
+      return `Back to ${referrer.collegeName}`;
+    case 'search':
+      return 'Back to Search';
+  }
+}
+
