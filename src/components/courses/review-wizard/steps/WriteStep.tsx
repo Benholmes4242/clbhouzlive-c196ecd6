@@ -311,7 +311,7 @@ export function WriteStep({
             type="text"
             className="w-full bg-transparent text-[16px] font-semibold mt-1 outline-none placeholder:text-muted-foreground/40"
             style={{ color: '#0F172A' }}
-            placeholder="Sum up your experience"
+            placeholder="Sum up your round in a few words"
             value={title}
             onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
             onFocus={() => setIsTitleFocused(true)}
@@ -378,15 +378,16 @@ export function WriteStep({
             <span className="text-[12px] text-muted-foreground flex-1">
               {currentVoiceState === 'listening' ? 'Listening… tap to stop' : 'Tap mic to speak'}
             </span>
-            {reviewLength > 0 && (
-              <span className={cn(
-                "text-[11px] tabular-nums",
-                reviewLength >= MAX_REVIEW_LENGTH * 0.95 ? 'text-destructive font-medium' :
-                reviewLength >= MAX_REVIEW_LENGTH * 0.8 ? 'text-amber-500' : 'text-muted-foreground'
-              )}>
-                {reviewLength.toLocaleString()}/{MAX_REVIEW_LENGTH.toLocaleString()}
-              </span>
-            )}
+            <span className={cn(
+              "text-[11px] tabular-nums",
+              reviewLength === 0 ? 'text-muted-foreground' :
+              reviewLength >= MAX_REVIEW_LENGTH * 0.95 ? 'text-destructive font-medium' :
+              reviewLength >= MAX_REVIEW_LENGTH * 0.8 ? 'text-amber-500' : 'text-muted-foreground'
+            )}>
+              {reviewLength === 0
+                ? `Up to ${MAX_REVIEW_LENGTH.toLocaleString()}`
+                : `${reviewLength.toLocaleString()}/${MAX_REVIEW_LENGTH.toLocaleString()}`}
+            </span>
           </div>
         </motion.div>
 

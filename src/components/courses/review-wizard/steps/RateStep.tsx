@@ -22,10 +22,10 @@ interface RateStepProps {
 }
 
 const BREAKDOWN_FIELDS = [
-  { key: 'design' as const, label: 'Course Design', description: 'Layout, design and landscape' },
-  { key: 'condition' as const, label: 'Course Condition', description: 'Greens, fairways, and overall upkeep' },
-  { key: 'clubhouse' as const, label: 'Clubhouse & Service', description: 'Clubhouse, changing rooms and staff friendliness' },
-  { key: 'facilities' as const, label: 'Practice Facilities', description: 'Range, putting green, and amenities' },
+  { key: 'design' as const,     label: 'Course Design',       description: 'Layout, design and landscape' },
+  { key: 'condition' as const,  label: 'Course Condition',    description: 'Greens, fairways and upkeep' },
+  { key: 'clubhouse' as const,  label: 'Clubhouse',           description: 'Building, food and welcome' },
+  { key: 'facilities' as const, label: 'Practice Facilities', description: 'Range, putting green and short-game area' },
 ];
 
 function snapToTenth(value: number): number {
@@ -45,11 +45,30 @@ interface SegmentedSliderProps {
 function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLabel }: SegmentedSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const prevWholeRef = useRef<number>(Math.floor(value));
+  // D8: transient release-confirmation scale (1.0 → 1.15 → 1.0 over 200ms)
+  const [isAnimatingThumb, setIsAnimatingThumb] = useState(false);
+  // D4: layered haptics — light on 0.5 crossings, medium on integer crossings
+  const lastHapticValueRef = useRef<number>(value);
 
   const trackHeight = size === 'hero' ? 8 : 6;
   const thumbSize = size === 'hero' ? 28 : 22;
   const thumbActiveSize = size === 'hero' ? 32 : 26;
+  // D11: ensure compact slider wrapper meets Apple HIG 44px minimum hit area
+  const wrapperPadding = 16;
+  const wrapperMin = 44;
+  const wrapperHeight = Math.max(thumbSize + wrapperPadding, wrapperMin);
+
+  const handleHapticTick = useCallback((newValue: number) => {
+    const prev = lastHapticValueRef.current;
+    const isIntegerCrossing = Math.floor(newValue) !== Math.floor(prev);
+    const isHalfCrossing = Math.floor(newValue * 2) !== Math.floor(prev * 2);
+    if (isIntegerCrossing) {
+      triggerHaptic('medium');
+    } else if (isHalfCrossing) {
+      triggerHaptic('light');
+    }
+    lastHapticValueRef.current = newValue;
+  }, []);
 
   const getValueFromPosition = useCallback((clientX: number) => {
     if (!trackRef.current) return value;
@@ -68,7 +87,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
       onFirstTouch();
     }
     const newValue = getValueFromPosition(e.clientX);
-    prevWholeRef.current = Math.floor(newValue);
+    lastHapticValueRef.current = newValue;
     onChange(newValue);
   }, [touched, onFirstTouch, getValueFromPosition, onChange]);
 
@@ -77,13 +96,9 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
     e.preventDefault();
     e.stopPropagation();
     const newValue = getValueFromPosition(e.clientX);
-    const newWhole = Math.floor(newValue);
-    if (newWhole !== prevWholeRef.current) {
-      triggerHaptic('light');
-      prevWholeRef.current = newWhole;
-    }
+    handleHapticTick(newValue);
     onChange(newValue);
-  }, [isDragging, getValueFromPosition, onChange]);
+  }, [isDragging, getValueFromPosition, onChange, handleHapticTick]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
@@ -91,24 +106,30 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
       if (!touched) onFirstTouch();
       const newVal = Math.min(10, snapToTenth((value ?? 5) + 0.1));
       onChange(newVal);
-      triggerHaptic('light');
+      handleHapticTick(newVal);
     }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
       e.preventDefault();
       if (!touched) onFirstTouch();
       const newVal = Math.max(0, snapToTenth((value ?? 5) - 0.1));
       onChange(newVal);
-      triggerHaptic('light');
+      handleHapticTick(newVal);
     }
-  }, [value, touched, onFirstTouch, onChange]);
+  }, [value, touched, onFirstTouch, onChange, handleHapticTick]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
     setIsDragging(false);
+    // D8: release confirmation pulse
+    setIsAnimatingThumb(true);
+    setTimeout(() => setIsAnimatingThumb(false), 200);
   }, []);
 
   const percent = (value / 10) * 100;
   const tierData = touched ? getScoreTier(value) : null;
+
+  // D8: compute thumb scale — release pulse takes precedence over drag size
+  const thumbScale = isAnimatingThumb ? 1.15 : 1.0;
 
   return (
     <div
@@ -126,7 +147,7 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
       <div
         ref={trackRef}
         className="relative w-full cursor-pointer"
-        style={{ height: thumbSize + 16, paddingTop: (thumbSize + 16 - trackHeight) / 2, paddingBottom: (thumbSize + 16 - trackHeight) / 2 }}
+        style={{ height: wrapperHeight, paddingTop: (wrapperHeight - trackHeight) / 2, paddingBottom: (wrapperHeight - trackHeight) / 2 }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -171,8 +192,10 @@ function SegmentedSlider({ value, onChange, touched, onFirstTouch, size, ariaLab
               : '0 1px 3px rgba(0,0,0,0.1)',
             left: `${percent}%`,
             top: '50%',
-            transform: 'translate(-50%, -50%)',
-            transition: isDragging ? 'none' : 'width 100ms ease, height 100ms ease, box-shadow 100ms ease, border-width 100ms ease',
+            transform: `translate(-50%, -50%) scale(${thumbScale})`,
+            transition: isDragging
+              ? 'transform 200ms ease'
+              : 'transform 200ms ease, width 100ms ease, height 100ms ease, box-shadow 100ms ease, border-width 100ms ease',
             zIndex: 2,
             pointerEvents: 'none',
           }}
@@ -250,8 +273,30 @@ export function RateStep({
     return () => observer.disconnect();
   }, []);
 
+  // D7: pulse the verdict number (1.0 → 1.06 → 1.0 over 200ms) when
+  // displayVerdict changes — fires in both hero and sticky bar.
+  const [isAnimatingVerdict, setIsAnimatingVerdict] = useState(false);
+  const prevVerdictRef = useRef<number | null>(displayVerdict);
+  useEffect(() => {
+    if (displayVerdict !== prevVerdictRef.current && displayVerdict !== null) {
+      setIsAnimatingVerdict(true);
+      const t = setTimeout(() => setIsAnimatingVerdict(false), 200);
+      prevVerdictRef.current = displayVerdict;
+      return () => clearTimeout(t);
+    }
+    prevVerdictRef.current = displayVerdict;
+  }, [displayVerdict]);
+
   return (
     <>
+      {/* D6: Keyframes for tier label fade-and-rise */}
+      <style>{`
+        @keyframes verdictLabelEnter {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
       {/* D30: Sticky compact verdict bar — engages on scroll past hero */}
       <AnimatePresence>
         {showSticky && displayVerdict !== null && (
@@ -268,11 +313,25 @@ export function RateStep({
             >
               <span className="text-[10px] font-extrabold tracking-widest text-amber-500">VERDICT</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-[22px] font-black tracking-tight text-slate-900 tabular-nums">
+                <span
+                  className="text-[22px] font-black tracking-tight text-slate-900 tabular-nums"
+                  style={{
+                    display: 'inline-block',
+                    transform: isAnimatingVerdict ? 'scale(1.06)' : 'scale(1.0)',
+                    transition: 'transform 200ms ease',
+                  }}
+                >
                   {displayVerdict.toFixed(1)}
                 </span>
                 {overallTier && (
-                  <span className="text-[11px] font-extrabold tracking-widest text-slate-500">
+                  <span
+                    key={overallTier.label}
+                    className="text-[11px] font-extrabold tracking-widest text-slate-500"
+                    style={{
+                      display: 'inline-block',
+                      animation: 'verdictLabelEnter 200ms ease-out',
+                    }}
+                  >
                     {overallTier.label}
                   </span>
                 )}
@@ -317,33 +376,36 @@ export function RateStep({
           ⚡ Your Verdict
         </div>
 
-        {/* Large animated score — derived from breakdowns */}
+        {/* Large animated score — derived from breakdowns (D7: scale pulse on change) */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-          <motion.span
-            key={displayVerdict !== null ? displayVerdict.toFixed(1) : 'unset'}
-            initial={{ opacity: 0, y: -8, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+          <span
             style={{
               fontSize: 48,
               fontWeight: 900,
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
               color: displayVerdict !== null ? '#0F172A' : 'rgba(15,23,42,0.18)',
+              display: 'inline-block',
+              transform: isAnimatingVerdict ? 'scale(1.06)' : 'scale(1.0)',
+              transition: 'transform 200ms ease',
             }}
           >
             {displayVerdict !== null ? displayVerdict.toFixed(1) : '—'}
-          </motion.span>
+          </span>
         </div>
 
-        {/* Tier label */}
+        {/* Tier label (D6: fade-and-rise on tier transitions) */}
         {overallTier ? (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}
+          <p
+            key={overallTier.label}
+            style={{
+              textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A',
+              textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8,
+              animation: 'verdictLabelEnter 200ms ease-out',
+            }}
           >
             {overallTier.label}
-          </motion.p>
+          </p>
         ) : (
           <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 8 }}>
             Rate categories below to set your verdict

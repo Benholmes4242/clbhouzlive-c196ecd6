@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import { Check, Eye, Home, X, RotateCw, ArrowRight, Star } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { VerdictPill } from './VerdictPill';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
 
 interface SuccessScreenProps {
@@ -196,16 +197,15 @@ export function SuccessScreen({
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E', marginRight: 2, position: 'relative', top: 1 }} />
-                <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                  {rating != null ? (rating === 10 ? '10' : rating.toFixed(1)) : '—'}
-                </span>
-                <span style={{ fontSize: 13, color: '#94a3b8' }}>/10</span>
-                {tierData && (
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginLeft: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{tierData.label}</span>
-                )}
-              </div>
+              {rating != null ? (
+                <VerdictPill rating={rating} />
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                  <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E', marginRight: 2, position: 'relative', top: 1 }} />
+                  <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>—</span>
+                  <span style={{ fontSize: 13, color: '#94a3b8' }}>/10</span>
+                </div>
+              )}
 
               {isNewReview && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 10px' }}>
