@@ -72,6 +72,25 @@ export function LeadersTab() {
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
 
+  // ─── Inline search (Phase 1 fix.1.7) ───
+  const [search, setSearch] = useState('');
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const debouncedSearch = useDebouncedValue(search, 200);
+
+  // Reset search on category change — less surprise across chips.
+  useEffect(() => {
+    setSearch('');
+    setSearchExpanded(false);
+  }, [categoryKey]);
+
+  // Cross-reference Players-page elite map for movement deltas (World Rank only).
+  const { data: elitePlayers } = useElitePlayers(200);
+  const eliteRankMap = useMemo(() => {
+    const map = new Map<string, number | null>();
+    elitePlayers?.forEach((ep) => map.set(ep.playerId, ep.rankChange));
+    return map;
+  }, [elitePlayers]);
+
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     await queryClient.invalidateQueries({ queryKey: ['tour-player-statistics'] });
