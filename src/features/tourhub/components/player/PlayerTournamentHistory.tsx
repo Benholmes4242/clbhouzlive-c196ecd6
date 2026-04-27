@@ -6,13 +6,16 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
-import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../../hooks/usePlayerResults';
+import { usePlayerResults, formatPositionShort, formatScore, formatMoney } from '../../hooks/usePlayerResults';
+import { tournamentRoute } from '../../routes';
 
 interface PlayerTournamentHistoryProps {
   playerId: string;
+  /** Player full name — drives the "Back to {Player}" label on the tournament page. */
+  playerName: string;
 }
 
-export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryProps) {
+export function PlayerTournamentHistory({ playerId, playerName }: PlayerTournamentHistoryProps) {
   const [showAll, setShowAll] = useState(false);
   const { data: allResults, isLoading } = usePlayerResults(playerId, 30);
 
