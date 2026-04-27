@@ -57,8 +57,8 @@ export function ReviewWizard({
   const [showPostingOptions, setShowPostingOptions] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
-  const [autoShareComplete, setAutoShareComplete] = useState(false);
-  const [isAutoSharing, setIsAutoSharing] = useState(false);
+  // D31/D34: autoShareComplete + isAutoSharing removed; auto-share runs in
+  // background and the success screen renders immediately.
   const autoShareAttempted = useRef(false);
   // Freeze previousRating at mount so it survives existingRating refetches
   const previousRatingRef = useRef<number | null>(existingRating?.rating ?? null);
@@ -166,7 +166,6 @@ export function ReviewWizard({
       wizard.submittedRatingId
     ) {
       autoShareAttempted.current = true;
-      setIsAutoSharing(true);
 
       const timer = window.setTimeout(async () => {
         try {
@@ -175,12 +174,9 @@ export function ReviewWizard({
           });
           if (result.success) {
             setSharedPostId(result.postId || null);
-            setAutoShareComplete(true);
           }
         } catch (err) {
           console.error('[ReviewWizard] Auto-share notify failed:', err);
-        } finally {
-          setIsAutoSharing(false);
         }
       }, 1500);
 
@@ -188,36 +184,15 @@ export function ReviewWizard({
     }
   }, [wizard.state.step, isEditMode, alreadyShared, wizard.submittedRatingId, notifyReviewShared]);
 
-  // ---- OPT-OUT: remove shared post ----
-  const handleOptOutShare = useCallback(async () => {
-    if (!wizard.submittedRatingId) return;
-    try {
-      await supabase
-        .from('posts')
-        .delete()
-        .eq('source_review_id', wizard.submittedRatingId);
-
-      setSharedPostId(null);
-      setAutoShareComplete(false);
-
-      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
-      queryClient.invalidateQueries({ queryKey: ['review-shared', wizard.submittedRatingId] });
-      queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
-
-      toast.success('Removed from Clubhouse');
-    } catch (err) {
-      console.error('[ReviewWizard] Opt-out share failed:', err);
-      toast.error('Could not remove. Try again.');
-    }
-  }, [wizard.submittedRatingId, queryClient]);
+  // D31/D34: handleOptOutShare removed — opt-out UI is gone. Auto-share runs in
+  // the background; users who don't want their review shared can delete the
+  // post from their feed afterward.
 
   // Navigation guard
-  const hasUnsavedChanges = wizard.state.rating !== null || 
-    wizard.state.review.length > 0 || 
+  const hasAnyBreakdown = Object.values(wizard.state.breakdowns).some(v => v !== null);
+  const hasUnsavedChanges = wizard.state.rating !== null ||
+    hasAnyBreakdown ||
+    wizard.state.review.length > 0 ||
     wizard.allMedia.length > 0;
 
   const isPostSubmit = wizard.state.step === 'success' || 
@@ -388,12 +363,9 @@ export function ReviewWizard({
                         rating={wizard.state.rating}
                         isEditMode={isEditMode}
                         previousRating={stablePreviousRating}
-                        isAutoSharing={isAutoSharing}
-                        autoShareComplete={autoShareComplete}
                         onViewReview={handleViewReview}
                         onGoToClubhouse={handleGoToClubhouse}
                         onDone={handleDone}
-                        onOptOutShare={handleOptOutShare}
                       />
                     ) : wizard.state.step === 'share-success' ? (
                       <SuccessScreen
@@ -412,6 +384,7 @@ export function ReviewWizard({
                         rating={wizard.state.rating}
                         breakdowns={wizard.state.breakdowns}
                         course={activeCourse}
+                        isLegacyMigration={wizard.isLegacyMigration}
                         onRatingChange={wizard.setRating}
                         onBreakdownChange={wizard.setBreakdown}
                       />

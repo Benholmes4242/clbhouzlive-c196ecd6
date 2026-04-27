@@ -16,6 +16,7 @@ interface RateStepProps {
   rating: number | null;
   breakdowns: ReviewBreakdowns;
   course: ReviewWizardCourse | null;
+  isLegacyMigration?: boolean;
   onRatingChange: (rating: number) => void;
   onBreakdownChange: (key: keyof ReviewBreakdowns, value: number | null) => void;
 }
@@ -185,6 +186,7 @@ export function RateStep({
   rating, 
   breakdowns, 
   course,
+  isLegacyMigration = false,
   onRatingChange, 
   onBreakdownChange 
 }: RateStepProps) {
@@ -209,9 +211,8 @@ export function RateStep({
     });
   }, [breakdowns]);
 
-  const handleOverallChange = useCallback((val: number) => {
-    onRatingChange(val);
-  }, [onRatingChange]);
+  // Note: overall verdict is derived from breakdowns (D28); no direct edit handler.
+  void onRatingChange; // retained in props for API compatibility
 
   const handleBreakdownChange = useCallback((key: keyof ReviewBreakdowns, val: number) => {
     setTouchedFields(prev => ({ ...prev, [key]: true }));
@@ -224,7 +225,16 @@ export function RateStep({
     country: course.country,
   }) : '';
 
-  const overallTier = rating !== null ? getScoreTier(rating) : null;
+  // D28: Display the derived verdict (mean of set categories) once any category
+  // is touched, so the user sees the verdict update live as they rate.
+  // Falls back to the prefilled overall rating when no categories are set yet.
+  const setBreakdownValues = Object.values(breakdowns).filter((v): v is number => v !== null);
+  const derivedVerdict = setBreakdownValues.length > 0
+    ? parseFloat((setBreakdownValues.reduce((s, v) => s + v, 0) / setBreakdownValues.length).toFixed(1))
+    : null;
+  const displayVerdict = derivedVerdict ?? rating;
+
+  const overallTier = displayVerdict !== null ? getScoreTier(displayVerdict) : null;
 
   return (
     <motion.div
@@ -255,44 +265,67 @@ export function RateStep({
         </div>
       )}
 
-      {/* Overall Rating — hero treatment */}
+      {/* Overall Verdict — derived from category breakdowns (D28) */}
       <div style={{ padding: '24px 16px 16px' }}>
         {/* Dispatch eyebrow */}
         <div style={{ textAlign: 'center', fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 12 }}>
           ⚡ Your Verdict
         </div>
 
-        {/* Large animated score */}
+        {/* Large animated score — derived from breakdowns */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
           <motion.span
-            key={(rating ?? 5).toFixed(1)}
+            key={displayVerdict !== null ? displayVerdict.toFixed(1) : 'unset'}
             initial={{ opacity: 0, y: -8, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: '#0F172A' }}
+            style={{
+              fontSize: 48,
+              fontWeight: 900,
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              color: displayVerdict !== null ? '#0F172A' : 'rgba(15,23,42,0.18)',
+            }}
           >
-            {rating !== null ? rating.toFixed(1) : '5.0'}
+            {displayVerdict !== null ? displayVerdict.toFixed(1) : '—'}
           </motion.span>
         </div>
 
         {/* Tier label */}
-        {overallTier && (
+        {overallTier ? (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}
+            style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}
           >
             {overallTier.label}
           </motion.p>
+        ) : (
+          <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 8 }}>
+            Rate categories below to set your verdict
+          </p>
         )}
 
-        <SegmentedSlider
-          value={rating ?? 5}
-          onChange={handleOverallChange}
-          touched={true}
-          onFirstTouch={() => {}}
-          size="hero"
-          ariaLabel="Overall rating"
-        />
+        {/* D28: Auto-calculated note */}
+        <p style={{ textAlign: 'center', fontSize: 11, color: '#CBD5E1', margin: 0 }}>
+          Auto-calculated from your category ratings
+        </p>
+
+        {/* D33: Legacy migration notice */}
+        {isLegacyMigration && (
+          <div
+            style={{
+              marginTop: 16,
+              padding: '10px 12px',
+              background: 'rgba(247,147,30,0.06)',
+              border: '0.5px solid rgba(247,147,30,0.25)',
+              borderRadius: 10,
+            }}
+          >
+            <p style={{ fontSize: 12, fontWeight: 600, color: '#0F172A', lineHeight: 1.45, margin: 0 }}>
+              We've updated how ratings work — please re-rate the categories below to update your verdict.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Divider */}

@@ -99,7 +99,7 @@ const INITIAL_BREAKDOWNS: ReviewBreakdowns = {
 
 const INITIAL_STATE: WizardState = {
   step: 1,
-  rating: 5,
+  rating: null,
   breakdowns: INITIAL_BREAKDOWNS,
   title: '',
   review: '',
@@ -107,6 +107,34 @@ const INITIAL_STATE: WizardState = {
   coverMediaId: null,
   selectedTags: [],
 };
+
+/**
+ * D28: Derive overall verdict from category breakdowns.
+ * Returns null if no breakdowns are set; otherwise the mean of set categories,
+ * clamped to [0, 10] and rounded to 1 decimal.
+ */
+function deriveVerdict(breakdowns: ReviewBreakdowns): number | null {
+  const values = Object.values(breakdowns).filter((v): v is number => v !== null);
+  if (values.length === 0) return null;
+  const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+  const clamped = Math.max(0, Math.min(10, avg));
+  return parseFloat(clamped.toFixed(1));
+}
+
+/**
+ * D33: A legacy ratings-only review has an overall rating but no category breakdowns.
+ * On edit-mount we force the user to re-rate categories.
+ */
+function isLegacyRatingsOnly(existing: ExistingRating | undefined): boolean {
+  if (!existing) return false;
+  if (existing.rating == null) return false;
+  return (
+    existing.design_score == null &&
+    existing.condition_score == null &&
+    existing.clubhouse_score == null &&
+    existing.facilities_score == null
+  );
+}
 
 export function useReviewWizard({
   course,
@@ -192,6 +220,15 @@ export function useReviewWizard({
   // Wizard state
   const [state, setState] = useState<WizardState>(() => {
     if (isEditMode && existingRating) {
+      // D33: Legacy ratings-only review → force re-rate (rating + breakdowns null)
+      if (isLegacyRatingsOnly(existingRating)) {
+        return {
+          ...INITIAL_STATE,
+          title: existingRating.title || '',
+          review: existingRating.review || '',
+        };
+      }
+      // D28(c): Prefill verdict from existing rating; recompute on save
       return {
         ...INITIAL_STATE,
         rating: existingRating.rating,
@@ -213,6 +250,18 @@ export function useReviewWizard({
     
     if (isEditMode && existingRating && !hasInitializedFromExisting.current) {
       hasInitializedFromExisting.current = true;
+      
+      if (isLegacyRatingsOnly(existingRating)) {
+        // D33: legacy ratings-only review → null state, force re-rate
+        setState(prev => ({
+          ...prev,
+          rating: null,
+          breakdowns: { ...INITIAL_BREAKDOWNS },
+          title: existingRating.title || '',
+          review: existingRating.review || '',
+        }));
+        return;
+      }
       
       setState(prev => ({
         ...prev,
@@ -693,10 +742,17 @@ export function useReviewWizard({
       return;
     }
     
-    if (!state.rating) {
-      toast.error('Rating required');
+    // D32: gate on at least one breakdown being set; D28: derive verdict from breakdowns
+    const derivedVerdict = deriveVerdict(state.breakdowns);
+    if (derivedVerdict === null) {
+      toast.error('Rate at least one category to continue');
       return;
     }
+    
+    // D28(c): Commit the derived verdict to state so the success screen and
+    // optimistic cache writes (which read state.rating in the onSuccess closure)
+    // reflect the value we are about to persist, not the prefilled legacy value.
+    setState(prev => ({ ...prev, rating: derivedVerdict }));
     
     submissionInProgressRef.current = true;
     setIsSubmitting(true);
@@ -716,11 +772,12 @@ export function useReviewWizard({
         ? [pendingFiles[coverFileIndex], ...pendingFiles.filter((_, i) => i !== coverFileIndex)]
         : pendingFiles;
 
+      // D28: persist the recomputed verdict, not the prefilled state.rating
       await submitReview({
         courseId: course.id,
         courseName: course.name,
         ratingId: isEditMode ? existingRating?.id : undefined,
-        overallRating: state.rating,
+        overallRating: derivedVerdict,
         breakdowns: {
           design: state.breakdowns.design ?? null,
           condition: state.breakdowns.condition ?? null,
@@ -897,12 +954,15 @@ export function useReviewWizard({
     setPendingDeletions([]); // Discard deferred deletions on cancel
   }, [cleanupBlobUrls]);
 
-  // Check if can proceed to next step
-  // Step 1: requires rating; all other steps: always true
-  const canProceed = state.step === 1 ? state.rating !== null : true;
+  // D32: Step 1 requires at least one breakdown set; all other steps: always true
+  const hasAnyBreakdown = Object.values(state.breakdowns).some(v => v !== null);
+  const canProceed = state.step === 1 ? hasAnyBreakdown : true;
   
   // Check if any uploads are in progress (always false with upload-on-submit)
   const hasUploadsInProgress = isSubmitting;
+
+  // D33: Surface legacy-migration notice for the Rate step
+  const isLegacyMigration = isEditMode && isLegacyRatingsOnly(existingRating);
 
   return {
     state,
@@ -913,6 +973,7 @@ export function useReviewWizard({
     isLoadingUser: effectiveLoadingUser,
     isDeleting: deleteMutation.isPending,
     submittedRatingId,
+    isLegacyMigration,
     uploadStatus: { total: pendingFiles.length, ready: 0, uploading: 0, failed: 0, overallPercent: 0 },
     
     // Navigation

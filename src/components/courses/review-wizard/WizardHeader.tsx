@@ -74,9 +74,9 @@ export function WizardHeader({
 
   const handleNextOrSubmit = () => {
     if (isSubmitting || isDeleting) return;
-    // Guard: step 1 requires a rating
+    // Guard: step 1 requires at least one category rating
     if (currentStep === 1 && !canProceed) {
-      toast('Add a rating to continue');
+      toast('Rate at least one category to continue');
       return;
     }
     if (isLastStep) {
