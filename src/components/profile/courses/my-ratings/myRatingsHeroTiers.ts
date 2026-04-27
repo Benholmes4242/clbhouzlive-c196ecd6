@@ -8,6 +8,25 @@
  * tier name still consume from this file.
  */
 
+export interface RatedCourseData {
+  id: string;
+  name: string;
+  country: string | null;
+  sub_country: string | null;
+  thumbnail_image: string | null;
+  is_top100: boolean;
+  global_rank: number | null;
+  last_played_at: string | null;
+  rating_value: number;
+  rating_id: string | null;
+  design_score: number | null;
+  condition_score: number | null;
+  clubhouse_score: number | null;
+  facilities_score: number | null;
+  review: string | null;
+  review_date: string | null;
+}
+
 /**
  * Tier name used in the byline metadata row on cards
  * and as section header labels. Aligned to the 5-tier taxonomy.
