@@ -506,6 +506,18 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           </p>
         </div>
       )}
+
+      {isOwnProfile && (
+        <BreakdownsPickerSheet
+          isOpen={showBreakdownsPicker}
+          onClose={() => setShowBreakdownsPicker(false)}
+          missingCourses={missingBreakdownsCourses}
+          onPickCourse={(courseId) => {
+            setShowBreakdownsPicker(false);
+            navigate(`/courses/${courseId}/rate`);
+          }}
+        />
+      )}
     </div>
   );
 };
