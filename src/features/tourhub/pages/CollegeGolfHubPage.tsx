@@ -111,13 +111,65 @@ export function CollegeGolfHubPage() {
     return () => document.removeEventListener('click', handler);
   }, [saveScroll]);
 
-  const topCollege = useMemo(() => {
-    if (!allStats?.length) return null;
-    return [...allStats].sort((a, b) => getMetricValue(b, activeMetric) - getMetricValue(a, activeMetric))[0];
-  }, [allStats, activeMetric]);
+  // Sort by active metric. For 'movers' tab the hero subject stays
+  // #1-by-earnings (locked decision #8) — only the pill set swaps.
+  const heroMetric: 'earnings' | 'wins' | 'top10s' =
+    activeMetric === 'movers' ? 'earnings' : activeMetric;
+
+  const { sortedForHero, topCollege, runnerUp, isTiedAtOne } = useMemo(() => {
+    if (!allStats?.length) {
+      return { sortedForHero: [] as CollegeSeasonStats[], topCollege: null, runnerUp: null, isTiedAtOne: false };
+    }
+    const getValue = (s: CollegeSeasonStats) => getMetricValue(s, heroMetric);
+    const sorted = [...allStats].sort((a, b) => getValue(b) - getValue(a));
+    const top = sorted[0] ?? null;
+    const second = sorted[1] ?? null;
+    const tied = !!(top && second && getValue(top) === getValue(second));
+    return { sortedForHero: sorted, topCollege: top, runnerUp: second, isTiedAtOne: tied };
+  }, [allStats, heroMetric]);
+  void sortedForHero;
 
   const topCollegeMedia = topCollege ? collegeMap?.get(topCollege.normalized_name) ?? null : null;
   const { data: heroAlumni } = useHeroAlumni(topCollege?.normalized_name);
+
+  // Captain for the #1 franchise — drives hero captain pill.
+  const captainSlugs = useMemo(
+    () => (topCollege ? [topCollege.normalized_name] : []),
+    [topCollege]
+  );
+  const { data: heroCaptainMap } = useFranchiseCaptains(captainSlugs);
+  const heroCaptain = topCollege ? heroCaptainMap?.get(topCollege.normalized_name) ?? null : null;
+
+  // Movers context — only fetched for the Movers tab.
+  const { data: weeklyRisers } = useCollegeWeeklyMovers({
+    direction: 'up',
+    limit: 50,
+  });
+  const moversContext = useMemo(() => {
+    if (activeMetric !== 'movers' || !weeklyRisers || weeklyRisers.length === 0) return null;
+    const climberCount = weeklyRisers.length;
+    const topByDelta = [...weeklyRisers].sort((a, b) => b.earnings_delta - a.earnings_delta)[0];
+    // Data layer: positive earnings_rank_change = rank improved here.
+    // (See useCollegeMovers — direction:'up' filter sorts by earnings_delta DESC.
+    // The rank_change sign is the raw data layer value.)
+    const topByRank = [...weeklyRisers]
+      .filter(m => (m.earnings_rank_change ?? 0) > 0)
+      .sort((a, b) => (b.earnings_rank_change ?? 0) - (a.earnings_rank_change ?? 0))[0];
+    const nameOf = (slug: string) => collegeMap?.get(slug)?.short_name
+      || collegeMap?.get(slug)?.college_name
+      || slug;
+    return {
+      climberCount,
+      biggestJump: topByDelta ? {
+        displayName: nameOf(topByDelta.normalized_name),
+        earningsDelta: topByDelta.earnings_delta,
+      } : null,
+      biggestRankMove: topByRank ? {
+        displayName: nameOf(topByRank.normalized_name),
+        rankDelta: topByRank.earnings_rank_change ?? 0,
+      } : null,
+    };
+  }, [activeMetric, weeklyRisers, collegeMap]);
 
   const showSearchResults = searchExpanded && debouncedSearch.length >= 2;
 
