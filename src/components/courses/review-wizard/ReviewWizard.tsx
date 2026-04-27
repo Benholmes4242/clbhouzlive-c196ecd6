@@ -166,7 +166,6 @@ export function ReviewWizard({
       wizard.submittedRatingId
     ) {
       autoShareAttempted.current = true;
-      setIsAutoSharing(true);
 
       const timer = window.setTimeout(async () => {
         try {
@@ -175,12 +174,9 @@ export function ReviewWizard({
           });
           if (result.success) {
             setSharedPostId(result.postId || null);
-            setAutoShareComplete(true);
           }
         } catch (err) {
           console.error('[ReviewWizard] Auto-share notify failed:', err);
-        } finally {
-          setIsAutoSharing(false);
         }
       }, 1500);
 
@@ -188,32 +184,9 @@ export function ReviewWizard({
     }
   }, [wizard.state.step, isEditMode, alreadyShared, wizard.submittedRatingId, notifyReviewShared]);
 
-  // ---- OPT-OUT: remove shared post ----
-  const handleOptOutShare = useCallback(async () => {
-    if (!wizard.submittedRatingId) return;
-    try {
-      await supabase
-        .from('posts')
-        .delete()
-        .eq('source_review_id', wizard.submittedRatingId);
-
-      setSharedPostId(null);
-      setAutoShareComplete(false);
-
-      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'] });
-      queryClient.invalidateQueries({ queryKey: ['review-shared', wizard.submittedRatingId] });
-      queryClient.invalidateQueries({ queryKey: ['trending-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
-
-      toast.success('Removed from Clubhouse');
-    } catch (err) {
-      console.error('[ReviewWizard] Opt-out share failed:', err);
-      toast.error('Could not remove. Try again.');
-    }
-  }, [wizard.submittedRatingId, queryClient]);
+  // D31/D34: handleOptOutShare removed — opt-out UI is gone. Auto-share runs in
+  // the background; users who don't want their review shared can delete the
+  // post from their feed afterward.
 
   // Navigation guard
   const hasAnyBreakdown = Object.values(wizard.state.breakdowns).some(v => v !== null);
