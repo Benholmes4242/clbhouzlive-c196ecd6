@@ -185,6 +185,42 @@ export function useTopCollegeTeaser() {
 }
 
 /**
+ * Money List leader — single-row teaser for the Stat Watch nav row.
+ * Returns: { name, earnings, photoUrl, tourCode } or null.
+ *
+ * Lightweight by design — fetches a single sr_player_statistics row ordered
+ * by earnings desc. NOT a substitute for useGamifiedLeaderboards (which
+ * powers the StatOfTheWeek section and fetches all 13 categories).
+ */
+export function useMoneyListLeader() {
+  return useQuery({
+    queryKey: ['money-list-leader'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('sr_player_statistics')
+        .select(`
+          earnings,
+          player:sr_players!sr_player_statistics_player_id_fkey(full_name, country)
+        `)
+        .not('earnings', 'is', null)
+        .order('earnings', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!data || !data.player) return null;
+
+      const player = data.player as any;
+      return {
+        name: player.full_name as string,
+        earnings: (data.earnings as number) ?? 0,
+        country: (player.country as string | null) ?? null,
+      };
+    },
+    staleTime: 600_000, // 10 minutes — money list moves slowly
+  });
+}
+
+/**
  * Prefetch nav menu data on trigger hover/press
  */
 export function usePrefetchNavMenu() {
