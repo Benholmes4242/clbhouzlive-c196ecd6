@@ -206,8 +206,12 @@ export function CollegeGolfHubPage() {
           <CollegeMasthead
             stats={topCollege}
             college={topCollegeMedia}
-            activeMetric={activeMetric === 'movers' ? 'earnings' : activeMetric}
+            activeMetric={activeMetric}
             heroAlumni={heroAlumni ?? null}
+            captain={heroCaptain}
+            runnerUp={runnerUp}
+            isTiedAtOne={isTiedAtOne}
+            moversContext={moversContext}
           />
         ) : null}
 
