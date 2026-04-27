@@ -59,9 +59,10 @@ interface AlumniRowProps {
   alumnus: CollegeAlumnus;
   index: number;
   tier: TierKey;
+  legacyContextLabel?: string | null;
 }
 
-function AlumniRow({ alumnus, index, tier }: AlumniRowProps) {
+function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps) {
   const fullName = `${alumnus.first_name} ${alumnus.last_name}`;
   const hasWins = (alumnus.wins || 0) > 0;
   const hasEarnings = (alumnus.earnings || 0) > 0;
@@ -72,10 +73,10 @@ function AlumniRow({ alumnus, index, tier }: AlumniRowProps) {
   const photoUrl = getPlayerHeadshotUrl(fullName, alumnus.tour_codes?.[0] ?? 'pga');
   const tourTag = getPlayerTourTag(alumnus.tour_codes);
 
-  // Legacy rows show editorial context line; others show OWGR when available.
-  const legacyContext = tier === 'legacy' ? LEGACY_ALUMNI_CONTEXT[alumnus.id] : null;
+  // Legacy rows show editorial context line (from legacy_alumni table);
+  // others show OWGR when available.
   const subline = tier === 'legacy'
-    ? (legacyContext ?? 'Major champion · Program history')
+    ? (legacyContextLabel ?? 'Major champion · Program history')
     : liveRank ? `#${liveRank} OWGR` : null;
 
   return (
