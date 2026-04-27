@@ -224,34 +224,7 @@ export function PlayerProfilePage() {
             </button>
           </div>
 
-          {/* Underline tab bar — flex:1 equal-width */}
-          <div style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}>
-            {STAT_TABS.map((tab) => {
-              const isActive = activeStatTab === tab;
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveStatTab(tab)}
-                  className="active:opacity-70 transition-opacity"
-                  style={{
-                    flex: 1,
-                    padding: '10px 4px 9px',
-                    fontSize: '13px',
-                    fontWeight: isActive ? 800 : 500,
-                    color: isActive ? '#0F172A' : '#94A3B8',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap' as const,
-                    textAlign: 'center' as const,
-                  }}
-                >
-                  {tab}
-                </button>
-              );
-            })}
-          </div>
+          {/* Stats segmented control now lives inside PlayerSeasonStats (Fix 1). */}
         </div>
 
         {/* Form section — three-branch render (Heating up / In form / Steady / Out of form). */}
