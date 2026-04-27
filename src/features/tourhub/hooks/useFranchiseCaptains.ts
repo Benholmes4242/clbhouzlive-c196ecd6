@@ -12,6 +12,12 @@ export interface FranchiseCaptain {
   photoUrl: string | null;
   pgaTourId: string | null;
   earnings: number;
+  /** Earnings of the second-highest-earning alumnus on the same college.
+   *  Used to gate the captain context line: caller suppresses the captain
+   *  when (earnings - runnerUpEarnings) / earnings <= 0.20, falling back to
+   *  the {N} alumni subline. Null when the college has only one alumnus
+   *  (treat as full dominance — render the captain). */
+  runnerUpEarnings: number | null;
   collegeNormalized: string;
   tourCode: string;
 }
