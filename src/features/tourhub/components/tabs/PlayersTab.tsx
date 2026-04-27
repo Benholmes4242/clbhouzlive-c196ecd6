@@ -1003,7 +1003,15 @@ export function PlayersTab() {
                       activeSort={sort}
                       activeTour={activeTour}
                       isTopTen={index < 9}
-                      rankChange={rank?.rankChange ?? null}
+                      // Movement indicator gated to OWGR-only because only sr_world_rankings
+                      // has prior-rank snapshots. Widen this gate when other ranking systems
+                      // (FedEx Cup / Earnings / Race to Dubai / Race to CME Globe) add weekly history.
+                      rankChange={
+                        activeTour === 'pga' && sort === 'world-rank-desc'
+                          ? rank?.rankChange ?? null
+                          : null
+                      }
+                      recentResult={recentResultsMap?.get(player.id) ?? null}
                       directoryMode={false}
                       onNavigate={() => sessionStorage.setItem('players-scroll', String(window.scrollY))}
                     />
