@@ -49,8 +49,12 @@ export function formatStatMarginGap(
   unit: string,
   categoryKey?: string,
   precision?: number,
+  /** When false, omit the trailing unit (legacy StatOfTheWeek behavior). */
+  appendUnit: boolean = true,
 ): string {
-  // Earnings — currency formatting, no trailing unit.
+  const tail = appendUnit && unit ? ` ${unit}` : '';
+
+  // Earnings — currency formatting, no trailing unit ever.
   if (categoryKey === 'earnings') {
     if (gap >= 1_000_000) return `$${(gap / 1_000_000).toFixed(2)}M`;
     if (gap >= 1_000) return `$${(gap / 1_000).toFixed(0)}K`;
@@ -59,7 +63,7 @@ export function formatStatMarginGap(
 
   // Per-stat precision rules (preserved from legacy formatMarginValue).
   if (categoryKey === 'putt_avg' || categoryKey === 'scoring_avg') {
-    return `${gap.toFixed(3)}${unit ? ` ${unit}` : ''}`;
+    return `${gap.toFixed(3)}${tail}`;
   }
   if (categoryKey === 'strokes_gained_total') {
     return gap.toFixed(2);
@@ -71,16 +75,16 @@ export function formatStatMarginGap(
     categoryKey === 'cuts_made' ||
     categoryKey === 'events_played'
   ) {
-    return `${Math.round(gap)}${unit ? ` ${unit}` : ''}`;
+    return `${Math.round(gap)}${tail}`;
   }
 
-  // Unit-driven defaults.
-  if (unit === 'yds') return `${gap.toFixed(1)} yds`;
-  if (unit === '%') return `${gap.toFixed(1)}%`;
+  // Unit-driven defaults — these always include their unit by design.
+  if (unit === 'yds') return `${gap.toFixed(1)}${appendUnit ? ' yds' : ''}`;
+  if (unit === '%') return `${gap.toFixed(1)}${appendUnit ? '%' : ''}`;
 
   // Generic fallback.
   const decimals = precision ?? 2;
-  return `${gap.toFixed(decimals)}${unit ? ` ${unit}` : ''}`;
+  return `${gap.toFixed(decimals)}${tail}`;
 }
 
 export function formatStatMargin(input: StatMarginInput): StatMarginOutput {

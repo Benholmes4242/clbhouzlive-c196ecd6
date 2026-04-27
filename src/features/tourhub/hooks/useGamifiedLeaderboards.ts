@@ -58,24 +58,19 @@ function lastNameOf(name: string): string {
  * Sign-less margin display for StatOfTheWeek copy
  * ("leads the field by {marginDisplay}").
  *
- * Delegates to the shared formatStatMarginGap util so per-stat precision
- * lives in one place. Output must remain byte-identical to the previous
- * inline implementation — verified cases:
- *   - earnings: "$1.20M" / "$200K" / "$500"
- *   - putt_avg / scoring_avg: "0.123 avg" / "0.123"
- *   - strokes_gained_total: "0.42"
- *   - yds / %: "1.5 yds" / "1.5%"
- *   - events / cuts / top_10: integer
- *   - generic: 2dp
- *
- * NB: legacy version emitted "0.123" (no unit) for putt_avg / scoring_avg
- * because category.unit was not appended. The shared util appends unit
- * when present; for putt_avg/scoring_avg unit is "avg" so output now
- * reads "0.123 avg". This matches the visible Tour Average format
- * ("1.790") in copy and is the editorially correct presentation.
+ * Delegates to the shared formatStatMarginGap util (with appendUnit=false)
+ * so per-stat precision lives in one place AND the legacy unit-less output
+ * is preserved byte-identically. Verified cases:
+ *   - earnings:              "$1.20M" / "$200K" / "$500"
+ *   - putt_avg/scoring_avg:  "0.123"
+ *   - strokes_gained_total:  "0.42"
+ *   - drive_avg (yds):       "1.5"
+ *   - drive_acc/gir/etc (%): "1.5"
+ *   - events/cuts/top_10:    "2"
+ *   - generic:               "1.23"
  */
 function formatMarginValue(category: LeaderCategory, margin: number): string {
-  return formatStatMarginGap(margin, category.unit, category.key);
+  return formatStatMarginGap(margin, category.unit, category.key, undefined, false);
 }
 
 export function useGamifiedLeaderboards() {
