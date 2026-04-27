@@ -1,13 +1,14 @@
 import React from 'react';
 import { Flag, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { getTierName, type RatedCourseData } from './my-ratings/myRatingsHeroTiers';
+import { getTierName, type RatedCourseData } from './my-ratings/myRatingsTiers';
 
 /**
- * DossierCard — single primitive for rated-course display in the
- * personal Course History list. Replaces both MyRatingsHeroCard and
- * MyRatingsCompactRow. 130×170 portrait image left, content right,
- * 2×2 breakdown grid, "Full review →" CTA when review text exists.
+ * DossierCard — single primitive for displaying a rated course in the
+ * profile Courses tab. Shows portrait thumbnail with overlaid score,
+ * course name, tier/date eyebrow, 2×2 breakdown grid, and Full Review CTA.
+ *
+ * Used uniformly across all rating tiers (no hero/compact split).
  */
 
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
@@ -194,6 +195,11 @@ const DossierCard: React.FC<DossierCardProps> = ({
             fontSize: 17,
             lineHeight: 1.1,
             letterSpacing: '-0.01em',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
           {course.name}

@@ -18,7 +18,7 @@ import {
   getBucketLabel,
   type MyRatingsBucket,
   type RatedCourseData,
-} from './my-ratings/myRatingsHeroTiers';
+} from './my-ratings/myRatingsTiers';
 
 interface AllCoursesListProps {
   userId: string;

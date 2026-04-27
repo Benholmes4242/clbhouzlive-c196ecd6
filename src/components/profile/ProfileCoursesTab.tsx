@@ -24,8 +24,6 @@ interface ProfileCoursesTabProps {
  * Spacing: each section gets `mt-6` after the first.
  *
  * Top 10 carousel lives on `ProfilePageV2.tsx`, not in this tab.
- * The previous TopTenActivityFeed mount was retired — reactions remain
- * accessible per-card on the Top 10 carousel itself.
  */
 export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   userId,
