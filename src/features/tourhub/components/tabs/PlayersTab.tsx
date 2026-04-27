@@ -6,13 +6,15 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, SlidersHorizontal } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, Flame, Trophy } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
+import { useChampionStreak } from '../../hooks/useChampionStreak';
+import { useChampionRecentForm } from '../../hooks/useChampionRecentForm';
 import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
