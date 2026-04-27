@@ -4,6 +4,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
@@ -31,6 +32,10 @@ interface PlayerCardV2Props {
   index?: number;
   activeSort?: PlayerSortType;
   activeTour?: string;
+  /** Tier-1 visual treatment for the top 9 rows below the hero (list position 0-8). */
+  isTopTen?: boolean;
+  /** Week-over-week movement: positive = moved up, negative = moved down, 0 = no change, null = no data. */
+  rankChange?: number | null;
   onNavigate?: () => void;
   disableAnimation?: boolean;
   directoryMode?: boolean;
@@ -40,6 +45,30 @@ function formatEarnings(amount: number): string {
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
   if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
   return `$${amount}`;
+}
+
+/** Movement indicator — ▲N green / ▼N red / — slate. Null when no data. */
+function MovementIndicator({ delta }: { delta: number | null | undefined }) {
+  if (delta == null) return null;
+  if (delta > 0) {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: '#16A34A', fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+        <TrendingUp size={10} strokeWidth={2.8} />
+        {delta}
+      </span>
+    );
+  }
+  if (delta < 0) {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: '#EF4444', fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+        <TrendingDown size={10} strokeWidth={2.8} />
+        {Math.abs(delta)}
+      </span>
+    );
+  }
+  return (
+    <span style={{ color: '#94A3B8', fontSize: 10, fontWeight: 700 }}>—</span>
+  );
 }
 
 export function PlayerCardV2({
@@ -56,6 +85,8 @@ export function PlayerCardV2({
   index = 0,
   activeSort = 'world-rank-desc',
   activeTour = 'all',
+  isTopTen = false,
+  rankChange,
   onNavigate,
   disableAnimation = false,
   directoryMode = false,
@@ -109,7 +140,20 @@ export function PlayerCardV2({
     return null;
   })();
 
+  // Top-10 tier accent (list-position 0-8 below hero) takes precedence over the
+  // legacy isFirst styling. Hero already renders #1 separately, so isFirst here
+  // is effectively only for the all-tours fallback.
   const isFirst = (worldRank === 1 && (activeSort === 'world-rank-desc' || activeTour === 'all'));
+  const tierAccent = isTopTen;
+
+  const photoSize = tierAccent ? 38 : 34;
+  const nameWeight = tierAccent ? 900 : (isFirst ? 800 : 600);
+  const nameSize = tierAccent ? 15 : 14;
+  const rankSize = tierAccent ? 16 : 18;
+  const rankColor = tierAccent
+    ? '#F7931E'
+    : (isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)');
+  const rowPaddingY = tierAccent ? 14 : 12;
 
   return (
     <motion.div
@@ -126,19 +170,23 @@ export function PlayerCardV2({
           alignItems: 'center',
           gap: 0,
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-          borderLeft: isFirst ? '3px solid #F7931E' : '3px solid transparent',
-          background: isFirst ? 'rgba(247,147,30,0.025)' : 'transparent',
+          borderLeft: tierAccent
+            ? '2px solid rgba(247,147,30,0.30)'
+            : (isFirst ? '3px solid #F7931E' : '2px solid transparent'),
+          background: tierAccent
+            ? 'rgba(247,147,30,0.05)'
+            : (isFirst ? 'rgba(247,147,30,0.025)' : 'transparent'),
           textDecoration: 'none',
         }}
         className="active:bg-black/[0.02] transition-colors"
       >
         {/* Large faded rank number — hidden for A-Z sorts */}
         {!isAlpha && (
-          <div style={{ width: '52px', padding: '13px 0 13px 14px', flexShrink: 0 }}>
+          <div style={{ width: '52px', padding: `${rowPaddingY}px 0 ${rowPaddingY}px 14px`, flexShrink: 0 }}>
             {worldRank != null && worldRank > 0 ? (
               <span style={{
-                fontSize: '18px', fontWeight: 900,
-                color: isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)',
+                fontSize: `${rankSize}px`, fontWeight: 900,
+                color: rankColor,
                 lineHeight: 1, letterSpacing: '-0.03em', display: 'block',
               }}>
                 {worldRank}
@@ -150,7 +198,7 @@ export function PlayerCardV2({
         )}
 
         {/* Avatar */}
-        <div style={{ width: '34px', height: '34px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', marginLeft: isAlpha ? '14px' : '0', marginRight: '10px' }}>
+        <div style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', marginLeft: isAlpha ? '14px' : '0', marginRight: '10px' }}>
           <img
             src={photoUrl}
             alt={player.fullName}
@@ -161,9 +209,9 @@ export function PlayerCardV2({
         </div>
 
         {/* Player info */}
-        <div style={{ flex: 1, minWidth: 0, padding: '12px 0' }}>
+        <div style={{ flex: 1, minWidth: 0, padding: `${rowPaddingY}px 0` }}>
           <div style={{
-            fontSize: '14px', fontWeight: isFirst ? 800 : 600, color: '#0F172A',
+            fontSize: `${nameSize}px`, fontWeight: nameWeight, color: '#0F172A', letterSpacing: tierAccent ? '-0.01em' : 0,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
           }}>
             {player.fullName}
@@ -180,28 +228,31 @@ export function PlayerCardV2({
 
         {/* Right value — hidden for A-Z sorts */}
         {!isAlpha && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px 12px 0', flexShrink: 0 }}>
-            {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-                <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>pts</span>
-              </span>
-            )}
-            {rightValue && (
-              <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                {rightValue.main}
-                {rightValue.label && (
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>
-                    {rightValue.label}
-                  </span>
-                )}
-              </span>
-            )}
-            {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
-              <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
-                {winCount} {winCount === 1 ? 'win' : 'wins'}
-              </span>
-            )}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, padding: `${rowPaddingY}px 14px ${rowPaddingY}px 0`, flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>pts</span>
+                </span>
+              )}
+              {rightValue && (
+                <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  {rightValue.main}
+                  {rightValue.label && (
+                    <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>
+                      {rightValue.label}
+                    </span>
+                  )}
+                </span>
+              )}
+              {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
+                  {winCount} {winCount === 1 ? 'win' : 'wins'}
+                </span>
+              )}
+            </div>
+            <MovementIndicator delta={rankChange} />
           </div>
         )}
       </Link>
