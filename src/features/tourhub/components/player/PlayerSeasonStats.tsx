@@ -137,12 +137,10 @@ function SubSectionLabel({ label, style }: { label: string; style?: React.CSSPro
 
 interface PlayerSeasonStatsProps {
   playerStats: TourPlayerStatistics;
-  activeTab?: string;
 }
 
-export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: PlayerSeasonStatsProps) {
-  const [internalTab, setInternalTab] = useState('Overview');
-  const activeTab = externalTab ?? internalTab;
+export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
+  const [activeTab, setActiveTab] = useState<StatTab>('Overview');
 
   const top10Ratio = (playerStats.top_10s && playerStats.events_played && playerStats.events_played > 0)
     ? (playerStats.top_10s / playerStats.events_played) * 100 : undefined;
@@ -156,8 +154,51 @@ export function PlayerSeasonStats({ playerStats, activeTab: externalTab }: Playe
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
           <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Season Performance · 2026
+            STATS · {activeTab}
           </span>
+        </div>
+
+        {/* Segmented control — slate-100 trough, white pill active state */}
+        <div
+          role="tablist"
+          aria-label="Stat category"
+          style={{
+            display: 'flex',
+            gap: 2,
+            padding: 3,
+            background: '#F1F5F9',
+            borderRadius: 10,
+            marginBottom: 12,
+          }}
+        >
+          {STAT_TABS.map((tab) => {
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(tab)}
+                className="active:opacity-80 transition-opacity"
+                style={{
+                  flex: 1,
+                  padding: '7px 4px',
+                  fontSize: 12,
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? '#0F172A' : '#64748B',
+                  background: isActive ? '#FFFFFF' : 'transparent',
+                  border: 'none',
+                  borderRadius: 7,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap' as const,
+                  boxShadow: isActive ? '0 1px 2px rgba(15,23,42,0.05)' : 'none',
+                  transition: 'background 0.15s ease, color 0.15s ease',
+                }}
+              >
+                {tab}
+              </button>
+            );
+          })}
         </div>
       </div>
 
