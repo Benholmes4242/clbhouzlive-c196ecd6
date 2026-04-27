@@ -6,13 +6,15 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, SlidersHorizontal } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, Flame, Trophy } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
+import { useChampionStreak } from '../../hooks/useChampionStreak';
+import { useChampionRecentForm } from '../../hooks/useChampionRecentForm';
 import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
@@ -58,6 +60,151 @@ function useDebouncedValue(value: string, delay: number): string {
 
 const PAGE_SIZE = 50;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// HeroChampion — the No.1 cover story (Phase 1 fix.1.3)
+// 56px rank · 26px name · 28px value · 68px squircle photo · pill row
+// ─────────────────────────────────────────────────────────────────────────────
+interface HeroChampionProps {
+  champion: ElitePlayer;
+  runnerUp: ElitePlayer | null;
+  champStats: { earnings: number | null; wins: number | null; tourRank: number | null; points: number | null; tournamentsPlayed: number | null } | undefined;
+  champPhotoUrl: string;
+  sort: PlayerSortType;
+  activeTour: string;
+  onClick: () => void;
+}
+
+function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
+  const { data: streakWeeks } = useChampionStreak(champion.playerId);
+  const { data: recentForm } = useChampionRecentForm(champion.playerId, 8);
+
+  // Primary value computation — mirrors original logic, just collapsed
+  const primary = (() => {
+    if (sort === 'fedex-points') {
+      if (!champStats?.points || champStats.points <= 0) return null;
+      return { value: champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), unit: 'pts' };
+    }
+    if (sort === 'highest-earnings') {
+      if (!champStats?.earnings || champStats.earnings <= 0) return null;
+      const e = champStats.earnings;
+      return { value: e >= 1_000_000 ? `$${(e / 1_000_000).toFixed(1)}M` : `$${(e / 1_000).toFixed(0)}K`, unit: '' };
+    }
+    if (sort === 'most-wins') {
+      if (!champStats?.wins) return null;
+      return { value: String(champStats.wins), unit: champStats.wins === 1 ? 'win' : 'wins' };
+    }
+    const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+    const tourPts = champStats?.points && champStats.points > 0 && (sort !== 'world-rank-desc' && (sort !== 'alpha-az' && sort !== 'alpha-za' || isNonPgaTour))
+      ? champStats.points
+      : null;
+    const owgrPts = champion.totalPoints ?? champion.avgPoints;
+    const displayPts = tourPts ?? (isNonPgaTour ? null : owgrPts);
+    if (displayPts == null) return null;
+    return { value: displayPts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), unit: 'pts' };
+  })();
+
+  // Margin pill — only on World Ranking sort with runner-up data
+  const marginPts = (() => {
+    if (sort !== 'world-rank-desc') return null;
+    const a = champion.totalPoints ?? champion.avgPoints;
+    const b = runnerUp?.totalPoints ?? runnerUp?.avgPoints;
+    if (a == null || b == null) return null;
+    const diff = a - b;
+    if (diff <= 0) return null;
+    return diff;
+  })();
+
+  const showStreak = (streakWeeks ?? 0) >= 2;
+  const showRecentForm = recentForm && recentForm.starts >= 3;
+
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'flex-start', gap: 14,
+        marginBottom: 14, paddingBottom: 14,
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        background: 'linear-gradient(180deg, rgba(247,147,30,0.05) 0%, transparent 100%)',
+        borderRadius: 8, padding: 12,
+      }}
+      onClick={onClick}
+      className="cursor-pointer active:opacity-80 transition-opacity"
+    >
+      {/* Large faded rank number */}
+      <div style={{ flexShrink: 0, width: 56, paddingTop: 4 }}>
+        <div style={{ fontSize: 9, fontWeight: 900, color: '#64748B', letterSpacing: '0.1em', marginBottom: 2 }}>NO.1</div>
+        <span style={{ fontSize: 56, fontWeight: 900, color: 'rgba(247,147,30,0.18)', lineHeight: 0.9, letterSpacing: '-0.05em', display: 'block' }}>1</span>
+      </div>
+
+      {/* Player info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+          <CountryFlag country={champion.country} size="sm" />
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>{titleCaseCountry(champion.country)}</span>
+        </div>
+        <div style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.05, marginBottom: 6 }}>
+          {champion.playerName}
+        </div>
+        {primary && (
+          <div style={{ marginBottom: 10 }}>
+            <span style={{ fontSize: 28, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em' }}>{primary.value}</span>
+            {primary.unit && <span style={{ fontSize: 11, fontWeight: 700, color: '#c97a10', marginLeft: 2 }}>{primary.unit}</span>}
+          </div>
+        )}
+
+        {/* Pills row */}
+        {(marginPts != null || showStreak || showRecentForm) && (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {marginPts != null && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '5px 9px', borderRadius: 6,
+                background: '#ffffff', border: '1px solid #E2E8F0',
+                fontSize: 11, fontWeight: 700,
+              }}>
+                <span style={{ color: '#64748B' }}>Margin:</span>
+                <span style={{ color: '#F7931E', fontWeight: 800 }}>+{marginPts.toFixed(2)}pts</span>
+              </span>
+            )}
+            {showStreak && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '5px 9px', borderRadius: 6,
+                background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.30)',
+                fontSize: 11, fontWeight: 800, color: '#c97a10',
+              }}>
+                <Flame size={11} strokeWidth={2.5} />
+                {streakWeeks}-week leader
+              </span>
+            )}
+            {showRecentForm && recentForm && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '5px 9px', borderRadius: 6,
+                background: '#ffffff', border: '1px solid #E2E8F0',
+                fontSize: 11, fontWeight: 700, color: '#334155',
+              }}>
+                <Trophy size={11} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+                {recentForm.starts} starts · {recentForm.wins > 0 ? `${recentForm.wins} ${recentForm.wins === 1 ? 'win' : 'wins'}` : `${recentForm.top10s} top-10${recentForm.top10s === 1 ? '' : 's'}`}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Headshot — 68px squircle */}
+      <div style={{ width: 68, height: 68, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', border: '1.5px solid #ffffff', boxShadow: '0 2px 8px rgba(15,23,42,0.08)' }}>
+        <img
+          src={champPhotoUrl}
+          alt={champion.playerName}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
+          onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+        />
+      </div>
+    </div>
+  );
+}
+
+
 export function PlayersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
@@ -70,7 +217,6 @@ export function PlayersTab() {
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
-  const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
   // Pull-to-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -148,12 +294,17 @@ export function PlayersTab() {
   }, [debouncedSearch, sort]);
 
 
-  // Build world rank & stats lookup from elite players
+  // Build world rank & stats lookup from elite players (includes weekly rank change)
   const rankMap = useMemo(() => {
-    const map = new Map<string, { worldRank: number; avgPoints: number | null; totalPoints: number | null }>();
+    const map = new Map<string, { worldRank: number; avgPoints: number | null; totalPoints: number | null; rankChange: number | null }>();
     if (elitePlayers) {
       elitePlayers.forEach(ep => {
-        map.set(ep.playerId, { worldRank: ep.worldRank, avgPoints: ep.avgPoints, totalPoints: ep.totalPoints });
+        map.set(ep.playerId, {
+          worldRank: ep.worldRank,
+          avgPoints: ep.avgPoints,
+          totalPoints: ep.totalPoints,
+          rankChange: ep.rankChange,
+        });
       });
     }
     return map;
@@ -346,7 +497,12 @@ export function PlayersTab() {
   }, [debouncedSearch]);
 
   // Pipeline: tour → search → sort → pagination
-  const heroPlayerIds = useMemo(() => new Set(heroPlayers.map(p => p.playerId)), [heroPlayers]);
+  // Only the world #1 (champion) is excluded from the rendered list. Rows 2-5
+  // appear in the list directly below the hero per Phase 1 spec.
+  const heroPlayerIds = useMemo(
+    () => new Set(heroPlayers.slice(0, 1).map(p => p.playerId)),
+    [heroPlayers],
+  );
 
   const { rows, totalCount } = useMemo(() => {
     let filtered = tourFilteredPlayers.filter(p =>
@@ -581,194 +737,18 @@ export function PlayersTab() {
             </div>
 
             {/* ── NO.1 COVER STORY ── */}
-            <div
-              style={{
-                display: 'flex', alignItems: 'flex-start', gap: '14px',
-                marginBottom: '14px', paddingBottom: '14px',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-              }}
+            <HeroChampion
+              champion={champion}
+              runnerUp={top5[1] ?? null}
+              champStats={champStats}
+              champPhotoUrl={champPhotoUrl}
+              sort={sort}
+              activeTour={activeTour}
               onClick={() => navigate(`/tourhub/player/${champion.playerId}`)}
-              className="cursor-pointer active:opacity-80 transition-opacity"
-            >
-              {/* Large faded rank number */}
-              <div style={{ flexShrink: 0, width: '56px', paddingTop: '4px' }}>
-                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', marginBottom: '2px' }}>NO.1</div>
-                <span style={{ fontSize: '52px', fontWeight: 900, color: 'rgba(247,147,30,0.15)', lineHeight: 1, letterSpacing: '-0.05em', display: 'block' }}>1</span>
-              </div>
-              {/* Player info */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
-                  <CountryFlag country={champion.country} size="sm" />
-                  <span style={{ fontSize: '10px', color: '#94A3B8' }}>{titleCaseCountry(champion.country)}</span>
-                </div>
-                <div style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '8px' }}>
-                  {champion.playerName}
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'baseline', flexWrap: 'wrap' as const }}>
-                  {/* Primary stat — depends on active sort */}
-                  {sort === 'fedex-points' ? (
-                    champStats?.points != null && champStats.points > 0 && (
-                      <div>
-                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                          {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                        <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E' }}>pts</span>
-                      </div>
-                    )
-                  ) : sort === 'highest-earnings' ? (
-                    champStats?.earnings != null && champStats.earnings > 0 && (
-                      <div>
-                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                          {champStats.earnings >= 1_000_000
-                            ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
-                            : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
-                        </span>
-                        
-                      </div>
-                    )
-                  ) : sort === 'most-wins' ? (
-                    (champStats?.wins ?? 0) > 0 && (
-                      <div>
-                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                          {champStats!.wins}
-                        </span>
-                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>
-                          {champStats!.wins === 1 ? 'win' : 'wins'}
-                        </span>
-                      </div>
-                    )
-                  ) : (
-                    (() => {
-                      const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
-                      const tourPts = champStats?.points != null && champStats.points > 0 && (sort !== 'world-rank-desc' && (sort !== 'alpha-az' && sort !== 'alpha-za' || isNonPgaTour))
-                        ? champStats.points
-                        : null;
-                      const owgrPts = champion.totalPoints ?? champion.avgPoints;
-                      const displayPts = tourPts ?? (isNonPgaTour ? null : owgrPts);
-                      const label = 'pts';
-                      return displayPts != null ? (
-                        <div>
-                          <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                            {displayPts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
-                          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E' }}>{label}</span>
-                        </div>
-                      ) : null;
-                    })()
-                  )}
-                  {/* Secondary stats — only show earnings on most-wins tab */}
-                  {sort === 'most-wins' && champStats?.earnings != null && champStats.earnings > 0 && (
-                    <span style={{ fontSize: '12px', color: '#64748B' }}>
-                      {champStats.earnings >= 1_000_000
-                        ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
-                        : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
-                    </span>
-                  )}
-                </div>
-              </div>
-              {/* Headshot */}
-              <div style={{ width: '56px', height: '56px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
-                <img
-                  src={champPhotoUrl}
-                  alt={champion.playerName}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-                  onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                />
-              </div>
-            </div>
+            />
 
-            {/* ── MOVERS GRID — #2–5 ── */}
-            {runners.length > 0 && (
-              <div style={{ marginBottom: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-                  <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                    {sort === 'highest-earnings' ? 'Top Earners · 2–5'
-                      : sort === 'most-wins' ? 'Most Wins · 2–5'
-                      : sort === 'fedex-points' ? 'FedEx Cup · 2–5'
-                      : 'Tour Rankings · 2–5'}
-                  </span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, background: '#ffffff', borderRadius: '12px', border: '1px solid rgba(15,23,42,0.08)', overflow: 'hidden' }}>
-                  {runners.map((player, i) => {
-                    const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
-                    const displayRank = i + 2; // positional: 2, 3, 4, 5
-                    return (
-                      <div
-                        key={player.playerId}
-                        onClick={() => navigate(`/tourhub/player/${player.playerId}`)}
-                        className="cursor-pointer active:opacity-70 transition-opacity"
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: '9px',
-                          padding: '11px 12px',
-                          borderRight: i % 2 === 0 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
-                          borderBottom: i < 2 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
-                        }}
-                      >
-                        <span style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(15,23,42,0.15)', width: '18px', flexShrink: 0 }}>
-                          {displayRank}
-                        </span>
-                        <div style={{ width: '30px', height: '30px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
-                          <img
-                            src={photoUrl}
-                            alt={player.playerName}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-                            loading="lazy"
-                            onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                          />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                            {player.playerName.split(' ').slice(-1)[0]}
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '1px' }}>
-                            <CountryFlag country={player.country} size="sm" />
-                            {(() => {
-                              const runnerStats = statsMap.get(player.playerId);
-                              if (sort === 'fedex-points') {
-                                const pts = runnerStats?.points;
-                                if (!pts || pts <= 0) return null;
-                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                  {pts.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}pts
-                                </div>;
-                              }
-                              if (sort === 'highest-earnings') {
-                                const earn = runnerStats?.earnings;
-                                if (!earn || earn <= 0) return null;
-                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                  {earn >= 1_000_000 ? `$${(earn / 1_000_000).toFixed(1)}M` : `$${(earn / 1_000).toFixed(0)}K`}
-                                </div>;
-                              }
-                              if (sort === 'most-wins') {
-                                const wins = runnerStats?.wins;
-                                if (!wins || wins <= 0) return null;
-                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                  {wins} {wins === 1 ? 'win' : 'wins'}
-                                </div>;
-                              }
-                              if (sort === 'world-rank-desc' || sort === 'alpha-az' || sort === 'alpha-za') {
-                                const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
-                                const tourPts = isNonPgaTour ? (runnerStats?.points ?? null) : null;
-                                const pts = tourPts ?? player.totalPoints ?? player.avgPoints;
-                                if (!pts || pts <= 0) return null;
-                                return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                  {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
-                                </div>;
-                              }
-                              const pts = runnerStats?.points ?? player.avgPoints;
-                              if (!pts || pts <= 0) return null;
-                              return <div style={{ fontSize: '10px', fontWeight: 800, color: '#F7931E', marginTop: '1px' }}>
-                                {pts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}pts
-                              </div>;
-                            })()}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            {/* 2-5 preview removed (Phase 1 — fix.1.1). Rows 2+ render in the
+                main list below the hero. */}
           </div>
         );
       })()}
@@ -786,42 +766,9 @@ export function PlayersTab() {
           
         }}
       >
-        {/* Collapsible search bar */}
-        <div
-          style={{
-            overflow: 'hidden',
-            transition: 'max-height 250ms ease, opacity 250ms ease',
-            maxHeight: searchExpanded ? '60px' : '0px',
-            opacity: searchExpanded ? 1 : 0,
-            padding: searchExpanded ? '8px 16px 0' : '0 16px',
-          }}
-        >
-          <div style={{ position: 'relative' }}>
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4 text-muted-foreground" strokeWidth={2.5} />
-            <input
-              type="text"
-              placeholder="Search players, countries..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-10 pl-9 pr-9 rounded-xl text-[13px] bg-card border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 transition-all"
-            />
-            <AnimatePresence>
-              {search && (
-                <motion.button
-                  onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-muted active:scale-90"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                >
-                  <X className="w-3 h-3 text-muted-foreground" />
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
+        {/* Top collapsible search removed — search now lives inline replacing the count bar (Phase 1 fix.1.7) */}
 
-        {/* Control row — back link + sort + search */}
+        {/* Control row — back link + search button (sort pill removed Phase 1 fix.1.2) */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: '6px' }}>
           <button
             type="button"
@@ -834,129 +781,100 @@ export function PlayersTab() {
 
           <div style={{ flex: 1 }} />
 
-          {/* Sort pill — only for specific tours */}
-          {(
+          {/* Search icon — only visible when search not expanded (count+search bar handles expanded state) */}
+          {!searchExpanded && (
             <button
-              onClick={() => setSortSheetOpen(true)}
+              onClick={() => setSearchExpanded(true)}
               style={{
-                display: 'flex', alignItems: 'center', gap: '5px',
-                padding: '5px 9px', borderRadius: '8px',
-                background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)',
-                boxShadow: '0 1px 3px rgba(15,23,42,0.05)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 10px', borderRadius: 8,
+                background: 'rgba(15,23,42,0.04)',
+                border: 'none', cursor: 'pointer',
               }}
-              className="active:scale-[0.97] transition-transform"
+              aria-label="Search players"
             >
-              <SlidersHorizontal className="w-3 h-3 shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#0F172A' }}>
-                {getSortShortLabel(sort, activeTour)}
-              </span>
-              <ChevronDown className="w-2.5 h-2.5 text-muted-foreground/60" strokeWidth={2.5} />
+              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
             </button>
           )}
-
-          {/* Search icon */}
-          <button
-            onClick={() => setSearchExpanded(v => !v)}
-            style={{
-              width: '32px', height: '32px', borderRadius: '8px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: searchExpanded ? 'rgba(247,147,30,0.08)' : 'transparent',
-              border: 'none', cursor: 'pointer',
-            }}
-          >
-            <Search
-              className="w-4 h-4 transition-colors"
-              style={{ color: searchExpanded ? '#F7931E' : undefined }}
-              strokeWidth={2.5}
-            />
-          </button>
         </div>
 
-        {/* Underline sort tabs */}
+        {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
-          {[
-                { value: getDefaultSortForTour(activeTour) as PlayerSortType, label: activeTour === 'pga' ? 'World Ranking' : getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) },
-                ...(activeTour === 'pga' ? [{ value: 'fedex-points' as PlayerSortType, label: 'FedEx' }] : []),
-                ...(activeTour === 'pga' ? [{ value: 'highest-earnings' as PlayerSortType, label: 'Earnings' }] : []),
-                { value: 'alpha-az' as PlayerSortType, label: 'A–Z' },
-              ].filter((tab, i, arr) => i === arr.findIndex(t => t.value === tab.value))
-          .map(tab => {
-            const isActive = sort === tab.value;
-            return (
-              <button
-                key={tab.value}
-                onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
-                style={{
-                  flex: 1, padding: '8px 0',
-                  fontSize: '11px', fontWeight: isActive ? 800 : 500,
-                  color: isActive ? '#0F172A' : '#94A3B8',
-                  background: 'transparent', border: 'none',
-                  borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
-                  cursor: 'pointer', transition: 'all 0.15s',
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+          {(() => {
+            // Per-tour tab config — single source of truth.
+            const tabs: { value: PlayerSortType; label: string }[] =
+              activeTour === 'pga'
+                ? [
+                    { value: 'world-rank-desc', label: 'World Ranking' },
+                    { value: 'fedex-points', label: 'FedEx Cup' },
+                    { value: 'highest-earnings', label: 'Earnings' },
+                  ]
+              : activeTour === 'EURO' ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }]
+              : activeTour === 'LPGA' ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }]
+              : activeTour === 'PGAD' ? [{ value: 'points-list', label: 'Korn Ferry Points' }]
+              : activeTour === 'LIV' ? [{ value: 'liv-standings', label: 'Individual Standings' }]
+              : activeTour === 'CHAMP' ? [{ value: 'highest-earnings', label: 'Earnings' }]
+              : [{ value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) }];
+
+            return tabs.map(tab => {
+              const isActive = sort === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
+                  style={{
+                    flex: 1, padding: '8px 0',
+                    fontSize: '11px', fontWeight: isActive ? 800 : 500,
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    background: 'transparent', border: 'none',
+                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    cursor: 'pointer', transition: 'all 0.15s',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            });
+          })()}
         </div>
 
-        {/* Count line */}
-        <div style={{ padding: '5px 16px 8px' }}>
-          <span style={{ fontSize: '10px', color: '#94A3B8' }}>
-            {`${(tourCounts[activeTour] ?? 0).toLocaleString()} players`}
-          </span>
-        </div>
+        {/* Count+sort bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
+        {!searchExpanded ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 8px', gap: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
+              {totalCount.toLocaleString()} {totalCount === 1 ? 'player' : 'players'}
+              <span style={{ color: '#CBD5E1' }}> · sorted by </span>
+              <span style={{ color: '#0F172A', fontWeight: 700 }}>{getSortShortLabel(sort, activeTour)}</span>
+            </span>
+          </div>
+        ) : (
+          <div style={{ padding: '6px 16px 8px' }}>
+            <div style={{ position: 'relative' }}>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search players..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)' }}
+              />
+              <button
+                onClick={() => { setSearch(''); setSearchExpanded(false); }}
+                aria-label="Close search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
+                style={{ background: 'rgba(15,23,42,0.06)' }}
+              >
+                <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Sort bottom sheet */}
-      <BottomSheet
-        open={sortSheetOpen}
-        onClose={() => setSortSheetOpen(false)}
-        ariaLabelledBy="players-sort-sheet-title"
-      >
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Sort</div>
-          <div id="players-sort-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Sort Players</div>
-        </div>
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-        {(() => {
-          const isPGA = activeTour === 'pga';
-          const isEuro = activeTour === 'EURO';
-          const isLPGA = activeTour === 'LPGA';
-          const isPGAD = activeTour === 'PGAD';
-          const isLIV = activeTour === 'LIV';
-          const opts: { value: PlayerSortType; label: string }[] =
-            isLIV  ? [{ value: 'liv-standings', label: 'Standings' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isPGAD ? [{ value: 'points-list', label: 'Standings' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isLPGA ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isEuro ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }, { value: 'alpha-az', label: 'Alphabetical A–Z' }, { value: 'alpha-za', label: 'Alphabetical Z–A' }]
-            : isPGA  ? [{ value: 'world-rank-desc', label: 'World Ranking' }, { value: 'fedex-points', label: 'FedEx Cup Points' }, { value: 'highest-earnings', label: 'Earnings' }, { value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }]
-            : [{ value: 'alpha-az', label: 'A–Z' }, { value: 'alpha-za', label: 'Z–A' }];
-          return opts.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => { setSort(opt.value); setVisibleCount(PAGE_SIZE); setSortSheetOpen(false); }}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '12px 20px',
-                background: sort === opt.value ? 'rgba(247,147,30,0.04)' : 'transparent',
-                border: 'none',
-                borderLeft: sort === opt.value ? '3px solid #F7931E' : '3px solid transparent',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                cursor: 'pointer', textAlign: 'left' as const,
-              }}
-            >
-              <span style={{ fontSize: 14, fontWeight: sort === opt.value ? 800 : 500, color: '#0F172A' }}>
-                {opt.label}
-              </span>
-              {sort === opt.value && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
-            </button>
-          ));
-        })()}
-        </div>
-        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
-      </BottomSheet>
+
 
       {/* Tour filter bottom sheet */}
       <BottomSheet
@@ -1057,7 +975,8 @@ export function PlayersTab() {
                       }}
                       worldRank={(() => {
                         if (sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'most-wins') {
-                          return index + 6;
+                          // Positional rank — champion is hero #1, list starts at #2
+                          return index + 2;
                         }
                         if (sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings') {
                           return pStats?.tourRank || rank?.worldRank;
@@ -1077,6 +996,8 @@ export function PlayersTab() {
                       index={index}
                       activeSort={sort}
                       activeTour={activeTour}
+                      isTopTen={index < 9}
+                      rankChange={rank?.rankChange ?? null}
                       directoryMode={false}
                       onNavigate={() => sessionStorage.setItem('players-scroll', String(window.scrollY))}
                     />
