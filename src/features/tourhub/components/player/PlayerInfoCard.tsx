@@ -61,7 +61,8 @@ interface PlayerInfoCardProps {
 }
 
 export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
-  const birthPlace = cleanBirthPlace(player.birth_place);
+  const birthPlace = cleanLocation(player.birth_place);
+  const residence = cleanLocation(player.residence);
   const handedness = formatHandedness(player.handedness);
   const height = formatHeight(player.height);
   const weight = formatWeight(player.weight);
@@ -76,7 +77,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
     });
   }
   if (birthPlace) personalFields.push({ label: 'Birth Place', value: birthPlace });
-  if (player.residence) personalFields.push({ label: 'Residence', value: player.residence });
+  if (residence) personalFields.push({ label: 'Residence', value: residence });
 
   const careerFields: { label: string; value: React.ReactNode }[] = [];
   // Tour affiliation is rendered authoritatively in the hero (TourChipGroup) — no duplicate row here.
