@@ -12,7 +12,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe } from 'lucide-react';
+import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe, Clock } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
@@ -23,6 +23,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
+import { TOUR_MAP, getTourLabel, getTourShort, getTourMeta } from '../../constants/tourMap';
+import { getCurrentWeek, getCurrentMonthKey, isInCurrentWeek } from '../../utils/getCurrentWeek';
+import { TourPill } from '../shared/TourPill';
+import { EventTag, type EventTagKind } from '../shared/EventTag';
+import { CompactNextUp } from '../shared/CompactNextUp';
+import { ThisWeekAnchor } from '../shared/ThisWeekAnchor';
+import { getContextLabel } from '../../utils/tournamentClassification';
 
 import {
   ScheduleFilterPills,
@@ -33,9 +40,6 @@ import {
   type TourFilterCode,
 } from '../schedule';
 
-const TOUR_LABELS: Record<string, string> = {
-  pga: 'PGA Tour', EURO: 'DP World Tour', LPGA: 'LPGA', CHAMP: 'Champions Tour', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
-};
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
 import { LiveRightNow } from '../overview-v3/LiveRightNow';
 
