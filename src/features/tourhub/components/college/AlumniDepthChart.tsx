@@ -235,12 +235,12 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
 
 /* ─── Classifier ────────────────────────────────────────────────────────── */
 
-function classifyTier(a: CollegeAlumnus): TierKey {
+function classifyTier(a: CollegeAlumnus, legacyMap: ReadonlyMap<string, string>): TierKey {
   // Sportradar uses 0 as "no rank" sentinel; treat as null
   const rank = a.world_ranking && a.world_ranking > 0 ? a.world_ranking : null;
   const wins = a.wins ?? 0;
   const events = a.events_played ?? 0;
-  const isMajorChamp = LEGACY_ALUMNI_IDS.has(a.id);
+  const isMajorChamp = legacyMap.has(a.id);
 
   // Legacy is mutually exclusive: major champ AND inactive this season
   if (isMajorChamp && events === 0) return 'legacy';
@@ -262,11 +262,14 @@ function classifyTier(a: CollegeAlumnus): TierKey {
 
 /* ─── Component ─────────────────────────────────────────────────────────── */
 
+const EMPTY_LEGACY_MAP: ReadonlyMap<string, string> = new Map();
+
 export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChartProps) {
   const { data: alumni, isLoading, error } = useCollegeAlumni(normalizedName, {
     orderBy: 'earnings',
     limit: 50,
   });
+  const { data: legacyMap = EMPTY_LEGACY_MAP } = useLegacyAlumni();
 
   const tiers = useMemo(() => {
     const buckets: Record<TierKey, CollegeAlumnus[]> = {
@@ -274,10 +277,10 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     };
     if (!alumni) return buckets;
     for (const a of alumni) {
-      buckets[classifyTier(a)].push(a);
+      buckets[classifyTier(a, legacyMap)].push(a);
     }
     return buckets;
-  }, [alumni]);
+  }, [alumni, legacyMap]);
 
   if (isLoading) {
     return (
@@ -306,7 +309,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
       <Section tier="stars"    alumni={tiers.stars}    defaultExpanded />
       <Section tier="regulars" alumni={tiers.regulars} defaultExpanded={tiers.regulars.length <= 5} />
       <Section tier="rising"   alumni={tiers.rising}   defaultExpanded={false} />
-      <Section tier="legacy"   alumni={tiers.legacy}   defaultExpanded />
+      <Section tier="legacy"   alumni={tiers.legacy}   defaultExpanded legacyMap={legacyMap} />
     </div>
   );
 }
