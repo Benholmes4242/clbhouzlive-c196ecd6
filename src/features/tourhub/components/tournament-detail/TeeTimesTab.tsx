@@ -264,13 +264,13 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (
-                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} />
+                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
               ))}
             </div>
           ))
         ) : (
           filteredGroups.map((group, idx) => (
-            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} />
+            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
           ))
         )}
       </div>
