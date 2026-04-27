@@ -435,5 +435,6 @@ export function RateStep({
       {/* Bottom spacer */}
       <div className="h-8" aria-hidden="true" />
     </motion.div>
+    </>
   );
 }
