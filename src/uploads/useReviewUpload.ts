@@ -47,6 +47,14 @@ export function useReviewUpload(options: UseReviewUploadOptions) {
   const hasCalledSuccessRef = useRef(false); // Prevent double-calling onSuccess
   
   // Keep refs updated
+  // NOTE (Fix 10 audit, D28 stale-state risk): the consuming hook
+  // (useReviewWizard) rebuilds `onSuccess` every render and reads its closed-over
+  // state inside that callback. Because we sync `successCallbackRef.current` on
+  // every change of `onSuccess`, the event handler below always invokes the
+  // *latest* closure — which closes over the most recent `state.rating`
+  // (including the derived verdict committed via setState before submitReview).
+  // Conclusion: closure is fresh, no stale-state bug. If this ref-sync is ever
+  // removed, audit downstream consumers that read state inside onSuccess.
   useEffect(() => {
     successCallbackRef.current = onSuccess;
     errorCallbackRef.current = onError;
