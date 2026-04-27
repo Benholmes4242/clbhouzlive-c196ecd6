@@ -29,6 +29,7 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../utils/editorialFallbacks';
+import { SectionHeader } from './shared/SectionHeader';
 
 const AMBER = '#F7931E';
 const AMBER_INK = '#D97706';
