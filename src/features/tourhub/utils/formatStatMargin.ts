@@ -36,11 +36,19 @@ export interface StatMarginOutput {
 /** U+2212 MINUS SIGN — typographic minus, not the hyphen-minus '-'. */
 const MINUS = '\u2212';
 
-function formatGap(
+/**
+ * Format an absolute gap value (no sign, no "tied" copy) using the
+ * same per-stat precision rules formatStatMargin uses internally.
+ *
+ * Exported so `useGamifiedLeaderboards.formatMarginValue` can delegate
+ * here without duplicating precision logic, while still producing the
+ * sign-less display StatOfTheWeek expects.
+ */
+export function formatStatMarginGap(
   gap: number,
   unit: string,
-  categoryKey: string | undefined,
-  precision: number | undefined,
+  categoryKey?: string,
+  precision?: number,
 ): string {
   // Earnings — currency formatting, no trailing unit.
   if (categoryKey === 'earnings') {
