@@ -16,14 +16,29 @@ import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderCategory } from './constants';
 
 export interface MastheadPill {
-  /** Render variant — 'highlight' (amber) for dominance moments, 'normal' (slate) for context. */
-  variant: 'highlight' | 'normal';
+  /**
+   * Render variant:
+   *   - 'highlight' — amber wash for dominance moments (Stat Watch + Tournament hero)
+   *   - 'normal'    — slate wash for context (Stat Watch masthead)
+   *   - 'live'      — amber wash + amber border for in-progress signal (Tournament hero)
+   *
+   * Note: 'normal' is designed for the dark slate masthead background. On the
+   * Tournament hero the bottom of the gradient is dark enough that 'normal'
+   * still reads — pills should render in the upper-mid overlay, not at the bottom.
+   */
+  variant: 'highlight' | 'normal' | 'live';
   /** Optional small label rendered before the value (e.g. "Margin:"). */
   label?: string;
   /** Main pill value (e.g. "+1.7 yds", "tied with #2", "5-week leader"). */
   value: string;
-  /** Optional leading icon component. */
+  /** Optional leading icon component (Stat Watch enum). */
   icon?: 'flame' | 'trophy';
+  /**
+   * Optional custom React node rendered before the label/value (e.g. <LivePulse />).
+   * Used by the Tournament hero to inject a pulsing dot into the live pill.
+   * Takes precedence over the icon enum if both are set.
+   */
+  prefix?: React.ReactNode;
 }
 
 interface LeadersMastheadProps {
@@ -51,10 +66,17 @@ interface LeadersMastheadProps {
 
 export function PillView({ pill }: { pill: MastheadPill }) {
   const isHighlight = pill.variant === 'highlight';
-  const bg = isHighlight ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.06)';
-  const border = isHighlight ? 'rgba(247,147,30,0.30)' : 'rgba(255,255,255,0.10)';
-  const valueColor = isHighlight ? '#F7931E' : '#ffffff';
-  const labelColor = isHighlight ? 'rgba(247,147,30,0.75)' : 'rgba(255,255,255,0.45)';
+  const isLive = pill.variant === 'live';
+  const isAmberToned = isHighlight || isLive;
+
+  const bg = isAmberToned ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.06)';
+  const border = isLive
+    ? 'rgba(247,147,30,0.55)'
+    : isHighlight
+      ? 'rgba(247,147,30,0.30)'
+      : 'rgba(255,255,255,0.10)';
+  const valueColor = isAmberToned ? '#F7931E' : '#ffffff';
+  const labelColor = isAmberToned ? 'rgba(247,147,30,0.75)' : 'rgba(255,255,255,0.45)';
   const Icon = pill.icon === 'flame' ? Flame : pill.icon === 'trophy' ? Trophy : null;
 
   return (
@@ -73,7 +95,9 @@ export function PillView({ pill }: { pill: MastheadPill }) {
         fontVariantNumeric: 'tabular-nums',
       }}
     >
-      {Icon && <Icon size={11} strokeWidth={2.5} style={{ color: valueColor }} />}
+      {pill.prefix
+        ? pill.prefix
+        : Icon && <Icon size={11} strokeWidth={2.5} style={{ color: valueColor }} />}
       {pill.label && (
         <span style={{ fontSize: 10, fontWeight: 600, color: labelColor }}>{pill.label}</span>
       )}
