@@ -85,7 +85,7 @@ function formatEarnings(money: number): string {
   return `$${Number(money).toLocaleString()}`;
 }
 
-function WinnerCard({ winner, runnerUp, headshotMap }: { winner: any; runnerUp: any | null; headshotMap?: Map<string, string> }) {
+function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner: any; runnerUp: any | null; headshotMap?: Map<string, string>; tournamentName?: string }) {
   const earnings = winner.money ? formatEarnings(winner.money) : null;
   const scoreToPar = winner.score !== null ? (winner.score === 0 ? 'E' : winner.score < 0 ? String(winner.score) : `+${winner.score}`) : '—';
   const marginOfVictory = runnerUp ? Math.abs((runnerUp.score ?? 0) - (winner.score ?? 0)) : null;
