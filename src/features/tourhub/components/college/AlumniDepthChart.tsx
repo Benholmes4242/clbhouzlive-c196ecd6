@@ -168,9 +168,10 @@ interface SectionProps {
   tier: TierKey;
   alumni: CollegeAlumnus[];
   defaultExpanded?: boolean;
+  legacyMap?: ReadonlyMap<string, string>;
 }
 
-function Section({ tier, alumni, defaultExpanded = true }: SectionProps) {
+function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const COLLAPSED_COUNT = 3;
 
@@ -205,7 +206,13 @@ function Section({ tier, alumni, defaultExpanded = true }: SectionProps) {
       {isExpanded && (
         <>
           {displayedAlumni.map((alumnus, index) => (
-            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tier={tier} />
+            <AlumniRow
+              key={alumnus.id}
+              alumnus={alumnus}
+              index={index}
+              tier={tier}
+              legacyContextLabel={tier === 'legacy' ? legacyMap?.get(alumnus.id) ?? null : null}
+            />
           ))}
 
           {hasMore && (
