@@ -242,9 +242,7 @@ const BusinessProfilePage: React.FC = () => {
           <PostsTabContent
             actorType="business"
             actorId={business?.id || ''}
-            actorName={business?.name || ''}
             isOwnProfile={isOwner || false}
-            hideReviewsCount
           />
         );
       case 'golfers':

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2, Film } from 'lucide-react';
@@ -7,9 +7,7 @@ import { LoopCard } from '@/components/loop-tab/LoopCard';
 import { ReviewCard } from './ReviewCard';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
-import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
-import { useActiveActor } from '@/context/ActiveActorContext';
-import CommentsSheet from '@/components/comments/CommentsSheet';
+import { FriendsAutoplay } from '@/components/friends-tab/FriendsAutoplay';
 
 interface ProfilePostsFeedProps {
   posts: FeedPost[];
@@ -27,10 +25,9 @@ interface ProfilePostsFeedProps {
  * Unified profile posts feed. Reuses the Loop tab card pattern (`LoopCard`) for
  * standard posts and the editorial `ReviewCard` for reviews.
  *
- * Comment-sheet ownership: this component owns the CommentsSheet ONLY for the
- * `ReviewCard` branch (which doesn't render its own). `LoopCard` renders its
- * own internal CommentsSheet — we don't wire `onComment` for that branch to
- * avoid double-mount.
+ * Comment-sheet ownership: `LoopCard` renders its own internal CommentsSheet.
+ * `ReviewCard` does not currently expose a comment trigger, so no parent-owned
+ * sheet is mounted here.
  */
 export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
   posts,
@@ -46,8 +43,6 @@ export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const fetchGuard = useRef(false);
   const { deletePost } = usePostDeletion();
-  const { activeActor } = useActiveActor();
-  const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
 
   const { ref: sentinelRef, inView } = useInView({ rootMargin: '400px' });
 
@@ -65,20 +60,6 @@ export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
     if (!isFullscreenOpen) return;
     if (posts.length > 0) appendPosts(posts);
   }, [posts.length, isFullscreenOpen, appendPosts]);
-
-  // Comments sheet — review branch only
-  const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
-  const [commentsCreatorId, setCommentsCreatorId] = useState<string | undefined>(undefined);
-  const [commentsCreatorName, setCommentsCreatorName] = useState<string | undefined>(undefined);
-  const [commentsCaption, setCommentsCaption] = useState<string | null>(null);
-
-  const openComments = (post: FeedPost) => {
-    setCommentsPostId(post.id);
-    setCommentsCreatorId(post.userId);
-    setCommentsCreatorName(post.displayName);
-    setCommentsCaption(post.caption ?? null);
-  };
-  const closeComments = () => setCommentsPostId(null);
 
   const handleDelete = (postId: string, postUserId?: string) => {
     const post = posts.find(p => p.id === postId);
@@ -125,6 +106,7 @@ export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
 
   return (
     <div ref={feedContainerRef} className="flex flex-col gap-3 pb-4 pt-2">
+      <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => {
         const isOwnPost = isOwnProfile && post.userId === userId;
 
@@ -137,9 +119,6 @@ export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
                 postIndex={i}
                 isOwnPost={isOwnPost}
                 onDelete={() => handleDelete(post.id, post.userId)}
-                likeState={getActiveLikeState(post)}
-                onLike={() => handleLike(post)}
-                onComment={() => openComments(post)}
               />
             </div>
           );
@@ -178,18 +157,6 @@ export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
           <p className="text-sm text-muted-foreground">You're all caught up</p>
         </div>
       )}
-
-      {/* Review-branch CommentsSheet (LoopCard owns its own internally) */}
-      <CommentsSheet
-        isOpen={!!commentsPostId}
-        onClose={closeComments}
-        postId={commentsPostId ?? ''}
-        currentUserId={userId}
-        creatorUserId={commentsCreatorId}
-        creatorName={commentsCreatorName}
-        caption={commentsCaption ?? undefined}
-        theme="light"
-      />
     </div>
   );
 };
