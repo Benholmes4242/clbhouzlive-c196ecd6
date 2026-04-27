@@ -57,8 +57,8 @@ export function ReviewWizard({
   const [showPostingOptions, setShowPostingOptions] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
-  const [autoShareComplete, setAutoShareComplete] = useState(false);
-  const [isAutoSharing, setIsAutoSharing] = useState(false);
+  // D31/D34: autoShareComplete + isAutoSharing removed; auto-share runs in
+  // background and the success screen renders immediately.
   const autoShareAttempted = useRef(false);
   // Freeze previousRating at mount so it survives existingRating refetches
   const previousRatingRef = useRef<number | null>(existingRating?.rating ?? null);
