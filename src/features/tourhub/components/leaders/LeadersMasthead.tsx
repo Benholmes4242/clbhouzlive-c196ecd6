@@ -1,16 +1,30 @@
 /**
- * LeadersMasthead — Dispatch editorial header for Performance Rankings.
- * Replaces LeadersHero + LeadersRunnersStrip + LeadersStatContext.
+ * LeadersMasthead — Dispatch editorial header for Stat Watch.
  * Slate background, category name as headline, No.1 cover story,
- * #2–#3 as flat runner grid on slate.
+ * narrative pills row (Margin / Streak / Recent Form / vs Avg).
+ *
+ * The 2-3 runners strip was removed in the Stat Watch polish (Phase 1) —
+ * hero owns rank #1, list starts at #2.
  */
 
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Flame, Trophy } from 'lucide-react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderCategory } from './constants';
+
+export interface MastheadPill {
+  /** Render variant — 'highlight' (amber) for dominance moments, 'normal' (slate) for context. */
+  variant: 'highlight' | 'normal';
+  /** Optional small label rendered before the value (e.g. "Margin:"). */
+  label?: string;
+  /** Main pill value (e.g. "+1.7 yds", "tied with #2", "5-week leader"). */
+  value: string;
+  /** Optional leading icon component. */
+  icon?: 'flame' | 'trophy';
+}
 
 interface LeadersMastheadProps {
   leader: {
@@ -27,33 +41,54 @@ interface LeadersMastheadProps {
     value: number;
     rank: number;
   } | null;
-  runners: Array<{
-    player: {
-      id: string;
-      full_name: string;
-      country: string | null;
-      country_code: string | null;
-      photo_url: string | null;
-      pga_tour_id: string | null;
-      tour_codes?: string[] | null;
-    };
-    playerId: string;
-    value: number;
-    rank: number;
-  }>;
   category: LeaderCategory;
   formatOverride?: (v: number) => string;
   unitOverride?: string;
   leaderValue?: string;
+  /** Narrative pills computed by parent — Margin / Streak / Recent Form / vs Avg. */
+  pills?: MastheadPill[];
+}
+
+function PillView({ pill }: { pill: MastheadPill }) {
+  const isHighlight = pill.variant === 'highlight';
+  const bg = isHighlight ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.06)';
+  const border = isHighlight ? 'rgba(247,147,30,0.30)' : 'rgba(255,255,255,0.10)';
+  const valueColor = isHighlight ? '#F7931E' : '#ffffff';
+  const labelColor = isHighlight ? 'rgba(247,147,30,0.75)' : 'rgba(255,255,255,0.45)';
+  const Icon = pill.icon === 'flame' ? Flame : pill.icon === 'trophy' ? Trophy : null;
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '5px 9px',
+        borderRadius: 6,
+        background: bg,
+        border: `1px solid ${border}`,
+        fontSize: 11,
+        lineHeight: 1.2,
+        whiteSpace: 'nowrap',
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {Icon && <Icon size={11} strokeWidth={2.5} style={{ color: valueColor }} />}
+      {pill.label && (
+        <span style={{ fontSize: 10, fontWeight: 600, color: labelColor }}>{pill.label}</span>
+      )}
+      <span style={{ fontWeight: 800, color: valueColor }}>{pill.value}</span>
+    </span>
+  );
 }
 
 export function LeadersMasthead({
   leader,
-  runners,
   category,
   formatOverride,
   unitOverride,
   leaderValue,
+  pills,
 }: LeadersMastheadProps) {
   if (!leader) return null;
 
@@ -74,11 +109,11 @@ export function LeadersMasthead({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}
+        style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 14px' }}
       >
         {/* Amber eyebrow */}
         <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
-          ⚡ CLBHOUZ · PERFORMANCE RANKINGS
+          ⚡ CLBHOUZ · STAT WATCH
         </div>
 
         {/* Masthead double-rule band */}
@@ -120,7 +155,7 @@ export function LeadersMasthead({
           className="active:opacity-80 transition-opacity"
         >
           {/* Left — faded rank + identity + value */}
-          <div style={{ flex: 1, minWidth: 0, paddingBottom: '14px' }}>
+          <div style={{ flex: 1, minWidth: 0, paddingBottom: '4px' }}>
             {/* Large ghost rank number */}
             <div style={{ fontSize: '72px', fontWeight: 900, color: 'rgba(247,147,30,0.12)', lineHeight: 0.85, letterSpacing: '-0.05em', marginBottom: '2px' }}>
               1
@@ -162,48 +197,12 @@ export function LeadersMasthead({
           </div>
         </Link>
 
-        {/* #2–#3 runner strip — flat 2-col grid on slate */}
-        {runners.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
-            {runners.slice(0, 2).map((runner, i) => {
-              const fmtRunner = formatOverride ?? category.format;
-              const unitRunner = unitOverride ?? category.unit;
-              const runnersLastName = runner.player.full_name.split(' ').slice(-1)[0];
-              const runnerPhoto = getPlayerHeadshotUrl(runner.player.full_name, runner.player.tour_codes?.[0] ?? 'pga');
-              return (
-                <Link
-                  key={runner.playerId}
-                  to={`/tourhub/player/${runner.player.id}`}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '8px 10px',
-                    borderRight: i === 0 ? '0.5px solid rgba(255,255,255,0.06)' : 'none',
-                    textDecoration: 'none',
-                  }}
-                  className="active:opacity-70 transition-opacity"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                    <span style={{ fontSize: '20px', fontWeight: 900, color: 'rgba(255,255,255,0.1)', width: '22px', flexShrink: 0, letterSpacing: '-0.03em' }}>
-                      {runner.rank}
-                    </span>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.06)' }}>
-                      <img
-                        src={runnerPhoto}
-                        alt={runner.player.full_name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-                        onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                      />
-                    </div>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
-                      {runnersLastName}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginLeft: '4px' }}>
-                    {fmtRunner(runner.value)}{unitRunner ? ` ${unitRunner}` : ''}
-                  </span>
-                </Link>
-              );
-            })}
+        {/* Narrative pills row — Margin / Streak / Recent Form / vs Avg */}
+        {pills && pills.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
+            {pills.map((p, i) => (
+              <PillView key={`${p.label ?? ''}-${p.value}-${i}`} pill={p} />
+            ))}
           </div>
         )}
       </motion.div>
