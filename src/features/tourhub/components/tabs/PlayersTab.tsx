@@ -621,40 +621,7 @@ export function PlayersTab() {
           
         }}
       >
-        {/* Collapsible search bar */}
-        <div
-          style={{
-            overflow: 'hidden',
-            transition: 'max-height 250ms ease, opacity 250ms ease',
-            maxHeight: searchExpanded ? '60px' : '0px',
-            opacity: searchExpanded ? 1 : 0,
-            padding: searchExpanded ? '8px 16px 0' : '0 16px',
-          }}
-        >
-          <div style={{ position: 'relative' }}>
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4 text-muted-foreground" strokeWidth={2.5} />
-            <input
-              type="text"
-              placeholder="Search players, countries..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-10 pl-9 pr-9 rounded-xl text-[13px] bg-card border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 transition-all"
-            />
-            <AnimatePresence>
-              {search && (
-                <motion.button
-                  onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-muted active:scale-90"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                >
-                  <X className="w-3 h-3 text-muted-foreground" />
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
+        {/* Top collapsible search removed — search now lives inline replacing the count bar (Phase 1 fix.1.7) */}
 
         {/* Control row — back link + search button (sort pill removed Phase 1 fix.1.2) */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: '6px' }}>
