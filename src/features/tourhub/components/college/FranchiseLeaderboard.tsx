@@ -41,26 +41,13 @@ export function FranchiseLeaderboard({
   limit = 25,
   className,
   activeMetric: externalMetric,
-  onMetricChange,
+  onMetricChange: _onMetricChange,
   hideHeader: _hideHeader = false,
 }: FranchiseLeaderboardProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const sortParam = searchParams.get('sort') || 'earnings';
   const internalMetric: MetricTab = VALID_METRICS.has(sortParam) ? (sortParam as MetricTab) : 'earnings';
   const activeMetric = externalMetric ?? internalMetric;
-
-  // setActiveMetric kept for URL sync when prop not supplied
-  const _setActiveMetric = (metric: MetricTab) => {
-    if (onMetricChange) {
-      onMetricChange(metric);
-    } else {
-      const params = new URLSearchParams(searchParams);
-      if (metric === 'earnings') params.delete('sort');
-      else params.set('sort', metric);
-      setSearchParams(params, { replace: true });
-    }
-  };
-  void _setActiveMetric;
 
   const { data: allStats, isLoading } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
