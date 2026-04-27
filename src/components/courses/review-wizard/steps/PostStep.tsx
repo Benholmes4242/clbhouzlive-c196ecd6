@@ -196,9 +196,21 @@ export function PostStep({
           </button>
         ) : (
           <div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <Reorder.Group
+              axis="x"
+              values={media}
+              onReorder={onSetMediaOrder}
+              className="flex gap-2 overflow-x-auto pb-1"
+              as="div"
+            >
               {composerMedia.map((item, index) => (
-                <div key={item.id} className="relative flex-shrink-0">
+                <Reorder.Item
+                  key={item.id}
+                  value={media[index]}
+                  className="relative flex-shrink-0"
+                  as="div"
+                  whileDrag={{ scale: 1.05, zIndex: 10 }}
+                >
                   <MediaThumbnail
                     item={item}
                     index={index}
@@ -208,7 +220,7 @@ export function PostStep({
                     onRemove={() => onRemoveMedia(item.id)}
                     onSetCover={() => onSetCover(item.id)}
                   />
-                </div>
+                </Reorder.Item>
               ))}
               {media.length < MAX_MEDIA_ITEMS && (
                 <button
@@ -219,7 +231,15 @@ export function PostStep({
                   <Plus className="w-5 h-5 text-muted-foreground" />
                 </button>
               )}
-            </div>
+            </Reorder.Group>
+            {media.length >= 2 && (
+              <div className="mt-3 px-3 py-2 bg-amber-50 rounded-lg flex items-center gap-1.5">
+                <span className="text-amber-700 text-xs">↔</span>
+                <span className="text-xs font-semibold text-amber-700">
+                  Drag photos to reorder · first becomes cover
+                </span>
+              </div>
+            )}
             <p className="text-[11px] text-muted-foreground mt-2 text-center">
               {media.length}/{MAX_MEDIA_ITEMS}
             </p>
