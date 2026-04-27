@@ -175,7 +175,7 @@ export function LeadersMasthead({
 
         {/* No.1 Cover Story */}
         <Link
-          to={`/tourhub/player/${leader.player.id}`}
+          {...playerRoute(leader.player.id, { kind: 'stat-watch' })}
           style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', textDecoration: 'none', marginBottom: 0 }}
           className="active:opacity-80 transition-opacity"
         >
