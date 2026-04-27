@@ -22,6 +22,9 @@ import { formatPurse } from '../shared/TourHeroHelpers';
 import { TourPill } from '../shared/TourPill';
 import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { WinnerPill } from '../shared/WinnerPill';
+import { TournamentMeta } from '../shared/TournamentMeta';
+import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
+import type { DefendingChampionEntry } from '../../hooks/useScheduleDefendingChampionPhotos';
 
 // SeasonTournament has no tour_code; derive from its display tourName.
 // TOUR_NAME_TO_SLUG returns lowercase slugs (pga, liv, euro, etc.) — translate
@@ -40,6 +43,7 @@ interface ScheduleTournamentCardProps {
   className?: string;
   compact?: boolean;
   leaderWinner?: TournamentLeaderWinner;
+  defendingChampion?: DefendingChampionEntry | null;
 }
 
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
@@ -80,6 +84,7 @@ export function ScheduleTournamentCard({
   className,
   compact = false,
   leaderWinner,
+  defendingChampion,
 }: ScheduleTournamentCardProps) {
   const navigate = useNavigate();
 
@@ -327,6 +332,28 @@ export function ScheduleTournamentCard({
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{venue}</span>
           </p>
         )}
+
+        {/* Tier 4 — defending champion + field strength on upcoming rows */}
+        {!isLive && !isFinal && !compact && (() => {
+          const purse = isSeasonTournament(tournament) ? null : (tournament as TourTournament).purse;
+          const fieldLabel = deriveFieldStrength({
+            name: tournament.name,
+            tourName: tourName ?? null,
+            purse,
+          });
+          const champ = defendingChampion?.name ? defendingChampion : null;
+          // Show section when EITHER tier qualifies OR (defending exists AND tier qualifies)
+          // — defending-only without a tier is intentionally suppressed to keep
+          // sub-$10M regular events clean per brief design intent.
+          if (!fieldLabel && !champ) return null;
+          if (!fieldLabel) return null; // gate: no tier → no section even if defending exists
+          return (
+            <TournamentMeta
+              defendingChampion={champ}
+              fieldStrengthLabel={fieldLabel}
+            />
+          );
+        })()}
       </div>
     </div>
   );

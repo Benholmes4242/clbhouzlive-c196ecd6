@@ -16,6 +16,8 @@ import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe, Clo
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
+import { useScheduleDefendingChampionPhotos } from '../../hooks/useScheduleDefendingChampionPhotos';
+import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -237,7 +239,22 @@ export function ScheduleTab() {
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
   const { data: liveTournaments } = useLiveRightNow();
 
-
+  // Phase 2 (Tier 4) — fetch defending-champion photos only for upcoming tournaments
+  // that pass the show-section threshold (have defending_champion AND a qualifying tier).
+  const upcomingForMeta = useMemo(() => {
+    if (!tournaments) return [] as { id: string; defending_champion: string | null }[];
+    return tournaments
+      .filter((t) => (t.status === 'scheduled' || t.status === 'created') && !!t.defending_champion)
+      .filter((t) =>
+        deriveFieldStrength({
+          name: t.name,
+          tourName: t.tour_full_name ?? null,
+          purse: t.purse,
+        }) !== null,
+      )
+      .map((t) => ({ id: t.id, defending_champion: t.defending_champion }));
+  }, [tournaments]);
+  const { data: defendingChampionMap } = useScheduleDefendingChampionPhotos(upcomingForMeta);
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
@@ -691,6 +708,7 @@ export function ScheduleTab() {
                             <ScheduleTournamentCard
                               tournament={tournament}
                               leaderWinner={leadersWinnersMap?.get(tournament.id)}
+                              defendingChampion={defendingChampionMap?.get(tournament.id) ?? null}
                             />
                           </div>
                         </InViewCard>
