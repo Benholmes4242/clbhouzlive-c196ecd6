@@ -366,14 +366,14 @@ export function LeadersTab() {
       {/* Unified editorial masthead */}
       <LeadersMasthead
         leader={leader}
-        runners={runners}
         category={category}
         formatOverride={worldFormatOverride}
         unitOverride={worldUnitOverride}
         leaderValue={leaderValue}
+        pills={heroPills}
       />
 
-      {/* Sticky header — back link + category pill + group tabs + category chips */}
+      {/* Sticky header — back link + group tabs + chip rail + count/search */}
       <div
         className="sticky top-0 z-20"
         style={{
@@ -383,8 +383,8 @@ export function LeadersTab() {
           borderBottom: '0.5px solid rgba(15,23,42,0.08)',
         }}
       >
-        {/* Back link */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0' }}>
+        {/* Control row — back link + search button */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: 6 }}>
           <Link
             to="/tourhub?tab=overview"
             replace
@@ -394,6 +394,24 @@ export function LeadersTab() {
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
           </Link>
+
+          <div style={{ flex: 1 }} />
+
+          {!searchExpanded && (
+            <button
+              onClick={() => setSearchExpanded(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 10px', borderRadius: 8,
+                background: 'rgba(15,23,42,0.04)',
+                border: 'none', cursor: 'pointer',
+              }}
+              aria-label="Search players"
+            >
+              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+            </button>
+          )}
         </div>
 
         {/* Group underline tabs */}
@@ -423,23 +441,23 @@ export function LeadersTab() {
           })}
         </div>
 
-        {/* Category chips — within the active group */}
-        <div style={{ display: 'flex', gap: '6px', padding: '8px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        {/* Category chips — amber language family (Phase 1 fix.1.6) */}
+        <div style={{ display: 'flex', gap: '8px', padding: '14px 18px 12px', overflowX: 'auto', scrollbarWidth: 'none' }}>
           {activeGroupCats.map(cat => {
             const on = cat.key === categoryKey;
             return (
               <button
                 key={cat.key}
                 onClick={() => setCategory(cat.key)}
-                className="flex-shrink-0 active:scale-[0.97] transition-transform"
+                className="flex-shrink-0 active:scale-[0.97]"
                 style={{
-                  padding: '4px 10px', borderRadius: '6px',
-                  fontSize: '10px', fontWeight: on ? 800 : 600,
-                  color: on ? '#ffffff' : '#94A3B8',
-                  background: on ? '#0F172A' : 'transparent',
-                  border: on ? 'none' : '0.5px solid rgba(15,23,42,0.12)',
+                  padding: '6px 12px', borderRadius: '8px',
+                  fontSize: '11px', fontWeight: on ? 800 : 700,
+                  color: on ? '#c97a10' : '#334155',
+                  background: on ? 'rgba(247,147,30,0.08)' : '#ffffff',
+                  border: `1px solid ${on ? 'rgba(247,147,30,0.30)' : '#E2E8F0'}`,
                   cursor: 'pointer', whiteSpace: 'nowrap' as const,
-                  transition: 'all 0.15s',
+                  transition: 'background 0.15s, border-color 0.15s',
                 }}
               >
                 {(cat as any).emoji} {cat.shortLabel}
@@ -447,21 +465,46 @@ export function LeadersTab() {
             );
           })}
         </div>
+
+        {/* Count bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
+        {!searchExpanded ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 8px', gap: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
+              {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'player' : 'players'}
+              <span style={{ color: '#CBD5E1' }}> · ranked by </span>
+              <span style={{ color: '#0F172A', fontWeight: 700 }}>{category.shortLabel}</span>
+            </span>
+          </div>
+        ) : (
+          <div style={{ padding: '6px 16px 8px' }}>
+            <div style={{ position: 'relative' }}>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search players..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)' }}
+              />
+              <button
+                onClick={() => { setSearch(''); setSearchExpanded(false); }}
+                aria-label="Close search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
+                style={{ background: 'rgba(15,23,42,0.06)' }}
+              >
+                <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Content area */}
       <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-        {/* Rankings list — white surface */}
+        {/* Rankings list — white surface (column header removed Phase 1 fix.1.3) */}
         <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
-          {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <span style={{ width: '44px', fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>RK</span>
-            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
-            <span style={{ width: '72px', textAlign: 'right' as const, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0, paddingRight: '14px' }}>
-              {category.shortLabel.toUpperCase()}
-            </span>
-          </div>
-
           <AnimatePresence mode="wait">
             <motion.div
               key={category.key}
@@ -472,28 +515,37 @@ export function LeadersTab() {
             >
               {listPlayers.length > 0 ? (
                 <>
-                  {listPlayers.map((item, idx) => (
-                    <LeaderRow
-                      key={item.playerId}
-                      rank={item.rank}
-                      overrideRank={isWorldCategory ? item.rank : undefined}
-                      player={{
-                        id: item.playerId,
-                        fullName: item.player.full_name,
-                        country: item.player.country,
-                        countryCode: item.player.country_code,
-                        photoUrl: item.player.photo_url,
-                        pgaTourId: item.player.pga_tour_id,
-                        tourCodes: (item.player as any).tour_codes ?? null,
-                      }}
-                      value={item.value}
-                      leaderValue={rankedPlayers[0]?.value ?? item.value}
-                      category={category}
-                      formatOverride={worldFormatOverride}
-                      unitOverride={worldUnitOverride}
-                      index={idx}
-                    />
-                  ))}
+                  {listPlayers.map((item, idx) => {
+                    const fmt = worldFormatOverride ?? category.format;
+                    const unit = worldUnitOverride ?? category.unit;
+                    // Movement gated to World Rankings only — only sr_world_rankings has
+                    // prior-rank snapshots. Cross-references useElitePlayers (Players page)
+                    // as the single source of truth for rankChange. If a leader isn't in
+                    // the elite top-200, no indicator renders — absence over fabrication.
+                    const rankChange = isWorldCategory
+                      ? (eliteRankMap.get(item.playerId) ?? null)
+                      : null;
+                    return (
+                      <PlayerCardV2
+                        key={item.playerId}
+                        player={{
+                          id: item.playerId,
+                          fullName: item.player.full_name,
+                          country: item.player.country,
+                          countryCode: item.player.country_code,
+                          photoUrl: item.player.photo_url,
+                          pgaTourId: item.player.pga_tour_id,
+                          tourCodes: (item.player as any).tour_codes ?? null,
+                        }}
+                        worldRank={item.rank}
+                        index={idx}
+                        isTopTen={idx < 9}
+                        rankChange={rankChange}
+                        recentResult={recentResultsMap?.get(item.playerId) ?? null}
+                        displayValue={{ main: fmt(item.value), label: unit || undefined }}
+                      />
+                    );
+                  })}
                   {/* Footer */}
                   <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
                     <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
