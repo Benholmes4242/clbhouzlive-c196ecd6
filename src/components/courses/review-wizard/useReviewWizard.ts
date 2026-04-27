@@ -1053,6 +1053,7 @@ export function useReviewWizard({
     removeMedia,
     retryMedia,
     reorderMedia,
+    setMediaOrder,
     
     // Actions
     submit: handleSubmit,
