@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
+import { playerRoute } from '../../routes';
 
 interface RawRoundData {
   thru?: number;
@@ -55,6 +56,7 @@ interface FullLeaderboardProps {
   headshotMap?: Map<string, string>;
   tournamentStatus?: string;
   tournamentTimezone?: string | null;
+  tournamentName?: string;
   venuePar?: number | null;
   onPlayerTap?: () => void;
 }
@@ -97,6 +99,7 @@ export function FullLeaderboard({
   headshotMap,
   tournamentStatus,
   tournamentTimezone,
+  tournamentName,
   venuePar,
   onPlayerTap,
 }: FullLeaderboardProps) {
