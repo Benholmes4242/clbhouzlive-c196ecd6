@@ -17,6 +17,7 @@ import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
+import { useFranchiseDrivers } from '../../hooks/useFranchiseDrivers';
 import { SectionHeader } from '../shared/SectionHeader';
 import { FranchiseCard } from './FranchiseCard';
 import { format } from 'date-fns';
@@ -47,6 +48,8 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
 
   const slugs = useMemo(() => enrichedMovers.map(m => m.normalized_name), [enrichedMovers]);
   const { data: alumniMap } = useBatchCollegeAlumni(slugs, 3);
+  // Single batched query for driver lines — one per Movers tab render.
+  const { data: driverMap } = useFranchiseDrivers(slugs, movers?.[0]?.week_start);
 
   const weekStart = movers?.[0]?.week_start;
   const weekLabel = weekStart
