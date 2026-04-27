@@ -313,11 +313,25 @@ export function RateStep({
             >
               <span className="text-[10px] font-extrabold tracking-widest text-amber-500">VERDICT</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-[22px] font-black tracking-tight text-slate-900 tabular-nums">
+                <span
+                  className="text-[22px] font-black tracking-tight text-slate-900 tabular-nums"
+                  style={{
+                    display: 'inline-block',
+                    transform: isAnimatingVerdict ? 'scale(1.06)' : 'scale(1.0)',
+                    transition: 'transform 200ms ease',
+                  }}
+                >
                   {displayVerdict.toFixed(1)}
                 </span>
                 {overallTier && (
-                  <span className="text-[11px] font-extrabold tracking-widest text-slate-500">
+                  <span
+                    key={overallTier.label}
+                    className="text-[11px] font-extrabold tracking-widest text-slate-500"
+                    style={{
+                      display: 'inline-block',
+                      animation: 'verdictLabelEnter 200ms ease-out',
+                    }}
+                  >
                     {overallTier.label}
                   </span>
                 )}
