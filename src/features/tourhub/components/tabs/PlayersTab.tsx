@@ -694,8 +694,8 @@ export function PlayersTab() {
           })()}
         </div>
 
-        {/* Count+sort bar — toggles with search input (Phase 1 fix.1.7) */}
-        {!searchExpanded && (
+        {/* Count+sort bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
+        {!searchExpanded ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 8px', gap: 8 }}>
             <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
               {totalCount.toLocaleString()} {totalCount === 1 ? 'player' : 'players'}
@@ -703,8 +703,32 @@ export function PlayersTab() {
               <span style={{ color: '#0F172A', fontWeight: 700 }}>{getSortShortLabel(sort, activeTour)}</span>
             </span>
           </div>
+        ) : (
+          <div style={{ padding: '6px 16px 8px' }}>
+            <div style={{ position: 'relative' }}>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search players..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
+                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)' }}
+              />
+              <button
+                onClick={() => { setSearch(''); setSearchExpanded(false); }}
+                aria-label="Close search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
+                style={{ background: 'rgba(15,23,42,0.06)' }}
+              >
+                <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
         )}
       </div>
+
 
 
       {/* Tour filter bottom sheet */}
