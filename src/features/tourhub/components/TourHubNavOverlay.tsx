@@ -544,18 +544,21 @@ export function TourHubNavOverlay({
           </div>
         )}
 
-        {/* Header */}
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Navigate</div>
-          <div id="tour-nav-menu-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Tour Hub</div>
+        {/* Header — title only (NAVIGATE eyebrow removed) */}
+        <div style={{ padding: '14px 20px 14px' }}>
+          <div
+            id="tour-nav-menu-title"
+            style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: -0.5 }}
+          >
+            Tour Hub
+          </div>
         </div>
 
         {/* Nav Items + Link Items — Dispatch flat rows */}
         <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.value;
-            const dynamicSubtitle = item.value === 'schedule' ? scheduleSubtitle : item.subtitle;
-            
+
             return (
               <button
                 key={item.value}
@@ -573,10 +576,8 @@ export function TourHubNavOverlay({
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={getAriaLabel(item)}
               >
-                {/* Icon */}
-                <div style={{ width: 36, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {item.icon}
-                </div>
+                {/* Icon — colored squircle with Lucide icon */}
+                <MenuRowIcon Icon={item.iconComponent} color={item.iconColor} />
 
                 {/* Label + subtitle */}
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -584,10 +585,9 @@ export function TourHubNavOverlay({
                     <span style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: '#0F172A' }}>
                       {item.label}
                     </span>
-                    {renderBadge(item)}
                   </div>
                   <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
-                    {dynamicSubtitle}
+                    {item.subtitle}
                   </div>
                   {renderTeaser(item)}
                 </div>
@@ -615,10 +615,8 @@ export function TourHubNavOverlay({
                 }}
                 aria-label={`${item.label} — ${item.subtitle}`}
               >
-                {/* Icon */}
-                <div style={{ width: 36, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {item.icon}
-                </div>
+                {/* Icon — colored squircle with Lucide icon */}
+                <MenuRowIcon Icon={item.iconComponent} color={item.iconColor} />
 
                 {/* Label + subtitle */}
                 <div style={{ flex: 1, minWidth: 0 }}>
