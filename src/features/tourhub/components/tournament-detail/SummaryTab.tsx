@@ -10,10 +10,12 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
+import { playerRoute } from '../../routes';
 
 interface SummaryTabProps {
   tournamentId: string;
   tournamentSrId: string | null;
+  tournamentName?: string;
   isLive: boolean;
   isCompleted: boolean;
   leaderboard: any[] | null;
@@ -83,7 +85,7 @@ function formatEarnings(money: number): string {
   return `$${Number(money).toLocaleString()}`;
 }
 
-function WinnerCard({ winner, runnerUp, headshotMap }: { winner: any; runnerUp: any | null; headshotMap?: Map<string, string> }) {
+function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner: any; runnerUp: any | null; headshotMap?: Map<string, string>; tournamentName?: string }) {
   const earnings = winner.money ? formatEarnings(winner.money) : null;
   const scoreToPar = winner.score !== null ? (winner.score === 0 ? 'E' : winner.score < 0 ? String(winner.score) : `+${winner.score}`) : '—';
   const marginOfVictory = runnerUp ? Math.abs((runnerUp.score ?? 0) - (winner.score ?? 0)) : null;
@@ -100,7 +102,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: { winner: any; runnerUp: 
 
       {/* Winner hero row */}
       <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
-        <Link to={`/tourhub/player/${winner.player?.id}`} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
+        <Link {...playerRoute(winner.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
           <div style={{ padding: '12px 20px 14px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -133,6 +135,7 @@ function WinnerCard({ winner, runnerUp, headshotMap }: { winner: any; runnerUp: 
 
 export function SummaryTab({
   tournamentId,
+  tournamentName,
   isLive,
   isCompleted,
   leaderboard,
@@ -162,7 +165,7 @@ export function SummaryTab({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Winner card */}
       {isCompleted && winner && (
-        <WinnerCard winner={winner} runnerUp={runnerUp} headshotMap={headshotMap} />
+        <WinnerCard winner={winner} runnerUp={runnerUp} headshotMap={headshotMap} tournamentName={tournamentName} />
       )}
 
       {/* Round-by-round scoring */}
@@ -268,7 +271,7 @@ export function SummaryTab({
                   transition={{ delay: 0.3 + idx * 0.03, duration: 0.25 }}
                 >
                   <Link
-                    to={`/tourhub/player/${entry.player?.id}`}
+                    {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
                     style={{
                       display: 'flex', alignItems: 'center',
                       padding: '10px 20px',

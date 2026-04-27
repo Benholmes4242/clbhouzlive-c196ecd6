@@ -20,6 +20,11 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const results = showAll ? allResults : allResults?.slice(0, INITIAL_LIMIT);
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
+  // Rule 26 — honest data: omit the entire section when not loading and no results.
+  if (!isLoading && (!allResults || allResults.length === 0)) {
+    return null;
+  }
+
   return (
     <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
       {/* Section header */}
@@ -109,14 +114,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
             </button>
           )}
         </>
-      ) : (
-        <div className="py-12 text-center">
-          <p style={{ fontWeight: 500, color: '#64748B' }}>No tournament results yet</p>
-          <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '4px' }}>
-            Results will appear as tournaments are completed
-          </p>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeAlumni } from '../../hooks/useCollegeAlumni';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { playerRoute } from '../../routes';
 
 interface FranchiseStoryStripProps {
   normalizedName: string;
@@ -95,7 +96,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
           </div>
           {topAlumnus ? (
             <Link
-              to={`/tourhub/player/${topAlumnus.id}`}
+              {...playerRoute(topAlumnus.id, topAlumnus.college ? { kind: 'college', collegeName: topAlumnus.college } : undefined)}
               style={{ display: 'block', textDecoration: 'none' }}
               className="active:opacity-70 transition-opacity"
             >

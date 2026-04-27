@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
+import { playerRoute } from '../../routes';
 
 interface RawRoundData {
   thru?: number;
@@ -55,6 +56,7 @@ interface FullLeaderboardProps {
   headshotMap?: Map<string, string>;
   tournamentStatus?: string;
   tournamentTimezone?: string | null;
+  tournamentName?: string;
   venuePar?: number | null;
   onPlayerTap?: () => void;
 }
@@ -97,6 +99,7 @@ export function FullLeaderboard({
   headshotMap,
   tournamentStatus,
   tournamentTimezone,
+  tournamentName,
   venuePar,
   onPlayerTap,
 }: FullLeaderboardProps) {
@@ -235,7 +238,7 @@ export function FullLeaderboard({
           return (
             <motion.div key={entry.id} custom={index} variants={rowVariants} initial="hidden" animate="visible">
               <Link
-                to={`/tourhub/player/${entry.player?.id}`}
+                {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
                 onClick={onPlayerTap}
                 aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{

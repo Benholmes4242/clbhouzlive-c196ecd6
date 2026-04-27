@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
+import { playerRoute } from '../../routes';
 
 interface LeaderboardEntry {
   id: string;
@@ -30,6 +31,7 @@ interface LeaderboardCardProps {
   limit?: number;
   showHeader?: boolean;
   title?: string;
+  tournamentName?: string;
 }
 
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
@@ -67,6 +69,7 @@ export function LeaderboardCard({
   limit = 10,
   showHeader = true,
   title = "Leaderboard",
+  tournamentName,
 }: LeaderboardCardProps) {
   const displayEntries = limit === 0 ? entries : entries.slice(0, limit);
   const hasMore = limit > 0 && entries.length > limit;
@@ -117,7 +120,7 @@ export function LeaderboardCard({
               transition={{ delay: index * 0.03, duration: 0.3 }}
             >
               <Link
-                to={`/tourhub/player/${entry.player?.id}`}
+                {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '10px 20px',

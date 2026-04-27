@@ -73,10 +73,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   if (player.residence) personalFields.push({ label: 'Residence', value: player.residence });
 
   const careerFields: { label: string; value: React.ReactNode }[] = [];
-  careerFields.push({
-    label: 'Tour',
-    value: (player as any).is_member ? 'PGA Tour' : 'Non-Member',
-  });
+  // Tour affiliation is rendered authoritatively in the hero (TourChipGroup) — no duplicate row here.
   if (player.turned_pro) careerFields.push({ label: 'Turned Pro', value: String(player.turned_pro) });
   if (handedness) careerFields.push({ label: 'Handedness', value: handedness });
   if (height) careerFields.push({ label: 'Height', value: height });

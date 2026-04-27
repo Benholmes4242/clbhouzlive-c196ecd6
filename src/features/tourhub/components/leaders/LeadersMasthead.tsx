@@ -13,6 +13,7 @@ import { Flame, Trophy } from 'lucide-react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
+import { playerRoute } from '../../routes';
 import type { LeaderCategory } from './constants';
 
 export interface MastheadPill {
@@ -174,7 +175,7 @@ export function LeadersMasthead({
 
         {/* No.1 Cover Story */}
         <Link
-          to={`/tourhub/player/${leader.player.id}`}
+          {...playerRoute(leader.player.id, { kind: 'stat-watch' })}
           style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', textDecoration: 'none', marginBottom: 0 }}
           className="active:opacity-80 transition-opacity"
         >

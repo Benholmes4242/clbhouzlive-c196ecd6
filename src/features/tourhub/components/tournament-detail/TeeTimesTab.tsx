@@ -12,10 +12,12 @@ import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
 import CountryFlag from '@/components/ui/country-flag';
+import { playerRoute } from '../../routes';
 
 interface TeeTimesTabProps {
   tournamentId: string;
   tournamentSrId: string | null;
+  tournamentName?: string;
   isLive: boolean;
   isCompleted?: boolean;
 }
@@ -89,7 +91,7 @@ interface TeeTimeGroup {
   }>;
 }
 
-function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; index: number; searchQuery: string }) {
+function TeeTimeGroupCard({ group, index, searchQuery, tournamentName }: { group: TeeTimeGroup; index: number; searchQuery: string; tournamentName?: string }) {
   const hasMatchingPlayer = searchQuery.trim() && group.players.some(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
@@ -109,7 +111,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
         {group.players.map((player, playerIdx) => (
           <Link
             key={player.id || playerIdx}
-            to={`/tourhub/player/${player.playerId || player.id}`}
+            {...playerRoute(player.playerId || player.id || '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', textDecoration: 'none' }}
             className="active:opacity-70 transition-opacity"
           >
@@ -123,7 +125,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
   );
 }
 
-export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
+export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTimesTabProps) {
   const [selectedRound, setSelectedRound] = useState('R1');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -262,13 +264,13 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (
-                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} />
+                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
               ))}
             </div>
           ))
         ) : (
           filteredGroups.map((group, idx) => (
-            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} />
+            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
           ))
         )}
       </div>
