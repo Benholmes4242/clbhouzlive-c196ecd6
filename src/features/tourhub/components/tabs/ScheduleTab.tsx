@@ -708,6 +708,7 @@ export function ScheduleTab() {
                             <ScheduleTournamentCard
                               tournament={tournament}
                               leaderWinner={leadersWinnersMap?.get(tournament.id)}
+                              defendingChampion={defendingChampionMap?.get(tournament.id) ?? null}
                             />
                           </div>
                         </InViewCard>
