@@ -356,18 +356,6 @@ export function ReviewWizard({
                         isEditMode={isEditMode}
                         previousRating={stablePreviousRating}
                         onViewReview={handleViewReview}
-                        onGoToClubhouse={handleGoToClubhouse}
-                        onDone={handleDone}
-                      />
-                    ) : wizard.state.step === 'share-success' ? (
-                      <SuccessScreen
-                        key="share-success"
-                        variant="shared"
-                        course={activeCourse}
-                        ratingId={wizard.submittedRatingId || ''}
-                        rating={wizard.state.rating}
-                        postId={sharedPostId || undefined}
-                        onViewPost={handleViewPost}
                         onDone={handleDone}
                       />
                     ) : wizard.state.step === 1 ? (
