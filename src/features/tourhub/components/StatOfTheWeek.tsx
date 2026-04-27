@@ -20,6 +20,7 @@ import { useTourSelection } from '../hooks/useTourSelection';
 import { LEADER_CATEGORIES, type LeaderCategory } from './leaders/constants';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
+import { SectionHeader } from './shared/SectionHeader';
 
 const AMBER = '#F7931E';
 const INK = '#0F172A';
@@ -165,6 +166,11 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
   return (
     <>
       <section className="px-4" aria-label="Stat of the Week">
+        <SectionHeader
+          eyebrow="Stat Watch"
+          title="Stat Watch"
+          subtitle="Who's leading the performance stats this year on tour"
+        />
         <div
           style={{
             position: 'relative',
@@ -338,23 +344,12 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               marginBottom: 14,
             }}
           >
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                padding: 2,
-                background: AMBER,
-                flexShrink: 0,
-              }}
-            >
-              <PlayerAvatar
-                playerId={leader.playerId}
-                playerName={leader.fullName}
-                tourCode="pga"
-                size="sm"
-              />
-            </div>
+            <PlayerAvatar
+              playerId={leader.playerId}
+              playerName={leader.fullName}
+              tourCode="pga"
+              size="md"
+            />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{

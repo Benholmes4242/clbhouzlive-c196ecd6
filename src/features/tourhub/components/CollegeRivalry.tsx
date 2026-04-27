@@ -29,6 +29,7 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../utils/editorialFallbacks';
+import { SectionHeader } from './shared/SectionHeader';
 
 const AMBER = '#F7931E';
 const AMBER_INK = '#D97706';
@@ -156,22 +157,13 @@ export function CollegeRivalry() {
 
   return (
     <section aria-label="This week's college rivalry">
-      {/* Section eyebrow */}
-      <div style={{ padding: '0 16px 14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 3, height: 14, background: INK, borderRadius: 1 }} />
-          <div>
-            <div style={{
-              fontSize: 9, fontWeight: 900, color: INK,
-              letterSpacing: '0.16em', textTransform: 'uppercase',
-            }}>
-              College Rivalry
-            </div>
-            <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}>
-              Where college legacies compete on tour · {currentYear} Season
-            </div>
-          </div>
-        </div>
+      {/* Section header — shared SectionHeader component */}
+      <div style={{ padding: '0 16px' }}>
+        <SectionHeader
+          eyebrow="College Rivalry"
+          title="College Franchise Battle"
+          subtitle={`Where college legacies compete on tour · ${currentYear} Season`}
+        />
       </div>
 
       {/* Rivalry hero card — matchup row sits DIRECTLY on the outer card (no inner card) */}
