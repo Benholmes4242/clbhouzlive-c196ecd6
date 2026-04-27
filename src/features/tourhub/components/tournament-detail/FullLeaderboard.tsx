@@ -230,13 +230,7 @@ export function FullLeaderboard({
           const liveRoundThru = liveRound?.thru ?? null;
           const displayPosition = isRoundView ? index + 1 : entry.position;
 
-          // Round score color helper
-          const getRoundScoreColor = (score: number | null) => {
-            if (score === null) return '#CBD5E1';
-            const par = venuePar ? Math.round(venuePar / 4) : 72; // rough per-round par
-            // We have strokes, compare to ~72 (or just show raw)
-            return '#64748B';
-          };
+          // (Phase 1 cleanup: dead getRoundScoreColor helper removed.)
 
           return (
             <motion.div key={entry.id} custom={index} variants={rowVariants} initial="hidden" animate="visible">
