@@ -222,6 +222,7 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
     comments,
     isLoading,
     addComment: addComment.mutate,
+    isAddingComment: addComment.isPending,
     deleteComment: deleteComment.mutate,
   };
 }
