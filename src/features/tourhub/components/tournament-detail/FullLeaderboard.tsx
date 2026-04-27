@@ -238,7 +238,7 @@ export function FullLeaderboard({
           return (
             <motion.div key={entry.id} custom={index} variants={rowVariants} initial="hidden" animate="visible">
               <Link
-                to={`/tourhub/player/${entry.player?.id}`}
+                {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
                 onClick={onPlayerTap}
                 aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{
