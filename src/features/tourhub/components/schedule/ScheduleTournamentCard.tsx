@@ -12,6 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { tournamentRoute } from '../../routes';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
@@ -150,7 +151,7 @@ export function ScheduleTournamentCard({
 
   return (
     <div
-      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      onClick={() => { const t = tournamentRoute(tournament.id, { kind: 'schedule' }); navigate(t.to, { state: t.state }); }}
       className={`w-full flex items-start gap-0 cursor-pointer active:bg-black/[0.02] transition-colors ${className || ''}`}
       style={{
         borderLeft: `3px solid ${leftBorderColor}`,

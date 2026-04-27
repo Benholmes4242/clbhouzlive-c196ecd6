@@ -5,7 +5,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
-import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Trophy, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,6 +18,7 @@ import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
 import { EventWinnerCard } from '../components/EventWinnerCard';
 import { EventMomentsList } from '../components/EventMomentsList';
+import { getReferrerLabel, type TournamentReferrer } from '../routes';
 
 import {
   TournamentHero,
@@ -28,6 +29,7 @@ import {
   TeeTimesTab,
   HoleStatsTab,
   SummaryTab,
+  LiveOverviewTab,
   type TournamentTab,
 } from '../components/tournament-detail';
 import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
@@ -42,7 +44,10 @@ export function TournamentDetailPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  
+  const location = useLocation();
+  const referrer = (location.state as { referrer?: TournamentReferrer } | null)?.referrer;
+  const backLabel = getReferrerLabel(referrer);
+
   const [activeTab, setActiveTab] = useState<TournamentTab>(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
     if (tabParam && VALID_TABS.includes(tabParam)) return tabParam;
@@ -107,7 +112,7 @@ export function TournamentDetailPage() {
   const isCompleted = tournament?.status === 'closed';
   const isUpcoming = tournament?.status === 'scheduled' || tournament?.status === 'created';
   
-  const { isConnected } = useLeaderboardRealtime(isLive ? tournamentId : null);
+  useLeaderboardRealtime(isLive ? tournamentId : null);
   
   const venueInput = useMemo(() => {
     if (!tournament) return null;
@@ -228,6 +233,23 @@ export function TournamentDetailPage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
+        if (isLive) {
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LiveOverviewTab
+                tournament={tournament}
+                leaderboard={leaderboard}
+                courseImage={courseMatch?.imageUrl}
+                courseId={courseMatch?.golfCourseId}
+                onViewLeaderboard={() => handleTabChange('leaderboard')}
+              />
+            </motion.div>
+          );
+        }
         return (
           <motion.div 
             initial={{ opacity: 0 }}
@@ -254,7 +276,6 @@ export function TournamentDetailPage() {
             
             <TournamentInfoGrid
               tournament={tournament}
-              fieldSize={leaderboard?.length}
             />
           </motion.div>
         );
@@ -362,6 +383,8 @@ export function TournamentDetailPage() {
         <TournamentHero 
           tournament={tournament} 
           imageUrl={heroImageUrl}
+          leader={leader}
+          leaderboard={leaderboard ?? null}
         />
 
         {/* STICKY HEADER — ← Back | underline tabs */}
@@ -383,7 +406,7 @@ export function TournamentDetailPage() {
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
-              Back
+              {backLabel}
             </button>
           </div>
 
@@ -436,31 +459,9 @@ export function TournamentDetailPage() {
           </div>
         </div>
 
-        {/* Live leader — floating pill */}
-        {isLive && leader && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '14px 16px 10px', background: '#F8FAFC' }}>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '6px 14px', borderRadius: 20,
-              background: '#ffffff',
-              border: '1px solid rgba(34,197,94,0.2)',
-              boxShadow: '0 1px 8px rgba(34,197,94,0.08), 0 1px 3px rgba(15,23,42,0.06)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span className="animate-live-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-                <span style={{ fontSize: '9px', fontWeight: 900, color: '#16A34A', letterSpacing: '0.1em' }}>LIVE</span>
-              </div>
-              <div style={{ width: '0.5px', height: 12, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>{leader.name}</span>
-              {leader.score && (
-                <>
-                  <div style={{ width: '0.5px', height: 12, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', fontWeight: 900, color: '#16A34A', letterSpacing: '-0.02em' }}>{leader.score}</span>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Live leader is now rendered as a hero pill (see TournamentHero buildPills).
+            The legacy floating "LIVE • leader" block was removed in Phase 1 to
+            avoid duplication with the hero narrative pills. */}
 
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           <AnimatePresence mode="wait">

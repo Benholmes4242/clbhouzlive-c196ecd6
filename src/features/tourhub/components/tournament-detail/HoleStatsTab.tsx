@@ -3,10 +3,10 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Target, Clock } from 'lucide-react';
+// Clock icon retired in Phase 1 — empty states use EditorialEmpty's amber rail.
 import { motion } from 'framer-motion';
 import { RoundSelector } from './RoundSelector';
-import { TournamentEmptyState } from './TournamentEmptyState';
+import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
 
 interface HoleStatsTabProps {
@@ -69,16 +69,31 @@ function HoleStatsSkeleton() {
 }
 
 function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; roundLabel?: string }) {
-  let title = 'Hole Statistics Not Available Yet';
-  let subtitle = 'Hole-by-hole statistics will appear once play begins.';
   if (isCompleted) {
-    title = 'Hole Statistics Not Available';
-    subtitle = 'Detailed hole statistics are not available for this tournament.';
-  } else if (roundLabel) {
-    title = `${roundLabel} Statistics Not Yet Available`;
-    subtitle = `${roundLabel} statistics will appear during play.`;
+    return (
+      <EditorialEmpty
+        eyebrow="Holes"
+        title="Hole statistics not available"
+        body="Detailed hole-by-hole statistics weren't captured for this tournament."
+      />
+    );
   }
-  return <TournamentEmptyState icon={<Target className="w-16 h-16" />} title={title} subtitle={subtitle} />;
+  if (roundLabel) {
+    return (
+      <EditorialEmpty
+        eyebrow={roundLabel}
+        title={`${roundLabel} statistics will appear during play`}
+        body="Hole-by-hole numbers populate as players post scores in this round."
+      />
+    );
+  }
+  return (
+    <EditorialEmpty
+      eyebrow="Holes"
+      title="Hole-by-hole stats appear once play begins"
+      body="Scoring distributions, hardest and easiest holes, and the field average will populate the moment the first round goes live."
+    />
+  );
 }
 
 export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
@@ -165,13 +180,11 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
       )}
 
       {!hasRoundData && selectedRound !== 'Overall' ? (
-        <motion.div className="flex items-center justify-center min-h-[300px] py-12" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <div className="text-center space-y-3">
-            <Clock className="w-8 h-8 mx-auto text-muted-foreground" />
-            <h3 className="text-base font-semibold text-foreground">{selectedRound} hasn't started yet</h3>
-            <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">Hole-by-hole stats will appear once play begins.</p>
-          </div>
-        </motion.div>
+        <EditorialEmpty
+          eyebrow={selectedRound}
+          title={`${selectedRound} hasn't started yet`}
+          body="Hole-by-hole stats will appear once play begins in this round."
+        />
       ) : (
         <>
           {/* 3-col summary strip */}
@@ -209,7 +222,8 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>H</span>
             <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>PAR</span>
-            <span style={{ width: '44px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>YDS</span>
+            {/* YDS column dropped Phase 1 — sr_hole_statistics.yardage is 100% NULL.
+                See audit B10. Re-introduce when ingestion populates this field. */}
             <span style={{ flex: 1, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>SCORING DIST.</span>
             <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>AVG</span>
           </div>
@@ -233,7 +247,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div key={hole.holeNumber} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                   <span style={{ width: '28px', fontSize: '14px', fontWeight: 900, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
                   <span style={{ width: '28px', fontSize: '12px', color: '#64748B', flexShrink: 0 }}>{hole.par}</span>
-                  <span style={{ width: '44px', fontSize: '12px', color: '#94A3B8', flexShrink: 0 }}>{hole.yardage ?? '—'}</span>
+                  {/* yardage column dropped — see header comment */}
                   <div style={{ flex: 1, height: '6px', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
                     <div style={{ width: `${bPct}%`, background: '#F7931E' }} />
                     <div style={{ width: `${pPct}%`, background: 'rgba(15,23,42,0.08)' }} />
@@ -263,7 +277,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div key={hole.holeNumber} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                   <span style={{ width: '28px', fontSize: '14px', fontWeight: 900, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
                   <span style={{ width: '28px', fontSize: '12px', color: '#64748B', flexShrink: 0 }}>{hole.par}</span>
-                  <span style={{ width: '44px', fontSize: '12px', color: '#94A3B8', flexShrink: 0 }}>{hole.yardage ?? '—'}</span>
+                  {/* yardage column dropped — see header comment */}
                   <div style={{ flex: 1, height: '6px', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
                     <div style={{ width: `${bPct}%`, background: '#F7931E' }} />
                     <div style={{ width: `${pPct}%`, background: 'rgba(15,23,42,0.08)' }} />
