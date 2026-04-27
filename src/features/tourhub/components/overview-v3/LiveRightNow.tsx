@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { tournamentRoute } from '../../routes';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
 
@@ -44,7 +45,7 @@ const LiveEventRow: React.FC<{ tournament: LiveTournamentWithLeader; isLast: boo
 
   return (
     <div
-      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      onClick={() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); navigate(t.to, { state: t.state }); }}
       className="active:opacity-70 transition-opacity"
       style={{
         flexShrink: 0,
