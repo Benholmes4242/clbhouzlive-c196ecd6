@@ -592,101 +592,15 @@ export function PlayersTab() {
             </div>
 
             {/* ── NO.1 COVER STORY ── */}
-            <div
-              style={{
-                display: 'flex', alignItems: 'flex-start', gap: '14px',
-                marginBottom: '14px', paddingBottom: '14px',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-              }}
+            <HeroChampion
+              champion={champion}
+              runnerUp={top5[1] ?? null}
+              champStats={champStats}
+              champPhotoUrl={champPhotoUrl}
+              sort={sort}
+              activeTour={activeTour}
               onClick={() => navigate(`/tourhub/player/${champion.playerId}`)}
-              className="cursor-pointer active:opacity-80 transition-opacity"
-            >
-              {/* Large faded rank number */}
-              <div style={{ flexShrink: 0, width: '56px', paddingTop: '4px' }}>
-                <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', marginBottom: '2px' }}>NO.1</div>
-                <span style={{ fontSize: '52px', fontWeight: 900, color: 'rgba(247,147,30,0.15)', lineHeight: 1, letterSpacing: '-0.05em', display: 'block' }}>1</span>
-              </div>
-              {/* Player info */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
-                  <CountryFlag country={champion.country} size="sm" />
-                  <span style={{ fontSize: '10px', color: '#94A3B8' }}>{titleCaseCountry(champion.country)}</span>
-                </div>
-                <div style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '8px' }}>
-                  {champion.playerName}
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'baseline', flexWrap: 'wrap' as const }}>
-                  {/* Primary stat — depends on active sort */}
-                  {sort === 'fedex-points' ? (
-                    champStats?.points != null && champStats.points > 0 && (
-                      <div>
-                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                          {champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                        <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E' }}>pts</span>
-                      </div>
-                    )
-                  ) : sort === 'highest-earnings' ? (
-                    champStats?.earnings != null && champStats.earnings > 0 && (
-                      <div>
-                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                          {champStats.earnings >= 1_000_000
-                            ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
-                            : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
-                        </span>
-                        
-                      </div>
-                    )
-                  ) : sort === 'most-wins' ? (
-                    (champStats?.wins ?? 0) > 0 && (
-                      <div>
-                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                          {champStats!.wins}
-                        </span>
-                        <span style={{ fontSize: '10px', color: '#94A3B8', marginLeft: '3px' }}>
-                          {champStats!.wins === 1 ? 'win' : 'wins'}
-                        </span>
-                      </div>
-                    )
-                  ) : (
-                    (() => {
-                      const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
-                      const tourPts = champStats?.points != null && champStats.points > 0 && (sort !== 'world-rank-desc' && (sort !== 'alpha-az' && sort !== 'alpha-za' || isNonPgaTour))
-                        ? champStats.points
-                        : null;
-                      const owgrPts = champion.totalPoints ?? champion.avgPoints;
-                      const displayPts = tourPts ?? (isNonPgaTour ? null : owgrPts);
-                      const label = 'pts';
-                      return displayPts != null ? (
-                        <div>
-                          <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.03em' }}>
-                            {displayPts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
-                          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E' }}>{label}</span>
-                        </div>
-                      ) : null;
-                    })()
-                  )}
-                  {/* Secondary stats — only show earnings on most-wins tab */}
-                  {sort === 'most-wins' && champStats?.earnings != null && champStats.earnings > 0 && (
-                    <span style={{ fontSize: '12px', color: '#64748B' }}>
-                      {champStats.earnings >= 1_000_000
-                        ? `$${(champStats.earnings / 1_000_000).toFixed(1)}M`
-                        : `$${(champStats.earnings / 1_000).toFixed(0)}K`}
-                    </span>
-                  )}
-                </div>
-              </div>
-              {/* Headshot */}
-              <div style={{ width: '56px', height: '56px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
-                <img
-                  src={champPhotoUrl}
-                  alt={champion.playerName}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-                  onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                />
-              </div>
-            </div>
+            />
 
             {/* ── MOVERS GRID — #2–5 ── */}
             {runners.length > 0 && (
