@@ -1,9 +1,14 @@
 /**
  * Success Screen — Two variants: New Review (auto-shared) & Updated Review
  * Light theme #F8FAFC background with amber hero zone
+ *
+ * D31: Auto-share runs in the background (setTimeout in ReviewWizard).
+ * No skeleton, no opt-out UI — the success screen renders immediately.
+ * D34: handleOptOutShare/onOptOutShare/optedOut/onShareToClubhouse all removed.
+ * D35: Secondary CTA renamed to "Done" and wired to onDone.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Eye, Home, X, RotateCw, ArrowRight, Star } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -18,44 +23,10 @@ interface SuccessScreenProps {
   isEditMode?: boolean;
   previousRating?: number | null;
   postId?: string;
-  isAutoSharing?: boolean;
-  autoShareComplete?: boolean;
   onViewReview?: () => void;
   onViewPost?: () => void;
   onGoToClubhouse?: () => void;
   onDone: () => void;
-  onOptOutShare?: () => void;
-  onShareToClubhouse?: () => void;
-  isSharing?: boolean;
-}
-
-/* ---------- Loading skeleton shown while auto-share is in flight ---------- */
-function ShareLoadingSkeleton() {
-  return (
-    <div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center px-5"
-      style={{ background: '#F8FAFC' }}
-    >
-      <style>{`
-        @keyframes shimmer {
-          0% { background-position: -800px 0; }
-          100% { background-position: 800px 0; }
-        }
-        .skel {
-          background: linear-gradient(90deg, #e9eef4 25%, #f1f5f9 50%, #e9eef4 75%);
-          background-size: 800px 100%;
-          animation: shimmer 1.6s infinite linear;
-          border-radius: 12px;
-        }
-      `}</style>
-      <div className="skel" style={{ width: 80, height: 80, borderRadius: '50%', marginBottom: 24 }} />
-      <div className="skel" style={{ width: 120, height: 12, marginBottom: 10 }} />
-      <div className="skel" style={{ width: 200, height: 20, marginBottom: 12 }} />
-      <div className="skel" style={{ width: '80%', maxWidth: 300, height: 72, marginBottom: 24 }} />
-      <div className="skel" style={{ width: '100%', maxWidth: 340, height: 52, marginBottom: 10 }} />
-      <div className="skel" style={{ width: '100%', maxWidth: 340, height: 48 }} />
-    </div>
-  );
 }
 
 export function SuccessScreen({
@@ -66,42 +37,25 @@ export function SuccessScreen({
   isEditMode = false,
   previousRating,
   postId,
-  isAutoSharing = false,
-  autoShareComplete = false,
   onViewReview,
   onViewPost,
   onGoToClubhouse,
   onDone,
-  onOptOutShare,
-  onShareToClubhouse,
-  isSharing = false,
 }: SuccessScreenProps) {
   const tierData = rating ? getScoreTier(rating) : null;
-  const [optedOut, setOptedOut] = useState(false);
 
-  // Confetti on mount (after loading)
+  // Confetti on mount
   useEffect(() => {
-    if (isAutoSharing) return;
     confetti({
       particleCount: 60,
       spread: 60,
       origin: { y: 0.6 },
       colors: ['#F7931E', '#FBBC2E', '#ffffff', '#d97706'],
     });
-  }, [isAutoSharing]);
-
-  // Show loading skeleton while auto-sharing
-  if (isAutoSharing) {
-    return <ShareLoadingSkeleton />;
-  }
+  }, []);
 
   const courseName = course?.name || 'the course';
   const isNewReview = !isEditMode;
-
-  const handleOptOut = () => {
-    setOptedOut(true);
-    onOptOutShare?.();
-  };
 
   return (
     <motion.div
@@ -253,30 +207,24 @@ export function SuccessScreen({
                 )}
               </div>
 
-              {isNewReview && !optedOut && (
+              {isNewReview && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 10px' }}>
                   <Check className="w-3 h-3" style={{ color: '#16a34a' }} strokeWidth={3} />
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a' }}>Review saved</span>
-                </div>
-              )}
-
-              {isNewReview && optedOut && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 20, padding: '4px 10px' }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>Not shared</span>
                 </div>
               )}
             </div>
           )}
         </motion.div>
 
-        {isNewReview && !optedOut && (
+        {isNewReview && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.65 }}
             style={{ fontSize: 11, color: '#cbd5e1', marginTop: 8 }}
           >
-            Shared to your Clubhouse feed
+            Shared to your clbhouz feed
           </motion.p>
         )}
 
@@ -305,8 +253,9 @@ export function SuccessScreen({
           View my review →
         </button>
 
+        {/* D35: Secondary CTA — "Done" wired to onDone for both new and edit flows */}
         <button
-          onClick={isEditMode ? onDone : onGoToClubhouse}
+          onClick={onDone}
           className="active:scale-[0.98] transition-transform"
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -315,21 +264,8 @@ export function SuccessScreen({
           }}
         >
           <Home className="w-4 h-4" />
-          {isEditMode ? 'Back to Clbhouz' : 'Go to Clbhouz'}
+          Done
         </button>
-
-        {isNewReview && !optedOut && onOptOutShare && (
-          <button
-            onClick={handleOptOut}
-            style={{
-              fontSize: 11, color: '#d1d5db', textDecoration: 'underline', textUnderlineOffset: '3px',
-              cursor: 'pointer', textAlign: 'center', marginTop: 4,
-              background: 'none', border: 'none', width: '100%',
-            }}
-          >
-            Don't share to Clubhouse
-          </button>
-        )}
       </motion.div>
 
       <style>{`
