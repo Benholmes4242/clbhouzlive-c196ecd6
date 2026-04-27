@@ -31,6 +31,7 @@ import { toTitleCase } from '../hooks/useWorldRankings';
 import { getTourLogo } from '../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
+import { SectionHeader } from './shared/SectionHeader';
 
 // ─── Tokens ─────────────────────────────────────────────────────────────────
 const INK = '#0F172A';
