@@ -769,6 +769,8 @@ export function useReviewWizard({
       return next;
     });
   }, [state.coverMediaId, pendingFiles]);
+
+  // Retry failed upload (no-op in new system - handled by pipeline)
   const retryMedia = useCallback((id: string) => {
     console.log('[useReviewWizard] Retry not needed with unified pipeline - files upload on submit');
   }, []);
