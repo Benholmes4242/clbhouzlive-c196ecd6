@@ -7,6 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
+// NOTE: ArrowLeft remains used in the error branch (L144). P3 (orphan import) is
+// out of scope this loop and remains in the resume queue.
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
