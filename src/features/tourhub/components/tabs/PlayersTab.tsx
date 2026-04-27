@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
+import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
 import { useChampionStreak } from '../../hooks/useChampionStreak';
 import { useChampionRecentForm } from '../../hooks/useChampionRecentForm';
@@ -613,6 +614,11 @@ export function PlayersTab() {
 
   const displayRows = rows.slice(0, visibleCount);
   const hasMore = visibleCount < totalCount;
+
+  // Recent results — batched 4-week query for ALL sortable rows (not just visible).
+  // This ensures stable cache across load-more and tab switches with the same player set.
+  const sortedPlayerIds = useMemo(() => rows.map(r => r.id), [rows]);
+  const { data: recentResultsMap } = useRecentPlayerResults(sortedPlayerIds);
 
   // Auto-load more players when sentinel scrolls into view
   useEffect(() => {
