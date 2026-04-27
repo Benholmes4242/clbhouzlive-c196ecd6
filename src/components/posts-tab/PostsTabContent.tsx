@@ -10,9 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { HybridPostsFeed } from './HybridPostsFeed';
-import { PostsAutoplay } from './PostsAutoplay';
-import { BusinessFriendsStyleFeed } from './BusinessFriendsStyleFeed';
+import { ProfilePostsFeed } from './ProfilePostsFeed';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
@@ -37,17 +35,13 @@ interface PostsTabContentProps {
 const PostsTabContent: React.FC<PostsTabContentProps> = ({
   actorType,
   actorId,
-  actorName,
   isOwnProfile = false,
-  hideReviewsCount = false,
 }) => {
   const { user } = useSupabaseSession();
-  const gridRef = React.useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<PostsFilter>('all');
 
   const {
     posts,
-    postCounts,
     isLoading,
     isError,
     hasNextPage,
@@ -114,36 +108,17 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         </div>
       )}
 
-      {actorType === 'business' ? (
-        <BusinessFriendsStyleFeed
-          posts={filteredPosts}
-          userId={user?.id}
-          isLoading={isLoading}
-          isError={isError}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          fetchNextPage={fetchNextPage}
-          refetch={refetch}
-          isOwnProfile={isOwnProfile}
-        />
-      ) : (
-        <>
-          <HybridPostsFeed
-            posts={filteredPosts}
-            userId={user?.id}
-            isLoading={isLoading}
-            isError={isError}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            fetchNextPage={fetchNextPage}
-            refetch={refetch}
-            isOwnProfile={isOwnProfile}
-            actorName={actorName}
-            gridRef={gridRef}
-          />
-          <PostsAutoplay posts={filteredPosts} gridRef={gridRef} />
-        </>
-      )}
+      <ProfilePostsFeed
+        posts={filteredPosts}
+        userId={user?.id}
+        isLoading={isLoading}
+        isError={isError}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+        refetch={refetch}
+        isOwnProfile={isOwnProfile}
+      />
     </div>
   );
 };
