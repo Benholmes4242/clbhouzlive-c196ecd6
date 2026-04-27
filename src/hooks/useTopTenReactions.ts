@@ -11,6 +11,24 @@ export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: strin
   want_to_play: { emoji: '⛳', label: 'On my list' },
 };
 
+export interface TopTenReactor {
+  id: string;
+  reactor_id: string;
+  reaction_type: ReactionType;
+  display_name: string;
+  username: string;
+  avatar: string | null;
+}
+
+const mapReactor = (r: any): TopTenReactor => ({
+  id: r.id,
+  reactor_id: r.reactor_id,
+  reaction_type: r.reaction_type as ReactionType,
+  display_name: r.user_profiles?.display_name ?? 'Golfer',
+  username: r.user_profiles?.username ?? '',
+  avatar: r.user_profiles?.profile_photo_url ?? null,
+});
+
 export function useTopTenReactions(targetUserId: string, courseId: string) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
@@ -22,7 +40,16 @@ export function useTopTenReactions(targetUserId: string, courseId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('top_ten_reactions')
-        .select('id, reactor_id, reaction_type')
+        .select(`
+          id,
+          reactor_id,
+          reaction_type,
+          user_profiles!top_ten_reactions_reactor_id_profiles_fkey (
+            display_name,
+            username,
+            profile_photo_url
+          )
+        `)
         .eq('target_user_id', targetUserId)
         .eq('course_id', courseId);
       if (error) throw error;
@@ -31,13 +58,15 @@ export function useTopTenReactions(targetUserId: string, courseId: string) {
     staleTime: 30_000,
   });
 
-  const counts = (data ?? []).reduce<Record<string, number>>((acc, r) => {
+  const reactors: TopTenReactor[] = (data ?? []).map(mapReactor);
+
+  const counts = (data ?? []).reduce<Record<string, number>>((acc, r: any) => {
     acc[r.reaction_type] = (acc[r.reaction_type] ?? 0) + 1;
     return acc;
   }, {});
 
   const myReaction = user
-    ? (data ?? []).find(r => r.reactor_id === user.id)?.reaction_type as ReactionType | undefined
+    ? ((data ?? []).find((r: any) => r.reactor_id === user.id)?.reaction_type as ReactionType | undefined)
     : undefined;
 
   const toggleReaction = useMutation({
@@ -63,5 +92,5 @@ export function useTopTenReactions(targetUserId: string, courseId: string) {
     },
   });
 
-  return { counts, myReaction, toggleReaction: toggleReaction.mutate, isLoading };
+  return { reactors, counts, myReaction, toggleReaction: toggleReaction.mutate, isLoading };
 }
