@@ -16,8 +16,9 @@
  * Data caveats handled:
  *   - world_ranking === 0 is treated as NULL (stale Sportradar default)
  *   - Cross-tour rankings unavailable → LPGA/DPWT alumni surface as Rising
- *     unless they're in LEGACY_ALUMNI_IDS
- *   - career_major_wins column doesn't exist → Legacy is editorial allow-list
+ *     unless they're in the legacy_alumni table
+ *   - career_major_wins column doesn't exist → Legacy is editorially curated
+ *     in public.legacy_alumni (queried via useLegacyAlumni)
  */
 
 import { useState, useMemo } from 'react';
