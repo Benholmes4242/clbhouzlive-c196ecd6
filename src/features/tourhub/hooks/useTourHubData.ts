@@ -52,6 +52,28 @@ export interface TourTournament {
   tour_full_name: string | null;
   /** Winner's finishing score (for completed tournaments) */
   winner_score?: number | string | null;
+  /**
+   * Live-state fields populated by tournament-live-sync during inprogress
+   * (some persist on closed events too — see the Phase 1 audit notes for the
+   * coverage caveats).
+   */
+  current_round?: number | null;
+  cutline?: number | null;
+  projected_cutline?: number | null;
+  /**
+   * NOTE: winner_id stores the player's sr_id (Sportradar UUID), NOT
+   * sr_players.id. To resolve a player from this column you must join via
+   * sr_players.sr_id. In practice we derive the winner from the leaderboard
+   * (position === 1) instead — see SummaryTab/WinnerCard. Kept in the type
+   * for completeness; do not consume directly.
+   */
+  winner_id?: string | null;
+  /**
+   * Champion narrative — populated by the prediction pipeline (despite the
+   * name, this is forward-looking, not retrospective). Not consumed in
+   * Phase 1.
+   */
+  champion_narrative?: string | null;
 }
 
 export interface TourPlayer {
