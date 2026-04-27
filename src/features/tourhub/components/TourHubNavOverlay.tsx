@@ -151,7 +151,9 @@ export function TourHubNavOverlay({
   const { data: liveCount } = useLiveTournamentCount();
   const { data: leaderTeaser } = useLiveLeaderTeaser();
   const { data: topCollege } = useTopCollegeTeaser();
-  
+  const { data: moneyLeader } = useMoneyListLeader();
+  const { data: upcomingTournaments } = useUpcomingTournaments(1);
+
   // BottomSheet handles scroll lock and ESC key
 
   useEffect(() => {
@@ -205,95 +207,159 @@ export function TourHubNavOverlay({
 
 
   const displayPlayers = topPlayers?.slice(0, 5) || [];
+  const worldNo1 = displayPlayers[0] ?? null;
+  const nextTournament = upcomingTournaments?.[0] ?? null;
 
-  const scheduleSubtitle = hasLive
-    ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
-    : "What's happening - past, present, and upcoming.";
+  // Schedule teaser state derivation
+  const scheduleTeaserState = (() => {
+    if (hasLive && leaderTeaser) {
+      const liveCopy = (liveCount ?? 0) > 1
+        ? `${liveCount} tournaments`
+        : leaderTeaser.tournamentName;
+      return { kind: 'live' as const, copy: liveCopy };
+    }
+    if (nextTournament) {
+      const start = new Date(nextTournament.startDate);
+      const diffDays = Math.floor((start.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      if (diffDays >= 0 && diffDays <= 7) {
+        return { kind: 'this-week' as const, copy: nextTournament.name };
+      }
+      return {
+        kind: 'next' as const,
+        copy: `${nextTournament.name} · ${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+      };
+    }
+    return null;
+  })();
 
   const getAriaLabel = (item: NavItem) => {
     switch (item.value) {
       case 'overview': return 'Overview — The global golf season at a glance';
-      case 'schedule': return hasLive ? `Schedule — ${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now` : 'Schedule - What\'s happening past, present, and upcoming';
+      case 'schedule': return 'Schedule — Past, present, and the road ahead';
       case 'players': return 'Players — The names shaping the season';
-      case 'leaderboards': return 'Performance Rankings — Statistical leaders across every category';
+      case 'leaderboards': return 'Stat Watch — Every stat, every category, every tour';
       default: return item.label;
     }
   };
 
   const renderTeaser = (item: NavItem) => {
-    if (item.value === 'overview' && hasLive && !leaderTeaser) {
-      return (
-        <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ height: 12, width: '75%', borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} className="animate-pulse" />
-          <div style={{ height: 12, width: '50%', borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} className="animate-pulse" />
-        </div>
-      );
-    }
-    if (item.value === 'overview' && leaderTeaser && hasLive) {
-      const scoreStr = leaderTeaser.score !== null
-        ? (leaderTeaser.score < 0 ? `${leaderTeaser.score}` : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
-        : null;
-      return (
-        <p style={{ fontSize: 11, marginTop: 2, color: '#64748b' }}>
-          {leaderTeaser.isTied ? (
-            <span style={{ fontWeight: 500 }}>{leaderTeaser.playerName}</span>
-          ) : (
-            <button
-              type="button"
-              style={{ fontWeight: 500, color: '#0f172a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-              className="transition-opacity active:opacity-70 focus:outline-none"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (leaderTeaser.playerId) handlePlayerClick(leaderTeaser.playerId);
-              }}
-            >
-              {leaderTeaser.playerName}
-            </button>
-          )}
-          {leaderTeaser.isTied ? ' at ' : ' leads at '}
-          {scoreStr !== null && (
-            <span style={{ color: leaderTeaser.score !== null && leaderTeaser.score < 0 ? TOUR_COLORS.scoreUnderPar : undefined }}>
-              {scoreStr}
-            </span>
-          )}
-          <br />
-          <button
-            type="button"
-            style={{ color: '#0f172a', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
-            className="truncate transition-opacity active:opacity-70 focus:outline-none"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (leaderTeaser.tournamentId) {
-                haptic('light');
-                onClose();
-                navigate(`/tourhub/tournament/${leaderTeaser.tournamentId}`);
-                window.scrollTo({ top: 0, behavior: 'instant' });
-              }
-            }}
+    // Overview — live state when a leader is known, else countdown to next event
+    if (item.value === 'overview') {
+      if (hasLive && leaderTeaser) {
+        const scoreStr = leaderTeaser.score !== null
+          ? (leaderTeaser.score < 0
+              ? `${leaderTeaser.score}`
+              : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
+          : '';
+        const isUnderPar = leaderTeaser.score !== null && leaderTeaser.score < 0;
+        return (
+          <MenuRowTeaser
+            leadingElement={
+              <motion.span
+                style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#22C55E', display: 'inline-block', flexShrink: 0,
+                }}
+                animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            }
+            label="LIVE"
+            labelColor="#16A34A"
           >
-            {leaderTeaser.tournamentName}
-          </button>
-        </p>
-      );
+            {leaderTeaser.tournamentName} ·{' '}
+            <span style={{ fontWeight: 800 }}>
+              {leaderTeaser.playerName}
+              {scoreStr && (
+                <>
+                  {' '}
+                  <span style={{ color: isUnderPar ? TOUR_COLORS.scoreUnderPar : '#334155' }}>
+                    {scoreStr}
+                  </span>
+                </>
+              )}
+            </span>
+          </MenuRowTeaser>
+        );
+      }
+      if (nextTournament) {
+        const countdown = formatCountdown(nextTournament.startDate);
+        return (
+          <MenuRowTeaser
+            leadingElement={
+              <span
+                style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#22C55E', display: 'inline-block', flexShrink: 0,
+                }}
+              />
+            }
+          >
+            {nextTournament.name}{countdown ? ` · Tees off in ${countdown}` : ''}
+          </MenuRowTeaser>
+        );
+      }
+      return null;
     }
-    return null;
-  };
 
-  const renderBadge = (item: NavItem) => {
-    if (item.value === 'schedule' && hasLive) {
+    // Schedule — adapts to live / this-week / next
+    if (item.value === 'schedule' && scheduleTeaserState) {
+      if (scheduleTeaserState.kind === 'live') {
+        return (
+          <MenuRowTeaser label="LIVE:" labelColor="#16A34A">
+            {scheduleTeaserState.copy}
+          </MenuRowTeaser>
+        );
+      }
+      if (scheduleTeaserState.kind === 'this-week') {
+        return (
+          <MenuRowTeaser label="This week:">
+            {scheduleTeaserState.copy}
+          </MenuRowTeaser>
+        );
+      }
       return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <motion.span
-            style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', display: 'inline-block' }}
-            animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-          <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22C55E' }}>
-            {liveCount} LIVE
-          </span>
-        </div>
+        <MenuRowTeaser label="Next:">
+          {scheduleTeaserState.copy}
+        </MenuRowTeaser>
       );
     }
+
+    // Players — World #1 with small headshot
+    if (item.value === 'players' && worldNo1) {
+      const headshot = getPlayerHeadshotUrl(
+        worldNo1.playerName,
+        (worldNo1 as any).tourCode ?? 'pga',
+      );
+      return (
+        <MenuRowTeaser
+          leadingElement={
+            <img
+              src={headshot || PLAYER_SILHOUETTE_URL}
+              alt=""
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              style={{
+                width: 16, height: 16, borderRadius: 5,
+                objectFit: 'cover', flexShrink: 0,
+                border: '0.5px solid rgba(0,0,0,0.08)',
+              }}
+            />
+          }
+        >
+          {worldNo1.playerName} · World #1
+        </MenuRowTeaser>
+      );
+    }
+
+    // Stat Watch — Money List leader
+    if (item.value === 'leaderboards' && moneyLeader) {
+      return (
+        <MenuRowTeaser label="Money List:" labelColor="#C97A10">
+          {moneyLeader.name} · {formatCurrency(moneyLeader.earnings)}
+        </MenuRowTeaser>
+      );
+    }
+
     return null;
   };
 
