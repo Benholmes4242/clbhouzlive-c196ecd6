@@ -23,6 +23,7 @@ import {
   LEADER_CATEGORIES,
   type LeaderCategory,
 } from '../components/leaders/constants';
+import { formatStatMarginGap } from '../utils/formatStatMargin';
 
 export interface GamifiedPlayer {
   playerId: string;
@@ -53,24 +54,24 @@ function lastNameOf(name: string): string {
   return parts[parts.length - 1] || name;
 }
 
+/**
+ * Sign-less margin display for StatOfTheWeek copy
+ * ("leads the field by {marginDisplay}").
+ *
+ * Delegates to the shared formatStatMarginGap util (with appendUnit=false)
+ * so per-stat precision lives in one place AND the legacy unit-less output
+ * is preserved byte-identically. Verified cases:
+ *   - earnings:              "$1.20M" / "$200K" / "$500"
+ *   - putt_avg/scoring_avg:  "0.123"
+ *   - strokes_gained_total:  "0.42"
+ *   - drive_avg (yds):       "1.5 yds"
+ *   - drive_acc/gir/etc (%): "1.5%"
+ *   - events/cuts/top_10:    "2"
+ *   - generic:               "1.23"
+ *   - generic:               "1.23"
+ */
 function formatMarginValue(category: LeaderCategory, margin: number): string {
-  // Reuse the category formatter for consistency, with a few units that
-  // need tweaks (margins are deltas, not absolute values).
-  if (category.key === 'earnings') {
-    if (margin >= 1_000_000) return `$${(margin / 1_000_000).toFixed(2)}M`;
-    if (margin >= 1_000) return `$${(margin / 1_000).toFixed(0)}K`;
-    return `$${Math.round(margin).toLocaleString()}`;
-  }
-  if (category.unit === 'yds') return `${margin.toFixed(1)} yds`;
-  if (category.unit === '%') return `${margin.toFixed(1)}%`;
-  if (category.key === 'putt_avg' || category.key === 'scoring_avg') {
-    return `${margin.toFixed(3)}`;
-  }
-  if (category.key === 'strokes_gained_total') return margin.toFixed(2);
-  if (category.unit === 'events' || category.unit === 'cuts' || category.key === 'top_10') {
-    return `${Math.round(margin)}`;
-  }
-  return margin.toFixed(2);
+  return formatStatMarginGap(margin, category.unit, category.key, undefined, false);
 }
 
 export function useGamifiedLeaderboards() {

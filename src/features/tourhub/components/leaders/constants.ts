@@ -1,7 +1,11 @@
 /**
- * Leaders tab category definitions.
- * Single source of truth for all 12 stat categories.
+ * Stat Watch category definitions.
+ * Single source of truth for all 14 stat categories.
  * Includes descriptions, tour averages, and accent colors for the immersive hero.
+ *
+ * tour averages are editorial Sportradar season snapshots — read directly,
+ * don't compute arithmetic mean from current player set (tail players skew it).
+ * Update annually or after major season shifts.
  */
 
 import {

@@ -23,6 +23,7 @@ import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersMasthead, type MastheadPill } from '../leaders/LeadersMasthead';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
+import { formatStatMargin, formatStatMarginGap } from '../../utils/formatStatMargin';
 
 interface RankedItem {
   player: {
@@ -284,35 +285,33 @@ export function LeadersTab() {
   );
   const { data: recentForm } = useChampionRecentForm(leader?.playerId, 8);
 
-  // ─── Build hero narrative pills (Phase 1: Margin + Streak + Recent Form) ───
-  // vs Avg pill is Phase 2; lower-is-better Margin is Phase 2 (omits in Phase 1).
+  // ─── Build hero narrative pills (Phase 2: Margin → Streak → vs Avg → Recent Form) ───
+  // - Margin uses the shared formatStatMargin util — handles higher-better,
+  //   lower-better (with U+2212), and tied uniformly. Phase 2 unlocks Margin
+  //   pills for putt_avg/scoring_avg for the first time.
+  // - vs Avg renders only when category.tourAverageNumeric !== null. Always
+  //   slate normal variant (editorial context, not a dominance moment).
   const heroPills = useMemo<MastheadPill[]>(() => {
     const out: MastheadPill[] = [];
     if (!leader) return out;
 
-    // Margin pill — Phase 1 ships higher-is-better only.
-    if (runnerUp && category.higherIsBetter) {
-      const gap = leader.value - runnerUp.value;
-      if (gap > 0) {
-        // Format gap using category's own formatter for consistency, drop unit
-        // when format() already includes it (e.g. earnings "$1.2M").
-        const fmtGap = category.format(gap);
-        const unit = category.unit && !fmtGap.includes(category.unit) ? ` ${category.unit}` : '';
-        out.push({
-          variant: 'highlight',
-          label: 'Margin:',
-          value: `+${fmtGap}${unit}`,
-        });
-      } else if (gap === 0) {
-        out.push({
-          variant: 'normal',
-          label: 'Margin:',
-          value: 'tied with #2',
-        });
-      }
+    // 1. Margin pill — stat-aware, handles all three branches.
+    if (runnerUp) {
+      const margin = formatStatMargin({
+        leaderValue: leader.value,
+        runnerValue: runnerUp.value,
+        unit: category.unit,
+        higherIsBetter: category.higherIsBetter,
+        categoryKey: category.key,
+      });
+      out.push({
+        variant: margin.variant,
+        label: 'Margin:',
+        value: margin.copy,
+      });
     }
 
-    // Streak pill — World Rankings only.
+    // 2. Streak pill — World Rankings only.
     if (category.showStreak && streakWeeks && streakWeeks >= 2) {
       out.push({
         variant: 'highlight',
@@ -321,7 +320,33 @@ export function LeadersTab() {
       });
     }
 
-    // Recent Form pill — when leader has played ≥3 events in last 8 weeks.
+    // 3. vs Avg pill — render whenever a numeric tour average exists.
+    //    Always slate normal variant regardless of direction. Edge case
+    //    "at avg" prevents "+0"/"−0" from rendering as a fake margin.
+    if (category.tourAverageNumeric !== null) {
+      const tourAvg = category.tourAverageNumeric;
+      const diff = leader.value - tourAvg;
+      let value: string;
+      if (diff === 0) {
+        value = 'at avg';
+      } else {
+        const absDiff = Math.abs(diff);
+        const formatted = formatStatMarginGap(absDiff, category.unit, category.key);
+        // Higher-better: positive diff = above avg (good) → '+'.
+        //                negative diff = below avg (rare/bad) → U+2212.
+        // Lower-better:  negative diff = below avg (good)    → U+2212.
+        //                positive diff = above avg (rare/bad) → '+'.
+        const sign = diff > 0 ? '+' : '\u2212';
+        value = `${sign}${formatted}`;
+      }
+      out.push({
+        variant: 'normal',
+        label: 'vs avg:',
+        value,
+      });
+    }
+
+    // 4. Recent Form pill — when leader has played ≥3 events in last 8 weeks.
     if (recentForm && recentForm.starts >= 3) {
       let value: string | null = null;
       if (recentForm.wins > 0) {
