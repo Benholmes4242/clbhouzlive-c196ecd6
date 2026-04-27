@@ -435,7 +435,6 @@ const ProfilePageV2Content: React.FC = () => {
           <PostsTabContent
             actorType="personal"
             actorId={profile?.id || ''}
-            actorName={displayName}
             isOwnProfile={isSelf}
           />
         );

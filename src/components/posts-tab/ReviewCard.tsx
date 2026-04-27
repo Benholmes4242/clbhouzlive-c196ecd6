@@ -9,9 +9,6 @@ interface ReviewCardProps {
   postIndex?: number;
   isOwnPost?: boolean;
   onDelete?: () => void;
-  likeState?: { isLiked: boolean; count: number };
-  onLike?: () => void;
-  onComment?: () => void;
 }
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({
