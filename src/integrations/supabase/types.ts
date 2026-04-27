@@ -2142,6 +2142,7 @@ export type Database = {
         Row: {
           college_a: string
           college_b: string
+          context_label: string | null
           created_at: string
           id: string
           weight: number
@@ -2149,6 +2150,7 @@ export type Database = {
         Insert: {
           college_a: string
           college_b: string
+          context_label?: string | null
           created_at?: string
           id?: string
           weight?: number
@@ -2156,6 +2158,7 @@ export type Database = {
         Update: {
           college_a?: string
           college_b?: string
+          context_label?: string | null
           created_at?: string
           id?: string
           weight?: number
@@ -6145,6 +6148,32 @@ export type Database = {
           surface?: string
         }
         Relationships: []
+      }
+      legacy_alumni: {
+        Row: {
+          context_label: string
+          created_at: string
+          player_id: string
+        }
+        Insert: {
+          context_label: string
+          created_at?: string
+          player_id: string
+        }
+        Update: {
+          context_label?: string
+          created_at?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legacy_alumni_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       logos: {
         Row: {
