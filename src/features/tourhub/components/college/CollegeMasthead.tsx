@@ -111,7 +111,7 @@ function buildPills(args: {
     if (moversContext.biggestJump) {
       pills.push({
         variant: 'normal',
-        value: `${moversContext.biggestJump.displayName} +${formatCompactUSD(moversContext.biggestJump.earningsDelta).replace('$', '$')} · biggest jump`,
+        value: `${moversContext.biggestJump.displayName} +${formatCompactUSD(moversContext.biggestJump.earningsDelta)} · biggest jump`,
       });
     }
     if (moversContext.biggestRankMove && moversContext.biggestRankMove.rankDelta > 0) {
