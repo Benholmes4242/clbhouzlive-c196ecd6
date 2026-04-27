@@ -72,7 +72,6 @@ export function PlayersTab() {
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
-  const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
   // Pull-to-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -150,12 +149,17 @@ export function PlayersTab() {
   }, [debouncedSearch, sort]);
 
 
-  // Build world rank & stats lookup from elite players
+  // Build world rank & stats lookup from elite players (includes weekly rank change)
   const rankMap = useMemo(() => {
-    const map = new Map<string, { worldRank: number; avgPoints: number | null; totalPoints: number | null }>();
+    const map = new Map<string, { worldRank: number; avgPoints: number | null; totalPoints: number | null; rankChange: number | null }>();
     if (elitePlayers) {
       elitePlayers.forEach(ep => {
-        map.set(ep.playerId, { worldRank: ep.worldRank, avgPoints: ep.avgPoints, totalPoints: ep.totalPoints });
+        map.set(ep.playerId, {
+          worldRank: ep.worldRank,
+          avgPoints: ep.avgPoints,
+          totalPoints: ep.totalPoints,
+          rankChange: ep.rankChange,
+        });
       });
     }
     return map;
