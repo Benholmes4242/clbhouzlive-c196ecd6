@@ -211,9 +211,8 @@ export function RateStep({
     });
   }, [breakdowns]);
 
-  const handleOverallChange = useCallback((val: number) => {
-    onRatingChange(val);
-  }, [onRatingChange]);
+  // Note: overall verdict is derived from breakdowns (D28); no direct edit handler.
+  void onRatingChange; // retained in props for API compatibility
 
   const handleBreakdownChange = useCallback((key: keyof ReviewBreakdowns, val: number) => {
     setTouchedFields(prev => ({ ...prev, [key]: true }));
