@@ -284,37 +284,22 @@ export function ComingUpCalendar() {
 
   return (
     <div style={{ padding: '0 16px' }}>
-      {/* Section header — preserved untouched */}
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-              <div style={{ width: 3, height: 14, background: AMBER, borderRadius: 1, flexShrink: 0 }} />
-              <span style={{
-                fontSize: 9, fontWeight: 900, color: AMBER,
-                letterSpacing: '0.16em', textTransform: 'uppercase',
-              }}>
-                Coming Up
-              </span>
-            </div>
-            <h2 style={{
-              fontSize: 20, fontWeight: 900, color: INK,
-              letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05,
-            }}>
-              Tournament Calendar
-            </h2>
-          </div>
+      {/* Section header — shared SectionHeader component */}
+      <SectionHeader
+        eyebrow="Coming Up"
+        title="Tournament Calendar"
+        action={
           <button
             onClick={() => navigate('/tourhub?tab=schedule')}
             className="flex items-center gap-0.5 transition-all active:scale-95 text-muted-foreground"
-            style={{ fontSize: 12, fontWeight: 600, minHeight: 44, marginTop: 2 }}
+            style={{ fontSize: 12, fontWeight: 600, minHeight: 44 }}
             aria-label="View full tournament schedule"
           >
             View All
             <ChevronRight style={{ width: 13, height: 13 }} />
           </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Week groups — directly on page background (no card wrapper) */}
       {weekGroups.map((group) => (
