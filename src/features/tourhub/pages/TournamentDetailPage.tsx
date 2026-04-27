@@ -233,6 +233,23 @@ export function TournamentDetailPage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
+        if (isLive) {
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LiveOverviewTab
+                tournament={tournament}
+                leaderboard={leaderboard}
+                courseImage={courseMatch?.imageUrl}
+                courseId={courseMatch?.golfCourseId}
+                onViewLeaderboard={() => handleTabChange('leaderboard')}
+              />
+            </motion.div>
+          );
+        }
         return (
           <motion.div 
             initial={{ opacity: 0 }}
@@ -259,7 +276,6 @@ export function TournamentDetailPage() {
             
             <TournamentInfoGrid
               tournament={tournament}
-              fieldSize={leaderboard?.length}
             />
           </motion.div>
         );
