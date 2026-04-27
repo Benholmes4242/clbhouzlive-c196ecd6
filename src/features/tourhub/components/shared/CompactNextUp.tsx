@@ -23,7 +23,6 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
       onClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
       className="active:scale-[0.99] transition-transform"
       style={{
-        width: '100%',
         display: 'flex',
         alignItems: 'center',
         gap: 8,
