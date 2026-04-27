@@ -1,21 +1,30 @@
 import React from 'react';
-import { MoreHorizontal, Bookmark, Link2, Share2, EyeOff, Flag } from 'lucide-react';
+import { MoreHorizontal, Bookmark, Link2, Share2, EyeOff, Flag, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-interface FriendsCardMenuProps {
+interface LoopCardMenuProps {
   postId: string;
   userId?: string;
   onShare: () => void;
+  isOwnPost?: boolean;
+  onDelete?: () => void;
 }
 
-export const FriendsCardMenu = React.memo(function FriendsCardMenu({ postId, userId, onShare }: FriendsCardMenuProps) {
+export const LoopCardMenu = React.memo(function LoopCardMenu({
+  postId,
+  userId,
+  onShare,
+  isOwnPost = false,
+  onDelete,
+}: LoopCardMenuProps) {
   const handleCopyLink = async () => {
     const url = `${window.location.origin}/post/${postId}`;
     await navigator.clipboard.writeText(url);
@@ -29,7 +38,7 @@ export const FriendsCardMenu = React.memo(function FriendsCardMenu({ postId, use
       user_id: userId,
     });
     if (error) {
-      if (import.meta.env.DEV) console.error('[FriendsCardMenu] Dismiss failed:', error);
+      if (import.meta.env.DEV) console.error('[LoopCardMenu] Dismiss failed:', error);
     } else {
       toast.success("We'll show you less like this");
     }
@@ -42,7 +51,7 @@ export const FriendsCardMenu = React.memo(function FriendsCardMenu({ postId, use
       reporter_id: userId,
     });
     if (error) {
-      if (import.meta.env.DEV) console.error('[FriendsCardMenu] Report failed:', error);
+      if (import.meta.env.DEV) console.error('[LoopCardMenu] Report failed:', error);
     } else {
       toast.success('Report submitted');
     }
@@ -50,6 +59,11 @@ export const FriendsCardMenu = React.memo(function FriendsCardMenu({ postId, use
 
   const handleSave = () => {
     toast.success('Saved');
+  };
+
+  const handleDelete = () => {
+    if (!onDelete) return;
+    if (window.confirm('Delete this post?')) onDelete();
   };
 
   return (
@@ -75,14 +89,32 @@ export const FriendsCardMenu = React.memo(function FriendsCardMenu({ postId, use
           <Share2 className="h-4 w-4" />
           Share
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleNotInterested} className="gap-2 text-sm">
-          <EyeOff className="h-4 w-4" />
-          Not Interested
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleReport} className="gap-2 text-sm text-destructive focus:text-destructive">
-          <Flag className="h-4 w-4" />
-          Report
-        </DropdownMenuItem>
+        {isOwnPost && onDelete ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleDelete}
+              className="gap-2 text-sm text-destructive focus:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            <DropdownMenuItem onClick={handleNotInterested} className="gap-2 text-sm">
+              <EyeOff className="h-4 w-4" />
+              Not Interested
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleReport}
+              className="gap-2 text-sm text-destructive focus:text-destructive"
+            >
+              <Flag className="h-4 w-4" />
+              Report
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -9,7 +9,7 @@ import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/uti
 import { toast } from 'sonner';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { FriendsCardMenu } from '@/components/friends-tab/FriendsCardMenu';
+import { LoopCardMenu } from './LoopCardMenu';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 import { useQueryClient } from '@tanstack/react-query';
@@ -24,6 +24,10 @@ interface LoopCardProps {
   isFetchingNextPage?: boolean;
   activity?: FriendCourseActivity;
   showNudge?: boolean;
+  isOwnPost?: boolean;
+  onDelete?: () => void;
+  /** When false, suppress friend chips, network rating, played pill, review nudge (used on own profile feeds). */
+  showActivitySignals?: boolean;
 }
 
 function formatCompact(n: number): string {
@@ -60,6 +64,9 @@ export const LoopCard = React.memo(function LoopCard({
   isFetchingNextPage,
   activity,
   showNudge = false,
+  isOwnPost = false,
+  onDelete,
+  showActivitySignals = true,
 }: LoopCardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -163,10 +170,11 @@ export const LoopCard = React.memo(function LoopCard({
     return `${firstName(topFriendNames[0])} + ${friendPlayedCount - 1} friends played here`;
   }, [friendPlayedCount, topFriendNames]);
 
-  const showFriendChip = friendPlayedCount > 0;
-  const showNetworkRating = networkRatingAvg != null && networkRatingCount >= 2;
-  const showPlayedPill = selfHasPlayed && !!courseId;
+  const showFriendChip = showActivitySignals && friendPlayedCount > 0;
+  const showNetworkRating = showActivitySignals && networkRatingAvg != null && networkRatingCount >= 2;
+  const showPlayedPill = showActivitySignals && selfHasPlayed && !!courseId;
   const showReviewNudge =
+    showActivitySignals &&
     showNudge &&
     !nudgeDismissedLocal &&
     selfHasPlayed &&
@@ -323,10 +331,12 @@ export const LoopCard = React.memo(function LoopCard({
             )}
           </button>
           {/* 3-dot menu */}
-          <FriendsCardMenu
+          <LoopCardMenu
             postId={post.id}
             userId={userId}
             onShare={handleShare}
+            isOwnPost={isOwnPost}
+            onDelete={onDelete}
           />
         </div>
 

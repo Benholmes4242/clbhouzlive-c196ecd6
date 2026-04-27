@@ -1,14 +1,14 @@
 import { Search } from 'lucide-react';
-import type { FriendsMode } from '@/components/friends-tab/hooks/useFriendsFeed';
+import type { LoopMode } from './types';
 
-const MODES: { id: FriendsMode; label: string }[] = [
+const MODES: { id: LoopMode; label: string }[] = [
   { id: 'latest', label: 'Latest' },
   { id: 'popular', label: 'Popular' },
 ];
 
 interface LoopHeaderProps {
-  activeMode: FriendsMode;
-  onModeChange: (mode: FriendsMode) => void;
+  activeMode: LoopMode;
+  onModeChange: (mode: LoopMode) => void;
   onOpenSearch: () => void;
   embedded?: boolean;
 }
