@@ -169,7 +169,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, paddingRight: '8px' }}>
               {a1 ? (
                 <Link
-                  to={`/tourhub/player/${a1.id}`}
+                  {...playerRoute(a1.id, a1.college ? { kind: 'college', collegeName: a1.college } : undefined)}
                   style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, textDecoration: 'none', flex: 1 }}
                   className="active:opacity-70 transition-opacity"
                 >
@@ -202,7 +202,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, paddingLeft: '8px' }}>
               {a2 ? (
                 <Link
-                  to={`/tourhub/player/${a2.id}`}
+                  {...playerRoute(a2.id, a2.college ? { kind: 'college', collegeName: a2.college } : undefined)}
                   style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, textDecoration: 'none', flex: 1 }}
                   className="active:opacity-70 transition-opacity"
                 >
