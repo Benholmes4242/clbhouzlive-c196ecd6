@@ -83,11 +83,18 @@ export function ScheduleTab() {
   const [searchInput, setSearchInput] = useState('');
   const [isTabsSticky, setIsTabsSticky] = useState(false);
   const stickysentinelRef = useRef<HTMLDivElement>(null);
+  const thisWeekAnchorRef = useRef<HTMLDivElement>(null);
+  const [isThisWeekVisible, setIsThisWeekVisible] = useState(true);
+  const hasAutoScrolledAllTab = useRef(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
-  
+
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
+
+  // Current week — computed once per render, used for THIS WEEK anchor + Today pill
+  const currentWeek = useMemo(() => getCurrentWeek(), []);
+  const currentMonthKey = useMemo(() => getCurrentMonthKey(), []);
 
   // Scroll to top on mount — always start at top
   useEffect(() => {
@@ -110,6 +117,21 @@ export function ScheduleTab() {
     return () => observer.disconnect();
   }, []);
 
+  // Track THIS WEEK anchor visibility for sticky Today pill
+  useEffect(() => {
+    const el = thisWeekAnchorRef.current;
+    if (!el) {
+      setIsThisWeekVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsThisWeekVisible(entry.isIntersecting),
+      { threshold: 0, rootMargin: '-80px 0px 0px 0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [filter]);
+
   // Default to upcoming tab on fresh mount (no filter param in URL)
   useEffect(() => {
     if (!searchParams.get('filter')) {
@@ -118,6 +140,26 @@ export function ScheduleTab() {
       setSearchParams(params, { replace: true });
     }
   }, []); // runs once on mount only
+
+  // First-activation scroll on All tab — scroll to current month divider
+  useEffect(() => {
+    if (filter !== 'all') return;
+    if (hasAutoScrolledAllTab.current) return;
+    // Wait a tick for monthGroups to render
+    const t = setTimeout(() => {
+      const el = document.getElementById(`month-${currentMonthKey}`);
+      if (el) {
+        el.scrollIntoView({ block: 'start', behavior: 'auto' });
+        hasAutoScrolledAllTab.current = true;
+      }
+    }, 80);
+    return () => clearTimeout(t);
+  }, [filter, currentMonthKey]);
+
+  const scrollToThisWeek = useCallback(() => {
+    const el = thisWeekAnchorRef.current ?? document.getElementById(`month-${currentMonthKey}`);
+    if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, [currentMonthKey]);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
