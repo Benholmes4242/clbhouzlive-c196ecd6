@@ -14,6 +14,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
+import { tournamentRoute } from '../../routes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
 
@@ -978,7 +979,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     gap: 10, padding: '0 16px', height: 58,
                   }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                      <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
                         <div style={{
                           fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff',
                           letterSpacing: '-0.02em', lineHeight: 1,
