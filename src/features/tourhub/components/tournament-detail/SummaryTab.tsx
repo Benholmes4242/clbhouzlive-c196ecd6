@@ -102,7 +102,7 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
 
       {/* Winner hero row */}
       <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
-        <Link to={`/tourhub/player/${winner.player?.id}`} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
+        <Link {...playerRoute(winner.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
           <div style={{ padding: '12px 20px 14px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
