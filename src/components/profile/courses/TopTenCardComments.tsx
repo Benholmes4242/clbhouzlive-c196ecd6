@@ -20,6 +20,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { MentionText } from '@/components/comments/MentionText';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
 
@@ -51,7 +52,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
   const navigate = useNavigate();
   const { activeActor } = useActiveActor();
   const { reactors, counts, myReaction, toggleReaction } = useTopTenReactions(targetUserId, courseId);
-  const { comments, addComment, deleteComment } = useTopTenComments(targetUserId, courseId);
+  const { comments, addComment, deleteComment, isAddingComment } = useTopTenComments(targetUserId, courseId);
 
   const [activeTab, setActiveTab] = useState<SheetTab>('comments');
   const [draft, setDraft] = useState('');
@@ -69,6 +70,16 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
   // Reset to Comments tab on every open (matches feed sheet pattern)
   useEffect(() => {
     if (isOpen) setActiveTab('comments');
+  }, [isOpen]);
+
+  // Clear compose state when sheet closes (matches feed sheet behavior)
+  useEffect(() => {
+    if (!isOpen) {
+      setDraft('');
+      setReplyingTo(null);
+      setMentionQuery(null);
+      setMentionResults([]);
+    }
   }, [isOpen]);
 
   // Mention autocomplete query
@@ -127,21 +138,15 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
 
   const renderComment = (comment: TopTenComment, isReply = false) => (
     <div key={comment.id} className={isReply ? 'flex gap-2.5' : 'flex gap-3'}>
-      {comment.commenter_avatar ? (
-        <img
+      <div className="flex-shrink-0">
+        <SquircleAvatar
+          size={isReply ? 24 : 32}
           src={comment.commenter_avatar}
           alt={comment.commenter_name}
-          className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} object-cover flex-shrink-0`}
-          style={{ borderRadius: '34%' }}
+          fallback={comment.commenter_name.charAt(0).toUpperCase()}
+          hideRing
         />
-      ) : (
-        <div
-          className={`${isReply ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-xs'} flex items-center justify-center font-semibold flex-shrink-0`}
-          style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)', color: INK_SOFT }}
-        >
-          {comment.commenter_name.charAt(0).toUpperCase()}
-        </div>
-      )}
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
           <span className={`${isReply ? 'text-xs' : 'text-sm'} font-semibold`} style={{ color: INK }}>
@@ -151,9 +156,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
           </span>
         </div>
-        <p className={`${isReply ? 'text-xs' : 'text-sm'} mt-0.5`} style={{ color: INK }}>
-          {comment.body}
-        </p>
+        <MentionText
+          text={comment.body}
+          className={`${isReply ? 'text-xs' : 'text-sm'} mt-0.5 block`}
+          mentionClassName="font-semibold"
+        />
         <div className="flex items-center gap-3 mt-1">
           {!isReply && canInteract && (
             <button
@@ -190,14 +197,16 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
       }}
       className="w-full px-5 py-3 flex items-center gap-3 active:bg-slate-100 bg-transparent border-0 text-left cursor-pointer"
     >
-      {r.avatar ? (
-        <img src={r.avatar} alt={r.display_name} className="w-9 h-9 object-cover flex-shrink-0" style={{ borderRadius: '34%' }} />
-      ) : (
-        <div className="w-9 h-9 flex items-center justify-center text-sm font-semibold flex-shrink-0"
-          style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)', color: INK_SOFT }}>
-          {r.display_name.charAt(0).toUpperCase()}
-        </div>
-      )}
+      <div className="flex-shrink-0">
+        <SquircleAvatar
+          size={36}
+          src={r.avatar}
+          alt={r.display_name}
+          userId={r.reactor_id}
+          fallback={r.display_name.charAt(0).toUpperCase()}
+          hideRing
+        />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="text-[15px] font-semibold truncate" style={{ color: INK }}>{r.display_name}</div>
         {r.username && (
@@ -550,16 +559,16 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={!draft.trim()}
+                disabled={!draft.trim() || isAddingComment}
                 aria-label="Send comment"
                 style={{
                   width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
-                  background: draft.trim() ? AMBER : 'rgba(15,23,42,0.1)',
-                  color: draft.trim() ? '#ffffff' : INK_SUBTLE,
+                  background: draft.trim() && !isAddingComment ? AMBER : 'rgba(15,23,42,0.1)',
+                  color: draft.trim() && !isAddingComment ? '#ffffff' : INK_SUBTLE,
                   border: 'none',
-                  cursor: draft.trim() ? 'pointer' : 'not-allowed',
+                  cursor: draft.trim() && !isAddingComment ? 'pointer' : 'not-allowed',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: draft.trim() ? '0 2px 6px rgba(247,147,30,0.35)' : 'none',
+                  boxShadow: draft.trim() && !isAddingComment ? '0 2px 6px rgba(247,147,30,0.35)' : 'none',
                   transition: 'background 150ms, box-shadow 150ms',
                 }}
               >
@@ -586,7 +595,9 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
               ? 'Comments are turned off'
               : isOwnProfile
               ? "You can't react to your own picks"
-              : 'Sign in to comment'}
+              : !user
+              ? 'Sign in to comment'
+              : null}
           </div>
         )}
       </SheetContent>
