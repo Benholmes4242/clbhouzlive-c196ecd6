@@ -4,11 +4,13 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown } from 'lucide-react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
+import { MovementIndicator } from '../shared/MovementIndicator';
+import { RecentResultPill } from '../shared/RecentResultPill';
 import type { PlayerSortType } from './PlayerSortControl';
+import type { RecentResult } from '../../hooks/useRecentPlayerResults';
 
 interface PlayerCardV2Props {
   player: {
@@ -34,8 +36,18 @@ interface PlayerCardV2Props {
   activeTour?: string;
   /** Tier-1 visual treatment for the top 9 rows below the hero (list position 0-8). */
   isTopTen?: boolean;
-  /** Week-over-week movement: positive = moved up, negative = moved down, 0 = no change, null = no data. */
+  /**
+   * Week-over-week movement: positive = moved up, negative = moved down,
+   * 0 = no change, null = no data.
+   *
+   * NOTE: callers must gate this to OWGR sort only. Only sr_world_rankings
+   * has prior-rank snapshots — FedEx, Earnings, Race to Dubai, Race to CME
+   * Globe, LIV, etc. have no weekly history. Widen the gate when those
+   * ranking systems add weekly snapshot capture.
+   */
   rankChange?: number | null;
+  /** Most recent notable finish (positions 1-10) within the last 4 weeks. */
+  recentResult?: RecentResult | null;
   onNavigate?: () => void;
   disableAnimation?: boolean;
   directoryMode?: boolean;
@@ -45,30 +57,6 @@ function formatEarnings(amount: number): string {
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
   if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
   return `$${amount}`;
-}
-
-/** Movement indicator — ▲N green / ▼N red / — slate. Null when no data. */
-function MovementIndicator({ delta }: { delta: number | null | undefined }) {
-  if (delta == null) return null;
-  if (delta > 0) {
-    return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: '#16A34A', fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-        <TrendingUp size={10} strokeWidth={2.8} />
-        {delta}
-      </span>
-    );
-  }
-  if (delta < 0) {
-    return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: '#EF4444', fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-        <TrendingDown size={10} strokeWidth={2.8} />
-        {Math.abs(delta)}
-      </span>
-    );
-  }
-  return (
-    <span style={{ color: '#94A3B8', fontSize: 10, fontWeight: 700 }}>—</span>
-  );
 }
 
 export function PlayerCardV2({
@@ -87,6 +75,7 @@ export function PlayerCardV2({
   activeTour = 'all',
   isTopTen = false,
   rankChange,
+  recentResult,
   onNavigate,
   disableAnimation = false,
   directoryMode = false,
@@ -210,11 +199,16 @@ export function PlayerCardV2({
 
         {/* Player info */}
         <div style={{ flex: 1, minWidth: 0, padding: `${rowPaddingY}px 0` }}>
-          <div style={{
-            fontSize: `${nameSize}px`, fontWeight: nameWeight, color: '#0F172A', letterSpacing: tierAccent ? '-0.01em' : 0,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-          }}>
-            {player.fullName}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span style={{
+              fontSize: `${nameSize}px`, fontWeight: nameWeight, color: '#0F172A', letterSpacing: tierAccent ? '-0.01em' : 0,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, minWidth: 0, flex: '0 1 auto',
+            }}>
+              {player.fullName}
+            </span>
+            {recentResult && (
+              <RecentResultPill position={recentResult.position} tied={recentResult.tied} />
+            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />
