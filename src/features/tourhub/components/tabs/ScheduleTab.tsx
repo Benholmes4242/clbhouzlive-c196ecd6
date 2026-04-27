@@ -642,7 +642,7 @@ export function ScheduleTab() {
             variant="no-live" 
             nextTournamentName={nextUpcoming?.name}
             nextTournamentDate={nextUpcoming?.start_date}
-            nextTournamentTour={getTourMeta(nextUpcoming?.tour_code)?.short ?? null}
+            nextTournamentTour={getTourMeta(nextUpcoming?.tour_code)?.short}
             // B44 FIX 2: suppress CTA when hero already shows upcoming
             onSwitchFilter={setFilter}
           />
