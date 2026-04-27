@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { Plus, AlertCircle, Images, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -35,6 +35,7 @@ interface PostStepProps {
   onSetCover: (id: string) => void;
   onRetryMedia: (id: string) => void;
   onReorderMedia: (from: number, to: number) => void;
+  onSetMediaOrder: (items: ReviewMediaItem[]) => void;
   onGoToStep: (step: 1 | 2) => void;
   onSubmit: () => void;
 }
@@ -44,7 +45,7 @@ const MAX_MEDIA_ITEMS = 10;
 const BREAKDOWN_LABELS: Record<keyof ReviewBreakdowns, string> = {
   design: 'Design',
   condition: 'Condition',
-  clubhouse: 'clubhouse',
+  clubhouse: 'Clubhouse',
   facilities: 'Facilities',
 };
 
@@ -66,6 +67,7 @@ export function PostStep({
   onSetCover,
   onRetryMedia,
   onReorderMedia,
+  onSetMediaOrder,
   onGoToStep,
   onSubmit,
 }: PostStepProps) {
@@ -123,6 +125,14 @@ export function PostStep({
 
   const tierInfo = rating !== null ? getScoreTier(rating) : null;
 
+  // Conditional Post step copy: branches on whether any media has been added
+  const hasMedia = media.length > 0;
+  const eyebrow = hasMedia ? 'READY TO POST' : 'ADD PHOTOS';
+  const headline = hasMedia ? 'Ready to post' : 'Add photos?';
+  const subline = hasMedia
+    ? 'Looking great, post when ready'
+    : 'Bring your review to life, or post as-is';
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 300 }}
@@ -134,9 +144,9 @@ export function PostStep({
     >
       {/* Header */}
       <div style={{ textAlign: 'center', paddingBottom: 20 }}>
-        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ Almost There</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Almost there</div>
-        <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Add photos, then post your review</div>
+        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ {eyebrow}</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>{headline}</div>
+        <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>{subline}</div>
       </div>
 
       {/* Media block */}
@@ -186,9 +196,21 @@ export function PostStep({
           </button>
         ) : (
           <div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <Reorder.Group
+              axis="x"
+              values={media}
+              onReorder={onSetMediaOrder}
+              className="flex gap-2 overflow-x-auto pb-1"
+              as="div"
+            >
               {composerMedia.map((item, index) => (
-                <div key={item.id} className="relative flex-shrink-0">
+                <Reorder.Item
+                  key={item.id}
+                  value={media[index]}
+                  className="relative flex-shrink-0"
+                  as="div"
+                  whileDrag={{ scale: 1.05, zIndex: 10 }}
+                >
                   <MediaThumbnail
                     item={item}
                     index={index}
@@ -198,7 +220,7 @@ export function PostStep({
                     onRemove={() => onRemoveMedia(item.id)}
                     onSetCover={() => onSetCover(item.id)}
                   />
-                </div>
+                </Reorder.Item>
               ))}
               {media.length < MAX_MEDIA_ITEMS && (
                 <button
@@ -209,7 +231,15 @@ export function PostStep({
                   <Plus className="w-5 h-5 text-muted-foreground" />
                 </button>
               )}
-            </div>
+            </Reorder.Group>
+            {media.length >= 2 && (
+              <div className="mt-3 px-3 py-2 bg-amber-50 rounded-lg flex items-center gap-1.5">
+                <span className="text-amber-700 text-xs">↔</span>
+                <span className="text-xs font-semibold text-amber-700">
+                  Drag photos to reorder · first becomes cover
+                </span>
+              </div>
+            )}
             <p className="text-[11px] text-muted-foreground mt-2 text-center">
               {media.length}/{MAX_MEDIA_ITEMS}
             </p>

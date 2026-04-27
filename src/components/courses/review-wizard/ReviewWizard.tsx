@@ -418,6 +418,7 @@ export function ReviewWizard({
                         onSetCover={wizard.setCoverMedia}
                         onRetryMedia={wizard.retryMedia}
                         onReorderMedia={wizard.reorderMedia}
+                        onSetMediaOrder={wizard.setMediaOrder}
                         onGoToStep={(step) => wizard.goToStep(step)}
                         onSubmit={() => wizard.submit()}
                       />

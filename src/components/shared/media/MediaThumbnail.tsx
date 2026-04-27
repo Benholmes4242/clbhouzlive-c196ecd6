@@ -57,7 +57,7 @@ export function MediaThumbnail({
       )}
 
       {/* Cover badge */}
-      {isCover && totalItems > 1 && (
+      {isCover && (
         <div className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
           <Star className="w-2.5 h-2.5" fill="currentColor" /> Cover
         </div>

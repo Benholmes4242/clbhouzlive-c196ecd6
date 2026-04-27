@@ -236,7 +236,52 @@ export function RateStep({
 
   const overallTier = displayVerdict !== null ? getScoreTier(displayVerdict) : null;
 
+  // D30: Sticky verdict bar — engages when hero verdict block scrolls offscreen
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowSticky(!entry.isIntersecting),
+      // WizardHeader: 48px row + max(safe-area, 47px) ≈ 95px on notched devices
+      { threshold: 0, rootMargin: '-95px 0px 0px 0px' }
+    );
+    observer.observe(heroRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
+    <>
+      {/* D30: Sticky compact verdict bar — engages on scroll past hero */}
+      <AnimatePresence>
+        {showSticky && displayVerdict !== null && (
+          <motion.div
+            initial={{ y: '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="fixed top-0 left-0 right-0 z-40 bg-slate-50/95 backdrop-blur-md border-b border-slate-200"
+          >
+            <div
+              className="px-4 pb-2 flex items-center justify-between"
+              style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px))' }}
+            >
+              <span className="text-[10px] font-extrabold tracking-widest text-amber-500">VERDICT</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-[22px] font-black tracking-tight text-slate-900 tabular-nums">
+                  {displayVerdict.toFixed(1)}
+                </span>
+                {overallTier && (
+                  <span className="text-[11px] font-extrabold tracking-widest text-slate-500">
+                    {overallTier.label}
+                  </span>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     <motion.div
       initial={{ opacity: 0, x: 300 }}
       animate={{ opacity: 1, x: 0 }}
@@ -266,7 +311,7 @@ export function RateStep({
       )}
 
       {/* Overall Verdict — derived from category breakdowns (D28) */}
-      <div style={{ padding: '24px 16px 16px' }}>
+      <div ref={heroRef} style={{ padding: '24px 16px 16px' }}>
         {/* Dispatch eyebrow */}
         <div style={{ textAlign: 'center', fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 12 }}>
           ⚡ Your Verdict
@@ -390,5 +435,6 @@ export function RateStep({
       {/* Bottom spacer */}
       <div className="h-8" aria-hidden="true" />
     </motion.div>
+    </>
   );
 }
