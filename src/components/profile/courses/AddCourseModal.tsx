@@ -959,6 +959,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     <button
                       onClick={() => setShowResetConfirm(true)}
                       style={{
+                        display: 'flex',
                         margin: '12px 20px',
                         padding: '10px 16px',
                         background: '#FFFFFF',
@@ -969,11 +970,9 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         fontWeight: 700,
                         cursor: 'pointer',
                         minHeight: 44,
-                        display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: 8,
-                        width: 'calc(100% - 40px)',
                       }}
                     >
                       <RotateCcw size={14} strokeWidth={2.25} />
@@ -1028,11 +1027,13 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 color: INK_SUBTLE,
                 fontSize: 14,
               }}>
-                {searchQuery
-                  ? 'No matching courses found in your played courses'
-                  : playedCourses.length === 0
-                    ? "You haven't played any courses yet. Play and rate courses to add them to your Top 10."
-                    : 'Start typing to search your played courses'}
+                {isAtLimit && searchQuery
+                  ? 'List complete · Remove a course before adding more'
+                  : searchQuery
+                    ? 'No matching courses found in your played courses'
+                    : playedCourses.length === 0
+                      ? "You haven't played any courses yet. Play and rate courses to add them to your Top 10."
+                      : 'Start typing to search your played courses'}
               </div>
             ) : (
               <div>
