@@ -78,9 +78,9 @@ export function formatStatMarginGap(
     return `${Math.round(gap)}${tail}`;
   }
 
-  // Unit-driven defaults — these always include their unit by design.
-  if (unit === 'yds') return `${gap.toFixed(1)}${appendUnit ? ' yds' : ''}`;
-  if (unit === '%') return `${gap.toFixed(1)}${appendUnit ? '%' : ''}`;
+  // Unit-driven defaults — yds/% are inseparable suffixes; always include.
+  if (unit === 'yds') return `${gap.toFixed(1)} yds`;
+  if (unit === '%') return `${gap.toFixed(1)}%`;
 
   // Generic fallback.
   const decimals = precision ?? 2;
