@@ -165,7 +165,7 @@ export function SummaryTab({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Winner card */}
       {isCompleted && winner && (
-        <WinnerCard winner={winner} runnerUp={runnerUp} headshotMap={headshotMap} />
+        <WinnerCard winner={winner} runnerUp={runnerUp} headshotMap={headshotMap} tournamentName={tournamentName} />
       )}
 
       {/* Round-by-round scoring */}
@@ -271,7 +271,7 @@ export function SummaryTab({
                   transition={{ delay: 0.3 + idx * 0.03, duration: 0.25 }}
                 >
                   <Link
-                    to={`/tourhub/player/${entry.player?.id}`}
+                    {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
                     style={{
                       display: 'flex', alignItems: 'center',
                       padding: '10px 20px',
