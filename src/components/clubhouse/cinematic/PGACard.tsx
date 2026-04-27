@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { tournamentRoute } from '@/features/tourhub/routes';
 import { Heart, MessageCircle, Trophy, Calendar, ChevronRight, MapPin, Shield } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
@@ -624,7 +625,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               Final Standings
             </span>
             <button
-              onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/tournament/${cd.tournamentId}`); }}
+              onClick={(e) => { e.stopPropagation(); const t = tournamentRoute(cd.tournamentId, { kind: 'clubhouse' }); navigate(t.to, { state: t.state }); }}
               className="flex items-center gap-1 text-amber-500 text-xs font-semibold active:opacity-70 transition-opacity"
             >
               Full Results
@@ -1303,7 +1304,7 @@ export const PGACard: React.FC<PGACardProps> = ({
             </span>
           </div>
           <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/tournament/${cd.tournamentId}`); }}
+            onClick={(e) => { e.stopPropagation(); const t = tournamentRoute(cd.tournamentId, { kind: 'clubhouse' }); navigate(t.to, { state: t.state }); }}
             style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', fontWeight: 600, color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer' }}
           >
             Full Leaderboard <ChevronRight style={{ width: 12, height: 12 }} />
