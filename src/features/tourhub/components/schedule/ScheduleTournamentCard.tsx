@@ -332,6 +332,28 @@ export function ScheduleTournamentCard({
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{venue}</span>
           </p>
         )}
+
+        {/* Tier 4 — defending champion + field strength on upcoming rows */}
+        {!isLive && !isFinal && !compact && (() => {
+          const purse = isSeasonTournament(tournament) ? null : (tournament as TourTournament).purse;
+          const fieldLabel = deriveFieldStrength({
+            name: tournament.name,
+            tourName: tourName ?? null,
+            purse,
+          });
+          const champ = defendingChampion?.name ? defendingChampion : null;
+          // Show section when EITHER tier qualifies OR (defending exists AND tier qualifies)
+          // — defending-only without a tier is intentionally suppressed to keep
+          // sub-$10M regular events clean per brief design intent.
+          if (!fieldLabel && !champ) return null;
+          if (!fieldLabel) return null; // gate: no tier → no section even if defending exists
+          return (
+            <TournamentMeta
+              defendingChampion={champ}
+              fieldStrengthLabel={fieldLabel}
+            />
+          );
+        })()}
       </div>
     </div>
   );
