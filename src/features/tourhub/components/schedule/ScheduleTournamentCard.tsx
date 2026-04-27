@@ -43,6 +43,7 @@ interface ScheduleTournamentCardProps {
   className?: string;
   compact?: boolean;
   leaderWinner?: TournamentLeaderWinner;
+  defendingChampion?: DefendingChampionEntry | null;
 }
 
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
