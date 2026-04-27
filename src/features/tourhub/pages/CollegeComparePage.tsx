@@ -23,8 +23,8 @@ export function CollegeComparePage() {
   return (
     <TourHubShell immersive>
       <div className="relative min-h-screen bg-background">
-        {/* ── SLATE EDITORIAL MASTHEAD ── */}
-        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
+        {/* ── SLATE EDITORIAL MASTHEAD (leader-tint gradient applied dynamically below) ── */}
+        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0', position: 'relative' as const, overflow: 'hidden' as const }}>
           {/* Amber eyebrow */}
           <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
             ⚡ CLBHOUZ · COLLEGE HEAD-TO-HEAD
@@ -113,17 +113,28 @@ export function CollegeComparePage() {
 
               return (
                 <>
+                  {/* Leader-tint gradient — subtle amber wash on the leading side */}
+                  {(c1Overall || c2Overall) && (
+                    <div
+                      aria-hidden
+                      style={{
+                        position: 'absolute' as const,
+                        inset: 0,
+                        pointerEvents: 'none' as const,
+                        background: c1Overall
+                          ? 'linear-gradient(90deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0) 55%)'
+                          : 'linear-gradient(270deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0) 55%)',
+                      }}
+                    />
+                  )}
                   {/* VS band */}
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 0, marginBottom: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 0, marginBottom: 0, position: 'relative' as const }}>
                     {/* College 1 left */}
                     <Link
                       to={`/tourhub/college-golf/${s1?.normalized_name}`}
                       style={{ flex: 1, paddingBottom: '14px', minWidth: 0, textDecoration: 'none' }}
                       className="active:opacity-80 transition-opacity"
                     >
-                      <div style={{ fontSize: '8px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '5px' }}>
-                        FRANCHISE 1
-                      </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
                         <div style={{ width: '40px', height: '40px', borderRadius: '9px', overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {logo1 ? (
@@ -162,9 +173,6 @@ export function CollegeComparePage() {
                       style={{ flex: 1, paddingBottom: '14px', minWidth: 0, textDecoration: 'none', textAlign: 'right' as const }}
                       className="active:opacity-80 transition-opacity"
                     >
-                      <div style={{ fontSize: '8px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '5px' }}>
-                        FRANCHISE 2
-                      </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px', justifyContent: 'flex-end' }}>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: '15px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
