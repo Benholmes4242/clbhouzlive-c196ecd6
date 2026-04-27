@@ -3,7 +3,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Clock } from 'lucide-react';
+// Clock icon retired in Phase 1 — empty states use EditorialEmpty's amber rail.
 import { motion } from 'framer-motion';
 import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
@@ -180,13 +180,11 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
       )}
 
       {!hasRoundData && selectedRound !== 'Overall' ? (
-        <motion.div className="flex items-center justify-center min-h-[300px] py-12" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <div className="text-center space-y-3">
-            <Clock className="w-8 h-8 mx-auto text-muted-foreground" />
-            <h3 className="text-base font-semibold text-foreground">{selectedRound} hasn't started yet</h3>
-            <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">Hole-by-hole stats will appear once play begins.</p>
-          </div>
-        </motion.div>
+        <EditorialEmpty
+          eyebrow={selectedRound}
+          title={`${selectedRound} hasn't started yet`}
+          body="Hole-by-hole stats will appear once play begins in this round."
+        />
       ) : (
         <>
           {/* 3-col summary strip */}
