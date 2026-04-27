@@ -9,16 +9,15 @@ import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionP
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList } from 'lucide-react';
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
-import MyRatingsHeroCard, {
-  type RatedCourseData,
-} from './my-ratings/MyRatingsHeroCard';
-import MyRatingsCompactRow from './my-ratings/MyRatingsCompactRow';
+import DossierCard from './DossierCard';
+import BreakdownsPrompt from './BreakdownsPrompt';
+import BreakdownsPickerSheet from './BreakdownsPickerSheet';
 import MyRatingsTierDivider from './my-ratings/MyRatingsTierDivider';
 import {
-  getHeroTier,
   getBucket,
   getBucketLabel,
   type MyRatingsBucket,
+  type RatedCourseData,
 } from './my-ratings/myRatingsHeroTiers';
 
 interface AllCoursesListProps {
