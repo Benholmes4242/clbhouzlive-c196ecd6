@@ -32,6 +32,7 @@ import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { getPlayerTourTag } from '../../utils/playerTourTag';
 import { TIER_SUBTITLES } from '../../constants/legacyAlumni';
+import { playerRoute } from '../../routes';
 
 interface AlumniDepthChartProps {
   normalizedName: string;
@@ -87,7 +88,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
       transition={{ duration: 0.2, delay: index * 0.02 }}
     >
       <Link
-        to={`/tourhub/player/${alumnus.id}`}
+        {...playerRoute(alumnus.id, alumnus.college ? { kind: 'college', collegeName: alumnus.college } : undefined)}
         aria-label={`${fullName}, ${subline ?? 'tour alumnus'}`}
         style={{
           display: 'flex', alignItems: 'center',
