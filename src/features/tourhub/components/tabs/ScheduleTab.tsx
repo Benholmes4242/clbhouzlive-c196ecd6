@@ -791,10 +791,10 @@ export function ScheduleTab() {
 
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>
-                    {labels[code]}
+                    {label}
                   </div>
                   <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
-                    {descriptions[code]}
+                    {description}
                   </div>
                 </div>
 
