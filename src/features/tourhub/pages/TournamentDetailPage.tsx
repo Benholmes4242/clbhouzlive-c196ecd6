@@ -5,7 +5,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
-import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Trophy, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,6 +18,7 @@ import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
 import { EventWinnerCard } from '../components/EventWinnerCard';
 import { EventMomentsList } from '../components/EventMomentsList';
+import { getReferrerLabel, type TournamentReferrer } from '../routes';
 
 import {
   TournamentHero,
@@ -28,6 +29,7 @@ import {
   TeeTimesTab,
   HoleStatsTab,
   SummaryTab,
+  LiveOverviewTab,
   type TournamentTab,
 } from '../components/tournament-detail';
 import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
