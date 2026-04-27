@@ -75,6 +75,7 @@ export function PlayerCardV2({
   activeTour = 'all',
   isTopTen = false,
   rankChange,
+  recentResult,
   onNavigate,
   disableAnimation = false,
   directoryMode = false,
