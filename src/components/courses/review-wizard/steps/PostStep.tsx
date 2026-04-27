@@ -125,6 +125,14 @@ export function PostStep({
 
   const tierInfo = rating !== null ? getScoreTier(rating) : null;
 
+  // Conditional Post step copy: branches on whether any media has been added
+  const hasMedia = media.length > 0;
+  const eyebrow = hasMedia ? 'READY TO POST' : 'ADD PHOTOS';
+  const headline = hasMedia ? 'Ready to post' : 'Add photos?';
+  const subline = hasMedia
+    ? 'Looking great, post when ready'
+    : 'Bring your review to life, or post as-is';
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 300 }}
@@ -136,9 +144,9 @@ export function PostStep({
     >
       {/* Header */}
       <div style={{ textAlign: 'center', paddingBottom: 20 }}>
-        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ Almost There</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Almost there</div>
-        <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Add photos, then post your review</div>
+        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ {eyebrow}</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>{headline}</div>
+        <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>{subline}</div>
       </div>
 
       {/* Media block */}
