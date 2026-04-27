@@ -1,20 +1,27 @@
 /**
- * LeadersTab — Dispatch editorial layout for Performance Rankings.
- * Slate masthead, underline group tabs, category chips, white surface table.
+ * LeadersTab — Dispatch editorial layout for Stat Watch.
+ * Slate masthead, underline group tabs, amber chip rail, white surface table.
+ * Rows reuse the Players-page PlayerCardV2 primitive for visual consistency
+ * across Tour Hub destinations.
  */
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ChevronLeft, ChevronDown } from 'lucide-react';
+import { RefreshCw, ChevronLeft, ChevronDown, Search, X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
+import { useElitePlayers } from '../../hooks/useElitePlayers';
+import { useChampionStreak } from '../../hooks/useChampionStreak';
+import { useChampionRecentForm } from '../../hooks/useChampionRecentForm';
+import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
-import { LeadersMasthead } from '../leaders/LeadersMasthead';
-import { LeaderRow } from '../leaders/LeaderRow';
+import { LeadersMasthead, type MastheadPill } from '../leaders/LeadersMasthead';
+import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
 
 interface RankedItem {
