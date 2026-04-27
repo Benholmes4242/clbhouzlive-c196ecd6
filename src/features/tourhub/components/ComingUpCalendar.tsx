@@ -13,6 +13,7 @@ import { ChevronRight, Star } from 'lucide-react';
 import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionErrorState } from './SectionErrorState';
+import { SectionHeader } from './shared/SectionHeader';
 import { formatPurse } from './shared/TourHeroHelpers';
 import { getContextLabel } from '../utils/tournamentClassification';
 import type { SeasonTournament } from '../hooks/useSeasonTournaments';
