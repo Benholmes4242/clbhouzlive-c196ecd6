@@ -242,7 +242,7 @@ export function PlayerProfilePage() {
             transition={{ duration: 0.4 }}
           >
             {playerStats ? (
-              <PlayerSeasonStats playerStats={playerStats} activeTab={activeStatTab} />
+              <PlayerSeasonStats playerStats={playerStats} />
             ) : (
               <div className="py-16 text-center">
                 <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
