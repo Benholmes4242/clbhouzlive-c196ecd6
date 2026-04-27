@@ -13,7 +13,7 @@ interface WizardProgressProps {
 }
 
 export function WizardProgress({ currentStep, totalSteps = 3 }: WizardProgressProps) {
-  if (currentStep === 'success' || currentStep === 'share-success') return null;
+  if (currentStep === 'success') return null;
   const stepNumber = typeof currentStep === 'number' ? currentStep : 0;
   const progressPercent = (stepNumber / totalSteps) * 100;
 

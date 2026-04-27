@@ -25,8 +25,6 @@ interface SuccessScreenProps {
   previousRating?: number | null;
   postId?: string;
   onViewReview?: () => void;
-  onViewPost?: () => void;
-  onGoToClubhouse?: () => void;
   onDone: () => void;
 }
 
@@ -39,8 +37,6 @@ export function SuccessScreen({
   previousRating,
   postId,
   onViewReview,
-  onViewPost,
-  onGoToClubhouse,
   onDone,
 }: SuccessScreenProps) {
   const tierData = rating ? getScoreTier(rating) : null;
@@ -120,7 +116,7 @@ export function SuccessScreen({
           </motion.div>
         </div>
 
-        {/* Eyebrow */}
+        {/* Eyebrow — D21: unified neutral copy across new + edit */}
         <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -134,10 +130,10 @@ export function SuccessScreen({
             marginBottom: 8,
           }}
         >
-          {isEditMode ? 'RATING UPDATED' : 'COURSE RATED'}
+          REVIEW LIVE
         </motion.p>
 
-        {/* Headline */}
+        {/* Headline — D21: unified */}
         <motion.h2
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -145,19 +141,17 @@ export function SuccessScreen({
           className="success-headline"
           style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', margin: 0 }}
         >
-          {isEditMode ? 'Verdict revised.' : 'Your take is live.'}
+          Your verdict is live
         </motion.h2>
 
-        {/* Sub-copy */}
+        {/* Sub-copy — D21: unified */}
         <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', marginTop: 6, marginBottom: 20, maxWidth: 280 }}
         >
-          {isEditMode
-            ? `Your updated take on ${courseName} is live`
-            : `Your verdict on ${courseName} is live on clbhouz`}
+          Your take on {courseName} is now in the feed
         </motion.p>
 
         {/* Rating card */}

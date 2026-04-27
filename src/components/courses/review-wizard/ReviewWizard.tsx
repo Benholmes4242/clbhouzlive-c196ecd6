@@ -195,8 +195,7 @@ export function ReviewWizard({
     wizard.state.review.length > 0 ||
     wizard.allMedia.length > 0;
 
-  const isPostSubmit = wizard.state.step === 'success' || 
-    wizard.state.step === 'share-success';
+  const isPostSubmit = wizard.state.step === 'success';
 
   useNavigationGuard({
     active: wizard.isSubmitting || (hasUnsavedChanges && !isPostSubmit),
@@ -253,16 +252,9 @@ export function ReviewWizard({
     }
   }, [sharedPostId, wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
-  const handleShareFromPreview = useCallback(async () => {
-    if (!wizard.submittedRatingId) return;
-    const result = await notifyReviewShared({
-      ratingId: wizard.submittedRatingId,
-    });
-    if (result.success) {
-      setSharedPostId(result.postId || null);
-      wizard.goToStep('share-success');
-    }
-  }, [wizard, notifyReviewShared]);
+  // D31/D34/Phase 2: handleShareFromPreview removed alongside the deleted
+  // share-success step. Auto-share runs from the success-screen useEffect above.
+
 
   const handleDone = useCallback(() => {
     wizard.cleanup();
@@ -364,18 +356,6 @@ export function ReviewWizard({
                         isEditMode={isEditMode}
                         previousRating={stablePreviousRating}
                         onViewReview={handleViewReview}
-                        onGoToClubhouse={handleGoToClubhouse}
-                        onDone={handleDone}
-                      />
-                    ) : wizard.state.step === 'share-success' ? (
-                      <SuccessScreen
-                        key="share-success"
-                        variant="shared"
-                        course={activeCourse}
-                        ratingId={wizard.submittedRatingId || ''}
-                        rating={wizard.state.rating}
-                        postId={sharedPostId || undefined}
-                        onViewPost={handleViewPost}
                         onDone={handleDone}
                       />
                     ) : wizard.state.step === 1 ? (
