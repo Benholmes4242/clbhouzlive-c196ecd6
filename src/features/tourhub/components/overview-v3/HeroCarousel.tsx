@@ -1081,7 +1081,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </div>
 
                       {/* ZONE B — Tournament name + venue (fluid by viewport height) */}
-                      <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                      <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
                         <h2 style={{
                           fontSize: 'clamp(26px, 4.8vh, 40px)', fontWeight: 900, color: '#fff',
                           letterSpacing: '-0.03em', lineHeight: 0.95, margin: 0, marginBottom: 'clamp(6px, 1.2vh, 10px)',
@@ -1282,7 +1282,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </AnimatePresence>
 
                       {!isExpanded && (
-                        <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
+                        <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="hero-text-cta">
                           <span>See All</span>
                           <ChevronRight className="w-4 h-4 cta-chevron" />
                         </Link>
@@ -1618,7 +1618,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     padding: '10px 16px 16px', flexShrink: 0,
                   }}>
                     <Link
-                      to={`/tourhub/tournament/${tournament.id}`}
+                      {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()}
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         background: 'rgba(255,255,255,0.08)',
@@ -1740,7 +1740,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   {/* ── FOOTER — View Tournament pill only, right-aligned. paddingBottom reserves space for absolute pill rail (~80px) ── */}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 18px 90px' }}>
                     <Link
-                      to={`/tourhub/tournament/${tournament.id}`}
+                      {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 4,
                         background: 'rgba(255,255,255,0.09)',
