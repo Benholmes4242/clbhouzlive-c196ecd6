@@ -135,6 +135,7 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
 
 export function SummaryTab({
   tournamentId,
+  tournamentName,
   isLive,
   isCompleted,
   leaderboard,
