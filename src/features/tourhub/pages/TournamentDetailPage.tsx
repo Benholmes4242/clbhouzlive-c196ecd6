@@ -459,31 +459,9 @@ export function TournamentDetailPage() {
           </div>
         </div>
 
-        {/* Live leader — floating pill */}
-        {isLive && leader && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '14px 16px 10px', background: '#F8FAFC' }}>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '6px 14px', borderRadius: 20,
-              background: '#ffffff',
-              border: '1px solid rgba(34,197,94,0.2)',
-              boxShadow: '0 1px 8px rgba(34,197,94,0.08), 0 1px 3px rgba(15,23,42,0.06)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span className="animate-live-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-                <span style={{ fontSize: '9px', fontWeight: 900, color: '#16A34A', letterSpacing: '0.1em' }}>LIVE</span>
-              </div>
-              <div style={{ width: '0.5px', height: 12, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>{leader.name}</span>
-              {leader.score && (
-                <>
-                  <div style={{ width: '0.5px', height: 12, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', fontWeight: 900, color: '#16A34A', letterSpacing: '-0.02em' }}>{leader.score}</span>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Live leader is now rendered as a hero pill (see TournamentHero buildPills).
+            The legacy floating "LIVE • leader" block was removed in Phase 1 to
+            avoid duplication with the hero narrative pills. */}
 
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           <AnimatePresence mode="wait">
