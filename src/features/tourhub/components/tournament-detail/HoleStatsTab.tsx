@@ -3,10 +3,10 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Target, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { RoundSelector } from './RoundSelector';
-import { TournamentEmptyState } from './TournamentEmptyState';
+import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
 
 interface HoleStatsTabProps {
@@ -69,16 +69,31 @@ function HoleStatsSkeleton() {
 }
 
 function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; roundLabel?: string }) {
-  let title = 'Hole Statistics Not Available Yet';
-  let subtitle = 'Hole-by-hole statistics will appear once play begins.';
   if (isCompleted) {
-    title = 'Hole Statistics Not Available';
-    subtitle = 'Detailed hole statistics are not available for this tournament.';
-  } else if (roundLabel) {
-    title = `${roundLabel} Statistics Not Yet Available`;
-    subtitle = `${roundLabel} statistics will appear during play.`;
+    return (
+      <EditorialEmpty
+        eyebrow="Holes"
+        title="Hole statistics not available"
+        body="Detailed hole-by-hole statistics weren't captured for this tournament."
+      />
+    );
   }
-  return <TournamentEmptyState icon={<Target className="w-16 h-16" />} title={title} subtitle={subtitle} />;
+  if (roundLabel) {
+    return (
+      <EditorialEmpty
+        eyebrow={roundLabel}
+        title={`${roundLabel} statistics will appear during play`}
+        body="Hole-by-hole numbers populate as players post scores in this round."
+      />
+    );
+  }
+  return (
+    <EditorialEmpty
+      eyebrow="Holes"
+      title="Hole-by-hole stats appear once play begins"
+      body="Scoring distributions, hardest and easiest holes, and the field average will populate the moment the first round goes live."
+    />
+  );
 }
 
 export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
