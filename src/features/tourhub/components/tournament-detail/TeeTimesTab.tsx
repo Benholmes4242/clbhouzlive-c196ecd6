@@ -125,7 +125,7 @@ function TeeTimeGroupCard({ group, index, searchQuery, tournamentName }: { group
   );
 }
 
-export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
+export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTimesTabProps) {
   const [selectedRound, setSelectedRound] = useState('R1');
   const [searchQuery, setSearchQuery] = useState('');
   
