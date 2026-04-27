@@ -283,7 +283,9 @@ export function CollegeGolfHubPage() {
             </button>
           </div>
 
-          {/* Underline metric tabs */}
+          {/* Underline metric tabs — College Franchise spec: active 800/13px, inactive 600/13px.
+              Intentionally diverges from PlayersTab (500/11px) per locked decision #2.
+              PlayersTab tab styling re-alignment logged as a follow-up. */}
           <div style={{ display: 'flex', marginTop: '4px' }}>
             {METRIC_TABS.map(tab => {
               const isActive = activeMetric === tab.value;
@@ -294,9 +296,10 @@ export function CollegeGolfHubPage() {
                   className="flex-shrink-0 active:scale-[0.97] transition-transform"
                   style={{
                     flex: 1,
-                    padding: '8px 0',
-                    fontSize: '11px',
-                    fontWeight: isActive ? 800 : 500,
+                    padding: '10px 0',
+                    fontSize: '13px',
+                    fontWeight: isActive ? 800 : 600,
+                    letterSpacing: '-0.1px',
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent', border: 'none',
                     borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
