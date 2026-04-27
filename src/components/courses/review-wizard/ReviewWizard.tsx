@@ -363,12 +363,9 @@ export function ReviewWizard({
                         rating={wizard.state.rating}
                         isEditMode={isEditMode}
                         previousRating={stablePreviousRating}
-                        isAutoSharing={isAutoSharing}
-                        autoShareComplete={autoShareComplete}
                         onViewReview={handleViewReview}
                         onGoToClubhouse={handleGoToClubhouse}
                         onDone={handleDone}
-                        onOptOutShare={handleOptOutShare}
                       />
                     ) : wizard.state.step === 'share-success' ? (
                       <SuccessScreen
