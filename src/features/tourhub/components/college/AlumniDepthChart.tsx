@@ -1,5 +1,23 @@
 /**
- * AlumniDepthChart - Dispatch-style depth chart with tier-colored left borders
+ * AlumniDepthChart — 4-tier alumni depth chart for the College Franchise
+ * individual page (Phase 1 fix step).
+ *
+ * Tiers (top to bottom): Stars → Regulars → Rising → Legacy
+ *
+ * Criterion (locked in brief):
+ *   - STARS    (amber)     — OWGR ≤ 50 OR ≥1 win this season
+ *   - REGULARS (slate-600) — OWGR 51–200 AND ≥3 events this season
+ *   - RISING   (green)     — OWGR > 200 OR no current ranking, with ≥1 event
+ *   - LEGACY   (purple)    — major champion AND no events this season
+ *
+ * Conflict resolution: Stars > Regulars > Rising. Legacy is mutually exclusive
+ * (requires no current activity AND a major-champion editorial allow-list).
+ *
+ * Data caveats handled:
+ *   - world_ranking === 0 is treated as NULL (stale Sportradar default)
+ *   - Cross-tour rankings unavailable → LPGA/DPWT alumni surface as Rising
+ *     unless they're in LEGACY_ALUMNI_IDS
+ *   - career_major_wins column doesn't exist → Legacy is editorial allow-list
  */
 
 import { useState, useMemo } from 'react';
@@ -7,41 +25,61 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { getPlayerTourTag } from '../../utils/playerTourTag';
+import {
+  LEGACY_ALUMNI_IDS,
+  LEGACY_ALUMNI_CONTEXT,
+  TIER_SUBTITLES,
+} from '../../constants/legacyAlumni';
 
 interface AlumniDepthChartProps {
   normalizedName: string;
   className?: string;
 }
 
-type TierAccent = 'amber' | 'blue' | 'green';
+type TierKey = 'stars' | 'regulars' | 'rising' | 'legacy';
+
+const TIER_COLORS: Record<TierKey, string> = {
+  stars:    '#F7931E', // amber
+  regulars: '#475569', // slate-600 (replaces off-brand iOS blue)
+  rising:   '#16A34A', // green
+  legacy:   '#7C3AED', // purple (NEW)
+};
+
+const TIER_LABELS: Record<TierKey, string> = {
+  stars:    'Stars',
+  regulars: 'Regulars',
+  rising:   'Rising',
+  legacy:   'Legacy',
+};
+
+/* ─── Row ───────────────────────────────────────────────────────────────── */
 
 interface AlumniRowProps {
   alumnus: CollegeAlumnus;
   index: number;
-  tierAccent: TierAccent;
+  tier: TierKey;
 }
 
-const tierBorderColor: Record<TierAccent, string> = {
-  amber: '#F7931E',
-  blue: '#3B82F6',
-  green: '#16A34A',
-};
-
-function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
+function AlumniRow({ alumnus, index, tier }: AlumniRowProps) {
   const fullName = `${alumnus.first_name} ${alumnus.last_name}`;
   const hasWins = (alumnus.wins || 0) > 0;
   const hasEarnings = (alumnus.earnings || 0) > 0;
-  const hasWorldRank = alumnus.world_ranking && alumnus.world_ranking < 500;
+  // world_ranking === 0 is the Sportradar "no rank" sentinel, treat as null
+  const liveRank = alumnus.world_ranking && alumnus.world_ranking > 0 && alumnus.world_ranking < 500
+    ? alumnus.world_ranking
+    : null;
   const photoUrl = getPlayerHeadshotUrl(fullName, alumnus.tour_codes?.[0] ?? 'pga');
+  const tourTag = getPlayerTourTag(alumnus.tour_codes);
 
-  const initials = fullName
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  // Legacy rows show editorial context line; others show OWGR when available.
+  const legacyContext = tier === 'legacy' ? LEGACY_ALUMNI_CONTEXT[alumnus.id] : null;
+  const subline = tier === 'legacy'
+    ? (legacyContext ?? 'Major champion · Program history')
+    : liveRank ? `#${liveRank} OWGR` : null;
 
   return (
     <motion.div
@@ -51,116 +89,135 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
     >
       <Link
         to={`/tourhub/player/${alumnus.id}`}
-        aria-label={`${fullName}, rank ${alumnus.world_ranking ?? 'N/A'}, ${formatCurrency(alumnus.earnings ?? 0)}${hasWins ? `, ${alumnus.wins} ${alumnus.wins === 1 ? 'win' : 'wins'}` : ''}`}
+        aria-label={`${fullName}, ${subline ?? 'tour alumnus'}`}
         style={{
           display: 'flex', alignItems: 'center',
-          padding: '10px 20px',
+          padding: '10px 16px',
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-          borderLeft: `3px solid ${tierBorderColor[tierAccent]}`,
+          borderLeft: `3px solid ${TIER_COLORS[tier]}`,
           textDecoration: 'none',
         }}
         className="active:bg-black/[0.02] transition-colors"
       >
-        {/* 34px squircle avatar */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
-          <div style={{ width: '34px', height: '34px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
-            {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={fullName}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
-                loading="lazy"
-                onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            ) : (
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: '#94A3B8' }}>{initials}</span>
-              </div>
-            )}
-          </div>
+          <PlayerInitialAvatar
+            name={fullName}
+            src={photoUrl}
+            size={32}
+            radius={11}
+            color={tier === 'legacy'
+              ? { bg: 'rgba(124,58,237,0.10)', fg: '#7C3AED' }
+              : undefined}
+          />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
-              {fullName}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+              <div style={{
+                fontSize: 14, fontWeight: 800, color: '#0F172A',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                letterSpacing: '-0.3px',
+              }}>
+                {fullName}
+              </div>
+              {tourTag && (
+                <span style={{
+                  fontSize: 8, fontWeight: 800, letterSpacing: '0.5px',
+                  padding: '1px 4px', borderRadius: 3,
+                  background: tourTag.bg, color: tourTag.fg,
+                  flexShrink: 0,
+                }}>
+                  {tourTag.label}
+                </span>
+              )}
             </div>
-            {hasWorldRank && (
-              <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '1px' }}>
-                #{alumnus.world_ranking} OWGR
+            {subline && (
+              <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', marginTop: 1 }}>
+                {subline}
               </div>
             )}
           </div>
         </div>
 
-        {/* OWGR number */}
-        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '12px', color: '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-          {hasWorldRank ? `#${alumnus.world_ranking}` : '—'}
-        </span>
+        {/* EARN */}
+        <div style={{ width: 56, textAlign: 'right' as const, flexShrink: 0 }}>
+          <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.04em' }}>EARN</div>
+          <div style={{
+            fontSize: 13, fontWeight: 800, color: hasEarnings ? '#F7931E' : '#94A3B8',
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {hasEarnings ? formatCurrency(alumnus.earnings ?? 0) : '—'}
+          </div>
+        </div>
 
-        {/* Earnings */}
-        <span style={{ width: '56px', textAlign: 'center' as const, fontSize: '13px', fontWeight: 700, color: '#F7931E', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-          {hasEarnings ? formatCurrency(alumnus.earnings ?? 0) : '—'}
-        </span>
-
-        {/* Wins */}
-        <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-          {alumnus.wins ?? 0}
-        </span>
+        {/* W */}
+        <div style={{ width: 36, textAlign: 'right' as const, flexShrink: 0, marginLeft: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.04em' }}>W</div>
+          <div style={{
+            fontSize: 13, fontWeight: 800,
+            color: hasWins ? '#0F172A' : '#94A3B8',
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {hasWins ? alumnus.wins : '—'}
+          </div>
+        </div>
       </Link>
     </motion.div>
   );
 }
 
+/* ─── Section ───────────────────────────────────────────────────────────── */
+
 interface SectionProps {
-  title: string;
-  subtitle: string;
+  tier: TierKey;
   alumni: CollegeAlumnus[];
   defaultExpanded?: boolean;
-  tierAccent: TierAccent;
 }
 
-function Section({ title, subtitle, alumni, defaultExpanded = true, tierAccent }: SectionProps) {
+function Section({ tier, alumni, defaultExpanded = true }: SectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const COLLAPSED_COUNT = 3;
-  
+
   if (alumni.length === 0) return null;
-  
+
   const displayedAlumni = isExpanded ? alumni : alumni.slice(0, COLLAPSED_COUNT);
   const hasMore = alumni.length > COLLAPSED_COUNT;
-  
+  const tierColor = TIER_COLORS[tier];
+
   return (
     <div style={{ marginBottom: 0 }}>
-      {/* Dispatch rule header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' as const, borderTop: '0.5px solid rgba(15,23,42,0.07)' }}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'baseline', gap: 10,
+          padding: '12px 16px 8px', background: 'none', border: 'none', cursor: 'pointer',
+          textAlign: 'left' as const,
+          borderTop: '0.5px solid rgba(15,23,42,0.07)',
+        }}
       >
-        <div style={{ width: 3, height: 14, background: tierBorderColor[tierAccent], borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: '12px', fontWeight: 900, color: tierBorderColor[tierAccent], letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
-          {title} · {subtitle}
+        <div style={{ width: 3, height: 12, background: tierColor, borderRadius: 1, flexShrink: 0, alignSelf: 'center' }} />
+        <span style={{ fontSize: 12, fontWeight: 800, color: tierColor, letterSpacing: '1.2px', textTransform: 'uppercase' as const }}>
+          {TIER_LABELS[tier].toUpperCase()}
         </span>
-        <span style={{ fontSize: '12px', color: '#94A3B8' }}>{alumni.length}</span>
-        <span style={{ fontSize: '12px', color: '#CBD5E1', marginLeft: '4px' }}>
-          {isExpanded ? '▾' : '▸'}
+        <span style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.2px', flex: 1 }}>
+          {TIER_SUBTITLES[tier]}
         </span>
+        <span style={{ fontSize: 11, color: '#94A3B8' }}>{alumni.length}</span>
+        <span style={{ fontSize: 11, color: '#CBD5E1' }}>{isExpanded ? '▾' : '▸'}</span>
       </button>
 
       {isExpanded && (
         <>
-          {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '4px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <span style={{ flex: 1, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
-            <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>OWGR</span>
-            <span style={{ width: '56px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>EARN</span>
-            <span style={{ width: '28px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>W</span>
-          </div>
-
           {displayedAlumni.map((alumnus, index) => (
-            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
+            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tier={tier} />
           ))}
 
           {hasMore && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              style={{ width: '100%', padding: '10px 0', fontSize: '12px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
+              style={{
+                width: '100%', padding: '10px 0', fontSize: 12, fontWeight: 700,
+                color: '#0F172A', background: 'transparent', border: 'none',
+                borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer',
+              }}
             >
               {isExpanded ? `View all ${alumni.length} ▾` : 'Show less ▴'}
             </button>
@@ -171,46 +228,66 @@ function Section({ title, subtitle, alumni, defaultExpanded = true, tierAccent }
   );
 }
 
+/* ─── Classifier ────────────────────────────────────────────────────────── */
+
+function classifyTier(a: CollegeAlumnus): TierKey {
+  // Sportradar uses 0 as "no rank" sentinel; treat as null
+  const rank = a.world_ranking && a.world_ranking > 0 ? a.world_ranking : null;
+  const wins = a.wins ?? 0;
+  const events = a.events_played ?? 0;
+  const isMajorChamp = LEGACY_ALUMNI_IDS.has(a.id);
+
+  // Legacy is mutually exclusive: major champ AND inactive this season
+  if (isMajorChamp && events === 0) return 'legacy';
+
+  // Stars: top OWGR or recent winners
+  if ((rank !== null && rank <= 50) || wins >= 1) return 'stars';
+
+  // Regulars: ranked 51–200 AND consistent activity
+  if (rank !== null && rank >= 51 && rank <= 200 && events >= 3) return 'regulars';
+
+  // Rising: outside top 200, or no rank, but at least one event
+  if ((rank === null || rank > 200) && events >= 1) return 'rising';
+
+  // Inactive non-major-champion alumni fall through to Rising as the
+  // honest "no current activity" bucket — Phase 1 fallback for cross-tour
+  // ranking gaps. (LPGA/DPWT alumni without OWGR land here.)
+  return 'rising';
+}
+
+/* ─── Component ─────────────────────────────────────────────────────────── */
+
 export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChartProps) {
-  const { data: alumni, isLoading, error } = useCollegeAlumni(normalizedName, { 
+  const { data: alumni, isLoading, error } = useCollegeAlumni(normalizedName, {
     orderBy: 'earnings',
-    limit: 50 
+    limit: 50,
   });
-  
-  const { headliners, engineRoom, pipeline } = useMemo(() => {
-    if (!alumni) return { headliners: [], engineRoom: [], pipeline: [] };
-    
-    const headliners: CollegeAlumnus[] = [];
-    const engineRoom: CollegeAlumnus[] = [];
-    const pipeline: CollegeAlumnus[] = [];
-    
-    alumni.forEach(a => {
-      if ((a.world_ranking && a.world_ranking <= 50) || (a.wins || 0) > 0) {
-        headliners.push(a);
-      } else if ((a.cuts_made || 0) >= 3 || (a.earnings || 0) >= 75_000) {
-        engineRoom.push(a);
-      } else {
-        pipeline.push(a);
-      }
-    });
-    
-    return { headliners, engineRoom, pipeline };
+
+  const tiers = useMemo(() => {
+    const buckets: Record<TierKey, CollegeAlumnus[]> = {
+      stars: [], regulars: [], rising: [], legacy: [],
+    };
+    if (!alumni) return buckets;
+    for (const a of alumni) {
+      buckets[classifyTier(a)].push(a);
+    }
+    return buckets;
   }, [alumni]);
-  
+
   if (isLoading) {
     return (
       <div className={cn('', className)}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <div style={{ width: '34px', height: '34px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
-            <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
-            <div style={{ width: '56px', height: '12px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div style={{ width: 32, height: 32, borderRadius: 11, background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+            <div style={{ flex: 1, height: 13, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
+            <div style={{ width: 56, height: 12, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
           </div>
         ))}
       </div>
     );
   }
-  
+
   if (error || !alumni?.length) {
     return (
       <div className={cn('text-center py-12 text-sm text-muted-foreground', className)}>
@@ -218,12 +295,13 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
       </div>
     );
   }
-  
+
   return (
     <div className={cn('', className)}>
-      <Section title="Stars" subtitle="Top ranked & winners" alumni={headliners} defaultExpanded={true} tierAccent="amber" />
-      <Section title="Regulars" subtitle="Consistent performers on tour" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} tierAccent="blue" />
-      <Section title="Rising" subtitle="Building their tour career" alumni={pipeline} defaultExpanded={false} tierAccent="green" />
+      <Section tier="stars"    alumni={tiers.stars}    defaultExpanded />
+      <Section tier="regulars" alumni={tiers.regulars} defaultExpanded={tiers.regulars.length <= 5} />
+      <Section tier="rising"   alumni={tiers.rising}   defaultExpanded={false} />
+      <Section tier="legacy"   alumni={tiers.legacy}   defaultExpanded />
     </div>
   );
 }
