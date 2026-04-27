@@ -48,6 +48,13 @@ interface PlayerCardV2Props {
   rankChange?: number | null;
   /** Most recent notable finish (positions 1-10) within the last 4 weeks. */
   recentResult?: RecentResult | null;
+  /**
+   * Override the right-side value rendering with a free-form display.
+   * When provided, the existing sort-mode value selection is bypassed entirely.
+   * Tour Hub standard for surfaces that render arbitrary per-stat values
+   * (Stat Watch, College Franchise, etc.) without growing the sort-mode enum.
+   */
+  displayValue?: { main: string; label?: string } | null;
   onNavigate?: () => void;
   disableAnimation?: boolean;
   directoryMode?: boolean;
@@ -76,6 +83,7 @@ export function PlayerCardV2({
   isTopTen = false,
   rankChange,
   recentResult,
+  displayValue,
   onNavigate,
   disableAnimation = false,
   directoryMode = false,
