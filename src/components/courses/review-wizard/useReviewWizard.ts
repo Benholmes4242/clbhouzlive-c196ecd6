@@ -712,7 +712,63 @@ export function useReviewWizard({
     }
   }, [state.media]);
 
-  // Retry failed upload (no-op in new system - handled by pipeline)
+  /**
+   * D29: Reorder the entire media list given a new order of items
+   * (from framer-motion Reorder.Group). Splits ids into existing vs pending,
+   * reorders each segment intra-bucket, and remaps coverMediaId since pending
+   * ids are positional (`pending-${index}`).
+   */
+  const setMediaOrder = useCallback((newOrder: ReviewMediaItem[]) => {
+    const newIds = newOrder.map(m => m.id);
+
+    // Existing media: reorder state.media existing entries to match newIds order
+    const existingIdsInOrder = newIds.filter(id => !id.startsWith('pending-'));
+    setState(prev => {
+      const existingItems = prev.media.filter(m => m.status === 'existing');
+      const otherItems = prev.media.filter(m => m.status !== 'existing');
+      const existingById = new Map(existingItems.map(m => [m.id, m]));
+      const reorderedExisting = existingIdsInOrder
+        .map(id => existingById.get(id))
+        .filter((m): m is ReviewMediaItem => Boolean(m));
+      // Preserve any existing items not in newOrder (defensive) at the end
+      const seen = new Set(existingIdsInOrder);
+      const leftover = existingItems.filter(m => !seen.has(m.id));
+      return { ...prev, media: [...reorderedExisting, ...leftover, ...otherItems] };
+    });
+
+    // Pending files: reorder by the order pending ids appear in newIds
+    const pendingIdsInOrder = newIds.filter(id => id.startsWith('pending-'));
+    const oldCoverId = state.coverMediaId;
+    let coverFile: File | null = null;
+    if (oldCoverId && oldCoverId.startsWith('pending-')) {
+      const oldIdx = parseInt(oldCoverId.replace('pending-', ''), 10);
+      coverFile = pendingFiles[oldIdx] ?? null;
+    }
+
+    setPendingFiles(prev => {
+      const reordered = pendingIdsInOrder
+        .map(id => {
+          const oldIdx = parseInt(id.replace('pending-', ''), 10);
+          return prev[oldIdx];
+        })
+        .filter((f): f is File => Boolean(f));
+      // Append any pending files not referenced (defensive)
+      const referencedIdxs = new Set(
+        pendingIdsInOrder.map(id => parseInt(id.replace('pending-', ''), 10))
+      );
+      const leftover = prev.filter((_, i) => !referencedIdxs.has(i));
+      const next = [...reordered, ...leftover];
+
+      // Remap coverMediaId since pending-N ids are positional
+      if (coverFile) {
+        const newIdx = next.indexOf(coverFile);
+        if (newIdx >= 0) {
+          setState(s => ({ ...s, coverMediaId: `pending-${newIdx}` }));
+        }
+      }
+      return next;
+    });
+  }, [state.coverMediaId, pendingFiles]);
   const retryMedia = useCallback((id: string) => {
     console.log('[useReviewWizard] Retry not needed with unified pipeline - files upload on submit');
   }, []);
