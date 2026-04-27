@@ -29,9 +29,15 @@ function formatHandedness(hand: string | null | undefined): string | null {
   return hand;
 }
 
-function cleanBirthPlace(bp: string | null | undefined): string | null {
-  if (!bp) return null;
-  return bp.replace(/,,/g, ',').replace(/, ?$/, '').trim() || null;
+function cleanLocation(loc: string | null | undefined): string | null {
+  if (!loc) return null;
+  const cleaned = loc
+    .replace(/,\s*,/g, ',')      // collapse comma-space-comma → comma
+    .replace(/^\s*,\s*/, '')      // strip leading comma
+    .replace(/,\s*$/, '')         // strip trailing comma
+    .replace(/\s+/g, ' ')         // collapse multiple whitespace
+    .trim();
+  return cleaned || null;
 }
 
 interface InfoFieldProps {
