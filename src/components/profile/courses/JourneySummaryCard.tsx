@@ -1,12 +1,13 @@
 /**
- * JourneySummaryCard - Premium hero card for Course Legacy stats
+ * JourneySummaryCard — Editorial Course Legacy summary.
+ * Serif rating numeral, dispatch eyebrow with amber rule marker,
+ * single-line dispatch caps stats row. No icon circles.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Globe, Star } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { AnimatedNumber } from '@/components/ui/motion';
 
 interface JourneySummaryCardProps {
   coursesPlayed: number;
@@ -64,72 +65,114 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
     );
   }
 
+  const showCountries = countriesPlayed > 0;
+  const showAvg = avgRating !== null && avgRating > 0;
+
   return (
     <motion.div
       initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={cn(
-        "p-6",
-        className
-      )}>
-
-      {/* Header */}
-      <div className="text-center mb-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
-          {isOwnProfile ? "Your Course Legacy" : `${displayName || "Their"}'s Course Legacy`}
-        </p>
-      </div>
-      
-      {/* Main stat */}
-      <div className="text-center mb-6">
-        <span style={{ fontWeight: 900 }}>
-          <AnimatedNumber 
-            value={coursesPlayed}
-            className="text-5xl text-foreground tracking-tight"
-          />
+      className={cn('px-5 pt-6 pb-5', className)}
+    >
+      {/* Eyebrow with amber rule marker */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <div
+          style={{
+            width: 3,
+            height: 8,
+            background: '#F7931E',
+            borderRadius: 1,
+            flexShrink: 0,
+          }}
+        />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 900,
+            color: '#F7931E',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {isOwnProfile
+            ? 'Your Course Legacy'
+            : `${displayName || 'Their'}'s Course Legacy`}
         </span>
-        <p className="text-sm text-muted-foreground mt-1">
-          Courses Played
-        </p>
       </div>
-      
-      {/* Secondary stats row */}
-      <div className="flex justify-center gap-8">
-        {/* Countries */}
-        {countriesPlayed > 0 && (
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
-              <Globe className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <div className="text-center">
-              <AnimatedNumber 
-                value={countriesPlayed} 
-                className="text-lg font-semibold text-foreground leading-tight"
-              />
-              <p className="text-xs text-muted-foreground">
-                {countriesPlayed === 1 ? 'country' : 'countries'}
-              </p>
-            </div>
-          </div>
-        )}
 
-        {/* Average Rating */}
-        {avgRating !== null && avgRating > 0 && (
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.25)' }}>
-              <Star className="w-4 h-4" style={{ color: '#F7931E' }} />
-            </div>
-            <div className="text-center">
-              <AnimatedNumber 
-                value={Number(avgRating.toFixed(1))} 
-                className="text-lg font-semibold text-foreground leading-tight"
-              />
-              <p className="text-xs text-muted-foreground">Avg Rating</p>
-            </div>
-          </div>
-        )}
+      {/* Big serif number */}
+      <div
+        style={{
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          fontWeight: 900,
+          fontSize: 56,
+          color: '#0F172A',
+          letterSpacing: '-0.035em',
+          lineHeight: 1,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {coursesPlayed}
       </div>
+      <p
+        style={{
+          marginTop: 4,
+          fontSize: 13,
+          color: '#64748B',
+          letterSpacing: '-0.005em',
+        }}
+      >
+        {coursesPlayed === 1 ? 'Course Played' : 'Courses Played'}
+      </p>
+
+      {/* Stats row — single dispatch line */}
+      {(showCountries || showAvg) && (
+        <div
+          style={{
+            marginTop: 14,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#475569',
+            flexWrap: 'wrap',
+          }}
+        >
+          {showCountries && (
+            <span>
+              <span
+                style={{
+                  color: '#0F172A',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {countriesPlayed}
+              </span>{' '}
+              {countriesPlayed === 1 ? 'COUNTRY' : 'COUNTRIES'}
+            </span>
+          )}
+          {showCountries && showAvg && (
+            <span style={{ color: '#CBD5E1' }}>·</span>
+          )}
+          {showAvg && (
+            <span>
+              <span
+                style={{
+                  color: '#0F172A',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {(avgRating as number).toFixed(1)}
+              </span>{' '}
+              AVG RATING
+            </span>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 };

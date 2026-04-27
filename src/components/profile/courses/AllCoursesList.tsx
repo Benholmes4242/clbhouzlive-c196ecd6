@@ -9,16 +9,15 @@ import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionP
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList } from 'lucide-react';
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
-import MyRatingsHeroCard, {
-  type RatedCourseData,
-} from './my-ratings/MyRatingsHeroCard';
-import MyRatingsCompactRow from './my-ratings/MyRatingsCompactRow';
+import DossierCard from './DossierCard';
+import BreakdownsPrompt from './BreakdownsPrompt';
+import BreakdownsPickerSheet from './BreakdownsPickerSheet';
 import MyRatingsTierDivider from './my-ratings/MyRatingsTierDivider';
 import {
-  getHeroTier,
   getBucket,
   getBucketLabel,
   type MyRatingsBucket,
+  type RatedCourseData,
 } from './my-ratings/myRatingsHeroTiers';
 
 interface AllCoursesListProps {
@@ -70,6 +69,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showBreakdownsPicker, setShowBreakdownsPicker] = useState(false);
 
   const handleCourseClick = useCallback(
     (courseId: string, ratingId: string | null) => {
@@ -77,6 +77,17 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         navigate(`/courses/${courseId}?tab=reviews&review=${ratingId}`);
       } else {
         navigate(`/courses/${courseId}`);
+      }
+    },
+    [navigate],
+  );
+
+  const handleFullReview = useCallback(
+    (courseId: string, ratingId: string | null) => {
+      if (ratingId) {
+        navigate(`/courses/${courseId}?tab=reviews&review=${ratingId}`);
+      } else {
+        navigate(`/courses/${courseId}?tab=reviews`);
       }
     },
     [navigate],
@@ -160,6 +171,31 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     all: courses.length,
     top100: courses.filter(c => c.is_top100).length,
   }), [courses]);
+
+  // Courses missing breakdown ratings (page-level prompt eligibility).
+  const missingBreakdownsCourses = useMemo<RatedCourseData[]>(
+    () =>
+      courses
+        .filter(
+          (c) =>
+            c.has_rating &&
+            c.rating_value != null &&
+            (c.design_score == null ||
+              c.condition_score == null ||
+              c.clubhouse_score == null ||
+              c.facilities_score == null),
+        )
+        .map((c) => toRatedCourseData(c as any)),
+    [courses],
+  );
+
+  const handleBreakdownsPromptTap = useCallback(() => {
+    if (missingBreakdownsCourses.length === 1) {
+      navigate(`/courses/${missingBreakdownsCourses[0].id}/rate`);
+    } else if (missingBreakdownsCourses.length >= 2) {
+      setShowBreakdownsPicker(true);
+    }
+  }, [missingBreakdownsCourses, navigate]);
 
   // Apply filters and sorting
   const filteredCourses = useMemo(() => {
@@ -300,6 +336,16 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         top100Count={tabCounts.top100}
       />
 
+      {/* Page-level breakdowns prompt (own profile only) */}
+      {isOwnProfile && missingBreakdownsCourses.length > 0 && (
+        <div style={{ padding: '12px 16px 0' }}>
+          <BreakdownsPrompt
+            missingCount={missingBreakdownsCourses.length}
+            onTap={handleBreakdownsPromptTap}
+          />
+        </div>
+      )}
+
       {/* Course list */}
       {tieAnnotated.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
@@ -330,9 +376,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             const isLowHigh = activeSort === 'rating-low-high';
             const isRatingSort = isHighLow || isLowHigh;
 
-            // ── Rating-sorted: stratified hero + compact, with dividers ─────
+            // ── Rating-sorted: single primitive with tier dividers ─────
             if (isRatingSort) {
-              // Tier counts across the *entire* filtered+sorted list.
               const tierCounts: Record<MyRatingsBucket, number> = {
                 top: 0,
                 rest: 0,
@@ -346,32 +391,16 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               const elements: React.ReactNode[] = [];
               let currentBucket: MyRatingsBucket | null = null;
               let firstDividerRendered = false;
-              let compactBucket: React.ReactNode[] = [];
-              let compactKeySeed = 0;
-
-              const flushCompact = () => {
-                if (compactBucket.length === 0) return;
-                elements.push(
-                  <div
-                    key={`compact-bucket-${compactKeySeed++}`}
-                    style={{ padding: '0 16px' }}
-                  >
-                    {compactBucket}
-                  </div>,
-                );
-                compactBucket = [];
-              };
 
               displayedCourses.forEach((course, index) => {
                 const rank = index + 1;
                 const isRated = course.has_rating && course.rating_value != null;
-                if (!isRated) return; // unrated dropped from rating-sorted view
+                if (!isRated) return;
 
                 const rating = course.rating_value as number;
                 const bucket = getBucket(rating);
 
                 if (bucket !== currentBucket) {
-                  flushCompact();
                   elements.push(
                     <MyRatingsTierDivider
                       key={`divider-${bucket}`}
@@ -384,57 +413,43 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   currentBucket = bucket;
                 }
 
-                const heroTier = isHighLow ? getHeroTier(rating) : null;
-                // In low→high mode, render everything as compact rows even
-                // for ≥9.0 — the cinematic hero only fires in high→low.
-
-                if (heroTier !== null) {
-                  flushCompact();
-                  elements.push(
-                    // Negative horizontal margin escapes the parent's
-                    // 10px (px-2.5) padding, achieving true full-bleed.
-                    <div key={course.id} style={{ marginLeft: -10, marginRight: -10 }}>
-                      <MyRatingsHeroCard
-                        course={toRatedCourseData(course as any)}
-                        rank={rank}
-                        onCourseClick={handleCourseClick}
-                      />
-                    </div>,
-                  );
-                } else {
-                  compactBucket.push(
-                    <MyRatingsCompactRow
-                      key={course.id}
-                      course={toRatedCourseData(course as any)}
-                      rank={rank}
-                      onCourseClick={handleCourseClick}
-                    />,
-                  );
-                }
+                elements.push(
+                  <DossierCard
+                    key={course.id}
+                    course={toRatedCourseData(course as any)}
+                    rank={rank}
+                    onCourseClick={handleCourseClick}
+                    onFullReview={handleFullReview}
+                  />,
+                );
               });
 
-              flushCompact();
               return elements;
             }
 
-            // ── Recently-played: flat compact list, dividers off ────────────
+            // ── Recently-played: flat list, no dividers ────────────
             return (
-              <div style={{ padding: '0 16px' }}>
+              <>
                 {displayedCourses.map((course, index) => {
                   const rank = index + 1;
                   const isRated = course.has_rating && course.rating_value != null;
                   if (isRated) {
                     return (
-                      <MyRatingsCompactRow
+                      <DossierCard
                         key={course.id}
                         course={toRatedCourseData(course as any)}
                         rank={rank}
                         onCourseClick={handleCourseClick}
+                        onFullReview={handleFullReview}
                       />
                     );
                   }
                   return (
-                    <div key={course.id} className="mb-2">
+                    <div
+                      key={course.id}
+                      className="mb-2"
+                      style={{ padding: '0 16px' }}
+                    >
                       <TieredCourseCard
                         course={course}
                         isOwnProfile={isOwnProfile}
@@ -442,7 +457,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                     </div>
                   );
                 })}
-              </div>
+              </>
             );
           })()}
         </div>
@@ -490,6 +505,18 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               : `That\u2019s ${firstName || 'their'}\u2019s journey so far.`}
           </p>
         </div>
+      )}
+
+      {isOwnProfile && (
+        <BreakdownsPickerSheet
+          isOpen={showBreakdownsPicker}
+          onClose={() => setShowBreakdownsPicker(false)}
+          missingCourses={missingBreakdownsCourses}
+          onPickCourse={(courseId) => {
+            setShowBreakdownsPicker(false);
+            navigate(`/courses/${courseId}/rate`);
+          }}
+        />
       )}
     </div>
   );

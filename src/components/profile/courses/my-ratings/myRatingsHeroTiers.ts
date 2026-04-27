@@ -1,36 +1,34 @@
 /**
- * Stratified card tiering for the My Ratings / Courses Played tab.
- * Determines which card variant renders for a given rating.
+ * Tier helpers for the My Ratings / Course History list.
  *
- * Full hero    (≥9.5)  → full-bleed editorial card
- * Compact hero (9.0-9.4) → medium hero card
- * Compact      (<9.0)  → small ruled row
- *
- * Internal hero-tier IDs are intentionally decoupled from user-facing
- * tier vocabulary: under the 5-tier taxonomy (April 2026), all ratings
- * ≥9.0 surface as "Exceptional". The two hero layouts preserve a silent
- * visual reward for the absolute best courses without pretending to be
- * separate tier labels.
+ * Naming preserved as `myRatingsHeroTiers.ts` to limit churn — but
+ * the hero-tier concept (full vs compact hero) was retired with the
+ * DossierCard consolidation (April 2026). All rated courses render
+ * as a single primitive; only the bucket dividers and the byline
+ * tier name still consume from this file.
  */
 
-export type MyRatingsHeroTier = 'fullHero' | 'compactHero' | null;
-
-/**
- * Returns 'fullHero' (≥9.5), 'compactHero' (9.0-9.4), or null (compact).
- * Bucketing boundaries preserved from the previous design — only the
- * value names changed (Phase C of the 5-tier taxonomy redesign).
- */
-export function getHeroTier(
-  rating: number | null | undefined,
-): MyRatingsHeroTier {
-  if (rating == null) return null;
-  if (rating >= 9.5) return 'fullHero';
-  if (rating >= 9.0) return 'compactHero';
-  return null;
+export interface RatedCourseData {
+  id: string;
+  name: string;
+  country: string | null;
+  sub_country: string | null;
+  thumbnail_image: string | null;
+  is_top100: boolean;
+  global_rank: number | null;
+  last_played_at: string | null;
+  rating_value: number;
+  rating_id: string | null;
+  design_score: number | null;
+  condition_score: number | null;
+  clubhouse_score: number | null;
+  facilities_score: number | null;
+  review: string | null;
+  review_date: string | null;
 }
 
 /**
- * Tier name used in the byline metadata row on hero cards
+ * Tier name used in the byline metadata row on cards
  * and as section header labels. Aligned to the 5-tier taxonomy.
  */
 export function getTierName(rating: number | null | undefined): string {
@@ -43,25 +41,9 @@ export function getTierName(rating: number | null | undefined): string {
 }
 
 /**
- * Category tier label used in the compact row inline breakdown.
- * Returns Title Case to sit inline with sentence text.
- */
-export function getCategoryTierLabel(
-  score: number | null | undefined,
-): string {
-  if (score == null) return 'No score';
-  if (score >= 9.0) return 'Exceptional';
-  if (score >= 7.5) return 'Excellent';
-  if (score >= 6.0) return 'Good';
-  if (score >= 4.0) return 'Fair';
-  return 'Poor';
-}
-
-/**
  * Coarse tier bucket used to group cards under section dividers.
  * Two buckets reflect the 5-tier taxonomy honestly — one Exceptional
- * section, one Excellent-and-below section. The card-layout split
- * within "top" (full hero vs compact hero) is a silent visual reward.
+ * section, one Excellent-and-below section.
  */
 export type MyRatingsBucket = 'top' | 'rest';
 

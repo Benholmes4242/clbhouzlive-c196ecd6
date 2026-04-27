@@ -3,7 +3,7 @@
  */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, MapPin, Trophy, X, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
+import { MapPin, Trophy, X, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
@@ -180,51 +180,203 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
     );
   }
 
-  // Empty state
+  // Hide entirely when empty (Rule 26 — honest UI)
   if (wantToPlay.length === 0) {
+    return null;
+  }
+
+  // Single editorial framing for 1–2 items
+  if (wantToPlay.length <= 2) {
     return (
-      <section className={cn("", className)}>
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <div className="flex items-center gap-1.5 mb-1">
-              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Bucket List</span>
-            </div>
-            <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>
-              Courses to Play
-            </h2>
-            <p className="text-[13px] text-muted-foreground mt-0.5">
-              0 courses on the bucket list
-            </p>
-          </div>
+      <section className={cn('', className)}>
+        <div className="flex items-center gap-1.5 mb-3 px-4">
+          <div
+            style={{
+              width: 3,
+              height: 8,
+              background: '#F7931E',
+              borderRadius: 1,
+              flexShrink: 0,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 900,
+              color: '#F7931E',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase' as const,
+            }}
+          >
+            On Your List
+          </span>
         </div>
-        
-        <div className="p-8">
-          <div className="flex flex-col items-center justify-center text-center">
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
-              <Bookmark className="w-6 h-6 text-muted-foreground" />
-            </div>
-            
-            <h3 className="text-base font-semibold text-foreground mb-1">
-              {isOwnProfile ? "Start Your Bucket List" : "No Courses Saved"}
-            </h3>
-            
-            <p className="text-sm text-muted-foreground mb-5 max-w-xs">
-              {isOwnProfile 
-                ? "Save courses you want to play to build your bucket list"
-                : "No courses on the bucket list yet."}
-            </p>
-            
-            {isOwnProfile && (
-              <button
-                onClick={() => navigate('/courses')}
-                className="px-5 py-2.5 text-sm font-semibold rounded-full transition-colors min-h-[44px] active:scale-[0.97]"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+
+        <div className="px-4 space-y-3">
+          {wantToPlay.map((course) => {
+            const isTop100 = !!(
+              course.global_rank ||
+              course.regional_rank ||
+              course.usa_rank
+            );
+            const addedAgo = formatDistanceToNow(new Date(course.added_at), {
+              addSuffix: true,
+            });
+            return (
+              <article
+                key={course.id}
+                onClick={() => handleCourseClick(course.course_id)}
+                style={{
+                  background: '#FFFFFF',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  border: '1px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer',
+                }}
               >
-                Explore Courses
-              </button>
-            )}
-          </div>
+                {/* Image hero */}
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    aspectRatio: '16 / 9',
+                    background: course.thumbnail_image
+                      ? `url(${course.thumbnail_image})`
+                      : 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background:
+                        'linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 55%)',
+                    }}
+                  />
+                  {isTop100 && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 12,
+                        left: 12,
+                        background: '#F7931E',
+                        color: '#FFFFFF',
+                        fontSize: 9,
+                        fontWeight: 900,
+                        letterSpacing: '0.18em',
+                        padding: '4px 8px',
+                        borderRadius: 999,
+                      }}
+                    >
+                      TOP 100
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 16,
+                      right: 16,
+                      bottom: 14,
+                      color: '#FFFFFF',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        fontWeight: 900,
+                        fontSize: 20,
+                        lineHeight: 1.1,
+                        letterSpacing: '-0.015em',
+                        textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                      }}
+                    >
+                      {course.course_name}
+                    </div>
+                    {(course.sub_country || course.country) && (
+                      <div
+                        style={{
+                          marginTop: 4,
+                          fontSize: 9,
+                          fontWeight: 700,
+                          letterSpacing: '0.16em',
+                          color: 'rgba(255,255,255,0.85)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                        }}
+                      >
+                        {(course.sub_country || course.country || '').toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* CTAs row */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '10px 14px',
+                    background: '#FFFFFF',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.16em',
+                      color: '#94A3B8',
+                      textTransform: 'uppercase' as const,
+                    }}
+                  >
+                    Added {addedAgo}
+                  </span>
+                  {isOwnProfile && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReview(course);
+                        }}
+                        className="min-h-[36px] px-3 active:scale-[0.97]"
+                        style={{
+                          background: 'rgba(247,147,30,0.10)',
+                          color: '#C97211',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          borderRadius: 8,
+                          border: 0,
+                        }}
+                      >
+                        Review
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemove(course);
+                        }}
+                        aria-label="Remove from bucket list"
+                        className="min-h-[36px] min-w-[36px] active:scale-[0.95]"
+                        style={{
+                          background: 'rgba(15,23,42,0.05)',
+                          borderRadius: 8,
+                          border: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <X className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     );
