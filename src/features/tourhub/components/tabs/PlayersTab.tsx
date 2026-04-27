@@ -830,7 +830,8 @@ export function PlayersTab() {
                       }}
                       worldRank={(() => {
                         if (sort === 'highest-earnings' || sort === 'fedex-points' || sort === 'most-wins') {
-                          return index + 6;
+                          // Positional rank — champion is hero #1, list starts at #2
+                          return index + 2;
                         }
                         if (sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings') {
                           return pStats?.tourRank || rank?.worldRank;
@@ -850,6 +851,8 @@ export function PlayersTab() {
                       index={index}
                       activeSort={sort}
                       activeTour={activeTour}
+                      isTopTen={index < 9}
+                      rankChange={rank?.rankChange ?? null}
                       directoryMode={false}
                       onNavigate={() => sessionStorage.setItem('players-scroll', String(window.scrollY))}
                     />
