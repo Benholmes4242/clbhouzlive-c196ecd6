@@ -186,6 +186,7 @@ export function RateStep({
   rating, 
   breakdowns, 
   course,
+  isLegacyMigration = false,
   onRatingChange, 
   onBreakdownChange 
 }: RateStepProps) {
@@ -225,7 +226,16 @@ export function RateStep({
     country: course.country,
   }) : '';
 
-  const overallTier = rating !== null ? getScoreTier(rating) : null;
+  // D28: Display the derived verdict (mean of set categories) once any category
+  // is touched, so the user sees the verdict update live as they rate.
+  // Falls back to the prefilled overall rating when no categories are set yet.
+  const setBreakdownValues = Object.values(breakdowns).filter((v): v is number => v !== null);
+  const derivedVerdict = setBreakdownValues.length > 0
+    ? parseFloat((setBreakdownValues.reduce((s, v) => s + v, 0) / setBreakdownValues.length).toFixed(1))
+    : null;
+  const displayVerdict = derivedVerdict ?? rating;
+
+  const overallTier = displayVerdict !== null ? getScoreTier(displayVerdict) : null;
 
   return (
     <motion.div
