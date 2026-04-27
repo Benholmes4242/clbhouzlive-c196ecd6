@@ -383,6 +383,8 @@ export function TournamentDetailPage() {
         <TournamentHero 
           tournament={tournament} 
           imageUrl={heroImageUrl}
+          leader={leader}
+          leaderboard={leaderboard ?? null}
         />
 
         {/* STICKY HEADER — ← Back | underline tabs */}
@@ -404,7 +406,7 @@ export function TournamentDetailPage() {
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
-              Back
+              {backLabel}
             </button>
           </div>
 
