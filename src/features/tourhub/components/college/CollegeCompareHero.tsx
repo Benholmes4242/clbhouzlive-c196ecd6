@@ -3,6 +3,7 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { useTourSeason } from '../../hooks/useTourHubData';
+import { playerRoute } from '../../routes';
 import type { CollegeCompareData } from '../../hooks/useCollegeCompare';
 import type { CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 
