@@ -265,6 +265,7 @@ export function TournamentDetailPage() {
                 headshotMap={headshotMap}
                 onViewAll={() => handleTabChange('leaderboard')}
                 limit={5}
+                tournamentName={tournament.name}
               />
             )}
             
@@ -297,6 +298,7 @@ export function TournamentDetailPage() {
             headshotMap={headshotMap}
             tournamentStatus={tournament.status}
             tournamentTimezone={tournament.timezone}
+            tournamentName={tournament.name}
             venuePar={tournament.venue_par}
             onPlayerTap={() => {}}
           />
@@ -308,6 +310,7 @@ export function TournamentDetailPage() {
             <SummaryTab
               tournamentId={tournamentId || ''}
               tournamentSrId={tournament.sr_id}
+              tournamentName={tournament.name}
               isLive={isLive}
               isCompleted={isCompleted}
               leaderboard={leaderboard}
@@ -334,6 +337,7 @@ export function TournamentDetailPage() {
           <TeeTimesTab
             tournamentId={tournamentId || ''}
             tournamentSrId={tournament.sr_id}
+            tournamentName={tournament.name}
             isLive={isLive}
           />
         );
