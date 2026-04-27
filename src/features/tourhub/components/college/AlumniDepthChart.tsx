@@ -25,15 +25,12 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
+import { useLegacyAlumni } from '../../hooks/useLegacyAlumni';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { getPlayerTourTag } from '../../utils/playerTourTag';
-import {
-  LEGACY_ALUMNI_IDS,
-  LEGACY_ALUMNI_CONTEXT,
-  TIER_SUBTITLES,
-} from '../../constants/legacyAlumni';
+import { TIER_SUBTITLES } from '../../constants/legacyAlumni';
 
 interface AlumniDepthChartProps {
   normalizedName: string;
