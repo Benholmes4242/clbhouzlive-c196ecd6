@@ -747,24 +747,11 @@ export function ScheduleTab() {
 
         <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
-            const labels: Record<string, string> = {
-              all: 'All Tours',
-              pga: 'PGA Tour',
-              EURO: 'DP World Tour',
-              LPGA: 'LPGA',
-              CHAMP: 'Champions',
-              PGAD: 'Korn Ferry',
-              LIV: 'LIV Golf',
-            };
-            const descriptions: Record<string, string> = {
-              all: 'Show events from every tour',
-              pga: 'PGA Tour events',
-              EURO: 'DP World Tour events',
-              LPGA: 'LPGA Tour events',
-              CHAMP: 'PGA Champions Tour events',
-              PGAD: 'Korn Ferry Tour events',
-              LIV: 'LIV Golf events',
-            };
+            const meta = code === 'all' ? null : getTourMeta(code);
+            const label = code === 'all' ? 'All Tours' : (meta?.short ?? code);
+            const description = code === 'all'
+              ? 'Show events from every tour'
+              : `${meta?.label ?? code} events`;
             const isSelected = activeTour === code;
             const count = code === 'all'
               ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
