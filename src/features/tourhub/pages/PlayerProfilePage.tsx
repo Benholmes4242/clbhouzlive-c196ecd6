@@ -43,7 +43,7 @@ export function PlayerProfilePage() {
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
-  const [activeStatTab, setActiveStatTab] = useState<StatTab>('Overview');
+  // activeStatTab state moved into PlayerSeasonStats (Fix 1).
 
   // Pull-to-refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
