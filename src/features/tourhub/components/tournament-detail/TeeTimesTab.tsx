@@ -3,14 +3,13 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Clock, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
-import { TournamentEmptyState } from './TournamentEmptyState';
+import { EditorialEmpty } from './EditorialEmpty';
 import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
 import CountryFlag from '@/components/ui/country-flag';
 
@@ -50,16 +49,31 @@ function TeeTimesSkeleton() {
 }
 
 function TeeTimesEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; roundLabel?: string }) {
-  let title = 'Tee Times Not Available Yet';
-  let subtitle = 'Tee times will be posted closer to the tournament start.';
   if (isCompleted) {
-    title = 'Tee Times No Longer Available';
-    subtitle = 'Historical tee time data is not available for this tournament.';
-  } else if (roundLabel) {
-    title = `${roundLabel} Tee Times Not Yet Published`;
-    subtitle = 'Check back after the previous round for updated pairings.';
+    return (
+      <EditorialEmpty
+        eyebrow="Tee Times"
+        title="Tee times no longer available"
+        body="Historical pairing data isn't kept for completed tournaments."
+      />
+    );
   }
-  return <TournamentEmptyState icon={<Clock className="w-16 h-16" />} title={title} subtitle={subtitle} />;
+  if (roundLabel) {
+    return (
+      <EditorialEmpty
+        eyebrow={roundLabel}
+        title={`${roundLabel} pairings not yet published`}
+        body="Pairings publish after the previous round closes. Check back shortly."
+      />
+    );
+  }
+  return (
+    <EditorialEmpty
+      eyebrow="Tee Times"
+      title="Tee times will be posted closer to the start"
+      body="Pairings, groupings, and split-tee starts appear here as soon as the field is set."
+    />
+  );
 }
 
 interface TeeTimeGroup {
