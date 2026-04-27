@@ -268,7 +268,7 @@ export function PlayerProfilePage() {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <PlayerTournamentHistory playerId={playerId} />
+              <PlayerTournamentHistory playerId={playerId} playerName={player.full_name} />
             </motion.div>
           )}
 
