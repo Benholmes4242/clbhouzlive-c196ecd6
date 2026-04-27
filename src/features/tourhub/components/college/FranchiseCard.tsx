@@ -209,8 +209,8 @@ export function FranchiseCard({
             </div>
             <p style={{
               fontSize: 11,
-              fontWeight: showCaptain ? 600 : 500,
-              color: showCaptain ? '#475569' : '#94A3B8',
+              fontWeight: (showCaptain || (isDelta && driverText)) ? 600 : 500,
+              color: (showCaptain || (isDelta && driverText)) ? '#475569' : '#94A3B8',
               margin: 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
             }}>
