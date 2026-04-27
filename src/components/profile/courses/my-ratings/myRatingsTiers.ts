@@ -1,11 +1,9 @@
 /**
- * Tier helpers for the My Ratings / Course History list.
+ * Tier helpers for the Course History list (`myRatingsTiers.ts`).
  *
- * Naming preserved as `myRatingsHeroTiers.ts` to limit churn — but
- * the hero-tier concept (full vs compact hero) was retired with the
- * DossierCard consolidation (April 2026). All rated courses render
- * as a single primitive; only the bucket dividers and the byline
- * tier name still consume from this file.
+ * Provides the shared `RatedCourseData` shape, the byline tier name,
+ * and the coarse bucket grouping (Exceptional vs Excellent-and-below)
+ * used by section dividers in the Course History list.
  */
 
 export interface RatedCourseData {
