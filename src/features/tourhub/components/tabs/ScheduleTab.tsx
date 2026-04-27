@@ -12,7 +12,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe } from 'lucide-react';
+import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe, Clock } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
@@ -23,6 +23,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
+import { TOUR_MAP, getTourLabel, getTourShort, getTourMeta } from '../../constants/tourMap';
+import { getCurrentWeek, getCurrentMonthKey, isInCurrentWeek } from '../../utils/getCurrentWeek';
+import { TourPill } from '../shared/TourPill';
+import { EventTag, type EventTagKind } from '../shared/EventTag';
+import { CompactNextUp } from '../shared/CompactNextUp';
+import { ThisWeekAnchor } from '../shared/ThisWeekAnchor';
+import { getContextLabel } from '../../utils/tournamentClassification';
 
 import {
   ScheduleFilterPills,
@@ -33,9 +40,6 @@ import {
   type TourFilterCode,
 } from '../schedule';
 
-const TOUR_LABELS: Record<string, string> = {
-  pga: 'PGA Tour', EURO: 'DP World Tour', LPGA: 'LPGA', CHAMP: 'Champions Tour', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
-};
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
 import { LiveRightNow } from '../overview-v3/LiveRightNow';
 
@@ -79,11 +83,18 @@ export function ScheduleTab() {
   const [searchInput, setSearchInput] = useState('');
   const [isTabsSticky, setIsTabsSticky] = useState(false);
   const stickysentinelRef = useRef<HTMLDivElement>(null);
+  const thisWeekAnchorRef = useRef<HTMLDivElement>(null);
+  const [isThisWeekVisible, setIsThisWeekVisible] = useState(true);
+  const hasAutoScrolledAllTab = useRef(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
-  
+
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
+
+  // Current week — computed once per render, used for THIS WEEK anchor + Today pill
+  const currentWeek = useMemo(() => getCurrentWeek(), []);
+  const currentMonthKey = useMemo(() => getCurrentMonthKey(), []);
 
   // Scroll to top on mount — always start at top
   useEffect(() => {
@@ -106,6 +117,21 @@ export function ScheduleTab() {
     return () => observer.disconnect();
   }, []);
 
+  // Track THIS WEEK anchor visibility for sticky Today pill
+  useEffect(() => {
+    const el = thisWeekAnchorRef.current;
+    if (!el) {
+      setIsThisWeekVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsThisWeekVisible(entry.isIntersecting),
+      { threshold: 0, rootMargin: '-80px 0px 0px 0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [filter]);
+
   // Default to upcoming tab on fresh mount (no filter param in URL)
   useEffect(() => {
     if (!searchParams.get('filter')) {
@@ -114,6 +140,26 @@ export function ScheduleTab() {
       setSearchParams(params, { replace: true });
     }
   }, []); // runs once on mount only
+
+  // First-activation scroll on All tab — scroll to current month divider
+  useEffect(() => {
+    if (filter !== 'all') return;
+    if (hasAutoScrolledAllTab.current) return;
+    // Wait a tick for monthGroups to render
+    const t = setTimeout(() => {
+      const el = document.getElementById(`month-${currentMonthKey}`);
+      if (el) {
+        el.scrollIntoView({ block: 'start', behavior: 'auto' });
+        hasAutoScrolledAllTab.current = true;
+      }
+    }, 80);
+    return () => clearTimeout(t);
+  }, [filter, currentMonthKey]);
+
+  const scrollToThisWeek = useCallback(() => {
+    const el = thisWeekAnchorRef.current ?? document.getElementById(`month-${currentMonthKey}`);
+    if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, [currentMonthKey]);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
@@ -387,13 +433,12 @@ export function ScheduleTab() {
         )}
       </AnimatePresence>
       
-      {/* ── SCHEDULE MASTHEAD ── */}
-      {!search && (
+      {/* ── SCHEDULE MASTHEAD — All tab only ── */}
+      {!search && filter === 'all' && (
         <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
 
           {/* Eyebrow */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, paddingTop: 8 }}>
-            
             <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
               ⚡ Clbhouz · Tour Hub
             </span>
@@ -414,10 +459,7 @@ export function ScheduleTab() {
             )}
           </div>
 
-
-
-
-          {/* Next Up — flat, no card */}
+          {/* Next Up — full header */}
           {nextUpTournament && daysUntilNext !== null && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
@@ -428,8 +470,8 @@ export function ScheduleTab() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 2 }}>
-                    {TOUR_LABELS[nextUpTournament.tour_code ?? ''] ?? nextUpTournament.tour_code ?? 'Tour'}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <TourPill tourCode={nextUpTournament.tour_code} />
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                     {nextUpTournament.name}
@@ -452,12 +494,22 @@ export function ScheduleTab() {
             </div>
           )}
 
-          {/* Live Now — reuse the Tour Overview component */}
+          {/* Live Now — All tab only */}
           <div style={{ paddingBottom: 12 }}>
             <LiveRightNow />
           </div>
 
         </div>
+      )}
+
+      {/* Compact Next Up — filtered tabs */}
+      {!search && filter !== 'all' && nextUpTournament && daysUntilNext !== null && (
+        <CompactNextUp
+          tournamentId={nextUpTournament.id}
+          tourCode={nextUpTournament.tour_code}
+          name={nextUpTournament.name}
+          daysUntil={daysUntilNext}
+        />
       )}
       {/* Sentinel for sticky detection */}
       <div ref={stickysentinelRef} style={{ height: 1, marginTop: -1 }} />
@@ -522,6 +574,31 @@ export function ScheduleTab() {
             Tour Overview
           </button>
           <div className="flex items-center gap-2">
+            {/* Today jump pill — All tab only, when current week not visible */}
+            {filter === 'all' && !isThisWeekVisible && (
+              <button
+                onClick={scrollToThisWeek}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '7px 11px',
+                  background: '#F7931E',
+                  color: '#FFFFFF',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 900,
+                  border: 'none',
+                  boxShadow: '0 2px 8px rgba(247,147,30,0.3)',
+                  cursor: 'pointer',
+                }}
+                className="active:scale-[0.97] transition-transform"
+                aria-label="Jump to this week"
+              >
+                <Clock size={12} strokeWidth={2.8} color="#FFFFFF" />
+                Today
+              </button>
+            )}
             <button
               onClick={() => setSearchExpanded(v => !v)}
               className={cn(
@@ -548,7 +625,7 @@ export function ScheduleTab() {
                 : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
               }
               <span className="text-[12px] font-semibold text-foreground">
-                {activeTour === 'all' ? 'All Tours' : activeTour === 'pga' ? 'PGA Tour' : activeTour === 'EURO' ? 'DP World Tour' : activeTour === 'LPGA' ? 'LPGA' : activeTour === 'CHAMP' ? 'Champions' : activeTour === 'PGAD' ? 'Korn Ferry' : 'LIV Golf'}
+                {activeTour === 'all' ? 'All Tours' : (getTourMeta(activeTour)?.short ?? activeTour)}
               </span>
               <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
             </button>
@@ -580,34 +657,43 @@ export function ScheduleTab() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {monthGroups.map((group, groupIndex) => (
-                // B42 FIX 5: plain div, no staggered entrance
+              {monthGroups.map((group, groupIndex) => {
+                const isCurrentMonth = group.monthKey === currentMonthKey;
+                // Find first tournament in current week to anchor the THIS WEEK band
+                const currentWeekIdx = isCurrentMonth && filter === 'all'
+                  ? group.tournaments.findIndex(t => isInCurrentWeek(t.start_date))
+                  : -1;
+                return (
                 <div
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
                   className=""
                 >
-                  {/* B44 FIX 3: suppress month header on live tab */}
                   {filter !== 'live' && (
-                    // B42 FIX 7: remove redundant wrapper div
-                    <ScheduleMonthHeader 
+                    <ScheduleMonthHeader
                       monthLabel={group.monthLabel}
                       eventCount={group.tournaments.length}
                       tourBreakdown={group.tourBreakdown}
+                      isCurrentMonth={isCurrentMonth}
                     />
                   )}
 
                   {/* Tournament list — flat rows with hairline dividers */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                     {group.tournaments.map((tournament, idx) => (
-                      <InViewCard key={tournament.id}>
-                        <div style={{ borderBottom: idx < group.tournaments.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
-                          <ScheduleTournamentCard 
-                            tournament={tournament}
-                            leaderWinner={leadersWinnersMap?.get(tournament.id)}
-                          />
-                        </div>
-                      </InViewCard>
+                      <div key={tournament.id}>
+                        {currentWeekIdx === idx && (
+                          <ThisWeekAnchor ref={thisWeekAnchorRef} label={currentWeek.label} />
+                        )}
+                        <InViewCard>
+                          <div style={{ borderBottom: idx < group.tournaments.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+                            <ScheduleTournamentCard
+                              tournament={tournament}
+                              leaderWinner={leadersWinnersMap?.get(tournament.id)}
+                            />
+                          </div>
+                        </InViewCard>
+                      </div>
                     ))}
                    </div>
                     {/* Heavier rule between date groups */}
@@ -626,7 +712,7 @@ export function ScheduleTab() {
               >
                 <ScheduleEmptyMessage 
                   variant={filter === 'upcoming' ? 'no-upcoming' : 'no-results'}
-                  tourName={activeTour !== 'all' ? TOUR_LABELS[activeTour] : undefined}
+                  tourName={activeTour !== 'all' ? getTourLabel(activeTour) : undefined}
                   onResetTour={() => setActiveTour('all')}
                 />
               </motion.div>

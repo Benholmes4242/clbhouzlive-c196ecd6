@@ -1,36 +1,45 @@
 /**
  * ScheduleTournamentCard - Flat ruled row design
- * No border-radius, no card bg. Hairline border handled by parent.
+ *
+ * Per Schedule polish brief (Phase 1):
+ *  - Compact TourPill replaces verbose "PGA TOUR EVENT" caps text
+ *  - EventTag (major / signature / rolex / playoff) inline beside pill
+ *  - Tier accents: amber bg+border for majors, green border for signature/rolex
+ *  - Date column normalized to 42px / 9px caps month / 22px day, slate-500
+ *  - Event name = visual anchor (15px / 900 / -0.3)
+ *  - WinnerPill on completed rows (trophy + photo + name + score)
+ *  - Location with 📍 emoji as supporting line
  */
 
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Trophy } from 'lucide-react';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
-import { getContextLabel } from '../../utils/tournamentClassification';
+import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
 import { TOUR_COLORS } from '../../constants/colors';
 import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { formatPurse } from '../shared/TourHeroHelpers';
+import { TourPill } from '../shared/TourPill';
+import { EventTag, type EventTagKind } from '../shared/EventTag';
+import { WinnerPill } from '../shared/WinnerPill';
+
+// SeasonTournament has no tour_code; derive from its display tourName.
+// TOUR_NAME_TO_SLUG returns lowercase slugs (pga, liv, euro, etc.) — translate
+// to our DB-cased TourMap keys.
+const SLUG_TO_DB_CODE: Record<string, string> = {
+  pga: 'pga',
+  liv: 'LIV',
+  euro: 'EURO',
+  pgad: 'PGAD',
+  champ: 'CHAMP',
+  lpga: 'LPGA',
+};
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
   compact?: boolean;
   leaderWinner?: TournamentLeaderWinner;
-}
-
-function getPrefixedContextLabel(contextLabel: string, tourName: string | null | undefined): string {
-  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
-  const isSignature = contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES';
-  if (!isMajor && !isSignature) return contextLabel;
-  const prefixMap: Record<string, string> = {
-    'PGA Tour': 'PGA Tour', 'LPGA Tour': 'LPGA Tour', 'Champions Tour': 'Champions Tour',
-    'DP World Tour': 'DP World Tour', 'Korn Ferry Tour': 'Korn Ferry',
-    'LIV Golf': 'LIV Golf', 'LIV Golf League': 'LIV Golf',
-  };
-  const prefix = (tourName && prefixMap[tourName]) || tourName || '';
-  return prefix ? `${prefix} · ${contextLabel}` : contextLabel;
 }
 
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
@@ -54,11 +63,23 @@ function getScoreColor(score: number | null): string {
   return '#94A3B8';
 }
 
-export function ScheduleTournamentCard({ 
-  tournament, 
-  className, 
-  compact = false, 
-  leaderWinner, 
+/**
+ * Resolve EventTag variant from the classification label.
+ * Priority: major > playoff > signature > rolex (defensive — typically single-designation).
+ */
+function resolveEventTag(contextLabel: string): EventTagKind | null {
+  if (contextLabel === 'MAJOR CHAMPIONSHIP') return 'major';
+  if (contextLabel === 'PLAYOFF EVENT') return 'playoff';
+  if (contextLabel === 'SIGNATURE EVENT') return 'signature';
+  if (contextLabel === 'ROLEX SERIES') return 'rolex';
+  return null;
+}
+
+export function ScheduleTournamentCard({
+  tournament,
+  className,
+  compact = false,
+  leaderWinner,
 }: ScheduleTournamentCardProps) {
   const navigate = useNavigate();
 
@@ -66,28 +87,31 @@ export function ScheduleTournamentCard({
   const venueCity = isSeasonTournament(tournament) ? tournament.venueCity : tournament.venue_city;
   const startDate = isSeasonTournament(tournament) ? tournament.startDate : tournament.start_date;
   const tourName = isSeasonTournament(tournament) ? tournament.tourName : tournament.tour_full_name;
-  
+  const tourCode = isSeasonTournament(tournament)
+    ? (SLUG_TO_DB_CODE[TOUR_NAME_TO_SLUG[tournament.tourName] ?? ''] ?? null)
+    : (tournament as TourTournament).tour_code ?? null;
+
   const winnerFirstName = isSeasonTournament(tournament) ? tournament.winnerFirstName : null;
   const winnerLastName = isSeasonTournament(tournament) ? tournament.winnerLastName : null;
-  
+
   const isFinal = tournament.status === 'closed' || tournament.status === 'complete';
   const isLive = tournament.status === 'inprogress';
-  
+
   const contextLabel = getContextLabel({ name: tournament.name, tourName: tourName ?? undefined });
-  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
-  const isSignature = contextLabel === 'SIGNATURE EVENT';
-  const isRolex = contextLabel === 'ROLEX SERIES';
-  
+  const eventTag = resolveEventTag(contextLabel);
+  const isMajor = eventTag === 'major';
+  const isSignatureTier = eventTag === 'signature' || eventTag === 'rolex';
+
   const venue = [venueName, venueCity].filter(Boolean).join(' · ');
 
   const hasSeasonWinner = winnerFirstName && winnerLastName && isFinal;
   const hasLeaderWinnerData = leaderWinner && isFinal;
   const hasLeaderData = leaderWinner && isLive;
-  
-  const winnerDisplay = hasSeasonWinner 
+
+  const winnerDisplay = hasSeasonWinner
     ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
-
+  const winnerPhotoUrl = hasLeaderWinnerData ? leaderWinner!.photoUrl : null;
   const winnerDisplayScore = leaderWinner?.displayScore ?? null;
 
   const displayDate = isFinal
@@ -100,10 +124,16 @@ export function ScheduleTournamentCard({
     if (playerId) navigate(`/tourhub/player/${playerId}`);
   };
 
-  const handleVenueTap = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (venueName) navigate(`/courses?q=${encodeURIComponent(venueName)}`);
-  };
+  // Tier accent — left border + optional bg tint
+  const leftBorderColor = isLive
+    ? TOUR_COLORS.liveGreen
+    : isMajor
+    ? '#F7931E'
+    : isSignatureTier
+    ? '#16A34A'
+    : 'transparent';
+
+  const rowBg = isMajor ? 'rgba(247,147,30,0.06)' : 'transparent';
 
   const ariaLabel = [
     tournament.name,
@@ -118,90 +148,146 @@ export function ScheduleTournamentCard({
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className={`w-full flex items-start gap-0 cursor-pointer active:bg-black/[0.02] transition-colors ${className || ''}`}
       style={{
-        borderLeft: (isLive || isMajor || isSignature || isRolex)
-          ? `3px solid ${isLive ? TOUR_COLORS.liveGreen : isMajor ? TOUR_COLORS.liveAmber : 'rgba(16,185,129,0.8)'}`
-          : '3px solid transparent',
-        background: isMajor ? 'rgba(247,147,30,0.03)' : 'transparent',
+        borderLeft: `3px solid ${leftBorderColor}`,
+        background: rowBg,
       }}
       role="button"
       aria-label={ariaLabel}
     >
-      {/* Date block */}
-      <div style={{ flexShrink: 0, width: '52px', padding: '13px 0 13px 14px' }}>
-        <p style={{ fontSize: '8.5px', fontWeight: 700, color: '#CBD5E1', letterSpacing: '0.08em', textTransform: 'uppercase' as const, lineHeight: 1, margin: 0 }}>
+      {/* Date block — 42px column, slate-500 month, 22px day */}
+      <div
+        style={{
+          flexShrink: 0,
+          width: 42,
+          padding: '14px 0 14px 8px',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            color: '#64748B',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            lineHeight: 1,
+            margin: 0,
+          }}
+        >
           {getMonthAbbr(displayDate)}
         </p>
-        <p style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', lineHeight: 1, letterSpacing: '-0.03em', margin: '2px 0 0' }}>
+        <p
+          style={{
+            fontSize: 22,
+            fontWeight: 900,
+            color: '#0F172A',
+            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            margin: '4px 0 0',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {getDayNum(displayDate)}
         </p>
       </div>
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0, padding: '12px 16px 12px 10px' }}>
-        {/* Context label */}
-        <p style={{
-          fontSize: '8.5px',
-          fontWeight: 800,
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase' as const,
-          lineHeight: 1,
-          margin: '0 0 4px',
-          color: isMajor
-            ? TOUR_COLORS.liveAmber
-            : (isSignature || isRolex)
-            ? 'rgba(16,185,129,0.9)'
-            : isLive
-            ? TOUR_COLORS.liveGreen
-            : '#94A3B8',
-        }}>
-          {isLive ? '● LIVE' : (isMajor ? '★ ' : '')}{isLive ? '' : getPrefixedContextLabel(contextLabel, tourName)}
-          {isLive && leaderWinner?.round1 !== undefined && (() => {
-            const roundInfo = getCurrentRound(
-              leaderWinner!.round1, leaderWinner!.round2,
-              leaderWinner!.round3, leaderWinner!.round4
-            );
-            return roundInfo ? (
-              <span style={{ fontWeight: 500, color: 'rgba(34,197,94,0.6)', marginLeft: '4px', letterSpacing: '0.04em' }}>
-                R{roundInfo.currentRound}
-              </span>
-            ) : null;
-          })()}
-        </p>
+        {/* Tour pill + event tag row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+          <TourPill tourCode={tourCode} />
+          {eventTag && <EventTag kind={eventTag} />}
+          {isLive && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                padding: '3px 6px',
+                borderRadius: 4,
+                background: 'rgba(34,197,94,0.10)',
+                border: '1px solid rgba(34,197,94,0.30)',
+                color: '#16A34A',
+                fontSize: 9,
+                fontWeight: 900,
+                letterSpacing: 0.6,
+                lineHeight: 1,
+              }}
+            >
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#16A34A' }} />
+              LIVE
+              {leaderWinner?.round1 !== undefined && (() => {
+                const roundInfo = getCurrentRound(
+                  leaderWinner!.round1,
+                  leaderWinner!.round2,
+                  leaderWinner!.round3,
+                  leaderWinner!.round4,
+                );
+                return roundInfo ? (
+                  <span style={{ marginLeft: 2, fontWeight: 700, opacity: 0.8 }}>· R{roundInfo.currentRound}</span>
+                ) : null;
+              })()}
+            </span>
+          )}
+        </div>
 
-        {/* Tournament name — full width, wraps naturally */}
-        <p style={{
-          fontSize: '15px',
-          fontWeight: 800,
-          color: '#0F172A',
-          letterSpacing: '-0.02em',
-          lineHeight: 1.25,
-          margin: '0 0 4px',
-        }}>
+        {/* Tournament name — visual anchor */}
+        <p
+          style={{
+            fontSize: 15,
+            fontWeight: 900,
+            color: '#0F172A',
+            letterSpacing: '-0.3px',
+            lineHeight: 1.2,
+            margin: '0 0 4px',
+          }}
+        >
           {tournament.name}
         </p>
 
-        {/* Winner / Leader row */}
-        {(winnerDisplay || hasLeaderData) && (
-          <p style={{ fontSize: '12px', fontWeight: 500, margin: '0 0 3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {isFinal && winnerDisplay && (
-              <span style={{ color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Trophy style={{ width: 12, height: 12, color: TOUR_COLORS.liveAmber, flexShrink: 0 }} />
-                <button onClick={handlePlayerTap} className="transition-opacity active:opacity-70" style={{ color: '#0F172A', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                  {winnerDisplay}
-                </button>
-                {winnerDisplayScore && (
-                  <span style={{ color: TOUR_COLORS.liveAmber, fontWeight: 700 }}>({winnerDisplayScore})</span>
-                )}
-              </span>
-            )}
-            {hasLeaderData && !isFinal && (
-              <span style={{ color: TOUR_COLORS.liveGreen }}>
-                Leader:{' '}
-                <button onClick={handlePlayerTap} className="transition-opacity active:opacity-70" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}>{leaderWinner!.displayName}</button>
-                <span style={{ fontWeight: 700, marginLeft: '4px', color: getScoreColor(leaderWinner!.score) }}>{leaderWinner!.displayScore}</span>
-              </span>
-            )}
+        {/* Live leader row (kept inline, not pill — only completed rows get a winner pill) */}
+        {hasLeaderData && !isFinal && (
+          <p
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              margin: '0 0 4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              color: TOUR_COLORS.liveGreen,
+            }}
+          >
+            Leader:{' '}
+            <button
+              type="button"
+              onClick={handlePlayerTap}
+              className="active:opacity-70 transition-opacity"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', fontWeight: 700 }}
+            >
+              {leaderWinner!.displayName}
+            </button>
+            <span
+              style={{
+                fontWeight: 800,
+                marginLeft: 2,
+                color: getScoreColor(leaderWinner!.score),
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {leaderWinner!.displayScore}
+            </span>
           </p>
+        )}
+
+        {/* Winner pill — completed rows only */}
+        {isFinal && winnerDisplay && (
+          <WinnerPill
+            name={winnerDisplay}
+            photoUrl={winnerPhotoUrl}
+            score={winnerDisplayScore}
+            onPlayerTap={leaderWinner?.playerId ? handlePlayerTap : undefined}
+          />
         )}
 
         {/* Date range + purse for upcoming */}
@@ -220,20 +306,26 @@ export function ScheduleTournamentCard({
             purse && formatPurse(purse),
           ].filter(Boolean);
           return parts.length > 0 ? (
-            <p style={{ fontSize: '11px', color: '#94A3B8', margin: '0 0 3px' }}>{parts.join(' · ')}</p>
+            <p style={{ fontSize: 11, fontWeight: 600, color: '#64748B', margin: '0 0 3px' }}>{parts.join(' · ')}</p>
           ) : null;
         })()}
 
-        {/* Venue */}
+        {/* Venue — pin emoji + supporting line */}
         {venue && !compact && (
-          <button
-            onClick={handleVenueTap}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-            className="transition-opacity active:opacity-70"
+          <p
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 11,
+              fontWeight: 600,
+              color: '#64748B',
+              margin: 0,
+            }}
           >
-            <MapPin style={{ width: 10, height: 10, flexShrink: 0, opacity: 0.6 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{venue}</span>
-          </button>
+            <span style={{ fontSize: 11, lineHeight: 1, flexShrink: 0 }}>📍</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{venue}</span>
+          </p>
         )}
       </div>
     </div>

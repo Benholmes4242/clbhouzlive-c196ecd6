@@ -11,28 +11,30 @@ interface ScheduleEmptyMessageProps {
   variant: 'no-live' | 'no-results' | 'no-upcoming' | 'season-complete';
   nextTournamentName?: string;
   nextTournamentDate?: string;
+  nextTournamentTour?: string; // tour label e.g. "Champions Tour"
   tourName?: string;
   onSwitchFilter?: (filter: string) => void;
   onResetTour?: () => void;
   className?: string;
 }
 
-function formatCountdown(dateStr: string): string {
+function formatTeesOff(dateStr: string): string {
   const target = new Date(dateStr);
-  return `Starts ${format(target, 'EEE, MMM d')}`;
+  return `Next event tees off ${format(target, 'EEEE, MMMM d')}.`;
 }
 
-export function ScheduleEmptyMessage({ 
-  variant, 
+export function ScheduleEmptyMessage({
+  variant,
   nextTournamentName,
   nextTournamentDate,
+  nextTournamentTour,
   tourName,
   onSwitchFilter,
   onResetTour,
-  className 
+  className,
 }: ScheduleEmptyMessageProps) {
 
-  const countdown = nextTournamentDate ? formatCountdown(nextTournamentDate) : null;
+  const teesOffLine = nextTournamentDate ? formatTeesOff(nextTournamentDate) : null;
 
   if (variant === 'no-live') {
     return (
@@ -42,7 +44,7 @@ export function ScheduleEmptyMessage({
           "py-16 px-6 mx-4 text-center",
           className
         )}
-        style={{ paddingTop: '40px', paddingBottom: '40px' }}
+        style={{ paddingTop: 40, paddingBottom: 40 }}
       >
         <div className="relative">
           <Flag className="w-12 h-12 text-muted-foreground/30" />
@@ -51,29 +53,36 @@ export function ScheduleEmptyMessage({
           </div>
         </div>
 
-        <h3 
+        <h3
           className="text-center"
-          style={{ fontSize: '18px', fontWeight: 700, marginTop: '16px', color: '#0F172A' }}
+          style={{ fontSize: 20, fontWeight: 900, marginTop: 16, color: '#0F172A', letterSpacing: '-0.5px' }}
         >
-          No Tournaments Live Right Now
+          Quiet on tour right now.
         </h3>
 
-        {nextTournamentName && countdown && (
-          <div className="flex flex-col items-center max-w-[300px]" style={{ marginTop: '24px' }}>
-            <p style={{ fontSize: '13px', fontWeight: 400, color: '#94A3B8' }}>
-              Next up
-            </p>
-            <p className="text-center" style={{ fontSize: '16px', fontWeight: 600, marginTop: '4px', color: '#0F172A' }}>
-              {nextTournamentName}
-            </p>
-            <p style={{ fontSize: '13px', fontWeight: 400, marginTop: '2px', color: '#94A3B8' }}>
-              {countdown}
-            </p>
-          </div>
+        {teesOffLine && (
+          <p
+            className="text-center max-w-[300px]"
+            style={{ fontSize: 13, fontWeight: 500, color: '#475569', marginTop: 12, lineHeight: 1.5 }}
+          >
+            {teesOffLine}
+          </p>
+        )}
+
+        {nextTournamentName && (
+          <p
+            className="text-center max-w-[300px]"
+            style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', marginTop: 6 }}
+          >
+            {nextTournamentName}
+            {nextTournamentTour && (
+              <span style={{ color: '#94A3B8', fontWeight: 600 }}> · {nextTournamentTour}</span>
+            )}
+          </p>
         )}
 
         {!nextTournamentName && (
-          <p className="max-w-[280px]" style={{ fontSize: '13px', fontWeight: 400, marginTop: '12px', color: '#94A3B8' }}>
+          <p className="max-w-[280px]" style={{ fontSize: 13, fontWeight: 500, marginTop: 12, color: '#475569' }}>
             No tournaments are in progress. Check back soon!
           </p>
         )}
@@ -84,11 +93,11 @@ export function ScheduleEmptyMessage({
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '5px',
+              gap: 5,
               padding: '12px 24px',
-              marginTop: '20px',
-              borderRadius: '12px',
-              fontSize: '13px',
+              marginTop: 20,
+              borderRadius: 12,
+              fontSize: 13,
               fontWeight: 700,
               color: '#0F172A',
               background: '#ffffff',
