@@ -216,8 +216,10 @@ export function ReviewWizard({
   }, [wizard.submittedRatingId, queryClient]);
 
   // Navigation guard
-  const hasUnsavedChanges = wizard.state.rating !== null || 
-    wizard.state.review.length > 0 || 
+  const hasAnyBreakdown = Object.values(wizard.state.breakdowns).some(v => v !== null);
+  const hasUnsavedChanges = wizard.state.rating !== null ||
+    hasAnyBreakdown ||
+    wizard.state.review.length > 0 ||
     wizard.allMedia.length > 0;
 
   const isPostSubmit = wizard.state.step === 'success' || 
