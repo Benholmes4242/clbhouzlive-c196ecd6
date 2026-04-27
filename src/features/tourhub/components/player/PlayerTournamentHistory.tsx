@@ -20,6 +20,11 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
   const results = showAll ? allResults : allResults?.slice(0, INITIAL_LIMIT);
   const hasMore = (allResults?.length ?? 0) > INITIAL_LIMIT;
 
+  // Rule 26 — honest data: omit the entire section when not loading and no results.
+  if (!isLoading && (!allResults || allResults.length === 0)) {
+    return null;
+  }
+
   return (
     <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
       {/* Section header */}
