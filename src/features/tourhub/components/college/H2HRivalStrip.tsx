@@ -64,9 +64,9 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
           const college = r.college;
           const displayName = college?.short_name || college?.college_name || r.rivalNormalizedName;
           const logoUrl = getCollegeLogoUrl(college?.college_name || displayName);
-          // Spec subtitle: real rivalry → "Conference rival" (until context_label
-          // ships in Phase 2); fallback row → "Top program".
-          const subtitle = r.isFallback ? 'Top program' : 'Conference rival';
+          // Editorial label from college_rivalries.context_label when present;
+          // fall back to generic copy distinguishing real vs proximity-fallback rows.
+          const subtitle = r.context_label ?? (r.isFallback ? 'Top program' : 'Conference rival');
 
           return (
             <Link
