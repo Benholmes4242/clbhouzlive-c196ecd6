@@ -29,9 +29,7 @@ const sectionVariants = {
 };
 
 const PULL_THRESHOLD = 50;
-
-const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
-type StatTab = (typeof STAT_TABS)[number];
+// STAT_TABS moved into PlayerSeasonStats (Fix 1 — segmented control now lives inside the card).
 
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
