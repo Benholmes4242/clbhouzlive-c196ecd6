@@ -255,10 +255,91 @@ export function LeadersTab() {
     );
   }
 
-  // ─── Hero leader (#1) ───
+  // ─── Hero leader (#1) + runner for margin ───
   const leader = rankedPlayers[0] ?? null;
-  const runners = rankedPlayers.slice(1, 3);
-  const listPlayers = rankedPlayers;
+  const runnerUp = rankedPlayers[1] ?? null;
+
+  // ─── Search-filtered list (hero #1 stays in list) ───
+  const filteredPlayers = useMemo(() => {
+    const q = debouncedSearch.trim().toLowerCase();
+    if (q.length < 2) return rankedPlayers;
+    return rankedPlayers.filter((item) => {
+      const name = item.player.full_name?.toLowerCase() ?? '';
+      const country = item.player.country?.toLowerCase() ?? '';
+      return name.includes(q) || country.includes(q);
+    });
+  }, [rankedPlayers, debouncedSearch]);
+  const listPlayers = filteredPlayers;
+
+  // ─── Recent results pills — batch fetch for all rendered rows ───
+  const sortedPlayerIds = useMemo(
+    () => rankedPlayers.map((p) => p.playerId),
+    [rankedPlayers],
+  );
+  const { data: recentResultsMap } = useRecentPlayerResults(sortedPlayerIds);
+
+  // ─── Champion streak + recent form for hero pills ───
+  const { data: streakWeeks } = useChampionStreak(
+    isWorldCategory ? leader?.playerId : null,
+  );
+  const { data: recentForm } = useChampionRecentForm(leader?.playerId, 8);
+
+  // ─── Build hero narrative pills (Phase 1: Margin + Streak + Recent Form) ───
+  // vs Avg pill is Phase 2; lower-is-better Margin is Phase 2 (omits in Phase 1).
+  const heroPills = useMemo<MastheadPill[]>(() => {
+    const out: MastheadPill[] = [];
+    if (!leader) return out;
+
+    // Margin pill — Phase 1 ships higher-is-better only.
+    if (runnerUp && category.higherIsBetter) {
+      const gap = leader.value - runnerUp.value;
+      if (gap > 0) {
+        // Format gap using category's own formatter for consistency, drop unit
+        // when format() already includes it (e.g. earnings "$1.2M").
+        const fmtGap = category.format(gap);
+        const unit = category.unit && !fmtGap.includes(category.unit) ? ` ${category.unit}` : '';
+        out.push({
+          variant: 'highlight',
+          label: 'Margin:',
+          value: `+${fmtGap}${unit}`,
+        });
+      } else if (gap === 0) {
+        out.push({
+          variant: 'normal',
+          label: 'Margin:',
+          value: 'tied with #2',
+        });
+      }
+    }
+
+    // Streak pill — World Rankings only.
+    if (category.showStreak && streakWeeks && streakWeeks >= 2) {
+      out.push({
+        variant: 'highlight',
+        icon: 'flame',
+        value: `${streakWeeks}-week leader`,
+      });
+    }
+
+    // Recent Form pill — when leader has played ≥3 events in last 8 weeks.
+    if (recentForm && recentForm.starts >= 3) {
+      let value: string | null = null;
+      if (recentForm.wins > 0) {
+        value = `${recentForm.starts} starts · ${recentForm.wins} ${recentForm.wins === 1 ? 'win' : 'wins'}`;
+      } else if (recentForm.top10s > 0) {
+        value = `${recentForm.starts} starts · ${recentForm.top10s} top-10${recentForm.top10s === 1 ? '' : 's'}`;
+      }
+      if (value) {
+        out.push({
+          variant: 'normal',
+          icon: 'trophy',
+          value,
+        });
+      }
+    }
+
+    return out;
+  }, [leader, runnerUp, category, streakWeeks, recentForm]);
 
   // Active group detection
   const activeGroup = Object.entries(GROUP_KEYS).find(([, keys]) => keys.includes(categoryKey))?.[0] ?? 'General';
