@@ -336,6 +336,16 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         top100Count={tabCounts.top100}
       />
 
+      {/* Page-level breakdowns prompt (own profile only) */}
+      {isOwnProfile && missingBreakdownsCourses.length > 0 && (
+        <div style={{ padding: '12px 16px 0' }}>
+          <BreakdownsPrompt
+            missingCount={missingBreakdownsCourses.length}
+            onTap={handleBreakdownsPromptTap}
+          />
+        </div>
+      )}
+
       {/* Course list */}
       {tieAnnotated.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
