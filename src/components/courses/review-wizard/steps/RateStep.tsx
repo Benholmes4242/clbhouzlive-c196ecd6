@@ -376,33 +376,36 @@ export function RateStep({
           ⚡ Your Verdict
         </div>
 
-        {/* Large animated score — derived from breakdowns */}
+        {/* Large animated score — derived from breakdowns (D7: scale pulse on change) */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-          <motion.span
-            key={displayVerdict !== null ? displayVerdict.toFixed(1) : 'unset'}
-            initial={{ opacity: 0, y: -8, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+          <span
             style={{
               fontSize: 48,
               fontWeight: 900,
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
               color: displayVerdict !== null ? '#0F172A' : 'rgba(15,23,42,0.18)',
+              display: 'inline-block',
+              transform: isAnimatingVerdict ? 'scale(1.06)' : 'scale(1.0)',
+              transition: 'transform 200ms ease',
             }}
           >
             {displayVerdict !== null ? displayVerdict.toFixed(1) : '—'}
-          </motion.span>
+          </span>
         </div>
 
-        {/* Tier label */}
+        {/* Tier label (D6: fade-and-rise on tier transitions) */}
         {overallTier ? (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}
+          <p
+            key={overallTier.label}
+            style={{
+              textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A',
+              textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8,
+              animation: 'verdictLabelEnter 200ms ease-out',
+            }}
           >
             {overallTier.label}
-          </motion.p>
+          </p>
         ) : (
           <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 8 }}>
             Rate categories below to set your verdict
