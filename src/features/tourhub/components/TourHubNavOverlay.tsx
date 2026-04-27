@@ -4,30 +4,42 @@
  * Uses the shared BottomSheet component for consistent UI across the app.
  */
 
-import React, { useEffect, useCallback, useRef, useState } from 'react';
+import React, { useEffect, useCallback, useRef, useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  ChevronRight, 
+import {
+  ChevronRight,
+  Globe,
+  Calendar,
+  Users,
+  Trophy,
+  GraduationCap,
+  type LucideProps,
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { 
-  useLiveTournamentCount, 
-  useLiveLeaderTeaser, 
-  useTopCollegeTeaser 
+import {
+  useLiveTournamentCount,
+  useLiveLeaderTeaser,
+  useTopCollegeTeaser,
+  useMoneyListLeader,
 } from '../hooks/useNavMenuData';
+import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
 import { TOUR_COLORS } from '../constants/colors';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatCountdown } from '../utils/formatCountdown';
 import type { TourHubTab } from './TourHubTabs';
+
+type LucideIcon = ComponentType<LucideProps>;
 
 interface NavItem {
   value: TourHubTab;
   label: string;
   subtitle: string;
-  icon: React.ReactNode;
+  iconComponent: LucideIcon;
+  iconColor: string;
 }
 
 interface LinkItem {
@@ -35,26 +47,85 @@ interface LinkItem {
   label: string;
   subtitle: string;
   path: string;
-  icon: React.ReactNode;
+  iconComponent: LucideIcon;
+  iconColor: string;
   badge?: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <span className="text-xl">🌍</span> },
-  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening - past, present, and upcoming.', icon: <span className="text-xl">📅</span> },
-  { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <span className="text-xl">🏌️</span> },
-  { value: 'leaderboards', label: 'Performance Rankings', subtitle: 'Statistical leaders across every category.', icon: <span className="text-xl">🏆</span> },
+  { value: 'overview',     label: 'Overview',    subtitle: 'The global golf season at a glance.',     iconComponent: Globe,    iconColor: '#F7931E' },
+  { value: 'schedule',     label: 'Schedule',    subtitle: 'Past, present, and the road ahead.',      iconComponent: Calendar, iconColor: '#0A5A3C' },
+  { value: 'players',      label: 'Players',     subtitle: 'The names shaping the season.',           iconComponent: Users,    iconColor: '#3B82F6' },
+  { value: 'leaderboards', label: 'Stat Watch',  subtitle: 'Every stat, every category, every tour.', iconComponent: Trophy,   iconColor: '#F7931E' },
 ];
 
 const LINK_ITEMS: LinkItem[] = [
-  { 
-    id: 'college-golf', 
-    label: 'College Franchise Rankings', 
-    subtitle: 'From campus standout to Tour contender.',
+  {
+    id: 'college-golf',
+    label: 'College Franchise Rankings',
+    subtitle: 'Where college legacies battle on tour.',
     path: '/tourhub/college-golf',
-    icon: <span className="text-xl">🎓</span>,
+    iconComponent: GraduationCap,
+    iconColor: '#7C3AED',
   },
 ];
+
+/** Reusable 40×40 colored squircle holding a Lucide icon. */
+function MenuRowIcon({ Icon, color }: { Icon: LucideIcon; color: string }) {
+  return (
+    <div
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        background: `${color}14`, // 8% alpha tint
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={20} color={color} strokeWidth={2.2} />
+    </div>
+  );
+}
+
+/** Reusable teaser line — leading element + optional label + value. */
+function MenuRowTeaser({
+  leadingElement,
+  label,
+  labelColor,
+  children,
+}: {
+  leadingElement?: React.ReactNode;
+  label?: string;
+  labelColor?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        fontSize: 11,
+        fontWeight: 700,
+        color: '#334155',
+        marginTop: 6,
+        minWidth: 0,
+      }}
+    >
+      {leadingElement}
+      {label && (
+        <span style={{ color: labelColor ?? '#64748B', fontWeight: 800 }}>{label}</span>
+      )}
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
 
 
 
