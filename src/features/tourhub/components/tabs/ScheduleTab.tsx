@@ -16,6 +16,8 @@ import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe, Clo
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
+import { useScheduleDefendingChampionPhotos } from '../../hooks/useScheduleDefendingChampionPhotos';
+import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
