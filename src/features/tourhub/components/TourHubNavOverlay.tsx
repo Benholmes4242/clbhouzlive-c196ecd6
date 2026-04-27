@@ -4,30 +4,42 @@
  * Uses the shared BottomSheet component for consistent UI across the app.
  */
 
-import React, { useEffect, useCallback, useRef, useState } from 'react';
+import React, { useEffect, useCallback, useRef, useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  ChevronRight, 
+import {
+  ChevronRight,
+  Globe,
+  Calendar,
+  Users,
+  Trophy,
+  GraduationCap,
+  type LucideProps,
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { 
-  useLiveTournamentCount, 
-  useLiveLeaderTeaser, 
-  useTopCollegeTeaser 
+import {
+  useLiveTournamentCount,
+  useLiveLeaderTeaser,
+  useTopCollegeTeaser,
+  useMoneyListLeader,
 } from '../hooks/useNavMenuData';
+import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
 import { TOUR_COLORS } from '../constants/colors';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatCountdown } from '../utils/formatCountdown';
 import type { TourHubTab } from './TourHubTabs';
+
+type LucideIcon = ComponentType<LucideProps>;
 
 interface NavItem {
   value: TourHubTab;
   label: string;
   subtitle: string;
-  icon: React.ReactNode;
+  iconComponent: LucideIcon;
+  iconColor: string;
 }
 
 interface LinkItem {
@@ -35,26 +47,85 @@ interface LinkItem {
   label: string;
   subtitle: string;
   path: string;
-  icon: React.ReactNode;
+  iconComponent: LucideIcon;
+  iconColor: string;
   badge?: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <span className="text-xl">🌍</span> },
-  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening - past, present, and upcoming.', icon: <span className="text-xl">📅</span> },
-  { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <span className="text-xl">🏌️</span> },
-  { value: 'leaderboards', label: 'Performance Rankings', subtitle: 'Statistical leaders across every category.', icon: <span className="text-xl">🏆</span> },
+  { value: 'overview',     label: 'Overview',    subtitle: 'The global golf season at a glance.',     iconComponent: Globe,    iconColor: '#F7931E' },
+  { value: 'schedule',     label: 'Schedule',    subtitle: 'Past, present, and the road ahead.',      iconComponent: Calendar, iconColor: '#0A5A3C' },
+  { value: 'players',      label: 'Players',     subtitle: 'The names shaping the season.',           iconComponent: Users,    iconColor: '#3B82F6' },
+  { value: 'leaderboards', label: 'Stat Watch',  subtitle: 'Every stat, every category, every tour.', iconComponent: Trophy,   iconColor: '#F7931E' },
 ];
 
 const LINK_ITEMS: LinkItem[] = [
-  { 
-    id: 'college-golf', 
-    label: 'College Franchise Rankings', 
-    subtitle: 'From campus standout to Tour contender.',
+  {
+    id: 'college-golf',
+    label: 'College Franchise Rankings',
+    subtitle: 'Where college legacies battle on tour.',
     path: '/tourhub/college-golf',
-    icon: <span className="text-xl">🎓</span>,
+    iconComponent: GraduationCap,
+    iconColor: '#7C3AED',
   },
 ];
+
+/** Reusable 40×40 colored squircle holding a Lucide icon. */
+function MenuRowIcon({ Icon, color }: { Icon: LucideIcon; color: string }) {
+  return (
+    <div
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        background: `${color}14`, // 8% alpha tint
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={20} color={color} strokeWidth={2.2} />
+    </div>
+  );
+}
+
+/** Reusable teaser line — leading element + optional label + value. */
+function MenuRowTeaser({
+  leadingElement,
+  label,
+  labelColor,
+  children,
+}: {
+  leadingElement?: React.ReactNode;
+  label?: string;
+  labelColor?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        fontSize: 11,
+        fontWeight: 700,
+        color: '#334155',
+        marginTop: 6,
+        minWidth: 0,
+      }}
+    >
+      {leadingElement}
+      {label && (
+        <span style={{ color: labelColor ?? '#64748B', fontWeight: 800 }}>{label}</span>
+      )}
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
 
 
 
@@ -80,7 +151,9 @@ export function TourHubNavOverlay({
   const { data: liveCount } = useLiveTournamentCount();
   const { data: leaderTeaser } = useLiveLeaderTeaser();
   const { data: topCollege } = useTopCollegeTeaser();
-  
+  const { data: moneyLeader } = useMoneyListLeader();
+  const { data: upcomingTournaments } = useUpcomingTournaments(1);
+
   // BottomSheet handles scroll lock and ESC key
 
   useEffect(() => {
@@ -134,95 +207,159 @@ export function TourHubNavOverlay({
 
 
   const displayPlayers = topPlayers?.slice(0, 5) || [];
+  const worldNo1 = displayPlayers[0] ?? null;
+  const nextTournament = upcomingTournaments?.[0] ?? null;
 
-  const scheduleSubtitle = hasLive
-    ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
-    : "What's happening - past, present, and upcoming.";
+  // Schedule teaser state derivation
+  const scheduleTeaserState = (() => {
+    if (hasLive && leaderTeaser) {
+      const liveCopy = (liveCount ?? 0) > 1
+        ? `${liveCount} tournaments`
+        : leaderTeaser.tournamentName;
+      return { kind: 'live' as const, copy: liveCopy };
+    }
+    if (nextTournament) {
+      const start = new Date(nextTournament.startDate);
+      const diffDays = Math.floor((start.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      if (diffDays >= 0 && diffDays <= 7) {
+        return { kind: 'this-week' as const, copy: nextTournament.name };
+      }
+      return {
+        kind: 'next' as const,
+        copy: `${nextTournament.name} · ${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+      };
+    }
+    return null;
+  })();
 
   const getAriaLabel = (item: NavItem) => {
     switch (item.value) {
       case 'overview': return 'Overview — The global golf season at a glance';
-      case 'schedule': return hasLive ? `Schedule — ${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now` : 'Schedule - What\'s happening past, present, and upcoming';
+      case 'schedule': return 'Schedule — Past, present, and the road ahead';
       case 'players': return 'Players — The names shaping the season';
-      case 'leaderboards': return 'Performance Rankings — Statistical leaders across every category';
+      case 'leaderboards': return 'Stat Watch — Every stat, every category, every tour';
       default: return item.label;
     }
   };
 
   const renderTeaser = (item: NavItem) => {
-    if (item.value === 'overview' && hasLive && !leaderTeaser) {
-      return (
-        <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ height: 12, width: '75%', borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} className="animate-pulse" />
-          <div style={{ height: 12, width: '50%', borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} className="animate-pulse" />
-        </div>
-      );
-    }
-    if (item.value === 'overview' && leaderTeaser && hasLive) {
-      const scoreStr = leaderTeaser.score !== null
-        ? (leaderTeaser.score < 0 ? `${leaderTeaser.score}` : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
-        : null;
-      return (
-        <p style={{ fontSize: 11, marginTop: 2, color: '#64748b' }}>
-          {leaderTeaser.isTied ? (
-            <span style={{ fontWeight: 500 }}>{leaderTeaser.playerName}</span>
-          ) : (
-            <button
-              type="button"
-              style={{ fontWeight: 500, color: '#0f172a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-              className="transition-opacity active:opacity-70 focus:outline-none"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (leaderTeaser.playerId) handlePlayerClick(leaderTeaser.playerId);
-              }}
-            >
-              {leaderTeaser.playerName}
-            </button>
-          )}
-          {leaderTeaser.isTied ? ' at ' : ' leads at '}
-          {scoreStr !== null && (
-            <span style={{ color: leaderTeaser.score !== null && leaderTeaser.score < 0 ? TOUR_COLORS.scoreUnderPar : undefined }}>
-              {scoreStr}
-            </span>
-          )}
-          <br />
-          <button
-            type="button"
-            style={{ color: '#0f172a', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
-            className="truncate transition-opacity active:opacity-70 focus:outline-none"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (leaderTeaser.tournamentId) {
-                haptic('light');
-                onClose();
-                navigate(`/tourhub/tournament/${leaderTeaser.tournamentId}`);
-                window.scrollTo({ top: 0, behavior: 'instant' });
-              }
-            }}
+    // Overview — live state when a leader is known, else countdown to next event
+    if (item.value === 'overview') {
+      if (hasLive && leaderTeaser) {
+        const scoreStr = leaderTeaser.score !== null
+          ? (leaderTeaser.score < 0
+              ? `${leaderTeaser.score}`
+              : `${leaderTeaser.score > 0 ? '+' : ''}${leaderTeaser.score}`)
+          : '';
+        const isUnderPar = leaderTeaser.score !== null && leaderTeaser.score < 0;
+        return (
+          <MenuRowTeaser
+            leadingElement={
+              <motion.span
+                style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#22C55E', display: 'inline-block', flexShrink: 0,
+                }}
+                animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            }
+            label="LIVE"
+            labelColor="#16A34A"
           >
-            {leaderTeaser.tournamentName}
-          </button>
-        </p>
-      );
+            {leaderTeaser.tournamentName} ·{' '}
+            <span style={{ fontWeight: 800 }}>
+              {leaderTeaser.playerName}
+              {scoreStr && (
+                <>
+                  {' '}
+                  <span style={{ color: isUnderPar ? TOUR_COLORS.scoreUnderPar : '#334155' }}>
+                    {scoreStr}
+                  </span>
+                </>
+              )}
+            </span>
+          </MenuRowTeaser>
+        );
+      }
+      if (nextTournament) {
+        const countdown = formatCountdown(nextTournament.startDate);
+        return (
+          <MenuRowTeaser
+            leadingElement={
+              <span
+                style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#22C55E', display: 'inline-block', flexShrink: 0,
+                }}
+              />
+            }
+          >
+            {nextTournament.name}{countdown ? ` · Tees off in ${countdown}` : ''}
+          </MenuRowTeaser>
+        );
+      }
+      return null;
     }
-    return null;
-  };
 
-  const renderBadge = (item: NavItem) => {
-    if (item.value === 'schedule' && hasLive) {
+    // Schedule — adapts to live / this-week / next
+    if (item.value === 'schedule' && scheduleTeaserState) {
+      if (scheduleTeaserState.kind === 'live') {
+        return (
+          <MenuRowTeaser label="LIVE:" labelColor="#16A34A">
+            {scheduleTeaserState.copy}
+          </MenuRowTeaser>
+        );
+      }
+      if (scheduleTeaserState.kind === 'this-week') {
+        return (
+          <MenuRowTeaser label="This week:">
+            {scheduleTeaserState.copy}
+          </MenuRowTeaser>
+        );
+      }
       return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <motion.span
-            style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', display: 'inline-block' }}
-            animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-          <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22C55E' }}>
-            {liveCount} LIVE
-          </span>
-        </div>
+        <MenuRowTeaser label="Next:">
+          {scheduleTeaserState.copy}
+        </MenuRowTeaser>
       );
     }
+
+    // Players — World #1 with small headshot
+    if (item.value === 'players' && worldNo1) {
+      const headshot = getPlayerHeadshotUrl(
+        worldNo1.playerName,
+        (worldNo1 as any).tourCode ?? 'pga',
+      );
+      return (
+        <MenuRowTeaser
+          leadingElement={
+            <img
+              src={headshot || PLAYER_SILHOUETTE_URL}
+              alt=""
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              style={{
+                width: 16, height: 16, borderRadius: 5,
+                objectFit: 'cover', flexShrink: 0,
+                border: '0.5px solid rgba(0,0,0,0.08)',
+              }}
+            />
+          }
+        >
+          {worldNo1.playerName} · World #1
+        </MenuRowTeaser>
+      );
+    }
+
+    // Stat Watch — Money List leader
+    if (item.value === 'leaderboards' && moneyLeader) {
+      return (
+        <MenuRowTeaser label="Money List:" labelColor="#C97A10">
+          {moneyLeader.name} · {formatCurrency(moneyLeader.earnings)}
+        </MenuRowTeaser>
+      );
+    }
+
     return null;
   };
 
@@ -407,18 +544,21 @@ export function TourHubNavOverlay({
           </div>
         )}
 
-        {/* Header */}
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Navigate</div>
-          <div id="tour-nav-menu-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Tour Hub</div>
+        {/* Header — title only (NAVIGATE eyebrow removed) */}
+        <div style={{ padding: '14px 20px 14px' }}>
+          <div
+            id="tour-nav-menu-title"
+            style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: -0.5 }}
+          >
+            Tour Hub
+          </div>
         </div>
 
         {/* Nav Items + Link Items — Dispatch flat rows */}
         <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.value;
-            const dynamicSubtitle = item.value === 'schedule' ? scheduleSubtitle : item.subtitle;
-            
+
             return (
               <button
                 key={item.value}
@@ -436,10 +576,8 @@ export function TourHubNavOverlay({
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={getAriaLabel(item)}
               >
-                {/* Icon */}
-                <div style={{ width: 36, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {item.icon}
-                </div>
+                {/* Icon — colored squircle with Lucide icon */}
+                <MenuRowIcon Icon={item.iconComponent} color={item.iconColor} />
 
                 {/* Label + subtitle */}
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -447,10 +585,9 @@ export function TourHubNavOverlay({
                     <span style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: '#0F172A' }}>
                       {item.label}
                     </span>
-                    {renderBadge(item)}
                   </div>
                   <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
-                    {dynamicSubtitle}
+                    {item.subtitle}
                   </div>
                   {renderTeaser(item)}
                 </div>
@@ -478,10 +615,8 @@ export function TourHubNavOverlay({
                 }}
                 aria-label={`${item.label} — ${item.subtitle}`}
               >
-                {/* Icon */}
-                <div style={{ width: 36, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {item.icon}
-                </div>
+                {/* Icon — colored squircle with Lucide icon */}
+                <MenuRowIcon Icon={item.iconComponent} color={item.iconColor} />
 
                 {/* Label + subtitle */}
                 <div style={{ flex: 1, minWidth: 0 }}>
