@@ -5,10 +5,10 @@
  * tap-through to the H2H comparison page.
  *
  * Data source: useCollegeRivalries — already implements the spec's
- * earnings-proximity fallback (E28(c)). Subtitle is derived as a prop:
- *   - real college_rivalries row → "Conference rival" (placeholder until
- *     a context_label column is added in Phase 2)
- *   - earnings-proximity fallback row → "Top program"
+ * earnings-proximity fallback (E28(c)). Subtitle is derived in priority order:
+ *   1. college_rivalries.context_label (editorial, e.g. "In-state rival")
+ *   2. real rivalry row without label → "Conference rival"
+ *   3. earnings-proximity fallback row → "Top program"
  *
  * Layout: 3 rival cards + a "Browse all" terminal card. Tap a card to
  * route to the H2H page with the rival pre-selected.
