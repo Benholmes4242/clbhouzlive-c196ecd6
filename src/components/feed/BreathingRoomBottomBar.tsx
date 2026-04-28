@@ -120,7 +120,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               alignSelf: 'flex-start',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 5,
+              gap: 6,
               maxWidth: '100%',
               padding: '5px 10px',
               borderRadius: 999,
@@ -133,7 +133,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
             }}
             aria-label={`View ${golfCourse.name}`}
           >
-            <MapPin size={11} fill="#F7931E" stroke="#F7931E" strokeWidth={1} />
+            <MapPin size={14} fill="#F7931E" stroke="#F7931E" strokeWidth={2} />
             <span
               style={{
                 fontSize: 11,
