@@ -126,6 +126,7 @@ export interface ActivityNotification {
   actor_display_name: string;
   actor_username: string;
   actor_avatar_url: string | null;
+  actor_is_public: boolean | null;
   
   // Target info (what the event is about)
   entity_type: string | null;
@@ -373,7 +374,7 @@ async function fetchRealUsersForMocks(currentUserId: string): Promise<Array<{
 }>> {
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, display_name, username, profile_photo_url')
+    .select('id, display_name, username, profile_photo_url, is_public')
     .neq('id', currentUserId)
     .not('display_name', 'is', null)
     .limit(20);
@@ -452,6 +453,7 @@ async function generateMockActivityWithRealUsers(currentUserId: string, followin
       actor_display_name: displayName,
       actor_username: user.username || '',
       actor_avatar_url: user.profile_photo_url || null,
+      actor_is_public: true,
       
       entity_type: template.entity_type || null,
       entity_id: template.entity_id || null,
@@ -623,7 +625,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         if (allProfileIds.length > 0) {
           const { data: profiles } = await supabase
             .from('user_profiles')
-            .select('id, display_name, username, profile_photo_url')
+            .select('id, display_name, username, profile_photo_url, is_public')
             .in('id', allProfileIds);
           
           if (profiles) {
@@ -688,6 +690,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             actor_display_name: actorDisplayName,
             actor_username: actorUsername,
             actor_avatar_url: actorAvatarUrl,
+            actor_is_public: actor?.is_public ?? null,
             
             entity_type: n.entity_type,
             entity_id: n.entity_id,
