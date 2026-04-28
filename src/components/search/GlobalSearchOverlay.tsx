@@ -1,6 +1,7 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock } from 'lucide-react';
+import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2 } from 'lucide-react';
+import { useStartDM } from '@/hooks/useStartDM';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useNavigate } from 'react-router-dom';
