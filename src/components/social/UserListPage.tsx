@@ -575,6 +575,29 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 })}
               </div>
             )}
+
+            {showFilterChips && (
+              <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                <FollowingFilterChip
+                  label="All"
+                  count={allFollowingCount}
+                  isActive={followingFilter === 'all'}
+                  onClick={() => handleFilterChange('all')}
+                />
+                <FollowingFilterChip
+                  label="Friends"
+                  count={friendsCount}
+                  isActive={followingFilter === 'friends'}
+                  onClick={() => handleFilterChange('friends')}
+                />
+                <FollowingFilterChip
+                  label="Pending"
+                  count={pendingCount}
+                  isActive={followingFilter === 'pending'}
+                  onClick={() => handleFilterChange('pending')}
+                />
+              </div>
+            )}
           </div>
         </div>
 
