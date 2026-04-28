@@ -812,12 +812,12 @@ export function useReviewWizard({
         ? [pendingFiles[coverFileIndex], ...pendingFiles.filter((_, i) => i !== coverFileIndex)]
         : pendingFiles;
 
-      // D28: persist the recomputed verdict, not the prefilled state.rating
+      // Persist user-set overall rating, independent of breakdowns
       await submitReview({
         courseId: course.id,
         courseName: course.name,
         ratingId: isEditMode ? existingRating?.id : undefined,
-        overallRating: derivedVerdict,
+        overallRating: state.rating,
         breakdowns: {
           design: state.breakdowns.design ?? null,
           condition: state.breakdowns.condition ?? null,

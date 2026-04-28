@@ -291,7 +291,7 @@ export function RateStep({
 
       {/* D30: Sticky compact verdict bar — engages on scroll past hero */}
       <AnimatePresence>
-        {showSticky && displayVerdict !== null && (
+        {showSticky && rating !== null && (
           <motion.div
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
@@ -313,7 +313,7 @@ export function RateStep({
                     transition: 'transform 200ms ease',
                   }}
                 >
-                  {displayVerdict.toFixed(1)}
+                  {rating.toFixed(1)}
                 </span>
                 {overallTier && (
                   <span
