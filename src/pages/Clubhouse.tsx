@@ -440,7 +440,7 @@ const ClubhouseContent = () => {
           />
 
           {/* Windowed carousel dots — centred under top chrome */}
-          {(activePost?.mediaItems?.length ?? 0) > 1 && (
+          {!skeletonVisible && (activePost?.mediaItems?.length ?? 0) > 1 && (
             <div
               className="fixed pointer-events-none flex justify-center"
               style={{
