@@ -91,6 +91,7 @@ const ClubsSectionWrapper: React.FC<{
   isSelf: boolean;
 }> = ({ profileId, viewerId, isPersonal, isSelf }) => {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { homeClub, secondaryClubs, isLoading, isPrivate } = useProfileClubs(profileId, viewerId);
 
   if (!isPersonal || !profileId || !viewerId || isLoading) return null;
@@ -103,7 +104,7 @@ const ClubsSectionWrapper: React.FC<{
         secondaryClubs={secondaryClubs}
         isOwner={isSelf}
         isPrivate={isPrivate}
-        onEditClick={() => navigate('/edit-profile')}
+        onEditClick={() => navigate(editRoute)}
       />
     </section>
   );
@@ -111,6 +112,7 @@ const ClubsSectionWrapper: React.FC<{
 
 const ProfilePageV2Content: React.FC = () => {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
 
