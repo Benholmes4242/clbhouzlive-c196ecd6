@@ -58,6 +58,7 @@ export type ListMode = 'followers' | 'following' | 'friends';
 interface UserListPageProps {
   mode: ListMode;
   title: string;
+  /** @deprecated No longer rendered internally; will be removed once consumers updated */
   subtitle: string;
   /** @deprecated Kept for backward compatibility — internal placeholder is now uniform. TODO: remove once consumers updated. */
   searchPlaceholder: string;
@@ -147,7 +148,7 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
         fontSize: 9,
         fontWeight: 800,
         color: INK_SUBTLE,
-        letterSpacing: '0.16em',
+        letterSpacing: '0.1em',
         textTransform: 'uppercase',
       }}
     >
@@ -474,7 +475,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             title="Discover · Suggested Golfers"
             variant="light"
             showViewAll
-            onViewAll={() => navigate('/golfers')}
+            onViewAll={() => navigate('/golferstofollow')}
           />
         )}
 
