@@ -283,10 +283,11 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   onKeyDown={handleEmailKeyDown}
                   placeholder="Email address"
                   disabled={submitting}
-                  className="w-full h-[56px] px-6 rounded-full text-white placeholder:text-neutral-500 text-[16px] text-center focus:outline-none transition-all disabled:opacity-50"
+                  className="auth-email-input w-full h-[56px] px-6 rounded-full font-medium text-[15px] text-center focus:outline-none transition-all disabled:opacity-50"
                   style={{
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.10)',
+                    color: 'rgba(255, 255, 255, 0.88)',
                   }}
                   autoComplete="email"
                   inputMode="email"
@@ -384,6 +385,12 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-4 { animation: auth-button-in 0.4s ease-out 0.65s both; }
         .auth-button-5 { animation: auth-button-in 0.4s ease-out 0.75s both; }
         .auth-button-6 { animation: auth-button-in 0.4s ease-out 0.85s both; }
+
+        .auth-email-input::placeholder {
+          color: rgba(255, 255, 255, 0.55);
+          font-weight: 500;
+          font-size: 15px;
+        }
         
         @media (prefers-reduced-motion: reduce) {
           .auth-logo-animate,
