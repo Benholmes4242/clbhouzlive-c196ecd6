@@ -5,10 +5,11 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Users, UserPlus } from 'lucide-react';
+import { Trophy, Users, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useProfileData } from '@/hooks/useProfileData';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ interface LeaderboardCardProps {
 export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalPlayed = 0 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const { profile } = useProfileData();
   const { data: friends = [], isLoading, isError } = useFriendsLeaderboard(userId);
 
   // Sort friends + current user by courses played and add ranks
@@ -34,12 +36,14 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
       })),
     ];
 
-    // Insert current user
+    // Insert current user with real profile data
     if (user?.id) {
+      const p = profile as any;
+      const realName = p?.display_name || p?.username || 'You';
       entries.push({
         id: user.id,
-        displayName: 'You',
-        avatarUrl: null,
+        displayName: realName,
+        avatarUrl: p?.profile_photo_url || null,
         totalPlayed,
         isCurrentUser: true,
       });
@@ -48,7 +52,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
     return entries
       .sort((a, b) => b.totalPlayed - a.totalPlayed)
       .map((entry, index) => ({ ...entry, rank: index + 1 }));
-  }, [friends, user?.id, totalPlayed]);
+  }, [friends, user?.id, totalPlayed, profile]);
 
   // Loading state
   if (isLoading) {
@@ -116,17 +120,17 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
   const top3 = rankedEntries.slice(0, 3);
   const remaining = rankedEntries.slice(3, 10);
 
-  // Rank medal colors
-  const getRankStyle = (rank: number) => {
+  // Medal styling for ranks 1-3 (rank number rendered inside the medal)
+  const getMedalStyle = (rank: number): { background: string; color: string } | null => {
     switch (rank) {
       case 1:
-        return { bg: 'rgba(255, 215, 0, 0.15)', border: 'rgba(255, 215, 0, 0.3)', color: '#D4AF37' };
+        return { background: 'linear-gradient(145deg, #FFE99D, #D2B461)', color: '#7A5510' };
       case 2:
-        return { bg: 'rgba(192, 192, 192, 0.15)', border: 'rgba(192, 192, 192, 0.3)', color: '#A0A0A0' };
+        return { background: 'linear-gradient(145deg, #F1F5F9, #CBD5E1)', color: '#475569' };
       case 3:
-        return { bg: 'rgba(205, 127, 50, 0.15)', border: 'rgba(205, 127, 50, 0.3)', color: '#CD7F32' };
+        return { background: 'linear-gradient(145deg, #F4D5A7, #C28850)', color: '#7A4C20' };
       default:
-        return { bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.2)', color: 'hsl(var(--muted-foreground))' };
+        return null;
     }
   };
 
@@ -148,8 +152,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
         {/* Top 3 list */}
         <div className="space-y-2">
           {top3.map((entry, index) => {
-            const rankStyle = getRankStyle(entry.rank);
-            
+            const medal = getMedalStyle(entry.rank);
+
             return (
               <motion.div
                 key={entry.id}
@@ -161,22 +165,27 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                {/* Rank badge */}
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: rankStyle.bg,
-                    border: `1px solid ${rankStyle.border}`,
-                  }}
-                >
-                  {entry.rank <= 3 ? (
-                    <Medal className="w-4 h-4" style={{ color: rankStyle.color }} />
-                  ) : (
-                    <span className="text-xs font-bold text-muted-foreground">
+                {/* Rank: medal for top 3, bare number for 4+ */}
+                {medal ? (
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: medal.background,
+                      boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    <span
+                      className="text-xs tabular-nums"
+                      style={{ color: medal.color, fontWeight: 800 }}
+                    >
                       {entry.rank}
                     </span>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <span className="w-8 text-sm font-semibold text-muted-foreground text-center tabular-nums flex-shrink-0">
+                    {entry.rank}
+                  </span>
+                )}
 
                 {/* Avatar */}
                 <SquircleAvatar
@@ -191,7 +200,15 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                   <p className="text-sm font-semibold truncate text-foreground"
                     style={entry.isCurrentUser ? { color: '#F7931E' } : undefined}
                   >
-                    {entry.displayName}
+                    {entry.isCurrentUser ? (
+                      <>
+                        {entry.displayName}
+                        {' '}
+                        <span className="font-normal text-muted-foreground">(you)</span>
+                      </>
+                    ) : (
+                      entry.displayName
+                    )}
                   </p>
                 </div>
 
@@ -234,7 +251,15 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                 )}
                   style={entry.isCurrentUser ? { color: '#F7931E' } : undefined}
                 >
-                  {entry.displayName}
+                  {entry.isCurrentUser ? (
+                    <>
+                      {entry.displayName}
+                      {' '}
+                      <span className="font-normal text-muted-foreground">(you)</span>
+                    </>
+                  ) : (
+                    entry.displayName
+                  )}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground">
                   {entry.totalPlayed}

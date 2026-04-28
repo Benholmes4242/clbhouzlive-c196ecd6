@@ -13,25 +13,31 @@ interface MomentumCardProps {
     name: string;
     dateAdded?: string;
   }[];
+  suggestedRegion?: string;
 }
 
 export const MomentumCard: React.FC<MomentumCardProps> = ({
   recentlyPlayed,
+  suggestedRegion,
 }) => {
-  // Calculate last course date and this month count
-  const { lastCourseDate, thisMonthCount, hasActivity } = useMemo(() => {
+  // Calculate last course date and this/last month counts
+  const { lastCourseDate, thisMonthCount, lastMonthCount, hasActivity } = useMemo(() => {
     if (!recentlyPlayed || recentlyPlayed.length === 0) {
-      return { lastCourseDate: null, thisMonthCount: 0, hasActivity: false };
+      return { lastCourseDate: null, thisMonthCount: 0, lastMonthCount: 0, hasActivity: false };
     }
 
     // Parse dates - dateAdded is in format "DD MMM" like "15 Jan"
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
+
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
     // Find the most recent date
     let latestDate: Date | null = null;
     let monthCount = 0;
+    let prevMonthCount = 0;
 
     for (const course of recentlyPlayed) {
       if (!course.dateAdded) continue;
@@ -68,11 +74,16 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
       if (courseDate.getMonth() === currentMonth && courseDate.getFullYear() === currentYear) {
         monthCount++;
       }
+      // Count last month
+      if (courseDate.getMonth() === lastMonth && courseDate.getFullYear() === lastMonthYear) {
+        prevMonthCount++;
+      }
     }
 
     return {
       lastCourseDate: latestDate,
       thisMonthCount: monthCount,
+      lastMonthCount: prevMonthCount,
       hasActivity: latestDate !== null,
     };
   }, [recentlyPlayed]);
@@ -133,7 +144,7 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
             </div>
 
-            {/* This month count */}
+            {/* This month count + delta */}
             <div className="flex items-center gap-3">
               <div 
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -146,18 +157,41 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
               <div className="flex-1">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Courses logged this month
+                  This month
                 </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {thisMonthCount}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-sm font-semibold text-foreground tabular-nums">
+                    {thisMonthCount} {thisMonthCount === 1 ? 'course' : 'courses'}
+                  </p>
+                  {lastMonthCount > 0 && thisMonthCount !== lastMonthCount && (
+                    <span
+                      className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full tabular-nums"
+                      style={{
+                        background:
+                          thisMonthCount > lastMonthCount
+                            ? 'rgba(16,185,129,0.10)'
+                            : 'rgba(15,23,42,0.05)',
+                        color: thisMonthCount > lastMonthCount ? '#0F6E56' : '#64748B',
+                      }}
+                    >
+                      {thisMonthCount > lastMonthCount ? '+' : ''}
+                      {thisMonthCount - lastMonthCount} vs last
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Encouragement copy */}
-            <p className="text-xs mt-2 text-muted-foreground">
-              Keep building your journey.
-            </p>
+            {/* Personalized nudge */}
+            {suggestedRegion ? (
+              <p className="text-xs mt-2 text-muted-foreground">
+                Try a new region — you've barely played {suggestedRegion} yet.
+              </p>
+            ) : (
+              <p className="text-xs mt-2 text-muted-foreground">
+                Keep building your journey.
+              </p>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-3 py-2">

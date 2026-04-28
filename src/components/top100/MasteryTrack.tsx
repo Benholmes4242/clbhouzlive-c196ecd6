@@ -74,14 +74,21 @@ export const MasteryTrack: React.FC<MasteryTrackProps> = ({
         <div className="flex items-center gap-2 mb-1">
           <Crown className="w-4 h-4" style={{ color: '#F7931E' }} />
           <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#F7931E' }}>
-            Mastery Track
+            Regional Mastery
           </span>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {coreComplete 
-            ? 'Complete each regional Top 100 list to achieve mastery' 
-            : 'Complete the Grand Slam Club to unlock regional mastery challenges'}
-        </p>
+        {(() => {
+          const inProgressCount = orderedRegions.filter(
+            r => r.played > 0 && r.played < r.total
+          ).length;
+          return (
+            <p className="text-sm text-muted-foreground">
+              {inProgressCount > 0
+                ? `Conquer the lists below to chase the Grand Slam · ${inProgressCount} of 4 lists in progress`
+                : 'Conquer regional Top 100 lists to chase the Grand Slam'}
+            </p>
+          );
+        })()}
       </div>
 
       {/* Regional items - directly on page background */}

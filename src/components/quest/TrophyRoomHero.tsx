@@ -31,7 +31,6 @@ interface RegionProgress {
 
 interface TrophyRoomHeroProps {
   totalPlayed: number;
-  target?: number;
   hasPremiumAccent?: boolean;
   onContinueJourney?: () => void;
   regionProgress?: RegionProgress[];
@@ -64,30 +63,33 @@ const CLUB_NAMES: Record<number, string> = {
 
 export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   totalPlayed,
-  target = 100,
   hasPremiumAccent = false,
   onContinueJourney,
   regionProgress = [],
   isOwnProfile = true,
 }) => {
-  const progressPercent = Math.min((totalPlayed / target) * 100, 100);
-  const isComplete = totalPlayed >= target;
-
   // Determine current tier
   const currentTier = CLUB_STEPS.filter(s => totalPlayed >= s.threshold).pop();
   const nextMilestone = CLUB_STEPS.find(s => totalPlayed < s.threshold);
   const tierName = currentTier?.tierName || 'Newcomer';
   const tierThreshold = currentTier?.threshold;
   const tierColor = tierThreshold ? getRingColorForThreshold(tierThreshold) : '#6e9277';
-  
+
   // Next milestone info
   const nextThreshold = nextMilestone?.threshold || 0;
   const remaining = nextThreshold - totalPlayed;
   const nextClubName = nextThreshold ? (CLUB_NAMES[nextThreshold] || `${nextThreshold} Club`) : '';
-  
+  const nextTierColor = nextThreshold ? getRingColorForThreshold(nextThreshold) : tierColor;
+
+  // Pin progress to next milestone
+  const isComplete = !nextMilestone;
+  const progressPercent = nextMilestone
+    ? Math.min((totalPlayed / nextThreshold) * 100, 100)
+    : 100;
+
   // Get current badge image for spotlight display
   const currentBadgeImage = tierThreshold ? BADGE_IMAGES[tierThreshold] : undefined;
-  
+
   // Dynamic hero title based on state
   const heroTitle = useMemo(() => {
     if (isComplete && !nextMilestone) return 'Grand Slam Achieved';
@@ -212,19 +214,31 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           </div>
         )}
 
-        {/* Right: Count */}
+        {/* Right: To-go count colored to next tier */}
         <div className="relative text-right">
-          <div className="flex items-baseline justify-end gap-0.5">
-            <span className="text-4xl tracking-tight text-foreground" style={{ fontWeight: 900 }}>
-              {totalPlayed}
-            </span>
-            <span className="text-lg font-medium text-muted-foreground/60">
-              /{target}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Courses Played
-          </p>
+          {nextMilestone ? (
+            <>
+              <div className="flex items-baseline justify-end gap-1">
+                <span
+                  className="text-4xl tracking-tight tabular-nums"
+                  style={{ fontWeight: 900, color: nextTierColor }}
+                >
+                  {remaining}
+                </span>
+                <span className="text-xs font-medium text-muted-foreground">to go</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                to {nextClubName}
+              </p>
+            </>
+          ) : (
+            <>
+              <span className="text-4xl tracking-tight text-foreground" style={{ fontWeight: 900 }}>
+                {totalPlayed}
+              </span>
+              <p className="text-xs text-muted-foreground mt-0.5">Courses played</p>
+            </>
+          )}
         </div>
       </motion.div>
 
@@ -249,8 +263,8 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           />
         </div>
         {nextMilestone && (
-          <p className="text-xs text-muted-foreground mt-1.5 text-center">
-            <span className="font-medium text-foreground">{nextClubName}</span> {progressLabel}
+          <p className="text-xs text-muted-foreground mt-1.5 text-center tabular-nums">
+            {totalPlayed} of {nextThreshold} · <span className="font-medium text-foreground">{nextClubName}</span>
           </p>
         )}
       </motion.div>

@@ -211,9 +211,12 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                       {m.isUnlocked && (
                         <div className="absolute inset-0 rounded-full blur-md scale-110" style={{ background: 'rgba(247,147,30,0.15)' }} />
                       )}
-                      {/* Next up: pulsing amber ring */}
+                      {/* Next up: pulsing amber rounded-rect ring matching badge shape */}
                       {isNext && !m.isUnlocked && (
-                        <div className="absolute inset-[-4px] rounded-full border-2 animate-pulse" style={{ borderColor: 'rgba(247,147,30,0.60)' }} />
+                        <div
+                          className="absolute inset-[-4px] border-2 animate-pulse pointer-events-none"
+                          style={{ borderColor: 'rgba(247,147,30,0.60)', borderRadius: 14 }}
+                        />
                       )}
                       <img
                         src={BADGE_IMAGES[m.threshold]}
@@ -237,7 +240,18 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                     )}>
                       {m.name}
                     </span>
-                    {/* Progress text under locked badges */}
+                    {/* Progress text under badges */}
+                    {m.isUnlocked && (
+                      <span className="flex items-center gap-1 text-xs font-semibold mt-0.5" style={{ color: '#10B981' }}>
+                        <span
+                          className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full text-white"
+                          style={{ background: '#10B981', fontSize: 9, lineHeight: 1 }}
+                        >
+                          ✓
+                        </span>
+                        Earned
+                      </span>
+                    )}
                     {!m.isUnlocked && isNext && (
                       <span className="text-xs font-semibold tabular-nums mt-0.5" style={{ color: '#F7931E' }}>
                         {remaining} away!
