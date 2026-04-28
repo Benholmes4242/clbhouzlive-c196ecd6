@@ -37,6 +37,7 @@ type UserProfileRow = {
   eg_handicap_index: number | null;
   creator_only: boolean | null;
   profile_type: string | null;
+  show_handicap: boolean | null;
 };
 
 export type SocialUser = {
@@ -46,6 +47,7 @@ export type SocialUser = {
   avatarUrl: string | null;
   homeClub: string | null;
   handicapIndex: number | null;
+  showHandicap: boolean;
   creatorOnly: boolean;
   profileType: string;
 };
@@ -70,6 +72,7 @@ function toSocialUser(profile: UserProfileRow): SocialUser {
     avatarUrl: profile.profile_photo_url,
     homeClub: profile.home_club,
     handicapIndex: profile.eg_handicap_index,
+    showHandicap: profile.show_handicap ?? true,
     creatorOnly: profile.creator_only ?? false,
     profileType: profile.profile_type || 'personal',
   };
@@ -80,7 +83,7 @@ async function fetchProfilesByIds(ids: string[]): Promise<Map<string, UserProfil
 
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, creator_only, profile_type')
+    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, creator_only, profile_type, show_handicap')
     .in('id', ids)
     .is('deleted_at', null);
 
