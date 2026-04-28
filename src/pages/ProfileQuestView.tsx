@@ -347,7 +347,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         {/* Section 6: Momentum — own profile only */}
         {isOwnProfile && (
           <section className="px-4 mb-10">
-            <MomentumCard recentlyPlayed={recentCourses} />
+            <MomentumCard recentlyPlayed={recentCourses} suggestedRegion={suggestedRegion} />
           </section>
         )}
 
