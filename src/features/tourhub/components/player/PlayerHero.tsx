@@ -1,10 +1,15 @@
 /**
  * PlayerHero - Dispatch-style slate editorial header with headshot.
  *
- * State-aware (D7): consumes usePlayerState to render narrative pills above
- * the masthead instead of the legacy ⚡ CLBHOUZ · PLAYER PROFILE eyebrow chip.
- * Pills follow Live > Recent > In-form > Inactive priority. Ghost rank
- * watermark renders behind the cover story when a world rank exists.
+ * Restructured to match the Stat Watch / College Franchise masthead family:
+ *   1. Amber eyebrow (⚡ CLBHOUZ · PLAYER)
+ *   2. Double-rule band (section title + tour codes)
+ *   3. Cover story row (status eyebrow → flag → name → hero amber stat → photo)
+ *   4. Narrative pills row (Live / Recent / Form / Inactive)
+ *
+ * State-aware via usePlayerState; pills follow Live > Recent > In-form > Inactive
+ * priority. Ghost rank watermark renders behind the cover story when world rank
+ * exists.
  */
 
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -14,7 +19,6 @@ import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubDat
 import { usePlayerState } from '../../hooks/usePlayerState';
 import { PillView, type MastheadPill } from '../leaders/LeadersMasthead';
 import { LivePulse } from '../shared/LivePulse';
-import { TourChipGroup } from '../shared/TourChipGroup';
 import { truncateName } from '../../utils/truncateName';
 
 interface PlayerHeroProps {
@@ -22,17 +26,66 @@ interface PlayerHeroProps {
   playerStats: TourPlayerStatistics | null;
 }
 
+/**
+ * Format earnings number as compact currency string ($6.7M / $850K).
+ */
+function formatEarnings(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${Math.round(value / 1_000)}K`;
+  return `$${value}`;
+}
+
+/**
+ * Pure helper — pick the single most relevant hero stat for the player.
+ * Priority: live score > recent finish > season earnings > world rank > age.
+ * Always returns something (never null).
+ */
+function chooseHeroStat(
+  player: TourPlayer,
+  playerStats: TourPlayerStatistics | null,
+  playerState: ReturnType<typeof usePlayerState>,
+): { primary: string } {
+  // 1. Live tournament
+  if (playerState.state === 'live' && playerState.liveData) {
+    const ld = playerState.liveData;
+    const round = ld.currentRound ? ` · R${ld.currentRound}` : '';
+    return { primary: `${ld.scoreText}${round}` };
+  }
+
+  // 2. Recent finish (within 14 days, per usePlayerState window)
+  if (playerState.state === 'recent' && playerState.recentData) {
+    const rd = playerState.recentData;
+    const ctx = rd.context ? ` at ${truncateName(rd.context, 18)}` : '';
+    return { primary: `${rd.label}${ctx}` };
+  }
+
+  // 3. Season earnings
+  if (playerStats?.earnings && playerStats.earnings > 0) {
+    return { primary: `${formatEarnings(playerStats.earnings)} earned` };
+  }
+
+  // 4. World rank fallback
+  if (playerStats?.world_rank && playerStats.world_rank > 0) {
+    return { primary: `World #${playerStats.world_rank}` };
+  }
+
+  // 5. Age fallback
+  if (player.birth_date) {
+    const age = Math.floor(
+      (Date.now() - new Date(player.birth_date).getTime()) /
+        (365.25 * 24 * 60 * 60 * 1000),
+    );
+    if (age > 0) return { primary: `Age ${age}` };
+  }
+
+  return { primary: 'Player profile' };
+}
+
 function buildHeroPills(
-  worldRank: number | null,
   seasonWins: number | null,
   state: ReturnType<typeof usePlayerState>,
 ): MastheadPill[] {
   const pills: MastheadPill[] = [];
-
-  // World rank — always first when present.
-  if (worldRank && worldRank > 0) {
-    pills.push({ variant: 'highlight', value: `World #${worldRank}` });
-  }
 
   switch (state.state) {
     case 'live': {
@@ -95,14 +148,21 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const seasonWins = playerStats?.wins ?? null;
 
   const playerState = usePlayerState(player.id);
-  const pills = buildHeroPills(worldRank, seasonWins, playerState);
+  const pills = buildHeroPills(seasonWins, playerState);
+  const heroStat = chooseHeroStat(player, playerStats, playerState);
+
+  // Status eyebrow — WORLD #N · AGE NN (or PLAYER · AGE NN)
+  const statusEyebrow = [
+    worldRank ? `WORLD #${worldRank}` : 'PLAYER',
+    age ? `AGE ${age}` : null,
+  ].filter(Boolean).join(' · ');
 
   return (
     <div
       style={{
         position: 'relative',
         background: '#0F172A',
-        padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0',
+        padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 14px',
         overflow: 'hidden',
       }}
     >
@@ -113,7 +173,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           style={{
             position: 'absolute',
             right: -10,
-            bottom: 40,
+            bottom: 80,
             fontSize: '220px',
             fontWeight: 900,
             color: 'rgba(255,255,255,0.04)',
@@ -129,55 +189,65 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       )}
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* Narrative pills — replaces eyebrow chip */}
-        {pills.length > 0 && (
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 6,
-              marginBottom: 12,
-            }}
-          >
-            {pills.map((p, i) => (
-              <PillView key={i} pill={p} />
-            ))}
-          </div>
-        )}
+        {/* 1. Amber eyebrow */}
+        <div
+          style={{
+            fontSize: 15,
+            fontWeight: 900,
+            color: '#F7931E',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            marginBottom: 10,
+          }}
+        >
+          ⚡ CLBHOUZ · PLAYER
+        </div>
 
-        {/* Masthead double-rule band */}
+        {/* 2. Masthead double-rule band — section descriptor + tour codes */}
         <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: '14px' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, margin: 0 }}>
-            {player.full_name}
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', lineHeight: 1, margin: 0 }}>
+            Player Profile
           </h1>
-          {/* Stat context row — country / age */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
-            <CountryFlag country={player.country} size="sm" />
-            {countryDisplay && (
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>{countryDisplay}</span>
-            )}
-            {age && (
-              <>
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>·</span>
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', fontWeight: 800 }}>Age {age}</span>
-              </>
-            )}
-          </div>
-          {/* Tour chip group — multi-tour honest (D4) */}
           {player.tour_codes && player.tour_codes.length > 0 && (
-            <div style={{ marginTop: 6 }}>
-              <TourChipGroup codes={player.tour_codes} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>Tours</span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.6)', letterSpacing: 0.5 }}>
+                {player.tour_codes.map(c => c.toUpperCase()).join(' · ')}
+              </span>
             </div>
           )}
         </div>
 
-        {/* Cover story row — headshot bottom-anchored */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', marginBottom: 0, minHeight: 88 }}>
-          <div style={{ flex: 1, minWidth: 0, paddingBottom: '14px' }} />
+        {/* 3. Cover story row — identity stack + headshot */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, paddingBottom: 4 }}>
+            {/* Status eyebrow */}
+            <div style={{ marginBottom: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>
+                {statusEyebrow}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                <CountryFlag country={player.country_code || player.country} size="sm" />
+                {countryDisplay && (
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{countryDisplay}</span>
+                )}
+              </div>
+            </div>
 
-          {/* Right — headshot, bottom-anchored */}
-          <div style={{ flexShrink: 0, width: '100px', alignSelf: 'flex-end' }}>
-            <div style={{ width: '100px', height: '120px', borderRadius: '12px 12px 0 0', overflow: 'hidden', background: 'rgba(255,255,255,0.06)' }}>
+            {/* Player name */}
+            <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: 8 }}>
+              {player.full_name}
+            </div>
+
+            {/* Hero amber stat */}
+            <span style={{ fontSize: 20, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
+              {heroStat.primary}
+            </span>
+          </div>
+
+          {/* RIGHT — headshot, bottom-anchored */}
+          <div style={{ flexShrink: 0, width: 100, alignSelf: 'flex-end' }}>
+            <div style={{ width: 100, height: 120, borderRadius: '12px 12px 0 0', overflow: 'hidden', background: 'rgba(255,255,255,0.06)' }}>
               <img
                 src={heroPhotoUrl}
                 alt={player.full_name}
@@ -188,26 +258,21 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           </div>
         </div>
 
-        {/* 4-col key stats grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
-          {[
-            { label: 'WORLD', value: worldRank ? `#${worldRank}` : '—', accent: !!worldRank },
-            { label: 'FEDEX', value: playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? `#${playerStats.fedex_rank}` : '—', accent: false },
-            { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : '—', accent: playerStats?.wins != null && playerStats.wins > 0 },
-            { label: 'EARNED', value: playerStats?.earnings != null && playerStats.earnings > 0
-                ? playerStats.earnings >= 1_000_000 ? `$${(playerStats.earnings / 1_000_000).toFixed(1)}M` : `$${Math.round(playerStats.earnings / 1_000)}K`
-                : '—', accent: false },
-          ].map((s, i) => (
-            <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center', borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
-              <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>
-                {s.label}
-              </div>
-              <div style={{ fontSize: '14px', fontWeight: 900, color: s.accent ? '#F7931E' : '#ffffff', letterSpacing: '-0.02em' }}>
-                {s.value}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* 4. Narrative pills — bottom of band */}
+        {pills.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 6,
+              marginTop: 12,
+            }}
+          >
+            {pills.map((p, i) => (
+              <PillView key={i} pill={p} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
