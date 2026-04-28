@@ -34,7 +34,6 @@ export function NewConversationModal({
 }: NewConversationModalProps) {
   const { user } = useSupabaseSession();
   const { getOrCreateDM, createGroupChat } = useMessagingContext();
-  const [mode_placeholder] = [0]; void mode_placeholder;
   
   const [mode, setMode] = useState<'direct' | 'group'>('direct');
   
