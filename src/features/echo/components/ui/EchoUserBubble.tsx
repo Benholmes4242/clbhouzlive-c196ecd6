@@ -16,8 +16,8 @@ export function EchoUserBubble({ content }: EchoUserBubbleProps) {
           maxWidth: '82%',
           padding: '9px 13px',
           borderRadius: '16px 16px 4px 16px',
-          background: 'rgba(247,147,30,0.10)',
-          border: '1px solid rgba(247,147,30,0.25)',
+          background: 'rgba(247,147,30,0.12)',
+          border: '1px solid rgba(247,147,30,0.30)',
         }}
       >
         <p
