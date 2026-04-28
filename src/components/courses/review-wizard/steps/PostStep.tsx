@@ -318,29 +318,26 @@ export function PostStep({
                 gap: 14,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
-                <span style={{ fontSize: 44, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-                  {rating.toFixed(1)}
-                </span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: '#94A3B8' }}>/ 10</span>
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                  <span style={{ fontSize: 44, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                    {rating.toFixed(1)}
+                  </span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#94A3B8' }}>/ 10</span>
+                </div>
                 <div
                   style={{
-                    display: 'inline-block',
-                    padding: '3px 8px',
-                    borderRadius: 4,
                     fontSize: 10,
                     fontWeight: 800,
                     textTransform: 'uppercase' as const,
                     letterSpacing: '0.06em',
-                    background: tierInfo.isExceptional ? 'rgba(247,147,30,0.12)' : 'rgba(15,23,42,0.06)',
                     color: tierInfo.isExceptional ? '#F7931E' : '#0F172A',
-                    marginBottom: 6,
                   }}
                 >
                   {tierInfo.label}
                 </div>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ height: 4, width: '100%', background: 'rgba(15,23,42,0.06)', borderRadius: 2, overflow: 'hidden' }}>
                   <div
                     style={{
