@@ -27,7 +27,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
 
   const handleFriendsClick = () => {
     if (username) {
-      navigate(`/profile/${username}/friends`);
+      navigate(`/profile/${username}/followers?tab=following&filter=friends`);
     }
   };
 

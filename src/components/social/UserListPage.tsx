@@ -23,6 +23,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useRelationshipStatuses, type RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
+import { useSocialCounts } from '@/hooks/useSocialCounts';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
@@ -53,15 +54,17 @@ const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
-export type ListMode = 'followers' | 'following' | 'friends';
+export type ListMode = 'followers' | 'following';
+
+type FollowingFilterId = 'all' | 'friends' | 'pending';
 
 interface UserListPageProps {
   mode: ListMode;
   title: string;
   /** @deprecated No longer rendered internally; will be removed once consumers updated */
-  subtitle: string;
+  subtitle?: string;
   /** @deprecated Kept for backward compatibility — internal placeholder is now uniform. TODO: remove once consumers updated. */
-  searchPlaceholder: string;
+  searchPlaceholder?: string;
   users: SocialUser[];
   totalCount?: number;
   isLoading: boolean;
@@ -82,6 +85,8 @@ interface UserListPageProps {
   onFollowingLoadMore?: () => void;
   onFollowingRefetch?: () => void;
   profileUsername?: string;
+  /** Profile owner's userId — used for social counts on filter chips */
+  profileUserId?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -167,6 +172,47 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
       {value.toFixed(1)}
     </span>
   </span>
+);
+
+interface FollowingFilterChipProps {
+  label: string;
+  count: number;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+const FollowingFilterChip: React.FC<FollowingFilterChipProps> = ({ label, count, isActive, onClick }) => (
+  <button
+    onClick={onClick}
+    aria-pressed={isActive}
+    style={{
+      minHeight: 32,
+      padding: '6px 14px',
+      background: isActive ? INK : 'transparent',
+      color: isActive ? '#FFFFFF' : INK_SOFT,
+      border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
+      borderRadius: 999,
+      fontSize: 12.5,
+      fontWeight: 700,
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 5,
+      flexShrink: 0,
+    }}
+  >
+    {label}
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: isActive ? 'rgba(255,255,255,0.7)' : INK_SUBTLE,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {count.toLocaleString()}
+    </span>
+  </button>
 );
 
 // ---------------------------------------------------------------------------
@@ -273,6 +319,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   onFollowingLoadMore,
   onFollowingRefetch,
   profileUsername: _profileUsername,
+  profileUserId,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -285,10 +332,33 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const initialTab = searchParams.get('tab') === 'following' ? 'following' : 'followers';
   const [activeTab, setActiveTab] = useState<'followers' | 'following'>(hasFollowingTab ? initialTab : 'followers');
 
+  // Filter state — Following tab + owner view only
+  const initialFilter: FollowingFilterId = (() => {
+    const f = searchParams.get('filter');
+    if (f === 'friends' || f === 'pending') return f;
+    return 'all';
+  })();
+  const [followingFilter, setFollowingFilter] = useState<FollowingFilterId>(initialFilter);
+
+  const handleFilterChange = (filter: FollowingFilterId) => {
+    setFollowingFilter(filter);
+    const next = new URLSearchParams(searchParams);
+    if (filter === 'all') {
+      next.delete('filter');
+    } else {
+      next.set('filter', filter);
+    }
+    if (next.get('tab') !== 'following') {
+      next.set('tab', 'following');
+    }
+    setSearchParams(next, { replace: true });
+  };
+
   const handleTabChange = (tab: 'followers' | 'following') => {
     setActiveTab(tab);
     setSearchInput('');
     setRemovedIds(new Set());
+    setFollowingFilter('all');
     if (tab === 'following') {
       setSearchParams({ tab: 'following' }, { replace: true });
     } else {
@@ -309,7 +379,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 
   const displayTitle = isFollowingTab ? 'Following' : title;
 
-  const filteredUsers = useMemo(() => {
+  // Step 1: Apply removedIds + search filters (no relationship dependency)
+  const preRelationshipFiltered = useMemo(() => {
     let result = activeUsers.filter(u => !removedIds.has(u.id));
     if (!debouncedSearch.trim()) return result;
     const query = debouncedSearch.toLowerCase();
@@ -319,6 +390,29 @@ export const UserListPage: React.FC<UserListPageProps> = ({
       (u.homeClub && u.homeClub.toLowerCase().includes(query))
     );
   }, [activeUsers, debouncedSearch, removedIds]);
+
+  // Step 2: Scope relationshipMap to pre-filter set (broader than filtered set
+  // — required so chip filter logic has access to relationship data for all
+  // candidate users, not just currently-visible ones).
+  const relationshipQueryIds = useMemo(
+    () => preRelationshipFiltered.map(u => u.id),
+    [preRelationshipFiltered]
+  );
+  const { data: relationshipMap = {} } = useRelationshipStatuses(relationshipQueryIds);
+
+  // Step 3: Apply Following filter (Following tab + owner view only)
+  const filteredUsers = useMemo(() => {
+    if (!isFollowingTab || !isOwnProfile || followingFilter === 'all') {
+      return preRelationshipFiltered;
+    }
+    return preRelationshipFiltered.filter(u => {
+      const rel = relationshipMap[u.id];
+      if (!rel) return false;
+      if (followingFilter === 'friends') return rel.friend_status === 'friends';
+      if (followingFilter === 'pending') return rel.friend_status === 'pending_sent';
+      return true;
+    });
+  }, [preRelationshipFiltered, isFollowingTab, isOwnProfile, followingFilter, relationshipMap]);
 
   const handleBack = () => {
     if (backPath) {
@@ -340,14 +434,30 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   };
 
   const modeDisplayName =
-    activeMode === 'followers' ? 'followers' : activeMode === 'following' ? 'following' : 'friends';
+    activeMode === 'followers' ? 'followers' : 'following';
 
-  const visibleUserIds = useMemo(() => filteredUsers.map(u => u.id), [filteredUsers]);
-  const { data: relationshipMap = {} } = useRelationshipStatuses(visibleUserIds);
+  // Social counts for filter chips (uses profile owner's userId, not viewer's)
+  const { data: socialCounts } = useSocialCounts(profileUserId);
+  const friendsCount = socialCounts?.friends ?? 0;
+
+  // Pending count is approximate — only counts relationships in the currently
+  // loaded page set. At current scale (39 pending across all users, most users
+  // <5), this approximation is acceptable. If users routinely paginate through
+  // more than 1 page of pending requests, revisit by adding a dedicated count
+  // query.
+  const pendingCount = useMemo(() => {
+    return Object.values(relationshipMap).filter(
+      r => r.friend_status === 'pending_sent'
+    ).length;
+  }, [relationshipMap]);
+
+  const allFollowingCount = preRelationshipFiltered.length;
 
   // Tab counts (for inline tab toggle)
   const followersTabCount = Math.max(0, (totalCount ?? users.length) - removedIds.size);
   const followingTabCount = followingTotalCount ?? (followingUsers?.length ?? 0);
+
+  const showFilterChips = isFollowingTab && isOwnProfile;
 
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_SURFACE }}>
@@ -465,6 +575,29 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 })}
               </div>
             )}
+
+            {showFilterChips && (
+              <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                <FollowingFilterChip
+                  label="All"
+                  count={allFollowingCount}
+                  isActive={followingFilter === 'all'}
+                  onClick={() => handleFilterChange('all')}
+                />
+                <FollowingFilterChip
+                  label="Friends"
+                  count={friendsCount}
+                  isActive={followingFilter === 'friends'}
+                  onClick={() => handleFilterChange('friends')}
+                />
+                <FollowingFilterChip
+                  label="Pending"
+                  count={pendingCount}
+                  isActive={followingFilter === 'pending'}
+                  onClick={() => handleFilterChange('pending')}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -542,6 +675,24 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   ctaIsAmber={false}
                   onCta={handleClearSearch}
                 />
+              ) : isFollowingTab && isOwnProfile && followingFilter !== 'all' ? (
+                <EmptyState
+                  eyebrow="No matches"
+                  icon={<Users className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
+                  heading={
+                    followingFilter === 'friends'
+                      ? 'No friends in following yet'
+                      : 'No pending friend requests'
+                  }
+                  body={
+                    followingFilter === 'friends'
+                      ? "You're not yet friends with anyone you follow. Send a friend request from a profile to connect."
+                      : 'You have no outgoing friend requests waiting on a response.'
+                  }
+                  ctaLabel="Show all"
+                  ctaIsAmber={false}
+                  onCta={() => handleFilterChange('all')}
+                />
               ) : activeMode === 'followers' ? (
                 <EmptyState
                   eyebrow="Empty list"
@@ -553,20 +704,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                       : "When people follow this golfer, they'll appear here."
                   }
                   ctaLabel={isOwnProfile ? 'Find golfers to follow' : undefined}
-                  ctaIsAmber
-                  onCta={isOwnProfile ? () => navigate('/golferstofollow') : undefined}
-                />
-              ) : activeMode === 'friends' ? (
-                <EmptyState
-                  eyebrow="Empty list"
-                  icon={<Users className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
-                  heading="No friends yet"
-                  body={
-                    isOwnProfile
-                      ? 'Add friends to plan games and share your golf journey together.'
-                      : "This golfer hasn't added any friends yet."
-                  }
-                  ctaLabel={isOwnProfile ? 'Find golfers' : undefined}
                   ctaIsAmber
                   onCta={isOwnProfile ? () => navigate('/golferstofollow') : undefined}
                 />
@@ -593,11 +730,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             <>
               <div style={{ padding: '20px 20px 10px' }}>
                 <SectionEyebrow
-                  label={
-                    activeMode === 'followers' ? 'All Followers' :
-                    activeMode === 'following' ? 'All Following' :
-                    'All Friends'
-                  }
+                  label={activeMode === 'followers' ? 'All Followers' : 'All Following'}
                   count={displayTotal}
                 />
               </div>

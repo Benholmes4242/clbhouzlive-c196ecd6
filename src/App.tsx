@@ -138,7 +138,7 @@ const GolfersSharedCoursesPage = lazy(() => import("./pages/GolfersSharedCourses
 const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProfileSocialRedirect"));
 const FollowersListPage = lazy(() => import("./pages/FollowersListPage"));
 const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
-const FriendsListPage = lazy(() => import("./pages/FriendsListPage"));
+const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
 const FriendsActivityPage = lazy(() => import("./pages/FriendsActivityPage"));
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
 
@@ -369,7 +369,7 @@ function AppRoutes() {
         <Route path="/following" element={<Suspense fallback={<GenericPageSkeleton />}><OwnProfileSocialRedirect tab="following" /></Suspense>} />
         <Route path="/profile/:username/followers" element={<Suspense fallback={<GenericPageSkeleton />}><FollowersListPage /></Suspense>} />
         <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingListPage /></Suspense>} />
-        <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsListPage /></Suspense>} />
+        <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsRedirectToFollowing /></Suspense>} />
         
         {/* Business routes */}
         <Route path="/business-profiles" element={<Navigate to="/businesses/manage" replace />} />
