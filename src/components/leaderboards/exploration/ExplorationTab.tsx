@@ -1315,7 +1315,7 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
           <div
             key={c.country}
             onClick={() =>
-              navigate(`/leaderboards?view=exploration&country=${encodeURIComponent(c.country)}`)
+              navigate(`/top100?tab=leaderboard&view=exploration&country=${encodeURIComponent(c.country)}`)
             }
             style={{
               display: 'grid',
