@@ -224,39 +224,11 @@ export function LeadersTab() {
     return map;
   }, [playerStats, worldRankings]);
 
-  // ─── Loading skeleton ───
-  if (isLoading) {
-    return (
-      <div style={{ background: '#F8FAFC' }}>
-        {/* Masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 14px' }}>
-          <Skeleton className="h-3 w-48 mb-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <Skeleton className="h-6 w-40 mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <Skeleton className="h-24 w-full rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
-            {[1, 2].map(i => <Skeleton key={i} className="h-10 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />)}
-          </div>
-        </div>
-        {/* Sticky header skeleton */}
-        <div style={{ padding: '12px 16px' }}>
-          <Skeleton className="h-8 w-full rounded-lg" />
-        </div>
-        {/* Row skeletons */}
-        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-              <Skeleton className="h-5 w-8" />
-              <Skeleton className="h-8 w-8 rounded-lg" />
-              <Skeleton className="h-4 flex-1" />
-              <Skeleton className="h-4 w-12" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   // ─── Hero leader (#1) + runner for margin ───
+  // Lifted above the loading early return so hook order stays stable across
+  // renders (was: React error #310 when isLoading flipped). All downstream
+  // react-query hooks have `enabled` guards (verified in audit Q3) so they
+  // sit idle until rankedPlayers materialises.
   const leader = rankedPlayers[0] ?? null;
   const runnerUp = rankedPlayers[1] ?? null;
 
@@ -365,6 +337,38 @@ export function LeadersTab() {
 
     return out;
   }, [leader, runnerUp, category, streakWeeks, recentForm]);
+
+  // ─── Loading skeleton ───
+  if (isLoading) {
+    return (
+      <div style={{ background: '#F8FAFC' }}>
+        {/* Masthead skeleton */}
+        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 14px' }}>
+          <Skeleton className="h-3 w-48 mb-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <Skeleton className="h-6 w-40 mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <Skeleton className="h-24 w-full rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+            {[1, 2].map(i => <Skeleton key={i} className="h-10 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />)}
+          </div>
+        </div>
+        {/* Sticky header skeleton */}
+        <div style={{ padding: '12px 16px' }}>
+          <Skeleton className="h-8 w-full rounded-lg" />
+        </div>
+        {/* Row skeletons */}
+        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+              <Skeleton className="h-5 w-8" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-4 w-12" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   // Active group detection
   const activeGroup = Object.entries(GROUP_KEYS).find(([, keys]) => keys.includes(categoryKey))?.[0] ?? 'General';
