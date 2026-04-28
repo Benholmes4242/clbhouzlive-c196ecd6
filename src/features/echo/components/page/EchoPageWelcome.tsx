@@ -14,58 +14,74 @@ interface EchoPageWelcomeProps {
   onChipSelect: (prompt: string) => void;
 }
 
-// Pool of 50 diverse golf prompts
-const ECHO_PROMPTS = [
-  "What's the best play from 155y?",
-  "How do I play a downhill lie?",
-  "Tips for playing in the wind",
-  "How to escape a fairway bunker",
-  "Best strategy for a blind tee shot",
-  "How to play a punch shot under trees",
-  "When should I lay up vs go for it?",
-  "How to read a breaking putt",
-  "Tips for playing fast greens",
-  "How to judge distance without a rangefinder",
-  "Explain stableford scoring",
-  "What's the rule for a lost ball?",
-  "Can I move my ball from a divot?",
-  "What's the penalty for an unplayable lie?",
-  "Explain the new stroke and distance rule",
-  "What are the rules for taking relief?",
-  "How does match play scoring work?",
-  "What's a provisional ball and when to use it?",
-  "Can I repair spike marks on the green?",
-  "What's the rule for a ball in a water hazard?",
-  "Course tips for Portrush",
-  "Best links courses in Scotland",
-  "Hidden gem courses near London",
-  "Top courses in Northern Ireland",
-  "Best public courses in Ireland",
-  "Bucket list courses in the UK",
-  "Best courses for beginners",
-  "Most challenging courses in Europe",
-  "Best winter golf destinations",
-  "Courses with the best views",
-  "Build a 3-day NI golf trip",
-  "Plan a Scotland golf tour",
-  "Best golf resorts in Spain",
-  "Weekend golf trip ideas",
-  "Golf and stay packages in Portugal",
-  "Best time to visit St Andrews",
-  "How to book Old Course tee times",
-  "Golf trip packing checklist",
-  "Best golf destinations in March",
-  "Affordable golf trips in Europe",
-  "What clubs should I carry?",
-  "How to choose the right driver",
-  "Best golf balls for mid handicappers",
-  "When should I replace my grips?",
-  "Hybrid vs long iron - which is better?",
-  "Best golf shoes for walking",
-  "How to fit a putter to my stroke",
-  "What loft should my wedges be?",
-  "Best rangefinder under £200",
-  "How often should I change my ball?",
+type SkillBracket = 'beginner' | 'mid' | 'low';
+type RegionTag = 'gb-i' | 'europe' | 'usa' | 'global';
+type CategoryTag = 'rules' | 'strategy' | 'courses' | 'gear' | 'travel' | 'general';
+
+interface PromptMeta {
+  text: string;
+  skills: SkillBracket[];
+  regions: RegionTag[];
+  category: CategoryTag;
+  personalizable?: boolean;
+}
+
+const ECHO_PROMPTS: PromptMeta[] = [
+  // Strategy
+  { text: "What's the best play from 155y?", skills: ['mid', 'low'], regions: [], category: 'strategy' },
+  { text: "How do I play a downhill lie?", skills: [], regions: [], category: 'strategy' },
+  { text: "Tips for playing in the wind", skills: [], regions: ['gb-i'], category: 'strategy', personalizable: true },
+  { text: "How to escape a fairway bunker", skills: [], regions: [], category: 'strategy' },
+  { text: "Best strategy for a blind tee shot", skills: ['mid', 'low'], regions: [], category: 'strategy' },
+  { text: "How to play a punch shot under trees", skills: ['mid', 'low'], regions: [], category: 'strategy' },
+  { text: "When should I lay up vs go for it?", skills: ['mid', 'low'], regions: [], category: 'strategy' },
+  { text: "How to read a breaking putt", skills: [], regions: [], category: 'strategy' },
+  { text: "Tips for playing fast greens", skills: [], regions: [], category: 'strategy' },
+  { text: "How to judge distance without a rangefinder", skills: ['beginner', 'mid'], regions: [], category: 'strategy' },
+  // Rules
+  { text: "Explain stableford scoring", skills: [], regions: [], category: 'rules' },
+  { text: "What's the rule for a lost ball?", skills: [], regions: [], category: 'rules' },
+  { text: "Can I move my ball from a divot?", skills: [], regions: [], category: 'rules' },
+  { text: "What's the penalty for an unplayable lie?", skills: [], regions: [], category: 'rules' },
+  { text: "Explain the new stroke and distance rule", skills: ['mid', 'low'], regions: [], category: 'rules' },
+  { text: "What are the rules for taking relief?", skills: [], regions: [], category: 'rules' },
+  { text: "How does match play scoring work?", skills: [], regions: [], category: 'rules' },
+  { text: "What's a provisional ball and when to use it?", skills: [], regions: [], category: 'rules' },
+  { text: "Can I repair spike marks on the green?", skills: [], regions: [], category: 'rules' },
+  { text: "What's the rule for a ball in a water hazard?", skills: [], regions: [], category: 'rules' },
+  // Courses
+  { text: "Course tips for Portrush", skills: [], regions: ['gb-i'], category: 'courses', personalizable: true },
+  { text: "Best links courses in Scotland", skills: [], regions: ['gb-i'], category: 'courses', personalizable: true },
+  { text: "Hidden gem courses near London", skills: [], regions: ['gb-i'], category: 'courses', personalizable: true },
+  { text: "Top courses in Northern Ireland", skills: [], regions: ['gb-i'], category: 'courses', personalizable: true },
+  { text: "Best public courses in Ireland", skills: [], regions: ['gb-i'], category: 'courses', personalizable: true },
+  { text: "Bucket list courses in the UK", skills: [], regions: ['gb-i'], category: 'courses', personalizable: true },
+  { text: "Best courses for beginners", skills: ['beginner'], regions: [], category: 'courses' },
+  { text: "Most challenging courses in Europe", skills: ['mid', 'low'], regions: ['europe'], category: 'courses' },
+  { text: "Best winter golf destinations", skills: [], regions: [], category: 'travel' },
+  { text: "Courses with the best views", skills: [], regions: [], category: 'courses' },
+  // Travel
+  { text: "Build a 3-day NI golf trip", skills: [], regions: ['gb-i'], category: 'travel', personalizable: true },
+  { text: "Plan a Scotland golf tour", skills: [], regions: ['gb-i'], category: 'travel', personalizable: true },
+  { text: "Best golf resorts in Spain", skills: [], regions: ['europe'], category: 'travel' },
+  { text: "Weekend golf trip ideas", skills: [], regions: [], category: 'travel' },
+  { text: "Golf and stay packages in Portugal", skills: [], regions: ['europe'], category: 'travel' },
+  { text: "Best time to visit St Andrews", skills: [], regions: ['gb-i'], category: 'travel', personalizable: true },
+  { text: "How to book Old Course tee times", skills: [], regions: ['gb-i'], category: 'travel', personalizable: true },
+  { text: "Golf trip packing checklist", skills: [], regions: [], category: 'travel' },
+  { text: "Best golf destinations in March", skills: [], regions: [], category: 'travel' },
+  { text: "Affordable golf trips in Europe", skills: [], regions: ['europe'], category: 'travel' },
+  // Gear
+  { text: "What clubs should I carry?", skills: ['beginner', 'mid'], regions: [], category: 'gear' },
+  { text: "How to choose the right driver", skills: [], regions: [], category: 'gear' },
+  { text: "Best golf balls for mid handicappers", skills: ['mid'], regions: [], category: 'gear', personalizable: true },
+  { text: "When should I replace my grips?", skills: [], regions: [], category: 'gear' },
+  { text: "Hybrid vs long iron - which is better?", skills: ['mid', 'low'], regions: [], category: 'gear' },
+  { text: "Best golf shoes for walking", skills: [], regions: [], category: 'gear' },
+  { text: "How to fit a putter to my stroke", skills: ['mid', 'low'], regions: [], category: 'gear' },
+  { text: "What loft should my wedges be?", skills: ['mid', 'low'], regions: [], category: 'gear' },
+  { text: "Best rangefinder under £200", skills: [], regions: [], category: 'gear' },
+  { text: "How often should I change my ball?", skills: ['beginner', 'mid'], regions: [], category: 'gear' },
 ];
 
 function getGreeting(): string {
@@ -75,13 +91,107 @@ function getGreeting(): string {
   return 'Good evening';
 }
 
-const getRandomPrompts = (count: number = 4): string[] => {
-  const shuffled = [...ECHO_PROMPTS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-};
+function deriveSkillBracket(handicap: number | null): SkillBracket | null {
+  if (handicap === null || handicap === undefined) return null;
+  if (handicap < 6) return 'low';
+  if (handicap < 18) return 'mid';
+  return 'beginner';
+}
+
+function deriveRegion(homeClub: string | null, location: string | null): RegionTag | null {
+  const haystack = `${homeClub || ''} ${location || ''}`.toLowerCase();
+  if (/\b(uk|united kingdom|england|scotland|wales|ireland|london|edinburgh|dublin|belfast)\b/.test(haystack)) return 'gb-i';
+  if (/\b(spain|portugal|france|germany|italy|netherlands|belgium|sweden|denmark)\b/.test(haystack)) return 'europe';
+  if (/\b(usa|united states|new york|california|florida|texas)\b/.test(haystack)) return 'usa';
+  return null;
+}
+
+interface SelectedPrompt {
+  text: string;
+  isPersonalized: boolean;
+}
+
+interface SessionPromptCache {
+  prompts: SelectedPrompt[];
+  expiresAt: number;
+}
+
+const SESSION_KEY = 'echo:welcome-prompts';
+const SESSION_TTL_MS = 30 * 60 * 1000;
+
+function loadCachedPrompts(): SessionPromptCache | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as SessionPromptCache;
+    if (Date.now() > parsed.expiresAt) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveCachedPrompts(prompts: SelectedPrompt[]): void {
+  try {
+    const cache: SessionPromptCache = { prompts, expiresAt: Date.now() + SESSION_TTL_MS };
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(cache));
+  } catch { /* storage quota or disabled */ }
+}
+
+function selectPrompts(profile: EchoProfile, count: number = 4): SelectedPrompt[] {
+  const skill = deriveSkillBracket(profile.handicap);
+  const region = deriveRegion(profile.homeClub, profile.location);
+
+  const skillFiltered = ECHO_PROMPTS.filter(p => {
+    if (p.skills.length === 0) return true;
+    if (skill && p.skills.includes(skill)) return true;
+    return false;
+  });
+
+  const scored = skillFiltered.map(p => {
+    let score = Math.random();
+    if (region && p.regions.includes(region)) score += 2.0;
+    if (region && p.regions.length === 0) score += 0.3;
+    return { prompt: p, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+
+  const seen = new Set<CategoryTag>();
+  const selected: PromptMeta[] = [];
+  for (const { prompt } of scored) {
+    if (selected.length >= count) break;
+    if (selected.length < count - 1 && seen.has(prompt.category)) continue;
+    selected.push(prompt);
+    seen.add(prompt.category);
+  }
+  while (selected.length < count && scored.length > selected.length) {
+    const next = scored[selected.length].prompt;
+    if (!selected.includes(next)) selected.push(next);
+  }
+
+  const personalizedIdx = selected.findIndex(p =>
+    p.personalizable && region && p.regions.includes(region)
+  );
+
+  return selected.map((p, i) => ({
+    text: p.text,
+    isPersonalized: i === personalizedIdx && personalizedIdx !== -1,
+  }));
+}
 
 export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps) {
-  const prompts = useMemo(() => getRandomPrompts(4), []);
+  const prompts = useMemo(() => {
+    const cached = loadCachedPrompts();
+    if (cached) return cached.prompts;
+    const fresh = selectPrompts(profile, 4);
+    saveCachedPrompts(fresh);
+    return fresh;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.handicap, profile.homeClub, profile.location]);
   const greeting = getGreeting();
 
   const handleChipClick = (prompt: string) => {
@@ -148,15 +258,29 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
           {prompts.map((prompt, index) => (
             <button
               key={index}
-              onClick={() => handleChipClick(prompt)}
+              onClick={() => handleChipClick(prompt.text)}
               className="px-4 py-[11px] rounded-[13px] text-[13px] font-medium text-left active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2"
               style={{
-                background: '#ffffff',
-                border: '1px solid rgba(15,23,42,0.07)',
+                background: prompt.isPersonalized
+                  ? 'linear-gradient(135deg, rgba(247,147,30,0.06), #ffffff)'
+                  : '#ffffff',
+                border: prompt.isPersonalized
+                  ? '1px solid rgba(247,147,30,0.20)'
+                  : '1px solid rgba(15,23,42,0.07)',
               }}
-              aria-label={`Ask Echo: ${prompt}`}
+              aria-label={`Ask Echo: ${prompt.text}`}
             >
-              <span style={{ color: '#0F172A' }}>{prompt}</span>
+              <span className="flex items-center gap-2 min-w-0">
+                {prompt.isPersonalized && (
+                  <span
+                    className="flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
+                    style={{ background: 'rgba(247,147,30,0.15)', color: '#F7931E' }}
+                  >
+                    For You
+                  </span>
+                )}
+                <span style={{ color: '#0F172A' }} className="truncate">{prompt.text}</span>
+              </span>
               <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.4)' }} />
             </button>
           ))}
