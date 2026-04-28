@@ -17,6 +17,7 @@ interface SettingsChevronRowProps {
   isBeta?: boolean;
   value?: string;
   iconTheme?: IconTheme;
+  isLocked?: boolean;
 }
 
 export function SettingsChevronRow({
@@ -32,6 +33,7 @@ export function SettingsChevronRow({
   isBeta = false,
   value,
   iconTheme = 'default',
+  isLocked = false,
 }: SettingsChevronRowProps) {
   const theme = iconThemeStyles[iconTheme];
 
@@ -69,7 +71,23 @@ export function SettingsChevronRow({
         {value && (
           <span className="text-[13px] text-muted-foreground max-w-[40%] truncate">{value}</span>
         )}
-        {isExternal ? (
+        {isLocked ? (
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#64748B',
+              background: 'rgba(15,23,42,0.06)',
+              border: '0.5px solid rgba(15,23,42,0.10)',
+              borderRadius: 6,
+              padding: '3px 7px',
+            }}
+          >
+            Locked
+          </span>
+        ) : isExternal ? (
           <ExternalLink className="w-5 h-5 text-muted-foreground/50" />
         ) : (
           <ChevronRight className="w-5 h-5 text-muted-foreground/50" />

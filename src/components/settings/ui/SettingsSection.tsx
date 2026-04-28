@@ -18,7 +18,7 @@ export function SettingsSection({
   const isDanger = variant === 'danger';
 
   return (
-    <section className={cn('w-full px-4', className)}>
+    <section className={cn('w-full', className)}>
       {/* Dispatch rule marker eyebrow */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
         <div style={{ width: 3, height: 10, background: isDanger ? '#DC2626' : '#F7931E', borderRadius: 1, flexShrink: 0 }} />
