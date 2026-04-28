@@ -16,14 +16,11 @@ export function HandicapInput({ value, onChange }: Props) {
     if (value.startsWith('+')) {
       setIsPlusHandicap(true);
       setInputValue(value.slice(1));
-    } else if (value.startsWith('-')) {
-      setIsPlusHandicap(true);
-      setInputValue(value.slice(1));
     } else {
       setIsPlusHandicap(false);
       setInputValue(value);
     }
-  }, []); // only on mount
+  }, []); // only on mount; canonical form string never has leading `-`
 
   const handleToggle = (plus: boolean) => {
     setIsPlusHandicap(plus);
