@@ -152,8 +152,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
         {/* Top 3 list */}
         <div className="space-y-2">
           {top3.map((entry, index) => {
-            const rankStyle = getRankStyle(entry.rank);
-            
+            const medal = getMedalStyle(entry.rank);
+
             return (
               <motion.div
                 key={entry.id}
@@ -165,22 +165,27 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                {/* Rank badge */}
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: rankStyle.bg,
-                    border: `1px solid ${rankStyle.border}`,
-                  }}
-                >
-                  {entry.rank <= 3 ? (
-                    <Medal className="w-4 h-4" style={{ color: rankStyle.color }} />
-                  ) : (
-                    <span className="text-xs font-bold text-muted-foreground">
+                {/* Rank: medal for top 3, bare number for 4+ */}
+                {medal ? (
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: medal.background,
+                      boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    <span
+                      className="text-xs tabular-nums"
+                      style={{ color: medal.color, fontWeight: 800 }}
+                    >
                       {entry.rank}
                     </span>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <span className="w-8 text-sm font-semibold text-muted-foreground text-center tabular-nums flex-shrink-0">
+                    {entry.rank}
+                  </span>
+                )}
 
                 {/* Avatar */}
                 <SquircleAvatar
@@ -195,7 +200,15 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                   <p className="text-sm font-semibold truncate text-foreground"
                     style={entry.isCurrentUser ? { color: '#F7931E' } : undefined}
                   >
-                    {entry.displayName}
+                    {entry.isCurrentUser ? (
+                      <>
+                        {entry.displayName}
+                        {' '}
+                        <span className="font-normal text-muted-foreground">(you)</span>
+                      </>
+                    ) : (
+                      entry.displayName
+                    )}
                   </p>
                 </div>
 
