@@ -385,6 +385,12 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-4 { animation: auth-button-in 0.4s ease-out 0.65s both; }
         .auth-button-5 { animation: auth-button-in 0.4s ease-out 0.75s both; }
         .auth-button-6 { animation: auth-button-in 0.4s ease-out 0.85s both; }
+
+        .auth-email-input::placeholder {
+          color: rgba(255, 255, 255, 0.55);
+          font-weight: 500;
+          font-size: 15px;
+        }
         
         @media (prefers-reduced-motion: reduce) {
           .auth-logo-animate,
