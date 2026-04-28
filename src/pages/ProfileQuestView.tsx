@@ -17,6 +17,8 @@ import { ArrowLeft } from 'lucide-react';
 import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useQuestCourses } from '@/hooks/useQuestCourses';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
