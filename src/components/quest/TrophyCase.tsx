@@ -211,9 +211,12 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                       {m.isUnlocked && (
                         <div className="absolute inset-0 rounded-full blur-md scale-110" style={{ background: 'rgba(247,147,30,0.15)' }} />
                       )}
-                      {/* Next up: pulsing amber ring */}
+                      {/* Next up: pulsing amber rounded-rect ring matching badge shape */}
                       {isNext && !m.isUnlocked && (
-                        <div className="absolute inset-[-4px] rounded-full border-2 animate-pulse" style={{ borderColor: 'rgba(247,147,30,0.60)' }} />
+                        <div
+                          className="absolute inset-[-4px] border-2 animate-pulse pointer-events-none"
+                          style={{ borderColor: 'rgba(247,147,30,0.60)', borderRadius: 14 }}
+                        />
                       )}
                       <img
                         src={BADGE_IMAGES[m.threshold]}
