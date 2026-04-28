@@ -25,7 +25,8 @@ import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Trophy, ChevronRight, ChevronDown, ChevronLeft, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
+import { Trophy, ChevronRight, ChevronDown, ChevronLeft, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2, MessageCircle } from 'lucide-react';
+import { useStartDM } from '@/hooks/useStartDM';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -164,6 +165,7 @@ const ProfilePageV2Content: React.FC = () => {
   
 
   const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(isSelf ? undefined : profileUserId);
+  const { startDM, isStarting: dmStarting } = useStartDM();
   const {
     status: friendshipStatus,
     isUpdating: friendshipUpdating,
@@ -713,6 +715,23 @@ const ProfilePageV2Content: React.FC = () => {
             </div>
           ) : (
           <>
+            <button
+              type="button"
+              onClick={() => profileUserId && startDM(profileUserId)}
+              disabled={dmStarting === profileUserId}
+              className="h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 disabled:opacity-60 active:scale-[0.98] transition-transform"
+              style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }}
+              aria-label="Send message"
+            >
+              {dmStarting === profileUserId ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <>
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  Message
+                </>
+              )}
+            </button>
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
