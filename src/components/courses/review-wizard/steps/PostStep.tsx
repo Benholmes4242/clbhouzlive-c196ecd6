@@ -9,6 +9,7 @@ import { Plus, AlertCircle, Images, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { formatCourseLocation } from '@/utils/courseLocation';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { PermissionDeniedCard } from '@/components/shared/media/PermissionDeniedCard';
@@ -124,6 +125,14 @@ export function PostStep({
   const canSubmit = rating !== null && !isSubmitting;
 
   const tierInfo = rating !== null ? getScoreTier(rating) : null;
+  const locationText = course
+    ? formatCourseLocation({
+        sub_country: course.sub_country,
+        region: course.region,
+        country: course.country,
+      })
+    : '';
+  const fillPct = rating !== null ? Math.max(0, Math.min(100, (rating / 10) * 100)) : 0;
 
   // Conditional Post step copy: branches on whether any media has been added
   const hasMedia = media.length > 0;
@@ -249,46 +258,127 @@ export function PostStep({
 
       {/* Inline review summary */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Your Review Summary</span>
-        </div>
-
         <div style={{ border: '1px solid rgba(15,23,42,0.07)', borderRadius: 12, overflow: 'hidden' }}>
-          {/* Score + tier row */}
+          {/* Course header row */}
+          {course && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+              {course.thumbnail_image ? (
+                <img
+                  src={course.thumbnail_image}
+                  alt={course.name}
+                  style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 8,
+                    background: 'rgba(247,147,30,0.12)',
+                    color: '#F7931E',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 15,
+                    fontWeight: 800,
+                    flexShrink: 0,
+                  }}
+                >
+                  {course.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                  {course.name}
+                </div>
+                {locationText && (
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    {locationText}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Hero score row */}
           {rating !== null && tierInfo && (
             <button
               type="button"
               onClick={() => onGoToStep(1)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'transparent', border: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' as const }}
+              style={{
+                width: '100%',
+                padding: '18px 14px 16px',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: hasBreakdowns ? '0.5px solid rgba(15,23,42,0.07)' : (hasText || true ? '0.5px solid rgba(15,23,42,0.07)' : 'none'),
+                cursor: 'pointer',
+                textAlign: 'left' as const,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+              }}
             >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}>
-                    {rating.toFixed(1)}
-                  </span>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
-                    {tierInfo.label}
-                  </span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+                <span style={{ fontSize: 44, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                  {rating.toFixed(1)}
+                </span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#94A3B8' }}>/ 10</span>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    display: 'inline-block',
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    fontSize: 10,
+                    fontWeight: 800,
+                    textTransform: 'uppercase' as const,
+                    letterSpacing: '0.06em',
+                    background: tierInfo.isExceptional ? 'rgba(247,147,30,0.12)' : 'rgba(15,23,42,0.06)',
+                    color: tierInfo.isExceptional ? '#F7931E' : '#0F172A',
+                    marginBottom: 6,
+                  }}
+                >
+                  {tierInfo.label}
+                </div>
+                <div style={{ height: 4, width: '100%', background: 'rgba(15,23,42,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      width: `${fillPct}%`,
+                      background: tierInfo.isExceptional ? '#F7931E' : '#0F172A',
+                      borderRadius: 2,
+                    }}
+                  />
                 </div>
               </div>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>Edit ›</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E', flexShrink: 0 }}>Edit ›</span>
             </button>
           )}
 
-          {/* Breakdown strip — 4-col grid */}
+          {/* Breakdown tiles row */}
           {hasBreakdowns && (
             <button
               type="button"
               onClick={() => onGoToStep(1)}
-              style={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'transparent', border: 'none', borderBottomStyle: 'solid', borderBottomWidth: 0.5, borderBottomColor: 'rgba(15,23,42,0.07)', padding: 0, cursor: 'pointer' }}
+              style={{
+                width: '100%',
+                padding: '12px 14px 14px',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: 8,
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                cursor: 'pointer',
+              }}
             >
-              {(Object.entries(breakdowns) as [keyof ReviewBreakdowns, number | null][]).map(([key, value], i) => (
-                <div key={key} style={{ padding: '7px 0', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
-                  <div style={{ fontSize: 8, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginBottom: 2 }}>
-                    {key === 'clubhouse' ? 'CLBHS' : BREAKDOWN_LABELS[key].slice(0, 4).toUpperCase()}
+              {(Object.entries(breakdowns) as [keyof ReviewBreakdowns, number | null][]).map(([key, value]) => (
+                <div key={key} style={{ background: '#F8FAFC', borderRadius: 8, padding: '8px 4px', textAlign: 'center' as const }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.04em', marginBottom: 3 }}>
+                    {BREAKDOWN_LABELS[key]}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: value !== null ? '#0F172A' : 'rgba(15,23,42,0.2)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: value !== null ? '#0F172A' : 'rgba(15,23,42,0.2)', fontVariantNumeric: 'tabular-nums' }}>
                     {value !== null ? value.toFixed(1) : '—'}
                   </div>
                 </div>
@@ -301,19 +391,19 @@ export function PostStep({
             <button
               type="button"
               onClick={() => onGoToStep(2)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
+              style={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '12px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const, gap: 12 }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
                 {title && <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{title}</div>}
                 {review && <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{review}</div>}
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#F7931E', flexShrink: 0, marginLeft: 12 }}>Edit ›</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#F7931E', flexShrink: 0 }}>Edit ›</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={() => onGoToStep(2)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
             >
               <span style={{ fontSize: 13, color: '#94A3B8' }}>No written review · ratings only</span>
               <span style={{ fontSize: 13, fontWeight: 600, color: '#F7931E' }}>Add ›</span>
