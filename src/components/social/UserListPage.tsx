@@ -675,6 +675,24 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   ctaIsAmber={false}
                   onCta={handleClearSearch}
                 />
+              ) : isFollowingTab && isOwnProfile && followingFilter !== 'all' ? (
+                <EmptyState
+                  eyebrow="No matches"
+                  icon={<Users className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
+                  heading={
+                    followingFilter === 'friends'
+                      ? 'No friends in following yet'
+                      : 'No pending friend requests'
+                  }
+                  body={
+                    followingFilter === 'friends'
+                      ? "You're not yet friends with anyone you follow. Send a friend request from a profile to connect."
+                      : 'You have no outgoing friend requests waiting on a response.'
+                  }
+                  ctaLabel="Show all"
+                  ctaIsAmber={false}
+                  onCta={() => handleFilterChange('all')}
+                />
               ) : activeMode === 'followers' ? (
                 <EmptyState
                   eyebrow="Empty list"
@@ -686,20 +704,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                       : "When people follow this golfer, they'll appear here."
                   }
                   ctaLabel={isOwnProfile ? 'Find golfers to follow' : undefined}
-                  ctaIsAmber
-                  onCta={isOwnProfile ? () => navigate('/golferstofollow') : undefined}
-                />
-              ) : activeMode === 'friends' ? (
-                <EmptyState
-                  eyebrow="Empty list"
-                  icon={<Users className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
-                  heading="No friends yet"
-                  body={
-                    isOwnProfile
-                      ? 'Add friends to plan games and share your golf journey together.'
-                      : "This golfer hasn't added any friends yet."
-                  }
-                  ctaLabel={isOwnProfile ? 'Find golfers' : undefined}
                   ctaIsAmber
                   onCta={isOwnProfile ? () => navigate('/golferstofollow') : undefined}
                 />
@@ -726,11 +730,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             <>
               <div style={{ padding: '20px 20px 10px' }}>
                 <SectionEyebrow
-                  label={
-                    activeMode === 'followers' ? 'All Followers' :
-                    activeMode === 'following' ? 'All Following' :
-                    'All Friends'
-                  }
+                  label={activeMode === 'followers' ? 'All Followers' : 'All Following'}
                   count={displayTotal}
                 />
               </div>
