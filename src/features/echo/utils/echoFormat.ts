@@ -44,57 +44,65 @@ export function sanitizeEchoText(text: string): string {
 /**
  * Generate smart follow-up suggestions based on the last response
  */
-export function generateFollowUps(lastResponse: string): string[] {
+export function generateFollowUps(lastResponse: string, recentUserMessages: string[] = []): string[] {
   const suggestions: string[] = [];
-  
+
   const lowerResponse = lastResponse.toLowerCase();
-  
-  // FIX 18: Detect numbered list of courses (e.g., "1. **Royal County Down**")
+  const recentNormalized = new Set(
+    recentUserMessages.map(m => m.trim().toLowerCase().replace(/[?.!]+$/, ''))
+  );
+
+  const isDuplicate = (chip: string): boolean => {
+    const norm = chip.trim().toLowerCase().replace(/[?.!]+$/, '');
+    return recentNormalized.has(norm);
+  };
+
+  // Detect numbered list of courses (e.g., "1. **Royal County Down**")
   const courseListPattern = /\d+\.\s+\*\*(.+?)\*\*/g;
   const courseMatches = [...lastResponse.matchAll(courseListPattern)];
-  
+
   if (courseMatches.length >= 2) {
-    // Response contains a numbered list of courses
     suggestions.push('Compare the top 3 in more detail');
     suggestions.push('Which one is best for a weekend trip?');
-    return suggestions.slice(0, 3);
+    return suggestions.filter(s => !isDuplicate(s)).slice(0, 3);
   }
-  
+
   // Single course mention
   const singleCoursePattern = /(?:Golf Club|Golf Course|Golf Links|Country Club)/i;
   if (singleCoursePattern.test(lastResponse) && courseMatches.length === 0) {
     suggestions.push('Best strategy for this course?');
     suggestions.push("What's the best time to visit?");
-    return suggestions.slice(0, 3);
+    suggestions.push('What clubs should I bring?');
+    const filtered = suggestions.filter(s => !isDuplicate(s));
+    if (filtered.length > 0) return filtered.slice(0, 3);
   }
-  
-  // Distance-related
+
   if (lowerResponse.includes('yard') || lowerResponse.includes('metre') || lowerResponse.includes('meter')) {
     suggestions.push('Convert to metres');
   }
-  
-  // Player mentions
   if (lowerResponse.includes('rory') || lowerResponse.includes('bryson') || lowerResponse.includes('scottie')) {
     suggestions.push('What about other pros?');
   }
-  
-  // Rules
   if (lowerResponse.includes('rule') || lowerResponse.includes('penalty') || lowerResponse.includes('relief')) {
     suggestions.push('Explain in simpler terms');
   }
-  
-  // Course tips
   if (lowerResponse.includes('course') || lowerResponse.includes('hole') || lowerResponse.includes('green')) {
     suggestions.push('Best strategy for this course?');
   }
-  
-  // General follow-ups if we don't have specific ones
-  if (suggestions.length < 2) {
-    suggestions.push('Tell me more');
-    suggestions.push('Make it shorter');
+
+  let filtered = suggestions.filter(s => !isDuplicate(s));
+
+  if (filtered.length < 2) {
+    const fallbacks = ['Tell me more', 'Make it shorter', 'Give me an example'];
+    for (const f of fallbacks) {
+      if (filtered.length >= 3) break;
+      if (!isDuplicate(f) && !filtered.includes(f)) {
+        filtered.push(f);
+      }
+    }
   }
-  
-  return suggestions.slice(0, 3);
+
+  return filtered.slice(0, 3);
 }
 
 /**
