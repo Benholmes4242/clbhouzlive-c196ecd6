@@ -77,6 +77,7 @@ const ActivityPage: React.FC = () => {
   const navigate = useNavigate();
 
   const hasMarkedSeen = useRef(false);
+  const isInitialMountRef = useRef(true);
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
@@ -364,7 +365,8 @@ const ActivityPage: React.FC = () => {
                             <FeaturedNotificationCard
                               key={item.id}
                               notification={item}
-                              index={idx}
+                              index={isInitialMountRef.current ? idx : 0}
+                              skipAnimation={!isInitialMountRef.current}
                               onClick={() => handleNotificationClick(item)}
                               onOpenActionsSheet={() => openActionsSheet(item)}
                               currentUserId={user?.id}
