@@ -13,25 +13,31 @@ interface MomentumCardProps {
     name: string;
     dateAdded?: string;
   }[];
+  suggestedRegion?: string;
 }
 
 export const MomentumCard: React.FC<MomentumCardProps> = ({
   recentlyPlayed,
+  suggestedRegion,
 }) => {
-  // Calculate last course date and this month count
-  const { lastCourseDate, thisMonthCount, hasActivity } = useMemo(() => {
+  // Calculate last course date and this/last month counts
+  const { lastCourseDate, thisMonthCount, lastMonthCount, hasActivity } = useMemo(() => {
     if (!recentlyPlayed || recentlyPlayed.length === 0) {
-      return { lastCourseDate: null, thisMonthCount: 0, hasActivity: false };
+      return { lastCourseDate: null, thisMonthCount: 0, lastMonthCount: 0, hasActivity: false };
     }
 
     // Parse dates - dateAdded is in format "DD MMM" like "15 Jan"
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
+
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
     // Find the most recent date
     let latestDate: Date | null = null;
     let monthCount = 0;
+    let prevMonthCount = 0;
 
     for (const course of recentlyPlayed) {
       if (!course.dateAdded) continue;
@@ -68,11 +74,16 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
       if (courseDate.getMonth() === currentMonth && courseDate.getFullYear() === currentYear) {
         monthCount++;
       }
+      // Count last month
+      if (courseDate.getMonth() === lastMonth && courseDate.getFullYear() === lastMonthYear) {
+        prevMonthCount++;
+      }
     }
 
     return {
       lastCourseDate: latestDate,
       thisMonthCount: monthCount,
+      lastMonthCount: prevMonthCount,
       hasActivity: latestDate !== null,
     };
   }, [recentlyPlayed]);
