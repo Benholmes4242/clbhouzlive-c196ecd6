@@ -114,6 +114,14 @@ const ActivityPage: React.FC = () => {
     };
   }, [queryClient]);
 
+  // Flip initial-mount flag after first non-empty render so filter-change
+  // re-renders skip the entrance stagger animation.
+  useEffect(() => {
+    if (!data) return;
+    const t = setTimeout(() => { isInitialMountRef.current = false; }, 1000);
+    return () => clearTimeout(t);
+  }, [data]);
+
   if (isRehydrating) return <ActivityPageSkeleton />;
 
   const handleRefresh = async () => {

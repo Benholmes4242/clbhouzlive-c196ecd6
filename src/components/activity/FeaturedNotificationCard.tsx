@@ -21,6 +21,7 @@ interface FeaturedNotificationCardProps {
   onOpenActionsSheet: () => void;
   index?: number;
   currentUserId?: string;
+  skipAnimation?: boolean;
 }
 
 const INK = '#0F172A';
@@ -28,6 +29,7 @@ const INK_SOFT = '#475569';
 const INK_SUBTLE = '#94A3B8';
 const BORDER = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97A10';
 
 function getNotificationActionText(notification: ActivityNotification): string {
   const { type, message, title } = notification;
@@ -70,6 +72,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   onOpenActionsSheet,
   index = 0,
   currentUserId,
+  skipAnimation = false,
 }) => {
   const actorName = getActorDisplayName(notification);
   const avatarUrl = getActorAvatarUrl(notification);
@@ -117,8 +120,8 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   if (isReview) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={skipAnimation ? false : { opacity: 0, y: 16 }}
+        animate={skipAnimation ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.28, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
         onClick={onClick}
         className="cursor-pointer active:scale-[0.98] transition-transform"
@@ -190,7 +193,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
                 {courseName}
               </span>
             )}
-            <ChevronRight size={18} color={INK_SUBTLE} className="pb-1 shrink-0" strokeWidth={2.25} />
+            <ChevronRight size={18} color={AMBER_DEEP} className="pb-1 shrink-0" strokeWidth={2.25} />
           </div>
 
           {/* Content */}
@@ -224,8 +227,8 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   // ──────────────────────────── COMPACT SOCIAL CARD ────────────────────────────
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={skipAnimation ? false : { opacity: 0, y: 16 }}
+      animate={skipAnimation ? undefined : { opacity: 1, y: 0 }}
       transition={{ duration: 0.28, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
       onClick={onClick}
       className="cursor-pointer active:scale-[0.98] transition-transform"
@@ -304,7 +307,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
 
           {/* Content column */}
           <div className="flex-1 min-w-0">
-            <p className="text-[13.5px] leading-[1.4]" style={{ color: INK }}>
+            <p className="text-[13.5px] leading-[1.4] line-clamp-2" style={{ color: INK }}>
               <span className="font-semibold">{actorName}</span>{' '}
               <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
             </p>
