@@ -5,10 +5,11 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Users, UserPlus } from 'lucide-react';
+import { Trophy, Users, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useProfileData } from '@/hooks/useProfileData';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
