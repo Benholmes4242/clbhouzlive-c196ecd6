@@ -263,8 +263,8 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           />
         </div>
         {nextMilestone && (
-          <p className="text-xs text-muted-foreground mt-1.5 text-center">
-            <span className="font-medium text-foreground">{nextClubName}</span> {progressLabel}
+          <p className="text-xs text-muted-foreground mt-1.5 text-center tabular-nums">
+            {totalPlayed} of {nextThreshold} · <span className="font-medium text-foreground">{nextClubName}</span>
           </p>
         )}
       </motion.div>
