@@ -613,10 +613,17 @@ export function NewConversationModal({
             </div>
 
             <ScrollArea className="flex-1">
-              {dmResults.length > 0
-                ? dmResults.map((u, i) => renderDmUserRow(u, i, dmResults.length))
-                : renderNoResults(dmSearch, dmLoading)
-              }
+              {dmSearch.trim() ? (
+                dmResults.length > 0
+                  ? dmResults.map((u, i) => renderDmUserRow(u, i, dmResults.length))
+                  : renderNoResults(dmSearch, dmLoading)
+              ) : suggestedQuery.isLoading ? (
+                [0, 1, 2, 3].map((i) => renderSuggestionSkeleton(i, i === 3))
+              ) : suggestedQuery.data && suggestedQuery.data.length > 0 ? (
+                suggestedQuery.data.map((s, i) => renderSuggestedRow(s, i, suggestedQuery.data!.length))
+              ) : (
+                renderNoResults('', false)
+              )}
             </ScrollArea>
           </div>
         )}
