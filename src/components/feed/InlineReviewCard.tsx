@@ -352,32 +352,12 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           </div>
         )}
 
-        {/* Italic Georgia excerpt in curly quotes */}
-        {reviewText && (
-          <div
-            style={{
-              marginTop: breakdownEntries.length > 0 ? 0 : 12,
-              marginBottom: 12,
-              fontFamily: FONTS.serifSystem,
-              fontStyle: 'italic',
-              fontSize: 13.5,
-              lineHeight: 1.45,
-              color: FROST.inkMute,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              wordBreak: 'break-word',
-            }}
-          >
-            {`\u201C${reviewText}\u201D`}
-          </div>
-        )}
+        {/* Review excerpt removed per design — caption no longer shown on review cards */}
 
         {/* Author row with inline Read review link */}
         <div
           style={{
-            marginTop: reviewText || breakdownEntries.length > 0 ? 0 : 12,
+            marginTop: breakdownEntries.length > 0 ? 0 : 12,
             display: 'flex',
             alignItems: 'center',
             gap: 6,
