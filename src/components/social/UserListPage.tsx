@@ -23,6 +23,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useRelationshipStatuses, type RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
+import { useSocialCounts } from '@/hooks/useSocialCounts';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
