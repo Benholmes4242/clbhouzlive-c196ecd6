@@ -246,12 +246,16 @@ export function EchoResponseCard({
 
         {/* Action row */}
         {!isStreaming && (
-          <div className="flex items-center gap-1 mt-2">
+          <div className="flex items-center gap-1.5 mt-2">
             {/* Copy */}
             <button
               onClick={handleCopy}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
-              style={{ color: copied ? '#F7931E' : '#94A3B8' }}
+              className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
+              style={{
+                background: copied ? 'rgba(247,147,30,0.10)' : 'rgba(15,23,42,0.04)',
+                border: copied ? '0.5px solid rgba(247,147,30,0.30)' : '0.5px solid rgba(15,23,42,0.07)',
+                color: copied ? '#F7931E' : '#94A3B8',
+              }}
               aria-label="Copy response to clipboard"
             >
               {copied ? (
@@ -270,8 +274,12 @@ export function EchoResponseCard({
             {/* Share */}
             <button
               onClick={handleShare}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
-              style={{ color: '#94A3B8' }}
+              className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
+              style={{
+                background: 'rgba(15,23,42,0.04)',
+                border: '0.5px solid rgba(15,23,42,0.07)',
+                color: '#94A3B8',
+              }}
               aria-label="Share response"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -282,8 +290,12 @@ export function EchoResponseCard({
             {isLast && onRegenerate && (
               <button
                 onClick={handleRegenerate}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
-                style={{ color: '#94A3B8' }}
+                className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
+                style={{
+                  background: 'rgba(15,23,42,0.04)',
+                  border: '0.5px solid rgba(15,23,42,0.07)',
+                  color: '#94A3B8',
+                }}
                 aria-label="Regenerate response"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
