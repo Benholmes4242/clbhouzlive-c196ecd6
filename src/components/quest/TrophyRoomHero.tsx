@@ -214,19 +214,31 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           </div>
         )}
 
-        {/* Right: Count */}
+        {/* Right: To-go count colored to next tier */}
         <div className="relative text-right">
-          <div className="flex items-baseline justify-end gap-0.5">
-            <span className="text-4xl tracking-tight text-foreground" style={{ fontWeight: 900 }}>
-              {totalPlayed}
-            </span>
-            <span className="text-lg font-medium text-muted-foreground/60">
-              /{target}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Courses Played
-          </p>
+          {nextMilestone ? (
+            <>
+              <div className="flex items-baseline justify-end gap-1">
+                <span
+                  className="text-4xl tracking-tight tabular-nums"
+                  style={{ fontWeight: 900, color: nextTierColor }}
+                >
+                  {remaining}
+                </span>
+                <span className="text-xs font-medium text-muted-foreground">to go</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                to {nextClubName}
+              </p>
+            </>
+          ) : (
+            <>
+              <span className="text-4xl tracking-tight text-foreground" style={{ fontWeight: 900 }}>
+                {totalPlayed}
+              </span>
+              <p className="text-xs text-muted-foreground mt-0.5">Courses played</p>
+            </>
+          )}
         </div>
       </motion.div>
 
