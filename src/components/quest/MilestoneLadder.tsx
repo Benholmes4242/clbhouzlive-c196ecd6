@@ -480,14 +480,21 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
             <div className="flex items-center gap-2 mb-1">
               <Crown className="w-4 h-4 text-[#C1A84C]" />
               <span className="text-sm font-semibold text-foreground">
-                Mastery Track
+                Regional Mastery
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {coreComplete 
-                ? 'Complete each regional Top 100 list to achieve mastery' 
-                : 'Complete the Grand Slam Club to unlock regional mastery challenges'}
-            </p>
+            {(() => {
+              const inProgressCount = regionMilestones.filter(
+                r => (r.played ?? 0) > 0 && (r.played ?? 0) < (r.total ?? 0)
+              ).length;
+              return (
+                <p className="text-sm text-muted-foreground">
+                  {inProgressCount > 0
+                    ? `Conquer the lists below to chase the Grand Slam · ${inProgressCount} of 4 lists in progress`
+                    : 'Conquer regional Top 100 lists to chase the Grand Slam'}
+                </p>
+              );
+            })()}
           </div>
 
           {/* Regional items */}
