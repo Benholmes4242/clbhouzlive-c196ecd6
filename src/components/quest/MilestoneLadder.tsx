@@ -184,7 +184,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
               "text-sm mt-0.5",
               milestone.isUnlocked ? "text-muted-foreground" : "text-muted-foreground/40"
             )}>
-              {`${milestone.threshold} Top 100 courses played`}
+              {`Play ${milestone.threshold} courses`}
             </p>
             
             {/* Progress bar for current target */}
