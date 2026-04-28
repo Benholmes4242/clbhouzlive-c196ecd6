@@ -36,6 +36,7 @@ export default function EchoPage() {
     conversationId,
     messages,
     sendMessage,
+    regenerateLastResponse,
     isStreaming,
     streamingContent,
     abortStream,
@@ -183,6 +184,7 @@ export default function EchoPage() {
                 isStreaming={isStreaming}
                 streamingContent={streamingContent}
                 onFollowUp={handleFollowUp}
+                onRegenerate={regenerateLastResponse}
                 onRefresh={async () => {
                   if (conversationId) {
                     await refetchMessages();

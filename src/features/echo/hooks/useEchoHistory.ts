@@ -77,10 +77,35 @@ export function useEchoConversations(search?: string) {
         }
       }
 
-      return (data ?? []).map(c => ({
+      const enriched = (data ?? []).map(c => ({
         ...c,
         message_count: messageCounts[c.id] || 0,
-      })) as EchoConversationRow[];
+      }));
+
+      // Filter out empty/stub conversations (no messages persisted)
+      const visible = enriched.filter(c => c.message_count > 0);
+
+      // Disambiguate duplicate titles by appending date suffix to newer ones.
+      // Older conversation keeps the bare title; subsequent collisions get " · {DD MMM}" suffix.
+      const seenTitles = new Map<string, number>();
+      const sorted = [...visible].sort((a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+
+      const titleSuffixed = sorted.map((c, sortedIdx) => {
+        if (!c.title) return c;
+        const norm = c.title.trim().toLowerCase();
+        if (!seenTitles.has(norm)) {
+          seenTitles.set(norm, sortedIdx);
+          return c;
+        }
+        const dt = new Date(c.created_at);
+        const suffix = dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        return { ...c, title: `${c.title} · ${suffix}` };
+      });
+
+      const titleMap = new Map(titleSuffixed.map(c => [c.id, c.title]));
+      return visible.map(c => ({ ...c, title: titleMap.get(c.id) ?? c.title })) as EchoConversationRow[];
     },
     staleTime: 0, // Always refetch when queried
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
