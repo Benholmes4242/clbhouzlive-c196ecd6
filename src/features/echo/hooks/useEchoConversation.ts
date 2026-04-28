@@ -29,6 +29,7 @@ interface UseEchoConversationReturn {
   conversationId: string | null;
   messages: EchoMessage[];
   sendMessage: (content: string) => Promise<void>;
+  regenerateLastResponse: () => Promise<void>;
   isStreaming: boolean;
   streamingContent: string;
   abortStream: () => Promise<void>;
