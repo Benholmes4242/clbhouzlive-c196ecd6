@@ -144,7 +144,6 @@ export function PostStep({
     >
       {/* Header */}
       <div style={{ textAlign: 'center', paddingBottom: 20 }}>
-        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ {eyebrow}</div>
         <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>{headline}</div>
         <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>{subline}</div>
       </div>
