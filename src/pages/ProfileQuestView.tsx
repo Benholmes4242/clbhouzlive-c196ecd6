@@ -323,7 +323,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
           <div className="mb-4">
             <div className="flex items-center gap-1.5 mb-1">
               <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Journey Map</span>
+              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Journey Map · Top 100 courses</span>
             </div>
             <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Milestone Ladder</h2>
           </div>
