@@ -158,10 +158,9 @@ export function SettingsPageV2() {
             icon={<User size={18} />}
             title="Username"
             value={`@${(profile as any)?.username ?? ''}`}
-            subtitle="Contact support to change your username"
             onClick={() => {}}
-            disabled
             iconTheme="account"
+            isLocked
           />
         </SettingsSection>
 
@@ -276,8 +275,8 @@ export function SettingsPageV2() {
           />
         </SettingsSection>
 
-        {/* Notifications */}
-        <SettingsSection title="Notifications">
+        {/* Notifications & Watch */}
+        <SettingsSection title="Notifications & Watch">
           <SettingsChevronRow
             icon={<Bell size={18} />}
             title="Notification Preferences"
@@ -285,10 +284,6 @@ export function SettingsPageV2() {
             iconTheme="notifications"
             onClick={() => open('notifications')}
           />
-        </SettingsSection>
-
-        {/* Watch */}
-        <SettingsSection title="Watch">
           <SettingsChevronRow
             icon={<Play size={18} />}
             title="Watch Preferences"
@@ -357,7 +352,7 @@ export function SettingsPageV2() {
         </SettingsSection>
 
         {/* Account Actions */}
-        <SettingsSection title="Account" variant="danger">
+        <SettingsSection title="Sign Out & Delete" variant="danger">
           <SettingsChevronRow
             icon={<LogOut size={18} />}
             title="Sign Out"
