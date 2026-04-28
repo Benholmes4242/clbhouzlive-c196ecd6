@@ -36,6 +36,7 @@ export default function EchoPage() {
     conversationId,
     messages,
     sendMessage,
+    regenerateLastResponse,
     isStreaming,
     streamingContent,
     abortStream,
