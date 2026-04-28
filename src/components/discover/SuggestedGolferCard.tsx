@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MutualFriendsAvatars, MutualFriend } from './MutualFriendsAvatars';
 import { AnimatedNumber } from '@/components/ui/motion';
+import { formatHcp } from '@/lib/formatHcp';
 
 interface SuggestedGolferCardProps {
   golfer: {
@@ -137,7 +138,7 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
   // Show handicap only if exists AND show_handicap is true
   const showHandicap = golfer.eg_handicap_index != null && golfer.show_handicap === true;
   const formattedHandicap = golfer.eg_handicap_index != null 
-    ? `HCP ${golfer.eg_handicap_index > 0 ? '+' : ''}${golfer.eg_handicap_index.toFixed(1)}`
+    ? `HCP ${formatHcp(golfer.eg_handicap_index)}`
     : null;
 
   return (

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play } from 'lucide-react';
+import { formatHcp } from '@/lib/formatHcp';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
@@ -92,7 +93,7 @@ export function SettingsPageV2() {
 
   const p = profile as any;
   const handicapSuffix = p?.eg_handicap_index != null
-    ? ` · ${p.eg_handicap_index > 0 ? '+' : ''}${p.eg_handicap_index} hcp`
+    ? ` · ${formatHcp(p.eg_handicap_index)} hcp`
     : '';
 
   return (
