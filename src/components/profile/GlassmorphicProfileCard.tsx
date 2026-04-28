@@ -1,6 +1,7 @@
 import React from 'react';
 import { Edit, Flag } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { formatHcp } from '@/lib/formatHcp';
 
 interface GlassmorphicProfileCardProps {
   profile: {
@@ -95,7 +96,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
                 <span className="text-xs text-white/50">Handicap:</span>
                 <span className="text-sm font-medium text-white/80">
                   {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined 
-                    ? `${profile.eg_handicap_index > 0 ? '+' : ''}${profile.eg_handicap_index.toFixed(1)}`
+                    ? formatHcp(profile.eg_handicap_index)
                     : 'Not set'
                   }
                 </span>
