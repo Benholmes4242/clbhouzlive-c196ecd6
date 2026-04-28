@@ -151,27 +151,35 @@ export function EchoPageMessageList({
         )}
         
         <AnimatePresence initial={false}>
-          {messages.map((msg, index) => (
-            <motion.div
-              key={msg.id}
-              initial={animationVariants.initial}
-              animate={animationVariants.animate}
-              exit={animationVariants.exit}
-              transition={animationVariants.transition}
-            >
-              {msg.role === 'user' ? (
-                <EchoUserBubble content={msg.content} />
-              ) : (
-                <EchoResponseCard
-                  content={msg.content}
-                  isLast={index === messages.length - 1 && !isStreaming}
-                  lastResponse={lastAssistantMessage?.content}
-                  onFollowUp={onFollowUp}
-                  wasAborted={msg.meta?.aborted}
-                />
-              )}
-            </motion.div>
-          ))}
+          {messages.map((msg, index) => {
+            const prev = index > 0 ? messages[index - 1] : null;
+            const showAvatar = msg.role === 'assistant' && (!prev || prev.role !== 'assistant');
+            const isLastMsg = index === messages.length - 1 && !isStreaming;
+            return (
+              <motion.div
+                key={msg.id}
+                initial={animationVariants.initial}
+                animate={animationVariants.animate}
+                exit={animationVariants.exit}
+                transition={animationVariants.transition}
+              >
+                {msg.role === 'user' ? (
+                  <EchoUserBubble content={msg.content} />
+                ) : (
+                  <EchoResponseCard
+                    content={msg.content}
+                    isLast={isLastMsg}
+                    lastResponse={lastAssistantMessage?.content}
+                    onFollowUp={onFollowUp}
+                    onRegenerate={isLastMsg ? onRegenerate : undefined}
+                    recentUserMessages={recentUserMessages}
+                    showAvatar={showAvatar}
+                    wasAborted={msg.meta?.aborted}
+                  />
+                )}
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
 
         {isStreaming && (
@@ -185,6 +193,7 @@ export function EchoPageMessageList({
                 content={streamingContent}
                 isStreaming
                 onFollowUp={onFollowUp}
+                showAvatar={messages[messages.length - 1]?.role !== 'assistant'}
               />
             ) : (
               <EchoThinkingCard />
