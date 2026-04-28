@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Building2, CheckCircle2 } from 'lucide-react';
+import { CheckCircle, Building2, CheckCircle2, Loader2, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useFollow } from '@/hooks/useFollow';
+import { useStartDM } from '@/hooks/useStartDM';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useMediaViewer } from '@/hooks/useMediaViewer';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -119,6 +121,9 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   
   // Use the new follow hook
   const { isFollowing: followState, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(user?.id);
+  const { startDM, isStarting } = useStartDM();
+  const { user: currentUser } = useSupabaseSession();
+  const isSelf = !!currentUser?.id && currentUser.id === user?.id;
   
   const { posts, loading: postsLoading, error: postsError, isEmpty } = useUserProfilePosts(user?.id);
   const { openViewer } = useMediaViewer();
@@ -368,26 +373,59 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
               </div>
             </div>
 
-            {/* Right: Follow button */}
-            <button
-              type="button"
-              onClick={handleFollowClick}
-              disabled={followBusy}
-              className={cn(
-                "px-4 py-1.5 text-[13px] font-semibold rounded-full",
-                "transition-all duration-150",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-                isFollowing
-                  ? "border text-foreground"
-                  : "text-white"
-              )}
-              style={isFollowing
-                ? { background: 'transparent', borderColor: 'rgba(0,0,0,0.12)' }
-                : { background: 'rgba(0,0,0,0.85)' }
-              }
-            >
-              {followBusy ? '...' : (isFollowing ? 'Following' : 'Follow')}
-            </button>
+            {/* Right: Action buttons (Message + Follow) */}
+            {!isSelf && (
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                {/* Message button */}
+                <button
+                  type="button"
+                  onClick={() => user?.id && startDM(user.id)}
+                  disabled={isStarting === user?.id}
+                  className="flex items-center justify-center transition-all duration-150 active:scale-[0.97] disabled:opacity-50"
+                  style={{
+                    gap: 4,
+                    padding: '6px 12px',
+                    borderRadius: 99,
+                    background: 'rgba(247,147,30,0.10)',
+                    border: '1px solid rgba(247,147,30,0.30)',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: '#F7931E',
+                  }}
+                  aria-label={`Message ${user.name}`}
+                >
+                  {isStarting === user?.id ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      Message
+                    </>
+                  )}
+                </button>
+
+                {/* Follow button */}
+                <button
+                  type="button"
+                  onClick={handleFollowClick}
+                  disabled={followBusy}
+                  className={cn(
+                    "px-4 py-1.5 text-[13px] font-semibold rounded-full",
+                    "transition-all duration-150",
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    isFollowing
+                      ? "border text-foreground"
+                      : "text-white"
+                  )}
+                  style={isFollowing
+                    ? { background: 'transparent', borderColor: 'rgba(0,0,0,0.12)' }
+                    : { background: 'rgba(0,0,0,0.85)' }
+                  }
+                >
+                  {followBusy ? '...' : (isFollowing ? 'Following' : 'Follow')}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Scrollable Recent Posts Section */}

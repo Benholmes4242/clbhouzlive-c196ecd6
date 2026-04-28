@@ -1,6 +1,7 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock } from 'lucide-react';
+import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2 } from 'lucide-react';
+import { useStartDM } from '@/hooks/useStartDM';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useNavigate } from 'react-router-dom';
@@ -172,6 +173,7 @@ interface GlobalSearchOverlayProps {
 function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const { startDM, isStarting: dmStarting } = useStartDM();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(inputValue, 250);
@@ -677,35 +679,61 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   {showPeople && people.length > 0 && (
                     <div>
                       <SectionHeader label="People" />
-                      {people.map(person => (
-                        <button
-                          key={person.id}
-                          type="button"
-                          onClick={() => selectPerson(person)}
-                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
-                        >
-                          <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
-                            {person.avatar_url && (
-                              <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                      {people.map(person => {
+                        const isSelf = !!user?.id && person.id === user.id;
+                        return (
+                          <div
+                            key={person.id}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => selectPerson(person)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectPerson(person); } }}
+                            className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] cursor-pointer"
+                          >
+                            <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
+                              {person.avatar_url && (
+                                <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0 text-left">
+                              <div className="flex items-center gap-1 min-w-0">
+                                <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{person.display_name}</p>
+                                {person.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
+                                {person.is_public === false && <Lock className="w-3 h-3 shrink-0" style={{ color: INK_SUBTLE }} />}
+                              </div>
+                              <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                                {person.username && !person.username.includes('@')
+                                  ? `@${person.username}`
+                                  : ''}
+                                {person.home_club_name
+                                  ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
+                                  : ''}
+                              </p>
+                            </div>
+                            {!isSelf && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); startDM(person.id); }}
+                                disabled={dmStarting === person.id}
+                                className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all disabled:opacity-50"
+                                style={{
+                                  width: 32, height: 32, borderRadius: '50%',
+                                  background: 'rgba(247,147,30,0.10)',
+                                  border: '1px solid rgba(247,147,30,0.25)',
+                                  marginLeft: 4,
+                                }}
+                                aria-label={`Message ${person.display_name}`}
+                              >
+                                {dmStarting === person.id ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: AMBER }} />
+                                ) : (
+                                  <MessageCircle className="w-3.5 h-3.5" style={{ color: AMBER }} />
+                                )}
+                              </button>
                             )}
                           </div>
-                          <div className="flex-1 min-w-0 text-left">
-                            <div className="flex items-center gap-1 min-w-0">
-                              <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{person.display_name}</p>
-                              {person.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
-                              {person.is_public === false && <Lock className="w-3 h-3 shrink-0" style={{ color: INK_SUBTLE }} />}
-                            </div>
-                            <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
-                              {person.username && !person.username.includes('@')
-                                ? `@${person.username}`
-                                : ''}
-                              {person.home_club_name
-                                ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
-                                : ''}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
 
