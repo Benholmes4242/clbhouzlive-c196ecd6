@@ -71,6 +71,8 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  useHideHeader();
+  useHideBottomNav();
   const { recentlyPlayed, isLoading: questLoading } = useQuestCourses();
   
   // Determine target user: use profileUserId if provided, otherwise fall back to current user
