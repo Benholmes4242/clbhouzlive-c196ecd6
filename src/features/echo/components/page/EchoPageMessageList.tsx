@@ -16,6 +16,7 @@ interface EchoPageMessageListProps {
   isStreaming: boolean;
   streamingContent: string;
   onFollowUp: (text: string) => void;
+  onRegenerate?: () => void;
   onRefresh?: () => Promise<void>;
 }
 
@@ -24,6 +25,7 @@ export function EchoPageMessageList({
   isStreaming,
   streamingContent,
   onFollowUp,
+  onRegenerate,
   onRefresh,
 }: EchoPageMessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
