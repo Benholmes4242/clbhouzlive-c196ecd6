@@ -7,6 +7,8 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSuggestedUsers, suggestionReasonLabel, type SuggestedUser } from '@/hooks/useSuggestedUsers';
 
 interface UserProfile {
   id: string;
@@ -32,6 +34,7 @@ export function NewConversationModal({
 }: NewConversationModalProps) {
   const { user } = useSupabaseSession();
   const { getOrCreateDM, createGroupChat } = useMessagingContext();
+  const [mode_placeholder] = [0]; void mode_placeholder;
   
   const [mode, setMode] = useState<'direct' | 'group'>('direct');
   
