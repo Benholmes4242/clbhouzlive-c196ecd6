@@ -2,8 +2,9 @@ import React, { useState, useRef } from 'react';
 import { 
   ChevronLeft, Camera, Pencil, UserPlus, LogOut, Archive,
   Shield, ShieldCheck, MoreVertical, Trash2, Image,
-  Bell, BellOff, Flag, ChevronRight, Users
+  Bell, BellOff, Flag, ChevronRight, Users, MessageCircle, Loader2
 } from 'lucide-react';
+import { useStartDM } from '@/hooks/useStartDM';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   DropdownMenu,
