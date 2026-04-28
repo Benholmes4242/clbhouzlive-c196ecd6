@@ -189,7 +189,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     } else if (route === '/settings/business') {
       navigate('/businesses/manage');
     } else if (route === '/settings/profile') {
-      navigate('/edit-profile');
+      navigate('/quick-edit-profile');
     } else if (route === `/profile/${currentActorData.id}`) {
       handleNavigate('/profile');
     } else {
@@ -444,7 +444,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           <MenuRow
             icon={<Pencil className="h-[18px] w-[18px]" />}
             label="Edit profile"
-            onClick={() => handleNavigate('/edit-profile')}
+            onClick={() => handleNavigate('/quick-edit-profile')}
             useLightTheme={useLightTheme}
           />
           

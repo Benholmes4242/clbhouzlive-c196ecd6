@@ -42,7 +42,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
           Add your handicap index to show it on your profile
         </p>
         <Button
-          onClick={() => navigate('/edit-profile?tab=basic')}
+          onClick={() => navigate('/quick-edit-profile?tab=basic')}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -87,7 +87,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/edit-profile?tab=basic')}
+            onClick={() => navigate('/quick-edit-profile?tab=basic')}
             className="text-muted-foreground"
           >
             Edit handicap

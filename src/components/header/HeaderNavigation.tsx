@@ -215,7 +215,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
           >
             View Profile
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
+          <DropdownMenuItem onClick={() => navigate('/quick-edit-profile')}>
             <Pencil className="h-4 w-4 mr-2" />
             Edit Profile
           </DropdownMenuItem>
