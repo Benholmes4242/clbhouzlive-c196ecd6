@@ -41,6 +41,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { startDM, isStarting: dmStarting } = useStartDM();
   
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
@@ -582,74 +583,97 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                     )}
                   </div>
 
-                  {/* Member action button */}
-                  {isAdmin && participant.user_id !== currentUserId && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          className="flex items-center justify-center flex-shrink-0"
-                          style={{
-                            width: 30, height: 30, borderRadius: '50%',
-                            background: 'transparent', border: 'none', cursor: 'pointer',
-                          }}
-                        >
-                          <MoreVertical size={18} style={{ color: '#94a3b8' }} />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
+                  {/* Trailing actions: Message (all non-self) + Admin menu */}
+                  {participant.user_id !== currentUserId && participant.user_id && (
+                    <div className="flex items-center" style={{ gap: 4 }}>
+                      <button
+                        type="button"
+                        onClick={() => participant.user_id && startDM(participant.user_id)}
+                        disabled={dmStarting === participant.user_id}
+                        className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all disabled:opacity-50"
                         style={{
-                          background: '#fff', borderRadius: 14, width: 210,
-                          boxShadow: '0 8px 24px rgba(0,0,0,0.13)',
-                          border: '1px solid rgba(0,0,0,0.07)',
-                          padding: 0, overflow: 'hidden',
+                          width: 32, height: 32, borderRadius: '50%',
+                          background: 'rgba(247,147,30,0.10)',
+                          border: '1px solid rgba(247,147,30,0.25)',
                         }}
+                        aria-label={`Message ${participant.profile?.display_name || 'member'}`}
                       >
-                        {participant.role === 'admin' && participant.user_id !== conversation.created_by ? (
-                          <DropdownMenuItem
-                            onClick={() => participant.user_id && handleRemoveAdmin(participant.user_id)}
-                            className="flex items-center"
-                            style={{ gap: 10, padding: '11px 14px' }}
-                          >
-                            <div
+                        {dmStarting === participant.user_id ? (
+                          <Loader2 size={14} style={{ color: '#F7931E' }} className="animate-spin" />
+                        ) : (
+                          <MessageCircle size={14} style={{ color: '#F7931E' }} />
+                        )}
+                      </button>
+
+                      {isAdmin && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
                               className="flex items-center justify-center flex-shrink-0"
-                              style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(247,147,30,0.10)' }}
+                              style={{
+                                width: 30, height: 30, borderRadius: '50%',
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                              }}
                             >
-                              <Shield size={14} style={{ color: '#d97706' }} />
-                            </div>
-                            <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Dismiss as admin</span>
-                          </DropdownMenuItem>
-                        ) : participant.role !== 'admin' ? (
-                          <DropdownMenuItem
-                            onClick={() => participant.user_id && handleMakeAdmin(participant.user_id)}
-                            className="flex items-center"
-                            style={{ gap: 10, padding: '11px 14px' }}
+                              <MoreVertical size={18} style={{ color: '#94a3b8' }} />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            style={{
+                              background: '#fff', borderRadius: 14, width: 210,
+                              boxShadow: '0 8px 24px rgba(0,0,0,0.13)',
+                              border: '1px solid rgba(0,0,0,0.07)',
+                              padding: 0, overflow: 'hidden',
+                            }}
                           >
-                            <div
-                              className="flex items-center justify-center flex-shrink-0"
-                              style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(245,158,11,0.10)' }}
+                            {participant.role === 'admin' && participant.user_id !== conversation.created_by ? (
+                              <DropdownMenuItem
+                                onClick={() => participant.user_id && handleRemoveAdmin(participant.user_id)}
+                                className="flex items-center"
+                                style={{ gap: 10, padding: '11px 14px' }}
+                              >
+                                <div
+                                  className="flex items-center justify-center flex-shrink-0"
+                                  style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(247,147,30,0.10)' }}
+                                >
+                                  <Shield size={14} style={{ color: '#d97706' }} />
+                                </div>
+                                <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Dismiss as admin</span>
+                              </DropdownMenuItem>
+                            ) : participant.role !== 'admin' ? (
+                              <DropdownMenuItem
+                                onClick={() => participant.user_id && handleMakeAdmin(participant.user_id)}
+                                className="flex items-center"
+                                style={{ gap: 10, padding: '11px 14px' }}
+                              >
+                                <div
+                                  className="flex items-center justify-center flex-shrink-0"
+                                  style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(245,158,11,0.10)' }}
+                                >
+                                  <ShieldCheck size={14} style={{ color: '#F7931E' }} />
+                                </div>
+                                <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Make group admin</span>
+                              </DropdownMenuItem>
+                            ) : null}
+                            <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
+                            <DropdownMenuItem
+                              onClick={() => participant.user_id && handleRemoveMember(participant.user_id)}
+                              className="flex items-center"
+                              style={{ gap: 10, padding: '11px 14px' }}
                             >
-                              <ShieldCheck size={14} style={{ color: '#F7931E' }} />
-                            </div>
-                            <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Make group admin</span>
-                          </DropdownMenuItem>
-                        ) : null}
-                        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
-                        <DropdownMenuItem
-                          onClick={() => participant.user_id && handleRemoveMember(participant.user_id)}
-                          className="flex items-center"
-                          style={{ gap: 10, padding: '11px 14px' }}
-                        >
-                          <div
-                            className="flex items-center justify-center flex-shrink-0"
-                            style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(239,68,68,0.08)' }}
-                          >
-                            <Trash2 size={14} style={{ color: '#ef4444' }} />
-                          </div>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444' }}>Remove from group</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                              <div
+                                className="flex items-center justify-center flex-shrink-0"
+                                style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(239,68,68,0.08)' }}
+                              >
+                                <Trash2 size={14} style={{ color: '#ef4444' }} />
+                              </div>
+                              <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444' }}>Remove from group</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
                   )}
                 </div>
               </React.Fragment>
