@@ -174,6 +174,47 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
   </span>
 );
 
+interface FollowingFilterChipProps {
+  label: string;
+  count: number;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+const FollowingFilterChip: React.FC<FollowingFilterChipProps> = ({ label, count, isActive, onClick }) => (
+  <button
+    onClick={onClick}
+    aria-pressed={isActive}
+    style={{
+      minHeight: 32,
+      padding: '6px 14px',
+      background: isActive ? INK : 'transparent',
+      color: isActive ? '#FFFFFF' : INK_SOFT,
+      border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
+      borderRadius: 999,
+      fontSize: 12.5,
+      fontWeight: 700,
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 5,
+      flexShrink: 0,
+    }}
+  >
+    {label}
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: isActive ? 'rgba(255,255,255,0.7)' : INK_SUBTLE,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {count.toLocaleString()}
+    </span>
+  </button>
+);
+
 // ---------------------------------------------------------------------------
 // Relationship UI state derivation + primary action config
 // ---------------------------------------------------------------------------
