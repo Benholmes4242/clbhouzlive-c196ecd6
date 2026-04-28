@@ -145,3 +145,41 @@ export function getHandicapBadgeStyle(handicap: number, _seasonColor?: string): 
       return { bg: '#F8FAFC', text: '#B0BAC7', border: 'transparent' };
   }
 }
+
+/**
+ * Parse a UI form-string handicap (e.g. "+1.8" or "8.4") into the
+ * DB storage convention (plus handicaps stored as negative numbers).
+ *
+ * - "+1.8"  → -1.8  (plus handicap, stored negative)
+ * - "1.8"   →  1.8  (standard handicap)
+ * - "0"     →  0    (scratch)
+ * - ""/junk → null
+ *
+ * Inverse of `formHcpFromDb`.
+ */
+export function parseHcpFormString(s: string): number | null {
+  if (typeof s !== 'string') return null;
+  const trimmed = s.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith('+')) {
+    const n = parseFloat(trimmed.slice(1));
+    return Number.isFinite(n) ? -n : null;
+  }
+  const n = parseFloat(trimmed);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Render a DB-stored numeric handicap as the canonical UI form-string.
+ * Inverse of `parseHcpFormString`.
+ *
+ * - -1.8  → "+1.8"
+ *  - 1.8  → "1.8"
+ *  - 0    → "0"
+ *  - null → ""
+ */
+export function formHcpFromDb(n: number | null | undefined): string {
+  if (n == null || !Number.isFinite(n)) return '';
+  if (n < 0) return `+${Math.abs(n)}`;
+  return String(n);
+}

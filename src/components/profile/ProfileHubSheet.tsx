@@ -228,7 +228,7 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { emoji: '✏️', bg: 'rgba(15,23,42,0.05)', label: 'Edit profile', route: '/edit-profile' },
+    { emoji: '✏️', bg: 'rgba(15,23,42,0.05)', label: 'Edit profile', route: '/quick-edit-profile' },
     { emoji: '🏢', bg: 'rgba(15,23,42,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
     { emoji: '⚙️', bg: 'rgba(15,23,42,0.05)', label: 'Settings', route: '/settings' },
   ];

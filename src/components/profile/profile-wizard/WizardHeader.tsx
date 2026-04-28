@@ -52,7 +52,7 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
         <button
           onClick={onSkip}
           className="flex items-center justify-center min-h-[44px] -mr-2 text-[12px] font-normal"
-          style={{ color: 'rgba(15,23,42,0.30)' }}
+          style={{ color: 'rgba(15,23,42,0.55)' }}
         >
           Skip for now
         </button>

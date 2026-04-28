@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { cn } from '@/lib/utils';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
@@ -90,6 +91,7 @@ const ClubsSectionWrapper: React.FC<{
   isSelf: boolean;
 }> = ({ profileId, viewerId, isPersonal, isSelf }) => {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { homeClub, secondaryClubs, isLoading, isPrivate } = useProfileClubs(profileId, viewerId);
 
   if (!isPersonal || !profileId || !viewerId || isLoading) return null;
@@ -102,7 +104,7 @@ const ClubsSectionWrapper: React.FC<{
         secondaryClubs={secondaryClubs}
         isOwner={isSelf}
         isPrivate={isPrivate}
-        onEditClick={() => navigate('/edit-profile')}
+        onEditClick={() => navigate(editRoute)}
       />
     </section>
   );
@@ -110,6 +112,7 @@ const ClubsSectionWrapper: React.FC<{
 
 const ProfilePageV2Content: React.FC = () => {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
 
@@ -640,7 +643,7 @@ const ProfilePageV2Content: React.FC = () => {
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
           <div className="flex items-center gap-3 w-full">
             <button
-              onClick={() => navigate('/edit-profile')}
+              onClick={() => navigate(editRoute)}
               className="flex-1 h-11 rounded-full font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
             >
@@ -679,7 +682,7 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
+                <DropdownMenuItem onClick={() => navigate(editRoute)}>
                   <Pencil className="w-4 h-4 mr-2" />
                   Edit profile
                 </DropdownMenuItem>
@@ -993,7 +996,7 @@ const ProfilePageV2Content: React.FC = () => {
         ) : isSelf ? (
           <section className="px-5 mb-4">
             <button
-              onClick={() => navigate('/edit-profile')}
+              onClick={() => navigate(editRoute)}
               className="text-sm font-medium italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
               style={{ color: '#F7931E' }}
             >

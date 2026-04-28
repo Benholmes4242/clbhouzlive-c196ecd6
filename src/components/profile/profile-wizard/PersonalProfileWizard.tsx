@@ -62,7 +62,7 @@ export function PersonalProfileWizard() {
 
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
-  const usernameIsLocked = !!(profile as any)?.has_completed_onboarding || !!(profile as any)?.username;
+  const usernameIsLocked = !!(profile as any)?.has_completed_onboarding;
   
   // Fix 2: Detect new user at mount time (before wizard changes onboarding status)
   const isNewUser = useRef(!(profile as any)?.has_completed_onboarding);

@@ -92,7 +92,7 @@ export function ProfileCompleteNudge() {
 
       {/* Text */}
       <button
-        onClick={() => navigate('/edit-profile')}
+        onClick={() => navigate('/quick-edit-profile')}
         style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
         <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)', margin: 0 }}>Complete your profile</p>

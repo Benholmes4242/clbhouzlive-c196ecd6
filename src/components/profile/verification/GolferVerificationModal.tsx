@@ -241,7 +241,7 @@ const GolferVerificationModal: React.FC<GolferVerificationModalProps> = ({
                     size="sm"
                     asChild
                   >
-                    <Link to="/edit-profile">
+                    <Link to="/quick-edit-profile">
                       <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
                       Edit profile
                     </Link>

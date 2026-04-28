@@ -895,7 +895,7 @@ export function LowestHandicapLeaderboard({
               Set a home club to see your club board.
             </p>
             <button
-              onClick={() => navigate('/profile/edit')}
+              onClick={() => navigate('/quick-edit-profile')}
               style={{
                 background: 'none',
                 border: 'none',

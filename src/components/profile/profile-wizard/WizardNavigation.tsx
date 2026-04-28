@@ -46,8 +46,8 @@ export function WizardNavigation({
           disabled={isDisabled}
           className="flex-1 min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
           style={{
-            background: isDisabled ? 'rgba(247,147,30,0.40)' : '#F7931E',
-            color: '#ffffff',
+            background: isDisabled ? 'rgba(15,23,42,0.06)' : '#F7931E',
+            color: isDisabled ? 'rgba(15,23,42,0.45)' : '#ffffff',
             boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
           }}
         >

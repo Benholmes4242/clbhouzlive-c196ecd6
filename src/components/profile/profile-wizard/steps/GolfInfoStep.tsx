@@ -1,3 +1,4 @@
+import { Flag } from 'lucide-react';
 import { ProfileFormData, ClubEntry } from '../types';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
@@ -30,8 +31,9 @@ export function GolfInfoStep({ form, userId, hasRegisteredInterest, onFieldChang
           onVisibilityChange={(v) => onFieldChange('homeClubVisibility', v)}
         />
         {!form.homeClubName && (
-          <p style={{ fontSize: 12, color: '#F7931E', marginTop: 6, marginLeft: 4 }}>
-            ⛳ Your home club appears on your profile and leaderboards
+          <p style={{ fontSize: 12, color: '#F7931E', marginTop: 6, marginLeft: 4, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Flag size={12} strokeWidth={2.25} />
+            <span>Your home club appears on your profile and leaderboards</span>
           </p>
         )}
       </SectionCard>

@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData } from '@/components/profile/profile-wizard/types';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { parseHcpFormString } from '@/lib/formatHcp';
 
 const INVALIDATE_KEYS = [
   'profile', 'user-profile', 'home-clubs-map',
@@ -60,9 +61,7 @@ export function useProfileSave(userId: string) {
           primary_club_id: form.primaryClubId,
           college_normalized: form.collegeNormalized,
           college_id: form.collegeId,
-          eg_handicap_index: form.handicapIndex
-            ? parseFloat(form.handicapIndex)
-            : null,
+          eg_handicap_index: parseHcpFormString(form.handicapIndex),
           home_club_visibility: form.homeClubVisibility,
           additional_clubs_visibility: form.additionalClubsVisibility,
           websites: form.websites

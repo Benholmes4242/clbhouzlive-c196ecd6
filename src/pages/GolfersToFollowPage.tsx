@@ -259,7 +259,7 @@ const GolfersToFollowPage = () => {
                     size="sm" 
                     variant="outline"
                     className="border-[#F79E1B]/50 text-[#F79E1B] hover:bg-[#F79E1B]/10 font-medium"
-                    onClick={() => navigate('/edit-profile?section=golf')}
+                    onClick={() => navigate('/quick-edit-profile?section=golf')}
                   >
                     Set Home Club
                   </Button>
