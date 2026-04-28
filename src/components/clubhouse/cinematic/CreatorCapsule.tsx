@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { FeedCarouselDots } from '@/components/feed/FeedCarouselDots';
+import { CarouselDots } from '@/components/media/CarouselDots';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -641,7 +641,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             className="absolute left-0 right-0 flex justify-center pointer-events-none"
             style={{ bottom: '100%', marginBottom: 8 }}
           >
-            <FeedCarouselDots count={carouselCount} activeIndex={carouselActiveIndex} />
+            <CarouselDots count={carouselCount} active={carouselActiveIndex} />
           </div>
         )}
 
