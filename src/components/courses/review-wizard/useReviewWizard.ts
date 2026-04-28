@@ -216,7 +216,7 @@ export function useReviewWizard({
           review: existingRating.review || '',
         };
       }
-      // D28(c): Prefill verdict from existing rating; recompute on save
+      // Prefill rating from existing review; saved as user-set value (no recomputation)
       return {
         ...INITIAL_STATE,
         rating: existingRating.rating,
