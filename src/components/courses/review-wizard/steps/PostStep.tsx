@@ -346,7 +346,7 @@ export function PostStep({
                     style={{
                       height: '100%',
                       width: `${fillPct}%`,
-                      background: tierInfo.isExceptional ? '#F7931E' : '#0F172A',
+                      background: 'linear-gradient(90deg, #f59e0b, #fbbf24)',
                       borderRadius: 2,
                     }}
                   />
