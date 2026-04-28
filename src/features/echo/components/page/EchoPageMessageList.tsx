@@ -194,8 +194,13 @@ export function EchoPageMessageList({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={prefersReduced ? undefined : { opacity: 0, y: 10, scale: 0.95 }}
             onClick={scrollToBottom}
-            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[0.75rem] font-semibold transition-all active:scale-95 shadow-xl"
-            style={{ background: '#1e1e22', color: 'rgba(255,255,255,0.88)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}
+            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[0.75rem] font-semibold transition-all active:scale-95 shadow-lg"
+            style={{
+              background: '#ffffff',
+              color: '#0F172A',
+              border: '1px solid rgba(15,23,42,0.10)',
+              boxShadow: '0 4px 16px rgba(15,23,42,0.12)',
+            }}
             aria-label="Scroll to new message"
           >
             <ChevronDown className="w-4 h-4" />
