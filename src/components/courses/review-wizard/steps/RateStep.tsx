@@ -234,8 +234,8 @@ export function RateStep({
     });
   }, [breakdowns]);
 
-  // Note: overall verdict is derived from breakdowns (D28); no direct edit handler.
-  void onRatingChange; // retained in props for API compatibility
+  // Overall rating is user-set independently from breakdowns.
+  // onRatingChange is wired to the hero SegmentedSlider in the verdict block.
 
   const handleBreakdownChange = useCallback((key: keyof ReviewBreakdowns, val: number) => {
     setTouchedFields(prev => ({ ...prev, [key]: true }));
@@ -248,16 +248,8 @@ export function RateStep({
     country: course.country,
   }) : '';
 
-  // D28: Display the derived verdict (mean of set categories) once any category
-  // is touched, so the user sees the verdict update live as they rate.
-  // Falls back to the prefilled overall rating when no categories are set yet.
-  const setBreakdownValues = Object.values(breakdowns).filter((v): v is number => v !== null);
-  const derivedVerdict = setBreakdownValues.length > 0
-    ? parseFloat((setBreakdownValues.reduce((s, v) => s + v, 0) / setBreakdownValues.length).toFixed(1))
-    : null;
-  const displayVerdict = derivedVerdict ?? rating;
-
-  const overallTier = displayVerdict !== null ? getScoreTier(displayVerdict) : null;
+  // Overall rating is user-set; tier reflects the user's chosen rating.
+  const overallTier = rating !== null ? getScoreTier(rating) : null;
 
   // D30: Sticky verdict bar — engages when hero verdict block scrolls offscreen
   const heroRef = useRef<HTMLDivElement>(null);
@@ -274,18 +266,18 @@ export function RateStep({
   }, []);
 
   // D7: pulse the verdict number (1.0 → 1.06 → 1.0 over 200ms) when
-  // displayVerdict changes — fires in both hero and sticky bar.
+  // overall rating changes — fires in both hero and sticky bar.
   const [isAnimatingVerdict, setIsAnimatingVerdict] = useState(false);
-  const prevVerdictRef = useRef<number | null>(displayVerdict);
+  const prevVerdictRef = useRef<number | null>(rating);
   useEffect(() => {
-    if (displayVerdict !== prevVerdictRef.current && displayVerdict !== null) {
+    if (rating !== prevVerdictRef.current && rating !== null) {
       setIsAnimatingVerdict(true);
       const t = setTimeout(() => setIsAnimatingVerdict(false), 200);
-      prevVerdictRef.current = displayVerdict;
+      prevVerdictRef.current = rating;
       return () => clearTimeout(t);
     }
-    prevVerdictRef.current = displayVerdict;
-  }, [displayVerdict]);
+    prevVerdictRef.current = rating;
+  }, [rating]);
 
   return (
     <>
