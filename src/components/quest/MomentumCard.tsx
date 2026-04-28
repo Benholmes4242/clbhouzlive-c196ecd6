@@ -144,7 +144,7 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
             </div>
 
-            {/* This month count */}
+            {/* This month count + delta */}
             <div className="flex items-center gap-3">
               <div 
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -157,18 +157,41 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
               <div className="flex-1">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Courses logged this month
+                  This month
                 </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {thisMonthCount}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-sm font-semibold text-foreground tabular-nums">
+                    {thisMonthCount} {thisMonthCount === 1 ? 'course' : 'courses'}
+                  </p>
+                  {lastMonthCount > 0 && thisMonthCount !== lastMonthCount && (
+                    <span
+                      className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full tabular-nums"
+                      style={{
+                        background:
+                          thisMonthCount > lastMonthCount
+                            ? 'rgba(16,185,129,0.10)'
+                            : 'rgba(15,23,42,0.05)',
+                        color: thisMonthCount > lastMonthCount ? '#0F6E56' : '#64748B',
+                      }}
+                    >
+                      {thisMonthCount > lastMonthCount ? '+' : ''}
+                      {thisMonthCount - lastMonthCount} vs last
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Encouragement copy */}
-            <p className="text-xs mt-2 text-muted-foreground">
-              Keep building your journey.
-            </p>
+            {/* Personalized nudge */}
+            {suggestedRegion ? (
+              <p className="text-xs mt-2 text-muted-foreground">
+                Try a new region — you've barely played {suggestedRegion} yet.
+              </p>
+            ) : (
+              <p className="text-xs mt-2 text-muted-foreground">
+                Keep building your journey.
+              </p>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-3 py-2">
