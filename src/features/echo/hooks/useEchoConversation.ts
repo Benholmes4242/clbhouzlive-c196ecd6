@@ -327,6 +327,78 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     }
   }, [sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown, profile]);
 
+  const regenerateLastResponse = useCallback(async () => {
+    if (isStreaming || !userId || rateLimitCooldown) return;
+
+    const currentMessages = messagesRef.current;
+    const reverseUserIdx = [...currentMessages].reverse().findIndex(m => m.role === 'user');
+    if (reverseUserIdx === -1) return;
+
+    // Drop any trailing assistant messages so the regenerated response replaces them
+    const trimmedMessages = [...currentMessages];
+    while (trimmedMessages.length > 0 && trimmedMessages[trimmedMessages.length - 1].role === 'assistant') {
+      trimmedMessages.pop();
+    }
+    setMessages(trimmedMessages);
+
+    setIsStreaming(true);
+    setStreamingContent('');
+    setWasAborted(false);
+
+    let accumulatedContent = '';
+    const assistantMessageId = nanoid();
+
+    try {
+      await sendToAI(
+        trimmedMessages.map(m => ({ role: m.role, content: m.content })),
+        'default-conversation',
+        {
+          onChunk: (chunk) => {
+            accumulatedContent += chunk;
+            setStreamingContent(accumulatedContent);
+          },
+          onComplete: async () => {
+            const sanitizedContent = sanitizeEchoText(accumulatedContent);
+            const assistantMessage: EchoMessage = {
+              id: assistantMessageId,
+              role: 'assistant',
+              content: sanitizedContent,
+              createdAt: new Date().toISOString(),
+            };
+            setMessages(prev => [...prev, assistantMessage]);
+            setIsStreaming(false);
+            setStreamingContent('');
+
+            if (conversationId) {
+              await insertMessage(conversationId, userId, 'assistant', sanitizedContent);
+              queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
+            }
+          },
+          onError: (error, errorType) => {
+            setIsStreaming(false);
+            setStreamingContent('');
+            if (errorType && errorType in RATE_LIMIT_MESSAGES) {
+              const { title, description } = RATE_LIMIT_MESSAGES[errorType as RateLimitError];
+              toast.error(title, { description });
+            } else {
+              toast.error('Could not regenerate', { description: error });
+            }
+          },
+        },
+        {
+          firstName: profile.firstName,
+          handicap: profile.handicap,
+          homeClub: profile.homeClub,
+          location: profile.location,
+        }
+      );
+    } catch (err) {
+      setIsStreaming(false);
+      setStreamingContent('');
+      console.error('[regenerateLastResponse] Error:', err);
+    }
+  }, [isStreaming, userId, rateLimitCooldown, conversationId, sendToAI, profile, queryClient]);
+
   const abortStream = useCallback(async () => {
     abort();
     setWasAborted(true);
