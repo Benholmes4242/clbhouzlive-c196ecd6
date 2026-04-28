@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityNotification, checkContentExists } from '@/hooks/useActivityFeed';
@@ -29,6 +29,9 @@ const REVIEW_TYPES = new Set([
   'course_review', 'friend_course_review', 'business_course_review', 'review_response',
 ]);
 
+// Intentional divergence from original brief: excludes generic 'comment' / 'comment_reply'
+// because those are not always mentions. Limited to types that explicitly represent a mention
+// (verified against useActivityFeed.ts notification type union).
 const MENTION_TYPES = new Set([
   'mention', 'tag', 'mention_post', 'comment_mention', 'top_ten_mention',
 ]);
@@ -42,6 +45,7 @@ const INK_SUBTLE = '#94A3B8';
 const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
 const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97A10';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
 const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
@@ -50,7 +54,7 @@ const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
     style={{ background: BG_SURFACE }}
   >
     <div style={{ width: 3, height: 9, background: AMBER, borderRadius: 1, flexShrink: 0 }} />
-    <span style={{ fontSize: 9, fontWeight: 900, color: INK_SOFT, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+    <span style={{ fontSize: 10, fontWeight: 800, color: INK_SUBTLE, letterSpacing: '0.22em', textTransform: 'uppercase' }}>
       {label}
     </span>
   </div>
@@ -73,6 +77,7 @@ const ActivityPage: React.FC = () => {
   const navigate = useNavigate();
 
   const hasMarkedSeen = useRef(false);
+  const isInitialMountRef = useRef(true);
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
@@ -108,6 +113,14 @@ const ActivityPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
     };
   }, [queryClient]);
+
+  // Flip initial-mount flag after first non-empty render so filter-change
+  // re-renders skip the entrance stagger animation.
+  useEffect(() => {
+    if (!data) return;
+    const t = setTimeout(() => { isInitialMountRef.current = false; }, 1000);
+    return () => clearTimeout(t);
+  }, [data]);
 
   if (isRehydrating) return <ActivityPageSkeleton />;
 
@@ -210,7 +223,7 @@ const ActivityPage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <div style={{ width: 3, height: 10, background: AMBER, borderRadius: 1, flexShrink: 0 }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: INK_SOFT, letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: INK_SUBTLE, letterSpacing: '0.25em', textTransform: 'uppercase' }}>Activity</span>
               </div>
               <div className="flex items-baseline gap-2.5">
                 <h1
@@ -277,7 +290,7 @@ const ActivityPage: React.FC = () => {
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
-                  color: INK_SOFT,
+                  color: AMBER_DEEP,
                   textDecoration: 'underline',
                   textUnderlineOffset: 2,
                   background: 'transparent',
@@ -360,7 +373,8 @@ const ActivityPage: React.FC = () => {
                             <FeaturedNotificationCard
                               key={item.id}
                               notification={item}
-                              index={idx}
+                              index={isInitialMountRef.current ? idx : 0}
+                              skipAnimation={!isInitialMountRef.current}
                               onClick={() => handleNotificationClick(item)}
                               onOpenActionsSheet={() => openActionsSheet(item)}
                               currentUserId={user?.id}
