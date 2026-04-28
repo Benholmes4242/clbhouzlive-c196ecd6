@@ -108,18 +108,6 @@ const INITIAL_STATE: WizardState = {
   selectedTags: [],
 };
 
-/**
- * D28: Derive overall verdict from category breakdowns.
- * Returns null if no breakdowns are set; otherwise the mean of set categories,
- * clamped to [0, 10] and rounded to 1 decimal.
- */
-function deriveVerdict(breakdowns: ReviewBreakdowns): number | null {
-  const values = Object.values(breakdowns).filter((v): v is number => v !== null);
-  if (values.length === 0) return null;
-  const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
-  const clamped = Math.max(0, Math.min(10, avg));
-  return parseFloat(clamped.toFixed(1));
-}
 
 /**
  * D33: A legacy ratings-only review has an overall rating but no category breakdowns.
@@ -800,17 +788,11 @@ export function useReviewWizard({
       return;
     }
     
-    // D32: gate on at least one breakdown being set; D28: derive verdict from breakdowns
-    const derivedVerdict = deriveVerdict(state.breakdowns);
-    if (derivedVerdict === null) {
-      toast.error('Rate at least one category to continue');
+    // Overall rating is independent of breakdowns and must be set by the user.
+    if (state.rating === null) {
+      toast.error('Set an overall rating to continue');
       return;
     }
-    
-    // D28(c): Commit the derived verdict to state so the success screen and
-    // optimistic cache writes (which read state.rating in the onSuccess closure)
-    // reflect the value we are about to persist, not the prefilled legacy value.
-    setState(prev => ({ ...prev, rating: derivedVerdict }));
     
     submissionInProgressRef.current = true;
     setIsSubmitting(true);
@@ -830,12 +812,12 @@ export function useReviewWizard({
         ? [pendingFiles[coverFileIndex], ...pendingFiles.filter((_, i) => i !== coverFileIndex)]
         : pendingFiles;
 
-      // D28: persist the recomputed verdict, not the prefilled state.rating
+      // Persist user-set overall rating, independent of breakdowns
       await submitReview({
         courseId: course.id,
         courseName: course.name,
         ratingId: isEditMode ? existingRating?.id : undefined,
-        overallRating: derivedVerdict,
+        overallRating: state.rating,
         breakdowns: {
           design: state.breakdowns.design ?? null,
           condition: state.breakdowns.condition ?? null,
@@ -1012,9 +994,8 @@ export function useReviewWizard({
     setPendingDeletions([]); // Discard deferred deletions on cancel
   }, [cleanupBlobUrls]);
 
-  // D32: Step 1 requires at least one breakdown set; all other steps: always true
-  const hasAnyBreakdown = Object.values(state.breakdowns).some(v => v !== null);
-  const canProceed = state.step === 1 ? hasAnyBreakdown : true;
+  // Step 1 requires overall rating to be set; breakdowns are optional.
+  const canProceed = state.step === 1 ? state.rating !== null : true;
   
   // Check if any uploads are in progress (always false with upload-on-submit)
   const hasUploadsInProgress = isSubmitting;
