@@ -54,15 +54,17 @@ const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
-export type ListMode = 'followers' | 'following' | 'friends';
+export type ListMode = 'followers' | 'following';
+
+type FollowingFilterId = 'all' | 'friends' | 'pending';
 
 interface UserListPageProps {
   mode: ListMode;
   title: string;
   /** @deprecated No longer rendered internally; will be removed once consumers updated */
-  subtitle: string;
+  subtitle?: string;
   /** @deprecated Kept for backward compatibility — internal placeholder is now uniform. TODO: remove once consumers updated. */
-  searchPlaceholder: string;
+  searchPlaceholder?: string;
   users: SocialUser[];
   totalCount?: number;
   isLoading: boolean;
@@ -83,6 +85,8 @@ interface UserListPageProps {
   onFollowingLoadMore?: () => void;
   onFollowingRefetch?: () => void;
   profileUsername?: string;
+  /** Profile owner's userId — used for social counts on filter chips */
+  profileUserId?: string;
 }
 
 // ---------------------------------------------------------------------------
