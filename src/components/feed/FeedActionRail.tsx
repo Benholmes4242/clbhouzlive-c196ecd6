@@ -169,9 +169,9 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
       }}
     >
       {isMuted ? (
-        <VolumeX size={28} stroke="#fff" strokeWidth={1.8} />
+        <VolumeX size={28} stroke="#fff" strokeWidth={2} />
       ) : (
-        <Volume2 size={28} stroke="#fff" strokeWidth={1.8} />
+        <Volume2 size={28} stroke="#fff" strokeWidth={2} />
       )}
     </button>
   ) : null;
@@ -253,8 +253,8 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 bottom: -6,
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: 20,
-                height: 20,
+                width: 22,
+                height: 22,
                 borderRadius: '50%',
                 background: '#F7931E',
                 border: '1.5px solid rgba(255,255,255,0.95)',
@@ -265,7 +265,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 justifyContent: 'center',
               }}
             >
-              <Plus size={12} strokeWidth={3} color="rgba(255,255,255,0.95)" />
+              <Plus size={14} strokeWidth={2.5} color="rgba(255,255,255,0.95)" />
             </button>
           )}
         </div>
@@ -283,10 +283,10 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             animateKey={likeAnimKey}
           >
             <Heart
-              size={32}
+              size={28}
               fill={hasLiked ? '#F7931E' : 'transparent'}
               stroke={hasLiked ? '#F7931E' : '#fff'}
-              strokeWidth={1.8}
+              strokeWidth={2}
             />
           </ActionButton>
 
@@ -296,17 +296,17 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             ariaLabel="Comments"
             count={formatCount(commentsCount)}
           >
-            <MessageCircle size={32} stroke="#fff" strokeWidth={1.8} />
+            <MessageCircle size={28} stroke="#fff" strokeWidth={2} />
           </ActionButton>
 
           {/* Share */}
           <ActionButton onClick={onShare} ariaLabel="Share">
-            <Send size={30} stroke="#fff" strokeWidth={1.8} />
+            <Send size={28} stroke="#fff" strokeWidth={2} />
           </ActionButton>
 
           {/* More */}
           <ActionButton onClick={onMore} ariaLabel="More options">
-            <MoreHorizontal size={30} stroke="#fff" strokeWidth={2} />
+            <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
           </ActionButton>
         </>
       )}

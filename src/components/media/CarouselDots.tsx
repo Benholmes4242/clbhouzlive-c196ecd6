@@ -58,8 +58,8 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
               key={i}
               style={{
                 flex: 1,
-                height: 3,
-                borderRadius: 2,
+                height: 2,
+                borderRadius: 1,
                 overflow: 'hidden',
                 background: 'rgba(255, 255, 255, 0.22)',
                 boxShadow: '0 1px 1px rgba(0,0,0,0.25)',
@@ -69,7 +69,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                 style={{
                   height: '100%',
                   width: fillWidth,
-                  borderRadius: 2,
+                  borderRadius: 1,
                   background: isCurrent
                     ? '#ffffff'
                     : 'rgba(255, 255, 255, 0.7)',
