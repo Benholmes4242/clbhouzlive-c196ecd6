@@ -310,7 +310,7 @@ export function PostStep({
                 padding: '18px 14px 16px',
                 background: 'transparent',
                 border: 'none',
-                borderBottom: hasBreakdowns ? '0.5px solid rgba(15,23,42,0.07)' : (hasText || true ? '0.5px solid rgba(15,23,42,0.07)' : 'none'),
+                borderBottom: hasBreakdowns ? '0.5px solid rgba(15,23,42,0.07)' : '0.5px solid rgba(15,23,42,0.07)',
                 cursor: 'pointer',
                 textAlign: 'left' as const,
                 display: 'flex',
