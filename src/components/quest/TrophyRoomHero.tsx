@@ -31,7 +31,6 @@ interface RegionProgress {
 
 interface TrophyRoomHeroProps {
   totalPlayed: number;
-  target?: number;
   hasPremiumAccent?: boolean;
   onContinueJourney?: () => void;
   regionProgress?: RegionProgress[];
@@ -64,30 +63,33 @@ const CLUB_NAMES: Record<number, string> = {
 
 export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   totalPlayed,
-  target = 100,
   hasPremiumAccent = false,
   onContinueJourney,
   regionProgress = [],
   isOwnProfile = true,
 }) => {
-  const progressPercent = Math.min((totalPlayed / target) * 100, 100);
-  const isComplete = totalPlayed >= target;
-
   // Determine current tier
   const currentTier = CLUB_STEPS.filter(s => totalPlayed >= s.threshold).pop();
   const nextMilestone = CLUB_STEPS.find(s => totalPlayed < s.threshold);
   const tierName = currentTier?.tierName || 'Newcomer';
   const tierThreshold = currentTier?.threshold;
   const tierColor = tierThreshold ? getRingColorForThreshold(tierThreshold) : '#6e9277';
-  
+
   // Next milestone info
   const nextThreshold = nextMilestone?.threshold || 0;
   const remaining = nextThreshold - totalPlayed;
   const nextClubName = nextThreshold ? (CLUB_NAMES[nextThreshold] || `${nextThreshold} Club`) : '';
-  
+  const nextTierColor = nextThreshold ? getRingColorForThreshold(nextThreshold) : tierColor;
+
+  // Pin progress to next milestone
+  const isComplete = !nextMilestone;
+  const progressPercent = nextMilestone
+    ? Math.min((totalPlayed / nextThreshold) * 100, 100)
+    : 100;
+
   // Get current badge image for spotlight display
   const currentBadgeImage = tierThreshold ? BADGE_IMAGES[tierThreshold] : undefined;
-  
+
   // Dynamic hero title based on state
   const heroTitle = useMemo(() => {
     if (isComplete && !nextMilestone) return 'Grand Slam Achieved';
