@@ -444,6 +444,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     conversationId,
     messages,
     sendMessage,
+    regenerateLastResponse,
     isStreaming,
     streamingContent,
     abortStream,
