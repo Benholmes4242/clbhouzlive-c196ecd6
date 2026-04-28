@@ -7,6 +7,7 @@ import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 export function ProfileCompleteNudge() {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { user } = useSupabaseSession();
   const { profile } = useProfileData();
   const [dismissed, setDismissed] = useState(false);

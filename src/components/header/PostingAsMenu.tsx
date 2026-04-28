@@ -30,6 +30,7 @@ interface PostingAsMenuProps {
 
 export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef }: PostingAsMenuProps) {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
   const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);

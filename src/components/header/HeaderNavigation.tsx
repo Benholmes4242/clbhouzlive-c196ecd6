@@ -28,6 +28,7 @@ interface HeaderNavigationProps {
 
 const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false }) => {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const location = useLocation();
   const { user } = useSupabaseSession();
   const { variant } = useHeader();

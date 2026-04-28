@@ -140,6 +140,7 @@ function ProfileHubSheet({
   isLoading,
 }: ProfileHubSheetProps) {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { logout: handleLogout } = useLogout();
   const { unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { conversations } = useMessagingContext();

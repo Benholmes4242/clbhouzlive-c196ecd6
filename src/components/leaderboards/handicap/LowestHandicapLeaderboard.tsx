@@ -218,6 +218,7 @@ export function LowestHandicapLeaderboard({
 }: LowestHandicapLeaderboardProps) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
 
   // ── User status (box score, eyebrow, similar window) ───────────────────
   const { data: userStatus } = useUserHandicapStatus({ userId: user?.id, enabled: !!user?.id });

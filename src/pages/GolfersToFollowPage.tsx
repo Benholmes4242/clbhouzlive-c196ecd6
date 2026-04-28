@@ -49,6 +49,7 @@ const EMPTY_STATES: Record<TabKey, { title: string; description: string; icon: L
 
 const GolfersToFollowPage = () => {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const [searchParams] = useSearchParams();
   const source = searchParams.get('source');
   

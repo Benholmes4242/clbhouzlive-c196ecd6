@@ -50,6 +50,7 @@ const GolferVerificationModal: React.FC<GolferVerificationModalProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const editRoute = useEditProfileRoute();
 
   const [step, setStep] = useState<Step>(1);
   const [proofTypes, setProofTypes] = useState<string[]>([]);
