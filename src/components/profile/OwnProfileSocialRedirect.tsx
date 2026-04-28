@@ -27,10 +27,11 @@ export default function OwnProfileSocialRedirect({ tab }: Props) {
     );
   }
 
-  if (tab === 'friends') {
-    return <Navigate to={`/profile/${profile.username}/friends`} replace />;
-  }
-
-  const search = tab === 'following' ? '?tab=following' : '';
+  const search =
+    tab === 'friends'
+      ? '?tab=following&filter=friends'
+      : tab === 'following'
+      ? '?tab=following'
+      : '';
   return <Navigate to={`/profile/${profile.username}/followers${search}`} replace />;
 }
