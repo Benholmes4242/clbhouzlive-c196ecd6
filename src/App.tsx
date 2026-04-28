@@ -110,6 +110,7 @@ const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeO
 
 
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
+const QuickEditProfilePage = lazy(() => import("./pages/QuickEditProfilePage"));
 const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
@@ -318,6 +319,7 @@ function AppRoutes() {
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/achievements" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
+        <Route path="/quick-edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><QuickEditProfilePage /></Suspense>} />
         
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
