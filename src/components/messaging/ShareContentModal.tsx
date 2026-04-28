@@ -140,9 +140,9 @@ export function ShareContentModal({
 
   const isVideo = (file: File) => file.type.startsWith('video/');
 
+  // Tee Times share tab is hidden until the feature is functional.
   const tabs: { key: TabType; label: string }[] = [
     { key: 'courses', label: 'Courses' },
-    { key: 'teetimes', label: 'Tee Times' },
     { key: 'moments', label: 'Moments' },
   ];
 

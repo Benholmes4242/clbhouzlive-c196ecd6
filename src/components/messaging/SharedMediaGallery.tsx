@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface SharedMediaGalleryProps {
   conversationId: string;
@@ -188,7 +189,20 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           {/* Media tab */}
           {activeTab === 'media' && (
             media.length === 0 ? (
-              <EmptyState icon={Image} iconColor="#F7931E" iconBg="rgba(247,147,30,0.10)" title="No media shared yet" subtitle="Photos and videos will appear here" />
+              <EmptyState
+                icon={Image}
+                iconColor="#F7931E"
+                iconBg="rgba(247,147,30,0.10)"
+                title="No media shared yet"
+                subtitle="Photos and videos will appear here"
+                cta={{
+                  label: 'Share a photo',
+                  onClick: () => {
+                    onClose();
+                    toast('Tap the camera in the message bar to share');
+                  },
+                }}
+              />
             ) : (
               <div className="grid grid-cols-3" style={{ gap: 3, padding: 16 }}>
                 {media.map(item => (
@@ -212,7 +226,20 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           {/* Courses tab */}
           {activeTab === 'courses' && (
             courses.length === 0 ? (
-              <EmptyState icon={MapPin} iconColor="#006747" iconBg="rgba(0,103,71,0.07)" title="No courses shared yet" subtitle="Course shares will appear here" />
+              <EmptyState
+                icon={MapPin}
+                iconColor="#006747"
+                iconBg="rgba(0,103,71,0.07)"
+                title="No courses shared yet"
+                subtitle="Course shares will appear here"
+                cta={{
+                  label: 'Share a course',
+                  onClick: () => {
+                    onClose();
+                    toast('Tap the green pin in the message bar to share a course');
+                  },
+                }}
+              />
             ) : (
               <div className="flex flex-col" style={{ gap: 10, padding: 16 }}>
                 {courses.map(course => (
@@ -341,12 +368,14 @@ function EmptyState({
   iconBg,
   title,
   subtitle,
+  cta,
 }: {
   icon: typeof Image;
   iconColor: string;
   iconBg: string;
   title: string;
   subtitle: string;
+  cta?: { label: string; onClick: () => void };
 }) {
   return (
     <div className="flex flex-col items-center justify-center text-center" style={{ padding: '60px 24px' }}>
@@ -358,6 +387,24 @@ function EmptyState({
       </div>
       <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>{title}</p>
       <p style={{ fontSize: 13, color: '#94a3b8', margin: '4px 0 0' }}>{subtitle}</p>
+      {cta && (
+        <button
+          onClick={cta.onClick}
+          className="active:scale-[0.97] transition-transform"
+          style={{
+            marginTop: 16,
+            padding: '8px 16px',
+            borderRadius: 99,
+            background: 'rgba(247,147,30,0.10)',
+            border: '1px solid rgba(247,147,30,0.25)',
+            color: '#F7931E',
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
+          {cta.label}
+        </button>
+      )}
     </div>
   );
 }

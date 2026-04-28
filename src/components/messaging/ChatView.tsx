@@ -35,19 +35,19 @@ function formatDateHeader(dateString: string): string {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  if (date.toDateString() === today.toDateString()) return 'TODAY';
-  if (date.toDateString() === yesterday.toDateString()) return 'YESTERDAY';
+  if (date.toDateString() === today.toDateString()) return 'Today';
+  if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
   
   const diffDays = Math.floor((today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays < 7) {
-    return date.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
+    return date.toLocaleDateString('en-GB', { weekday: 'long' });
   }
   
   return date.toLocaleDateString('en-GB', { 
     day: 'numeric', 
-    month: 'long',
+    month: 'short',
     year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-  }).toUpperCase();
+  });
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -99,7 +99,6 @@ function DateSeparator({ date }: { date: string }) {
           background: 'rgba(0,0,0,0.05)',
           borderRadius: 99,
           padding: '3px 12px',
-          textTransform: 'uppercase',
         }}
       >
         {formatDateHeader(date)}

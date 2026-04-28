@@ -281,7 +281,7 @@ function MessagesPageInner() {
         {!searchInput && conversationFilter === 'all' && conversations.length > 0 && (
           <div style={{ padding: '10px 16px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Recent</span>
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#64748b', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Recent</span>
           </div>
         )}
         
