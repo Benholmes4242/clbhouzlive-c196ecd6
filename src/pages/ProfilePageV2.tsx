@@ -606,7 +606,7 @@ const ProfilePageV2Content: React.FC = () => {
           </button>
         </div>
 
-        {/* HCP + Golfer pills - right side, just below header photo */}
+        {/* HCP pill - right side, just below header photo */}
         <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
@@ -620,20 +620,6 @@ const ProfilePageV2Content: React.FC = () => {
               HCP {formatHandicap(profile.eg_handicap_index)}
             </span>
           )}
-          
-          {/* Golfer pill - dispatch amber glass */}
-          <span 
-            className="px-4 py-1.5 text-sm font-semibold rounded-full flex items-center justify-center"
-            style={{ 
-              color: '#F7931E',
-              background: 'rgba(247, 147, 30, 0.12)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(247, 147, 30, 0.30)'
-            }}
-          >
-            Golfer
-          </span>
         </div>
       </div>
 
