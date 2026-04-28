@@ -6,7 +6,7 @@ import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, BellOff, Building2, Search } from 'lucide-react';
+import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, BellOff, Building2, Search, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -109,28 +109,54 @@ function ConversationSkeleton() {
   );
 }
 
-function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
+function EmptyState({
+  onNewConversation,
+  variant = 'all',
+}: {
+  onNewConversation?: () => void;
+  variant?: 'all' | 'unread' | 'groups';
+}) {
+  const copy = {
+    all: {
+      title: 'No messages yet',
+      subtitle: 'Start a conversation with your golf buddies',
+      cta: 'Start a Chat',
+      icon: MessageCircle,
+    },
+    unread: {
+      title: 'All caught up',
+      subtitle: "You've read everything in your inbox",
+      cta: null as string | null,
+      icon: Check,
+    },
+    groups: {
+      title: 'No group chats yet',
+      subtitle: 'Start a group with your friends',
+      cta: 'Start a Group Chat',
+      icon: Users,
+    },
+  }[variant];
+
+  const Icon = copy.icon;
+
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
       <div className="relative flex items-center justify-center mb-4" style={{ width: 80, height: 80 }}>
-        {/* Outer ring */}
         <div className="absolute" style={{ inset: 0, borderRadius: '50%', border: '1.5px solid rgba(247,147,30,0.12)' }} />
-        {/* Mid ring */}
         <div className="absolute" style={{ inset: 10, borderRadius: '50%', border: '1.5px solid rgba(247,147,30,0.20)' }} />
-        {/* Inner filled circle */}
         <div
           className="flex items-center justify-center"
           style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(247,147,30,0.10)' }}
         >
-          <MessageCircle style={{ color: '#F7931E' }} className="h-5 w-5" />
+          <Icon style={{ color: '#F7931E' }} className="h-5 w-5" />
         </div>
       </div>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>No messages yet</h3>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>{copy.title}</h3>
       <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20, maxWidth: 240 }}>
-        Start a conversation with your golf buddies
+        {copy.subtitle}
       </p>
-      {onNewConversation && (
-        <button 
+      {copy.cta && onNewConversation && (
+        <button
           onClick={onNewConversation}
           className="flex items-center active:scale-[0.97] transition-transform"
           style={{
@@ -141,7 +167,7 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
           }}
         >
           <Plus className="h-4 w-4" />
-          Start a Chat
+          {copy.cta}
         </button>
       )}
     </div>
@@ -186,7 +212,7 @@ function SectionLabel({ text }: { text: string }) {
   return (
     <div style={{ padding: '10px 16px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
       <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+      <span style={{ fontSize: 9, fontWeight: 900, color: '#64748b', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
         {text}
       </span>
     </div>
@@ -292,11 +318,14 @@ export function ConversationList({
   }
 
   if (conversations.length === 0) {
-    return <EmptyState onNewConversation={onNewConversation} />;
+    return <EmptyState onNewConversation={onNewConversation} variant="all" />;
   }
 
-  if (filteredConversations.length === 0 && searchQuery) {
-    return <NoResults query={searchQuery} />;
+  if (filteredConversations.length === 0) {
+    if (searchQuery) {
+      return <NoResults query={searchQuery} />;
+    }
+    return <EmptyState onNewConversation={onNewConversation} variant={filterType} />;
   }
 
   // Split into people (direct) and groups
