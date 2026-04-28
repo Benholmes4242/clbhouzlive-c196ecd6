@@ -319,12 +319,9 @@ export function PostStep({
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, gap: 4 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                  <span style={{ fontSize: 44, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-                    {rating.toFixed(1)}
-                  </span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#94A3B8' }}>/ 10</span>
-                </div>
+                <span style={{ fontSize: 44, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                  {rating.toFixed(1)}
+                </span>
                 <div
                   style={{
                     fontSize: 10,
