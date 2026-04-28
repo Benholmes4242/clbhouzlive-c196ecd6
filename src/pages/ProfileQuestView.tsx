@@ -246,31 +246,61 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 
   return (
     <PageRoot className="min-h-screen bg-background">
-      {/* Read-only header when viewing another user's quest */}
-      {!isOwnProfile && (
-        <header className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 backdrop-blur-lg"
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)', background: 'rgba(248,250,252,0.95)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+      {/* Always-on header with back button + centered title */}
+      <header
+        className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 backdrop-blur-lg"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          background: 'rgba(248,250,252,0.95)',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        }}
+      >
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="Back"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            background: 'rgba(15,23,42,0.05)',
+            border: '0.5px solid rgba(15,23,42,0.10)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            cursor: 'pointer',
+          }}
         >
-          <button
-            onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-            style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-            aria-label="Go back"
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+        <div className="flex-1 flex flex-col items-center min-w-0">
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 900,
+              color: '#F7931E',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase' as const,
+            }}
           >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
-          <h1 className="text-[17px] font-semibold text-foreground truncate">
-            {profileDisplayName ? `${profileDisplayName}\u2019s Journey` : 'Journey'}
+            Trophy Case
+          </span>
+          <h1 className="text-[15px] font-semibold text-foreground truncate max-w-full">
+            {isOwnProfile
+              ? 'Your Journey'
+              : profileDisplayName
+              ? `${profileDisplayName}\u2019s Journey`
+              : 'Journey'}
           </h1>
-        </header>
-      )}
+        </div>
+        <div style={{ width: 36, height: 36, flexShrink: 0 }} />
+      </header>
       {/* Content - generous spacing (24-32px gaps) for Apple-level polish */}
       <div className="relative pb-10 pt-4">
         {/* Section 1: Trophy Room Hero */}
         <section className="px-4 pt-4 mb-8">
           <TrophyRoomHero
             totalPlayed={totalPlayed}
-            target={100}
             hasPremiumAccent={rewards.hasPremiumAccent}
             onContinueJourney={handleContinueJourney}
             regionProgress={regionProgress}
