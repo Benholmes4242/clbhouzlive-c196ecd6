@@ -643,7 +643,7 @@ const ProfilePageV2Content: React.FC = () => {
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
           <div className="flex items-center gap-3 w-full">
             <button
-              onClick={() => navigate('/edit-profile')}
+              onClick={() => navigate(editRoute)}
               className="flex-1 h-11 rounded-full font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
             >
@@ -682,7 +682,7 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
+                <DropdownMenuItem onClick={() => navigate(editRoute)}>
                   <Pencil className="w-4 h-4 mr-2" />
                   Edit profile
                 </DropdownMenuItem>
@@ -996,7 +996,7 @@ const ProfilePageV2Content: React.FC = () => {
         ) : isSelf ? (
           <section className="px-5 mb-4">
             <button
-              onClick={() => navigate('/edit-profile')}
+              onClick={() => navigate(editRoute)}
               className="text-sm font-medium italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
               style={{ color: '#F7931E' }}
             >
