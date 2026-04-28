@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ProfileFormData, ClubEntry } from '@/components/profile/profile-wizard/types';
 import { nanoid } from 'nanoid';
+import { formHcpFromDb } from '@/lib/formatHcp';
 
 function makeInitial(profile: any): ProfileFormData {
   const social = profile?.social_links ?? {};
@@ -21,7 +22,7 @@ function makeInitial(profile: any): ProfileFormData {
     })),
     collegeNormalized: profile?.college_normalized ?? null,
     collegeId: profile?.college_id ?? null,
-    handicapIndex: profile?.eg_handicap_index?.toString() ?? '',
+    handicapIndex: formHcpFromDb(profile?.eg_handicap_index),
     homeClubVisibility: profile?.home_club_visibility ?? 'public',
     additionalClubsVisibility: profile?.additional_clubs_visibility ?? 'public',
     bio: profile?.bio ?? '',
