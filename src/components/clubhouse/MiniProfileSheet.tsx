@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Building2, CheckCircle2 } from 'lucide-react';
+import { CheckCircle, Building2, CheckCircle2, Loader2, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useFollow } from '@/hooks/useFollow';
+import { useStartDM } from '@/hooks/useStartDM';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useMediaViewer } from '@/hooks/useMediaViewer';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
