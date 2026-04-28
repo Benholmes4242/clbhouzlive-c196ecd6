@@ -371,11 +371,6 @@ export function RateStep({
 
       {/* Overall Verdict — derived from category breakdowns (D28) */}
       <div ref={heroRef} style={{ padding: '24px 16px 16px' }}>
-        {/* Dispatch eyebrow */}
-        <div style={{ textAlign: 'center', fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 12 }}>
-          ⚡ Your Verdict
-        </div>
-
         {/* Large animated score — derived from breakdowns (D7: scale pulse on change) */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
           <span

@@ -282,9 +282,7 @@ export function WriteStep({
     >
       {/* Header */}
       <div style={{ textAlign: 'center', paddingBottom: 16 }}>
-        <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 6 }}>⚡ The Verdict</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>The Verdict</div>
-        <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Optional — your ratings already tell the story</div>
+        <div style={{ fontSize: 13, color: '#94A3B8' }}>Optional — your ratings already tell the story</div>
       </div>
 
       {/* Form Fields */}
