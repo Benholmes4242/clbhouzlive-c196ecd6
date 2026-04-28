@@ -118,6 +118,13 @@ export function EchoPageMessageList({
     () => [...messages].reverse().find(m => m.role === 'assistant'),
     [messages]
   );
+
+  // Last 3 user messages, for follow-up dedup
+  const recentUserMessages = useMemo(
+    () => messages.filter(m => m.role === 'user').slice(-3).map(m => m.content),
+    [messages]
+  );
+
   const animationVariants = {
     initial: prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
     animate: { opacity: 1, y: 0 },
