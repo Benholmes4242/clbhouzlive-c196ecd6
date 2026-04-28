@@ -3,7 +3,8 @@
  * Reuses wizard step components but renders all sections stacked.
  * No wizard chrome, no slide animation, sticky save bar at the bottom.
  */
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -31,6 +32,26 @@ export default function QuickEditProfilePage() {
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
   const usernameIsLocked = !!(profile as any)?.has_completed_onboarding;
+
+  const [searchParams] = useSearchParams();
+  const photosRef = useRef<HTMLDivElement | null>(null);
+  const golfRef = useRef<HTMLDivElement | null>(null);
+  const aboutRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (loading) return;
+    const section = searchParams.get('section');
+    const target =
+      section === 'golf' ? golfRef.current :
+      section === 'about' ? aboutRef.current :
+      section === 'photos' ? photosRef.current :
+      null;
+    if (target) {
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [loading, searchParams]);
 
   if (loading) return <ProfileSkeleton />;
 
@@ -88,26 +109,32 @@ export default function QuickEditProfilePage() {
         className="flex-1 overflow-y-auto pt-4"
         style={{ paddingBottom: 'calc(var(--sab) + 96px)' }}
       >
-        <PhotosIdentityStep
-          form={form}
-          usernameIsLocked={usernameIsLocked}
-          displayNameError={errors.displayName}
-          onFieldChange={setField}
-        />
-        <GolfInfoStep
-          form={form}
-          onFieldChange={setField}
-          onAddClub={addClub}
-          onRemoveClub={removeClub}
-        />
-        <AboutStep
-          form={form}
-          errors={errors}
-          onFieldChange={setField}
-          onAddWebsite={addWebsite}
-          onRemoveWebsite={removeWebsite}
-          onUpdateWebsite={updateWebsite}
-        />
+        <div ref={photosRef}>
+          <PhotosIdentityStep
+            form={form}
+            usernameIsLocked={usernameIsLocked}
+            displayNameError={errors.displayName}
+            onFieldChange={setField}
+          />
+        </div>
+        <div ref={golfRef}>
+          <GolfInfoStep
+            form={form}
+            onFieldChange={setField}
+            onAddClub={addClub}
+            onRemoveClub={removeClub}
+          />
+        </div>
+        <div ref={aboutRef}>
+          <AboutStep
+            form={form}
+            errors={errors}
+            onFieldChange={setField}
+            onAddWebsite={addWebsite}
+            onRemoveWebsite={removeWebsite}
+            onUpdateWebsite={updateWebsite}
+          />
+        </div>
       </div>
 
       {/* Sticky save bar */}

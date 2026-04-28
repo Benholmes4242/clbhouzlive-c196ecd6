@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 // Tab configuration for pill toggle bar
 const TABS: { key: TabKey; label: string }[] = [
@@ -259,7 +260,7 @@ const GolfersToFollowPage = () => {
                     size="sm" 
                     variant="outline"
                     className="border-[#F79E1B]/50 text-[#F79E1B] hover:bg-[#F79E1B]/10 font-medium"
-                    onClick={() => navigate('/quick-edit-profile?section=golf')}
+                    onClick={() => navigate(`${editRoute}?section=golf`)}
                   >
                     Set Home Club
                   </Button>

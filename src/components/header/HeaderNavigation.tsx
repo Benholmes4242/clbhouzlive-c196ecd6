@@ -19,6 +19,7 @@ import {
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 import { IdentitySelector } from '@/components/identity/IdentitySelector';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 interface HeaderNavigationProps {
   onInteraction?: () => void;
@@ -215,7 +216,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
           >
             View Profile
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/quick-edit-profile')}>
+          <DropdownMenuItem onClick={() => navigate(editRoute)}>
             <Pencil className="h-4 w-4 mr-2" />
             Edit Profile
           </DropdownMenuItem>

@@ -3,6 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 export function ProfileCompleteNudge() {
   const navigate = useNavigate();
@@ -92,7 +93,7 @@ export function ProfileCompleteNudge() {
 
       {/* Text */}
       <button
-        onClick={() => navigate('/quick-edit-profile')}
+        onClick={() => navigate(editRoute)}
         style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
         <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)', margin: 0 }}>Complete your profile</p>

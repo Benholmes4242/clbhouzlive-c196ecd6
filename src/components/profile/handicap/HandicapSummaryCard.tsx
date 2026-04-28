@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 interface HandicapSummaryCardProps {
   handicapIndex: number | null;
