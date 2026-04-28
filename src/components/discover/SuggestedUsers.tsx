@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
+import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
 import { supabase } from '@/integrations/supabase/client';
 import { UnifiedVideoPlayer } from '@/media';
 
@@ -10,7 +10,7 @@ interface SuggestedUsersProps {
 }
 
 const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
-  const { users, loading } = useSuggestedUsers();
+  const { users, loading } = useSuggestedUsersDiscover();
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
   const [followingInProgress, setFollowingInProgress] = useState<Set<string>>(new Set());
 
