@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { ChevronRight } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FollowBackButton } from './FollowBackButton';
@@ -10,6 +10,9 @@ import {
   getActorDisplayName,
   getActorAvatarUrl,
   getNotificationBadgeIcon,
+  getBadgeColor,
+  isPrivateActor,
+  isIncompleteProfile,
 } from './rows/rowHelpers';
 
 interface FeaturedNotificationCardProps {
@@ -20,7 +23,11 @@ interface FeaturedNotificationCardProps {
   currentUserId?: string;
 }
 
-const stripGradient = 'linear-gradient(160deg, #0a2342 0%, #1a4a2e 50%, #2d6a4f 100%)';
+const INK = '#0F172A';
+const INK_SOFT = '#475569';
+const INK_SUBTLE = '#94A3B8';
+const BORDER = 'rgba(15,23,42,0.07)';
+const AMBER = '#F7931E';
 
 function getNotificationActionText(notification: ActivityNotification): string {
   const { type, message, title } = notification;
@@ -48,7 +55,7 @@ function getNotificationActionText(notification: ActivityNotification): string {
 
 function getSubtext(notification: ActivityNotification): string | null {
   const { type, data, message } = notification;
-  if (type === 'comment' && message && message.length > 60) return null; // already shown in action
+  if (type === 'comment' && message && message.length > 60) return null;
   if (type === 'friend_request' && data?.mutual_friends_count) {
     return `${data.mutual_friends_count} mutual friend${data.mutual_friends_count > 1 ? 's' : ''}`;
   }
@@ -67,11 +74,13 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   const actorName = getActorDisplayName(notification);
   const avatarUrl = getActorAvatarUrl(notification);
   const badgeIcon = getNotificationBadgeIcon(notification.type);
+  const badgeColor = getBadgeColor(notification.type);
   const actionText = getNotificationActionText(notification);
   const subtext = getSubtext(notification);
   const courseName = notification.data?.course_name;
+  const incomplete = isIncompleteProfile(notification);
 
-  // Fetch course thumbnail for friend_course_review notifications
+  // Fetch course thumbnail for review notifications
   const [courseThumbnail, setCourseThumbnail] = useState<string | null>(null);
   const courseId = notification.data?.course_id;
   const isReviewNotif = notification.type === 'friend_course_review' || notification.type === 'course_review';
@@ -88,44 +97,47 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
       });
   }, [courseId, isReviewNotif]);
 
+  const isPrivateFollow = notification.type === 'follow' && isPrivateActor(notification);
+
   const showFollowBack =
     notification.type === 'follow' &&
     notification.actor_type === 'user' &&
     notification.actor_id &&
-    notification.actor_id !== currentUserId;
+    notification.actor_id !== currentUserId &&
+    !isPrivateFollow;
 
   const showFriendButtons =
     notification.type === 'friend_request' &&
     (!notification.data?.status || notification.data?.status === 'pending');
 
   const friendRequestId = notification.data?.request_id || notification.id;
+  const isReview = isReviewNotif && courseThumbnail;
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      onClick={onClick}
-      className="cursor-pointer active:scale-[0.98] transition-transform"
-    >
-      <div className="rounded-2xl overflow-hidden bg-background shadow-sm border border-border/60">
-        {/* Layer 1 — Strip: photo hero for reviews, gradient for everything else */}
-        {isReviewNotif && courseThumbnail ? (
-          // ── PHOTO HERO — course review ──
+  // ──────────────────────────── REVIEW HERO CARD ────────────────────────────
+  if (isReview) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
+        onClick={onClick}
+        className="cursor-pointer active:scale-[0.98] transition-transform"
+      >
+        <div
+          className="rounded-2xl overflow-hidden bg-white"
+          style={{ border: `1px solid ${BORDER}` }}
+        >
+          {/* Photo hero */}
           <div className="relative" style={{ height: 110 }}>
             <img
-              src={courseThumbnail}
+              src={courseThumbnail!}
               alt={courseName || 'Course'}
               className="absolute inset-0 w-full h-full object-cover"
             />
-            {/* Dark gradient overlay */}
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.25) 100%)' }} />
-
-            {/* Time ago — top right */}
-            <span className="absolute top-3 right-3 text-[11px] font-medium text-white/50">
+            <span className="absolute top-3 right-3 text-[11px] font-medium text-white/60">
               {notification.time_ago}
             </span>
-            {/* Rating badge — bottom right */}
             <div className="absolute bottom-2.5 right-3.5">
               {notification.data?.rating != null && (
                 <div
@@ -140,132 +152,203 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
                   }}
                 >
                   <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-3 h-3" />
-                  <span className="text-[13px] font-bold text-white">
+                  <span
+                    className="text-[13px] font-bold text-white"
+                    style={{ fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums' }}
+                  >
                     {Number(notification.data.rating).toFixed(1)}
                   </span>
                 </div>
               )}
             </div>
           </div>
-        ) : (
-          // ── GRADIENT STRIP — all other notification types ──
-          <div
-            className="relative h-[72px]"
-            style={{
-              backgroundImage: `${stripGradient}, radial-gradient(circle at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%)`,
-            }}
-          >
-            <span className="absolute top-3 right-3 text-[11px] font-medium text-white/50">
-              {notification.time_ago}
-            </span>
+
+          {/* Avatar overlapping */}
+          <div className="relative px-3.5 flex items-end gap-2.5" style={{ marginTop: -28 }}>
+            <div className="relative inline-block shrink-0">
+              <div style={{ border: '3px solid white', borderRadius: '34%', lineHeight: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
+                <SquircleAvatar
+                  src={avatarUrl}
+                  alt={actorName || 'User'}
+                  size={48}
+                  fallback={actorName?.charAt(0) || '?'}
+                  hideRing
+                />
+              </div>
+              <span
+                className="absolute -bottom-0.5 -right-1.5 h-5 w-5 rounded-full ring-2 ring-white shadow-sm flex items-center justify-center"
+                style={{ background: badgeColor }}
+              >
+                {badgeIcon}
+              </span>
+            </div>
             {courseName && (
-              <span className="absolute bottom-2.5 left-3.5 text-[10px] font-semibold tracking-[0.06em] uppercase text-white/40">
+              <span
+                className="text-[13px] font-bold pb-1 truncate"
+                style={{ minWidth: 0, flex: 1, color: INK }}
+              >
                 {courseName}
               </span>
             )}
+            <ChevronRight size={18} color={INK_SUBTLE} className="pb-1 shrink-0" strokeWidth={2.25} />
           </div>
-        )}
 
-        {/* Layer 2 — Avatar overlapping the strip */}
-        <div
-          className="relative px-3.5 flex items-end gap-2.5"
-          style={{ marginTop: -28 }}
-        >
-          {/* Avatar */}
-          <div className="relative inline-block shrink-0">
-            <div
-              style={{
-                border: '3px solid white',
-                borderRadius: '34%',
-                lineHeight: 0,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-              }}
-            >
-              <SquircleAvatar
-                src={avatarUrl}
-                alt={actorName || 'User'}
-                size={48}
-                fallback={actorName?.charAt(0) || '?'}
-                hideRing
-              />
-            </div>
-            <span className="absolute -bottom-0.5 -right-1.5 h-5 w-5 rounded-full bg-white ring-2 ring-white shadow-sm flex items-center justify-center">
-              {badgeIcon}
-            </span>
-          </div>
-          {/* Course name — only for review notifications, sits right of avatar */}
-          {isReviewNotif && notification.data?.course_name && (
-            <span
-              className="text-[13px] font-bold text-foreground pb-1 truncate"
-              style={{ minWidth: 0, flex: 1 }}
-            >
-              {notification.data.course_name}
-            </span>
-          )}
-        </div>
-
-        {/* Layer 3 — Content area */}
-        <div className="px-3.5 pt-2.5 pb-3.5">
-          <p className="text-[13.5px] leading-[1.45] text-foreground">
+          {/* Content */}
+          <div className="px-3.5 pt-2.5 pb-3.5 relative">
             {notification.is_unread && (
               <span
                 style={{
-                  display: 'inline-block',
-                  width: 6, height: 6,
+                  position: 'absolute',
+                  top: 10, left: 10,
+                  width: 8, height: 8,
                   borderRadius: '50%',
-                  background: '#F7931E',
-                  marginRight: 6,
-                  verticalAlign: 'middle',
-                  marginTop: -1,
-                  flexShrink: 0,
+                  background: AMBER,
                 }}
               />
             )}
-            <span className="font-semibold">{actorName}</span>{' '}
-            <span className="text-muted-foreground font-normal">{actionText}</span>
-          </p>
-
-          {subtext && (
-            <p className="text-[12px] text-muted-foreground/70 mt-1 italic leading-snug line-clamp-2">
-              {subtext}
+            <p className="text-[13.5px] leading-[1.45]" style={{ color: INK }}>
+              <span className="font-semibold">{actorName}</span>{' '}
+              <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
             </p>
-          )}
+            {subtext && (
+              <p className="text-[12px] mt-1 italic leading-snug line-clamp-2" style={{ color: INK_SUBTLE }}>
+                {subtext}
+              </p>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
-          {/* Action buttons */}
-          {(showFollowBack || showFriendButtons) && (
+  // ──────────────────────────── COMPACT SOCIAL CARD ────────────────────────────
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
+      onClick={onClick}
+      className="cursor-pointer active:scale-[0.98] transition-transform"
+    >
+      <div
+        className="relative rounded-2xl bg-white"
+        style={{
+          border: `1px solid ${BORDER}`,
+          padding: '12px 14px',
+          paddingLeft: 18,
+        }}
+      >
+        {/* Unread dot — top-left */}
+        {notification.is_unread && (
+          <span
+            style={{
+              position: 'absolute',
+              top: 12, left: 8,
+              width: 8, height: 8,
+              borderRadius: '50%',
+              background: AMBER,
+            }}
+          />
+        )}
+
+        {/* Timestamp — top right */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 12, right: 14,
+            fontSize: 11,
+            fontWeight: 500,
+            color: INK_SUBTLE,
+          }}
+        >
+          {notification.time_ago}
+        </span>
+
+        <div className="flex items-start gap-3" style={{ paddingRight: 56 }}>
+          {/* Avatar with badge */}
+          <div className="relative shrink-0">
             <div
-              className="mt-2.5"
-              onClick={(e) => e.stopPropagation()}
+              style={{
+                border: incomplete ? '0' : '0.5px solid #D1D5DB',
+                borderRadius: '34%',
+                lineHeight: 0,
+                background: incomplete ? '#1E293B' : 'transparent',
+                width: 44,
+                height: 44,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              {showFriendButtons && (
-                <FriendRequestButtons
-                  notificationId={notification.id}
-                  requestId={friendRequestId}
-                  requesterId={notification.actor_id!}
-                  requesterName={actorName}
-                  initialStatus={notification.data?.status || 'pending'}
-                  isMock={notification.is_mock}
-                />
-              )}
-              {showFollowBack && (
-                <FollowBackButton
-                  actorId={notification.actor_id!}
-                  actorDisplayName={actorName}
-                  isMock={notification.is_mock}
+              {incomplete ? (
+                <span style={{ color: '#FFFFFF', fontSize: 17, fontWeight: 700 }}>
+                  {(notification.actor_display_name?.charAt(0) || 'G').toUpperCase()}
+                </span>
+              ) : (
+                <SquircleAvatar
+                  src={avatarUrl}
+                  alt={actorName || 'User'}
+                  size={44}
+                  fallback={actorName?.charAt(0) || '?'}
+                  hideRing
                 />
               )}
             </div>
-          )}
-
-          {/* View review CTA — review notifications only */}
-          {isReviewNotif && (
-            <button
-              className="mt-2.5 w-full text-center text-[13px] font-bold py-2 rounded-lg"
-              style={{ background: 'rgba(247,147,30,0.12)', color: '#F7931E' }}
+            <span
+              className="absolute -bottom-0.5 -right-0.5 h-[18px] w-[18px] rounded-full ring-2 ring-white shadow-sm flex items-center justify-center"
+              style={{ background: badgeColor }}
             >
-              ⛳ View review
-            </button>
-          )}
+              {badgeIcon}
+            </span>
+          </div>
+
+          {/* Content column */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[13.5px] leading-[1.4]" style={{ color: INK }}>
+              <span className="font-semibold">{actorName}</span>{' '}
+              <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
+            </p>
+
+            {!isPrivateFollow && !incomplete && notification.actor_username && (
+              <p style={{ fontSize: 11.5, color: INK_SUBTLE, marginTop: 1 }}>
+                @{notification.actor_username}
+              </p>
+            )}
+
+            {subtext && (
+              <p className="text-[12px] mt-1 italic leading-snug line-clamp-2" style={{ color: INK_SUBTLE }}>
+                {subtext}
+              </p>
+            )}
+
+            {isPrivateFollow && (
+              <p style={{ fontSize: 11.5, color: INK_SUBTLE, marginTop: 2, fontStyle: 'italic' }}>
+                Private profile · no profile to view
+              </p>
+            )}
+
+            {(showFollowBack || showFriendButtons) && (
+              <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                {showFriendButtons && (
+                  <FriendRequestButtons
+                    notificationId={notification.id}
+                    requestId={friendRequestId}
+                    requesterId={notification.actor_id!}
+                    requesterName={actorName}
+                    initialStatus={notification.data?.status || 'pending'}
+                    isMock={notification.is_mock}
+                  />
+                )}
+                {showFollowBack && (
+                  <FollowBackButton
+                    actorId={notification.actor_id!}
+                    actorDisplayName={actorName}
+                    isMock={notification.is_mock}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
