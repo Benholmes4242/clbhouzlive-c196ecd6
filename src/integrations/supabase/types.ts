@@ -16606,6 +16606,20 @@ export type Database = {
           video_count: number
         }[]
       }
+      get_suggested_dm_users: {
+        Args: { p_limit?: number }
+        Returns: {
+          display_name: string
+          eg_handicap_index: number
+          home_club: string
+          id: string
+          profile_photo_url: string
+          reason: string
+          reason_detail: string
+          tier: number
+          username: string
+        }[]
+      }
       get_suggested_feed: {
         Args: {
           p_cursor?: string
