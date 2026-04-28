@@ -120,17 +120,17 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
   const top3 = rankedEntries.slice(0, 3);
   const remaining = rankedEntries.slice(3, 10);
 
-  // Rank medal colors
-  const getRankStyle = (rank: number) => {
+  // Medal styling for ranks 1-3 (rank number rendered inside the medal)
+  const getMedalStyle = (rank: number): { background: string; color: string } | null => {
     switch (rank) {
       case 1:
-        return { bg: 'rgba(255, 215, 0, 0.15)', border: 'rgba(255, 215, 0, 0.3)', color: '#D4AF37' };
+        return { background: 'linear-gradient(145deg, #FFE99D, #D2B461)', color: '#7A5510' };
       case 2:
-        return { bg: 'rgba(192, 192, 192, 0.15)', border: 'rgba(192, 192, 192, 0.3)', color: '#A0A0A0' };
+        return { background: 'linear-gradient(145deg, #F1F5F9, #CBD5E1)', color: '#475569' };
       case 3:
-        return { bg: 'rgba(205, 127, 50, 0.15)', border: 'rgba(205, 127, 50, 0.3)', color: '#CD7F32' };
+        return { background: 'linear-gradient(145deg, #F4D5A7, #C28850)', color: '#7A4C20' };
       default:
-        return { bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.2)', color: 'hsl(var(--muted-foreground))' };
+        return null;
     }
   };
 
