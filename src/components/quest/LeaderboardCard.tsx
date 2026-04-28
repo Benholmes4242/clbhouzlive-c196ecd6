@@ -21,6 +21,7 @@ interface LeaderboardCardProps {
 export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalPlayed = 0 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const { profile } = useProfileData();
   const { data: friends = [], isLoading, isError } = useFriendsLeaderboard(userId);
 
   // Sort friends + current user by courses played and add ranks
@@ -35,12 +36,14 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
       })),
     ];
 
-    // Insert current user
+    // Insert current user with real profile data
     if (user?.id) {
+      const p = profile as any;
+      const realName = p?.display_name || p?.username || 'You';
       entries.push({
         id: user.id,
-        displayName: 'You',
-        avatarUrl: null,
+        displayName: realName,
+        avatarUrl: p?.profile_photo_url || null,
         totalPlayed,
         isCurrentUser: true,
       });
@@ -49,7 +52,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
     return entries
       .sort((a, b) => b.totalPlayed - a.totalPlayed)
       .map((entry, index) => ({ ...entry, rank: index + 1 }));
-  }, [friends, user?.id, totalPlayed]);
+  }, [friends, user?.id, totalPlayed, profile]);
 
   // Loading state
   if (isLoading) {
