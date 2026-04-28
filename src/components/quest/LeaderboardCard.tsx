@@ -251,7 +251,15 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                 )}
                   style={entry.isCurrentUser ? { color: '#F7931E' } : undefined}
                 >
-                  {entry.displayName}
+                  {entry.isCurrentUser ? (
+                    <>
+                      {entry.displayName}
+                      {' '}
+                      <span className="font-normal text-muted-foreground">(you)</span>
+                    </>
+                  ) : (
+                    entry.displayName
+                  )}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground">
                   {entry.totalPlayed}
