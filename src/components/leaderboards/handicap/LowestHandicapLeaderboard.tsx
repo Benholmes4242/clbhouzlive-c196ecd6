@@ -31,6 +31,7 @@ import {
   type HandicapTier,
 } from '@/lib/formatHcp';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
@@ -217,6 +218,7 @@ export function LowestHandicapLeaderboard({
 }: LowestHandicapLeaderboardProps) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
 
   // ── User status (box score, eyebrow, similar window) ───────────────────
   const { data: userStatus } = useUserHandicapStatus({ userId: user?.id, enabled: !!user?.id });
@@ -895,7 +897,7 @@ export function LowestHandicapLeaderboard({
               Set a home club to see your club board.
             </p>
             <button
-              onClick={() => navigate('/quick-edit-profile')}
+              onClick={() => navigate(editRoute)}
               style={{
                 background: 'none',
                 border: 'none',

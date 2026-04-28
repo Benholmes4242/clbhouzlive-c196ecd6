@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 // ── Types ──
 
@@ -139,6 +140,7 @@ function ProfileHubSheet({
   isLoading,
 }: ProfileHubSheetProps) {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { logout: handleLogout } = useLogout();
   const { unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { conversations } = useMessagingContext();
@@ -228,7 +230,7 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { emoji: '✏️', bg: 'rgba(15,23,42,0.05)', label: 'Edit profile', route: '/quick-edit-profile' },
+    { emoji: '✏️', bg: 'rgba(15,23,42,0.05)', label: 'Edit profile', route: editRoute },
     { emoji: '🏢', bg: 'rgba(15,23,42,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
     { emoji: '⚙️', bg: 'rgba(15,23,42,0.05)', label: 'Settings', route: '/settings' },
   ];

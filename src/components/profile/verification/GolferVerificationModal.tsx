@@ -20,6 +20,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 interface GolferVerificationModalProps {
   open: boolean;
@@ -49,6 +50,7 @@ const GolferVerificationModal: React.FC<GolferVerificationModalProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const editRoute = useEditProfileRoute();
 
   const [step, setStep] = useState<Step>(1);
   const [proofTypes, setProofTypes] = useState<string[]>([]);
@@ -241,7 +243,7 @@ const GolferVerificationModal: React.FC<GolferVerificationModalProps> = ({
                     size="sm"
                     asChild
                   >
-                    <Link to="/quick-edit-profile">
+                    <Link to={editRoute}>
                       <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
                       Edit profile
                     </Link>

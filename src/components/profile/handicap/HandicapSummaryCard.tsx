@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 interface HandicapSummaryCardProps {
   handicapIndex: number | null;
@@ -15,6 +16,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
   isOwnProfile,
 }) => {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
 
   const formatHandicap = (hcp: number): string => {
     if (hcp < 0) return `+${Math.abs(hcp).toFixed(1)}`;
@@ -42,7 +44,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
           Add your handicap index to show it on your profile
         </p>
         <Button
-          onClick={() => navigate('/quick-edit-profile?tab=basic')}
+          onClick={() => navigate(`${editRoute}?section=golf`)}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -87,7 +89,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/quick-edit-profile?tab=basic')}
+            onClick={() => navigate(`${editRoute}?section=golf`)}
             className="text-muted-foreground"
           >
             Edit handicap

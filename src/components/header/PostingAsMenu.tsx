@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useLogout } from '@/hooks/useLogout';
 import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
+import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
 interface PostingAsMenuProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ interface PostingAsMenuProps {
 
 export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef }: PostingAsMenuProps) {
   const navigate = useNavigate();
+  const editRoute = useEditProfileRoute();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
   const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
@@ -189,7 +191,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     } else if (route === '/settings/business') {
       navigate('/businesses/manage');
     } else if (route === '/settings/profile') {
-      navigate('/quick-edit-profile');
+      navigate(editRoute);
     } else if (route === `/profile/${currentActorData.id}`) {
       handleNavigate('/profile');
     } else {
@@ -444,7 +446,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           <MenuRow
             icon={<Pencil className="h-[18px] w-[18px]" />}
             label="Edit profile"
-            onClick={() => handleNavigate('/quick-edit-profile')}
+            onClick={() => handleNavigate(editRoute)}
             useLightTheme={useLightTheme}
           />
           
