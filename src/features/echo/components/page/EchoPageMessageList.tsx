@@ -127,7 +127,7 @@ export function EchoPageMessageList({
     <div
       ref={scrollRef}
       className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
-      style={{ background: '#0c0c0e', WebkitOverflowScrolling: 'touch' }}
+      style={{ background: '#F8FAFC', WebkitOverflowScrolling: 'touch' }}
       onScroll={handleScroll}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
