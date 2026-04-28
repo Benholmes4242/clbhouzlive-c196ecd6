@@ -361,9 +361,14 @@ export function RateStep({
         </div>
       )}
 
-      {/* Overall Verdict — derived from category breakdowns (D28) */}
+      {/* Overall Rating — user-set, independent of breakdowns */}
       <div ref={heroRef} style={{ padding: '24px 16px 16px' }}>
-        {/* Large animated score — derived from breakdowns (D7: scale pulse on change) */}
+        {/* Dispatch eyebrow */}
+        <div style={{ textAlign: 'center', fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 12 }}>
+          ⚡ Your Verdict
+        </div>
+
+        {/* Large animated score */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
           <span
             style={{
@@ -371,13 +376,13 @@ export function RateStep({
               fontWeight: 900,
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
-              color: displayVerdict !== null ? '#0F172A' : 'rgba(15,23,42,0.18)',
+              color: rating !== null ? '#0F172A' : 'rgba(15,23,42,0.18)',
               display: 'inline-block',
               transform: isAnimatingVerdict ? 'scale(1.06)' : 'scale(1.0)',
               transition: 'transform 200ms ease',
             }}
           >
-            {displayVerdict !== null ? displayVerdict.toFixed(1) : '—'}
+            {rating !== null ? rating.toFixed(1) : '—'}
           </span>
         </div>
 
@@ -387,22 +392,31 @@ export function RateStep({
             key={overallTier.label}
             style={{
               textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#0F172A',
-              textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8,
+              textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12,
               animation: 'verdictLabelEnter 200ms ease-out',
             }}
           >
             {overallTier.label}
           </p>
         ) : (
-          <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 8 }}>
-            Rate categories below to set your verdict
+          <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 12 }}>
+            Slide to set your overall rating
           </p>
         )}
 
-        {/* D28: Auto-calculated note */}
-        <p style={{ textAlign: 'center', fontSize: 11, color: '#CBD5E1', margin: 0 }}>
-          Auto-calculated from your category ratings
-        </p>
+        {/* Hero slider — overall rating */}
+        <div style={{ padding: '0 8px' }}>
+          <SegmentedSlider
+            value={rating ?? 5}
+            onChange={(val) => onRatingChange(val)}
+            touched={rating !== null}
+            onFirstTouch={() => {
+              if (rating === null) onRatingChange(5);
+            }}
+            size="hero"
+            ariaLabel="Overall rating"
+          />
+        </div>
 
         {/* D33: Legacy migration notice */}
         {isLegacyMigration && (
@@ -416,7 +430,7 @@ export function RateStep({
             }}
           >
             <p style={{ fontSize: 12, fontWeight: 600, color: '#0F172A', lineHeight: 1.45, margin: 0 }}>
-              We've updated how ratings work — please re-rate the categories below to update your verdict.
+              We've updated how ratings work — please re-rate the categories below to add detail.
             </p>
           </div>
         )}
