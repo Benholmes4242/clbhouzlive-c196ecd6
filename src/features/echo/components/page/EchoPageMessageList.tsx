@@ -1,5 +1,5 @@
 /**
- * EchoPageMessageList - Message list with bubble styling (dark theme)
+ * EchoPageMessageList - Message list with bubble styling (light dispatch theme)
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo, TouchEvent } from 'react';
