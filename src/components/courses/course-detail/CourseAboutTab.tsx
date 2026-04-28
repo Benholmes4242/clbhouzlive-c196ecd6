@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { ExternalLink, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, Pencil, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -137,22 +138,25 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             onSeeAllReviews={() => onTabChange?.('reviews')}
           />
         </div>
-        <div style={{ padding: '12px 16px 0' }}>
-          {userRating ? (
-            <button
-              onClick={handleRateClick}
-              style={{ width: '100%', padding: '13px 0', borderRadius: 14, background: '#FFFFFF', border: '1.5px solid #F7931E', fontSize: 14, fontWeight: 800, color: '#c97a10', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-            >
-              ✏️ Edit Your Rating
-            </button>
-          ) : (
-            <button
-              onClick={handleRateClick}
-              style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
-            >
-              ⭐ Rate this course
-            </button>
-          )}
+        <div style={{ padding: '12px 16px 0', display: 'flex', justifyContent: 'center' }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRateClick}
+            className="h-auto py-1 px-2 text-xs"
+          >
+            {userRating ? (
+              <>
+                <Pencil className="h-3 w-3 mr-1" />
+                Edit Your Rating
+              </>
+            ) : (
+              <>
+                <Star className="h-3 w-3 mr-1" />
+                Rate this course
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
