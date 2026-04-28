@@ -917,7 +917,7 @@ const ProfilePageV2Content: React.FC = () => {
             <motion.button
               onClick={() => {
                 setActiveMiniNav('friends');
-                navigate(`/profile/${username}/friends`);
+                navigate(`/profile/${username}/followers?tab=following&filter=friends`);
               }}
               className="pb-3 flex flex-col items-center text-center min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
               variants={{
