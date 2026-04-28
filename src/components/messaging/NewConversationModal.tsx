@@ -50,6 +50,9 @@ export function NewConversationModal({
   const [groupName, setGroupName] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
   const [creatingGroup, setCreatingGroup] = useState(false);
+
+  // Suggested users (DM mode, empty search only)
+  const suggestedQuery = useSuggestedUsers(open && mode === 'direct' && !dmSearch.trim());
   
   // Group avatar state
   const [groupAvatarFile, setGroupAvatarFile] = useState<File | null>(null);
@@ -289,6 +292,106 @@ export function NewConversationModal({
                 >
                   <MapPin size={10} />
                   {userProfile.home_club}
+                </span>
+              )}
+            </div>
+          </div>
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" style={{ color: '#F7931E' }} />
+          ) : (
+            <span
+              className="flex-shrink-0"
+              style={{
+                padding: '5px 12px', borderRadius: 99,
+                background: 'rgba(247,147,30,0.10)',
+                border: '1px solid rgba(247,147,30,0.25)',
+                fontSize: 12, fontWeight: 600, color: '#F7931E',
+              }}
+            >
+              Message →
+            </span>
+          )}
+        </button>
+        {index < total - 1 && (
+          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
+        )}
+      </div>
+    );
+  };
+
+  // Skeleton row for suggestions loading state
+  const renderSuggestionSkeleton = (key: number, isLast: boolean) => (
+    <div key={`sk-${key}`}>
+      <div className="flex items-center" style={{ gap: 12, padding: '10px 20px' }}>
+        <Skeleton className="rounded-xl" style={{ width: 44, height: 44 }} />
+        <div className="flex-1 min-w-0">
+          <Skeleton style={{ height: 13, width: '50%', borderRadius: 4 }} />
+          <Skeleton style={{ height: 11, width: '35%', borderRadius: 4, marginTop: 6 }} />
+        </div>
+        <Skeleton style={{ height: 24, width: 86, borderRadius: 99 }} />
+      </div>
+      {!isLast && (
+        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
+      )}
+    </div>
+  );
+
+  // Suggested user row (similar to DM row, with reason chip; no username/home-club chips)
+  const renderSuggestedRow = (s: SuggestedUser, index: number, total: number) => {
+    const isLoading = creatingDmWith === s.id;
+    const reasonLabel = suggestionReasonLabel(s.reason, s.reason_detail);
+
+    return (
+      <div key={s.id}>
+        <button
+          onClick={() => !isLoading && handleCreateDM(s.id)}
+          disabled={isLoading}
+          className="w-full flex items-center text-left active:bg-[rgba(247,147,30,0.04)]"
+          style={{
+            gap: 12, padding: '10px 20px',
+            border: 'none', background: 'transparent',
+            cursor: isLoading ? 'default' : 'pointer',
+            opacity: isLoading ? 0.5 : 1,
+          }}
+        >
+          <SquircleAvatar
+            src={s.profile_photo_url}
+            alt={s.display_name || s.username || 'User'}
+            userId={s.id}
+            size={44}
+            hideRing
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center" style={{ gap: 6 }}>
+              <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>
+                {s.display_name || s.username || 'Unknown User'}
+              </span>
+            </div>
+            <div className="flex items-center" style={{ gap: 6, marginTop: 2 }}>
+              {reasonLabel && (
+                <span
+                  className="truncate"
+                  style={{
+                    fontSize: '10.5px', fontWeight: 600, color: '#475569',
+                    background: 'rgba(15,23,42,0.05)',
+                    border: '1px solid rgba(15,23,42,0.10)',
+                    borderRadius: 99, padding: '0 6px',
+                    maxWidth: 180,
+                  }}
+                >
+                  {reasonLabel}
+                </span>
+              )}
+              {s.eg_handicap_index != null && (
+                <span
+                  style={{
+                    fontSize: '10.5px', fontWeight: 600, color: '#F7931E',
+                    background: 'rgba(247,147,30,0.08)',
+                    border: '1px solid rgba(247,147,30,0.20)',
+                    borderRadius: 99, padding: '0 6px',
+                  }}
+                >
+                  HCP {s.eg_handicap_index}
                 </span>
               )}
             </div>
