@@ -1,3 +1,4 @@
+import { Sparkles } from 'lucide-react';
 import { ProfileFormData } from '../types';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
@@ -58,8 +59,9 @@ export function PhotosIdentityStep({
           }}
         />
         {!form.profilePhotoBlob && !form.profilePhotoUrl && (
-          <p className="text-[12px] text-[hsl(38,92%,50%)] mt-1.5 ml-1">
-            👋 Golfers with a photo get 3× more friend requests
+          <p className="text-[12px] text-[hsl(38,92%,50%)] mt-1.5 ml-1 inline-flex items-center gap-1.5">
+            <Sparkles size={12} strokeWidth={2.25} />
+            <span>Golfers with a photo get 3× more friend requests</span>
           </p>
         )}
       </div>
