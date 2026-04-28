@@ -104,7 +104,7 @@ const FollowersListPage = () => {
         title="Followers"
         subtitle={`People who follow @${profileUser.username}`}
         searchPlaceholder="Search followers by name or club"
-        
+        profileUserId={profileUser.id}
         users={followers}
         totalCount={totalCount}
         isLoading={followersLoading}
