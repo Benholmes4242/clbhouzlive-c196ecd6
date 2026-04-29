@@ -48,7 +48,7 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { getProfilePathById } from '@/lib/profileRoutes';
+import { getActorRouteByType } from '@/types/actor';
 
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
@@ -268,7 +268,7 @@ const ClubhouseContent = () => {
   // ── Navigation to profile ──
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
-    navigate(getProfilePathById(activePost.userId));
+    navigate(getActorRouteByType(activePost.actorType, activePost.actorId));
   }, [activePost, navigate]);
 
   // Season Recap Modal
