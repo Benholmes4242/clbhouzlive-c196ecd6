@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, RefreshCw, WifiOff } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 import {
@@ -175,6 +176,29 @@ interface ChampionshipLeaderboardViewProps {
  * Editorial newspaper layout with masthead, lede, box score, prize/sponsor card,
  * schedule strip, and full standings. All "serif moments" use Geist 900.
  */
+function LedeFactor({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+      gap: 12, padding: '8px 12px', borderRadius: 8,
+      background: 'rgba(15,23,42,0.04)',
+    }}>
+      <span style={{
+        fontSize: 10, fontWeight: 800, color: '#64748B',
+        letterSpacing: '0.12em', textTransform: 'uppercase',
+      }}>
+        {label}
+      </span>
+      <span style={{
+        fontSize: 13, fontWeight: 800, color: '#0F172A',
+        fontVariantNumeric: 'tabular-nums lining-nums',
+      }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
 export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboardViewProps) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -201,6 +225,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   });
 
   const [showSponsorSheet, setShowSponsorSheet] = useState(false);
+  const [showLedeInfoSheet, setShowLedeInfoSheet] = useState(false);
   const [userCountry, setUserCountry] = useState<string | null>(null);
 
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
@@ -443,11 +468,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [hasNextPage, fetchNextPage]);
 
   // ─── Arena tabs config ───────────────────────────────────────────
-  const arenas: { key: ChampionshipArenaMode; label: string }[] = [
+  const totalCount = leaderboardData?.pages?.[0]?.total_count ?? null;
+
+  const arenas: { key: ChampionshipArenaMode; label: string; count?: number | null }[] = [
     { key: 'global', label: 'Global' },
     { key: 'division', label: 'Division' },
-    { key: 'friends', label: 'Friends' },
-    { key: 'club', label: 'Club' },
+    { key: 'friends', label: 'Friends', count: arenaMode === 'friends' ? totalCount : null },
+    { key: 'club', label: 'Club', count: arenaMode === 'club' ? totalCount : null },
     { key: 'country', label: 'Country' },
   ];
 
@@ -462,6 +489,39 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     { key: 'legendary', label: 'Legendary' },
     { key: 'grandslam', label: 'Grand Slam' },
   ];
+
+  // ─── Filter reset / active state ─────────────────────────────────
+  const handleResetFilters = useCallback(() => {
+    setArenaMode('global');
+    setDivisionFilter('all');
+    setSelectedClubId(null);
+    setSelectedClubName(null);
+    setSelectedCountry(null);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY_FILTERS);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const hasActiveFilters = useMemo(() => {
+    return arenaMode !== 'global'
+      || divisionFilter !== 'all'
+      || selectedClubId !== null
+      || selectedCountry !== null;
+  }, [arenaMode, divisionFilter, selectedClubId, selectedCountry]);
+
+  const activeFilterLabel = useMemo(() => {
+    const parts: string[] = [];
+    if (arenaMode === 'friends') parts.push('Friends');
+    if (arenaMode === 'club' && selectedClubName) parts.push(selectedClubName);
+    if (arenaMode === 'country' && selectedCountry) parts.push(selectedCountry);
+    if (divisionFilter !== 'all') {
+      const div = divisionChips.find((d) => d.key === divisionFilter);
+      if (div) parts.push(div.label);
+    }
+    return parts.join(' · ');
+  }, [arenaMode, divisionFilter, selectedClubName, selectedCountry, divisionChips]);
 
   // ─── Render ──────────────────────────────────────────────────────
   return (
@@ -551,8 +611,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{
             fontSize: 10, fontWeight: 800, letterSpacing: '0.28em',
             color: '#9F1D1D', marginBottom: 10,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           }}>
-            {personalisedEyebrow}
+            <span>{personalisedEyebrow}</span>
+            <button
+              type="button"
+              onClick={() => setShowLedeInfoSheet(true)}
+              aria-label="Why this headline"
+              style={{
+                background: 'none', padding: 0, cursor: 'pointer',
+                width: 14, height: 14, borderRadius: '50%',
+                border: '1px solid rgba(159,29,29,0.4)',
+                color: '#9F1D1D',
+                fontSize: 9, fontWeight: 800, lineHeight: 1,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                letterSpacing: 0,
+              }}
+            >
+              i
+            </button>
           </div>
           <h2 style={{
             fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em',
@@ -621,14 +698,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
           <div style={{ textAlign: 'center' }}>
             <div style={{
-              fontSize: 9, fontWeight: 800, color: '#94A3B8',
+              fontSize: 9, fontWeight: 800,
+              color: userIsLeader ? '#15803D' : '#94A3B8',
               letterSpacing: '0.18em', marginBottom: 4,
             }}>
-              GAP
+              {userIsLeader ? 'LEAD' : 'GAP'}
             </div>
             <div style={{
               fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
-              lineHeight: 1, color: '#0F172A',
+              lineHeight: 1,
+              color: userIsLeader ? '#15803D' : '#0F172A',
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}>
               {gap === null ? '—' : userIsLeader ? `+${gap}` : `−${gap}`}
@@ -778,28 +857,49 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
         {/* Arena tabs */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8, justifyContent: 'center' }}>
-          {arenas.map((a) => (
-            <button
-              key={a.key}
-              onClick={() => handleArenaModeChange(a.key)}
-              style={{
-                padding: '5px 10px', borderRadius: 8,
-                background: arenaMode === a.key ? '#0F172A' : 'transparent',
-                color: arenaMode === a.key ? '#fff' : '#64748B',
-                border: arenaMode === a.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-                fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em',
-              }}
-            >
-              {a.label}
-            </button>
-          ))}
+          {arenas.map((a) => {
+            const isActive = arenaMode === a.key;
+            return (
+              <button
+                key={a.key}
+                onClick={() => handleArenaModeChange(a.key)}
+                style={{
+                  padding: '5px 10px', borderRadius: 8,
+                  background: isActive ? '#0F172A' : 'transparent',
+                  color: isActive ? '#fff' : '#64748B',
+                  border: isActive ? 'none' : '1px solid rgba(15,23,42,0.15)',
+                  fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em',
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                }}
+              >
+                {a.label}
+                {a.count != null && (
+                  <span style={{
+                    fontSize: 9, fontWeight: 800,
+                    padding: '1px 5px', borderRadius: 6,
+                    background: isActive ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)',
+                    color: isActive ? '#fff' : '#64748B',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                    letterSpacing: 0,
+                  }}>
+                    {a.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Division sub-filter */}
         {arenaMode === 'division' && (
-          <div style={{
-            display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10, marginTop: 8, justifyContent: 'center',
-          }}>
+          <div
+            className="no-scrollbar"
+            style={{
+              display: 'flex', gap: 4, marginBottom: 10, marginTop: 8,
+              overflowX: 'auto', WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+            }}
+          >
             {divisionChips.map((d) => (
               <button
                 key={d.key}
@@ -810,6 +910,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   color: divisionFilter === d.key ? '#0F172A' : '#94A3B8',
                   border: '1px solid rgba(15,23,42,0.1)',
                   fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em',
+                  whiteSpace: 'nowrap' as const,
+                  flexShrink: 0,
                 }}
               >
                 {d.label}
@@ -838,6 +940,32 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               selectedCountry={selectedCountry}
               onCountrySelect={setSelectedCountry}
             />
+          </div>
+        )}
+
+        {/* Active filter pill */}
+        {hasActiveFilters && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4, marginBottom: 6 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '4px 10px', borderRadius: 999,
+              background: 'rgba(247,147,30,0.12)',
+              border: '1px solid rgba(247,147,30,0.35)',
+              fontSize: 10, fontWeight: 800, color: '#9A4A0F',
+              letterSpacing: '0.04em',
+            }}>
+              <span>Filtering by {activeFilterLabel || '…'}</span>
+              <button
+                onClick={handleResetFilters}
+                aria-label="Clear filters"
+                style={{
+                  background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                  color: '#9A4A0F', fontSize: 11, fontWeight: 800, lineHeight: 1,
+                }}
+              >
+                ✕ clear
+              </button>
+            </div>
           </div>
         )}
 
@@ -1063,7 +1191,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         <div style={{
           fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic',
         }}>
-          Compiled from members' verified rounds · Updated daily
+          Compiled from members' verified course visits · Updated daily
         </div>
       </div>
 
@@ -1076,6 +1204,69 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           title={season.sponsor_name || 'Sponsor'}
         />
       )}
+
+      {/* Lede explainer sheet */}
+      <BottomSheet
+        open={showLedeInfoSheet}
+        onClose={() => setShowLedeInfoSheet(false)}
+        zIndexBase={1500}
+        className="!rounded-t-[24px]"
+        style={{ background: '#fff' }}
+      >
+        <div style={{ padding: '12px 20px 28px', background: '#fff' }}>
+          <div style={{
+            width: 36, height: 4, borderRadius: 999,
+            background: 'rgba(15,23,42,0.18)',
+            margin: '0 auto 16px',
+          }} />
+          <div style={{
+            fontSize: 18, fontWeight: 900, color: '#0F172A',
+            letterSpacing: '-0.01em', marginBottom: 8,
+          }}>
+            Why this headline
+          </div>
+          <p style={{
+            fontSize: 13, color: '#64748B', lineHeight: 1.55, margin: 0,
+            marginBottom: 16,
+          }}>
+            Our editorial AI tailors the headline to your position in the standings, the season's pace, and how your week is going.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {currentUserEntry?.current_rank != null && (
+              <LedeFactor
+                label="Your rank"
+                value={`#${currentUserEntry.current_rank}`}
+              />
+            )}
+            {timeFilter === 'seasonal' && season && daysRemaining > 0 && (
+              <LedeFactor
+                label="Days remaining"
+                value={`${daysRemaining}d`}
+              />
+            )}
+            {currentUserEntry?.rank_movement != null && currentUserEntry.rank_movement !== 0 && (
+              <LedeFactor
+                label="Weekly movement"
+                value={
+                  currentUserEntry.rank_movement > 0
+                    ? `Up ${currentUserEntry.rank_movement} this week`
+                    : `Down ${Math.abs(currentUserEntry.rank_movement)} this week`
+                }
+              />
+            )}
+          </div>
+
+          <div style={{
+            marginTop: 16, paddingTop: 12,
+            borderTop: '1px solid rgba(15,23,42,0.08)',
+            fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em',
+            fontStyle: 'italic', textAlign: 'center',
+          }}>
+            Headline by Editorial AI · Updated daily
+          </div>
+        </div>
+      </BottomSheet>
     </div>
   );
 }
