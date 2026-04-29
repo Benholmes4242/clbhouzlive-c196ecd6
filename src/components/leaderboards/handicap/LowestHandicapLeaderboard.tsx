@@ -1444,6 +1444,41 @@ export function LowestHandicapLeaderboard({
             : 'Ranked by handicap index · Lowest first · Updated daily'}
         </div>
       </div>
+
+      {/* ── JUMP-TO-POSITION PILL — top100 only, when user row offscreen ── */}
+      {userRowOffscreen && peerRank !== null && peerGroup === 'top100' && (
+        <button
+          type="button"
+          onClick={handleJumpToUser}
+          aria-label="Jump to your position"
+          style={{
+            position: 'fixed',
+            bottom: 96,
+            right: 16,
+            zIndex: 40,
+            background: INK,
+            color: '#fff',
+            border: 'none',
+            borderRadius: 999,
+            padding: '8px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(15,23,42,0.20)',
+            fontFamily: 'inherit',
+          }}
+          className="active:scale-[0.97] transition-transform"
+        >
+          <span style={{ fontSize: 10, lineHeight: 1 }}>
+            {userRowDirection === 'above' ? '↑' : '↓'}
+          </span>
+          <span>You · #{peerRank}</span>
+        </button>
+      )}
     </div>
   );
 }
