@@ -215,9 +215,23 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             isFetchingNextPage={isFetchingNextPage}
             onOpenFullscreen={handleOpenFullscreen}
           />
-          {/* Featured badge */}
-          <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(247,147,30,0.95)', backdropFilter: 'blur(4px)', borderRadius: 6, padding: '3px 8px', fontSize: 8, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', pointerEvents: 'none', zIndex: 2, transform: 'rotate(-6deg)', transformOrigin: 'top left', boxShadow: '0 2px 6px rgba(0,0,0,0.18)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: 10, lineHeight: 1 }}>🔥</span>
+          {/* Featured badge — Dispatch glass pill (matches Explore + Hottest) */}
+          <div style={{
+            position: 'absolute', top: 16, left: 16,
+            background: 'rgba(0, 0, 0, 0.28)',
+            backdropFilter: 'blur(22px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            borderRadius: 4,
+            padding: '4px 10px',
+            fontSize: 10, fontWeight: 800, color: '#FFFFFF',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            pointerEvents: 'none', zIndex: 2,
+            transform: 'rotate(-6deg)', transformOrigin: 'top left',
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+          }}>
+            <span style={{ fontSize: 11, lineHeight: 1 }}>🔥</span>
             Featured
           </div>
         </div>

@@ -163,16 +163,16 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
           {post.caption && (
             <div
               style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: '#fff',
-                lineHeight: 1.3,
+                fontSize: 11,
+                fontWeight: 400,
+                color: '#FFFFFF',
+                lineHeight: 1.35,
                 overflow: 'hidden',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-                marginBottom: 2,
+                marginBottom: 3,
               }}
             >
               {post.caption}
@@ -181,9 +181,9 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
           {post.displayName && (
             <div
               style={{
-                fontSize: 10,
+                fontSize: 13,
                 fontWeight: 600,
-                color: 'rgba(255,255,255,0.75)',
+                color: '#FFFFFF',
                 textShadow: '0 1px 2px rgba(0,0,0,0.5)',
               }}
             >
