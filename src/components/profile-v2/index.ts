@@ -7,7 +7,7 @@ export { AvatarXPRing } from './AvatarXPRing';
 export { HeroMedia } from './HeroMedia';
 export { IdentityOverlay } from './IdentityOverlay';
 export { GolfDNACard } from './GolfDNACard';
-export { MilestoneUnlockSheet } from './MilestoneUnlockSheet';
+
 export { GolfDNASheet } from './GolfDNASheet';
 export { MomentCard } from './MomentCard';
 export { MomentsTimeline } from './MomentsTimeline';
@@ -18,7 +18,7 @@ export { CoursesWorldPreview } from './CoursesWorldPreview';
 export { StickyMiniHeader } from './StickyMiniHeader';
 export { HandicapPreviewCard } from './HandicapPreviewCard';
 export { QuestPreviewCard } from './QuestPreviewCard';
-export { RegionListSheet } from './RegionListSheet';
+
 export { JourneyMapPath } from './JourneyMapPath';
 export { NextTargetCard } from './NextTargetCard';
 

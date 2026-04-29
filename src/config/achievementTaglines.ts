@@ -128,3 +128,135 @@ export function getRegionTagline(slug: string): string {
 export function getRegionFullName(slug: string): string {
   return REGION_FULL_NAMES[slug] || "";
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// UNIFIED SHEET TAGLINES — editorial copy per tier, state-aware
+// Used exclusively by UnifiedAchievementSheet. Does NOT replace existing exports.
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+interface SheetTaglineSet {
+  unlocked: string;
+  locked: string;
+  peerUnlocked: string;
+  peerLocked: string;
+}
+
+const MILESTONE_SHEET_TAGLINES: Record<number, SheetTaglineSet> = {
+  5: {
+    unlocked: 'Five of the greatest, on your card.',
+    locked: 'Play five Top 100 courses to unlock.',
+    peerUnlocked: "{name}'s through the first five.",
+    peerLocked: "{name}'s on {played} of 5 Top 100 courses.",
+  },
+  10: {
+    unlocked: 'Past the casual mark. The tour is real now.',
+    locked: 'Ten courses in. The journey takes shape.',
+    peerUnlocked: "{name}'s past the casual mark.",
+    peerLocked: "{name}'s on {played} of 10 Top 100 courses.",
+  },
+  20: {
+    unlocked: "You're a serious player on the road.",
+    locked: 'Twenty courses · the work begins to show.',
+    peerUnlocked: "{name}'s a serious player on the road.",
+    peerLocked: "{name}'s on {played} of 20 Top 100 courses.",
+  },
+  50: {
+    unlocked: "Halfway to a life's work.",
+    locked: 'Fifty courses · the halfway mark.',
+    peerUnlocked: "{name}'s crossed the 50-course mark.",
+    peerLocked: "{name}'s on {played} of 50 Top 100 courses.",
+  },
+  100: {
+    unlocked: 'Top 100 played. The list is yours.',
+    locked: 'One hundred courses · the Quest complete.',
+    peerUnlocked: "{name}'s done the full hundred.",
+    peerLocked: "{name}'s on {played} of 100 Top 100 courses.",
+  },
+  200: {
+    unlocked: 'Two hundred and counting. Few get here.',
+    locked: 'Two hundred · into rare company.',
+    peerUnlocked: "{name}'s past two hundred. Rare company.",
+    peerLocked: "{name}'s on {played} of 200 Top 100 courses.",
+  },
+  300: {
+    unlocked: 'Three hundred. A career on the road.',
+    locked: 'Three hundred · few have come this far.',
+    peerUnlocked: "{name}'s past three hundred.",
+    peerLocked: "{name}'s on {played} of 300 Top 100 courses.",
+  },
+  400: {
+    unlocked: 'Four hundred. The list is a footnote now.',
+    locked: 'Four hundred · uncharted territory.',
+    peerUnlocked: "{name}'s past four hundred. Uncharted.",
+    peerLocked: "{name}'s on {played} of 400 Top 100 courses.",
+  },
+};
+
+const REGIONAL_SHEET_TAGLINES: Record<string, SheetTaglineSet> = {
+  'gb-i': {
+    unlocked: 'Every links and inland gem on home soil.',
+    locked: 'The home circuit · birth of the game.',
+    peerUnlocked: "{name}'s played every GB&I Top 100 course.",
+    peerLocked: "{name}'s on {played} of {total} GB&I courses.",
+  },
+  europe: {
+    unlocked: "The continent's finest, all played.",
+    locked: 'From the Algarve to the Alps.',
+    peerUnlocked: "{name}'s played every Europe Top 100 course.",
+    peerLocked: "{name}'s on {played} of {total} Europe courses.",
+  },
+  usa: {
+    unlocked: 'Coast to coast. Every great American course.',
+    locked: 'The big country · big golf.',
+    peerUnlocked: "{name}'s played every USA Top 100 course.",
+    peerLocked: "{name}'s on {played} of {total} USA courses.",
+  },
+  global: {
+    unlocked: "The whole world's Top 100. Played.",
+    locked: "Every continent's best on one list.",
+    peerUnlocked: "{name}'s played every Global Top 100 course.",
+    peerLocked: "{name}'s on {played} of {total} Global courses.",
+  },
+};
+
+function applyTokens(template: string, tokens: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_, key) => String(tokens[key] ?? ''));
+}
+
+/** Get unified-sheet tagline for a milestone. */
+export function getSheetMilestoneTagline(
+  threshold: number,
+  isUnlocked: boolean,
+  mode: 'browse' | 'celebrate' | 'peer',
+  context: { firstName?: string; played?: number } = {}
+): string {
+  const set = MILESTONE_SHEET_TAGLINES[threshold];
+  if (!set) return '';
+
+  if (mode === 'peer') {
+    const name = context.firstName || 'They';
+    const template = isUnlocked ? set.peerUnlocked : set.peerLocked;
+    return applyTokens(template, { name, played: context.played ?? 0 });
+  }
+
+  return isUnlocked ? set.unlocked : set.locked;
+}
+
+/** Get unified-sheet tagline for a regional achievement. */
+export function getSheetRegionalTagline(
+  listSlug: string,
+  isUnlocked: boolean,
+  mode: 'browse' | 'celebrate' | 'peer',
+  context: { firstName?: string; played?: number; total?: number } = {}
+): string {
+  const set = REGIONAL_SHEET_TAGLINES[listSlug];
+  if (!set) return '';
+
+  if (mode === 'peer') {
+    const name = context.firstName || 'They';
+    const template = isUnlocked ? set.peerUnlocked : set.peerLocked;
+    return applyTokens(template, { name, played: context.played ?? 0, total: context.total ?? 100 });
+  }
+
+  return isUnlocked ? set.unlocked : set.locked;
+}

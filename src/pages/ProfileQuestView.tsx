@@ -23,8 +23,6 @@ import { useQuestCourses } from '@/hooks/useQuestCourses';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
-import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
-import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
 
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
 
@@ -128,13 +126,55 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
       .filter((r): r is RegionProgress => r !== null);
   }, [progressData?.lists]);
 
-  const [selectedRegion, setSelectedRegion] = useState<RegionProgress | null>(null);
-  
-  // Badge detail sheet state - now uses UnifiedAchievementSheet format
+  // Badge detail sheet state - tap-to-explore (browse / peer mode)
   const [achievementData, setAchievementData] = useState<AchievementData | null>(null);
+
+  // Celebrate-mode state — own profile only, auto-fires on first unlock
+  const [celebrateData, setCelebrateData] = useState<AchievementData | null>(null);
 
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
+
+  // ── Celebrate-mode auto-detection (own profile only) ─────────────────────
+  // Detects newly-unlocked achievements and opens the unified sheet in celebrate mode.
+  // Uses the same `clbhouz_unlocked_achievements` localStorage key as useAchievementUnlock,
+  // so dismissal (which calls markAnimated) prevents re-fires.
+  useEffect(() => {
+    if (!isOwnProfile) return;
+    if (totalPlayed === 0 && regionProgress.length === 0) return;
+    if (celebrateData) return;
+
+    let stored: { milestones: number[]; regional: string[] };
+    try {
+      const raw = localStorage.getItem('clbhouz_unlocked_achievements');
+      stored = raw ? JSON.parse(raw) : { milestones: [], regional: [] };
+    } catch {
+      stored = { milestones: [], regional: [] };
+    }
+
+    // Highest unseen milestone first
+    const sortedSteps = [...CLUB_STEPS].sort((a, b) => b.threshold - a.threshold);
+    for (const step of sortedSteps) {
+      if (totalPlayed >= step.threshold && !stored.milestones.includes(step.threshold)) {
+        setCelebrateData({ type: 'milestone', threshold: step.threshold, totalPlayed });
+        return;
+      }
+    }
+
+    // Then regional unlocks
+    for (const region of regionProgress) {
+      if (region.played >= region.total && region.total > 0 && !stored.regional.includes(region.id)) {
+        setCelebrateData({
+          type: 'regional',
+          listSlug: region.id as 'gb-i' | 'europe' | 'usa' | 'global',
+          played: region.played,
+          total: region.total,
+        });
+        return;
+      }
+    }
+  }, [isOwnProfile, totalPlayed, regionProgress, celebrateData]);
+
 
   // Quest onboarding state
   const onboarding = useQuestOnboarding(totalPlayed);
@@ -371,33 +411,31 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         )}
       </div>
 
-      {/* Region List Sheet */}
-      <RegionListSheet
-        region={selectedRegion ? {
-          id: selectedRegion.id,
-          name: selectedRegion.name,
-          shortName: selectedRegion.shortName,
-          played: selectedRegion.played,
-          total: selectedRegion.total,
-        } : null}
-        onClose={() => setSelectedRegion(null)}
-      />
-
+      {/* Tap-to-explore sheet (browse / peer mode) */}
       <UnifiedAchievementSheet
         isOpen={!!achievementData}
         onClose={() => setAchievementData(null)}
         data={achievementData}
         firstName={profileFirstName}
         isOwnProfile={isOwnProfile}
+        mode={isOwnProfile ? 'browse' : 'peer'}
       />
 
-      {/* Milestone Unlock Sheet */}
-      <MilestoneUnlockSheet totalPlayed={totalPlayed} isOwnProfile={isOwnProfile} firstName={profileFirstName} />
+      {/* Auto-fire celebrate sheet — own profile only */}
+      {isOwnProfile && (
+        <UnifiedAchievementSheet
+          isOpen={!!celebrateData}
+          onClose={() => setCelebrateData(null)}
+          data={celebrateData}
+          firstName={undefined}
+          isOwnProfile={true}
+          mode="celebrate"
+        />
+      )}
 
-
-      {/* First Course Celebration Sheet */}
+      {/* First Course Celebration Sheet — gated on isOwnProfile */}
       <QuestFirstCourseSheet
-        open={onboarding.shouldShowFirstCourse}
+        open={isOwnProfile && onboarding.shouldShowFirstCourse}
         onClose={onboarding.markFirstCourseSeen}
       />
     </PageRoot>
