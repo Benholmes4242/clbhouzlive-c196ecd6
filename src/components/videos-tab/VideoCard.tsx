@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { getActorRouteByType } from '@/types/actor';
@@ -41,6 +42,7 @@ function formatVideoDuration(totalSeconds: number): string {
 
 export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex = 0, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }: VideoCardProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
   const hlsUrl = firstVideo?.hlsUrl || '';
@@ -103,6 +105,9 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           .eq('actor_type', 'personal');
         if (error) throw error;
       }
+      // Refresh the LikesSheet for THIS post (gated by `enabled: isOpen`
+      // inside usePostLikes — cheap no-op when sheet is closed).
+      queryClient.invalidateQueries({ queryKey: ['post-likes', post.id, 'post'] });
     } catch (err) {
       if (import.meta.env.DEV) console.error('[VideoCard] Like toggle failed:', err);
       setIsLiked(!newLiked);
