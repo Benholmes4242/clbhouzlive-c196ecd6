@@ -404,9 +404,9 @@ export function LeadersTab() {
 
       {/* Sticky header — back link + group tabs + chip rail + count/search */}
       <div
-        className="sticky z-20"
+        className="sticky top-0 z-20"
         style={{
-          top: 'var(--sat)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
           background: 'rgba(248,250,252,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
