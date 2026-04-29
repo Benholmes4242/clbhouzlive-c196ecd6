@@ -912,7 +912,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '4px 10px',
+                padding: season.sponsor_logo_url ? '5px 10px' : '4px 10px',
                 border: '1px solid rgba(15,23,42,0.12)',
                 borderRadius: 4,
                 background: '#fff',
@@ -922,44 +922,46 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                     src={season.sponsor_logo_url}
                     alt={`${season.sponsor_name} logo`}
                     style={{
-                      width: 18,
-                      height: 18,
+                      height: 20,
+                      width: 'auto',
+                      maxWidth: 140,
                       objectFit: 'contain',
-                      borderRadius: 2,
+                      display: 'block',
                       flexShrink: 0,
                     }}
                   />
                 ) : (
-                  <div style={{
-                    width: 18,
-                    height: 18,
-                    background: '#0F172A',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 2,
-                    flexShrink: 0,
-                  }}>
-                    <span style={{
-                      fontSize: 11,
-                      fontWeight: 900,
-                      color: '#fff',
-                      letterSpacing: '-0.05em',
-                      lineHeight: 1,
+                  <>
+                    <div style={{
+                      width: 18,
+                      height: 18,
+                      background: '#0F172A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 2,
+                      flexShrink: 0,
                     }}>
-                      {season.sponsor_name.charAt(0).toUpperCase()}
+                      <span style={{
+                        fontSize: 11,
+                        fontWeight: 900,
+                        color: '#fff',
+                        letterSpacing: '-0.05em',
+                        lineHeight: 1,
+                      }}>
+                        {season.sponsor_name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <span style={{
+                      fontSize: 13,
+                      fontWeight: 800,
+                      color: '#0F172A',
+                      letterSpacing: '-0.01em',
+                    }}>
+                      {season.sponsor_name}
                     </span>
-                  </div>
+                  </>
                 )}
-
-                <span style={{
-                  fontSize: 13,
-                  fontWeight: 800,
-                  color: '#0F172A',
-                  letterSpacing: '-0.01em',
-                }}>
-                  {season.sponsor_name}
-                </span>
               </div>
             </div>
 
