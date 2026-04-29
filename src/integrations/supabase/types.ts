@@ -17161,6 +17161,13 @@ export type Database = {
           tier_name: string
         }[]
       }
+      get_user_tier_unlocks: {
+        Args: { p_user_id: string }
+        Returns: {
+          tier_id: string
+          unlocked_at: string
+        }[]
+      }
       get_user_top100_course_ids: {
         Args: { target_user_id: string }
         Returns: string[]
