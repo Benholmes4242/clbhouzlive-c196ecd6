@@ -486,6 +486,26 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       ? Math.max(0, leaderCourses - youCourses)
       : null;
 
+  // ─── On the chase: predictive statements (current user, seasonal only) ───
+  const chaseStatements = useMemo<ChaseStatement[]>(() => {
+    if (!currentUserEntry || !userStatus) return [];
+    if (timeFilter === 'all_time') return [];
+    if (!season || daysRemaining <= 0) return [];
+
+    return buildChaseStatements({
+      currentRank: currentUserEntry.current_rank,
+      rankMovementWeekly: currentUserEntry.rank_movement ?? userStatus.rank_movement_weekly ?? 0,
+      daysRemaining,
+      closestRivalName: userStatus.closest_rival?.display_name ?? null,
+      closestRivalGap: userStatus.closest_rival?.gap ?? 0,
+      coursesToPromotion: userStatus.courses_to_next_division ?? 0,
+      nextDivisionName: userStatus.next_division_name ?? null,
+      streakCurrent: userStatus.streak_current ?? 0,
+      streakBest: userStatus.streak_best ?? 0,
+      bestRankThisSeason: userStatus.best_rank_this_season ?? 0,
+    });
+  }, [currentUserEntry, userStatus, timeFilter, season, daysRemaining]);
+
   // ─── Scroll save/restore ─────────────────────────────────────────
   const handleEntryClick = useCallback((clickedUserId: string) => {
     const rootEl = document.getElementById('root');
