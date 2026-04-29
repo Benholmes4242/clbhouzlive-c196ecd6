@@ -185,6 +185,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
                 src={post.avatarUrl}
                 alt={post.displayName}
                 size={20}
+                thinRing
                 fallback={post.displayName.charAt(0).toUpperCase()}
               />
               <div
