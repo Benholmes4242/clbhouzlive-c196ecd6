@@ -135,20 +135,32 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
 }
 
 /**
- * Group multi-media posts: merge rows with the same post_id into one FeedPost.
+ * Groups posts sharing the same `id` and merges their `mediaItems`.
+ *
+ * IMPORTANT — pure function. Does NOT mutate input. The input may be a
+ * React Query cache reference (see useCourseMedia.ts:97 — calls this in
+ * a useMemo over query.data.pages). A previous version of this function
+ * mutated the shared mediaItems arrays via `.push(...)` and shallow spread,
+ * which compounded across re-evaluations of the useMemo and caused the
+ * displayed media count to grow on every Course Media tab navigation.
+ *
+ * Always clone arrays before reassigning. Always reassign — never .push.
  */
 export function groupMultiMedia(posts: FeedPost[]): FeedPost[] {
   const map = new Map<string, FeedPost>();
   for (const post of posts) {
-    if (map.has(post.id)) {
-      map.get(post.id)!.mediaItems.push(...post.mediaItems);
+    const existing = map.get(post.id);
+    if (existing) {
+      // Reassign with a NEW array — do not mutate the existing one
+      existing.mediaItems = [...existing.mediaItems, ...post.mediaItems];
     } else {
-      map.set(post.id, { ...post });
+      // Clone mediaItems — do not share reference with input
+      map.set(post.id, { ...post, mediaItems: [...post.mediaItems] });
     }
   }
   for (const post of map.values()) {
+    // Safe: post.mediaItems is owned by us (cloned/reassigned above)
     post.mediaItems.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-    // Deduplicate by media_id to prevent duplicate React keys
     const seenIds = new Set<string>();
     post.mediaItems = post.mediaItems.filter(item => {
       if (!item.id || seenIds.has(item.id)) return false;
