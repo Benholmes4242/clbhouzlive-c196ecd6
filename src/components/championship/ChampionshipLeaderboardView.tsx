@@ -176,6 +176,97 @@ interface ChampionshipLeaderboardViewProps {
  * Editorial newspaper layout with masthead, lede, box score, prize/sponsor card,
  * schedule strip, and full standings. All "serif moments" use Geist 900.
  */
+interface ChaseStatement {
+  priority: number;
+  text: string;
+  emphasis?: 'positive' | 'negative' | 'neutral';
+}
+
+interface ChaseStatementsArgs {
+  currentRank: number;
+  rankMovementWeekly: number;
+  daysRemaining: number;
+  closestRivalName: string | null;
+  closestRivalGap: number;
+  coursesToPromotion: number;
+  nextDivisionName: string | null;
+  streakCurrent: number;
+  streakBest: number;
+  bestRankThisSeason: number;
+}
+
+function buildChaseStatements(args: ChaseStatementsArgs): ChaseStatement[] {
+  const out: ChaseStatement[] = [];
+
+  // P1 — Pace projection
+  const weeksRemaining = Math.max(0, args.daysRemaining / 7);
+  if (weeksRemaining > 0.5) {
+    const movement = args.rankMovementWeekly;
+    const projectedRank = Math.max(1, Math.round(args.currentRank - movement * weeksRemaining));
+    const finishLabel = args.daysRemaining <= 7 ? 'this Sunday' : `in ${Math.round(weeksRemaining)} weeks`;
+
+    if (movement > 0) {
+      out.push({
+        priority: 1,
+        text: `At your current pace you'll finish ${ordinal(projectedRank)} ${finishLabel}.`,
+        emphasis: 'positive',
+      });
+    } else if (movement < 0) {
+      out.push({
+        priority: 1,
+        text: `On current pace, you'll drift to ${ordinal(projectedRank)} ${finishLabel}.`,
+        emphasis: 'negative',
+      });
+    } else {
+      out.push({
+        priority: 1,
+        text: `Hold pace and you'll finish ${ordinal(args.currentRank)}.`,
+        emphasis: 'neutral',
+      });
+    }
+  }
+
+  // P2 — Closest rival
+  if (args.closestRivalName && args.closestRivalGap > 0) {
+    const courses = args.closestRivalGap === 1 ? 'course' : 'courses';
+    out.push({
+      priority: 2,
+      text: `${args.closestRivalName} is ${args.closestRivalGap} ${courses} ahead — playable.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  // P3 — Division promotion
+  if (args.coursesToPromotion > 0 && args.nextDivisionName) {
+    const courses = args.coursesToPromotion === 1 ? 'course' : 'courses';
+    out.push({
+      priority: 3,
+      text: `${args.coursesToPromotion} ${courses} to reach ${args.nextDivisionName}.`,
+      emphasis: 'positive',
+    });
+  }
+
+  // P4 — Streak callout
+  if (args.streakCurrent >= 3 && args.streakCurrent >= args.streakBest) {
+    out.push({
+      priority: 4,
+      text: `Your ${args.streakCurrent}-week streak is your longest this season.`,
+      emphasis: 'positive',
+    });
+  }
+
+  // P5 — Peak comeback
+  if (args.bestRankThisSeason > 0 && args.currentRank - args.bestRankThisSeason >= 3) {
+    out.push({
+      priority: 5,
+      text: `You peaked at ${ordinal(args.bestRankThisSeason)} this season.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  return out.sort((a, b) => a.priority - b.priority).slice(0, 3);
+}
+
 function LedeFactor({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
