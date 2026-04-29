@@ -126,10 +126,11 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
       .filter((r): r is RegionProgress => r !== null);
   }, [progressData?.lists]);
 
-  const [selectedRegion, setSelectedRegion] = useState<RegionProgress | null>(null);
-  
-  // Badge detail sheet state - now uses UnifiedAchievementSheet format
+  // Badge detail sheet state - tap-to-explore (browse / peer mode)
   const [achievementData, setAchievementData] = useState<AchievementData | null>(null);
+
+  // Celebrate-mode state — own profile only, auto-fires on first unlock
+  const [celebrateData, setCelebrateData] = useState<AchievementData | null>(null);
 
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
