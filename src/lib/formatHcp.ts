@@ -76,6 +76,38 @@ export function isTierSharper(tierA: HandicapTier, tierB: HandicapTier): boolean
   return order.indexOf(tierA) < order.indexOf(tierB);
 }
 
+/**
+ * Human-readable threshold range for a tier.
+ * Mirrors getHandicapTier() boundaries.
+ */
+export function getTierThresholdRange(id: HandicapTier): string {
+  switch (id) {
+    case 'elite':       return 'plus';
+    case 'scratch':     return '0.0–0.5';
+    case 'player':      return '0.6–5.0';
+    case 'single':      return '5.1–10.0';
+    case 'midfielder':  return '10.1–20.0';
+    case 'weekend':     return '20.1–30.0';
+    case 'hacker':      return '30.0+';
+  }
+}
+
+/**
+ * Returns the upper-bound threshold for a tier (used for distance calculations).
+ * For elite (plus), returns -0.6 (the floor; users go lower from there).
+ */
+export function getTierUpperBound(id: HandicapTier): number {
+  switch (id) {
+    case 'elite':       return -0.6;
+    case 'scratch':     return 0.5;
+    case 'player':      return 5.0;
+    case 'single':      return 10.0;
+    case 'midfielder':  return 20.0;
+    case 'weekend':     return 30.0;
+    case 'hacker':      return Infinity;
+  }
+}
+
 export function getHandicapTier(handicap: number): HandicapTier {
   if (handicap <= -0.6) return 'elite';
   if (handicap <= 0.5) return 'scratch';
