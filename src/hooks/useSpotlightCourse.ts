@@ -36,6 +36,7 @@ export function useSpotlightCourse() {
       const { data: { user } } = await supabase.auth.getUser();
       const { data, error } = await supabase.rpc('get_course_leaderboard', {
         p_sort_by: 'most_played',
+        p_sort_order: 'desc',
         p_time_period: 'season',
         p_limit: 1,
         p_offset: 0,
