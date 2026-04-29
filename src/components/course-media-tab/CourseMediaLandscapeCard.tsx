@@ -206,11 +206,14 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         </div>
         {post.likeCount > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#F7931E">
               <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
             </svg>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
               {post.likeCount}
+            </span>
+          </div>
+        )}
             </span>
           </div>
         )}
