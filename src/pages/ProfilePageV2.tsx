@@ -640,7 +640,7 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* Action Buttons - different for self vs other */}
-      <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
+      <div className="mt-3 px-5 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
         {isSelf ? (
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
           <div className="flex items-center gap-3 w-full">
@@ -719,7 +719,7 @@ const ProfilePageV2Content: React.FC = () => {
               type="button"
               onClick={() => profileUserId && startDM(profileUserId)}
               disabled={dmStarting === profileUserId}
-              className="h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 disabled:opacity-60 active:scale-[0.98] transition-transform"
+              className="h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }}
               aria-label="Send message"
             >
@@ -733,7 +733,7 @@ const ProfilePageV2Content: React.FC = () => {
               )}
             </button>
             <button 
-              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
+              className="h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
               onClick={toggleFollow}
               disabled={followBusy || (isFollowing === 'unknown' && !followResolved)}
@@ -752,7 +752,7 @@ const ProfilePageV2Content: React.FC = () => {
             
             <button 
               className={cn(
-                'h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5',
+                'h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5',
                 'whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform border',
                 friendshipStatus === 'friends'
                   ? ''
