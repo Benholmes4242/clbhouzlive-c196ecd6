@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, RefreshCw, WifiOff } from 'lucide-react';
+import { Loader2, RefreshCw, WifiOff, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -14,8 +14,10 @@ import {
   useUserChampionshipStatus,
   useSeasonCalendar,
   useDailyEditorial,
+  useChampionshipDispatches,
 } from '@/hooks/championship';
 import type { EditorialCopy } from '@/hooks/championship/useDailyEditorial';
+import type { ChampionshipDispatch } from '@/hooks/championship';
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
 import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
@@ -52,6 +54,175 @@ function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function formatDispatchTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 60_000) return 'now';
+  if (ms < 3_600_000) return `${Math.floor(ms / 60_000)}m`;
+  if (ms < 86_400_000) return `${Math.floor(ms / 3_600_000)}h`;
+  return `${Math.floor(ms / 86_400_000)}d`;
+}
+
+interface WireTickerProps {
+  dispatches: ChampionshipDispatch[];
+  onDispatchClick: (dispatch: ChampionshipDispatch) => void;
+}
+
+function WireTicker({ dispatches, onDispatchClick }: WireTickerProps) {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const touchStartXRef = useRef<number | null>(null);
+  const prefersReducedMotion = useMemo(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  useEffect(() => {
+    if (paused || prefersReducedMotion || dispatches.length <= 1) return;
+    const tid = setInterval(() => {
+      setIndex((i) => (i + 1) % dispatches.length);
+    }, 5_000);
+    return () => clearInterval(tid);
+  }, [paused, prefersReducedMotion, dispatches.length]);
+
+  useEffect(() => {
+    if (index >= dispatches.length) setIndex(0);
+  }, [dispatches.length, index]);
+
+  if (dispatches.length === 0) return null;
+  const current = dispatches[index];
+  if (!current) return null;
+
+  const goPrev = () => setIndex((i) => (i - 1 + dispatches.length) % dispatches.length);
+  const goNext = () => setIndex((i) => (i + 1) % dispatches.length);
+
+  return (
+    <div
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onTouchStart={(e) => {
+        setPaused(true);
+        touchStartXRef.current = e.touches[0]?.clientX ?? null;
+      }}
+      onTouchEnd={(e) => {
+        const start = touchStartXRef.current;
+        if (start !== null) {
+          const dx = (e.changedTouches[0]?.clientX ?? start) - start;
+          if (Math.abs(dx) > 30) {
+            if (dx > 0) goPrev();
+            else goNext();
+          }
+        }
+        touchStartXRef.current = null;
+        setTimeout(() => setPaused(false), 1500);
+      }}
+      style={{
+        margin: '14px 20px 0',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        height: 28,
+        padding: '0 10px',
+        background: '#fff',
+        border: '1px solid rgba(15,23,42,0.10)',
+        borderRadius: 4,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: '#9F1D1D',
+          flexShrink: 0,
+          animation: prefersReducedMotion ? undefined : 'wirePulse 1.6s ease-in-out infinite',
+        }}
+      />
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.18em',
+          color: '#9F1D1D',
+          flexShrink: 0,
+        }}
+      >
+        WIRE
+      </span>
+      <div style={{ width: 1, height: 14, background: 'rgba(15,23,42,0.12)', flexShrink: 0 }} />
+      <button
+        type="button"
+        onClick={() => onDispatchClick(current)}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          textAlign: 'left',
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: current.subject_user_id ? 'pointer' : 'default',
+          fontSize: 12,
+          fontWeight: 600,
+          color: '#0F172A',
+          lineHeight: 1.3,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          letterSpacing: '-0.005em',
+          fontVariantNumeric: 'tabular-nums lining-nums',
+        }}
+        aria-label={current.body}
+      >
+        {current.body}
+      </button>
+      <span
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          color: '#94A3B8',
+          flexShrink: 0,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {formatDispatchTime(current.surfaced_at)}
+      </span>
+      {dispatches.length > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            aria-label="Previous dispatch"
+            style={{
+              width: 16, height: 16, padding: 0, border: 'none',
+              background: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#94A3B8',
+            }}
+          >
+            <ChevronLeft size={12} />
+          </button>
+          <span style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', minWidth: 22, textAlign: 'center' }}>
+            {index + 1}/{dispatches.length}
+          </span>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            aria-label="Next dispatch"
+            style={{
+              width: 16, height: 16, padding: 0, border: 'none',
+              background: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#94A3B8',
+            }}
+          >
+            <ChevronRight size={12} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 
@@ -514,6 +685,17 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     navigate(getProfilePathById(clickedUserId) + '?tab=top100');
   }, [navigate]);
 
+  // ─── Wire ticker dispatches (seasonal mode only) ─────────────────
+  const { data: dispatches } = useChampionshipDispatches({
+    limit: 10,
+    enabled: timeFilter === 'seasonal',
+  });
+
+  const handleDispatchClick = useCallback((dispatch: ChampionshipDispatch) => {
+    if (!dispatch.subject_user_id) return;
+    navigate(getProfilePathById(dispatch.subject_user_id) + '?tab=top100');
+  }, [navigate]);
+
   useEffect(() => {
     if (hasRestoredScroll.current || allEntries.length === 0) return;
     const savedScroll = sessionStorage.getItem(STORAGE_KEY_SCROLL);
@@ -713,6 +895,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           </button>
         ))}
       </div>
+
+      {/* ── 2.5. WIRE TICKER (seasonal only, conditional on dispatches) ── */}
+      {timeFilter === 'seasonal' && dispatches && dispatches.length > 0 && (
+        <WireTicker dispatches={dispatches} onDispatchClick={handleDispatchClick} />
+      )}
 
       {/* ── 3. FRONT-PAGE LEDE ── */}
       {editorialPending ? (
