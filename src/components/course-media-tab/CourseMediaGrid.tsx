@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import { AlertCircle, Camera, Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
@@ -47,7 +47,6 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   courseName,
   courseId,
 }, ref) => {
-  const fullscreenPosts = postsForFullscreen ?? posts;
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -69,34 +68,24 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Sync new posts into fullscreen overlay — use the grouped shape so
-  // SnapFeed receives unique post.id keys (matches the canonical invariant).
-  const isFullscreenOpen = useFullscreenFeedStore(s => s.isOpen);
-  const appendPosts = useFullscreenFeedStore(s => s.appendPosts);
-  const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
-
-  useEffect(() => {
-    if (!isFullscreenOpen) return;
-    if (fullscreenPosts.length > 0) {
-      appendPosts(fullscreenPosts);
-    }
-  }, [fullscreenPosts.length, isFullscreenOpen, appendPosts, fullscreenPosts]);
-
-  // Mirror the hook's pagination state into the store so the overlay's
+  // Mirror the hook's pagination state into the dedicated viewer store so
   // SnapFeed sees fresh hasNextPage / isFetchingNextPage values reactively
   // (not just the snapshot taken at .open() time).
+  const isViewerOpen = useCourseMediaViewerStore(s => s.isOpen);
+  const setPaginationState = useCourseMediaViewerStore(s => s.setPaginationState);
+
   useEffect(() => {
-    if (!isFullscreenOpen) return;
+    if (!isViewerOpen) return;
     setPaginationState({
       hasNextPage: hasNextPage ?? false,
       isFetchingNextPage: isFetchingNextPage ?? false,
     });
-  }, [isFullscreenOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
+  }, [isViewerOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
 
   // Single open-fullscreen entrypoint — wraps the store call with the current
   // pagination callbacks so the overlay can drive `fetchNextPage` itself.
   const handleOpenFullscreen = useCallback((postsToOpen: FeedPost[], index: number) => {
-    useFullscreenFeedStore.getState().open(postsToOpen, index, {
+    useCourseMediaViewerStore.getState().open(postsToOpen, index, {
       hasNextPage: hasNextPage ?? false,
       fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
       isFetchingNextPage: isFetchingNextPage ?? false,
