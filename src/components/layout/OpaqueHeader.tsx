@@ -23,7 +23,7 @@ export const OpaqueHeader: React.FC<OpaqueHeaderProps> = ({
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 flex items-center justify-between h-14 px-4 border-b",
+        "sticky top-0 z-50 flex items-center justify-between min-h-14 px-4 border-b",
         "backdrop-blur-xl",
         className
       )}
