@@ -139,7 +139,11 @@ const Top100Hub = () => {
 
           {/* Tabs: Courses | My Progress */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
-            <TabsList className="flex gap-1 rounded-xl p-1 mb-5 border-0" style={{ background: 'rgba(15,23,42,0.05)' }}>
+            <div
+              className="sticky bg-background"
+              style={{ top: 0, zIndex: 20, paddingTop: 8, paddingBottom: 8 }}
+            >
+            <TabsList className="flex gap-1 rounded-xl p-1 mb-0 border-0" style={{ background: 'rgba(15,23,42,0.05)' }}>
               <TabsTrigger 
                 value="courses" 
                 className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] after:hidden data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none data-[state=active]:font-semibold data-[state=inactive]:font-medium"

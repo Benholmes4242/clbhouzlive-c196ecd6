@@ -485,9 +485,19 @@ const Top100List = () => {
         {/* Ref target for scroll-to-top after pagination */}
         <div ref={listTopRef} />
 
-        {/* 5. Filter Chips */}
+        {/* 5. Filter Chips — sticky */}
         {/* Spacing: Token rail → Filter = 24px */}
-        <div ref={filterRef} className="mt-6">
+        <div
+          ref={filterRef}
+          className="mt-6 sticky bg-background"
+          style={{
+            top: 0,
+            zIndex: 20,
+            paddingTop: 8,
+            paddingBottom: 8,
+            borderBottom: '1px solid hsl(var(--border) / 0.12)',
+          }}
+        >
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={handleFilterChange}

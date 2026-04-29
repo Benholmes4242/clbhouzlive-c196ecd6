@@ -299,15 +299,24 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <SegmentedControl
-            tabs={[
-              { id: 'explore', label: 'Explore' },
-              { id: 'top100', label: 'Top 100' },
-              { id: 'leaderboards', label: 'Rankings' },
-            ]}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
+          <div
+            className="sticky bg-background"
+            style={{
+              top: 0,
+              zIndex: 20,
+              borderBottom: '1px solid hsl(var(--border) / 0.12)',
+            }}
+          >
+            <SegmentedControl
+              tabs={[
+                { id: 'explore', label: 'Explore' },
+                { id: 'top100', label: 'Top 100' },
+                { id: 'leaderboards', label: 'Rankings' },
+              ]}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+          </div>
 
           {/* Rate a Course CTA — slim row, visible on all tabs */}
           {user && (
