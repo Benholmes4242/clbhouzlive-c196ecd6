@@ -176,6 +176,29 @@ interface ChampionshipLeaderboardViewProps {
  * Editorial newspaper layout with masthead, lede, box score, prize/sponsor card,
  * schedule strip, and full standings. All "serif moments" use Geist 900.
  */
+function LedeFactor({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+      gap: 12, padding: '8px 12px', borderRadius: 8,
+      background: 'rgba(15,23,42,0.04)',
+    }}>
+      <span style={{
+        fontSize: 10, fontWeight: 800, color: '#64748B',
+        letterSpacing: '0.12em', textTransform: 'uppercase',
+      }}>
+        {label}
+      </span>
+      <span style={{
+        fontSize: 13, fontWeight: 800, color: '#0F172A',
+        fontVariantNumeric: 'tabular-nums lining-nums',
+      }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
 export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboardViewProps) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
