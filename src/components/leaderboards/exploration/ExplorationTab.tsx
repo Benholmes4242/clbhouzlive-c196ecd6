@@ -71,7 +71,7 @@ function selectGlobalEyebrow(args: {
   defaultEyebrow: string;
 }): string {
   if (!args.isLoggedIn || !args.hasData || args.userRank === null) {
-    return 'LOG A ROUND TO ENTER';
+    return 'RATE A COURSE TO ENTER';
   }
   if (args.isMaxTier) return "YOU'VE REACHED THE SUMMIT";
   if (args.countriesNeeded === 0 && args.continentsNeeded === 0) {
@@ -496,6 +496,11 @@ export function ExplorationTab() {
             label="COUNTRIES"
             value={countriesPlayed > 0 ? String(countriesPlayed) : '—'}
             color={CRIMSON}
+            target={
+              nextTier && countriesPlayed > 0 && countriesPlayed < nextTier.minCountries
+                ? String(nextTier.minCountries)
+                : null
+            }
           />
           <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
           {/* Continents */}
@@ -503,6 +508,11 @@ export function ExplorationTab() {
             label="CONTINENTS"
             value={continentsPlayed > 0 ? String(continentsPlayed) : '—'}
             color={CRIMSON}
+            target={
+              nextTier && continentsPlayed > 0 && continentsPlayed < nextTier.minContinents
+                ? String(nextTier.minContinents)
+                : null
+            }
           />
           <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
           {/* Rank */}
@@ -656,7 +666,7 @@ export function ExplorationTab() {
                 lineHeight: 1.4,
               }}
             >
-              Log your first round to begin your explorer journey.
+              Rate a course to begin your explorer journey.
             </div>
             <button
               onClick={() => navigate('/courses')}
@@ -748,26 +758,32 @@ export function ExplorationTab() {
                 <CountryFlag country={country} size="sm" />
               </div>
             ))}
-            {nextTier && (
-              <div
-                style={{
-                  width: 22,
-                  height: 16,
-                  borderRadius: 2,
-                  background: 'rgba(15,23,42,0.03)',
-                  border: '0.5px dashed rgba(15,23,42,0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 10,
-                  color: HAIRLINE,
-                  fontWeight: 700,
-                }}
-                aria-label="Room to grow"
-              >
-                +
-              </div>
-            )}
+            {nextTier && (() => {
+              const gap = Math.max(0, nextTier.minCountries - countriesPlayed);
+              const slots = Math.min(5, gap);
+              if (slots === 0) return null;
+              return Array.from({ length: slots }).map((_, idx) => (
+                <div
+                  key={`gap-${idx}`}
+                  style={{
+                    width: 22,
+                    height: 16,
+                    borderRadius: 2,
+                    background: 'rgba(15,23,42,0.03)',
+                    border: '0.5px dashed rgba(15,23,42,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 10,
+                    color: HAIRLINE,
+                    fontWeight: 700,
+                  }}
+                  aria-label="Country to unlock"
+                >
+                  +
+                </div>
+              ));
+            })()}
           </div>
         </div>
       )}
@@ -825,7 +841,7 @@ export function ExplorationTab() {
           }}
         >
           {viewMode === 'player'
-            ? 'Ranked by countries explored, then continents, then courses · Updated daily'
+            ? "Compiled from explorers' verified country count · Updated daily"
             : 'Ranked by member count · Updated daily'}
         </div>
       </div>
@@ -837,7 +853,17 @@ export function ExplorationTab() {
 // Sub-components
 // ----------------------------------------------------------------------------
 
-function BoxStat({ label, value, color }: { label: string; value: string; color: string }) {
+function BoxStat({
+  label,
+  value,
+  color,
+  target,
+}: {
+  label: string;
+  value: string;
+  color: string;
+  target?: string | null;
+}) {
   return (
     <div style={{ textAlign: 'center' }}>
       <div
@@ -853,15 +879,38 @@ function BoxStat({ label, value, color }: { label: string; value: string; color:
       </div>
       <div
         style={{
-          fontSize: 28,
-          fontWeight: 900,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-          color,
-          fontVariantNumeric: 'tabular-nums lining-nums',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'center',
+          gap: 4,
         }}
       >
-        {value}
+        <span
+          style={{
+            fontSize: 28,
+            fontWeight: 900,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            color,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {value}
+        </span>
+        {target && (
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: INK_FAINT,
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            → {target}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -1207,9 +1256,24 @@ function PlayerStandings({
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 1 }}>
-                {p.home_club || 'Independent'}
-              </div>
+              {(() => {
+                const isUserClub =
+                  !!userHomeClubName &&
+                  !!p.home_club &&
+                  p.home_club === userHomeClubName &&
+                  !p.is_current_user;
+                return (
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: isUserClub ? HAIRLINE : INK_FAINT,
+                      marginTop: 1,
+                    }}
+                  >
+                    {p.home_club || 'Independent'}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Continents */}
