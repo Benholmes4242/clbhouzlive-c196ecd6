@@ -1,16 +1,17 @@
 /**
- * UnifiedAchievementSheet - World-Class Achievement Bottom Sheet
- * 
- * Single unified structure for ALL achievements (milestone & regional).
- * Uses actual badge images, tier-specific colours, and positive framing.
+ * UnifiedAchievementSheet - World-Class Achievement Bottom Sheet (v3)
+ *
+ * Three modes:
+ *  - 'browse'    : own profile, exploring (default)
+ *  - 'celebrate' : auto-fires on first unlock detection (own profile only)
+ *  - 'peer'      : viewing another user's profile
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { X, ChevronRight, Check } from 'lucide-react';
+import { X, ChevronRight, Share2 } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
-import { CLUB_STEPS } from '@/lib/top100Club';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
 import { getRegionTheme, type Top100ListSlug } from '@/lib/regionTheme';
 import { Button } from '@/components/ui/button';
@@ -18,8 +19,12 @@ import { cn } from '@/lib/utils';
 import { useAchievementUnlock } from '@/hooks/useAchievementUnlock';
 import { AchievementConfetti, getConfettiTheme } from './AchievementConfetti';
 import { haptic } from '@/utils/haptics';
-import { getMilestoneTagline, getRegionalTagline, REGION_FULL_NAMES } from '@/config/achievementTaglines';
-import { MILESTONE_BADGE_IMAGES, REGION_BADGE_IMAGES } from '@/config/badgeImages';
+import {
+  getSheetMilestoneTagline,
+  getSheetRegionalTagline,
+  REGION_FULL_NAMES,
+} from '@/config/achievementTaglines';
+import { MILESTONE_BADGE_IMAGES, REGION_BADGE_IMAGES, MILESTONE_NAMES } from '@/config/badgeImages';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -46,34 +51,36 @@ interface UnifiedAchievementSheetProps {
   isOpen: boolean;
   onClose: () => void;
   data: AchievementData | null;
-  /** First name of the profile user (for contextual taglines) */
+  /** First name of the profile user (used in peer mode) */
   firstName?: string;
   /** Whether viewing own profile (defaults to true) */
   isOwnProfile?: boolean;
+  /**
+   * Display mode. Controls visuals + copy + CTA destination.
+   * Defaults to 'browse'. When 'celebrate', confetti fires once on open.
+   */
+  mode?: 'browse' | 'celebrate' | 'peer';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// REGION COLORS (from brief)
+// REGION COLORS
 // ═══════════════════════════════════════════════════════════════════════════
 
 const REGION_COLORS: Record<Top100ListSlug, string> = {
-  global: '#C9A961',    // Soft gold
-  'gb-i': '#1B4D2E',    // Deep racing green  
-  usa: '#8B3A3A',       // Muted heritage red
-  europe: '#5B6B7C',    // Calm slate-blue
+  global: '#C9A961',
+  'gb-i': '#1B4D2E',
+  usa: '#8B3A3A',
+  europe: '#5B6B7C',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HELPER FUNCTIONS
+// HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
 
 function getMilestoneColor(threshold: number): string {
-  // Always use the tier's own primary colour — both locked and unlocked
   const paletteKey = MILESTONE_PALETTE_MAP[threshold];
-  if (paletteKey) {
-    return CLBHOUZ_ACHIEVEMENT_PALETTE[paletteKey];
-  }
-  return '#A89F91'; // Warm stone fallback
+  if (paletteKey) return CLBHOUZ_ACHIEVEMENT_PALETTE[paletteKey];
+  return '#A89F91';
 }
 
 function getRegionColor(listSlug: Top100ListSlug): string {
@@ -81,34 +88,11 @@ function getRegionColor(listSlug: Top100ListSlug): string {
 }
 
 function getMilestoneName(threshold: number): string {
-  const tierMeta = CLUB_STEPS.find(s => s.threshold === threshold);
-  return tierMeta?.tierName || `${threshold} Club`;
-}
-
-/** Get status text with positive framing for distant milestones */
-function getStatusText(played: number, threshold: number, isUnlocked: boolean): string {
-  if (isUnlocked) return 'Unlocked';
-  
-  const remaining = threshold - played;
-  
-  // Near completion (≤10 away) — urgency framing
-  if (remaining <= 10) return `${remaining} course${remaining === 1 ? '' : 's'} to go`;
-  
-  // Mid-range and far-off — positive framing
-  return `${played} of ${threshold} played`;
-}
-
-/** Get context-specific CTA text */
-function getCtaText(type: string, isUnlocked: boolean, remaining: number): string {
-  if (type === 'regional') return ''; // handled separately per-region
-  
-  if (isUnlocked) return 'View all achievements';
-  if (remaining <= 3) return 'Find your next Top 100 course';
-  return 'Browse Top 100 courses';
+  return MILESTONE_NAMES[threshold] || `${threshold} Club`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ICON DISC COMPONENT — Uses actual badge images
+// ICON DISC — actual badge image, parameterised size
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface IconDiscProps {
@@ -119,26 +103,31 @@ interface IconDiscProps {
   isUnlocked: boolean;
   isAnimating: boolean;
   animationPhase: number;
+  size?: number;
 }
 
-function IconDisc({ type, threshold, regionSlug, color, isUnlocked, isAnimating, animationPhase }: IconDiscProps) {
-  // Get actual badge image
+function IconDisc({
+  type,
+  threshold,
+  regionSlug,
+  color,
+  isUnlocked,
+  isAnimating,
+  animationPhase,
+  size = 96,
+}: IconDiscProps) {
   const badgeImage = type === 'milestone' && threshold
     ? MILESTONE_BADGE_IMAGES[threshold]
     : regionSlug
       ? REGION_BADGE_IMAGES[regionSlug]
       : undefined;
 
-  // Animation: scale from 0.96 → 1 at phase 1
   const scaleValue = isAnimating && animationPhase < 1 ? 0.96 : 1;
   const opacityValue = isAnimating && animationPhase < 1 ? 0.7 : 1;
-
-  // During animation: start muted, transition to filled
   const showFilled = isUnlocked && (!isAnimating || animationPhase >= 2);
 
   return (
-    <div className="flex justify-center mb-5 relative">
-      {/* Ring stroke animation - draws clockwise at phase 3 */}
+    <div className="flex justify-center mb-5 relative" style={{ minHeight: size }}>
       {isAnimating && animationPhase >= 3 && (
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
@@ -146,11 +135,11 @@ function IconDisc({ type, threshold, regionSlug, color, isUnlocked, isAnimating,
           animate={{ opacity: 1 }}
           transition={{ duration: 0.1 }}
         >
-          <svg width="96" height="96" className="absolute">
+          <svg width={size} height={size} className="absolute">
             <motion.circle
-              cx="48"
-              cy="48"
-              r="46"
+              cx={size / 2}
+              cy={size / 2}
+              r={size / 2 - 2}
               fill="none"
               stroke={color}
               strokeWidth="2"
@@ -158,46 +147,35 @@ function IconDisc({ type, threshold, regionSlug, color, isUnlocked, isAnimating,
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              style={{
-                transform: 'rotate(-90deg)',
-                transformOrigin: 'center',
-              }}
+              style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
             />
           </svg>
         </motion.div>
       )}
-      
-      <motion.div 
+
+      <motion.div
         className="flex items-center justify-center"
-        animate={{
-          scale: scaleValue,
-          opacity: opacityValue,
-        }}
+        animate={{ scale: scaleValue, opacity: opacityValue }}
         transition={{ duration: 0.12, ease: 'easeOut' }}
       >
         <motion.div
-          animate={{
-            scale: isAnimating && animationPhase === 2 ? [1, 1.1, 1] : 1,
-          }}
+          animate={{ scale: isAnimating && animationPhase === 2 ? [1, 1.1, 1] : 1 }}
           transition={{ duration: 0.15 }}
         >
           {badgeImage ? (
             <img
               src={badgeImage}
               alt={type === 'milestone' ? getMilestoneName(threshold ?? 0) : (regionSlug ?? 'badge')}
+              style={{ width: size, height: size }}
               className={cn(
-                'w-20 h-24 object-contain drop-shadow-md transition-all duration-200',
-                !showFilled && !isUnlocked && 'opacity-60 grayscale-[40%]'
+                'object-contain drop-shadow-md transition-all duration-200',
+                !showFilled && !isUnlocked && 'opacity-40 grayscale-[40%]'
               )}
             />
           ) : (
-            // Fallback disc (should never appear with correct config)
             <div
-              className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
-              style={{
-                background: 'rgba(255, 255, 255, 0.85)',
-                boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08)',
-              }}
+              style={{ width: size * 0.75, height: size * 0.75 }}
+              className="rounded-full"
             />
           )}
         </motion.div>
@@ -207,44 +185,7 @@ function IconDisc({ type, threshold, regionSlug, color, isUnlocked, isAnimating,
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STATUS PILL COMPONENT — Tier-coloured with positive framing
-// ═══════════════════════════════════════════════════════════════════════════
-
-interface StatusPillProps {
-  isUnlocked: boolean;
-  statusText: string;
-  color: string;
-}
-
-function StatusPill({ isUnlocked, statusText, color }: StatusPillProps) {
-  if (isUnlocked) {
-    return (
-      <div className="flex justify-center mb-5">
-        <span
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium"
-          style={{
-            backgroundColor: `${color}18`,
-            color: color,
-          }}
-        >
-          <Check className="w-3.5 h-3.5" />
-          Unlocked
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex justify-center mb-5">
-      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-        {statusText}
-      </span>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PROGRESS MODULE COMPONENT
+// PROGRESS MODULE — v3: tier-coloured top rule + state label + count + bar
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface ProgressModuleProps {
@@ -255,34 +196,53 @@ interface ProgressModuleProps {
 }
 
 function ProgressModule({ played, total, color, isUnlocked }: ProgressModuleProps) {
-  const displayedPlayed = isUnlocked ? total : played;
-  const progressPercent = total > 0 ? Math.min(100, (displayedPlayed / total) * 100) : 0;
-  
+  const displayedPlayed = played; // lifetime count, no cap
+  const pct = total > 0 ? Math.min(100, (displayedPlayed / total) * 100) : 0;
+
+  const remaining = Math.max(0, total - played);
+  const stateLabel = isUnlocked
+    ? 'Complete'
+    : remaining <= 10
+      ? `${remaining} to go`
+      : 'In progress';
+
+  const topRuleColor = isUnlocked ? color : 'rgba(15,23,42,0.10)';
+  const countColor = isUnlocked ? color : '#0F172A';
+
   return (
-    <div className="rounded-xl border border-border/60 p-4 mb-5 bg-card/50">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-medium text-muted-foreground">Progress</span>
-        <span 
-          className="text-sm font-bold"
-          style={{ color }}
+    <div className="mb-6">
+      <div style={{ height: 2, background: topRuleColor, borderRadius: 1, marginBottom: 12 }} />
+      <div className="flex items-center justify-between mb-2">
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#64748B',
+          }}
         >
-          {displayedPlayed} / {total}
+          {stateLabel}
+        </span>
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: countColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {displayedPlayed} <span style={{ color: '#94A3B8', fontWeight: 600 }}>/ {total}</span>
         </span>
       </div>
-
-      <div className="h-2.5 rounded-full bg-muted overflow-hidden mb-2">
+      <div style={{ height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.06)', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${progressPercent}%` }}
+          animate={{ width: `${pct}%` }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="h-full rounded-full"
-          style={{ backgroundColor: color }}
+          style={{ height: '100%', background: color, borderRadius: 2 }}
         />
       </div>
-
-      <p className="text-xs text-muted-foreground text-center">
-        {isUnlocked ? 'Milestone achieved' : 'Progress in motion'}
-      </p>
     </div>
   );
 }
@@ -297,56 +257,63 @@ export function UnifiedAchievementSheet({
   data,
   firstName,
   isOwnProfile = true,
+  mode,
 }: UnifiedAchievementSheetProps) {
   const navigate = useNavigate();
   const dragControls = useDragControls();
-  
+
   const [animationPhase, setAnimationPhase] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
 
   const isMilestone = data?.type === 'milestone';
-  const identifier = isMilestone 
-    ? (data as MilestoneData)?.threshold 
+  const identifier = isMilestone
+    ? (data as MilestoneData)?.threshold
     : (data as RegionalData)?.listSlug;
-  
-  const played = isMilestone 
+
+  const played = isMilestone
     ? (data as MilestoneData)?.totalPlayed ?? 0
     : (data as RegionalData)?.played ?? 0;
-  const total = isMilestone 
+  const total = isMilestone
     ? (data as MilestoneData)?.threshold ?? 0
     : (data as RegionalData)?.total ?? 0;
   const isUnlocked = played >= total && total > 0;
-  
+
+  // Derive effective mode (default 'browse'; isOwnProfile=false → 'peer')
+  const effectiveMode: 'browse' | 'celebrate' | 'peer' =
+    mode ?? (isOwnProfile === false ? 'peer' : 'browse');
+  const isCelebrate = effectiveMode === 'celebrate';
+  const isPeer = effectiveMode === 'peer';
+
   const unlockState = useAchievementUnlock(
     isMilestone ? 'milestone' : 'regional',
     identifier ?? 0,
     isUnlocked,
     isOpen
   );
-  
+
   const isAnimating = unlockState.shouldAnimate && !unlockState.hasAnimated;
 
+  // Confetti only fires in celebrate mode
   useEffect(() => {
-    if (!isAnimating) {
+    if (!isCelebrate || !isAnimating) {
       setAnimationPhase(0);
       setShowConfetti(false);
       return;
     }
-    
+
+    setShowConfetti(true);
+    haptic('medium');
     const timers: NodeJS.Timeout[] = [];
     timers.push(setTimeout(() => setAnimationPhase(1), 120));
     timers.push(setTimeout(() => setAnimationPhase(2), 240));
     timers.push(setTimeout(() => setAnimationPhase(3), 320));
     timers.push(setTimeout(() => setAnimationPhase(4), 420));
-    timers.push(setTimeout(() => setAnimationPhase(5), 520));
     timers.push(setTimeout(() => {
-      setShowConfetti(true);
-      haptic('medium');
       unlockState.markAnimated();
     }, 600));
-    
+
     return () => { timers.forEach(clearTimeout); };
-  }, [isAnimating, unlockState]);
+  }, [isCelebrate, isAnimating, unlockState]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -357,54 +324,79 @@ export function UnifiedAchievementSheet({
 
   if (!data) return null;
 
-  // Derive all display values
+  // Derive copy + CTA per mode
   let title: string;
-  let purposeSentence: string;
-  let color: string;
-  let regionSlug: Top100ListSlug | undefined;
-  let milestoneThreshold: number | undefined;
+  let tagline: string;
   let primaryCtaLabel: string;
   let primaryCtaAction: () => void;
+  let regionSlug: Top100ListSlug | undefined;
+  let milestoneThreshold: number | undefined;
+
+  const color = isMilestone
+    ? getMilestoneColor((data as MilestoneData).threshold)
+    : getRegionColor((data as RegionalData).listSlug);
 
   if (isMilestone) {
     const { threshold, totalPlayed } = data as MilestoneData;
     milestoneThreshold = threshold;
     title = getMilestoneName(threshold);
-    purposeSentence = getMilestoneTagline(threshold, firstName, isOwnProfile);
-    color = getMilestoneColor(threshold);
-    
-    const remaining = Math.max(0, threshold - totalPlayed);
-    primaryCtaLabel = getCtaText('milestone', isUnlocked, remaining);
-    primaryCtaAction = isUnlocked 
-      ? () => { navigate('/achievements'); onClose(); }
-      : () => { navigate('/top100/global?filter=unplayed'); onClose(); };
+    tagline = getSheetMilestoneTagline(threshold, isUnlocked, effectiveMode, {
+      firstName,
+      played: totalPlayed,
+    });
+
+    if (isPeer) {
+      primaryCtaLabel = 'View your own progress';
+      primaryCtaAction = () => { navigate('/achievements'); onClose(); };
+    } else if (isCelebrate) {
+      primaryCtaLabel = 'Continue';
+      primaryCtaAction = () => { onClose(); };
+    } else if (isUnlocked) {
+      primaryCtaLabel = 'View all achievements';
+      primaryCtaAction = () => { navigate('/achievements'); onClose(); };
+    } else {
+      const remaining = Math.max(0, threshold - totalPlayed);
+      primaryCtaLabel = remaining <= 3 ? 'Find your next course' : 'Browse Top 100';
+      primaryCtaAction = () => { navigate('/top100/global?filter=unplayed'); onClose(); };
+    }
   } else {
     const { listSlug, played: p, total: t } = data as RegionalData;
     regionSlug = listSlug;
     const theme = getRegionTheme(listSlug);
     title = REGION_FULL_NAMES[listSlug] || theme.primaryLabel;
-    purposeSentence = getRegionalTagline(listSlug, firstName, isOwnProfile);
-    color = getRegionColor(listSlug);
-    
-    primaryCtaLabel = `View ${theme.shortName} list`;
-    primaryCtaAction = () => { navigate(`/top100/${listSlug}`); onClose(); };
+    tagline = getSheetRegionalTagline(listSlug, isUnlocked, effectiveMode, {
+      firstName,
+      played: p,
+      total: t,
+    });
+
+    if (isPeer) {
+      primaryCtaLabel = 'View your own progress';
+      primaryCtaAction = () => { navigate('/achievements'); onClose(); };
+    } else if (isCelebrate) {
+      primaryCtaLabel = 'Continue';
+      primaryCtaAction = () => { onClose(); };
+    } else {
+      primaryCtaLabel = `View ${theme.shortName} list`;
+      primaryCtaAction = () => { navigate(`/top100/${listSlug}`); onClose(); };
+    }
   }
 
-  const remaining = Math.max(0, total - played);
-  const statusText = getStatusText(played, total, isUnlocked);
   const confettiTheme = getConfettiTheme(isMilestone ? 'milestone' : 'regional', regionSlug);
+  const taglineItalic = isCelebrate && isUnlocked;
+  const badgeSize = isCelebrate ? 112 : 96;
 
   const content = (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Confetti overlay */}
-          <AchievementConfetti 
-            isActive={showConfetti} 
+          {/* Confetti — only in celebrate mode */}
+          <AchievementConfetti
+            isActive={showConfetti}
             theme={confettiTheme}
             onComplete={() => setShowConfetti(false)}
           />
-          
+
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -423,7 +415,7 @@ export function UnifiedAchievementSheet({
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             drag="y"
             dragControls={dragControls}
-            dragListener={false}
+            dragListener={true}
             dragConstraints={{ top: 0 }}
             dragElastic={0.2}
             onDragEnd={(_, info) => {
@@ -438,27 +430,19 @@ export function UnifiedAchievementSheet({
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
             }}
           >
-            {/* 1. Drag handle */}
-            <div
-              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
-              onPointerDown={(e) => dragControls.start(e)}
-            >
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-            </div>
-
-            {/* Close button — 44px tap target */}
+            {/* Close button — top-right */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.97] transition-transform z-10"
+              className="absolute top-3 right-3 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.97] transition-transform z-10"
               aria-label="Close"
             >
               <X className="w-5 h-5 text-muted-foreground" />
             </button>
 
             {/* Content */}
-            <div className="px-6 pt-2 pb-6">
-              {/* 2. Icon disc — actual badge image */}
-              <IconDisc 
+            <div className="px-6 pt-8 pb-6">
+              {/* Hero badge */}
+              <IconDisc
                 type={isMilestone ? 'milestone' : 'regional'}
                 threshold={milestoneThreshold}
                 regionSlug={regionSlug}
@@ -466,34 +450,35 @@ export function UnifiedAchievementSheet({
                 isUnlocked={isUnlocked}
                 isAnimating={isAnimating}
                 animationPhase={animationPhase}
+                size={badgeSize}
               />
 
-              {/* 3. Title */}
-              <h2 className="text-xl font-bold text-center text-foreground mb-1">
+              {/* Title */}
+              <h2
+                className="text-center text-foreground mb-2"
+                style={{
+                  fontSize: isCelebrate ? 22 : 20,
+                  fontWeight: isCelebrate ? 900 : 800,
+                  letterSpacing: '-0.01em',
+                }}
+              >
                 {title}
               </h2>
 
-              {/* 4. Purpose sentence */}
-              <p className="text-sm text-muted-foreground text-center mb-4">
-                {purposeSentence}
+              {/* Tagline */}
+              <p
+                className="text-center mb-5"
+                style={{
+                  fontSize: 14,
+                  color: '#475569',
+                  fontStyle: taglineItalic ? 'italic' : 'normal',
+                  lineHeight: 1.45,
+                }}
+              >
+                {tagline}
               </p>
 
-              {/* 5. Status pill — tier-coloured, positive framing */}
-              <motion.div
-                animate={isAnimating && animationPhase >= 4 ? {
-                  opacity: [0.5, 1],
-                  scale: [0.95, 1],
-                } : {}}
-                transition={{ duration: 0.15 }}
-              >
-                <StatusPill 
-                  isUnlocked={isUnlocked}
-                  statusText={statusText}
-                  color={color}
-                />
-              </motion.div>
-
-              {/* 6. Progress module */}
+              {/* Progress block */}
               <ProgressModule
                 played={played}
                 total={total}
@@ -501,8 +486,27 @@ export function UnifiedAchievementSheet({
                 isUnlocked={isUnlocked}
               />
 
-              {/* 7. Primary CTA — tier-coloured */}
-              <div className="pb-6">
+              {/* CTAs */}
+              {isCelebrate ? (
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => { onClose(); }}
+                    className="flex-1 rounded-full font-semibold min-h-[44px] active:scale-[0.98] transition-transform"
+                  >
+                    <Share2 className="w-4 h-4 mr-1.5" />
+                    Share
+                  </Button>
+                  <Button
+                    onClick={primaryCtaAction}
+                    className="flex-1 rounded-full font-semibold text-white min-h-[44px] active:scale-[0.98] transition-transform"
+                    style={{ backgroundColor: color }}
+                  >
+                    {primaryCtaLabel}
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              ) : (
                 <Button
                   onClick={primaryCtaAction}
                   className="w-full rounded-full font-medium text-white min-h-[44px] active:scale-[0.98] transition-transform"
@@ -511,7 +515,7 @@ export function UnifiedAchievementSheet({
                   {primaryCtaLabel}
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
-              </div>
+              )}
             </div>
           </motion.div>
         </>
