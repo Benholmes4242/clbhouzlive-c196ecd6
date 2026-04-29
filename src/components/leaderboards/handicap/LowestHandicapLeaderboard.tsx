@@ -1272,6 +1272,7 @@ export function LowestHandicapLeaderboard({
               return (
                 <div
                   key={p.user_id}
+                  data-handicap-user-row={isYou ? 'self' : undefined}
                   onClick={() => handleRowClick(p.user_id)}
                   style={{
                     display: 'grid',
