@@ -298,8 +298,10 @@ export function LowestHandicapLeaderboard({
   // improvement_season > 0 means handicap dropped → improving (green ↓)
   // improvement_season < 0 means handicap rose → drifting (crimson ↑)
   const seasonColour =
-    !seasonHasData || seasonImprovement === 0
-      ? INK
+    !seasonHasData
+      ? INK_FAINT
+      : seasonImprovement === 0
+      ? INK_FAINT
       : seasonImprovement > 0
       ? SUCCESS
       : CRIMSON;
@@ -392,7 +394,7 @@ export function LowestHandicapLeaderboard({
           }}
         >
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: CRIMSON, display: 'inline-block' }} />
-          <span>LIVE · {getMastheadSubtitle(peerGroup, userHomeClubName)}</span>
+          <span>{getMastheadSubtitle(peerGroup, userHomeClubName)}</span>
         </div>
         <h1
           style={{
@@ -497,7 +499,7 @@ export function LowestHandicapLeaderboard({
             }}
           >
             {editorial?.standfirst ??
-              'The clbhouz handicap board tracks every member who plays off a verified index. Rate more rounds to refine yours.'}
+              'The clbhouz handicap board tracks every member who plays off a verified index. Rate more courses to refine yours.'}
           </p>
         </div>
       )}
@@ -599,7 +601,7 @@ export function LowestHandicapLeaderboard({
               {!seasonHasData
                 ? '—'
                 : seasonImprovement === 0
-                ? '—'
+                ? '0.0'
                 : `${seasonArrow}${Math.abs(seasonImprovement).toFixed(1)}`}
             </div>
           </div>
@@ -1097,18 +1099,27 @@ export function LowestHandicapLeaderboard({
                         </span>
                       )}
                     </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: INK_FAINT,
-                        marginTop: 1,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {p.home_club || 'Independent'}
-                    </div>
+                    {(() => {
+                      const isUserClub =
+                        !!userHomeClubName &&
+                        !!p.home_club &&
+                        p.home_club === userHomeClubName &&
+                        !isYou;
+                      return (
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: isUserClub ? HAIRLINE : INK_FAINT,
+                            marginTop: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {p.home_club || 'Independent'}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* TIER */}
