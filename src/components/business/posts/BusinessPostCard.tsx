@@ -362,20 +362,6 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
     }
   }, [mediaItems.length]);
 
-  const handlePrev = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (activeMediaIndex > 0) {
-      scrollToIndex(activeMediaIndex - 1);
-    }
-  }, [activeMediaIndex, scrollToIndex]);
-
-  const handleNext = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (activeMediaIndex < mediaItems.length - 1) {
-      scrollToIndex(activeMediaIndex + 1);
-    }
-  }, [activeMediaIndex, mediaItems.length, scrollToIndex]);
-
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
   }, []);
