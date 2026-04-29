@@ -192,7 +192,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </button>
         ) : (
           user.avatarUrl ? (
-            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} />
+            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} thinRing />
           ) : (
             <div
               style={{
