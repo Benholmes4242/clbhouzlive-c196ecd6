@@ -893,7 +893,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {/* Division sub-filter */}
         {arenaMode === 'division' && (
           <div
-            className="clbhouz-no-scrollbar"
+            className="no-scrollbar"
             style={{
               display: 'flex', gap: 4, marginBottom: 10, marginTop: 8,
               overflowX: 'auto', WebkitOverflowScrolling: 'touch',
