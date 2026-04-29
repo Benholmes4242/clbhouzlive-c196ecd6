@@ -66,59 +66,68 @@ export default function ClipsSubpage() {
   return (
     <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
-        {/* ── Editorial header ── */}
+        {/* ── Editorial header (sticky) ── */}
         <div
+          className="sticky"
           style={{
-            padding: '14px 16px 0',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 12,
+            top: 0,
+            zIndex: 20,
             background: CREAM,
+            borderBottom: '1px solid hsl(var(--border) / 0.12)',
           }}
         >
-          <button
-            onClick={() => navigate(-1)}
-            className="active:scale-[0.97] transition-transform"
+          <div
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: 'rgba(15,23,42,0.06)',
-              border: 'none',
+              padding: '14px 16px 12px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              marginTop: 2,
+              alignItems: 'flex-start',
+              gap: 12,
             }}
-            aria-label="Back"
           >
-            <ChevronLeft size={20} color="#0F172A" />
-          </button>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <Kicker color="amber">Short-form</Kicker>
-            <h1
+            <button
+              onClick={() => navigate(-1)}
+              className="active:scale-[0.97] transition-transform"
               style={{
-                fontSize: 22,
-                fontWeight: 900,
-                letterSpacing: '-0.02em',
-                color: '#0F172A',
-                lineHeight: 1.05,
-                margin: 0,
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: 'rgba(15,23,42,0.06)',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: 2,
               }}
+              aria-label="Back"
             >
-              Clips
-            </h1>
-            <p
-              style={{
-                fontSize: 12,
-                color: 'rgba(15,23,42,0.55)',
-                margin: '4px 0 12px',
-                fontWeight: 500,
-              }}
-            >
-              Quick golf moments, all under 90 seconds
-            </p>
+              <ChevronLeft size={20} color="#0F172A" />
+            </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Kicker color="amber">Short-form</Kicker>
+              <h1
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  letterSpacing: '-0.02em',
+                  color: '#0F172A',
+                  lineHeight: 1.05,
+                  margin: 0,
+                }}
+              >
+                Clips
+              </h1>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: 'rgba(15,23,42,0.55)',
+                  margin: '4px 0 0',
+                  fontWeight: 500,
+                }}
+              >
+                Quick golf moments, all under 90 seconds
+              </p>
+            </div>
           </div>
         </div>
 
