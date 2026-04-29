@@ -186,10 +186,30 @@ const HeroCardMedia: React.FC<ExtendedCardMediaProps> = memo(({
         />
       </div>
       
-      {/* Hero badge indicator */}
+      {/* Hero badge indicator — matches Explore "Featured" pill (angled, dark blur) */}
       {showFeaturedBadge && (
-        <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-sq-xs">
-          <span className="text-base font-medium text-white">Featured</span>
+        <div className="absolute top-3 left-3 z-20">
+          <span
+            style={{
+              display: 'inline-block',
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: '#FFFFFF',
+              background: 'rgba(0, 0, 0, 0.28)',
+              backdropFilter: 'blur(22px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+              padding: '4px 10px',
+              borderRadius: 4,
+              transform: 'rotate(-6deg)',
+              transformOrigin: 'left center',
+            }}
+          >
+            Featured
+          </span>
         </div>
       )}
     </div>
