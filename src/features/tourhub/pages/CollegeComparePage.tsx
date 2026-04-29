@@ -1,17 +1,33 @@
+import { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Search, X } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
+import { useCollegeSearch } from '../hooks/useCollegeStats';
+import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { PlayerInitialAvatar } from '../components/shared/PlayerInitialAvatar';
+
+/**
+ * Convert "northwestern" or "wake-forest" → "Northwestern" / "Wake Forest"
+ * Used when collegeMap isn't loaded yet.
+ */
+function formatCollegeName(normalizedName: string): string {
+  return normalizedName
+    .split('-')
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
 
 /**
  * College Compare Page - Side-by-side comparison of two colleges.
  * Route: /tourhub/college-golf/compare?c1=<slug>&c2=<slug>
  */
 export function CollegeComparePage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const c1 = searchParams.get('c1') || '';
   const c2 = searchParams.get('c2') || '';
@@ -19,6 +35,29 @@ export function CollegeComparePage() {
   const { data, isLoading, error } = useCollegeCompare(c1, c2);
 
   const hasValidParams = c1 && c2;
+
+  // ── Picker state (active when c1 set but c2 missing, or both missing) ──
+  const [pickerInput, setPickerInput] = useState('');
+  const debouncedPickerInput = useDebouncedValue(pickerInput, 200);
+  const showPickerResults = debouncedPickerInput.length >= 2;
+  const { data: pickerResults, isLoading: pickerLoading } = useCollegeSearch(
+    showPickerResults ? debouncedPickerInput : ''
+  );
+  const { data: collegeMap } = useCollegeMediaMap();
+
+  const c1DisplayName =
+    collegeMap?.get(c1)?.short_name ||
+    collegeMap?.get(c1)?.college_name ||
+    (c1 ? formatCollegeName(c1) : '');
+
+  const handlePickCollege = (normalizedName: string) => {
+    if (!c1) {
+      setSearchParams({ c1: normalizedName }, { replace: false });
+    } else {
+      setSearchParams({ c1, c2: normalizedName }, { replace: false });
+    }
+    setPickerInput('');
+  };
 
   return (
     <TourHubShell immersive>
