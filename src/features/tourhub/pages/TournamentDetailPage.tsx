@@ -393,8 +393,9 @@ export function TournamentDetailPage() {
 
         {/* STICKY HEADER — ← Back | underline tabs */}
         <div
-          className="sticky top-0 z-20"
+          className="sticky z-20"
           style={{
+            top: 'var(--sat)',
             background: 'rgba(248,250,252,0.97)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',

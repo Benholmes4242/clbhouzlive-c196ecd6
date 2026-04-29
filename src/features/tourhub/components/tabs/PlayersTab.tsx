@@ -763,13 +763,13 @@ export function PlayersTab() {
           STICKY HEADER — back link · sort · search
           ══════════════════════════════════════════════ */}
       <div
-        className="sticky top-0 z-20"
+        className="sticky z-20"
         style={{
+          top: 'var(--sat)',
           background: 'rgba(248,250,252,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-          
         }}
       >
         {/* Top collapsible search removed — search now lives inline replacing the count bar (Phase 1 fix.1.7) */}
