@@ -1181,6 +1181,69 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           title={season.sponsor_name || 'Sponsor'}
         />
       )}
+
+      {/* Lede explainer sheet */}
+      <BottomSheet
+        open={showLedeInfoSheet}
+        onClose={() => setShowLedeInfoSheet(false)}
+        zIndexBase={1500}
+        className="!rounded-t-[24px]"
+        style={{ background: '#fff' }}
+      >
+        <div style={{ padding: '12px 20px 28px', background: '#fff' }}>
+          <div style={{
+            width: 36, height: 4, borderRadius: 999,
+            background: 'rgba(15,23,42,0.18)',
+            margin: '0 auto 16px',
+          }} />
+          <div style={{
+            fontSize: 18, fontWeight: 900, color: '#0F172A',
+            letterSpacing: '-0.01em', marginBottom: 8,
+          }}>
+            Why this headline
+          </div>
+          <p style={{
+            fontSize: 13, color: '#64748B', lineHeight: 1.55, margin: 0,
+            marginBottom: 16,
+          }}>
+            Our editorial AI tailors the headline to your position in the standings, the season's pace, and how your week is going.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {currentUserEntry?.current_rank != null && (
+              <LedeFactor
+                label="Your rank"
+                value={`#${currentUserEntry.current_rank}`}
+              />
+            )}
+            {timeFilter === 'seasonal' && season && daysRemaining > 0 && (
+              <LedeFactor
+                label="Days remaining"
+                value={`${daysRemaining}d`}
+              />
+            )}
+            {currentUserEntry?.rank_movement != null && currentUserEntry.rank_movement !== 0 && (
+              <LedeFactor
+                label="Weekly movement"
+                value={
+                  currentUserEntry.rank_movement > 0
+                    ? `Up ${currentUserEntry.rank_movement} this week`
+                    : `Down ${Math.abs(currentUserEntry.rank_movement)} this week`
+                }
+              />
+            )}
+          </div>
+
+          <div style={{
+            marginTop: 16, paddingTop: 12,
+            borderTop: '1px solid rgba(15,23,42,0.08)',
+            fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em',
+            fontStyle: 'italic', textAlign: 'center',
+          }}>
+            Headline by Editorial AI · Updated daily
+          </div>
+        </div>
+      </BottomSheet>
     </div>
   );
 }
