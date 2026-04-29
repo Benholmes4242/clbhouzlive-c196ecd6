@@ -285,7 +285,7 @@ const CourseExplorer = () => {
     return '';
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
-  const [sortOption, setSortOption] = useState<SortOption>('official_rating');
+  const [sortOption, setSortOption] = useState<SortOption>('community_rating');
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Sticky filter bar elevation on scroll.
