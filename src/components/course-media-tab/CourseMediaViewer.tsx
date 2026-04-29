@@ -20,7 +20,7 @@ import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
-import { getProfilePathById } from '@/lib/profileRoutes';
+import { getActorRouteByType } from '@/types/actor';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
@@ -137,7 +137,7 @@ export function CourseMediaViewer() {
   const handleViewProfile = () => {
     if (!activePost) return;
     close();
-    navigate(getProfilePathById(activePost.userId));
+    navigate(getActorRouteByType(activePost.actorType, activePost.actorId));
   };
 
   const handleReviewTap = () => {
