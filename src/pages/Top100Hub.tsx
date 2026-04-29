@@ -159,6 +159,7 @@ const Top100Hub = () => {
                 My Progress
               </TabsTrigger>
             </TabsList>
+            </div>
 
             <TabsContent value="courses" className="mt-0">
               {/* Editorial header — mirrors Explore + My Progress patterns */}
