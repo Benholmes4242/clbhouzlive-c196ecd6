@@ -135,6 +135,47 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
 
+  // ── Celebrate-mode auto-detection (own profile only) ─────────────────────
+  // Detects newly-unlocked achievements and opens the unified sheet in celebrate mode.
+  // Uses the same `clbhouz_unlocked_achievements` localStorage key as useAchievementUnlock,
+  // so dismissal (which calls markAnimated) prevents re-fires.
+  useEffect(() => {
+    if (!isOwnProfile) return;
+    if (totalPlayed === 0 && regionProgress.length === 0) return;
+    if (celebrateData) return;
+
+    let stored: { milestones: number[]; regional: string[] };
+    try {
+      const raw = localStorage.getItem('clbhouz_unlocked_achievements');
+      stored = raw ? JSON.parse(raw) : { milestones: [], regional: [] };
+    } catch {
+      stored = { milestones: [], regional: [] };
+    }
+
+    // Highest unseen milestone first
+    const sortedSteps = [...CLUB_STEPS].sort((a, b) => b.threshold - a.threshold);
+    for (const step of sortedSteps) {
+      if (totalPlayed >= step.threshold && !stored.milestones.includes(step.threshold)) {
+        setCelebrateData({ type: 'milestone', threshold: step.threshold, totalPlayed });
+        return;
+      }
+    }
+
+    // Then regional unlocks
+    for (const region of regionProgress) {
+      if (region.played >= region.total && region.total > 0 && !stored.regional.includes(region.id)) {
+        setCelebrateData({
+          type: 'regional',
+          listSlug: region.id as 'gb-i' | 'europe' | 'usa' | 'global',
+          played: region.played,
+          total: region.total,
+        });
+        return;
+      }
+    }
+  }, [isOwnProfile, totalPlayed, regionProgress, celebrateData]);
+
+
   // Quest onboarding state
   const onboarding = useQuestOnboarding(totalPlayed);
   const [showJourneyHint, setShowJourneyHint] = useState(false);
