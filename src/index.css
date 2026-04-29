@@ -4444,3 +4444,9 @@ em-emoji-picker input:focus {
   opacity: 0;
   transition: opacity 200ms ease;
 }
+
+/* Championship wire ticker live indicator pulse */
+@keyframes wirePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(1.15); }
+}
