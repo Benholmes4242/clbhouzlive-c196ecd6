@@ -427,7 +427,7 @@ function ProfileHubSheet({
 
               {/* ── Quick actions — 3 column grid ── */}
               <div className="grid grid-cols-3 gap-2 py-4">
-                {quickActions.map(({ emoji, label, route, badge, badgeColor }) => (
+                {quickActions.map(({ Icon, iconColor, label, route, badge, badgeColor }) => (
                     <button
                       key={label}
                       type="button"
