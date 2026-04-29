@@ -411,33 +411,31 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         )}
       </div>
 
-      {/* Region List Sheet */}
-      <RegionListSheet
-        region={selectedRegion ? {
-          id: selectedRegion.id,
-          name: selectedRegion.name,
-          shortName: selectedRegion.shortName,
-          played: selectedRegion.played,
-          total: selectedRegion.total,
-        } : null}
-        onClose={() => setSelectedRegion(null)}
-      />
-
+      {/* Tap-to-explore sheet (browse / peer mode) */}
       <UnifiedAchievementSheet
         isOpen={!!achievementData}
         onClose={() => setAchievementData(null)}
         data={achievementData}
         firstName={profileFirstName}
         isOwnProfile={isOwnProfile}
+        mode={isOwnProfile ? 'browse' : 'peer'}
       />
 
-      {/* Milestone Unlock Sheet */}
-      <MilestoneUnlockSheet totalPlayed={totalPlayed} isOwnProfile={isOwnProfile} firstName={profileFirstName} />
+      {/* Auto-fire celebrate sheet — own profile only */}
+      {isOwnProfile && (
+        <UnifiedAchievementSheet
+          isOpen={!!celebrateData}
+          onClose={() => setCelebrateData(null)}
+          data={celebrateData}
+          firstName={undefined}
+          isOwnProfile={true}
+          mode="celebrate"
+        />
+      )}
 
-
-      {/* First Course Celebration Sheet */}
+      {/* First Course Celebration Sheet — gated on isOwnProfile */}
       <QuestFirstCourseSheet
-        open={onboarding.shouldShowFirstCourse}
+        open={isOwnProfile && onboarding.shouldShowFirstCourse}
         onClose={onboarding.markFirstCourseSeen}
       />
     </PageRoot>
