@@ -62,7 +62,6 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                 borderRadius: 1,
                 overflow: 'hidden',
                 background: 'rgba(255, 255, 255, 0.22)',
-                boxShadow: '0 1px 1px rgba(0,0,0,0.25)',
               }}
             >
               <div
@@ -73,9 +72,6 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
                   background: isCurrent
                     ? '#ffffff'
                     : 'rgba(255, 255, 255, 0.7)',
-                  boxShadow: isCurrent
-                    ? '0 0 6px rgba(255,255,255,0.5)'
-                    : undefined,
                   transition: 'width 320ms cubic-bezier(0.22,0.61,0.36,1)',
                 }}
               />
