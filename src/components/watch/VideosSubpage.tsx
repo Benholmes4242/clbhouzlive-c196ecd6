@@ -59,86 +59,96 @@ export default function VideosSubpage() {
   return (
     <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
-        {/* Editorial header */}
+        {/* ── Editorial header + search bar (combined sticky chrome) ── */}
         <div
+          className="sticky"
           style={{
-            padding: '14px 16px 0',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 12,
+            top: 0,
+            zIndex: 20,
             background: CREAM,
+            borderBottom: '1px solid hsl(var(--border) / 0.12)',
           }}
         >
-          <button
-            onClick={() => navigate(-1)}
-            className="active:scale-[0.97] transition-transform"
+          {/* Editorial header */}
+          <div
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: 'rgba(15,23,42,0.06)',
-              border: 'none',
+              padding: '14px 16px 0',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              marginTop: 2,
+              alignItems: 'flex-start',
+              gap: 12,
             }}
-            aria-label="Back"
           >
-            <ChevronLeft size={20} color="#0F172A" />
-          </button>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <Kicker color="amber">Long-form</Kicker>
-            <h1
+            <button
+              onClick={() => navigate(-1)}
+              className="active:scale-[0.97] transition-transform"
               style={{
-                fontSize: 22,
-                fontWeight: 900,
-                letterSpacing: '-0.02em',
-                color: '#0F172A',
-                lineHeight: 1.05,
-                margin: 0,
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: 'rgba(15,23,42,0.06)',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: 2,
               }}
+              aria-label="Back"
             >
-              Videos
-            </h1>
-            <p
-              style={{
-                fontSize: 12,
-                color: 'rgba(15,23,42,0.55)',
-                margin: '4px 0 0',
-                fontWeight: 500,
-              }}
-            >
-              Course vlogs, coaching, tournament recaps
-            </p>
+              <ChevronLeft size={20} color="#0F172A" />
+            </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Kicker color="amber">Long-form</Kicker>
+              <h1
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  letterSpacing: '-0.02em',
+                  color: '#0F172A',
+                  lineHeight: 1.05,
+                  margin: 0,
+                }}
+              >
+                Videos
+              </h1>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: 'rgba(15,23,42,0.55)',
+                  margin: '4px 0 0',
+                  fontWeight: 500,
+                }}
+              >
+                Course vlogs, coaching, tournament recaps
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Search bar */}
-        <div style={{ padding: '14px 16px 4px', background: CREAM }}>
-          <button
-            type="button"
-            onClick={() => setIsSearchOpen(true)}
-            className="active:scale-[0.99] transition-transform"
-            style={{
-              width: '100%',
-              background: 'rgba(15,23,42,0.05)',
-              borderRadius: 999,
-              padding: '10px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              border: 'none',
-              cursor: 'pointer',
-            }}
-            aria-label="Search videos"
-          >
-            <Search size={15} color="rgba(15,23,42,0.55)" />
-            <span style={{ fontSize: 13, color: 'rgba(15,23,42,0.55)', fontWeight: 500 }}>
-              Search videos by course, creator, topic…
-            </span>
-          </button>
+          {/* Search bar */}
+          <div style={{ padding: '14px 16px 12px' }}>
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              className="active:scale-[0.99] transition-transform"
+              style={{
+                width: '100%',
+                background: 'rgba(15,23,42,0.05)',
+                borderRadius: 999,
+                padding: '10px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              aria-label="Search videos"
+            >
+              <Search size={15} color="rgba(15,23,42,0.55)" />
+              <span style={{ fontSize: 13, color: 'rgba(15,23,42,0.55)', fontWeight: 500 }}>
+                Search videos by course, creator, topic…
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Mood chips */}

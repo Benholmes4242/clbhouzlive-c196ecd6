@@ -27,10 +27,8 @@ function ExploreHeaderInner({
     <div
       className="sticky z-20 pb-0 pt-0 px-0"
       style={{
-        top: embedded ? 0 : 0,
+        top: embedded ? '45px' : 0,
         background: 'rgba(248,250,252,0.97)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
         borderBottom: '0.5px solid rgba(15,23,42,0.08)',
         ...(!embedded && { paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }),
       }}
