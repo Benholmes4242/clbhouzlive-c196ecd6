@@ -288,13 +288,116 @@ export function CollegeComparePage() {
         {/* ── CONTENT ── */}
         <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
           {!hasValidParams ? (
-            <div style={{ textAlign: 'center' as const, padding: '48px 20px' }}>
-              <button
-                onClick={() => navigate('/tourhub/college-golf')}
-                style={{ fontSize: '15px', fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                Browse colleges
-              </button>
+            <div style={{ padding: '20px' }}>
+              {/* Heading */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 6 }}>
+                  Step {c1 ? '2' : '1'} of 2
+                </div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+                  {c1
+                    ? `Pick a college to compare against ${c1DisplayName}`
+                    : 'Pick two colleges to compare'}
+                </div>
+              </div>
+
+              {/* Search input */}
+              <div style={{ position: 'relative' as const, marginBottom: 16 }}>
+                <Search
+                  size={18}
+                  style={{ position: 'absolute' as const, left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(15,23,42,0.4)' }}
+                />
+                <input
+                  type="text"
+                  value={pickerInput}
+                  onChange={e => setPickerInput(e.target.value)}
+                  placeholder="Search colleges…"
+                  autoFocus
+                  style={{
+                    width: '100%', height: 48, padding: '0 40px 0 44px',
+                    background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
+                    borderRadius: 12, fontSize: 15, fontWeight: 500, color: '#0F172A',
+                    outline: 'none',
+                  }}
+                />
+                {pickerInput && (
+                  <button
+                    onClick={() => setPickerInput('')}
+                    style={{
+                      position: 'absolute' as const, right: 10, top: '50%', transform: 'translateY(-50%)',
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: 'rgba(15,23,42,0.06)', border: 'none',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}
+                    aria-label="Clear search"
+                  >
+                    <X size={14} color="#0F172A" />
+                  </button>
+                )}
+              </div>
+
+              {/* Results */}
+              {!showPickerResults ? (
+                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: 'rgba(15,23,42,0.45)', fontWeight: 500 }}>
+                  Start typing to find a college
+                </div>
+              ) : pickerLoading ? (
+                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="animate-pulse" style={{ height: 60, borderRadius: 12, background: 'rgba(15,23,42,0.05)' }} />
+                  ))}
+                </div>
+              ) : pickerResults && pickerResults.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+                  {pickerResults
+                    .filter(stats => stats.normalized_name !== c1)
+                    .map(stats => {
+                      const college = collegeMap?.get(stats.normalized_name) || null;
+                      const displayName = college?.short_name || college?.college_name || formatCollegeName(stats.normalized_name);
+                      const logoUrl = getCollegeLogoUrl(college?.college_name || displayName);
+                      const earnings = (stats as any).season_earnings ?? (stats as any).earnings_total ?? 0;
+                      return (
+                        <button
+                          key={stats.normalized_name}
+                          onClick={() => handlePickCollege(stats.normalized_name)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 12,
+                            width: '100%', padding: 12,
+                            background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
+                            borderRadius: 12, cursor: 'pointer', textAlign: 'left' as const,
+                          }}
+                          className="active:scale-[0.98] transition-transform"
+                        >
+                          <PlayerInitialAvatar
+                            name={displayName}
+                            src={logoUrl}
+                            size={40}
+                            radius={9}
+                            paletteSeed={stats.normalized_name}
+                            imageScale={0.78}
+                          />
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                              {displayName}
+                            </div>
+                            {earnings > 0 && (
+                              <div style={{ fontSize: 12, color: 'rgba(15,23,42,0.5)', fontWeight: 500, marginTop: 2 }}>
+                                {earnings >= 1_000_000
+                                  ? `$${(earnings / 1_000_000).toFixed(1)}M season`
+                                  : `${formatCurrency(earnings)} season`}
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: 'rgba(15,23,42,0.45)', fontWeight: 500 }}>
+                  No colleges found matching "{debouncedPickerInput}"
+                </div>
+              )}
             </div>
           ) : isLoading ? (
             <div style={{ marginTop: '8px' }}>
