@@ -67,9 +67,11 @@ export function useUserChampionshipStatus(userId?: string) {
         division_color: status.division_ring_color,
         zone: toZone(status.zone_type),
         courses_to_next_division: status.courses_to_promotion,
+        next_division_name: status.next_division_name ?? null,
         days_remaining: status.days_remaining,
         streak_current: status.active_streak_days,
         streak_best: status.longest_streak_this_season,
+        best_rank_this_season: status.best_rank_this_season ?? 0,
         closest_rival: status.closest_rival_name ? {
           user_id: '', // Not provided by RPC
           display_name: status.closest_rival_name,
