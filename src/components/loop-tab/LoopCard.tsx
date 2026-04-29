@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, Share2, MapPin, Star, X } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -255,7 +256,7 @@ export const LoopCard = React.memo(function LoopCard({
                 border: '0.5px solid rgba(255,255,255,0.15)',
               }}
             >
-              <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+              <img src={clbhouzLogo} alt="" className="h-3 w-3 object-contain" />
               <span className="text-[12px] font-semibold text-white">
                 {post.review.rating.toFixed(1)}
               </span>
@@ -393,7 +394,7 @@ export const LoopCard = React.memo(function LoopCard({
                 }}
                 aria-label={`Network average rating ${networkRatingAvg} from ${networkRatingCount} friends`}
               >
-                <Star className="h-3 w-3" style={{ color: '#F7931E', fill: '#F7931E' }} />
+                <img src={clbhouzLogo} alt="" className="h-3 w-3 object-contain" />
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#c97a10' }}>
                   {networkRatingAvg?.toFixed(1)}
                 </span>
