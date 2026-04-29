@@ -1137,6 +1137,40 @@ export function ExplorationTab() {
             : 'Ranked by member count · Updated daily'}
         </div>
       </div>
+
+      {/* Jump-to-position pill — visible only when user's row is offscreen */}
+      {userRowOffscreen && userVisibleRank !== null && (
+        <button
+          onClick={handleJumpToUser}
+          style={{
+            position: 'fixed',
+            right: 16,
+            bottom: 96,
+            zIndex: 50,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 12px',
+            borderRadius: 14,
+            background: INK,
+            color: '#fff',
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            boxShadow: '0 6px 18px rgba(15,23,42,0.28)',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+          aria-label={`Jump to your row, rank ${userVisibleRank}`}
+        >
+          <span aria-hidden="true" style={{ fontSize: 13, lineHeight: 1 }}>
+            {userRowDirection === 'above' ? '↑' : '↓'}
+          </span>
+          You · #{userVisibleRank}
+        </button>
+      )}
     </div>
   );
 }
@@ -1451,6 +1485,7 @@ function PlayerStandings({
         return (
           <div
             key={p.user_id}
+            data-user-row={isYou ? 'self' : undefined}
             onClick={() => {
               onRowClick();
               navigate(getProfilePathById(p.user_id));
