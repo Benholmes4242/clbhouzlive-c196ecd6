@@ -534,15 +534,14 @@ export function CoursesLeaderboardView() {
             }}
           >
             <div style={{
-              height: 160,
+              height: 140,
               background: spotlight.image_url
                 ? `linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.7) 100%), url(${spotlight.image_url}) center/cover`
                 : 'linear-gradient(180deg, #2d5a3d, #1a3d2e)',
               position: 'relative',
-              borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}>
               <div style={{
-                position: 'absolute', top: 12, left: 12,
+                position: 'absolute', top: 22, left: 12,
                 fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
                 background: 'rgba(0,0,0,0.4)',
                 padding: '4px 8px', borderRadius: 2,
@@ -556,14 +555,14 @@ export function CoursesLeaderboardView() {
                 THIS SEASON'S HOTTEST
               </div>
             </div>
-            <div style={{ padding: '14px 18px' }}>
+            <div style={{ padding: '12px 18px 13px' }}>
               <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 4 }}>
                 {spotlight.course_name}
               </div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginBottom: 14 }}>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginBottom: 12 }}>
                 {[spotlight.city, spotlight.country].filter(Boolean).join(', ')}
               </div>
-              <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+              <div style={{ display: 'flex', gap: 16, paddingTop: 9, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
                 <div>
                   <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
                     RATING
