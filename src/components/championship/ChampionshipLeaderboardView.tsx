@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, RefreshCw, WifiOff } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 import {
@@ -201,6 +202,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   });
 
   const [showSponsorSheet, setShowSponsorSheet] = useState(false);
+  const [showLedeInfoSheet, setShowLedeInfoSheet] = useState(false);
   const [userCountry, setUserCountry] = useState<string | null>(null);
 
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
