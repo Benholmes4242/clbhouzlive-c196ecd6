@@ -445,11 +445,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [hasNextPage, fetchNextPage]);
 
   // ─── Arena tabs config ───────────────────────────────────────────
-  const arenas: { key: ChampionshipArenaMode; label: string }[] = [
+  const totalCount = leaderboardData?.pages?.[0]?.total_count ?? null;
+
+  const arenas: { key: ChampionshipArenaMode; label: string; count?: number | null }[] = [
     { key: 'global', label: 'Global' },
     { key: 'division', label: 'Division' },
-    { key: 'friends', label: 'Friends' },
-    { key: 'club', label: 'Club' },
+    { key: 'friends', label: 'Friends', count: arenaMode === 'friends' ? totalCount : null },
+    { key: 'club', label: 'Club', count: arenaMode === 'club' ? totalCount : null },
     { key: 'country', label: 'Country' },
   ];
 
@@ -464,6 +466,39 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     { key: 'legendary', label: 'Legendary' },
     { key: 'grandslam', label: 'Grand Slam' },
   ];
+
+  // ─── Filter reset / active state ─────────────────────────────────
+  const handleResetFilters = useCallback(() => {
+    setArenaMode('global');
+    setDivisionFilter('all');
+    setSelectedClubId(null);
+    setSelectedClubName(null);
+    setSelectedCountry(null);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY_FILTERS);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const hasActiveFilters = useMemo(() => {
+    return arenaMode !== 'global'
+      || divisionFilter !== 'all'
+      || selectedClubId !== null
+      || selectedCountry !== null;
+  }, [arenaMode, divisionFilter, selectedClubId, selectedCountry]);
+
+  const activeFilterLabel = useMemo(() => {
+    const parts: string[] = [];
+    if (arenaMode === 'friends') parts.push('Friends');
+    if (arenaMode === 'club' && selectedClubName) parts.push(selectedClubName);
+    if (arenaMode === 'country' && selectedCountry) parts.push(selectedCountry);
+    if (divisionFilter !== 'all') {
+      const div = divisionChips.find((d) => d.key === divisionFilter);
+      if (div) parts.push(div.label);
+    }
+    return parts.join(' · ');
+  }, [arenaMode, divisionFilter, selectedClubName, selectedCountry, divisionChips]);
 
   // ─── Render ──────────────────────────────────────────────────────
   return (
