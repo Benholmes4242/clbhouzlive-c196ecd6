@@ -404,6 +404,71 @@ export function LowestHandicapLeaderboard({
     return () => observer.disconnect();
   }, [peerGroup, lowestQuery.hasNextPage, lowestQuery.fetchNextPage]);
 
+  // ── Closest rival ahead (for chase panel P2) ───────────────────────────
+  const closestRivalAhead = useMemo(() => {
+    if (!user || !displayEntries.length) return null;
+    const userIdx = displayEntries.findIndex((e) => e.is_current_user);
+    if (userIdx <= 0) return null;
+    const rival = displayEntries[userIdx - 1];
+    const me = displayEntries[userIdx];
+    if (!rival || !me) return null;
+    const gap = me.handicap_index - rival.handicap_index;
+    if (gap <= 0) return null;
+    return {
+      name: rival.display_name || rival.username || 'A rival',
+      gap,
+    };
+  }, [user, displayEntries]);
+
+  const chaseStatements = useMemo<HandicapChaseStatement[]>(() => {
+    if (!user) return [];
+    if (peerGroup !== 'top100') return [];
+    if (userHandicap === null || userTier === null) return [];
+    return buildHandicapChaseStatements({
+      userHandicap,
+      userTier,
+      trajectoryBest: trajectory?.best ?? null,
+      yoyImprovement: trajectory?.yoy_improvement ?? null,
+      closestRivalAhead,
+    });
+  }, [user, peerGroup, userHandicap, userTier, trajectory?.best, trajectory?.yoy_improvement, closestRivalAhead]);
+
+  // ── Jump-to-position pill (top100 only) ────────────────────────────────
+  const [userRowOffscreen, setUserRowOffscreen] = useState(false);
+  const [userRowDirection, setUserRowDirection] = useState<'above' | 'below'>('below');
+
+  useEffect(() => {
+    if (peerGroup !== 'top100') {
+      setUserRowOffscreen(false);
+      return;
+    }
+    const el = document.querySelector('[data-handicap-user-row="self"]') as HTMLElement | null;
+    if (!el) {
+      setUserRowOffscreen(false);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setUserRowOffscreen(false);
+        } else {
+          setUserRowOffscreen(true);
+          const rect = entry.boundingClientRect;
+          setUserRowDirection(rect.top < 0 ? 'above' : 'below');
+        }
+      },
+      { threshold: 0, rootMargin: '0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [peerGroup, displayEntries.length]);
+
+  const handleJumpToUser = useCallback(() => {
+    const el = document.querySelector('[data-handicap-user-row="self"]') as HTMLElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
+
   // ── Row click handler ──────────────────────────────────────────────────
   const handleRowClick = useCallback(
     (userId: string) => {
