@@ -176,6 +176,97 @@ interface ChampionshipLeaderboardViewProps {
  * Editorial newspaper layout with masthead, lede, box score, prize/sponsor card,
  * schedule strip, and full standings. All "serif moments" use Geist 900.
  */
+interface ChaseStatement {
+  priority: number;
+  text: string;
+  emphasis?: 'positive' | 'negative' | 'neutral';
+}
+
+interface ChaseStatementsArgs {
+  currentRank: number;
+  rankMovementWeekly: number;
+  daysRemaining: number;
+  closestRivalName: string | null;
+  closestRivalGap: number;
+  coursesToPromotion: number;
+  nextDivisionName: string | null;
+  streakCurrent: number;
+  streakBest: number;
+  bestRankThisSeason: number;
+}
+
+function buildChaseStatements(args: ChaseStatementsArgs): ChaseStatement[] {
+  const out: ChaseStatement[] = [];
+
+  // P1 — Pace projection
+  const weeksRemaining = Math.max(0, args.daysRemaining / 7);
+  if (weeksRemaining > 0.5) {
+    const movement = args.rankMovementWeekly;
+    const projectedRank = Math.max(1, Math.round(args.currentRank - movement * weeksRemaining));
+    const finishLabel = args.daysRemaining <= 7 ? 'this Sunday' : `in ${Math.round(weeksRemaining)} weeks`;
+
+    if (movement > 0) {
+      out.push({
+        priority: 1,
+        text: `At your current pace you'll finish ${ordinal(projectedRank)} ${finishLabel}.`,
+        emphasis: 'positive',
+      });
+    } else if (movement < 0) {
+      out.push({
+        priority: 1,
+        text: `On current pace, you'll drift to ${ordinal(projectedRank)} ${finishLabel}.`,
+        emphasis: 'negative',
+      });
+    } else {
+      out.push({
+        priority: 1,
+        text: `Hold pace and you'll finish ${ordinal(args.currentRank)}.`,
+        emphasis: 'neutral',
+      });
+    }
+  }
+
+  // P2 — Closest rival
+  if (args.closestRivalName && args.closestRivalGap > 0) {
+    const courses = args.closestRivalGap === 1 ? 'course' : 'courses';
+    out.push({
+      priority: 2,
+      text: `${args.closestRivalName} is ${args.closestRivalGap} ${courses} ahead — playable.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  // P3 — Division promotion
+  if (args.coursesToPromotion > 0 && args.nextDivisionName) {
+    const courses = args.coursesToPromotion === 1 ? 'course' : 'courses';
+    out.push({
+      priority: 3,
+      text: `${args.coursesToPromotion} ${courses} to reach ${args.nextDivisionName}.`,
+      emphasis: 'positive',
+    });
+  }
+
+  // P4 — Streak callout
+  if (args.streakCurrent >= 3 && args.streakCurrent >= args.streakBest) {
+    out.push({
+      priority: 4,
+      text: `Your ${args.streakCurrent}-week streak is your longest this season.`,
+      emphasis: 'positive',
+    });
+  }
+
+  // P5 — Peak comeback
+  if (args.bestRankThisSeason > 0 && args.currentRank - args.bestRankThisSeason >= 3) {
+    out.push({
+      priority: 5,
+      text: `You peaked at ${ordinal(args.bestRankThisSeason)} this season.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  return out.sort((a, b) => a.priority - b.priority).slice(0, 3);
+}
+
 function LedeFactor({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
@@ -394,6 +485,26 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     : youCourses !== null
       ? Math.max(0, leaderCourses - youCourses)
       : null;
+
+  // ─── On the chase: predictive statements (current user, seasonal only) ───
+  const chaseStatements = useMemo<ChaseStatement[]>(() => {
+    if (!currentUserEntry || !userStatus) return [];
+    if (timeFilter === 'all_time') return [];
+    if (!season || daysRemaining <= 0) return [];
+
+    return buildChaseStatements({
+      currentRank: currentUserEntry.current_rank,
+      rankMovementWeekly: currentUserEntry.rank_movement ?? userStatus.rank_movement_weekly ?? 0,
+      daysRemaining,
+      closestRivalName: userStatus.closest_rival?.display_name ?? null,
+      closestRivalGap: userStatus.closest_rival?.gap ?? 0,
+      coursesToPromotion: userStatus.courses_to_next_division ?? 0,
+      nextDivisionName: userStatus.next_division_name ?? null,
+      streakCurrent: userStatus.streak_current ?? 0,
+      streakBest: userStatus.streak_best ?? 0,
+      bestRankThisSeason: userStatus.best_rank_this_season ?? 0,
+    });
+  }, [currentUserEntry, userStatus, timeFilter, season, daysRemaining]);
 
   // ─── Scroll save/restore ─────────────────────────────────────────
   const handleEntryClick = useCallback((clickedUserId: string) => {
@@ -715,6 +826,71 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           </div>
         </div>
       </div>
+
+      {/* ── 4.5. ON THE CHASE PANEL (current user only, seasonal only) ── */}
+      {chaseStatements.length > 0 && (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div style={{
+            borderTop: '3px double #0F172A',
+            borderBottom: '3px double #0F172A',
+            padding: '16px 4px',
+            background: '#fff',
+            position: 'relative',
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: -8, left: '50%', transform: 'translateX(-50%)',
+              background: '#F8FAFC', padding: '0 10px',
+              fontSize: 9, fontWeight: 800, color: '#9F1D1D',
+              letterSpacing: '0.28em',
+            }}>
+              ON THE CHASE
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+              {chaseStatements.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex', alignItems: 'baseline', gap: 10,
+                    padding: '4px 12px',
+                  }}
+                >
+                  <span style={{
+                    fontSize: 9, fontWeight: 800, color: '#94A3B8',
+                    letterSpacing: '0.18em', minWidth: 14,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span style={{
+                    flex: 1,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: s.emphasis === 'positive' ? '#15803D'
+                      : s.emphasis === 'negative' ? '#9F1D1D'
+                      : '#0F172A',
+                    letterSpacing: '-0.005em',
+                    lineHeight: 1.4,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}>
+                    {s.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{
+              marginTop: 14,
+              textAlign: 'center',
+              fontSize: 9, fontWeight: 700, color: '#94A3B8',
+              letterSpacing: '0.12em', fontStyle: 'italic',
+            }}>
+              Based on your weekly pace · Updated daily
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 5. PRIZE & SPONSOR CARD (Seasonal only) ── */}
       {timeFilter === 'seasonal' && season?.prize_description && (
@@ -1043,6 +1219,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           const isLast = i === allEntries.length - 1;
           const showStreak = timeFilter === 'seasonal' && p.streak_current >= 3;
 
+          // ── Chaser strip values (only for current user) ──
+          let chaserAbove: number | null = null;
+          let chaserBelow: number | null = null;
+          if (p.is_current_user && i > 0 && i < allEntries.length - 1) {
+            const above = allEntries[i - 1];
+            const below = allEntries[i + 1];
+            if (above && below) {
+              chaserAbove = Math.max(0, above.courses_this_season - p.courses_this_season);
+              chaserBelow = Math.max(0, p.courses_this_season - below.courses_this_season);
+            }
+          }
+          const showChaserStrip = chaserAbove !== null && chaserBelow !== null && (chaserAbove > 0 || chaserBelow > 0);
+
           return (
             <div
               key={p.user_id}
@@ -1162,6 +1351,36 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               }}>
                 {p.courses_this_season}
               </span>
+
+              {showChaserStrip && (
+                <div style={{
+                  gridColumn: '1 / -1',
+                  marginTop: 8,
+                  height: 4,
+                  display: 'flex',
+                  gap: 2,
+                  alignItems: 'stretch',
+                }}>
+                  <div style={{
+                    flex: Math.min(chaserAbove ?? 0, 6),
+                    background: 'rgba(159,29,29,0.30)',
+                    borderRadius: 1,
+                    minWidth: chaserAbove === 0 ? 4 : 8,
+                  }} />
+                  <div style={{
+                    width: 6,
+                    background: '#9F1D1D',
+                    borderRadius: 1,
+                    flexShrink: 0,
+                  }} />
+                  <div style={{
+                    flex: Math.min(chaserBelow ?? 0, 6),
+                    background: 'rgba(15,23,42,0.15)',
+                    borderRadius: 1,
+                    minWidth: chaserBelow === 0 ? 4 : 8,
+                  }} />
+                </div>
+              )}
             </div>
           );
         })}
