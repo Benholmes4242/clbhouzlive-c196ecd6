@@ -216,7 +216,8 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             onOpenFullscreen={handleOpenFullscreen}
           />
           {/* Featured badge */}
-          <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(247,147,30,0.92)', backdropFilter: 'blur(4px)', borderRadius: 6, padding: '3px 8px', fontSize: 8, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', pointerEvents: 'none', zIndex: 2 }}>
+          <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(247,147,30,0.95)', backdropFilter: 'blur(4px)', borderRadius: 6, padding: '3px 8px', fontSize: 8, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', pointerEvents: 'none', zIndex: 2, transform: 'rotate(-6deg)', transformOrigin: 'top left', boxShadow: '0 2px 6px rgba(0,0,0,0.18)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 10, lineHeight: 1 }}>🔥</span>
             Featured
           </div>
         </div>

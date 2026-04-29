@@ -445,7 +445,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <div style={{ paddingBottom: 40, background: '#F8FAFC', minHeight: '100%' }}>
       {/* Community score header — stacked & centered */}
       <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
-        <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 10 }}>⚡ Community Score</div>
+        
         <div style={{ fontSize: 56, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
           {communityScore.toFixed(1)}
         </div>
