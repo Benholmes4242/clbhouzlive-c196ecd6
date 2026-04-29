@@ -42,8 +42,12 @@ export function useLikeMutation() {
     onError: (error) => {
       console.error('[Like] Mutation failed:', error);
     },
-    onSettled: () => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
+      // Refresh the LikesSheet for THIS post. Active refetch is safe — the
+      // sheet is a modal (no scroll-snap concerns) and usePostLikes is gated
+      // by `enabled: isOpen`, so when closed this is a cheap no-op.
+      queryClient.invalidateQueries({ queryKey: ['post-likes', variables.postId, 'post'] });
       // Mark feed caches stale without active refetch — optimistic state in
       // useClubhouseLikes drives the UI. An active refetch here would re-order
       // posts and combined with scroll-snap-type: y mandatory cause the feed
