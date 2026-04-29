@@ -21,6 +21,29 @@ import './styles/superellipse.css'
 import './styles/theme.css'
 import './styles/theme-tokens.css'
 
+// ============================================================================
+// PRE-REACT IMMERSIVE FLAGS
+// Eliminates the white flash between native splash and Clubhouse skeleton on
+// cold start. By setting these flags synchronously BEFORE React mounts, the
+// CSS dark-shell rules apply from the very first paint instead of waiting for
+// useLayoutEffect to fire after the first commit.
+//
+// The corresponding useLayoutEffect logic in App.tsx and ClubhouseWrapped.tsx
+// continues to handle subsequent route changes — this block is idempotent
+// with that logic.
+// ============================================================================
+import { isImmersiveRoute } from '@/components/header/globalHeaderRules';
+
+const initialPath = window.location.pathname;
+if (isImmersiveRoute(initialPath)) {
+  document.documentElement.setAttribute('data-immersive-route', 'true');
+}
+if (initialPath === '/' || initialPath === '/clubhouse') {
+  document.body.classList.add('route-clubhouse');
+} else if (initialPath.startsWith('/auth')) {
+  document.body.classList.add('route-auth');
+}
+
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
 import './utils/echoDocNavHeight'
