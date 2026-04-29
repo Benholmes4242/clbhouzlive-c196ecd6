@@ -153,75 +153,12 @@ export function getNextBadgeNudge(progress: UserTop100Progress): BadgeNudge | nu
     }
   }
 
-  // 2. Regional milestones
-  const regionalThresholds = [10, 25, 50, 75, 100];
-
-  for (const list of progress.lists) {
-    const { played, total, regionId } = list;
-
-    // Find current and next regional tier
-    let currentRegionalTier: number | null = null;
-    let nextRegionalTier: number | null = null;
-
-    for (let i = regionalThresholds.length - 1; i >= 0; i--) {
-      if (played >= regionalThresholds[i]) {
-        currentRegionalTier = regionalThresholds[i];
-        break;
-      }
-    }
-
-    for (const t of regionalThresholds) {
-      if (played < t && t <= total) {
-        nextRegionalTier = t;
-        break;
-      }
-    }
-
-    if (!nextRegionalTier) continue;
-
-    const remaining = nextRegionalTier - played;
-
-    // "Close" = within 3 courses AND at least 5 played
-    const isClose = remaining <= 3 && played >= 5;
-
-    if (!isClose || remaining <= 0) continue;
-
-    const themeId = REGION_ID_TO_THEME[regionId];
-    const regionTheme = getRegionTheme(themeId);
-    
-    // Null-safe fallback - skip this nudge if theme resolution fails
-    if (!regionTheme) {
-      console.warn(`[nextBadgeNudge] Unknown region theme for: ${themeId}`);
-      continue;
-    }
-
-    // All colors sourced exclusively from globalAchievementMilestoneSystem
-    candidates.push({
-      type: 'regional',
-      regionId,
-      currentThreshold: currentRegionalTier,
-      nextThreshold: nextRegionalTier,
-      remaining,
-      playedOnList: played,
-      totalOnList: total,
-      regionLabel: REGION_LABELS[regionId],
-      palette: {
-        accent: regionTheme.accent,
-        bgLight: regionTheme.bgLight,
-        bgDark: regionTheme.bgDark,
-        bgLocked: regionTheme.bgLocked,
-        icon: regionTheme.accent,
-      },
-    });
-  }
-
   if (candidates.length === 0) return null;
 
-  // 3. Priority: fewest remaining → higher threshold → global over regional
+  // Priority: fewest remaining → higher threshold (only globals now)
   candidates.sort((a, b) => {
     if (a.remaining !== b.remaining) return a.remaining - b.remaining;
     if (a.nextThreshold !== b.nextThreshold) return b.nextThreshold - a.nextThreshold;
-    if (a.type !== b.type) return a.type === 'global' ? -1 : 1;
     return 0;
   });
 
