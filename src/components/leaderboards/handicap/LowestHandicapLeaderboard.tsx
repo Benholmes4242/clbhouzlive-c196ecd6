@@ -27,6 +27,8 @@ import {
   getHandicapStatusLabel,
   getTierAbbr,
   getTierShortName,
+  getTierThresholdRange,
+  getTierUpperBound,
   isTierSharper,
   type HandicapTier,
 } from '@/lib/formatHcp';
@@ -52,6 +54,73 @@ const DARK = '#0F172A';
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
+function formatHandicapDistance(distance: number): string {
+  if (distance < 0.1) return '<0.1';
+  return distance.toFixed(1);
+}
+
+interface HandicapChaseStatement {
+  priority: number;
+  text: string;
+  emphasis?: 'positive' | 'negative' | 'neutral';
+}
+
+interface BuildHandicapChaseArgs {
+  userHandicap: number;
+  userTier: HandicapTier;
+  trajectoryBest: number | null;
+  yoyImprovement: number | null;
+  closestRivalAhead: { name: string; gap: number } | null;
+}
+
+function buildHandicapChaseStatements(args: BuildHandicapChaseArgs): HandicapChaseStatement[] {
+  const out: HandicapChaseStatement[] = [];
+
+  // P1 — Distance to next sharper tier
+  const tierOrder: HandicapTier[] = ['elite', 'scratch', 'player', 'single', 'midfielder', 'weekend', 'hacker'];
+  const currentIdx = tierOrder.indexOf(args.userTier);
+  if (currentIdx > 0) {
+    const sharperTier = tierOrder[currentIdx - 1];
+    const sharperUpperBound = getTierUpperBound(sharperTier);
+    const distance = args.userHandicap - sharperUpperBound;
+    if (distance > 0 && distance <= 5.0) {
+      out.push({
+        priority: 1,
+        text: `Drop ${formatHandicapDistance(distance)} to reach ${getTierShortName(sharperTier)}.`,
+        emphasis: 'positive',
+      });
+    }
+  }
+
+  // P2 — Closest rival overtake
+  if (args.closestRivalAhead && args.closestRivalAhead.gap > 0 && args.closestRivalAhead.gap <= 3.0) {
+    out.push({
+      priority: 2,
+      text: `${args.closestRivalAhead.name} is ${formatHandicapDistance(args.closestRivalAhead.gap)} ahead — close to draw level.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  // P3 — Improvement streak (12-month)
+  if (args.yoyImprovement !== null && args.yoyImprovement > 0.3) {
+    out.push({
+      priority: 3,
+      text: `Down ${args.yoyImprovement.toFixed(1)} over 12 months — keep going.`,
+      emphasis: 'positive',
+    });
+  }
+
+  // P4 — Peak status
+  if (args.trajectoryBest !== null && Math.abs(args.userHandicap - args.trajectoryBest) < 0.05) {
+    out.push({
+      priority: 4,
+      text: `${formatHcp(args.userHandicap)} matches your 12-month best — holding peak.`,
+      emphasis: 'positive',
+    });
+  }
+
+  return out.sort((a, b) => a.priority - b.priority).slice(0, 3);
+}
 
 function getMastheadSubtitle(peerGroup: PeerGroup, clubName: string | null): string {
   switch (peerGroup) {
@@ -335,6 +404,71 @@ export function LowestHandicapLeaderboard({
     return () => observer.disconnect();
   }, [peerGroup, lowestQuery.hasNextPage, lowestQuery.fetchNextPage]);
 
+  // ── Closest rival ahead (for chase panel P2) ───────────────────────────
+  const closestRivalAhead = useMemo(() => {
+    if (!user || !displayEntries.length) return null;
+    const userIdx = displayEntries.findIndex((e) => e.is_current_user);
+    if (userIdx <= 0) return null;
+    const rival = displayEntries[userIdx - 1];
+    const me = displayEntries[userIdx];
+    if (!rival || !me) return null;
+    const gap = me.handicap_index - rival.handicap_index;
+    if (gap <= 0) return null;
+    return {
+      name: rival.display_name || rival.username || 'A rival',
+      gap,
+    };
+  }, [user, displayEntries]);
+
+  const chaseStatements = useMemo<HandicapChaseStatement[]>(() => {
+    if (!user) return [];
+    if (peerGroup !== 'top100') return [];
+    if (userHandicap === null || userTier === null) return [];
+    return buildHandicapChaseStatements({
+      userHandicap,
+      userTier,
+      trajectoryBest: trajectory?.best ?? null,
+      yoyImprovement: trajectory?.yoy_improvement ?? null,
+      closestRivalAhead,
+    });
+  }, [user, peerGroup, userHandicap, userTier, trajectory?.best, trajectory?.yoy_improvement, closestRivalAhead]);
+
+  // ── Jump-to-position pill (top100 only) ────────────────────────────────
+  const [userRowOffscreen, setUserRowOffscreen] = useState(false);
+  const [userRowDirection, setUserRowDirection] = useState<'above' | 'below'>('below');
+
+  useEffect(() => {
+    if (peerGroup !== 'top100') {
+      setUserRowOffscreen(false);
+      return;
+    }
+    const el = document.querySelector('[data-handicap-user-row="self"]') as HTMLElement | null;
+    if (!el) {
+      setUserRowOffscreen(false);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setUserRowOffscreen(false);
+        } else {
+          setUserRowOffscreen(true);
+          const rect = entry.boundingClientRect;
+          setUserRowDirection(rect.top < 0 ? 'above' : 'below');
+        }
+      },
+      { threshold: 0, rootMargin: '0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [peerGroup, displayEntries.length]);
+
+  const handleJumpToUser = useCallback(() => {
+    const el = document.querySelector('[data-handicap-user-row="self"]') as HTMLElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
+
   // ── Row click handler ──────────────────────────────────────────────────
   const handleRowClick = useCallback(
     (userId: string) => {
@@ -608,6 +742,95 @@ export function LowestHandicapLeaderboard({
         </div>
       </div>
 
+      {/* ── 5.5 ON THE CHASE PANEL — top100 logged-in with handicap ── */}
+      {chaseStatements.length > 0 && (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div
+            style={{
+              borderTop: `3px double ${INK}`,
+              borderBottom: `3px double ${INK}`,
+              padding: '16px 4px',
+              background: '#fff',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: -8,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: BG,
+                padding: '0 10px',
+                fontSize: 9,
+                fontWeight: 800,
+                color: CRIMSON,
+                letterSpacing: '0.28em',
+              }}
+            >
+              ON THE CHASE
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+              {chaseStatements.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 10,
+                    padding: '4px 12px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      color: INK_FAINT,
+                      letterSpacing: '0.18em',
+                      minWidth: 14,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span
+                    style={{
+                      flex: 1,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color:
+                        s.emphasis === 'positive'
+                          ? '#15803D'
+                          : s.emphasis === 'negative'
+                          ? CRIMSON
+                          : INK,
+                      letterSpacing: '-0.005em',
+                      lineHeight: 1.4,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {s.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{
+                marginTop: 14,
+                textAlign: 'center',
+                fontSize: 9,
+                fontWeight: 700,
+                color: INK_FAINT,
+                letterSpacing: '0.12em',
+                fontStyle: 'italic',
+              }}
+            >
+              Based on your global standings · Updated daily
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── TRAJECTORY CARD ── */}
       {showTrajectory && (
         <div style={{ padding: '20px 20px 0' }}>
@@ -806,8 +1029,8 @@ export function LowestHandicapLeaderboard({
         </div>
       )}
 
-      {/* ── TIER LADDER ── */}
-      <div style={{ padding: '22px 20px 0' }}>
+      {/* ── TIER LADDER — threshold ranges + connector hairline ── */}
+      <div style={{ padding: '22px 20px 0', position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           <div style={{ width: 12, height: 1, background: INK }} />
@@ -824,41 +1047,85 @@ export function LowestHandicapLeaderboard({
           <div style={{ width: 12, height: 1, background: INK }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)' }}>
+
+        {/* Connector hairline through tier name row centre */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 28,
+            right: 28,
+            top: 'calc(22px + 22px + 14px)',
+            height: 1,
+            background: 'rgba(15,23,42,0.10)',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }}
+        />
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6,1fr)',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           {DISPLAY_TIERS.map((t, i) => {
             const isCurrent = userTier !== null && t.id === displayTierId;
             const sharperThanYou = userTier !== null && isTierSharper(t.id, displayTierId);
+            const labelColor = isCurrent ? INK : sharperThanYou ? INK_MUTED : HAIRLINE;
+            const rangeColor = isCurrent ? INK_FAINT : HAIRLINE;
             return (
               <div
                 key={t.id}
                 style={{
-                  borderRight:
-                    i < DISPLAY_TIERS.length - 1 ? '1px solid rgba(15,23,42,0.1)' : 'none',
-                  padding: '10px 2px',
+                  padding: '10px 2px 6px',
                   textAlign: 'center',
                   background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
+                  borderRight:
+                    i < DISPLAY_TIERS.length - 1 ? '1px solid rgba(15,23,42,0.08)' : 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
                 }}
               >
-                <div
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    letterSpacing: '0.12em',
-                    marginBottom: 4,
-                    color: isCurrent ? CRIMSON : sharperThanYou ? INK_FAINT : HAIRLINE,
-                  }}
-                >
-                  {isCurrent ? '● NOW' : t.abbr}
+                <div style={{ height: 6, marginBottom: 4 }}>
+                  {isCurrent && (
+                    <div
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: CRIMSON,
+                      }}
+                    />
+                  )}
                 </div>
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 700,
                     lineHeight: 1.2,
-                    color: isCurrent ? INK : INK_MUTED,
+                    color: labelColor,
+                    letterSpacing: '-0.005em',
+                    background: BG,
+                    padding: '0 4px',
                   }}
                 >
-                  {t.shortLabel}
+                  {getTierShortName(t.id)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: rangeColor,
+                    letterSpacing: '0.04em',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}
+                >
+                  {getTierThresholdRange(t.id)}
                 </div>
               </div>
             );
@@ -1005,6 +1272,7 @@ export function LowestHandicapLeaderboard({
               return (
                 <div
                   key={p.user_id}
+                  data-handicap-user-row={isYou ? 'self' : undefined}
                   onClick={() => handleRowClick(p.user_id)}
                   style={{
                     display: 'grid',
@@ -1176,6 +1444,41 @@ export function LowestHandicapLeaderboard({
             : 'Ranked by handicap index · Lowest first · Updated daily'}
         </div>
       </div>
+
+      {/* ── JUMP-TO-POSITION PILL — top100 only, when user row offscreen ── */}
+      {userRowOffscreen && peerRank !== null && peerGroup === 'top100' && (
+        <button
+          type="button"
+          onClick={handleJumpToUser}
+          aria-label="Jump to your position"
+          style={{
+            position: 'fixed',
+            bottom: 96,
+            right: 16,
+            zIndex: 40,
+            background: INK,
+            color: '#fff',
+            border: 'none',
+            borderRadius: 999,
+            padding: '8px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(15,23,42,0.20)',
+            fontFamily: 'inherit',
+          }}
+          className="active:scale-[0.97] transition-transform"
+        >
+          <span style={{ fontSize: 10, lineHeight: 1 }}>
+            {userRowDirection === 'above' ? '↑' : '↓'}
+          </span>
+          <span>You · #{peerRank}</span>
+        </button>
+      )}
     </div>
   );
 }
