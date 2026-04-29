@@ -903,6 +903,32 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           </div>
         )}
 
+        {/* Active filter pill */}
+        {hasActiveFilters && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4, marginBottom: 6 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '4px 10px', borderRadius: 999,
+              background: 'rgba(247,147,30,0.12)',
+              border: '1px solid rgba(247,147,30,0.35)',
+              fontSize: 10, fontWeight: 800, color: '#9A4A0F',
+              letterSpacing: '0.04em',
+            }}>
+              <span>Filtering by {activeFilterLabel || '…'}</span>
+              <button
+                onClick={handleResetFilters}
+                aria-label="Clear filters"
+                style={{
+                  background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                  color: '#9A4A0F', fontSize: 11, fontWeight: 800, lineHeight: 1,
+                }}
+              >
+                ✕ clear
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Column headers */}
         <div style={{
           display: 'grid',
