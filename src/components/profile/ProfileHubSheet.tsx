@@ -209,21 +209,24 @@ function ProfileHubSheet({
   // ── Quick actions config ──
   const quickActions = [
     {
-      emoji: '👤',
+      Icon: User,
+      iconColor: '#3B82F6',
       label: 'View Profile',
       route: `/profile/${localActiveId}`,
       badge: 0,
       badgeColor: '',
     },
     {
-      emoji: '💬',
+      Icon: MessageCircle,
+      iconColor: '#10B981',
       label: 'Messages',
       route: '/messages',
       badge: unreadMessageCount,
       badgeColor: 'emerald',
     },
     {
-      emoji: '🔔',
+      Icon: Bell,
+      iconColor: '#F7931E',
       label: 'Notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
@@ -232,9 +235,9 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { emoji: '✏️', bg: 'rgba(15,23,42,0.05)', label: 'Edit profile', route: editRoute },
-    { emoji: '🏢', bg: 'rgba(15,23,42,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
-    { emoji: '⚙️', bg: 'rgba(15,23,42,0.05)', label: 'Settings', route: '/settings' },
+    { Icon: Pencil, iconColor: '#F7931E', label: 'Edit profile', route: editRoute },
+    { Icon: Building2, iconColor: '#0A5A3C', label: 'Manage business profiles', route: '/businesses/manage' },
+    { Icon: SettingsIcon, iconColor: '#64748B', label: 'Settings', route: '/settings' },
   ];
 
   // ── Portal content ──
