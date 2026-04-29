@@ -621,14 +621,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
           <div style={{ textAlign: 'center' }}>
             <div style={{
-              fontSize: 9, fontWeight: 800, color: '#94A3B8',
+              fontSize: 9, fontWeight: 800,
+              color: userIsLeader ? '#15803D' : '#94A3B8',
               letterSpacing: '0.18em', marginBottom: 4,
             }}>
-              GAP
+              {userIsLeader ? 'LEAD' : 'GAP'}
             </div>
             <div style={{
               fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
-              lineHeight: 1, color: '#0F172A',
+              lineHeight: 1,
+              color: userIsLeader ? '#15803D' : '#0F172A',
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}>
               {gap === null ? '—' : userIsLeader ? `+${gap}` : `−${gap}`}
