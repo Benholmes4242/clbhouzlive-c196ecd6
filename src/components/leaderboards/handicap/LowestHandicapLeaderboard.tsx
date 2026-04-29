@@ -27,6 +27,8 @@ import {
   getHandicapStatusLabel,
   getTierAbbr,
   getTierShortName,
+  getTierThresholdRange,
+  getTierUpperBound,
   isTierSharper,
   type HandicapTier,
 } from '@/lib/formatHcp';
