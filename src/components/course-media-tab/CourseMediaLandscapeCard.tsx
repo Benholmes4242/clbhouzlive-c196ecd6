@@ -214,9 +214,6 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
             </span>
           </div>
         )}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
