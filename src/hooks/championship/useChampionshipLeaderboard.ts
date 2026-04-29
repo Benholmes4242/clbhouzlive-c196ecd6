@@ -199,7 +199,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
         // `get_active_season` RPC doesn't expose them).
         const { data: sponsorRow } = await supabase
           .from('championship_seasons')
-          .select('prize_description, sponsor_name, sponsor_url')
+          .select('prize_description, sponsor_name, sponsor_url, sponsor_logo_url')
           .eq('id', base.id)
           .maybeSingle();
 
@@ -214,6 +214,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
           prize_description: sponsorRow?.prize_description ?? null,
           sponsor_name: sponsorRow?.sponsor_name ?? null,
           sponsor_url: sponsorRow?.sponsor_url ?? null,
+          sponsor_logo_url: (sponsorRow as any)?.sponsor_logo_url ?? null,
         };
       }
 

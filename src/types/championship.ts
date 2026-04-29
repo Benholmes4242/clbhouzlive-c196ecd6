@@ -27,6 +27,8 @@ export interface ChampionshipSeason {
   sponsor_name?: string | null;
   /** Editorial: sponsor link target (opens externally). */
   sponsor_url?: string | null;
+  /** Editorial: sponsor logo URL (public bucket). Used in masthead presented-by chip. */
+  sponsor_logo_url?: string | null;
 }
 
 export interface DivisionConfig {
