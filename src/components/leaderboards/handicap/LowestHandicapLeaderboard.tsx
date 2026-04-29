@@ -1029,8 +1029,8 @@ export function LowestHandicapLeaderboard({
         </div>
       )}
 
-      {/* ── TIER LADDER ── */}
-      <div style={{ padding: '22px 20px 0' }}>
+      {/* ── TIER LADDER — threshold ranges + connector hairline ── */}
+      <div style={{ padding: '22px 20px 0', position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           <div style={{ width: 12, height: 1, background: INK }} />
@@ -1047,41 +1047,85 @@ export function LowestHandicapLeaderboard({
           <div style={{ width: 12, height: 1, background: INK }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)' }}>
+
+        {/* Connector hairline through tier name row centre */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 28,
+            right: 28,
+            top: 'calc(22px + 22px + 14px)',
+            height: 1,
+            background: 'rgba(15,23,42,0.10)',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }}
+        />
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6,1fr)',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           {DISPLAY_TIERS.map((t, i) => {
             const isCurrent = userTier !== null && t.id === displayTierId;
             const sharperThanYou = userTier !== null && isTierSharper(t.id, displayTierId);
+            const labelColor = isCurrent ? INK : sharperThanYou ? INK_MUTED : HAIRLINE;
+            const rangeColor = isCurrent ? INK_FAINT : HAIRLINE;
             return (
               <div
                 key={t.id}
                 style={{
-                  borderRight:
-                    i < DISPLAY_TIERS.length - 1 ? '1px solid rgba(15,23,42,0.1)' : 'none',
-                  padding: '10px 2px',
+                  padding: '10px 2px 6px',
                   textAlign: 'center',
                   background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
+                  borderRight:
+                    i < DISPLAY_TIERS.length - 1 ? '1px solid rgba(15,23,42,0.08)' : 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
                 }}
               >
-                <div
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    letterSpacing: '0.12em',
-                    marginBottom: 4,
-                    color: isCurrent ? CRIMSON : sharperThanYou ? INK_FAINT : HAIRLINE,
-                  }}
-                >
-                  {isCurrent ? '● NOW' : t.abbr}
+                <div style={{ height: 6, marginBottom: 4 }}>
+                  {isCurrent && (
+                    <div
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: CRIMSON,
+                      }}
+                    />
+                  )}
                 </div>
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 700,
                     lineHeight: 1.2,
-                    color: isCurrent ? INK : INK_MUTED,
+                    color: labelColor,
+                    letterSpacing: '-0.005em',
+                    background: BG,
+                    padding: '0 4px',
                   }}
                 >
-                  {t.shortLabel}
+                  {getTierShortName(t.id)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: rangeColor,
+                    letterSpacing: '0.04em',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}
+                >
+                  {getTierThresholdRange(t.id)}
                 </div>
               </div>
             );
