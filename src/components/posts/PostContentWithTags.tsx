@@ -109,11 +109,21 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
     const { start_index, end_index, taggable_entities } = tag;
 
     if (start_index > lastIndex) {
-      elements.push(<span key={`text-${index}`}>{content.slice(lastIndex, start_index)}</span>);
+      const interText = content.slice(lastIndex, start_index);
+      elements.push(<span key={`text-${index}`}>{interText}</span>);
+    } else if (start_index === lastIndex && index > 0) {
+      // Adjacent mentions — inject a visual separator so they don't run together.
+      elements.push(<span key={`gap-${index}`}>{' '}</span>);
     }
 
-    const fallbackLabel = `@${taggable_entities.username || taggable_entities.name}`;
-    const tagText = content.slice(start_index, end_index) || fallbackLabel;
+    const username = taggable_entities.username;
+    const name = taggable_entities.name;
+    const sliceLabel = content.slice(start_index, end_index);
+    const tagText = username
+      ? `@${username}`
+      : name
+        ? `@${name.replace(/\s+/g, '')}`
+        : sliceLabel.replace(/\s+/g, '') || `@${name || ''}`;
 
     elements.push(
       <span
@@ -141,7 +151,13 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
   });
 
   if (lastIndex < content.length) {
-    elements.push(<span key="text-end">{content.slice(lastIndex)}</span>);
+    const tailText = content.slice(lastIndex);
+    // Insert a space before subsequent word/digit/@ text so a mention doesn't
+    // run into the next word. Punctuation stays attached (e.g. "@user.").
+    const needsLeadingSpace = tailText.length > 0 && /^[\w@]/.test(tailText);
+    elements.push(
+      <span key="text-end">{(needsLeadingSpace ? ' ' : '') + tailText}</span>
+    );
   }
 
   return <div className={className}>{elements}</div>;
