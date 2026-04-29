@@ -16,7 +16,7 @@ export { SeasonCalendar } from './SeasonCalendar';
 // Premium Redesign Components (Phase 1-3)
 export { SeasonHeroHeader } from './SeasonHeroHeader';
 export { PositionCard } from './PositionCard';
-export { LeaderboardRowEnhanced } from './LeaderboardRowEnhanced';
+
 export { PodiumVisual } from './PodiumVisual';
 export { DivisionLadderVisual } from './DivisionLadderVisual';
 export { SeasonCalendarStrip } from './SeasonCalendarStrip';
@@ -32,7 +32,7 @@ export { PerformanceStrip } from './PerformanceStrip';
 export { ActivityNudgeRow } from './ActivityNudgeRow';
 export { PromotionStatusBanner } from './PromotionStatusBanner';
 export { DivisionLadderPanel } from './DivisionLadderPanel';
-export { LeaderboardRowV2 } from './LeaderboardRowV2';
+
 
 export { TimeModeToggle } from './TimeModeToggle';
 export { HallOfFameHeader } from './HallOfFameHeader';
