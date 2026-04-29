@@ -685,6 +685,17 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     navigate(getProfilePathById(clickedUserId) + '?tab=top100');
   }, [navigate]);
 
+  // ─── Wire ticker dispatches (seasonal mode only) ─────────────────
+  const { data: dispatches } = useChampionshipDispatches({
+    limit: 10,
+    enabled: timeFilter === 'seasonal',
+  });
+
+  const handleDispatchClick = useCallback((dispatch: ChampionshipDispatch) => {
+    if (!dispatch.subject_user_id) return;
+    navigate(getProfilePathById(dispatch.subject_user_id) + '?tab=top100');
+  }, [navigate]);
+
   useEffect(() => {
     if (hasRestoredScroll.current || allEntries.length === 0) return;
     const savedScroll = sessionStorage.getItem(STORAGE_KEY_SCROLL);
