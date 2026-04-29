@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import type { FeedPost } from '@/components/media-system/types/media';
+import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
 import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { toast } from 'sonner';
@@ -211,58 +212,100 @@ export const LoopCard = React.memo(function LoopCard({
       <article ref={tileRef} className="bg-card border-b border-border/50">
 
         {/* 1. MEDIA — leads the card, full width, variable aspect ratio */}
-        <button
-          type="button"
-          data-media-wrapper
-          aria-label={`Open post by ${post.displayName}`}
-          className={`relative w-full ${aspectClass} bg-muted block`}
-          onClick={() => {
-            if (allPosts && cardIndex != null) {
-              useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+        {post.mediaItems.length > 1 ? (
+          <PostFeedCarousel
+            mediaItems={post.mediaItems}
+            aspectClass={aspectClass}
+            ariaLabel={`Media from post by ${post.displayName}`}
+            onSlideClick={() => {
+              if (allPosts && cardIndex != null) {
+                useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+              }
+            }}
+            topRightOverlay={
+              post.isReview && post.review?.rating ? (
+                <div
+                  className="flex items-center gap-0.5"
+                  style={{
+                    background: 'rgba(0,0,0,0.55)',
+                    backdropFilter: 'blur(8px)',
+                    borderRadius: 6,
+                    padding: '3px 7px',
+                    border: '0.5px solid rgba(255,255,255,0.15)',
+                  }}
+                >
+                  <img src={clbhouzLogo} alt="" className="h-3 w-3 object-contain" />
+                  <span className="text-[12px] font-semibold text-white">
+                    {post.review.rating.toFixed(1)}
+                  </span>
+                </div>
+              ) : null
             }
-          }}
-        >
-          {thumbnailUrl && (
-            <img
-              src={thumbnailUrl}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
-            />
-          )}
+            bottomRightOverlay={
+              isVideo && duration > 0 ? (
+                <span
+                  className="text-[12px] font-semibold text-white liquid-glass"
+                  style={{ borderRadius: 6, padding: '3px 7px' }}
+                >
+                  {formatVideoDuration(duration)}
+                </span>
+              ) : null
+            }
+          />
+        ) : (
+          <button
+            type="button"
+            data-media-wrapper
+            aria-label={`Open post by ${post.displayName}`}
+            className={`relative w-full ${aspectClass} bg-muted block`}
+            onClick={() => {
+              if (allPosts && cardIndex != null) {
+                useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+              }
+            }}
+          >
+            {thumbnailUrl && (
+              <img
+                src={thumbnailUrl}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+              />
+            )}
 
-          {/* Duration badge — bottom right, videos only */}
-          {isVideo && duration > 0 && (
-            <span
-              className="absolute bottom-2 right-2 z-10 text-[12px] font-semibold text-white liquid-glass"
-              style={{
-                borderRadius: 6,
-                padding: '3px 7px',
-              }}
-            >
-              {formatVideoDuration(duration)}
-            </span>
-          )}
-
-          {/* Review rating badge — top right */}
-          {post.isReview && post.review?.rating && (
-            <div
-              className="absolute top-2 right-2 z-10 flex items-center gap-0.5"
-              style={{
-                background: 'rgba(0,0,0,0.55)',
-                backdropFilter: 'blur(8px)',
-                borderRadius: 6,
-                padding: '3px 7px',
-                border: '0.5px solid rgba(255,255,255,0.15)',
-              }}
-            >
-              <img src={clbhouzLogo} alt="" className="h-3 w-3 object-contain" />
-              <span className="text-[12px] font-semibold text-white">
-                {post.review.rating.toFixed(1)}
+            {/* Duration badge — bottom right, videos only */}
+            {isVideo && duration > 0 && (
+              <span
+                className="absolute bottom-2 right-2 z-10 text-[12px] font-semibold text-white liquid-glass"
+                style={{
+                  borderRadius: 6,
+                  padding: '3px 7px',
+                }}
+              >
+                {formatVideoDuration(duration)}
               </span>
-            </div>
-          )}
-        </button>
+            )}
+
+            {/* Review rating badge — top right */}
+            {post.isReview && post.review?.rating && (
+              <div
+                className="absolute top-2 right-2 z-10 flex items-center gap-0.5"
+                style={{
+                  background: 'rgba(0,0,0,0.55)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: 6,
+                  padding: '3px 7px',
+                  border: '0.5px solid rgba(255,255,255,0.15)',
+                }}
+              >
+                <img src={clbhouzLogo} alt="" className="h-3 w-3 object-contain" />
+                <span className="text-[12px] font-semibold text-white">
+                  {post.review.rating.toFixed(1)}
+                </span>
+              </div>
+            )}
+          </button>
+        )}
 
         {/* 2. CREATOR ROW — compact, sits directly below media */}
         <div className="flex items-center gap-2.5 px-4 pt-3 pb-0">
