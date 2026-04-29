@@ -249,7 +249,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                   <span>#{course.ranks.global}</span>
                 </span>
               )}
-              {(!activeListSlug || activeListSlug === 'global') && course.ranks?.global && regionalRank && regionalBadgeSlug && (
+              {!activeListSlug && course.ranks?.global && regionalRank && regionalBadgeSlug && (
                 <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
               )}
               {(!activeListSlug || activeListSlug === regionalBadgeSlug) && regionalRank && regionalBadgeSlug && (
