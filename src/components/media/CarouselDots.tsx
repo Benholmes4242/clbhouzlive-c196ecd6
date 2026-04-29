@@ -86,7 +86,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
             fontSize: 9,
             fontWeight: 600,
             letterSpacing: '0.3px',
-            marginLeft: 2,
+            marginLeft: 6,
           }}
         >
           +{overflow}
