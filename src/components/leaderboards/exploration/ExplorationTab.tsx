@@ -717,7 +717,11 @@ export function ExplorationTab() {
                     style={{
                       fontSize: 14,
                       fontWeight: 600,
-                      color: s.emphasis === 'positive' ? INK : INK_BODY,
+                      color: s.emphasis === 'positive'
+                        ? '#15803D'
+                        : s.emphasis === 'negative'
+                          ? CRIMSON
+                          : INK,
                       lineHeight: 1.45,
                       letterSpacing: '-0.005em',
                     }}
