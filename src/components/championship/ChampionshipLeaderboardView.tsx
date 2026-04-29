@@ -827,6 +827,71 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
       </div>
 
+      {/* ── 4.5. ON THE CHASE PANEL (current user only, seasonal only) ── */}
+      {chaseStatements.length > 0 && (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div style={{
+            borderTop: '3px double #0F172A',
+            borderBottom: '3px double #0F172A',
+            padding: '16px 4px',
+            background: '#fff',
+            position: 'relative',
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: -8, left: '50%', transform: 'translateX(-50%)',
+              background: '#F8FAFC', padding: '0 10px',
+              fontSize: 9, fontWeight: 800, color: '#9F1D1D',
+              letterSpacing: '0.28em',
+            }}>
+              ON THE CHASE
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+              {chaseStatements.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex', alignItems: 'baseline', gap: 10,
+                    padding: '4px 12px',
+                  }}
+                >
+                  <span style={{
+                    fontSize: 9, fontWeight: 800, color: '#94A3B8',
+                    letterSpacing: '0.18em', minWidth: 14,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span style={{
+                    flex: 1,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: s.emphasis === 'positive' ? '#15803D'
+                      : s.emphasis === 'negative' ? '#9F1D1D'
+                      : '#0F172A',
+                    letterSpacing: '-0.005em',
+                    lineHeight: 1.4,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                  }}>
+                    {s.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{
+              marginTop: 14,
+              textAlign: 'center',
+              fontSize: 9, fontWeight: 700, color: '#94A3B8',
+              letterSpacing: '0.12em', fontStyle: 'italic',
+            }}>
+              Based on your weekly pace · Updated daily
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 5. PRIZE & SPONSOR CARD (Seasonal only) ── */}
       {timeFilter === 'seasonal' && season?.prize_description && (
         <div style={{ padding: '20px 20px 0' }}>
