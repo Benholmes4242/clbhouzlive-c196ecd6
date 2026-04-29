@@ -5,7 +5,9 @@ import {
   useExplorationLeaderboard,
   useUserExplorationStatus,
   useCountriesByMemberCount,
+  useUserTierUnlocks,
 } from '@/hooks/leaderboards';
+import { getTierIcon } from './icons/TierIcons';
 import { useDailyEditorial } from '@/hooks/championship';
 import { supabase } from '@/integrations/supabase/client';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -14,7 +16,6 @@ import {
   EXPLORER_TIERS,
   getUserTier,
   getNextTier,
-  getTierAbbr,
   getTierShortName,
 } from '@/config/explorerTiers';
 
@@ -58,6 +59,72 @@ function loadSavedFilters() {
 // ----------------------------------------------------------------------------
 // Helpers
 // ----------------------------------------------------------------------------
+
+function formatTierUnlockDate(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const monthsAgo = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+
+  if (monthsAgo > 12) {
+    return d.toLocaleDateString('en-GB', { year: 'numeric' });
+  }
+
+  const month = d.toLocaleDateString('en-GB', { month: 'short' });
+  const yy = d.getFullYear().toString().slice(2);
+  return `${month} '${yy}`;
+}
+
+interface GlobalChaseStatement {
+  priority: number;
+  text: string;
+  emphasis?: 'positive' | 'negative' | 'neutral';
+}
+
+interface BuildGlobalChaseArgs {
+  countriesPlayed: number;
+  continentsPlayed: number;
+  nextTier: { name: string; minCountries: number; minContinents: number } | null;
+  closestRivalAhead: { name: string; gap: number } | null;
+}
+
+function buildGlobalChaseStatements(args: BuildGlobalChaseArgs): GlobalChaseStatement[] {
+  const out: GlobalChaseStatement[] = [];
+
+  if (args.nextTier) {
+    const countriesNeeded = Math.max(0, args.nextTier.minCountries - args.countriesPlayed);
+    if (countriesNeeded > 0) {
+      const word = countriesNeeded === 1 ? 'country' : 'countries';
+      out.push({
+        priority: 1,
+        text: `${countriesNeeded} ${word} to reach ${args.nextTier.name}.`,
+        emphasis: 'positive',
+      });
+    }
+  }
+
+  if (args.nextTier) {
+    const continentsNeeded = Math.max(0, args.nextTier.minContinents - args.continentsPlayed);
+    if (continentsNeeded > 0) {
+      const word = continentsNeeded === 1 ? 'continent' : 'continents';
+      out.push({
+        priority: 2,
+        text: `Add ${continentsNeeded} ${word} to unlock ${args.nextTier.name}.`,
+        emphasis: 'neutral',
+      });
+    }
+  }
+
+  if (args.closestRivalAhead && args.closestRivalAhead.gap > 0) {
+    const word = args.closestRivalAhead.gap === 1 ? 'country' : 'countries';
+    out.push({
+      priority: 3,
+      text: `${args.closestRivalAhead.name} has ${args.closestRivalAhead.gap} more ${word} — ${args.closestRivalAhead.gap} to draw level.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  return out.sort((a, b) => a.priority - b.priority).slice(0, 3);
+}
 
 
 function selectGlobalEyebrow(args: {
@@ -228,6 +295,13 @@ export function ExplorationTab() {
   );
 
   const { data: userStatus } = useUserExplorationStatus({ userId: user?.id });
+  const { data: tierUnlocks = [] } = useUserTierUnlocks({ userId: user?.id });
+
+  const tierUnlockMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const t of tierUnlocks) map.set(t.tier_id, t.unlocked_at);
+    return map;
+  }, [tierUnlocks]);
 
   const {
     data: countryData,
@@ -265,6 +339,76 @@ export function ExplorationTab() {
 
   const countriesNeeded = nextTier ? Math.max(0, nextTier.minCountries - countriesPlayed) : 0;
   const continentsNeeded = nextTier ? Math.max(0, nextTier.minContinents - continentsPlayed) : 0;
+
+  // ---- Chase statements (P1 country gap, P2 continent expansion, P3 closest rival) ----
+  const closestRivalAhead = useMemo(() => {
+    if (!user || !allEntries.length) return null;
+    const userIdx = allEntries.findIndex((e) => e.is_current_user);
+    if (userIdx <= 0) return null;
+    const rival = allEntries[userIdx - 1];
+    const me = allEntries[userIdx];
+    if (!rival || !me) return null;
+    const gap = (rival.countries_count ?? 0) - (me.countries_count ?? 0);
+    if (gap <= 0) return null;
+    return {
+      name: rival.display_name || rival.username || 'A rival',
+      gap,
+    };
+  }, [user, allEntries]);
+
+  const chaseStatements = useMemo(() => {
+    if (!user) return [];
+    if (countriesPlayed === 0) return [];
+    if (!nextTier) return [];
+
+    return buildGlobalChaseStatements({
+      countriesPlayed,
+      continentsPlayed,
+      nextTier: {
+        name: nextTier.name,
+        minCountries: nextTier.minCountries,
+        minContinents: nextTier.minContinents,
+      },
+      closestRivalAhead,
+    });
+  }, [user, countriesPlayed, continentsPlayed, nextTier, closestRivalAhead]);
+
+  // ---- Jump-to-position pill state ----
+  const [userRowOffscreen, setUserRowOffscreen] = useState(false);
+  const [userRowDirection, setUserRowDirection] = useState<'above' | 'below'>('below');
+
+  useEffect(() => {
+    if (viewMode !== 'player' || !(scope === 'global' || scope === 'friends')) {
+      setUserRowOffscreen(false);
+      return;
+    }
+    const el = document.querySelector('[data-user-row="self"]') as HTMLElement | null;
+    if (!el) {
+      setUserRowOffscreen(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setUserRowOffscreen(false);
+        } else {
+          setUserRowOffscreen(true);
+          const rect = entry.boundingClientRect;
+          setUserRowDirection(rect.top < 0 ? 'above' : 'below');
+        }
+      },
+      { threshold: 0, rootMargin: '0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [viewMode, scope, allEntries.length]);
+
+  const handleJumpToUser = useCallback(() => {
+    const el = document.querySelector('[data-user-row="self"]') as HTMLElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
 
   // ---- Editorial eyebrow (personalised) ----
   const personalisedEyebrow = useMemo(() => {
@@ -524,6 +668,82 @@ export function ExplorationTab() {
         </div>
       </div>
 
+      {/* 5.5. ON THE CHASE PANEL (current user only, when not max tier) */}
+      {chaseStatements.length > 0 && (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div
+            style={{
+              borderTop: `3px double ${INK}`,
+              borderBottom: `3px double ${INK}`,
+              padding: '14px 0 12px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.28em',
+                color: CRIMSON,
+                textAlign: 'center',
+                marginBottom: 12,
+              }}
+            >
+              ON THE CHASE
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {chaseStatements.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '24px 1fr',
+                    alignItems: 'baseline',
+                    gap: 10,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      color: INK_FAINT,
+                      letterSpacing: '0.06em',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: s.emphasis === 'positive' ? INK : INK_BODY,
+                      lineHeight: 1.45,
+                      letterSpacing: '-0.005em',
+                    }}
+                  >
+                    {s.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 10,
+                color: INK_FAINT,
+                fontStyle: 'italic',
+                textAlign: 'center',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Based on your global standings · Updated daily
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 6. YOUR TIER CARD or CTA */}
       {countriesPlayed > 0 ? (
         <div style={{ padding: '20px 20px 0' }}>
@@ -692,45 +912,116 @@ export function ExplorationTab() {
       {/* 7. TIER LADDER */}
       <div style={{ padding: '22px 20px 0' }}>
         <SectionLabel>TIER LADDER</SectionLabel>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)' }}>
-          {EXPLORER_TIERS.map((t, i) => {
-            const isUnlocked =
-              countriesPlayed >= t.minCountries && continentsPlayed >= t.minContinents;
-            const isCurrent = t.id === currentTier.id && countriesPlayed > 0;
-            return (
-              <div
-                key={t.id}
-                style={{
-                  borderRight: i < 4 ? '1px solid rgba(15,23,42,0.1)' : 'none',
-                  padding: '10px 4px',
-                  textAlign: 'center',
-                  background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
-                }}
-              >
+        <div style={{ position: 'relative' }}>
+          {/* Connector hairline through the icon row centre.
+              Status dot (~6px h + 6px mb) + icon circle (28px) ⇒ centre ≈ 12 + 14 = 26px from top of cell.
+              Cell padding-top is 10, so absolute top ≈ 36px. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              left: '10%',
+              right: '10%',
+              top: 36,
+              height: 1,
+              background: HAIRLINE,
+              zIndex: 0,
+            }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', position: 'relative', zIndex: 1 }}>
+            {EXPLORER_TIERS.map((t) => {
+              const isUnlocked =
+                countriesPlayed >= t.minCountries && continentsPlayed >= t.minContinents;
+              const isCurrent = t.id === currentTier.id && countriesPlayed > 0;
+              const unlockedAt = tierUnlockMap.get(t.id);
+
+              const Icon = getTierIcon(t.id);
+              const iconColor = isCurrent ? CRIMSON : isUnlocked ? INK : HAIRLINE;
+              const labelColor = isCurrent ? INK : isUnlocked ? INK : INK_FAINT;
+              const dateColor = isCurrent ? CRIMSON : INK_FAINT;
+
+              let statusDot: React.ReactNode;
+              if (isCurrent) {
+                statusDot = (
+                  <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: CRIMSON }} />
+                );
+              } else if (isUnlocked) {
+                statusDot = (
+                  <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: INK }} />
+                );
+              } else {
+                statusDot = (
+                  <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', border: `1px solid ${HAIRLINE}`, background: 'transparent' }} />
+                );
+              }
+
+              return (
                 <div
+                  key={t.id}
                   style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                    marginBottom: 4,
-                    color: isCurrent ? CRIMSON : isUnlocked ? INK_FAINT : HAIRLINE,
+                    padding: '10px 4px 12px',
+                    textAlign: 'center',
+                    background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
-                  {isCurrent ? '● NOW' : isUnlocked ? 'DONE' : getTierAbbr(t.id)}
+                  {/* Status dot */}
+                  <div style={{ height: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {statusDot}
+                  </div>
+
+                  {/* Icon wrapped in a 28×28 bg circle so the connector hairline appears to thread through */}
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      background: BG,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: iconColor,
+                    }}
+                  >
+                    <Icon size={16} color={iconColor} />
+                  </div>
+
+                  {/* Tier short name */}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      lineHeight: 1.2,
+                      color: labelColor,
+                      letterSpacing: '-0.005em',
+                    }}
+                  >
+                    {getTierShortName(t.id)}
+                  </div>
+
+                  {/* Unlock date (only for unlocked tiers) */}
+                  <div style={{ minHeight: 12 }}>
+                    {unlockedAt && (
+                      <div
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 700,
+                          color: dateColor,
+                          letterSpacing: '0.06em',
+                          fontVariantNumeric: 'tabular-nums lining-nums',
+                        }}
+                      >
+                        {formatTierUnlockDate(unlockedAt)}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    color: isCurrent ? INK : isUnlocked ? INK_FAINT : INK_MUTED,
-                  }}
-                >
-                  {getTierShortName(t.id)}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -845,6 +1136,40 @@ export function ExplorationTab() {
             : 'Ranked by member count · Updated daily'}
         </div>
       </div>
+
+      {/* Jump-to-position pill — visible only when user's row is offscreen */}
+      {userRowOffscreen && userVisibleRank !== null && (
+        <button
+          onClick={handleJumpToUser}
+          style={{
+            position: 'fixed',
+            right: 16,
+            bottom: 96,
+            zIndex: 50,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 12px',
+            borderRadius: 14,
+            background: INK,
+            color: '#fff',
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            boxShadow: '0 6px 18px rgba(15,23,42,0.28)',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+          aria-label={`Jump to your row, rank ${userVisibleRank}`}
+        >
+          <span aria-hidden="true" style={{ fontSize: 13, lineHeight: 1 }}>
+            {userRowDirection === 'above' ? '↑' : '↓'}
+          </span>
+          You · #{userVisibleRank}
+        </button>
+      )}
     </div>
   );
 }
@@ -1159,6 +1484,7 @@ function PlayerStandings({
         return (
           <div
             key={p.user_id}
+            data-user-row={isYou ? 'self' : undefined}
             onClick={() => {
               onRowClick();
               navigate(getProfilePathById(p.user_id));
