@@ -12,13 +12,14 @@
  */
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { TaggedPost } from '@/hooks/useBusinessTaggedPosts';
-import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2, Loader2, MapPin, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
+import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2, Loader2, MapPin, Camera } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import CommentsSheet from '@/components/comments/CommentsSheet';
+import CarouselDots from '@/components/media/CarouselDots';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { PostActionBar } from '@/components/posts/PostActionBar';
@@ -328,20 +329,6 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
     }
   }, [mediaItems.length]);
 
-  const handlePrev = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (activeMediaIndex > 0) {
-      scrollToIndex(activeMediaIndex - 1);
-    }
-  }, [activeMediaIndex, scrollToIndex]);
-
-  const handleNext = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (activeMediaIndex < mediaItems.length - 1) {
-      scrollToIndex(activeMediaIndex + 1);
-    }
-  }, [activeMediaIndex, mediaItems.length, scrollToIndex]);
-
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
   }, []);
@@ -526,45 +513,9 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
                   ))}
                 </div>
 
-                {/* Chevron Navigation */}
-                {activeMediaIndex > 0 && (
-                  <button
-                    onClick={handlePrev}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity hover:bg-black/70"
-                    aria-label="Previous"
-                  >
-                    <ChevronLeft className="h-5 w-5 text-white" />
-                  </button>
-                )}
-                {activeMediaIndex < mediaItems.length - 1 && (
-                  <button
-                    onClick={handleNext}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity hover:bg-black/70"
-                    aria-label="Next"
-                  >
-                    <ChevronRight className="h-5 w-5 text-white" />
-                  </button>
-                )}
-
-                {/* Dot Indicators */}
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-                  {mediaItems.length <= 10 ? (
-                    <div className="flex gap-1.5">
-                      {mediaItems.map((_, idx) => (
-                        <div
-                          key={idx}
-                          className={cn(
-                            "w-1.5 h-1.5 rounded-full transition-opacity",
-                            activeMediaIndex === idx ? "bg-white" : "bg-white/50"
-                          )}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="px-2 py-0.5 bg-black/60 rounded-full text-white text-xs font-medium">
-                      {activeMediaIndex + 1}/{mediaItems.length}
-                    </div>
-                  )}
+                {/* Carousel dots — top center, Clubhouse-style segment bars */}
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                  <CarouselDots count={mediaItems.length} active={activeMediaIndex} />
                 </div>
               </>
             ) : (
