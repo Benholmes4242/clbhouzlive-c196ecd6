@@ -817,28 +817,49 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
         {/* Arena tabs */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8, justifyContent: 'center' }}>
-          {arenas.map((a) => (
-            <button
-              key={a.key}
-              onClick={() => handleArenaModeChange(a.key)}
-              style={{
-                padding: '5px 10px', borderRadius: 8,
-                background: arenaMode === a.key ? '#0F172A' : 'transparent',
-                color: arenaMode === a.key ? '#fff' : '#64748B',
-                border: arenaMode === a.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-                fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em',
-              }}
-            >
-              {a.label}
-            </button>
-          ))}
+          {arenas.map((a) => {
+            const isActive = arenaMode === a.key;
+            return (
+              <button
+                key={a.key}
+                onClick={() => handleArenaModeChange(a.key)}
+                style={{
+                  padding: '5px 10px', borderRadius: 8,
+                  background: isActive ? '#0F172A' : 'transparent',
+                  color: isActive ? '#fff' : '#64748B',
+                  border: isActive ? 'none' : '1px solid rgba(15,23,42,0.15)',
+                  fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em',
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                }}
+              >
+                {a.label}
+                {a.count != null && (
+                  <span style={{
+                    fontSize: 9, fontWeight: 800,
+                    padding: '1px 5px', borderRadius: 6,
+                    background: isActive ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)',
+                    color: isActive ? '#fff' : '#64748B',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                    letterSpacing: 0,
+                  }}>
+                    {a.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Division sub-filter */}
         {arenaMode === 'division' && (
-          <div style={{
-            display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10, marginTop: 8, justifyContent: 'center',
-          }}>
+          <div
+            className="clbhouz-no-scrollbar"
+            style={{
+              display: 'flex', gap: 4, marginBottom: 10, marginTop: 8,
+              overflowX: 'auto', WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+            }}
+          >
             {divisionChips.map((d) => (
               <button
                 key={d.key}
@@ -849,6 +870,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   color: divisionFilter === d.key ? '#0F172A' : '#94A3B8',
                   border: '1px solid rgba(15,23,42,0.1)',
                   fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em',
+                  whiteSpace: 'nowrap' as const,
+                  flexShrink: 0,
                 }}
               >
                 {d.label}
