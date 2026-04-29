@@ -16,7 +16,6 @@ import {
   EXPLORER_TIERS,
   getUserTier,
   getNextTier,
-  getTierAbbr,
   getTierShortName,
 } from '@/config/explorerTiers';
 
