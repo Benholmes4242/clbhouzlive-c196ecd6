@@ -44,6 +44,7 @@ export function FriendsAvatarRow({ friends, focusedFriendId, onFriendClick }: Fr
                   size={56} 
                   src={friend.avatarUrl}
                   alt={friend.name}
+                  thinRing
                   fallback={firstName.charAt(0)}
                 />
 
