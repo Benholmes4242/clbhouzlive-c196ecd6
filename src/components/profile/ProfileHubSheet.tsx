@@ -502,7 +502,7 @@ function ProfileHubSheet({
               {/* ── Account section ── */}
               <div>
                 <RuleMarker label="Account" />
-                {accountRows.map(({ emoji, bg, label, route }, index) => (
+                {accountRows.map(({ Icon, iconColor, label, route }, index) => (
                   <div key={label}>
                     {index > 0 && <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', marginLeft: 46 }} />}
                     <button
@@ -512,9 +512,9 @@ function ProfileHubSheet({
                     >
                       <div
                         className="flex items-center justify-center rounded-[10px]"
-                        style={{ width: 34, height: 34, background: bg }}
+                        style={{ width: 34, height: 34, background: `${iconColor}14` }}
                       >
-                        <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
+                        <Icon size={17} color={iconColor} strokeWidth={2.2} />
                       </div>
                       <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
                       <ChevronRight className="w-[13px] h-[13px] text-muted-foreground/30" />
