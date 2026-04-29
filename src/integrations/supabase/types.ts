@@ -1659,6 +1659,71 @@ export type Database = {
           },
         ]
       }
+      championship_dispatches: {
+        Row: {
+          body: string
+          created_at: string
+          expires_at: string
+          id: string
+          kind: string
+          season_id: string | null
+          subject_display_name: string | null
+          subject_user_id: string | null
+          surfaced_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind: string
+          season_id?: string | null
+          subject_display_name?: string | null
+          subject_user_id?: string | null
+          surfaced_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind?: string
+          season_id?: string | null
+          subject_display_name?: string | null
+          subject_user_id?: string | null
+          surfaced_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "championship_dispatches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "championship_dispatches_subject_user_id_fkey"
+            columns: ["subject_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "championship_dispatches_subject_user_id_fkey"
+            columns: ["subject_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "championship_dispatches_subject_user_id_fkey"
+            columns: ["subject_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       championship_editorial_daily: {
         Row: {
           created_at: string
@@ -15488,6 +15553,16 @@ export type Database = {
         }
         Returns: string
       }
+      emit_championship_dispatch: {
+        Args: {
+          p_body: string
+          p_kind: string
+          p_season_id: string
+          p_subject_display_name: string
+          p_subject_user_id: string
+        }
+        Returns: string
+      }
       enablelongtransactions: { Args: never; Returns: string }
       ensure_user_season_stats: { Args: { p_user_id: string }; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
@@ -15721,6 +15796,17 @@ export type Database = {
       get_business_profile_headline_stats: {
         Args: { p_business_profile_id: string; p_days?: number }
         Returns: Json
+      }
+      get_championship_dispatches: {
+        Args: { p_limit?: number }
+        Returns: {
+          body: string
+          id: string
+          kind: string
+          subject_display_name: string
+          subject_user_id: string
+          surfaced_at: string
+        }[]
       }
       get_championship_leaderboard: {
         Args: {
