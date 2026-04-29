@@ -119,7 +119,11 @@ function getNextGlobalTier(totalPlayed: number): MilestoneTier | null {
 export function getNextBadgeNudge(progress: UserTop100Progress): BadgeNudge | null {
   const candidates: BadgeNudge[] = [];
 
-  // 1. Global milestones
+  // Global milestones only.
+  // Regional achievements (GB&I / EU / USA / WORLD sub-tiers) intentionally
+  // excluded from the locked-nudge slot — per spec, they only appear in the
+  // rail once EARNED. The rail's "next to unlock" slot is reserved for
+  // milestone clubs (Rookie/Fairway/Founders/Heritage/Century/Elite/etc.).
   const { totalTop100Played } = progress;
   const currentTier = getCurrentGlobalTier(totalTop100Played);
   const nextThreshold = getNextGlobalTier(totalTop100Played);
