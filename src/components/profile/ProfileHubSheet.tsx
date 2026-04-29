@@ -11,6 +11,8 @@ import type { PanInfo } from 'framer-motion';
 import {
   ChevronRight, LogOut,
   Shield, Plus, Check, X,
+  User, MessageCircle, Bell,
+  Pencil, Building2, Settings as SettingsIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
