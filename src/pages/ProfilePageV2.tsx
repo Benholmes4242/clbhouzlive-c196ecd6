@@ -1109,10 +1109,8 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Segmented control tabs */}
         <section 
-          className="px-4 py-2 sticky"
+          className="px-4 py-2"
           style={{ 
-            top: 0,
-            zIndex: 20,
             background: 'hsl(var(--background))',
             touchAction: 'auto',
             pointerEvents: 'auto',
