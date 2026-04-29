@@ -78,9 +78,11 @@ export interface UserChampionshipStatus {
   division_color: string;
   zone: ZoneType;
   courses_to_next_division: number | null;
+  next_division_name: string | null;
   days_remaining: number;
   streak_current: number;
   streak_best: number;
+  best_rank_this_season: number;
   closest_rival: {
     user_id: string;
     display_name: string;
