@@ -184,8 +184,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* Tabs — flush below hero */}
-      <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
+      {/* Tabs — sticky below hero */}
+      <div
+        className="sticky bg-background"
+        style={{ top: 0, zIndex: 20 }}
+      >
+        <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
+      </div>
 
       {/* Keep-mounted tabs */}
       <div className="course-hero-wrapper bg-background">
