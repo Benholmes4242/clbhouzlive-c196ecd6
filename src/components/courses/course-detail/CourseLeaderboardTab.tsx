@@ -187,6 +187,7 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
               src={user.profile_photo_url}
               alt={getUserDisplayName(user)}
               size={48}
+              thinRing
               fallback={getUserInitials(user)}
             />
 
