@@ -588,8 +588,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{
             fontSize: 10, fontWeight: 800, letterSpacing: '0.28em',
             color: '#9F1D1D', marginBottom: 10,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           }}>
-            {personalisedEyebrow}
+            <span>{personalisedEyebrow}</span>
+            <button
+              type="button"
+              onClick={() => setShowLedeInfoSheet(true)}
+              aria-label="Why this headline"
+              style={{
+                background: 'none', padding: 0, cursor: 'pointer',
+                width: 14, height: 14, borderRadius: '50%',
+                border: '1px solid rgba(159,29,29,0.4)',
+                color: '#9F1D1D',
+                fontSize: 9, fontWeight: 800, lineHeight: 1,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                letterSpacing: 0,
+              }}
+            >
+              i
+            </button>
           </div>
           <h2 style={{
             fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em',
