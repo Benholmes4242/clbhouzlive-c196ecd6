@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, RefreshCw, WifiOff } from 'lucide-react';
+import { Loader2, RefreshCw, WifiOff, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -14,8 +14,10 @@ import {
   useUserChampionshipStatus,
   useSeasonCalendar,
   useDailyEditorial,
+  useChampionshipDispatches,
 } from '@/hooks/championship';
 import type { EditorialCopy } from '@/hooks/championship/useDailyEditorial';
+import type { ChampionshipDispatch } from '@/hooks/championship';
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
 import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
