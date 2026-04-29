@@ -14,7 +14,9 @@ import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Search, X, Pencil, Filter, ChevronDown } from 'lucide-react';
+import { Search, X, Pencil, ArrowUpDown } from 'lucide-react';
+import { AppSelect } from '@/components/ui/AppSelect';
+import type { ScoreTier } from '@/utils/getScoreTier';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { 
@@ -272,6 +274,23 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const filteredMyReview = filteredReviews.find((r) => r.user_id === user?.id);
   const otherReviews = filteredReviews.filter((r) => r.user_id !== user?.id);
 
+  // Per-tier review counts for the filter sheet (computed client-side from fetched reviews)
+  const reviewCountsByTier = useMemo(() => {
+    const counts: Record<ScoreTier | 'all', number> = {
+      all: reviews.length,
+      exceptional: 0,
+      excellent: 0,
+      good: 0,
+      fair: 0,
+      poor: 0,
+    };
+    for (const r of reviews) {
+      const tier = getScoreTier(r.rating).tier;
+      counts[tier] += 1;
+    }
+    return counts;
+  }, [reviews]);
+
   useEffect(() => {
     if (!highlightedReviewId || !reviewsData) return;
     const timeout = setTimeout(() => {
@@ -486,58 +505,29 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         </div>
       </div>
 
-      {/* Compressed control bar: sort pill (cycle-on-tap) + divider + tier filter chips */}
+      {/* Toolbar: sort dropdown + filter sheet trigger (single row, no overflow) */}
       <div
-        className="scrollbar-hide"
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 8,
           padding: '12px 16px 12px',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
         }}
       >
-        {(() => {
-          const currentSortLabel = sortOptions.find((o) => o.value === sortBy)?.label ?? 'Sort';
-          const cycleSort = () => {
-            const idx = sortOptions.findIndex((o) => o.value === sortBy);
-            const next = sortOptions[(idx + 1) % sortOptions.length];
-            setSortBy(next.value as ReviewsSortBy);
-          };
-          return (
-            <button
-              type="button"
-              onClick={cycleSort}
-              aria-label={`Sort: ${currentSortLabel}. Tap to change.`}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '6px 12px',
-                borderRadius: 999,
-                background: '#0F172A',
-                color: '#fff',
-                fontSize: 11.5,
-                fontWeight: 800,
-                border: 'none',
-                cursor: 'pointer',
-                flexShrink: 0,
-                whiteSpace: 'nowrap' as const,
-              }}
-            >
-              <Filter className="w-3 h-3" />
-              {currentSortLabel}
-              <ChevronDown className="w-3 h-3" />
-            </button>
-          );
-        })()}
+        <AppSelect
+          value={sortBy}
+          onChange={(v) => setSortBy(v as ReviewsSortBy)}
+          options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
+          ariaLabel="Sort reviews"
+          icon={<ArrowUpDown className="w-3 h-3" />}
+          triggerClassName="!h-auto !rounded-full !bg-[#0F172A] !border-0 !text-white !px-3 !py-1.5 !text-[11.5px] !font-extrabold gap-1.5 [&>span]:text-white [&_svg]:text-white"
+        />
 
-        <div style={{ width: 1, height: 20, background: 'rgba(15,23,42,0.1)', flexShrink: 0 }} />
-
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <RatingFilterChips value={ratingFilter} onChange={setRatingFilter} />
-        </div>
+        <RatingFilterChips
+          value={ratingFilter}
+          onChange={setRatingFilter}
+          counts={reviewCountsByTier}
+        />
       </div>
 
       <Divider />
