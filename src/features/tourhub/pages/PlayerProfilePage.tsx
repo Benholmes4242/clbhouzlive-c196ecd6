@@ -209,7 +209,7 @@ export function PlayerProfilePage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: 0,
+            paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
         >
           {/* Back link */}
