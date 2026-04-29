@@ -542,12 +542,16 @@ export function CoursesLeaderboardView() {
               borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}>
               <div style={{
-                position: 'absolute', top: 10, left: 10,
+                position: 'absolute', top: 12, left: 12,
                 fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
                 background: 'rgba(0,0,0,0.4)',
                 padding: '4px 8px', borderRadius: 2,
                 backdropFilter: 'blur(6px)',
                 WebkitBackdropFilter: 'blur(6px)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                transform: 'rotate(-4deg)',
+                transformOrigin: 'left center',
               }}>
                 THIS SEASON'S HOTTEST
               </div>
