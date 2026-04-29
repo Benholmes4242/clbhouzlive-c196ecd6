@@ -1794,6 +1794,7 @@ export type Database = {
           season_number: number
           season_winner_courses: number | null
           season_winner_user_id: string | null
+          sponsor_logo_url: string | null
           sponsor_name: string | null
           sponsor_url: string | null
           start_date: string
@@ -1813,6 +1814,7 @@ export type Database = {
           season_number: number
           season_winner_courses?: number | null
           season_winner_user_id?: string | null
+          sponsor_logo_url?: string | null
           sponsor_name?: string | null
           sponsor_url?: string | null
           start_date: string
@@ -1832,6 +1834,7 @@ export type Database = {
           season_number?: number
           season_winner_courses?: number | null
           season_winner_user_id?: string | null
+          sponsor_logo_url?: string | null
           sponsor_name?: string | null
           sponsor_url?: string | null
           start_date?: string
