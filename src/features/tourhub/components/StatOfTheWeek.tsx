@@ -29,9 +29,10 @@ const SLATE_500 = '#64748B';
 const SLATE_600 = '#475569';
 const SLATE_200 = 'rgba(15,23,42,0.10)';
 
-// ── Default category ──
+// ── Random per-session default ──
 function pickRandomCategoryKey(): string {
-  return 'earnings';
+  const idx = Math.floor(Math.random() * LEADER_CATEGORIES.length);
+  return LEADER_CATEGORIES[idx]?.key ?? 'earnings';
 }
 
 // ── Split hero number into ink whole + amber decimal/suffix ──
