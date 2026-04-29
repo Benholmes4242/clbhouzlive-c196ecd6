@@ -913,45 +913,116 @@ export function ExplorationTab() {
       {/* 7. TIER LADDER */}
       <div style={{ padding: '22px 20px 0' }}>
         <SectionLabel>TIER LADDER</SectionLabel>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)' }}>
-          {EXPLORER_TIERS.map((t, i) => {
-            const isUnlocked =
-              countriesPlayed >= t.minCountries && continentsPlayed >= t.minContinents;
-            const isCurrent = t.id === currentTier.id && countriesPlayed > 0;
-            return (
-              <div
-                key={t.id}
-                style={{
-                  borderRight: i < 4 ? '1px solid rgba(15,23,42,0.1)' : 'none',
-                  padding: '10px 4px',
-                  textAlign: 'center',
-                  background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
-                }}
-              >
+        <div style={{ position: 'relative' }}>
+          {/* Connector hairline through the icon row centre.
+              Status dot (~6px h + 6px mb) + icon circle (28px) ⇒ centre ≈ 12 + 14 = 26px from top of cell.
+              Cell padding-top is 10, so absolute top ≈ 36px. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              left: '10%',
+              right: '10%',
+              top: 36,
+              height: 1,
+              background: HAIRLINE,
+              zIndex: 0,
+            }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', position: 'relative', zIndex: 1 }}>
+            {EXPLORER_TIERS.map((t) => {
+              const isUnlocked =
+                countriesPlayed >= t.minCountries && continentsPlayed >= t.minContinents;
+              const isCurrent = t.id === currentTier.id && countriesPlayed > 0;
+              const unlockedAt = tierUnlockMap.get(t.id);
+
+              const Icon = getTierIcon(t.id);
+              const iconColor = isCurrent ? CRIMSON : isUnlocked ? INK : HAIRLINE;
+              const labelColor = isCurrent ? INK : isUnlocked ? INK : INK_FAINT;
+              const dateColor = isCurrent ? CRIMSON : INK_FAINT;
+
+              let statusDot: React.ReactNode;
+              if (isCurrent) {
+                statusDot = (
+                  <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: CRIMSON }} />
+                );
+              } else if (isUnlocked) {
+                statusDot = (
+                  <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: INK }} />
+                );
+              } else {
+                statusDot = (
+                  <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', border: `1px solid ${HAIRLINE}`, background: 'transparent' }} />
+                );
+              }
+
+              return (
                 <div
+                  key={t.id}
                   style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                    marginBottom: 4,
-                    color: isCurrent ? CRIMSON : isUnlocked ? INK_FAINT : HAIRLINE,
+                    padding: '10px 4px 12px',
+                    textAlign: 'center',
+                    background: isCurrent ? 'rgba(159,29,29,0.04)' : 'transparent',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
-                  {isCurrent ? '● NOW' : isUnlocked ? 'DONE' : getTierAbbr(t.id)}
+                  {/* Status dot */}
+                  <div style={{ height: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {statusDot}
+                  </div>
+
+                  {/* Icon wrapped in a 28×28 bg circle so the connector hairline appears to thread through */}
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      background: BG,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: iconColor,
+                    }}
+                  >
+                    <Icon size={16} color={iconColor} />
+                  </div>
+
+                  {/* Tier short name */}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      lineHeight: 1.2,
+                      color: labelColor,
+                      letterSpacing: '-0.005em',
+                    }}
+                  >
+                    {getTierShortName(t.id)}
+                  </div>
+
+                  {/* Unlock date (only for unlocked tiers) */}
+                  <div style={{ minHeight: 12 }}>
+                    {unlockedAt && (
+                      <div
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 700,
+                          color: dateColor,
+                          letterSpacing: '0.06em',
+                          fontVariantNumeric: 'tabular-nums lining-nums',
+                        }}
+                      >
+                        {formatTierUnlockDate(unlockedAt)}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    color: isCurrent ? INK : isUnlocked ? INK_FAINT : INK_MUTED,
-                  }}
-                >
-                  {getTierShortName(t.id)}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
