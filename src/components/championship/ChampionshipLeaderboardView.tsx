@@ -1063,7 +1063,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         <div style={{
           fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic',
         }}>
-          Compiled from members' verified rounds · Updated daily
+          Compiled from members' verified course visits · Updated daily
         </div>
       </div>
 
