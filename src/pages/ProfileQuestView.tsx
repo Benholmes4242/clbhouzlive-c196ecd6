@@ -23,8 +23,6 @@ import { useQuestCourses } from '@/hooks/useQuestCourses';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
-import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
-import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
 
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
 
