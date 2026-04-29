@@ -54,6 +54,73 @@ const DARK = '#0F172A';
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
+function formatHandicapDistance(distance: number): string {
+  if (distance < 0.1) return '<0.1';
+  return distance.toFixed(1);
+}
+
+interface HandicapChaseStatement {
+  priority: number;
+  text: string;
+  emphasis?: 'positive' | 'negative' | 'neutral';
+}
+
+interface BuildHandicapChaseArgs {
+  userHandicap: number;
+  userTier: HandicapTier;
+  trajectoryBest: number | null;
+  yoyImprovement: number | null;
+  closestRivalAhead: { name: string; gap: number } | null;
+}
+
+function buildHandicapChaseStatements(args: BuildHandicapChaseArgs): HandicapChaseStatement[] {
+  const out: HandicapChaseStatement[] = [];
+
+  // P1 — Distance to next sharper tier
+  const tierOrder: HandicapTier[] = ['elite', 'scratch', 'player', 'single', 'midfielder', 'weekend', 'hacker'];
+  const currentIdx = tierOrder.indexOf(args.userTier);
+  if (currentIdx > 0) {
+    const sharperTier = tierOrder[currentIdx - 1];
+    const sharperUpperBound = getTierUpperBound(sharperTier);
+    const distance = args.userHandicap - sharperUpperBound;
+    if (distance > 0 && distance <= 5.0) {
+      out.push({
+        priority: 1,
+        text: `Drop ${formatHandicapDistance(distance)} to reach ${getTierShortName(sharperTier)}.`,
+        emphasis: 'positive',
+      });
+    }
+  }
+
+  // P2 — Closest rival overtake
+  if (args.closestRivalAhead && args.closestRivalAhead.gap > 0 && args.closestRivalAhead.gap <= 3.0) {
+    out.push({
+      priority: 2,
+      text: `${args.closestRivalAhead.name} is ${formatHandicapDistance(args.closestRivalAhead.gap)} ahead — close to draw level.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  // P3 — Improvement streak (12-month)
+  if (args.yoyImprovement !== null && args.yoyImprovement > 0.3) {
+    out.push({
+      priority: 3,
+      text: `Down ${args.yoyImprovement.toFixed(1)} over 12 months — keep going.`,
+      emphasis: 'positive',
+    });
+  }
+
+  // P4 — Peak status
+  if (args.trajectoryBest !== null && Math.abs(args.userHandicap - args.trajectoryBest) < 0.05) {
+    out.push({
+      priority: 4,
+      text: `${formatHcp(args.userHandicap)} matches your 12-month best — holding peak.`,
+      emphasis: 'positive',
+    });
+  }
+
+  return out.sort((a, b) => a.priority - b.priority).slice(0, 3);
+}
 
 function getMastheadSubtitle(peerGroup: PeerGroup, clubName: string | null): string {
   switch (peerGroup) {
