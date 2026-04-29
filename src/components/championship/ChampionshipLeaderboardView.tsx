@@ -1219,6 +1219,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           const isLast = i === allEntries.length - 1;
           const showStreak = timeFilter === 'seasonal' && p.streak_current >= 3;
 
+          // ── Chaser strip values (only for current user) ──
+          let chaserAbove: number | null = null;
+          let chaserBelow: number | null = null;
+          if (p.is_current_user && i > 0 && i < allEntries.length - 1) {
+            const above = allEntries[i - 1];
+            const below = allEntries[i + 1];
+            if (above && below) {
+              chaserAbove = Math.max(0, above.courses_this_season - p.courses_this_season);
+              chaserBelow = Math.max(0, p.courses_this_season - below.courses_this_season);
+            }
+          }
+          const showChaserStrip = chaserAbove !== null && chaserBelow !== null && (chaserAbove > 0 || chaserBelow > 0);
+
           return (
             <div
               key={p.user_id}
