@@ -5,7 +5,9 @@ import {
   useExplorationLeaderboard,
   useUserExplorationStatus,
   useCountriesByMemberCount,
+  useUserTierUnlocks,
 } from '@/hooks/leaderboards';
+import { getTierIcon } from './icons/TierIcons';
 import { useDailyEditorial } from '@/hooks/championship';
 import { supabase } from '@/integrations/supabase/client';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -58,6 +60,72 @@ function loadSavedFilters() {
 // ----------------------------------------------------------------------------
 // Helpers
 // ----------------------------------------------------------------------------
+
+function formatTierUnlockDate(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const monthsAgo = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+
+  if (monthsAgo > 12) {
+    return d.toLocaleDateString('en-GB', { year: 'numeric' });
+  }
+
+  const month = d.toLocaleDateString('en-GB', { month: 'short' });
+  const yy = d.getFullYear().toString().slice(2);
+  return `${month} '${yy}`;
+}
+
+interface GlobalChaseStatement {
+  priority: number;
+  text: string;
+  emphasis?: 'positive' | 'negative' | 'neutral';
+}
+
+interface BuildGlobalChaseArgs {
+  countriesPlayed: number;
+  continentsPlayed: number;
+  nextTier: { name: string; minCountries: number; minContinents: number } | null;
+  closestRivalAhead: { name: string; gap: number } | null;
+}
+
+function buildGlobalChaseStatements(args: BuildGlobalChaseArgs): GlobalChaseStatement[] {
+  const out: GlobalChaseStatement[] = [];
+
+  if (args.nextTier) {
+    const countriesNeeded = Math.max(0, args.nextTier.minCountries - args.countriesPlayed);
+    if (countriesNeeded > 0) {
+      const word = countriesNeeded === 1 ? 'country' : 'countries';
+      out.push({
+        priority: 1,
+        text: `${countriesNeeded} ${word} to reach ${args.nextTier.name}.`,
+        emphasis: 'positive',
+      });
+    }
+  }
+
+  if (args.nextTier) {
+    const continentsNeeded = Math.max(0, args.nextTier.minContinents - args.continentsPlayed);
+    if (continentsNeeded > 0) {
+      const word = continentsNeeded === 1 ? 'continent' : 'continents';
+      out.push({
+        priority: 2,
+        text: `Add ${continentsNeeded} ${word} to unlock ${args.nextTier.name}.`,
+        emphasis: 'neutral',
+      });
+    }
+  }
+
+  if (args.closestRivalAhead && args.closestRivalAhead.gap > 0) {
+    const word = args.closestRivalAhead.gap === 1 ? 'country' : 'countries';
+    out.push({
+      priority: 3,
+      text: `${args.closestRivalAhead.name} has ${args.closestRivalAhead.gap} more ${word} — ${args.closestRivalAhead.gap} to draw level.`,
+      emphasis: 'neutral',
+    });
+  }
+
+  return out.sort((a, b) => a.priority - b.priority).slice(0, 3);
+}
 
 
 function selectGlobalEyebrow(args: {
