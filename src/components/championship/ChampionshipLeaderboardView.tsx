@@ -1004,10 +1004,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         ))}
       </div>
 
-      {/* ── 2.5. WIRE TICKER (seasonal only, conditional on dispatches) ── */}
-      {timeFilter === 'seasonal' && dispatches && dispatches.length > 0 && (
-        <WireTicker dispatches={dispatches} onDispatchClick={handleDispatchClick} />
-      )}
+      {/* ── WIRE TICKER removed ── */}
 
       {/* ── 3. FRONT-PAGE LEDE ── */}
       {editorialPending ? (
