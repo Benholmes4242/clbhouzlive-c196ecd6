@@ -742,6 +742,95 @@ export function LowestHandicapLeaderboard({
         </div>
       </div>
 
+      {/* ── 5.5 ON THE CHASE PANEL — top100 logged-in with handicap ── */}
+      {chaseStatements.length > 0 && (
+        <div style={{ padding: '20px 20px 0' }}>
+          <div
+            style={{
+              borderTop: `3px double ${INK}`,
+              borderBottom: `3px double ${INK}`,
+              padding: '16px 4px',
+              background: '#fff',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: -8,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: BG,
+                padding: '0 10px',
+                fontSize: 9,
+                fontWeight: 800,
+                color: CRIMSON,
+                letterSpacing: '0.28em',
+              }}
+            >
+              ON THE CHASE
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+              {chaseStatements.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 10,
+                    padding: '4px 12px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      color: INK_FAINT,
+                      letterSpacing: '0.18em',
+                      minWidth: 14,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span
+                    style={{
+                      flex: 1,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color:
+                        s.emphasis === 'positive'
+                          ? '#15803D'
+                          : s.emphasis === 'negative'
+                          ? CRIMSON
+                          : INK,
+                      letterSpacing: '-0.005em',
+                      lineHeight: 1.4,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {s.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{
+                marginTop: 14,
+                textAlign: 'center',
+                fontSize: 9,
+                fontWeight: 700,
+                color: INK_FAINT,
+                letterSpacing: '0.12em',
+                fontStyle: 'italic',
+              }}
+            >
+              Based on your global standings · Updated daily
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── TRAJECTORY CARD ── */}
       {showTrajectory && (
         <div style={{ padding: '20px 20px 0' }}>
