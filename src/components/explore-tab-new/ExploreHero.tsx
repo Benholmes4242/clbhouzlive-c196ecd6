@@ -107,6 +107,9 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
         >
           <span
             style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
               fontSize: 10,
               fontWeight: 800,
               letterSpacing: '0.12em',
@@ -123,6 +126,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               transformOrigin: 'left center',
             }}
           >
+            <span style={{ fontSize: 11, lineHeight: 1 }}>🔥</span>
             Featured
           </span>
           {hero.global_rank ? (
