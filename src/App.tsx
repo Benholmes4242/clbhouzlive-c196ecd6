@@ -14,7 +14,6 @@ import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { ThemeProvider } from '@/components/theme-provider';
 
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
-import { AppBootstrapLoader } from "@/components/AppBootstrapLoader";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
