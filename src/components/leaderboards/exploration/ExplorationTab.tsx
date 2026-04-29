@@ -341,6 +341,76 @@ export function ExplorationTab() {
   const countriesNeeded = nextTier ? Math.max(0, nextTier.minCountries - countriesPlayed) : 0;
   const continentsNeeded = nextTier ? Math.max(0, nextTier.minContinents - continentsPlayed) : 0;
 
+  // ---- Chase statements (P1 country gap, P2 continent expansion, P3 closest rival) ----
+  const closestRivalAhead = useMemo(() => {
+    if (!user || !allEntries.length) return null;
+    const userIdx = allEntries.findIndex((e) => e.is_current_user);
+    if (userIdx <= 0) return null;
+    const rival = allEntries[userIdx - 1];
+    const me = allEntries[userIdx];
+    if (!rival || !me) return null;
+    const gap = (rival.countries_count ?? 0) - (me.countries_count ?? 0);
+    if (gap <= 0) return null;
+    return {
+      name: rival.display_name || rival.username || 'A rival',
+      gap,
+    };
+  }, [user, allEntries]);
+
+  const chaseStatements = useMemo(() => {
+    if (!user) return [];
+    if (countriesPlayed === 0) return [];
+    if (!nextTier) return [];
+
+    return buildGlobalChaseStatements({
+      countriesPlayed,
+      continentsPlayed,
+      nextTier: {
+        name: nextTier.name,
+        minCountries: nextTier.minCountries,
+        minContinents: nextTier.minContinents,
+      },
+      closestRivalAhead,
+    });
+  }, [user, countriesPlayed, continentsPlayed, nextTier, closestRivalAhead]);
+
+  // ---- Jump-to-position pill state ----
+  const [userRowOffscreen, setUserRowOffscreen] = useState(false);
+  const [userRowDirection, setUserRowDirection] = useState<'above' | 'below'>('below');
+
+  useEffect(() => {
+    if (viewMode !== 'player' || !(scope === 'global' || scope === 'friends')) {
+      setUserRowOffscreen(false);
+      return;
+    }
+    const el = document.querySelector('[data-user-row="self"]') as HTMLElement | null;
+    if (!el) {
+      setUserRowOffscreen(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setUserRowOffscreen(false);
+        } else {
+          setUserRowOffscreen(true);
+          const rect = entry.boundingClientRect;
+          setUserRowDirection(rect.top < 0 ? 'above' : 'below');
+        }
+      },
+      { threshold: 0, rootMargin: '0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [viewMode, scope, allEntries.length]);
+
+  const handleJumpToUser = useCallback(() => {
+    const el = document.querySelector('[data-user-row="self"]') as HTMLElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
+
   // ---- Editorial eyebrow (personalised) ----
   const personalisedEyebrow = useMemo(() => {
     return selectGlobalEyebrow({
