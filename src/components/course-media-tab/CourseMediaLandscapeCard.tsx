@@ -180,15 +180,26 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
             </div>
           )}
           {post.displayName && (
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#FFFFFF',
-                textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-              }}
-            >
-              {post.displayName}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <SquircleAvatar
+                src={post.avatarUrl}
+                alt={post.displayName}
+                size={20}
+                fallback={post.displayName.charAt(0).toUpperCase()}
+              />
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#FFFFFF',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {post.displayName}
+              </div>
             </div>
           )}
         </div>
