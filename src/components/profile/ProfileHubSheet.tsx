@@ -11,6 +11,8 @@ import type { PanInfo } from 'framer-motion';
 import {
   ChevronRight, LogOut,
   Shield, Plus, Check, X,
+  User, MessageCircle, Bell,
+  Pencil, Building2, Settings as SettingsIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -207,21 +209,24 @@ function ProfileHubSheet({
   // ── Quick actions config ──
   const quickActions = [
     {
-      emoji: '👤',
+      Icon: User,
+      iconColor: '#3B82F6',
       label: 'View Profile',
       route: `/profile/${localActiveId}`,
       badge: 0,
       badgeColor: '',
     },
     {
-      emoji: '💬',
+      Icon: MessageCircle,
+      iconColor: '#10B981',
       label: 'Messages',
       route: '/messages',
       badge: unreadMessageCount,
       badgeColor: 'emerald',
     },
     {
-      emoji: '🔔',
+      Icon: Bell,
+      iconColor: '#F7931E',
       label: 'Notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
@@ -230,9 +235,9 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
-    { emoji: '✏️', bg: 'rgba(15,23,42,0.05)', label: 'Edit profile', route: editRoute },
-    { emoji: '🏢', bg: 'rgba(15,23,42,0.05)', label: 'Manage business profiles', route: '/businesses/manage' },
-    { emoji: '⚙️', bg: 'rgba(15,23,42,0.05)', label: 'Settings', route: '/settings' },
+    { Icon: Pencil, iconColor: '#F7931E', label: 'Edit profile', route: editRoute },
+    { Icon: Building2, iconColor: '#0A5A3C', label: 'Manage business profiles', route: '/businesses/manage' },
+    { Icon: SettingsIcon, iconColor: '#64748B', label: 'Settings', route: '/settings' },
   ];
 
   // ── Portal content ──
@@ -422,7 +427,7 @@ function ProfileHubSheet({
 
               {/* ── Quick actions — 3 column grid ── */}
               <div className="grid grid-cols-3 gap-2 py-4">
-                {quickActions.map(({ emoji, label, route, badge, badgeColor }) => (
+                {quickActions.map(({ Icon, iconColor, label, route, badge, badgeColor }) => (
                     <button
                       key={label}
                       type="button"
@@ -467,9 +472,9 @@ function ProfileHubSheet({
                           height: 36,
                           background: badge > 0
                             ? badgeColor === 'emerald'
-                              ? 'rgba(16,185,129,0.10)'
-                              : 'rgba(247,147,30,0.10)'
-                            : 'rgba(100,116,139,0.08)',
+                              ? 'rgba(16,185,129,0.12)'
+                              : 'rgba(247,147,30,0.12)'
+                            : `${iconColor}14`,
                           boxShadow: badge > 0
                             ? badgeColor === 'emerald'
                               ? '0 0 0 1px rgba(16,185,129,0.20)'
@@ -478,7 +483,7 @@ function ProfileHubSheet({
                           transition: 'background 0.2s ease, box-shadow 0.2s ease',
                         }}
                       >
-                        <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
+                        <Icon size={18} color={iconColor} strokeWidth={2.2} />
                       </div>
 
                       <span
@@ -497,7 +502,7 @@ function ProfileHubSheet({
               {/* ── Account section ── */}
               <div>
                 <RuleMarker label="Account" />
-                {accountRows.map(({ emoji, bg, label, route }, index) => (
+                {accountRows.map(({ Icon, iconColor, label, route }, index) => (
                   <div key={label}>
                     {index > 0 && <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', marginLeft: 46 }} />}
                     <button
@@ -507,9 +512,9 @@ function ProfileHubSheet({
                     >
                       <div
                         className="flex items-center justify-center rounded-[10px]"
-                        style={{ width: 34, height: 34, background: bg }}
+                        style={{ width: 34, height: 34, background: `${iconColor}14` }}
                       >
-                        <span style={{ fontSize: 17, lineHeight: 1 }}>{emoji}</span>
+                        <Icon size={17} color={iconColor} strokeWidth={2.2} />
                       </div>
                       <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
                       <ChevronRight className="w-[13px] h-[13px] text-muted-foreground/30" />
