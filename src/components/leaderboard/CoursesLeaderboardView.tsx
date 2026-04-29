@@ -46,19 +46,31 @@ function selectCoursesEyebrow(args: {
   totalInList: number;
   bucketListMoved: { course: string; positions: number } | null;
   circleActivity: { player: string; course: string; rating: number } | null;
+  mastheadCourse: string | null;
   defaultEyebrow: string;
 }): string {
   if (!args.isLoggedIn) return args.defaultEyebrow;
 
-  if (args.bucketListMoved) {
+  // Bucket list mover: only when the moving course IS the lede course.
+  if (
+    args.bucketListMoved &&
+    args.mastheadCourse &&
+    args.bucketListMoved.course === args.mastheadCourse
+  ) {
     return `ON YOUR RADAR · ${args.bucketListMoved.course.toUpperCase()}`;
   }
 
-  if (args.circleActivity && args.circleActivity.rating >= 8.0) {
+  // Circle activity: only when the rated course IS the lede course.
+  if (
+    args.circleActivity &&
+    args.circleActivity.rating >= 8.0 &&
+    args.mastheadCourse &&
+    args.circleActivity.course === args.mastheadCourse
+  ) {
     return `FROM YOUR CIRCLE · ${args.circleActivity.player.toUpperCase()}`;
   }
 
-  if (args.userPlayedCount === 0) return 'LOG A ROUND TO ENTER THE LIST';
+  if (args.userPlayedCount === 0) return 'RATE A COURSE TO ENTER THE LIST';
   if (args.totalInList > 0 && args.userPlayedCount >= args.totalInList) return "YOU'VE COMPLETED THE LIST";
   if (args.userPlayedCount >= 50) return `YOU'VE PLAYED ${args.userPlayedCount} OF THE LIST`;
 
@@ -341,9 +353,10 @@ export function CoursesLeaderboardView() {
       totalInList,
       bucketListMoved: bucketListMoved ?? null,
       circleActivity,
+      mastheadCourse: masthead?.course_name ?? null,
       defaultEyebrow: fallback,
     });
-  }, [mastheadCopy?.eyebrow, circleRecentRounds, authUser?.id, userPlayedCount, totalInList, bucketListMoved]);
+  }, [mastheadCopy?.eyebrow, masthead?.course_name, circleRecentRounds, authUser?.id, userPlayedCount, totalInList, bucketListMoved]);
 
   // ─── Infinite scroll ───────────────────────────────────────────────
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -802,7 +815,7 @@ export function CoursesLeaderboardView() {
       {/* ── FOOTER CAPTION ──────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic' }}>
-          Ranked by community rating across verified rounds · Updated daily
+          Compiled from members' verified course ratings · Updated daily
         </div>
       </div>
     </div>
