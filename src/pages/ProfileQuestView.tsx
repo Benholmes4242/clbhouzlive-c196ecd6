@@ -248,7 +248,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
     <PageRoot className="min-h-screen bg-background">
       {/* Always-on header with back button + centered title */}
       <header
-        className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 backdrop-blur-lg"
+        className="sticky top-0 z-50 flex items-center gap-3 px-4 min-h-14 backdrop-blur-lg"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           background: 'rgba(248,250,252,0.95)',
