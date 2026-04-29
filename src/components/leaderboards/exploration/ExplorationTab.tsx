@@ -669,6 +669,82 @@ export function ExplorationTab() {
         </div>
       </div>
 
+      {/* 5.5. ON THE CHASE PANEL (current user only, when not max tier) */}
+      {chaseStatements.length > 0 && (
+        <div style={{ padding: '22px 20px 0' }}>
+          <div
+            style={{
+              borderTop: `3px double ${INK}`,
+              borderBottom: `3px double ${INK}`,
+              padding: '14px 0 12px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.28em',
+                color: CRIMSON,
+                textAlign: 'center',
+                marginBottom: 12,
+              }}
+            >
+              ON THE CHASE
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {chaseStatements.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '24px 1fr',
+                    alignItems: 'baseline',
+                    gap: 10,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      color: INK_FAINT,
+                      letterSpacing: '0.06em',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: s.emphasis === 'positive' ? INK : INK_BODY,
+                      lineHeight: 1.45,
+                      letterSpacing: '-0.005em',
+                    }}
+                  >
+                    {s.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 10,
+                color: INK_FAINT,
+                fontStyle: 'italic',
+                textAlign: 'center',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Based on your global standings · Updated daily
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 6. YOUR TIER CARD or CTA */}
       {countriesPlayed > 0 ? (
         <div style={{ padding: '20px 20px 0' }}>
