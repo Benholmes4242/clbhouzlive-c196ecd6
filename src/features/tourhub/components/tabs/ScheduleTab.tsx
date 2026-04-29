@@ -533,8 +533,8 @@ export function ScheduleTab() {
 
       {/* Content below hero */}
       <div
-        className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
-        
+        className="sticky z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
+        style={{ top: 'var(--sat)' }}
       >
         {/* ── ROW 1: Filter underline tabs ── */}
         <div style={{ padding: '0' }}>
