@@ -24,3 +24,7 @@ export type { Season } from './useSeasonCalendar';
 // Daily editorial (Top 100 front page)
 export { useDailyEditorial } from './useDailyEditorial';
 export type { EditorialCopy } from './useDailyEditorial';
+
+// Wire ticker dispatches
+export { useChampionshipDispatches } from './useChampionshipDispatches';
+export type { ChampionshipDispatch } from './useChampionshipDispatches';
