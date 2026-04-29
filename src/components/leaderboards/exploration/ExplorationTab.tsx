@@ -296,6 +296,13 @@ export function ExplorationTab() {
   );
 
   const { data: userStatus } = useUserExplorationStatus({ userId: user?.id });
+  const { data: tierUnlocks = [] } = useUserTierUnlocks({ userId: user?.id });
+
+  const tierUnlockMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const t of tierUnlocks) map.set(t.tier_id, t.unlocked_at);
+    return map;
+  }, [tierUnlocks]);
 
   const {
     data: countryData,
