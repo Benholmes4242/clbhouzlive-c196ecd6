@@ -16,6 +16,7 @@ import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Search, X, Pencil, ArrowUpDown } from 'lucide-react';
 import { AppSelect } from '@/components/ui/AppSelect';
+import { Button } from '@/components/ui/button';
 import type { ScoreTier } from '@/utils/getScoreTier';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -519,8 +520,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           onChange={(v) => setSortBy(v as ReviewsSortBy)}
           options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
           ariaLabel="Sort reviews"
-          icon={<ArrowUpDown className="w-3 h-3" />}
-          triggerClassName="!h-auto !rounded-full !bg-[#0F172A] !border-0 !text-white !px-3 !py-1.5 !text-[11.5px] !font-extrabold gap-1.5 [&>span]:text-white [&_svg]:text-white"
+          icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
+          triggerClassName="!h-auto !py-1 !px-2 !text-xs !font-medium !rounded-md !bg-background !border !border-input !text-foreground hover:!bg-accent hover:!text-accent-foreground gap-0 [&>span]:text-foreground"
         />
 
         <RatingFilterChips
