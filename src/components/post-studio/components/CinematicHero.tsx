@@ -248,42 +248,50 @@ export function CinematicHero({
         {/* Video play indicator + duration */}
         {isVideo && (
           <>
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                pointerEvents: 'none',
-              }}
-            >
-              <div
+            {!isPlaying && (
+              <button
+                type="button"
+                onClick={handleVideoTap}
+                aria-label="Play video"
                 style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.55)',
+                  position: 'absolute',
+                  inset: 0,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid rgba(255,255,255,0.18)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  zIndex: 5,
                 }}
               >
-                <Play
-                  className="text-white"
-                  style={{ width: 24, height: 24, marginLeft: 2 }}
-                  fill="white"
-                  strokeWidth={0}
-                />
-              </div>
-            </div>
-            {cover.duration != null && (
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.55)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                  }}
+                >
+                  <Play
+                    className="text-white"
+                    style={{ width: 24, height: 24, marginLeft: 2 }}
+                    fill="white"
+                    strokeWidth={0}
+                  />
+                </div>
+              </button>
+            )}
+            {!isPlaying && cover.duration != null && (
               <div
                 style={{
                   position: 'absolute',
-                  top: 12,
-                  right: 56,
+                  bottom: 12,
+                  left: 12,
                   background: 'rgba(0,0,0,0.55)',
                   border: '1px solid rgba(255,255,255,0.18)',
                   borderRadius: 6,
@@ -292,7 +300,8 @@ export function CinematicHero({
                   fontWeight: 700,
                   color: '#fff',
                   pointerEvents: 'none',
-                  zIndex: 3,
+                  zIndex: 5,
+                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
                 {formatDuration(cover.duration)}
