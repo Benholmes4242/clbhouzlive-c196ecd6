@@ -1126,15 +1126,17 @@ const ProfilePageV2Content: React.FC = () => {
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
                   className={cn(
-                    "relative py-1.5 px-2 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg flex-1",
-                    isActive 
-                      ? "font-semibold" 
-                      : "font-medium text-[#64748B] hover:text-foreground"
+                    "relative py-1.5 px-2 text-sm transition-colors duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex-1",
+                    isActive
+                      ? "font-extrabold"
+                      : "font-medium hover:text-foreground"
                   )}
-                  style={{ 
+                  style={{
                     touchAction: 'auto',
-                    background: isActive ? '#0F172A' : 'transparent',
-                    color: isActive ? '#ffffff' : undefined,
+                    background: 'transparent',
+                    border: 'none',
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    letterSpacing: isActive ? '-0.01em' : 0,
                   }}
                 >
                   {tab.label}

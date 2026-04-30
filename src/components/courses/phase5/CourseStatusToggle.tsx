@@ -66,7 +66,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   return (
     <div className={cn("space-y-3", className)}>
       <div style={{ display: 'flex', gap: 8 }}>
-        {/* Mark Played — white/dark border by default; amber gradient when played */}
+        {/* Mark Played — amber ghost (matches Official Course Website button) */}
         <button
           onClick={handlePlayedClick}
           disabled={isUpdating}
@@ -82,11 +82,13 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
             justifyContent: 'center',
             gap: 6,
             background: isPlayed
-              ? 'linear-gradient(90deg, #F59E0B, #F7931E)'
+              ? 'rgba(247,147,30,0.06)'
               : '#ffffff',
-            color: isPlayed ? '#fff' : '#0F172A',
-            border: isPlayed ? 'none' : '1.5px solid rgba(15,23,42,0.12)',
-            boxShadow: isPlayed ? '0 3px 12px rgba(247,147,30,0.28)' : 'none',
+            color: isPlayed ? '#F7931E' : '#0F172A',
+            border: isPlayed
+              ? '1.5px solid rgba(247,147,30,0.2)'
+              : '1.5px solid rgba(15,23,42,0.12)',
+            boxShadow: 'none',
             transition: 'all 0.18s ease',
           }}
         >

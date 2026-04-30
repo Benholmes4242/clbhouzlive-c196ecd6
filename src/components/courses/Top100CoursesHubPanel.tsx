@@ -252,7 +252,7 @@ const Top100CoursesHubPanel = () => {
       {/* List filter — horizontal pill row, scrollable on overflow */}
       <div className="-mx-4 px-4 overflow-x-auto" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
         <style>{`.top100-pill-row::-webkit-scrollbar { display: none; }`}</style>
-        <div className="top100-pill-row" style={{ display: 'flex', gap: 6, paddingBottom: 2 }}>
+        <div className="top100-pill-row" style={{ display: 'flex', gap: 18, paddingBottom: 2 }}>
           {listOptions.map((option) => {
             const isActive = option.value === selectedList;
             const pillLabel = option.label.replace(/\s*Top 100\s*$/, '').trim() || option.label;
@@ -264,16 +264,17 @@ const Top100CoursesHubPanel = () => {
                 aria-pressed={isActive}
                 style={{
                   flexShrink: 0,
-                  padding: '8px 14px',
-                  borderRadius: 999,
-                  fontSize: 13, fontWeight: 700,
-                  background: isActive ? '#0F172A' : '#ffffff',
-                  color: isActive ? '#ffffff' : '#475569',
-                  border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
+                  padding: '6px 4px',
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: 13,
+                  fontWeight: isActive ? 800 : 500,
+                  color: isActive ? '#0F172A' : '#94A3B8',
                   cursor: 'pointer',
-                  transition: 'all 150ms',
-                  letterSpacing: '-0.005em',
+                  transition: 'color 150ms',
+                  letterSpacing: isActive ? '-0.01em' : 0,
                   whiteSpace: 'nowrap',
+                  minHeight: 34,
                 }}
                 className="active:scale-[0.97]"
               >

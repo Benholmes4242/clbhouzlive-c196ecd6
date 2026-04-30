@@ -18,19 +18,20 @@ interface SegmentedTabsProps {
  */
 export function SegmentedTabs({ options, value, onChange, className = '' }: SegmentedTabsProps) {
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-5', className)}>
       {options.map((option) => {
         const isActive = value === option.value;
         return (
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
-            className="px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold"
+            className="px-1 min-h-[36px] text-sm whitespace-nowrap transition-colors duration-200 active:scale-[0.97]"
             style={{
-              borderRadius: 8,
-              background: isActive ? '#0F172A' : 'transparent',
-              color: isActive ? '#ffffff' : '#64748B',
-              border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
+              background: 'transparent',
+              border: 'none',
+              fontWeight: isActive ? 800 : 500,
+              color: isActive ? '#0F172A' : '#94A3B8',
+              letterSpacing: isActive ? '-0.01em' : 0,
             }}
           >
             {option.label}

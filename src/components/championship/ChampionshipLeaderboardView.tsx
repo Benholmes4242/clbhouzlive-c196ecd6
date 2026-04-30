@@ -1251,7 +1251,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
 
         {/* Arena tabs */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8, justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, marginBottom: 8, justifyContent: 'center' }}>
           {arenas.map((a) => {
             const isActive = arenaMode === a.key;
             return (
@@ -1259,23 +1259,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 key={a.key}
                 onClick={() => handleArenaModeChange(a.key)}
                 style={{
-                  padding: '5px 10px', borderRadius: 8,
-                  background: isActive ? '#0F172A' : 'transparent',
-                  color: isActive ? '#fff' : '#64748B',
-                  border: isActive ? 'none' : '1px solid rgba(15,23,42,0.15)',
-                  fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em',
+                  padding: '6px 4px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: isActive ? '#0F172A' : '#94A3B8',
+                  fontSize: 12, fontWeight: isActive ? 800 : 500,
+                  cursor: 'pointer',
+                  letterSpacing: isActive ? '-0.01em' : 0,
                   display: 'inline-flex', alignItems: 'center', gap: 4,
+                  transition: 'color 0.15s ease',
                 }}
               >
                 {a.label}
                 {a.count != null && (
                   <span style={{
-                    fontSize: 9, fontWeight: 800,
-                    padding: '1px 5px', borderRadius: 6,
-                    background: isActive ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)',
-                    color: isActive ? '#fff' : '#64748B',
+                    fontSize: 10, fontWeight: 700,
+                    color: isActive ? '#0F172A' : '#94A3B8',
                     fontVariantNumeric: 'tabular-nums lining-nums',
                     letterSpacing: 0,
+                    opacity: isActive ? 1 : 0.7,
                   }}>
                     {a.count}
                   </span>
