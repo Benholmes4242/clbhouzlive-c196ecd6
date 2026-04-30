@@ -26,8 +26,8 @@ import {
 import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useIsFollowingUser } from '@/hooks/useIsFollowingUser';
-import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
 const FONTS = {
   geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
