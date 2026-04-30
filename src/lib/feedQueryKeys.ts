@@ -27,6 +27,8 @@
  * - 'pga-card-post-id' — tournament→post lookup metadata, not engagement
  * - 'player-scorecard' — tournament leaderboard data, not engagement
  * - 'tournaments-cache' — tournament metadata, not engagement
+ * - 'pga-card-scorecards-live' — tournament golf scoring data (eagles/birdies/pars), not engagement
+ * - 'pga-card-scorecards-result' — same, for completed tournaments
  *
  * If you find a query key matching the audit pattern that ISN'T in the
  * registries, verify it actually loads post engagement state before adding.
