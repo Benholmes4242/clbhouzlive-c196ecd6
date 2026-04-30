@@ -15,9 +15,14 @@
  *
  * Returns `{ isFollowing: boolean | undefined }`. `undefined` means
  * "cache unseeded — caller should fall back to its own prop".
+ *
+ * Implemented via useSyncExternalStore against React Query's QueryCache so
+ * we re-render whenever patchFollow writes to the canonical key — without
+ * triggering a fetch (a queryFn-less useQuery throws in v5).
  */
 
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useMemo, useSyncExternalStore } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface FollowStateTarget {
   targetActorType: 'personal' | 'business';
@@ -38,26 +43,42 @@ export function useFollowState({
 }: FollowStateTarget): FollowStateResult {
   const queryClient = useQueryClient();
 
-  const queryKey = [
-    'follow-status',
-    viewerActorType,
-    viewerActorId ?? null,
-    targetActorType,
-    targetActorId ?? null,
-  ] as const;
+  const queryKey = useMemo(
+    () => [
+      'follow-status',
+      viewerActorType,
+      viewerActorId ?? null,
+      targetActorType,
+      targetActorId ?? null,
+    ],
+    [viewerActorType, viewerActorId, targetActorType, targetActorId],
+  );
 
-  // useQuery WITHOUT a queryFn subscribes to the cache entry and re-renders
-  // on changes (which is what patchFollow triggers), but never fetches.
-  // We gate enabled on having both ids so we don't subscribe to noise.
-  const { data } = useQuery<{ isFollowing: boolean } | boolean | undefined>({
-    queryKey,
-    enabled: !!targetActorId && !!viewerActorId,
-    // No queryFn — pure cache subscriber.
-    staleTime: Infinity,
-    // Initial value comes from existing cache entry if any (seeded by mutations
-    // or surface-level direct-fetch queries).
-    initialData: () => queryClient.getQueryData(queryKey),
-  });
+  const cache = queryClient.getQueryCache();
+
+  // useSyncExternalStore needs a stable subscribe + snapshot. Snapshot returns
+  // the cached value (or undefined). Subscribe registers a cache listener
+  // that fires our notify callback whenever ANY query changes, but we only
+  // re-snapshot for our exact key (cheap shallow read).
+  const { subscribe, getSnapshot } = useMemo(() => {
+    const keyHash = JSON.stringify(queryKey);
+    return {
+      subscribe(notify: () => void) {
+        const unsub = cache.subscribe((event) => {
+          if (event?.query?.queryHash === keyHash) notify();
+        });
+        return unsub;
+      },
+      getSnapshot(): boolean | { isFollowing: boolean } | undefined {
+        return queryClient.getQueryData(queryKey) as
+          | boolean
+          | { isFollowing: boolean }
+          | undefined;
+      },
+    };
+  }, [cache, queryClient, queryKey]);
+
+  const data = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   const isFollowing =
     typeof data === 'boolean'
