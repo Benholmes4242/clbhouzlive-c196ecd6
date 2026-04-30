@@ -3,19 +3,21 @@ import { toast } from 'sonner';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useFollowStore } from '@/store/followStore';
 
 interface UseClubhouseFollowsOptions {
   userId: string | undefined;
 }
 
 /**
- * Manages optimistic follow state for the Clubhouse feed.
- * Uses the global Zustand follow store for cross-page sync.
+ * Manages follow tap handling for the Clubhouse feed.
+ *
+ * Post PR 2: Zustand overlay store removed. Follow state propagation now
+ * flows through React Query cache via patchFollow (single source of truth).
+ * The feed query holds isFollowedByMe per-post; mutations patch the cache
+ * which re-renders the feed without a refetch.
  */
 export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
   const followMutation = useFollowMutation();
-  const { setFollowing, getFollowing } = useFollowStore();
 
   // Busy guard to prevent rapid-fire mutations
   const isMutatingRef = useRef(false);
@@ -27,12 +29,12 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
 
     isMutatingRef.current = true;
 
-    const currentlyFollowed = getFollowing(post.userId, post.isFollowedByMe);
+    const currentlyFollowed = !!post.isFollowedByMe;
 
-    // Optimistic update via global store
-    setFollowing(post.userId, !currentlyFollowed);
-
-    analyticsEvents.track('feed_follow', { target_user_id: post.userId, action: currentlyFollowed ? 'unfollow' : 'follow' });
+    analyticsEvents.track('feed_follow', {
+      target_user_id: post.userId,
+      action: currentlyFollowed ? 'unfollow' : 'follow',
+    });
 
     followMutation.mutate(
       {
@@ -45,29 +47,40 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
       {
         onError: (error) => {
           console.error('[useClubhouseFollows] follow mutation failed:', error);
-          // Revert optimistic update in global store
-          setFollowing(post.userId, currentlyFollowed);
           toast.error('Could not update follow status. Please try again.');
         },
         onSettled: () => {
           isMutatingRef.current = false;
         },
-      }
+      },
     );
-  }, [userId, followMutation, setFollowing, getFollowing]);
+  }, [userId, followMutation]);
 
-  const handleFollowChange = useCallback((targetUserId: string, isFollowed: boolean) => {
-    setFollowing(targetUserId, isFollowed);
-  }, [setFollowing]);
+  // Kept for backward-compat with callers that used to push state into the
+  // Zustand store. No-op now — the cache patch is the source of truth.
+  const handleFollowChange = useCallback((_targetUserId: string, _isFollowed: boolean) => {
+    // intentional no-op
+  }, []);
 
   const getFollowState = useCallback((post: FeedPost | null): boolean => {
     if (!post) return false;
-    return getFollowing(post.userId, post.isFollowedByMe);
-  }, [getFollowing]);
-
-  const resetFollows = useCallback(() => {
-    useFollowStore.getState().reset();
+    return !!post.isFollowedByMe;
   }, []);
 
-  return { followOverrides: useFollowStore.getState().overrides, handleFollow, handleFollowChange, getFollowState, resetFollows };
+  const resetFollows = useCallback(() => {
+    // intentional no-op (no overlay store anymore)
+  }, []);
+
+  // Backward-compat: callers still destructure followOverrides as a Map.
+  // Always empty now — the cache patch is the source of truth, so downstream
+  // components reading a per-user override Map effectively get pass-through.
+  return {
+    followOverrides: EMPTY_OVERRIDES,
+    handleFollow,
+    handleFollowChange,
+    getFollowState,
+    resetFollows,
+  };
 }
+
+const EMPTY_OVERRIDES: Map<string, boolean> = new Map();

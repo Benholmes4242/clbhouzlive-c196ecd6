@@ -3,6 +3,7 @@ import { Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { patchFollow } from '@/lib/followCache';
 
 interface FriendRequestButtonsProps {
   notificationId: string;
@@ -76,6 +77,18 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       }
       setState('accepted');
       toast.success("Friend added");
+      // auto_follow_on_friend_accept trigger creates user_follows rows in BOTH
+      // directions. Patch follow caches so every surface updates without refresh.
+      patchFollow(
+        queryClient,
+        { targetActorType: 'personal', targetActorId: requesterId, targetUserId: requesterId, viewerUserId: user.id },
+        { isFollowing: true },
+      );
+      patchFollow(
+        queryClient,
+        { targetActorType: 'personal', targetActorId: user.id, targetUserId: user.id, viewerUserId: requesterId },
+        { isFollowing: true },
+      );
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
       queryClient.invalidateQueries({ queryKey: ['friends'] });
