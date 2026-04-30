@@ -15800,6 +15800,10 @@ export type Database = {
         Args: { p_business_profile_id: string; p_days?: number }
         Returns: Json
       }
+      get_business_relationship_status: {
+        Args: { target_business_id: string }
+        Returns: Json
+      }
       get_championship_dispatches: {
         Args: { p_limit?: number }
         Returns: {
