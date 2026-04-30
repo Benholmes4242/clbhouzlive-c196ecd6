@@ -22,7 +22,8 @@
  */
 
 import { useMemo, useSyncExternalStore } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FollowStateTarget {
   targetActorType: 'personal' | 'business';
