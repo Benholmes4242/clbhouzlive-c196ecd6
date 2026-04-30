@@ -249,8 +249,8 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     );
   })();
 
-  // Use relationship.isFollowing as source of truth (from RPC),
-  // but useUserFollow provides optimistic state
+  // Follow state is read from canonical 5-element cache key (Slice 3).
+  // Optimistic propagation is handled by useToggleFollow + patchFollow.
   const btnGuard = 'whitespace-nowrap overflow-visible';
   const followButton = (
     <Button
