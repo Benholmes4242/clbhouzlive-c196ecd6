@@ -49,15 +49,25 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         </div>
       )}
 
-      {/* Filter chips */}
-      <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+      {/* Filter chips — text-only, bold = active */}
+      <div style={{ display: 'flex', gap: 18, justifyContent: 'center' }}>
         {FILTERS.map(({ key, label }) => {
           const isActive = activeFilter === key;
           return (
             <button
               key={key}
               onClick={() => onFilterChange(key)}
-              style={{ padding: '6px 18px', borderRadius: 8, fontSize: 12, fontWeight: isActive ? 800 : 600, background: isActive ? '#0F172A' : 'transparent', color: isActive ? '#fff' : '#94A3B8', border: isActive ? 'none' : '1px solid rgba(15,23,42,0.1)', cursor: 'pointer', minHeight: 34 }}
+              style={{
+                padding: '6px 4px',
+                background: 'transparent',
+                border: 'none',
+                fontSize: 13,
+                fontWeight: isActive ? 800 : 500,
+                color: isActive ? '#0F172A' : '#94A3B8',
+                cursor: 'pointer',
+                minHeight: 34,
+                letterSpacing: isActive ? '-0.01em' : 0,
+              }}
             >
               {label}
             </button>
