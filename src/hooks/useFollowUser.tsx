@@ -1,54 +1,47 @@
+/**
+ * @deprecated Use `useToggleFollow` from '@/hooks/useToggleFollow' directly.
+ * Wrapper preserved for PR 3 incremental migration.
+ */
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
-import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { AppLog } from '@/lib/logger';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
 export const useFollowUser = () => {
-  const queryClient = useQueryClient();
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.warn('[deprecated] useFollowUser → migrate to useToggleFollow');
+  }
+
   const { user } = useSupabaseSession();
   const [loading, setLoading] = useState(false);
-
-  const invalidateFollowCaches = (targetUserId: string) => {
-    queryClient.invalidateQueries({ queryKey: ['relationship-status', targetUserId] });
-    queryClient.invalidateQueries({ queryKey: ['relationship-statuses'] });
-    queryClient.invalidateQueries({ queryKey: ['followers-paginated'] });
-    queryClient.invalidateQueries({ queryKey: ['following-paginated'] });
-    queryClient.invalidateQueries({ queryKey: ['social-counts'] });
-  };
+  const toggle = useToggleFollow();
 
   const followUser = async (targetUserId: string) => {
     if (!user) {
       toast.error('Please sign in to follow users');
       return false;
     }
-
     if (targetUserId === user.id) {
       AppLog.warn('[useFollowUser]', 'Attempted self-follow — blocked at client');
       return false;
     }
-
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('user_follows')
-        .insert({
-          follower_id: user.id,
-          following_id: targetUserId
-        });
-
-      if (error) {
-        AppLog.error('[useFollowUser]', 'Error following user:', error);
-        toast.error('Failed to follow user');
-        return false;
-      }
-
+      await toggle.mutateAsync({
+        targetActorType: 'personal',
+        targetActorId: targetUserId,
+        targetUserId,
+        viewerActorType: 'personal',
+        viewerActorId: user.id,
+        viewerUserId: user.id,
+        isFollowing: false,
+      });
       toast.success('Following user');
-      invalidateFollowCaches(targetUserId);
       return true;
     } catch (error) {
-      AppLog.error('[useFollowUser]', 'Error following user (RLS path):', error);
+      AppLog.error('[useFollowUser]', 'Error following user:', error);
       toast.error('Failed to follow user');
       return false;
     } finally {
@@ -61,31 +54,22 @@ export const useFollowUser = () => {
       toast.error('Please sign in to unfollow users');
       return false;
     }
-
-    if (targetUserId === user.id) {
-      AppLog.warn('[useFollowUser]', 'Attempted self-unfollow — blocked at client');
-      return false;
-    }
-
+    if (targetUserId === user.id) return false;
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', user.id)
-        .eq('following_id', targetUserId);
-
-      if (error) {
-        AppLog.error('[useFollowUser]', 'Error unfollowing user:', error);
-        toast.error('Failed to unfollow user');
-        return false;
-      }
-
+      await toggle.mutateAsync({
+        targetActorType: 'personal',
+        targetActorId: targetUserId,
+        targetUserId,
+        viewerActorType: 'personal',
+        viewerActorId: user.id,
+        viewerUserId: user.id,
+        isFollowing: true,
+      });
       toast.success('Unfollowed user');
-      invalidateFollowCaches(targetUserId);
       return true;
     } catch (error) {
-      AppLog.error('[useFollowUser]', 'Error unfollowing user (RLS path):', error);
+      AppLog.error('[useFollowUser]', 'Error unfollowing user:', error);
       toast.error('Failed to unfollow user');
       return false;
     } finally {
@@ -93,9 +77,5 @@ export const useFollowUser = () => {
     }
   };
 
-  return {
-    followUser,
-    unfollowUser,
-    loading
-  };
+  return { followUser, unfollowUser, loading };
 };
