@@ -9,26 +9,39 @@ interface UseClubhouseLikesOptions {
 }
 
 /**
- * Manages optimistic like state for the Clubhouse feed.
- * Re-wired for Brief 3: calls useLikeMutation.
+ * Manages PENDING optimistic like state for the Clubhouse feed.
+ *
+ * Post-engagementCache refactor: the Map only holds in-flight optimistic
+ * overrides. Once the mutation settles, `patchEngagement` updates the post
+ * prop directly via the cache, and we clear the override. Display falls back
+ * to the (now-fresh) post prop.
  */
 export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOptions) {
   const likeMutation = useLikeMutation();
   const [localLikeState, setLocalLikeState] = useState<Map<string, { isLiked: boolean; count: number }>>(new Map());
 
+  const clearOverride = useCallback((postId: string) => {
+    setLocalLikeState(prev => {
+      if (!prev.has(postId)) return prev;
+      const next = new Map(prev);
+      next.delete(postId);
+      return next;
+    });
+  }, []);
+
   const handleLike = useCallback((post: FeedPost | null) => {
     if (!userId || !post || !activeActor) return;
 
-    const current = localLikeState.get(post.id) ?? { isLiked: post.isLikedByMe, count: post.likeCount };
-    const newState = {
-      isLiked: !current.isLiked,
-      count: current.isLiked ? Math.max(0, current.count - 1) : current.count + 1,
-    };
+    const wasLiked = post.isLikedByMe;
 
-    setLocalLikeState(prev => new Map(prev).set(post.id, newState));
+    // Optimistic override for instant feedback before mutation settles.
+    setLocalLikeState(prev => new Map(prev).set(post.id, {
+      isLiked: !wasLiked,
+      count: Math.max(0, post.likeCount + (wasLiked ? -1 : 1)),
+    }));
 
-    analyticsEvents.track('video_like', { post_id: post.id, action: current.isLiked ? 'unlike' : 'like' });
-    analyticsEvents.track('post_like', { post_id: post.id, action: current.isLiked ? 'unlike' : 'like' });
+    analyticsEvents.track('video_like', { post_id: post.id, action: wasLiked ? 'unlike' : 'like' });
+    analyticsEvents.track('post_like', { post_id: post.id, action: wasLiked ? 'unlike' : 'like' });
 
     likeMutation.mutate(
       {
@@ -36,17 +49,22 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
         userId,
         actorId: activeActor.id ?? userId,
         actorType: activeActor.type === 'business' ? 'business' : 'personal',
-        isLiked: current.isLiked,
+        isLiked: wasLiked,
       },
       {
-        onError: () => setLocalLikeState(prev => new Map(prev).set(post.id, current)),
+        // Clear override on success or error — cache patch (or rollback) now
+        // drives the display via the post prop.
+        onSuccess: () => clearOverride(post.id),
+        onError: () => clearOverride(post.id),
       }
     );
-  }, [userId, activeActor, localLikeState, likeMutation]);
+  }, [userId, activeActor, likeMutation, clearOverride]);
 
   const getActiveLikeState = useCallback((post: FeedPost | null) => {
     if (!post) return { isLiked: false, count: 0 };
-    return localLikeState.get(post.id) ?? { isLiked: post.isLikedByMe, count: post.likeCount };
+    const pending = localLikeState.get(post.id);
+    if (pending) return pending;
+    return { isLiked: post.isLikedByMe, count: post.likeCount };
   }, [localLikeState]);
 
   const resetLikes = useCallback(() => {
