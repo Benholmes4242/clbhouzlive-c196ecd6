@@ -1,11 +1,23 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+/**
+ * @deprecated Use `useFollowState` (read) + `useToggleFollow` (write) directly.
+ * Wrapper preserved for PR 3 incremental migration.
+ *
+ * Keeps the legacy 3-element ['business-follow-status', businessId, userId]
+ * cache key for backward-compat. patchFollow walks that key in
+ * FOLLOW_CACHE_KEYS so optimistic updates from useToggleFollow propagate here.
+ */
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
-/**
- * Check if current user is following a business
- */
 export function useIsFollowingBusiness(businessId: string | undefined, userId: string | undefined) {
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.warn('[deprecated] useIsFollowingBusiness → migrate to useFollowState');
+  }
+  const queryClient = useQueryClient();
+
   return useQuery({
     queryKey: ['business-follow-status', businessId, userId],
     enabled: !!businessId && !!userId,
@@ -16,17 +28,19 @@ export function useIsFollowingBusiness(businessId: string | undefined, userId: s
         .eq('business_id', businessId ?? '')
         .eq('follower_id', userId ?? '')
         .maybeSingle();
-
       if (error) throw error;
-      return !!data;
+      const result = !!data;
+      // Seed canonical 5-element key for useFollowState readers.
+      queryClient.setQueryData(
+        ['follow-status', 'personal', userId, 'business', businessId],
+        { isFollowing: result },
+      );
+      return result;
     },
     staleTime: 60_000,
   });
 }
 
-/**
- * Get follower count for a business
- */
 export function useBusinessFollowersCount(businessId: string | undefined) {
   return useQuery({
     queryKey: ['business-followers-count', businessId],
@@ -36,7 +50,6 @@ export function useBusinessFollowersCount(businessId: string | undefined) {
         .from('business_follows')
         .select('*', { count: 'exact', head: true })
         .eq('business_id', businessId ?? '');
-
       if (error) throw error;
       return count ?? 0;
     },
@@ -44,82 +57,52 @@ export function useBusinessFollowersCount(businessId: string | undefined) {
   });
 }
 
-/**
- * Follow/unfollow a business
- */
 export function useBusinessFollowMutation(businessId: string, userId: string | undefined) {
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.warn('[deprecated] useBusinessFollowMutation → migrate to useToggleFollow');
+  }
   const queryClient = useQueryClient();
-  
-
-  const statusKey = ['business-follow-status', businessId, userId];
+  const toggle = useToggleFollow();
   const countKey = ['business-followers-count', businessId];
 
-  const followMutation = useMutation({
-    mutationFn: async () => {
-      if (!userId) throw new Error('Must be logged in to follow');
-      const { error } = await supabase
-        .from('business_follows')
-        .insert({ business_id: businessId, follower_id: userId });
-      if (error) throw error;
-    },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: statusKey });
-      await queryClient.cancelQueries({ queryKey: countKey });
-      const prevStatus = queryClient.getQueryData<boolean>(statusKey);
-      const prevCount = queryClient.getQueryData<number>(countKey);
-      queryClient.setQueryData(statusKey, true);
-      queryClient.setQueryData(countKey, (old: number | undefined) => (old ?? 0) + 1);
-      return { prevStatus, prevCount };
-    },
-    onError: (_error, _vars, context) => {
-      if (context) {
-        queryClient.setQueryData(statusKey, context.prevStatus);
-        queryClient.setQueryData(countKey, context.prevCount);
-      }
-      toast.error('Error', { description: 'Failed to follow business.' });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: statusKey });
-      queryClient.invalidateQueries({ queryKey: countKey });
-    },
-  });
-
-  const unfollowMutation = useMutation({
-    mutationFn: async () => {
-      if (!userId) throw new Error('Must be logged in to unfollow');
-      const { error } = await supabase
-        .from('business_follows')
-        .delete()
-        .eq('business_id', businessId)
-        .eq('follower_id', userId);
-      if (error) throw error;
-    },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: statusKey });
-      await queryClient.cancelQueries({ queryKey: countKey });
-      const prevStatus = queryClient.getQueryData<boolean>(statusKey);
-      const prevCount = queryClient.getQueryData<number>(countKey);
-      queryClient.setQueryData(statusKey, false);
-      queryClient.setQueryData(countKey, (old: number | undefined) => Math.max((old ?? 1) - 1, 0));
-      return { prevStatus, prevCount };
-    },
-    onError: (_error, _vars, context) => {
-      if (context) {
-        queryClient.setQueryData(statusKey, context.prevStatus);
-        queryClient.setQueryData(countKey, context.prevCount);
-      }
-      toast.error('Error', { description: 'Failed to unfollow business.' });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: statusKey });
-      queryClient.invalidateQueries({ queryKey: countKey });
-    },
-  });
+  const run = (isFollowing: boolean) => {
+    if (!userId) {
+      toast.error('Please sign in');
+      return;
+    }
+    // Optimistic count bump (canonical key handled by patchFollow).
+    queryClient.setQueryData<number | undefined>(countKey, (old) =>
+      Math.max(0, (old ?? 0) + (isFollowing ? -1 : 1)),
+    );
+    toggle.mutate(
+      {
+        targetActorType: 'business',
+        targetActorId: businessId,
+        targetUserId: businessId,
+        viewerActorType: 'personal',
+        viewerActorId: userId,
+        viewerUserId: userId,
+        isFollowing,
+      },
+      {
+        onError: () => {
+          // Revert count on error.
+          queryClient.setQueryData<number | undefined>(countKey, (old) =>
+            Math.max(0, (old ?? 0) + (isFollowing ? 1 : -1)),
+          );
+          toast.error('Error', {
+            description: isFollowing ? 'Failed to unfollow business.' : 'Failed to follow business.',
+          });
+        },
+      },
+    );
+  };
 
   return {
-    follow: followMutation.mutate,
-    unfollow: unfollowMutation.mutate,
-    isFollowing: followMutation.isPending,
-    isUnfollowing: unfollowMutation.isPending,
+    follow: () => run(false),
+    unfollow: () => run(true),
+    isFollowing: toggle.isPending,
+    isUnfollowing: toggle.isPending,
   };
 }
