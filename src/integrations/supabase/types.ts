@@ -1020,18 +1020,24 @@ export type Database = {
         Row: {
           business_id: string
           created_at: string
+          follower_actor_id: string
+          follower_actor_type: string
           follower_id: string
           id: string
         }
         Insert: {
           business_id: string
           created_at?: string
+          follower_actor_id: string
+          follower_actor_type?: string
           follower_id: string
           id?: string
         }
         Update: {
           business_id?: string
           created_at?: string
+          follower_actor_id?: string
+          follower_actor_type?: string
           follower_id?: string
           id?: string
         }
@@ -12335,18 +12341,24 @@ export type Database = {
       user_follows: {
         Row: {
           created_at: string
+          follower_actor_id: string
+          follower_actor_type: string
           follower_id: string
           following_id: string
           id: string
         }
         Insert: {
           created_at?: string
+          follower_actor_id: string
+          follower_actor_type?: string
           follower_id: string
           following_id: string
           id?: string
         }
         Update: {
           created_at?: string
+          follower_actor_id?: string
+          follower_actor_type?: string
           follower_id?: string
           following_id?: string
           id?: string
@@ -16002,6 +16014,8 @@ export type Database = {
           p_page_size?: number
           p_seen_post_ids?: string[]
           p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
         }
         Returns: {
           business_is_verified: boolean
@@ -16255,6 +16269,8 @@ export type Database = {
           p_search_query?: string
           p_seen_post_ids?: string[]
           p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
         }
         Returns: {
           business_is_verified: boolean
@@ -16404,6 +16420,8 @@ export type Database = {
           p_search_query?: string
           p_seen_post_ids?: string[]
           p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
         }
         Returns: {
           actor_id: string
@@ -16720,6 +16738,8 @@ export type Database = {
           p_page_size?: number
           p_seen_post_ids?: string[]
           p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
         }
         Returns: {
           business_is_verified: boolean
@@ -17383,6 +17403,16 @@ export type Database = {
           p_target_actor_type: string
           p_target_post_user_id: string
           p_viewer_user_id: string
+        }
+        Returns: boolean
+      }
+      is_following_actor_v2: {
+        Args: {
+          p_target_actor_id: string
+          p_target_actor_type: string
+          p_target_post_user_id: string
+          p_viewer_actor_id: string
+          p_viewer_actor_type: string
         }
         Returns: boolean
       }
