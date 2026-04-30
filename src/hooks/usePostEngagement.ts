@@ -184,7 +184,6 @@ export function usePostEngagement(postId: string | null) {
       }
     },
   });
-  });
 
   // 3) Comments list query (now includes actor info)
   const { data: comments = [], isLoading: commentsLoading } = useQuery({
