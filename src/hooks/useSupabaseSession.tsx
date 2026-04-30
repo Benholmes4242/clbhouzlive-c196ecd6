@@ -27,6 +27,22 @@ export function useSupabaseSession() {
   
   useEffect(() => {
     let mounted = true;
+    let initialSessionChecked = false;
+
+    const applySession = (nextSession: Session | null) => {
+      if (!mounted) return;
+
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      setLoading(false);
+
+      // Log session resolution
+      if (nextSession?.user) {
+        logSessionReady(nextSession.user.id);
+      } else {
+        logSessionNone();
+      }
+    };
     
     // Log session start once
     if (!sessionStartLogged.current) {
@@ -36,40 +52,32 @@ export function useSupabaseSession() {
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (mounted) {
-        // Phase 3: Clean up on sign out
-        if (event === 'SIGNED_OUT' && queryClient) {
-          cleanupOnLogout(queryClient);
-        }
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-        
-        // Log session resolution
-        if (session?.user) {
-          logSessionReady(session.user.id);
-        } else {
-          logSessionNone();
-        }
+      if (!mounted) return;
+
+      // Phase 3: Clean up on sign out
+      if (event === 'SIGNED_OUT' && queryClient) {
+        cleanupOnLogout(queryClient);
       }
+
+      // Supabase can emit an empty INITIAL_SESSION before persisted auth has
+      // been restored. Do not resolve loading from that transient null state.
+      if (event === 'INITIAL_SESSION' && !session && !initialSessionChecked) {
+        return;
+      }
+
+      applySession(session);
     });
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (mounted) {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-        
-        // Log session resolution
-        if (session?.user) {
-          logSessionReady(session.user.id);
-        } else {
-          logSessionNone();
-        }
-      }
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        initialSessionChecked = true;
+        applySession(session);
+      })
+      .catch(() => {
+        initialSessionChecked = true;
+        applySession(null);
+      });
 
     return () => {
       mounted = false;
