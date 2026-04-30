@@ -5,13 +5,14 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 
 import {
-  Camera, ImagePlus, AtSign, X, Pencil, Play, Plus, Clock, FileText,
+  Camera, ImagePlus, AtSign, X, Play, Clock, FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { StudioHeader } from '../components/StudioHeader';
 import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
+import { CinematicHero } from '../components/CinematicHero';
 import { usePostStudioContext } from '../usePostStudio';
 import { useSaveDraft } from '../hooks/useSaveDraft';
 import { useDrafts } from '@/hooks/useDrafts';
