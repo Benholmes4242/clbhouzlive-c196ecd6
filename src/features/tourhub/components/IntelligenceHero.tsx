@@ -19,7 +19,7 @@
  */
 
 import { memo, useMemo, useState } from 'react';
-import { Brain, ChevronRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Brain, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCountdown } from '@/hooks/useCountdown';
 import {
   useIntelligenceLifecycleState,
@@ -61,11 +61,25 @@ function formatScore(score: number | null): string {
   return score > 0 ? `+${score}` : `${score}`;
 }
 
-/** Reasoning playing-out heuristic per Phase B brief: actualPos ≤ predictedRank × 5. */
-function isReasoningPlayingOut(p: TrackedPrediction): boolean {
-  if (p.actualPosition === null) return false;
-  if (p.performanceStatus === 'cut' || p.performanceStatus === 'withdrawn') return false;
-  return p.actualPosition <= p.predictedRank * 5;
+/** Ordinal suffix for a 1-based position number: 1 → 'st', 2 → 'nd', 3 → 'rd', 4–20 → 'th', 21 → 'st', etc. */
+function ordinalSuffix(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return 'th';
+  switch (n % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
+
+/** Split formatPosition output into a base ('1', 'T27', 'MC', 'WD', '—') and an optional ordinal suffix.
+ *  MC / WD / — never get a suffix. Tied positions ('T27') still get the ordinal of the underlying number. */
+function formatPositionParts(p: TrackedPrediction): { base: string; suffix: string } {
+  const base = formatPosition(p);
+  if (base === 'MC' || base === 'WD' || base === '—') return { base, suffix: '' };
+  if (p.actualPosition === null) return { base, suffix: '' };
+  return { base, suffix: ordinalSuffix(p.actualPosition) };
 }
 
 /** Date range for masthead state label. Always includes month on both sides for clarity. */
@@ -427,8 +441,25 @@ function LiveStateBlock({
   tracker: PredictionTrackerData | undefined;
 }) {
   const editorial = INTELLIGENCE_HERO_FALLBACK.live;
-  const picks = tracker?.predictions ?? [];
   const accuracy = tracker?.accuracy;
+  const picks = useMemo(() => {
+    const raw = tracker?.predictions ?? [];
+    return [...raw].sort((a, b) => {
+      // MC / WD sink to the bottom but stay visible as picks.
+      const aOut = a.performanceStatus === 'cut' || a.performanceStatus === 'withdrawn';
+      const bOut = b.performanceStatus === 'cut' || b.performanceStatus === 'withdrawn';
+      if (aOut !== bOut) return aOut ? 1 : -1;
+      // Players with a live leaderboard position come first, sorted ASC.
+      const aPos = a.actualPosition;
+      const bPos = b.actualPosition;
+      if (aPos === null && bPos === null) return a.predictedRank - b.predictedRank;
+      if (aPos === null) return 1;
+      if (bPos === null) return -1;
+      if (aPos !== bPos) return aPos - bPos;
+      // Same leaderboard position → predicted rank breaks the tie for stable ordering.
+      return a.predictedRank - b.predictedRank;
+    });
+  }, [tracker?.predictions]);
 
   return (
     <div>
@@ -817,8 +848,8 @@ function CountdownUnit({
 // ─── Pick rows ───────────────────────────────────────────────────────────────
 
 function LivePickRow({ pick }: { pick: TrackedPrediction }) {
-  const reasoningHit = isReasoningPlayingOut(pick);
-  const positionStr = formatPosition(pick);
+  const isLeading = pick.actualPosition === 1;
+  const { base: positionBase, suffix: positionSuffix } = formatPositionParts(pick);
   const scoreStr = formatScore(pick.score);
   const reasonText = pick.reasons[0] ?? '';
 
@@ -846,13 +877,14 @@ function LivePickRow({ pick }: { pick: TrackedPrediction }) {
           >
             {pick.playerName}
           </span>
-          {reasoningHit && (
-            <Check
-              size={11}
-              color={AMBER_ACCENT}
-              strokeWidth={3}
-              aria-label="Reasoning playing out"
-            />
+          {isLeading && (
+            <span
+              style={{ fontSize: 12, lineHeight: 1 }}
+              role="img"
+              aria-label="Currently leading"
+            >
+              🏆
+            </span>
           )}
         </div>
         {reasonText && (
@@ -875,12 +907,26 @@ function LivePickRow({ pick }: { pick: TrackedPrediction }) {
           textAlign: 'right',
           fontVariantNumeric: 'tabular-nums',
           flexShrink: 0,
+          minWidth: 44,
         }}
       >
-        <div style={{ fontSize: 12, fontWeight: 800, color: '#ffffff' }}>
-          {positionStr}
+        <div style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+          {positionBase}
+          {positionSuffix && (
+            <span style={{ fontSize: 9, fontWeight: 700, marginLeft: 1 }}>
+              {positionSuffix}
+            </span>
+          )}
         </div>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.55)',
+            lineHeight: 1,
+          }}
+        >
           {scoreStr}
         </div>
       </div>
