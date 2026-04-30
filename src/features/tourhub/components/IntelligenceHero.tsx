@@ -540,10 +540,15 @@ function LiveStateBlock({
     });
   }, [tracker?.predictions]);
 
+  const dynamicHeadline = useMemo(
+    () => buildLiveHeadline(picks) ?? editorial.headline,
+    [picks, editorial.headline],
+  );
+
   return (
     <div>
       <Eyebrow>{editorial.eyebrow}</Eyebrow>
-      <Headline>{editorial.headline}</Headline>
+      <Headline>{dynamicHeadline}</Headline>
       <Standfirst>{editorial.standfirst}</Standfirst>
 
       {/* Performance band — honest zeros pre-tee-off (per refinement) */}
