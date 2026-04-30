@@ -149,17 +149,18 @@ export function usePostEngagement(postId: string | null) {
       await queryClient.cancelQueries({ queryKey: ['post-engagement', postId, actorType, actorId] });
       const prev = queryClient.getQueryData<any>(['post-engagement', postId, actorType, actorId]);
 
-      if (!prev) return { prev };
+      const wasLiked = !!prev?.hasLiked;
 
-      const next = {
-        ...prev,
-        hasLiked: !prev.hasLiked,
-        likesCount: prev.likesCount + (prev.hasLiked ? -1 : 1),
-      };
+      if (prev) {
+        const next = {
+          ...prev,
+          hasLiked: !prev.hasLiked,
+          likesCount: prev.likesCount + (prev.hasLiked ? -1 : 1),
+        };
+        queryClient.setQueryData(['post-engagement', postId, actorType, actorId], next);
+      }
 
-      queryClient.setQueryData(['post-engagement', postId, actorType, actorId], next);
-
-      return { prev };
+      return { prev, wasLiked };
     },
     onError: (_err, _vars, ctx) => {
       // Revert on error
@@ -167,24 +168,22 @@ export function usePostEngagement(postId: string | null) {
         queryClient.setQueryData(['post-engagement', postId, actorType, actorId], ctx.prev);
       }
     },
-    onSettled: (_data, _error, _vars, _ctx) => {
-      // Surgical cache patch across every feed surface (including the
-      // ['post-engagement', postId, ...] entry this hook itself reads).
-      // `engagementData?.hasLiked` here represents the NEW state because the
-      // optimistic update in onMutate already flipped it.
-      const newLiked = !!engagementData?.hasLiked;
-      if (postId) {
+    onSettled: (_data, _error, _vars, ctx) => {
+      // Surgical cache patch across every OTHER feed surface. The
+      // `['post-engagement', postId, actorType, actorId]` entry was already
+      // updated optimistically in onMutate; patchEngagement will reapply
+      // the +/-1 delta to any other variant of the post-engagement key (other
+      // actors viewing the same post) and to all feed caches.
+      // Use the pre-toggle state from context to compute the correct delta.
+      if (postId && ctx) {
+        const wasLiked = ctx.wasLiked;
         patchEngagement(queryClient, postId, {
-          isLikedByMe: newLiked,
-          // Patch contributes the delta vs the server-truth post; the
-          // optimistic update already adjusted the local engagement object,
-          // and patchEngagement reapplies +/-1 to OTHER caches that haven't
-          // been touched. Use the inverse of the new state to compute what
-          // the toggle just did.
-          likeCountDelta: newLiked ? +1 : -1,
+          isLikedByMe: !wasLiked,
+          likeCountDelta: wasLiked ? -1 : +1,
         });
       }
     },
+  });
   });
 
   // 3) Comments list query (now includes actor info)
