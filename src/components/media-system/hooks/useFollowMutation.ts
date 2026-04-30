@@ -1,5 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+/**
+ * useFollowMutation — legacy wrapper over the canonical useToggleFollow.
+ *
+ * Preserves the existing call signature so PR 2 callsites keep compiling
+ * unchanged. PR 3 will migrate them to call useToggleFollow directly.
+ */
+
+import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface FollowParams {
   targetUserId: string;
@@ -10,47 +17,42 @@ interface FollowParams {
 }
 
 export function useFollowMutation() {
-  const queryClient = useQueryClient();
+  const toggle = useToggleFollow();
+  const { activeActor } = useActiveActor();
 
-  return useMutation({
-    mutationFn: async ({ targetUserId, targetActorType, targetActorId, currentUserId, isFollowed }: FollowParams) => {
-      if (targetActorType === 'business') {
-        if (isFollowed) {
-          const { error } = await supabase
-            .from('business_follows')
-            .delete()
-            .eq('follower_id', currentUserId)
-            .eq('business_id', targetActorId);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from('business_follows')
-            .insert({ follower_id: currentUserId, business_id: targetActorId });
-          if (error) throw error;
-        }
-      } else {
-        if (isFollowed) {
-          const { error } = await supabase
-            .from('user_follows')
-            .delete()
-            .eq('follower_id', currentUserId)
-            .eq('following_id', targetUserId);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from('user_follows')
-            .insert({ follower_id: currentUserId, following_id: targetUserId });
-          if (error) throw error;
-        }
-      }
-    },
-    onError: (error) => {
-      console.error('[Follow] Mutation failed:', error);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['media-feed'], refetchType: 'none' });
-      queryClient.invalidateQueries({ queryKey: ['user-follows'] });
-      queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
-    },
-  });
+  return {
+    ...toggle,
+    mutate: (
+      params: FollowParams,
+      options?: Parameters<typeof toggle.mutate>[1],
+    ) =>
+      toggle.mutate(
+        {
+          targetActorType: params.targetActorType,
+          targetActorId: params.targetActorId,
+          targetUserId: params.targetUserId,
+          viewerActorType: activeActor?.type ?? 'personal',
+          viewerActorId: activeActor?.id ?? params.currentUserId,
+          viewerUserId: params.currentUserId,
+          isFollowing: params.isFollowed,
+        },
+        options,
+      ),
+    mutateAsync: (
+      params: FollowParams,
+      options?: Parameters<typeof toggle.mutateAsync>[1],
+    ) =>
+      toggle.mutateAsync(
+        {
+          targetActorType: params.targetActorType,
+          targetActorId: params.targetActorId,
+          targetUserId: params.targetUserId,
+          viewerActorType: activeActor?.type ?? 'personal',
+          viewerActorId: activeActor?.id ?? params.currentUserId,
+          viewerUserId: params.currentUserId,
+          isFollowing: params.isFollowed,
+        },
+        options,
+      ),
+  };
 }
