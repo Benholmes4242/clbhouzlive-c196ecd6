@@ -38,6 +38,8 @@ export function useToggleFollow() {
             .from('business_follows')
             .insert({
               follower_id: params.viewerUserId ?? '',
+              follower_actor_id: params.viewerUserId ?? '',
+              follower_actor_type: 'personal',
               business_id: params.targetActorId,
             });
           // 23505 = unique violation = already following = no-op
@@ -56,6 +58,8 @@ export function useToggleFollow() {
             .from('user_follows')
             .insert({
               follower_id: params.viewerUserId ?? '',
+              follower_actor_id: params.viewerUserId ?? '',
+              follower_actor_type: 'personal',
               following_id: params.targetUserId,
             });
           if (error && (error as any).code !== '23505') throw error;

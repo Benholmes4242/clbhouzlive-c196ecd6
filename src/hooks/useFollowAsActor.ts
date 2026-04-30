@@ -61,6 +61,8 @@ export function useFollowAsActor() {
           .from('user_follows')
           .insert({
             follower_id: user.id,
+            follower_actor_id: user.id,
+            follower_actor_type: 'personal',
             following_id: targetUserId,
           });
         if (error) throw error;
@@ -135,6 +137,8 @@ export function useFollowAsActor() {
           .from('business_follows')
           .insert({
             follower_id: user.id,
+            follower_actor_id: user.id,
+            follower_actor_type: 'personal',
             business_id: targetBusinessId,
           });
         if (error) throw error;
