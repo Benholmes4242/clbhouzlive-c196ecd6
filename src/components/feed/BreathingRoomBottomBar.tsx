@@ -24,6 +24,7 @@ import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { FROST, FROST_BLUR } from '@/lib/frostPanel';
 
 interface BreathingRoomBottomBarProps {
   caption: string;
@@ -124,11 +125,11 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               maxWidth: '100%',
               padding: '5px 11px',
               borderRadius: 999,
-              background: 'rgba(255, 255, 255, 0.12)',
-              border: '0.5px solid rgba(255, 255, 255, 0.30)',
-              backdropFilter: 'blur(40px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(40px) saturate(160%)',
-              boxShadow: 'inset 0 0.5px 0 0 rgba(255,255,255,0.40), 0 4px 12px rgba(0,0,0,0.10)',
+              background: FROST.glass,
+              border: `1px solid ${FROST.border}`,
+              backdropFilter: FROST_BLUR.tile,
+              WebkitBackdropFilter: FROST_BLUR.tile,
+              boxShadow: `${FROST.dropShadow}, ${FROST.innerHighlight}`,
               cursor: onCourseTap ? 'pointer' : 'default',
               fontFamily: 'inherit',
             }}
@@ -150,8 +151,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: '#fff',
-                textShadow: '0 1px 2px rgba(0,0,0,0.20)',
+                color: FROST.ink,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
