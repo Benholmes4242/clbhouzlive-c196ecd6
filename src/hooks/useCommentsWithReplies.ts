@@ -636,7 +636,10 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
-      queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+      // Surgical cache patch: decrement comment count across every feed surface.
+      if (postId) {
+        patchEngagement(queryClient, postId, { commentCountDelta: -1 });
+      }
       onCommentDeleted?.();
     },
   });
