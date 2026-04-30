@@ -139,6 +139,13 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const { openViewer } = useMediaViewer();
   const [isClosing, setIsClosing] = useState(false);
 
+  const headerRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [scrollMaxHeight, setScrollMaxHeight] = React.useState<number>();
+  const { notifySheetClosing, notifySheetOpened } = useSheetPlayback();
+
+  const isBusiness = user.isBusiness || user.profileType === 'business';
+
   // Reset closing state when modal opens
   useEffect(() => {
     if (isOpen) {
