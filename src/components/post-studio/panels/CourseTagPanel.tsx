@@ -39,14 +39,51 @@ export function CourseTagPanel() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query]);
 
-  const handleSelect = useCallback((course: CourseResult) => {
+  const handleSelect = useCallback(async (course: CourseResult) => {
     if (state.taggedCourses.some((c) => c.courseId === course.id)) return;
     if (state.taggedCourses.length >= 5) { toast.error('Maximum 5 courses per post'); return; }
-    const newCourse: TaggedCourse = {
+
+    const baseCourse: TaggedCourse = {
       courseId: course.id, courseName: course.name,
       country: course.country, region: course.region ?? undefined,
     };
-    setTaggedCourses([...state.taggedCourses, newCourse]);
+    // Insert immediately so UI is responsive; enrich asynchronously below.
+    setTaggedCourses([...state.taggedCourses, baseCourse]);
+
+    // Non-blocking enrichment: thumbnail image + best Top 100 rank.
+    try {
+      const [imgRes, rankRes] = await Promise.all([
+        supabase.from('golf_courses').select('thumbnail_image').eq('id', course.id).maybeSingle(),
+        supabase
+          .from('course_top100_memberships')
+          .select('rank, list:top100_lists!inner(slug, sort_order)')
+          .eq('course_id', course.id)
+          .order('rank', { ascending: true }),
+      ]);
+      const imageUrl = imgRes.data?.thumbnail_image ?? undefined;
+      // Pick the most prestigious list (lowest sort_order), then the best rank.
+      const memberships = (rankRes.data ?? []) as Array<{ rank: number; list: { slug: string; sort_order: number } | null }>;
+      const best = memberships
+        .filter((m) => m.list)
+        .sort((a, b) => (a.list!.sort_order - b.list!.sort_order) || (a.rank - b.rank))[0];
+
+      if (!imageUrl && !best) return;
+
+      setTaggedCourses(
+        [...state.taggedCourses, baseCourse].map((c) =>
+          c.courseId === course.id
+            ? {
+                ...c,
+                imageUrl: imageUrl ?? c.imageUrl,
+                top100Rank: best?.rank ?? c.top100Rank,
+                top100List: best?.list?.slug ?? c.top100List,
+              }
+            : c,
+        ),
+      );
+    } catch (err) {
+      console.warn('[CourseTagPanel] enrichment failed', err);
+    }
   }, [state.taggedCourses, setTaggedCourses]);
 
   const handleRemove = useCallback((courseId: string) => {
