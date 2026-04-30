@@ -17,7 +17,8 @@ import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
 import { usePersonalReviewsCount } from '@/hooks/usePersonalReviewsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
-import { useFollow } from '@/hooks/useFollow';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useFriendship } from '@/hooks/useFriendship';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
 import { useRealtimeSocialCounts } from '@/hooks/useRealtimeSocialCounts';
@@ -164,7 +165,28 @@ const ProfilePageV2Content: React.FC = () => {
   const isSelf = user?.id === profileUserId;
   
 
-  const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(isSelf ? undefined : profileUserId);
+  const followToggle = useToggleFollow();
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: isSelf ? undefined : profileUserId,
+    viewerActorType: 'personal',
+    viewerActorId: user?.id,
+  });
+  const isFollowing = cachedFollowing ?? false;
+  const followBusy = followToggle.isPending;
+  const toggleFollow = () => {
+    if (isSelf || !user?.id || !profileUserId) return;
+    followToggle.mutate({
+      targetActorType: 'personal',
+      targetActorId: profileUserId,
+      targetUserId: profileUserId,
+      viewerActorType: 'personal',
+      viewerActorId: user.id,
+      viewerUserId: user.id,
+      isFollowing,
+    });
+  };
+
   const { startDM, isStarting: dmStarting } = useStartDM();
   const {
     status: friendshipStatus,
@@ -180,20 +202,7 @@ const ProfilePageV2Content: React.FC = () => {
     !isSelf &&
     profile?.is_public === false &&
     friendshipStatus !== 'friends';
-  
-  useEffect(() => {
-    if (!isSelf && profileUserId) {
-      ensureInitial();
-    }
-  }, [isSelf, profileUserId, ensureInitial]);
 
-  const [followResolved, setFollowResolved] = useState(false);
-  useEffect(() => {
-    if (isFollowing !== 'unknown') { setFollowResolved(true); return; }
-    const t = setTimeout(() => setFollowResolved(true), 5000);
-    return () => clearTimeout(t);
-  }, [isFollowing]);
-  
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = useMemo(() => {
     const tabParam = searchParams.get('tab');
@@ -736,11 +745,11 @@ const ProfilePageV2Content: React.FC = () => {
               className="h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
               onClick={toggleFollow}
-              disabled={followBusy || (isFollowing === 'unknown' && !followResolved)}
+              disabled={followBusy}
             >
               {followBusy ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : isFollowing === 'following' ? (
+              ) : isFollowing ? (
                 <>
                   <Check className="w-3.5 h-3.5" />
                   Following
