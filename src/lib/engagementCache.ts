@@ -19,6 +19,12 @@
  */
 
 import type { QueryClient } from '@tanstack/react-query';
+import {
+  FEED_QUERY_KEYS,
+  PROFILE_QUERY_KEYS,
+  ENGAGEMENT_RECORD_KEYS,
+  ENGAGEMENT_ONLY_KEYS,
+} from './feedQueryKeys';
 
 interface EngagementDelta {
   /** New value for `isLikedByMe`. Omit to leave unchanged. */
@@ -45,35 +51,10 @@ interface PatchOptions {
  * shortest unique prefix is sufficient.
  */
 const ENGAGEMENT_CACHE_KEYS: readonly (readonly unknown[])[] = [
-  // Clubhouse + cross-app feeds
-  ['media-feed', 'suggested'],
-  ['media-feed', 'friends'],
-  ['explore-posts'],
-  ['real-posts'],
-
-  // Watch tab
-  ['watch-feed'],
-  ['watch-feed-posts-by-ids'],
-
-  // Profile + actor feeds
-  ['profile-posts'],
-  ['actor-posts'],
-  ['userPosts'],
-  ['user-posts-preview'],
-  ['followedUsersPosts'],
-  ['activity-posts'],
-
-  // Business surfaces (single-post engagement key)
-  ['post-engagement'],
-  ['business-posts-infinite'],
-  ['business-tagged-posts'],
-  ['business-tagged-posts-infinite'],
-
-  // Course detail surfaces
-  ['course-media-feed'],
-  ['course-reviews-full'],
-  ['user-course-reviews'],
-  ['friend-course-activity'],
+  ...FEED_QUERY_KEYS,
+  ...PROFILE_QUERY_KEYS,
+  ...ENGAGEMENT_RECORD_KEYS,
+  ...ENGAGEMENT_ONLY_KEYS,
 ];
 
 /**
