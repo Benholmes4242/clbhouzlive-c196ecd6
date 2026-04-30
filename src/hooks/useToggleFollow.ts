@@ -27,12 +27,16 @@ export function useToggleFollow() {
 
       if (params.targetActorType === 'business') {
         if (params.isFollowing) {
-          const { error } = await supabase
+          const { error, count } = await supabase
             .from('business_follows')
-            .delete()
+            .delete({ count: 'exact' })
             .eq('follower_id', params.viewerUserId ?? '')
             .eq('business_id', params.targetActorId);
           if (error) throw error;
+          if ((count ?? 0) === 0) {
+            patchFollow(queryClient, params, { isFollowing: false });
+            return { next: false };
+          }
         } else {
           const { error } = await supabase
             .from('business_follows')
@@ -42,17 +46,26 @@ export function useToggleFollow() {
               follower_actor_type: 'personal',
               business_id: params.targetActorId,
             });
-          // 23505 = unique violation = already following = no-op
-          if (error && (error as any).code !== '23505') throw error;
+          if (error) {
+            if ((error as any).code === '23505') {
+              patchFollow(queryClient, params, { isFollowing: true });
+              return { next: true };
+            }
+            throw error;
+          }
         }
       } else {
         if (params.isFollowing) {
-          const { error } = await supabase
+          const { error, count } = await supabase
             .from('user_follows')
-            .delete()
+            .delete({ count: 'exact' })
             .eq('follower_id', params.viewerUserId ?? '')
             .eq('following_id', params.targetUserId);
           if (error) throw error;
+          if ((count ?? 0) === 0) {
+            patchFollow(queryClient, params, { isFollowing: false });
+            return { next: false };
+          }
         } else {
           const { error } = await supabase
             .from('user_follows')
@@ -62,7 +75,13 @@ export function useToggleFollow() {
               follower_actor_type: 'personal',
               following_id: params.targetUserId,
             });
-          if (error && (error as any).code !== '23505') throw error;
+          if (error) {
+            if ((error as any).code === '23505') {
+              patchFollow(queryClient, params, { isFollowing: true });
+              return { next: true };
+            }
+            throw error;
+          }
         }
       }
 
