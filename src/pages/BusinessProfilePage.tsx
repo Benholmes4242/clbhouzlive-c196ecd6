@@ -11,7 +11,9 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
-import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMutation } from '@/hooks/useBusinessFollow';
+import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { 
