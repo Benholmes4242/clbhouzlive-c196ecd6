@@ -145,15 +145,13 @@ export const FollowFriendButtons: React.FC<FollowFriendButtonsProps> = ({
     return null;
   }
 
-  const following = isFollowing === 'following';
-
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {/* Follow Button */}
       <Button
         variant={following ? "secondary" : "gradient"}
         size={compact ? "sm" : "default"}
-        onClick={toggleFollow}
+        onClick={handleToggleFollow}
         disabled={isUpdating}
         className="flex items-center gap-1.5"
       >
