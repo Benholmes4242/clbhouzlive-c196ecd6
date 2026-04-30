@@ -146,7 +146,30 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   isMuted = false,
   onToggleMute,
 }) => {
+  const [justFollowed, setJustFollowed] = useState(false);
+  const prevFollowingRef = useRef(isFollowing);
+  const prevCreatorIdRef = useRef(creator?.id);
+
+  useEffect(() => {
+    // Reset when the creator changes (different post in the feed).
+    if (creator?.id !== prevCreatorIdRef.current) {
+      prevCreatorIdRef.current = creator?.id;
+      prevFollowingRef.current = isFollowing;
+      setJustFollowed(false);
+      return;
+    }
+    // Detect a false → true transition on isFollowing.
+    if (!prevFollowingRef.current && isFollowing) {
+      setJustFollowed(true);
+      const t = setTimeout(() => setJustFollowed(false), 1500);
+      prevFollowingRef.current = isFollowing;
+      return () => clearTimeout(t);
+    }
+    prevFollowingRef.current = isFollowing;
+  }, [creator?.id, isFollowing]);
+
   const showFollowPlus = !readOnly && !isOwnPost && !isFollowing && !!creator;
+  const showJustFollowed = !readOnly && !isOwnPost && justFollowed && !!creator;
 
   const muteButton = isVideo && onToggleMute ? (
     <button
