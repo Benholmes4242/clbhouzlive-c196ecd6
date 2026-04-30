@@ -942,7 +942,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               onAddMore={() => fileInputRef.current?.click()}
             />
           ) : !state.caption ? (
-            <div className="flex items-center justify-center" style={{ minHeight: 180 }}>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center justify-center w-full"
+              style={{
+                minHeight: 180,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+              aria-label="Add photos or a video"
+            >
               <div style={{ textAlign: 'center', opacity: 0.55 }}>
                 <div
                   style={{
@@ -958,7 +970,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   Add photos or a video to bring your round to life
                 </div>
               </div>
-            </div>
+            </button>
           ) : null}
         </div>
 
