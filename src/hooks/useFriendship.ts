@@ -145,6 +145,20 @@ export function useFriendship(targetUserId: string | undefined) {
       
       if (error) throw error;
       // Notification is created by database trigger - no frontend insert needed
+      // auto_follow_on_friend_accept trigger creates user_follows rows in BOTH
+      // directions. Patch follow caches so every surface updates without refresh.
+      if (currentUserId && targetUserId) {
+        patchFollow(
+          queryClient,
+          { targetActorType: 'personal', targetActorId: targetUserId, targetUserId, viewerUserId: currentUserId },
+          { isFollowing: true },
+        );
+        patchFollow(
+          queryClient,
+          { targetActorType: 'personal', targetActorId: currentUserId, targetUserId: currentUserId, viewerUserId: targetUserId },
+          { isFollowing: true },
+        );
+      }
     },
     onSuccess: () => {
       toast.success('Request accepted');
