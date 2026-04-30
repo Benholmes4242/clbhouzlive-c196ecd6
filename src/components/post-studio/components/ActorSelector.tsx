@@ -81,63 +81,85 @@ export function ActorSelector({ compact = false, header = false, visibilityIcon,
 
   // ── Compact header mode: light identity pill ──
   if (compact) {
+    const isVisibilityOnly = mode === 'visibility';
+
     return (
       <>
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setSheetOpen(true)}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheetOpen(true); } }}
-          className="relative flex items-center"
-          style={{
-            gap: 8,
-            background: 'rgba(15,23,42,0.05)',
-            border: '1px solid rgba(15,23,42,0.07)',
-            borderRadius: 24,
-            padding: '6px 11px 6px 6px',
-            cursor: 'pointer',
-            flex: 1,
-            maxWidth: 210,
-          }}
-        >
-          <div
-            className="overflow-hidden shrink-0"
+        {isVisibilityOnly ? (
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            className="flex items-center"
             style={{
-              width: 28,
-              height: 28,
-              borderRadius: '34%',
-              background: 'rgba(15,23,42,0.08)',
-              border: '1px solid rgba(15,23,42,0.08)',
+              gap: 5,
+              background: 'rgba(15,23,42,0.05)',
+              border: '1px solid rgba(15,23,42,0.07)',
+              borderRadius: 999,
+              padding: '6px 10px',
+              cursor: 'pointer',
+            }}
+            aria-label={`Audience: ${visibilityLabel ?? 'Everyone'}`}
+          >
+            {visibilityIcon && <span style={{ fontSize: 12, lineHeight: 1 }}>{visibilityIcon}</span>}
+            <span className="text-[11px] font-semibold" style={{ color: DARK_TEXT }}>
+              {visibilityLabel ?? 'Everyone'}
+            </span>
+            <ChevronDown className="w-[11px] h-[11px] shrink-0" style={{ color: 'rgba(15,23,42,0.45)' }} />
+          </button>
+        ) : (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setSheetOpen(true)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheetOpen(true); } }}
+            className="relative flex items-center"
+            style={{
+              gap: 8,
+              background: 'rgba(15,23,42,0.05)',
+              border: '1px solid rgba(15,23,42,0.07)',
+              borderRadius: 24,
+              padding: '5px 11px 5px 5px',
+              cursor: 'pointer',
+              maxWidth: 180,
             }}
           >
-            {activeAvatar ? (
-              <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[11px] font-bold" style={{ color: 'rgba(15,23,42,0.50)' }}>
-                {activeName.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
+            <div
+              className="overflow-hidden shrink-0"
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: '34%',
+                background: 'rgba(15,23,42,0.08)',
+                border: '1px solid rgba(15,23,42,0.08)',
+              }}
+            >
+              {activeAvatar ? (
+                <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[11px] font-bold" style={{ color: 'rgba(15,23,42,0.50)' }}>
+                  {activeName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
 
-          <div className="flex flex-col items-start min-w-0">
-            <span className="text-[13px] font-semibold truncate" style={{ color: DARK_TEXT, maxWidth: 120 }}>
+            <span className="text-[13px] font-semibold truncate" style={{ color: DARK_TEXT, maxWidth: 100 }}>
               {activeName}
             </span>
-            {visibilityLabel && (
+
+            {/* Legacy combined mode: still show the visibility sub-action under the name */}
+            {mode === 'combined' && visibilityLabel && (
               <button
                 onClick={(e) => { e.stopPropagation(); onOpenVisibility?.(); }}
                 className="flex items-center gap-1"
-                style={{ marginTop: 1 }}
               >
                 {visibilityIcon && <span style={{ fontSize: 10 }}>{visibilityIcon}</span>}
                 <span className="text-[10px]" style={{ color: DARK_TEXT3 }}>{visibilityLabel}</span>
               </button>
             )}
+
+            <ChevronDown className="w-[11px] h-[11px] shrink-0" style={{ color: 'rgba(15,23,42,0.35)' }} />
           </div>
-
-          <ChevronDown className="w-[10px] h-[10px] shrink-0 ml-auto" style={{ color: 'rgba(15,23,42,0.35)' }} />
-        </div>
-
+        )}
         {createPortal(
           <AnimatePresence>
             {sheetOpen && (
