@@ -74,8 +74,11 @@ export function CourseTagPanel() {
 
       if (!imageUrl && !best) return;
 
+      // Merge against the latest taggedCourses (via ref), not the snapshot
+      // captured when handleSelect started — otherwise a second tap during
+      // enrichment would drop the newly-added course.
       setTaggedCourses(
-        [...state.taggedCourses, baseCourse].map((c) =>
+        taggedCoursesRef.current.map((c) =>
           c.courseId === course.id
             ? {
                 ...c,
