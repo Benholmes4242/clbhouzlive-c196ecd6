@@ -679,7 +679,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     </div>
   );
 
-  const isOverWarn = charCount > POST_LIMITS.MAX_CAPTION_LENGTH * 0.9;
+  
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG, minHeight: 0, overflow: 'hidden' }}>
