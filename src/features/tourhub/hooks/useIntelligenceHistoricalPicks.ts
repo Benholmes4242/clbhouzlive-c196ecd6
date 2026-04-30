@@ -1,18 +1,18 @@
 /**
  * useIntelligenceHistoricalPicks
  *
- * Phase C parallel hook. Powers `IntelligenceAllPicksSheet` (the "All
- * Intelligence Picks" bottom sheet). Returns a chronological list of
- * completed PGA tournaments where Intelligence had predictions, with:
+ * Single source of truth for season Intelligence pick history. Powers the
+ * hero card track record, the Pick Record rail, and the All Intelligence
+ * Picks bottom sheet.
+ *
+ * Returns a chronological list of completed PGA tournaments (plus cross-tour
+ * majors from EURO seasons) where Intelligence had predictions, with:
  *
  *   - All 3 picks per tournament (not just the best finisher)
- *   - Final position per pick (formatted: "1", "T8", "MC", "WD", "—")
+ *   - Final position + score per pick (formatted: "1", "T8", "MC", "WD", "—")
  *   - Tournament date range (start + end ISO)
  *   - Client-side outcome classification (win | top5 | partial | miss)
- *
- * This is intentionally separate from `usePickHistory` (the rail on the
- * results view), which reduces all picks to a single best finisher and
- * caps at 10. Phase C needs the full pick array; the rail does not.
+ *   - Derived `bestPick` for the rail's single-pick rendering
  *
  * Cap: ORDER BY end_date DESC LIMIT 50 (~1 PGA season). Most recent first.
  *
