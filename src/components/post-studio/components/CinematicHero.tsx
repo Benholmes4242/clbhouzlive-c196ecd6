@@ -43,6 +43,8 @@ export function CinematicHero({
 }: CinematicHeroProps) {
   const [pileOpen, setPileOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const cover =
     mediaItems.find((m) => m.id === coverMediaId) || mediaItems[0];
