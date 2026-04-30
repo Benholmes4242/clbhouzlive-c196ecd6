@@ -293,11 +293,11 @@ function PickRecordRail() {
 }
 
 function PickRecordBadge() {
-  const { data: pickHistory = [], isLoading } = usePickHistory();
-  if (isLoading || !pickHistory.length) return null;
+  const { data: tournaments = [], isLoading } = useIntelligenceHistoricalPicks();
+  if (isLoading || !tournaments.length) return null;
 
-  const wins = pickHistory.filter(e => e.isWinner).length;
-  const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
+  const wins = tournaments.filter(t => t.outcome === 'win').length;
+  const top5 = tournaments.filter(t => t.outcome === 'win' || t.outcome === 'top5').length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 4, flexShrink: 0 }}>
