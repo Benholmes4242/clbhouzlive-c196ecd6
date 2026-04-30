@@ -24,6 +24,7 @@ import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { FROST, FROST_BLUR } from '@/lib/frostPanel';
 
 interface BreathingRoomBottomBarProps {
   caption: string;
