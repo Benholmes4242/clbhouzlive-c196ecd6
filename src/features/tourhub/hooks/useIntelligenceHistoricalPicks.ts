@@ -208,10 +208,19 @@ export function useIntelligenceHistoricalPicks() {
             actualPositionTied,
             status,
             finalPosition: formatFinalPosition(actualPosition, actualPositionTied, status),
+            scoreToPar: lb?.score ?? null,
           });
         }
 
         if (picks.length === 0) continue;
+
+        const bestPick = picks.reduce<IntelligenceHistoricalPick | null>((best, p) => {
+          if (best === null) return p;
+          // Null positions (MC/WD) treated as worst.
+          if (p.actualPosition === null) return best;
+          if (best.actualPosition === null) return p;
+          return p.actualPosition < best.actualPosition ? p : best;
+        }, null);
 
         tournaments.push({
           id: row.tournament_id,
@@ -223,6 +232,8 @@ export function useIntelligenceHistoricalPicks() {
           isMajor: isMajor(t.name ?? ''),
           outcome: classifyOutcome(picks),
           picks,
+          bestPick,
+          year: new Date(t.start_date).getFullYear().toString(),
         });
       }
 
