@@ -1,13 +1,13 @@
 /**
  * @deprecated Use `useUserFollow` for ProfileSocialButtons.
  * This hook is retained only for BusinessProfileActions and legacy consumers.
- * All Supabase calls now properly check for errors.
+ * Internals now route through the canonical `useToggleFollow`.
  */
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
 interface UseProfileActionsProps {
   targetUserId: string;
@@ -17,7 +17,8 @@ interface UseProfileActionsProps {
 export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileActionsProps) => {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-  
+  const toggle = useToggleFollow();
+
   // Check relationship status to respect blocks
   const { data: relationship } = useRelationshipStatus(targetUserId);
 
@@ -40,33 +41,19 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
       });
       return;
     }
-    
+
     setLoading(true);
     try {
-      if (isFollowing) {
-        const { error } = await supabase
-          .from('user_follows')
-          .delete()
-          .eq('follower_id', currentUserId)
-          .eq('following_id', targetUserId);
-        
-        if (error) throw error;
-        toast.success("Unfollowed");
-      } else {
-        const { error } = await supabase
-          .from('user_follows')
-          .upsert({
-            follower_id: currentUserId,
-            following_id: targetUserId
-          }, { 
-            onConflict: 'follower_id,following_id',
-            ignoreDuplicates: true 
-          });
-        
-        if (error) throw error;
-        toast.success("Following");
-      }
-      
+      await toggle.mutateAsync({
+        targetActorType: 'personal',
+        targetActorId: targetUserId,
+        targetUserId: targetUserId,
+        viewerActorType: 'personal',
+        viewerActorId: currentUserId,
+        viewerUserId: currentUserId,
+        isFollowing,
+      });
+      toast.success(isFollowing ? 'Unfollowed' : 'Following');
       invalidateAllRelatedQueries();
     } catch (error: any) {
       console.error('Error toggling follow:', error);

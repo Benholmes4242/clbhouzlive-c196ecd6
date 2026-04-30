@@ -6,6 +6,7 @@ import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
 import { useDiscoveryExclusions } from '@/hooks/useDiscoveryExclusions';
 import { useQueryClient } from '@tanstack/react-query';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
 interface SuggestedUser {
   id: string;
@@ -21,6 +22,7 @@ const SuggestedUsers = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const toggle = useToggleFollow();
 
   // Get exclusion data from the centralized hook
   const { data: exclusions, isLoading: exclusionsLoading } = useDiscoveryExclusions(user?.id);
@@ -134,23 +136,19 @@ const SuggestedUsers = () => {
     if (!user) return;
 
     try {
-      // Insert follow relationship
-      const { error } = await supabase
-        .from('user_follows')
-        .insert({
-          follower_id: user.id,
-          following_id: userId
-        });
-
-      if (error) {
-        console.error('Error following user:', error);
-        return;
-      }
+      await toggle.mutateAsync({
+        targetActorType: 'personal',
+        targetActorId: userId,
+        targetUserId: userId,
+        viewerActorType: 'personal',
+        viewerActorId: user.id,
+        viewerUserId: user.id,
+        isFollowing: false,
+      });
 
       // Invalidate exclusions cache and remove user from list
       queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
       setSuggestedUsers(prev => prev.filter(u => u.id !== userId));
-
     } catch (error) {
       console.error('Error in handleFollow:', error);
     }

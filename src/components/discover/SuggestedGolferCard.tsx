@@ -4,8 +4,9 @@ import { X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { toast } from 'sonner';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MutualFriendsAvatars, MutualFriend } from './MutualFriendsAvatars';
@@ -45,58 +46,62 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+
+  const { isFollowing: cached } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: golfer.id,
+    viewerActorType: 'personal',
+    viewerActorId: user?.id,
+  });
+  const isFollowing = cached ?? false;
+  const toggle = useToggleFollow();
+  const isLoading = toggle.isPending;
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDismissed(true);
-    
+
     // Haptic feedback
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate([5]);
     }
-    
+
     // Delay actual removal for animation
     setTimeout(() => {
       onDismiss?.(golfer.id);
     }, 200);
   };
 
-  const handleFollow = async (e: React.MouseEvent) => {
+  const handleFollow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (!user?.id) {
       toast.error('Please sign in to follow golfers');
       return;
     }
-    
-    setIsLoading(true);
-    
-    // Haptic feedback
+
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate([10]);
     }
-    
-    try {
-      const { error } = await supabase
-        .from('user_follows')
-        .insert({
-          follower_id: user.id,
-          following_id: golfer.id,
-        });
-      
-      if (error) throw error;
-      
-      setIsFollowing(true);
-      onFollow?.(golfer.id);
-    } catch (error) {
-      console.error('Follow error:', error);
-      toast.error('Failed to follow');
-    } finally {
-      setIsLoading(false);
-    }
+
+    toggle.mutate(
+      {
+        targetActorType: 'personal',
+        targetActorId: golfer.id,
+        targetUserId: golfer.id,
+        viewerActorType: 'personal',
+        viewerActorId: user.id,
+        viewerUserId: user.id,
+        isFollowing,
+      },
+      {
+        onSuccess: () => {
+          if (!isFollowing) onFollow?.(golfer.id);
+        },
+        onError: () => toast.error('Failed to follow'),
+      },
+    );
   };
 
   const handleCardClick = () => {
@@ -215,7 +220,7 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
             isFollowing && "bg-muted text-muted-foreground"
           )}
           onClick={handleFollow}
-          disabled={isLoading || isFollowing}
+          disabled={isLoading}
         >
           {isLoading ? (
             <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

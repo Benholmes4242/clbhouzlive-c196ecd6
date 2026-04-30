@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Squircle } from '@/components/ui/squircle';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
 
 interface ProfileData {
@@ -26,9 +28,18 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
   onMorphToHeader
 }) => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const { session } = useSupabaseSession();
+  const viewerId = session?.user?.id;
+
+  const { isFollowing: cached } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: userId,
+    viewerActorType: 'personal',
+    viewerActorId: viewerId,
+  });
+  const isFollowing = cached ?? false;
+  const toggle = useToggleFollow();
 
   // Enhanced liquid glass styling - match golf club tab pull style
   const liquidGlassStyle = {
@@ -44,7 +55,6 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
     const fetchProfile = async () => {
       try {
-        // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
           .from('public_profiles')
           .select('id, display_name, username, profile_photo_url')
@@ -52,20 +62,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
           .single();
 
         if (profileError) throw profileError;
-
         setProfile(profileData);
-
-        // Check if following (only if user is logged in and viewing someone else's profile)
-        if (session?.user?.id && session.user.id !== userId) {
-          const { data: followData } = await supabase
-            .from('user_follows')
-            .select('id')
-            .eq('follower_id', session.user.id)
-            .eq('following_id', userId)
-            .single();
-
-          setIsFollowing(!!followData);
-        }
       } catch (error) {
         console.error('Error fetching profile:', error);
       } finally {
@@ -74,38 +71,24 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
     };
 
     fetchProfile();
-  }, [userId, session?.user?.id]);
+  }, [userId]);
 
-  const handleFollow = async () => {
-    if (!session?.user?.id || !profile) return;
-
-    try {
-      if (isFollowing) {
-        // Unfollow
-        await supabase
-          .from('user_follows')
-          .delete()
-          .eq('follower_id', session.user.id)
-          .eq('following_id', profile.id);
-        setIsFollowing(false);
-      } else {
-        // Follow
-        await supabase
-          .from('user_follows')
-          .insert({
-            follower_id: session.user.id,
-            following_id: profile.id
-          });
-        setIsFollowing(true);
-      }
-    } catch (error) {
-      console.error('Error updating follow status:', error);
-    }
+  const handleFollow = () => {
+    if (!viewerId || !profile) return;
+    toggle.mutate({
+      targetActorType: 'personal',
+      targetActorId: profile.id,
+      targetUserId: profile.id,
+      viewerActorType: 'personal',
+      viewerActorId: viewerId,
+      viewerUserId: viewerId,
+      isFollowing,
+    });
   };
 
   if (loading || !profile) return null;
 
-  const isOwnProfile = session?.user?.id === userId;
+  const isOwnProfile = viewerId === userId;
 
   return (
     <div
@@ -157,6 +140,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
               <div className="flex items-center gap-1">
                 <Button
                   onClick={handleFollow}
+                  disabled={toggle.isPending}
                   size="sm"
                   variant={isFollowing ? "secondary" : "default"}
                   className="rounded-full px-3 h-7 text-xs font-medium"
