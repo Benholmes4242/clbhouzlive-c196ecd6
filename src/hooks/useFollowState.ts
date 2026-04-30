@@ -7,7 +7,7 @@
  * The cache is seeded by:
  *   1. Mutations via patchFollow (every toggle writes the canonical key)
  *   2. Direct-fetch surfaces that own a useQuery against the canonical key
- *      (BusinessProfilePage, BusinessFollowButton, MiniProfileSheet,
+ *      (BusinessProfilePage, BusinessFollowButton, ReviewBottomSheet,
  *      suggested-user cards) — they call get_business_relationship_status
  *      or the personal equivalent and the result lands here automatically.
  *   3. Feed RPC results — components fall back to `?? post.isFollowedByMe`
