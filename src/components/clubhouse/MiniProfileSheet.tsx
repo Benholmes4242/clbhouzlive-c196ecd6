@@ -119,28 +119,25 @@ function RecentPostTile({
 
 const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetProps) => {
   const navigate = useNavigate();
-  
-  // Use the new follow hook
-  const { isFollowing: followState, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(user?.id);
-  const { startDM, isStarting } = useStartDM();
   const { user: currentUser } = useSupabaseSession();
+
+  // Canonical follow hooks
+  const toggle = useToggleFollow();
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: user?.id,
+    viewerActorType: 'personal',
+    viewerActorId: currentUser?.id,
+  });
+  const isFollowing = cachedFollowing ?? user?.isFollowing ?? false;
+  const followBusy = toggle.isPending;
+
+  const { startDM, isStarting } = useStartDM();
   const isSelf = !!currentUser?.id && currentUser.id === user?.id;
-  
+
   const { posts, loading: postsLoading, error: postsError, isEmpty } = useUserProfilePosts(user?.id);
   const { openViewer } = useMediaViewer();
   const [isClosing, setIsClosing] = useState(false);
-  
-  const headerRef = React.useRef<HTMLDivElement>(null);
-  const scrollRef = React.useRef<HTMLDivElement>(null);
-  const [scrollMaxHeight, setScrollMaxHeight] = React.useState<number>();
-  const { notifySheetClosing, notifySheetOpened } = useSheetPlayback();
-
-  const isBusiness = user.isBusiness || user.profileType === 'business';
-
-  // Initialize follow state on mount
-  useEffect(() => {
-    ensureInitial();
-  }, [ensureInitial]);
 
   // Reset closing state when modal opens
   useEffect(() => {
