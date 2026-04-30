@@ -20,9 +20,16 @@ interface ActorSelectorProps {
   visibilityIcon?: string;
   visibilityLabel?: string;
   onOpenVisibility?: () => void;
+  /**
+   * 'combined' (default) — current behaviour: avatar + name + optional visibility sub-text in one pill.
+   * 'identity' — avatar + name + chevron only.
+   * 'visibility' — visibility icon + label + chevron only.
+   * All modes open the same combined "Post settings" sheet.
+   */
+  mode?: 'combined' | 'identity' | 'visibility';
 }
 
-export function ActorSelector({ compact = false, header = false, visibilityIcon, visibilityLabel, onOpenVisibility }: ActorSelectorProps) {
+export function ActorSelector({ compact = false, header = false, visibilityIcon, visibilityLabel, onOpenVisibility, mode = 'combined' }: ActorSelectorProps) {
   const { state, setActor, setVisibility } = usePostStudioContext();
   const [businesses, setBusinesses] = useState<BusinessAccount[]>([]);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
