@@ -29,6 +29,16 @@ interface EngagementDelta {
   commentCountDelta?: number;
 }
 
+interface PatchOptions {
+  /**
+   * Key prefixes to SKIP when walking ENGAGEMENT_CACHE_KEYS.
+   * Use this when the caller has already updated a specific cache entry
+   * directly (e.g. an optimistic update in onMutate) and doesn't want
+   * the helper to re-apply the delta.
+   */
+  skipKeyPrefixes?: readonly (readonly unknown[])[];
+}
+
 /**
  * Audit-derived list of every query key prefix that holds post engagement
  * state. React Query prefix-matches via `setQueriesData`, so listing the
@@ -82,7 +92,9 @@ export function patchEngagement(
   queryClient: QueryClient,
   postId: string,
   delta: EngagementDelta,
+  options?: PatchOptions,
 ): void {
+  const skip = options?.skipKeyPrefixes ?? [];
   const updatePostObject = (post: any): any => {
     if (!post || post.id !== postId) return post;
 
@@ -139,6 +151,13 @@ export function patchEngagement(
       'commentsCount' in obj);
 
   for (const keyPrefix of ENGAGEMENT_CACHE_KEYS) {
+    // Skip prefixes the caller has already handled (e.g. optimistic updates).
+    const isSkipped = skip.some(
+      (s) =>
+        s.length === keyPrefix.length && s.every((v, i) => v === keyPrefix[i]),
+    );
+    if (isSkipped) continue;
+
     queryClient.setQueriesData(
       { queryKey: keyPrefix as readonly unknown[] },
       (oldData: any) => {

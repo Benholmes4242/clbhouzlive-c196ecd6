@@ -177,10 +177,15 @@ export function usePostEngagement(postId: string | null) {
       // Use the pre-toggle state from context to compute the correct delta.
       if (postId && ctx) {
         const wasLiked = ctx.wasLiked;
-        patchEngagement(queryClient, postId, {
-          isLikedByMe: !wasLiked,
-          likeCountDelta: wasLiked ? -1 : +1,
-        });
+        patchEngagement(
+          queryClient,
+          postId,
+          {
+            isLikedByMe: !wasLiked,
+            likeCountDelta: wasLiked ? -1 : +1,
+          },
+          { skipKeyPrefixes: [['post-engagement']] },
+        );
       }
     },
   });
