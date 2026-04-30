@@ -177,7 +177,7 @@ export function useIntelligenceHistoricalPicks() {
         if (!t?.start_date || !t?.end_date) continue;
 
         // For EURO season tournaments, only include majors (e.g. The Masters).
-        // Mirrors usePickHistory's cross-tour majors fold-back so card + sheet stay scope-aligned.
+        // Cross-tour majors fold-back so card + sheet stay scope-aligned.
         if (euroSeasonIds.includes(t.season_id) && !isMajor(t.name || '')) continue;
 
         const rawPredictions = (row.predictions as any[]) ?? [];
