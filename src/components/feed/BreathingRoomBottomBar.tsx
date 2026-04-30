@@ -2,7 +2,7 @@
  * BreathingRoomBottomBar — bottom-left content slot for regular posts.
  *
  * Renders, top → bottom:
- *   1. Course tag pill (MapPin + course name) — if a course is tagged. Reads as
+ *   1. Course tag pill (⛳ + course name) — if a course is tagged. Reads as
  *      "posted at <course>".
  *   2. Author identity row (avatar + name + HCP, sub-line: home club · time)
  *   3. Caption — direct on the photo, 2-line clamp default, tap-anywhere to
