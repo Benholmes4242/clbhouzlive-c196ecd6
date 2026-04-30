@@ -145,10 +145,10 @@ export function useIntelligenceHistoricalPicks() {
       // Step 2: batched leaderboard fetch keyed by tournament + sr_id/name.
       const { data: leaderboardData } = await supabase
         .from('sr_leaderboards')
-        .select('tournament_id, position, position_tied, status, sr_players!inner(sr_id, full_name)')
+        .select('tournament_id, position, position_tied, status, score, sr_players!inner(sr_id, full_name)')
         .in('tournament_id', tournamentIds);
 
-      type LBEntry = { position: number | null; tied: boolean; status: string | null };
+      type LBEntry = { position: number | null; tied: boolean; status: string | null; score: number | null };
       const lbByTournament = new Map<string, { bySrId: Map<string, LBEntry>; byName: Map<string, LBEntry> }>();
 
       for (const row of (leaderboardData ?? [])) {
@@ -163,6 +163,7 @@ export function useIntelligenceHistoricalPicks() {
           position: row.position ?? null,
           tied: row.position_tied ?? false,
           status: row.status ?? null,
+          score: (row as any).score ?? null,
         };
         if (srId) maps.bySrId.set(srId, entry);
         if (fullName) maps.byName.set(fullName.toLowerCase(), entry);
