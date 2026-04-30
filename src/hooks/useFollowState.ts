@@ -22,7 +22,8 @@
  */
 
 import { useMemo, useSyncExternalStore } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FollowStateTarget {
   targetActorType: 'personal' | 'business';
@@ -53,6 +54,39 @@ export function useFollowState({
     ],
     [viewerActorType, viewerActorId, targetActorType, targetActorId],
   );
+
+  // Seed the canonical key from DB truth on mount. Shares cache storage with
+  // the useSyncExternalStore subscription below — populates once, all
+  // consumers of the same key dedupe to a single network call.
+  useQuery({
+    queryKey,
+    queryFn: async (): Promise<boolean> => {
+      if (targetActorType === 'business') {
+        const { data, error } = await supabase
+          .from('business_follows')
+          .select('id')
+          .eq('follower_actor_type', viewerActorType)
+          .eq('follower_actor_id', viewerActorId!)
+          .eq('business_id', targetActorId!)
+          .maybeSingle();
+        if (error) throw error;
+        return !!data;
+      } else {
+        const { data, error } = await supabase
+          .from('user_follows')
+          .select('id')
+          .eq('follower_actor_type', viewerActorType)
+          .eq('follower_actor_id', viewerActorId!)
+          .eq('following_id', targetActorId!)
+          .maybeSingle();
+        if (error) throw error;
+        return !!data;
+      }
+    },
+    enabled: !!viewerActorId && !!targetActorId,
+    staleTime: 30_000,
+    gcTime: 5 * 60 * 1000,
+  });
 
   const cache = queryClient.getQueryCache();
 
