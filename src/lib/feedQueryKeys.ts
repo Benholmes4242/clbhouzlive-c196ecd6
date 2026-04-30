@@ -24,6 +24,9 @@
  * - 'mutualCountsAndFriends' — friend graph metadata, not engagement state
  * - 'viewerProfileForReasons' — viewer's own profile metadata
  * - 'scheduled-posts', 'scheduled-posts-count' — user's own drafts
+ * - 'pga-card-post-id' — tournament→post lookup metadata, not engagement
+ * - 'player-scorecard' — tournament leaderboard data, not engagement
+ * - 'tournaments-cache' — tournament metadata, not engagement
  *
  * If you find a query key matching the audit pattern that ISN'T in the
  * registries, verify it actually loads post engagement state before adding.
@@ -101,6 +104,7 @@ export const DISCOVERY_QUERY_KEYS: readonly (readonly unknown[])[] = [
 /** Single-record engagement queries (post-engagement, post-likes, etc). */
 export const ENGAGEMENT_RECORD_KEYS: readonly (readonly unknown[])[] = [
   ['post-engagement'],
+  ['pga-card-counts'],
 ] as const;
 
 /** Single-record relationship queries. */
