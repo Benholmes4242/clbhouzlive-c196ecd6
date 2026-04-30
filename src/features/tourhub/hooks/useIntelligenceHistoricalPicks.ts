@@ -1,18 +1,18 @@
 /**
  * useIntelligenceHistoricalPicks
  *
- * Phase C parallel hook. Powers `IntelligenceAllPicksSheet` (the "All
- * Intelligence Picks" bottom sheet). Returns a chronological list of
- * completed PGA tournaments where Intelligence had predictions, with:
+ * Single source of truth for season Intelligence pick history. Powers the
+ * hero card track record, the Pick Record rail, and the All Intelligence
+ * Picks bottom sheet.
+ *
+ * Returns a chronological list of completed PGA tournaments (plus cross-tour
+ * majors from EURO seasons) where Intelligence had predictions, with:
  *
  *   - All 3 picks per tournament (not just the best finisher)
- *   - Final position per pick (formatted: "1", "T8", "MC", "WD", "—")
+ *   - Final position + score per pick (formatted: "1", "T8", "MC", "WD", "—")
  *   - Tournament date range (start + end ISO)
  *   - Client-side outcome classification (win | top5 | partial | miss)
- *
- * This is intentionally separate from `usePickHistory` (the rail on the
- * results view), which reduces all picks to a single best finisher and
- * caps at 10. Phase C needs the full pick array; the rail does not.
+ *   - Derived `bestPick` for the rail's single-pick rendering
  *
  * Cap: ORDER BY end_date DESC LIMIT 50 (~1 PGA season). Most recent first.
  *
@@ -41,6 +41,8 @@ export interface IntelligenceHistoricalPick {
   status: string | null;
   /** Pre-formatted display string: "1", "T8", "MC", "WD", "—". */
   finalPosition: string;
+  /** Score to par from the leaderboard (null when missing or pre-cut). */
+  scoreToPar: number | null;
 }
 
 export interface IntelligenceHistoricalTournament {
@@ -54,6 +56,10 @@ export interface IntelligenceHistoricalTournament {
   isMajor: boolean;
   outcome: IntelligenceOutcome;
   picks: IntelligenceHistoricalPick[];
+  /** Best-finishing pick across rank 1-3. Null positions (MC/WD) treated as worst. */
+  bestPick: IntelligenceHistoricalPick | null;
+  /** ISO year of start_date, for display. */
+  year: string;
 }
 
 const SKIP_WORDS = new Set([
@@ -139,10 +145,10 @@ export function useIntelligenceHistoricalPicks() {
       // Step 2: batched leaderboard fetch keyed by tournament + sr_id/name.
       const { data: leaderboardData } = await supabase
         .from('sr_leaderboards')
-        .select('tournament_id, position, position_tied, status, sr_players!inner(sr_id, full_name)')
+        .select('tournament_id, position, position_tied, status, score, sr_players!inner(sr_id, full_name)')
         .in('tournament_id', tournamentIds);
 
-      type LBEntry = { position: number | null; tied: boolean; status: string | null };
+      type LBEntry = { position: number | null; tied: boolean; status: string | null; score: number | null };
       const lbByTournament = new Map<string, { bySrId: Map<string, LBEntry>; byName: Map<string, LBEntry> }>();
 
       for (const row of (leaderboardData ?? [])) {
@@ -157,6 +163,7 @@ export function useIntelligenceHistoricalPicks() {
           position: row.position ?? null,
           tied: row.position_tied ?? false,
           status: row.status ?? null,
+          score: (row as any).score ?? null,
         };
         if (srId) maps.bySrId.set(srId, entry);
         if (fullName) maps.byName.set(fullName.toLowerCase(), entry);
@@ -170,7 +177,7 @@ export function useIntelligenceHistoricalPicks() {
         if (!t?.start_date || !t?.end_date) continue;
 
         // For EURO season tournaments, only include majors (e.g. The Masters).
-        // Mirrors usePickHistory's cross-tour majors fold-back so card + sheet stay scope-aligned.
+        // Cross-tour majors fold-back so card + sheet stay scope-aligned.
         if (euroSeasonIds.includes(t.season_id) && !isMajor(t.name || '')) continue;
 
         const rawPredictions = (row.predictions as any[]) ?? [];
@@ -201,10 +208,19 @@ export function useIntelligenceHistoricalPicks() {
             actualPositionTied,
             status,
             finalPosition: formatFinalPosition(actualPosition, actualPositionTied, status),
+            scoreToPar: lb?.score ?? null,
           });
         }
 
         if (picks.length === 0) continue;
+
+        const bestPick = picks.reduce<IntelligenceHistoricalPick | null>((best, p) => {
+          if (best === null) return p;
+          // Null positions (MC/WD) treated as worst.
+          if (p.actualPosition === null) return best;
+          if (best.actualPosition === null) return p;
+          return p.actualPosition < best.actualPosition ? p : best;
+        }, null);
 
         tournaments.push({
           id: row.tournament_id,
@@ -216,6 +232,8 @@ export function useIntelligenceHistoricalPicks() {
           isMajor: isMajor(t.name ?? ''),
           outcome: classifyOutcome(picks),
           picks,
+          bestPick,
+          year: new Date(t.start_date).getFullYear().toString(),
         });
       }
 

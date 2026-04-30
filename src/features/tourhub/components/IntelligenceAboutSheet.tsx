@@ -9,7 +9,7 @@
  *   2. Lead paragraph card (vague on multi-LLM consensus per locked decision)
  *   3. WHAT WE ANALYSE (6 icon rows)
  *   4. HOW PICKS ARE TIERED (3 tier rows)
- *   5. THE RECEIPTS (live track-record numbers from usePickHistory)
+ *   5. THE RECEIPTS (live track-record numbers from useIntelligenceHistoricalPicks)
  *   6. Footnote
  */
 

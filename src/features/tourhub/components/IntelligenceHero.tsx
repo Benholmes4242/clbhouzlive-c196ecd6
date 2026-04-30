@@ -25,7 +25,7 @@ import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
 } from '../hooks/useIntelligenceLifecycleState';
-import { usePickHistory } from '../hooks/usePickHistory';
+import { useIntelligenceHistoricalPicks } from '../hooks/useIntelligenceHistoricalPicks';
 import { usePredictionTracker } from '../hooks/usePredictionTracker';
 import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions';
 import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
@@ -139,7 +139,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     nextTournamentPredictions,
     isLoading,
   } = useIntelligenceLifecycleState();
-  const { data: pickHistory = [] } = usePickHistory();
+  const { data: tournaments = [] } = useIntelligenceHistoricalPicks();
 
   // Tracker is needed for both live AND results states (per Phase B audit).
   // Upcoming skips it — there is nothing to track.
@@ -150,15 +150,16 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   );
 
   // ─── Computed track record ────────────────────────────────────────────────
+  // Derived from the same dataset that powers the All Picks bottom sheet, so
+  // WIN/TOP-5 chips and these counters can never drift.
   const { wins, topFives, topFiveRate } = useMemo(() => {
-    const w = pickHistory.filter(e => e.isWinner).length;
-    const t5 = pickHistory.filter(
-      e => e.actualPosition !== null && e.actualPosition <= 5,
-    ).length;
-    const total = pickHistory.length || 1;
+    const w = tournaments.filter(t => t.outcome === 'win').length;
+    const t5 = tournaments.filter(t => t.outcome === 'win' || t.outcome === 'top5').length;
+    const total = tournaments.length || 1;
     const rate = Math.round((t5 / total) * 100);
     return { wins: w, topFives: t5, topFiveRate: rate };
-  }, [pickHistory]);
+  }, [tournaments]);
+
 
   const stateLabel = useMemo(
     () => formatStateLabel(state, data, nextTournamentPredictions, tracker),

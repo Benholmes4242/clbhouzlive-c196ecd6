@@ -8,9 +8,9 @@
  * non-PGA-equivalent events (senior / women / junior / amateur fields)
  * that would otherwise match on substring.
  *
- * Single source of truth — imported by `usePickHistory` and
- * `useIntelligenceHistoricalPicks` so the card track record and the
- * "All Intelligence Picks" bottom sheet stay in lockstep.
+ * Single source of truth — imported by `useIntelligenceHistoricalPicks`
+ * (which powers the hero card track record, the Pick Record rail, and the
+ * All Intelligence Picks bottom sheet).
  */
 
 /** Major tournament name matching (sr_tournaments has no is_major column). */

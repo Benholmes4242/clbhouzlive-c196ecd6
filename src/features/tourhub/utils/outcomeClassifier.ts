@@ -1,8 +1,9 @@
 /**
  * outcomeClassifier — shared any-pick-wins classifier for Intelligence picks.
  *
- * Single source of truth used by both `useIntelligenceHistoricalPicks` (bottom
- * sheet) and `usePickHistory` (card track record) so outcomes never drift.
+ * Single source of truth used by `useIntelligenceHistoricalPicks` — which
+ * powers IntelligenceHero, TournamentInsights, and the All Picks sheet — so
+ * outcomes never drift between surfaces.
  *
  * Semantics: outcome reflects the BEST finishing pick across rank 1-3, not
  * just the Top Pick. Matches the user-facing framing in IntelligenceHero
