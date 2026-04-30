@@ -122,23 +122,36 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               alignItems: 'center',
               gap: 6,
               maxWidth: '100%',
-              padding: '5px 10px',
+              padding: '5px 11px',
               borderRadius: 999,
-              background: 'rgba(0, 0, 0, 0.45)',
-              border: '1px solid rgba(255, 255, 255, 0.10)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
+              background: 'rgba(255, 255, 255, 0.12)',
+              border: '0.5px solid rgba(255, 255, 255, 0.30)',
+              backdropFilter: 'blur(40px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(40px) saturate(160%)',
+              boxShadow: 'inset 0 0.5px 0 0 rgba(255,255,255,0.40), 0 4px 12px rgba(0,0,0,0.10)',
               cursor: onCourseTap ? 'pointer' : 'default',
               fontFamily: 'inherit',
             }}
             aria-label={`View ${golfCourse.name}`}
           >
-            <MapPin size={14} fill="#F7931E" stroke="#F7931E" strokeWidth={2} />
+            <span
+              style={{
+                fontSize: 13,
+                lineHeight: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                flexShrink: 0,
+              }}
+              aria-hidden="true"
+            >
+              ⛳
+            </span>
             <span
               style={{
                 fontSize: 11,
                 fontWeight: 700,
                 color: '#fff',
+                textShadow: '0 1px 2px rgba(0,0,0,0.20)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
