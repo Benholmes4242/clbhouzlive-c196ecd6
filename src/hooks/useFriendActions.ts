@@ -120,6 +120,19 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
 
       if (error) throw error;
 
+      // auto_follow_on_friend_accept trigger creates user_follows rows in BOTH
+      // directions. Patch follow caches so every surface updates without refresh.
+      patchFollow(
+        queryClient,
+        { targetActorType: 'personal', targetActorId: requesterId, targetUserId: requesterId, viewerUserId: currentUserId },
+        { isFollowing: true },
+      );
+      patchFollow(
+        queryClient,
+        { targetActorType: 'personal', targetActorId: currentUserId, targetUserId: currentUserId, viewerUserId: requesterId },
+        { isFollowing: true },
+      );
+
       // Note: Notification is now created automatically by database trigger
       toast.success('Friend request accepted');
       invalidateQueries();
