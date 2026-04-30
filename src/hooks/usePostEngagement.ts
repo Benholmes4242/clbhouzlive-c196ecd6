@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { createMentionNotifications } from '@/utils/mentionExtractor';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { patchEngagement } from '@/lib/engagementCache';
 
 export interface PostComment {
   id: string;
@@ -148,17 +149,18 @@ export function usePostEngagement(postId: string | null) {
       await queryClient.cancelQueries({ queryKey: ['post-engagement', postId, actorType, actorId] });
       const prev = queryClient.getQueryData<any>(['post-engagement', postId, actorType, actorId]);
 
-      if (!prev) return { prev };
+      const wasLiked = !!prev?.hasLiked;
 
-      const next = {
-        ...prev,
-        hasLiked: !prev.hasLiked,
-        likesCount: prev.likesCount + (prev.hasLiked ? -1 : 1),
-      };
+      if (prev) {
+        const next = {
+          ...prev,
+          hasLiked: !prev.hasLiked,
+          likesCount: prev.likesCount + (prev.hasLiked ? -1 : 1),
+        };
+        queryClient.setQueryData(['post-engagement', postId, actorType, actorId], next);
+      }
 
-      queryClient.setQueryData(['post-engagement', postId, actorType, actorId], next);
-
-      return { prev };
+      return { prev, wasLiked };
     },
     onError: (_err, _vars, ctx) => {
       // Revert on error
@@ -166,16 +168,20 @@ export function usePostEngagement(postId: string | null) {
         queryClient.setQueryData(['post-engagement', postId, actorType, actorId], ctx.prev);
       }
     },
-    onSettled: () => {
-      // Refetch to sync with server
-      queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      // Invalidate all feed queries to update like counts across pages
-      queryClient.invalidateQueries({ queryKey: ['explore-content'] });
-      queryClient.invalidateQueries({ queryKey: ['watch-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['course-media'] });
-      queryClient.invalidateQueries({ queryKey: ['user-posts'] });
+    onSettled: (_data, _error, _vars, ctx) => {
+      // Surgical cache patch across every OTHER feed surface. The
+      // `['post-engagement', postId, actorType, actorId]` entry was already
+      // updated optimistically in onMutate; patchEngagement will reapply
+      // the +/-1 delta to any other variant of the post-engagement key (other
+      // actors viewing the same post) and to all feed caches.
+      // Use the pre-toggle state from context to compute the correct delta.
+      if (postId && ctx) {
+        const wasLiked = ctx.wasLiked;
+        patchEngagement(queryClient, postId, {
+          isLikedByMe: !wasLiked,
+          likeCountDelta: wasLiked ? -1 : +1,
+        });
+      }
     },
   });
 
@@ -327,10 +333,12 @@ export function usePostEngagement(postId: string | null) {
       }
     },
     onSuccess: () => {
-      // Refetch comments and engagement summary
+      // Refetch comments list for THIS post (visible thread).
       queryClient.invalidateQueries({ queryKey: ['post-comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Surgical cache patch: bump comment count across every feed surface.
+      if (postId) {
+        patchEngagement(queryClient, postId, { commentCountDelta: +1 });
+      }
     },
   });
 
