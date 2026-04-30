@@ -656,14 +656,16 @@ const BusinessProfilePage: React.FC = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as BusinessTab)}
                   className={cn(
-                    "relative flex-1 min-h-[44px] transition-all duration-200 whitespace-nowrap active:scale-[0.98] rounded-lg px-4 py-1.5 text-sm",
+                    "relative flex-1 min-h-[44px] transition-colors duration-200 whitespace-nowrap active:scale-[0.98] px-4 py-1.5 text-sm",
                     isActive
-                      ? "font-semibold"
-                      : "font-medium text-[#64748B] hover:text-foreground"
+                      ? "font-extrabold"
+                      : "font-medium hover:text-foreground"
                   )}
                   style={{
-                    background: isActive ? '#0F172A' : 'transparent',
-                    color: isActive ? '#ffffff' : undefined,
+                    background: 'transparent',
+                    border: 'none',
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    letterSpacing: isActive ? '-0.01em' : 0,
                   }}
                 >
                   {tab.label}

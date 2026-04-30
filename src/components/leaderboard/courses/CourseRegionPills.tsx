@@ -22,7 +22,7 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
     <div
       style={{
         display: 'flex',
-        gap: 8,
+        gap: 18,
         overflowX: 'auto',
         scrollbarWidth: 'none',
       }}
@@ -38,15 +38,16 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              padding: '7px 14px',
-              borderRadius: 10,
+              padding: '6px 4px',
+              background: 'transparent',
+              border: 'none',
               cursor: 'pointer',
               fontSize: 13,
-              fontWeight: 600,
-              border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
-              background: isActive ? '#0F172A' : 'transparent',
-              color: isActive ? '#ffffff' : '#64748B',
-              transition: 'all 0.15s ease',
+              fontWeight: isActive ? 800 : 500,
+              color: isActive ? '#0F172A' : '#94A3B8',
+              letterSpacing: isActive ? '-0.01em' : 0,
+              transition: 'color 0.15s ease',
+              minHeight: 34,
             }}
             className="active:scale-[0.96]"
           >

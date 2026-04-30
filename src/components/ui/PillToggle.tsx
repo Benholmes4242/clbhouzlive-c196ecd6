@@ -31,19 +31,20 @@ export const PillToggle: React.FC<PillToggleProps> = ({
   variant = 'default',
 }) => {
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-5', className)}>
       {options.map((option) => {
         const isActive = selected === option.id;
         return (
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
-            className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors flex items-center active:scale-[0.97]"
+            className="shrink-0 min-h-[36px] px-1 text-sm transition-colors flex items-center active:scale-[0.97]"
             style={{
-              borderRadius: 8,
-              background: isActive ? '#0F172A' : 'transparent',
-              color: isActive ? '#ffffff' : '#64748B',
-              border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
+              background: 'transparent',
+              border: 'none',
+              fontWeight: isActive ? 800 : 500,
+              color: isActive ? '#0F172A' : '#94A3B8',
+              letterSpacing: isActive ? '-0.01em' : 0,
             }}
           >
             {option.label}

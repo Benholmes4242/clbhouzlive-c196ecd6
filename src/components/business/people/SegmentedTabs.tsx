@@ -15,7 +15,7 @@ interface SegmentedTabsProps {
 export function SegmentedTabs({ tabs, activeTab, onTabChange }: SegmentedTabsProps) {
   return (
     <div className="flex justify-center py-3">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-5">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -23,12 +23,13 @@ export function SegmentedTabs({ tabs, activeTab, onTabChange }: SegmentedTabsPro
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className="px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold"
+              className="px-1 min-h-[36px] text-sm whitespace-nowrap transition-colors duration-200 active:scale-[0.97]"
               style={{
-                borderRadius: 8,
-                background: isActive ? '#0F172A' : 'transparent',
-                color: isActive ? '#ffffff' : '#64748B',
-                border: isActive ? 'none' : '1px solid rgba(15,23,42,0.10)',
+                background: 'transparent',
+                border: 'none',
+                fontWeight: isActive ? 800 : 500,
+                color: isActive ? '#0F172A' : '#94A3B8',
+                letterSpacing: isActive ? '-0.01em' : 0,
               }}
             >
               {tab.label}
