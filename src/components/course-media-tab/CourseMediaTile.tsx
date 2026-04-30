@@ -139,8 +139,8 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         </div>
       )}
 
-      {/* Caption + likes — bottom overlay */}
-      {(post.caption || post.likeCount > 0) && (
+      {/* Likes — bottom right overlay */}
+      {post.likeCount > 0 && (
         <div
           style={{
             position: 'absolute',
@@ -149,33 +149,12 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
             bottom: 6,
             display: 'flex',
             alignItems: 'flex-end',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             gap: 6,
             zIndex: 2,
             pointerEvents: 'none',
           }}
         >
-          {post.caption ? (
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: '#fff',
-                lineHeight: 1.3,
-                overflow: 'hidden',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                textShadow: '0 1px 2px rgba(0,0,0,0.4)',
-                flex: 1,
-                minWidth: 0,
-              }}
-            >
-              {post.caption}
-            </div>
-          ) : (
-            <div style={{ flex: 1 }} />
-          )}
           {post.likeCount > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff">
