@@ -71,5 +71,16 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
     // intentional no-op (no overlay store anymore)
   }, []);
 
-  return { handleFollow, handleFollowChange, getFollowState, resetFollows };
+  // Backward-compat: callers still destructure followOverrides as a Map.
+  // Always empty now — the cache patch is the source of truth, so downstream
+  // components reading a per-user override Map effectively get pass-through.
+  return {
+    followOverrides: EMPTY_OVERRIDES,
+    handleFollow,
+    handleFollowChange,
+    getFollowState,
+    resetFollows,
+  };
 }
+
+const EMPTY_OVERRIDES: ReadonlyMap<string, boolean> = new Map();
