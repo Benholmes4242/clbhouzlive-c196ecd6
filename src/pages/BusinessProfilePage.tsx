@@ -74,8 +74,14 @@ const BusinessProfilePage: React.FC = () => {
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
-  const { data: isFollowingStatus, isLoading: statusLoading } = useIsFollowingBusiness(business?.id, user?.id);
-  const { follow, unfollow, isFollowing: followPending, isUnfollowing: unfollowPending } = useBusinessFollowMutation(business?.id || '', user?.id);
+  // Slice 3: canonical follow state + mutation (5-element key)
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'business',
+    targetActorId: business?.id,
+    viewerActorType: 'personal',
+    viewerActorId: user?.id,
+  });
+  const toggleFollow = useToggleFollow();
 
   // Image upload hooks (P7: owner affordances)
   const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business?.id);
