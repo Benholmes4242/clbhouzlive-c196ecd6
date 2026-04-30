@@ -17373,6 +17373,15 @@ export type Database = {
             Args: { p_business_id: string; p_user_profile_id: string }
             Returns: boolean
           }
+      is_following_actor: {
+        Args: {
+          p_target_actor_id: string
+          p_target_actor_type: string
+          p_target_post_user_id: string
+          p_viewer_user_id: string
+        }
+        Returns: boolean
+      }
       is_following_user: {
         Args: { followed: string; follower: string }
         Returns: boolean
