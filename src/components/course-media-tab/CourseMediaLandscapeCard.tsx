@@ -155,24 +155,6 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          {post.caption && (
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 400,
-                color: '#FFFFFF',
-                lineHeight: 1.35,
-                overflow: 'hidden',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-                marginBottom: 3,
-              }}
-            >
-              {post.caption}
-            </div>
-          )}
           {post.displayName && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <SquircleAvatar
