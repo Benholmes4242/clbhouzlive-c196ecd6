@@ -122,8 +122,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     followEnabled ? user.id : undefined,
   );
 
-  const isFollowing = useFollowStore((s) => s.getFollowing(user.id, serverIsFollowing ?? false));
-  const setFollowing = useFollowStore((s) => s.setFollowing);
+  const isFollowing = !!serverIsFollowing;
 
   const followMutation = useFollowMutation();
 
@@ -137,26 +136,19 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
       }
       if (followMutation.isPending) return;
 
-      const wasFollowing = isFollowing;
-      // Optimistic store update so all surfaces reflect the change immediately.
-      setFollowing(user.id, !wasFollowing);
-
-      followMutation.mutate(
-        {
-          targetUserId: user.id,
-          targetActorType: 'personal',
-          targetActorId: user.id,
-          currentUserId: viewer.id,
-          isFollowed: wasFollowing,
-        },
-        {
-          onError: () => {
-            setFollowing(user.id, wasFollowing);
-          },
-        },
-      );
+      // patchFollow (invoked inside useToggleFollow) handles optimistic
+      // propagation across every cache surface, including the
+      // ['user-follow-status', viewer.id, user.id] key that drives
+      // serverIsFollowing here. No local override needed.
+      followMutation.mutate({
+        targetUserId: user.id,
+        targetActorType: 'personal',
+        targetActorId: user.id,
+        currentUserId: viewer.id,
+        isFollowed: isFollowing,
+      });
     },
-    [isFollowing, isOwnReview, user.id, viewer?.id, setFollowing, followMutation],
+    [isFollowing, isOwnReview, user.id, viewer?.id, followMutation],
   );
 
   // ─── Drag scoping ─────────────────────────────────────────────
