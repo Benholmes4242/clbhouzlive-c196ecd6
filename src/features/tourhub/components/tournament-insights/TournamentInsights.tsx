@@ -48,10 +48,41 @@ const TournamentInsightsSkeleton = () => (
 
 // ─── Pick Record Rail ────────────────────────────────────────────────────────
 
+type RailEntry = {
+  tournamentId: string;
+  tournamentName: string;
+  shortName: string;
+  topPickName: string;
+  actualPosition: number | null;
+  actualPositionTied: boolean;
+  isWinner: boolean;
+  scoreToPar: number | null;
+  year: string;
+};
+
+function toRailEntry(t: IntelligenceHistoricalTournament): RailEntry | null {
+  if (!t.bestPick) return null;
+  return {
+    tournamentId: t.id,
+    tournamentName: t.name,
+    shortName: t.shortName,
+    topPickName: t.bestPick.playerName,
+    actualPosition: t.bestPick.actualPosition,
+    actualPositionTied: t.bestPick.actualPositionTied,
+    isWinner: t.outcome === 'win',
+    scoreToPar: t.bestPick.scoreToPar,
+    year: t.year,
+  };
+}
+
 function PickRecordRail() {
   const navigate = useNavigate();
-  const { data: pickHistory, isLoading } = usePickHistory();
-  const [selectedEntry, setSelectedEntry] = React.useState<PickHistoryEntry | null>(null);
+  const { data: tournaments = [], isLoading } = useIntelligenceHistoricalPicks();
+  const pickHistory = useMemo(
+    () => tournaments.map(toRailEntry).filter((e): e is RailEntry => e !== null),
+    [tournaments],
+  );
+  const [selectedEntry, setSelectedEntry] = React.useState<RailEntry | null>(null);
 
   if (isLoading) {
     return (
