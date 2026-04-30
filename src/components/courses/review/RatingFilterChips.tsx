@@ -118,20 +118,9 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
                 }}
               >
                 <span>{option.label}</span>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: isActive ? '#F7931E' : '#94A3B8',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  <span>{count}</span>
-                  {isActive && <Check className="h-4 w-4" />}
-                </span>
+                {isActive && (
+                  <Check className="h-4 w-4" style={{ color: '#F7931E' }} />
+                )}
               </button>
             );
           })}
