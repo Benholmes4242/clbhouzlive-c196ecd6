@@ -49,7 +49,7 @@ function maskEmail(email: string): string {
 
 export function SettingsPageV2() {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const { profile, loading } = useProfileData();
 
   // Sync email RPC on mount
@@ -89,7 +89,7 @@ export function SettingsPageV2() {
   // with session=null before the real session restores) can briefly set loading=false
   // while profile is still null, causing the full page to render with undefined data.
   // Since Settings is route-guarded, !profile is only ever true during the load phase.
-  if (loading || !profile) return <SettingsSkeleton />;
+  if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
   const p = profile as any;
   const handicapSuffix = p?.eg_handicap_index != null
