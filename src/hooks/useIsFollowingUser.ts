@@ -1,14 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+/**
+ * @deprecated Use `useFollowState` (read) + `useToggleFollow` (write) directly.
+ * Wrapper preserved for PR 3 incremental migration.
+ *
+ * Note: this file still exposes the original 3-element ['user-follow-status']
+ * cache key for backward-compat. patchFollow walks that key in
+ * FOLLOW_CACHE_KEYS so optimistic updates from useToggleFollow propagate here.
+ */
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
-/**
- * Check if the current user is following a target user
- */
 export function useIsFollowingUser(
   viewerUserId: string | undefined,
-  targetUserId: string | undefined
+  targetUserId: string | undefined,
 ) {
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.warn('[deprecated] useIsFollowingUser → migrate to useFollowState');
+  }
+  const queryClient = useQueryClient();
+
   return useQuery({
     queryKey: ['user-follow-status', viewerUserId, targetUserId],
     enabled: !!viewerUserId && !!targetUserId && viewerUserId !== targetUserId,
@@ -19,96 +31,51 @@ export function useIsFollowingUser(
         .eq('follower_id', viewerUserId!)
         .eq('following_id', targetUserId!)
         .maybeSingle();
-
       if (error) throw error;
-      return !!data;
+      const result = !!data;
+      // Seed canonical 5-element key so useFollowState readers see it too.
+      queryClient.setQueryData(
+        ['follow-status', 'personal', viewerUserId, 'personal', targetUserId],
+        { isFollowing: result },
+      );
+      return result;
     },
     staleTime: 60_000,
   });
 }
 
-/**
- * Follow/unfollow a user with optimistic updates
- */
 export function useUserFollowMutation(
   viewerUserId: string | undefined,
-  targetUserId: string | undefined
+  targetUserId: string | undefined,
 ) {
-  const queryClient = useQueryClient();
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.warn('[deprecated] useUserFollowMutation → migrate to useToggleFollow');
+  }
+  const toggle = useToggleFollow();
 
-  const followMutation = useMutation({
-    mutationFn: async () => {
-      if (!viewerUserId || !targetUserId) throw new Error('Must be logged in to follow');
-
-      const { error } = await supabase
-        .from('user_follows')
-        .insert({ follower_id: viewerUserId, following_id: targetUserId });
-
-      if (error) throw error;
-    },
-    onMutate: async () => {
-      // Optimistic update
-      await queryClient.cancelQueries({ queryKey: ['user-follow-status', viewerUserId, targetUserId] });
-      const previousStatus = queryClient.getQueryData<boolean>(['user-follow-status', viewerUserId, targetUserId]);
-      queryClient.setQueryData(['user-follow-status', viewerUserId, targetUserId], true);
-      return { previousStatus };
-    },
-    onError: (error, _, context) => {
-      // Rollback on error
-      if (context?.previousStatus !== undefined) {
-        queryClient.setQueryData(['user-follow-status', viewerUserId, targetUserId], context.previousStatus);
-      }
-      console.error('Follow error:', error);
-      toast.error("Couldn't follow");
-    },
-    onSettled: () => {
-      // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: ['user-follow-status', viewerUserId, targetUserId] });
-      queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
-      queryClient.invalidateQueries({ queryKey: ['social-counts', viewerUserId] });
-      // Invalidate discovery exclusions so suggested users refreshes
-      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
-    },
-  });
-
-  const unfollowMutation = useMutation({
-    mutationFn: async () => {
-      if (!viewerUserId || !targetUserId) throw new Error('Must be logged in to unfollow');
-
-      const { error } = await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', viewerUserId)
-        .eq('following_id', targetUserId);
-
-      if (error) throw error;
-    },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['user-follow-status', viewerUserId, targetUserId] });
-      const previousStatus = queryClient.getQueryData<boolean>(['user-follow-status', viewerUserId, targetUserId]);
-      queryClient.setQueryData(['user-follow-status', viewerUserId, targetUserId], false);
-      return { previousStatus };
-    },
-    onError: (error, _, context) => {
-      if (context?.previousStatus !== undefined) {
-        queryClient.setQueryData(['user-follow-status', viewerUserId, targetUserId], context.previousStatus);
-      }
-      console.error('Unfollow error:', error);
-      toast.error("Couldn't unfollow");
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-follow-status', viewerUserId, targetUserId] });
-      queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
-      queryClient.invalidateQueries({ queryKey: ['social-counts', viewerUserId] });
-      // Invalidate discovery exclusions so suggested users refreshes
-      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
-    },
-  });
+  const run = (isFollowing: boolean) => {
+    if (!viewerUserId || !targetUserId) return;
+    toggle.mutate(
+      {
+        targetActorType: 'personal',
+        targetActorId: targetUserId,
+        targetUserId,
+        viewerActorType: 'personal',
+        viewerActorId: viewerUserId,
+        viewerUserId,
+        isFollowing,
+      },
+      {
+        onError: () => toast.error(isFollowing ? "Couldn't unfollow" : "Couldn't follow"),
+      },
+    );
+  };
 
   return {
-    follow: followMutation.mutate,
-    unfollow: unfollowMutation.mutate,
-    isFollowing: followMutation.isPending,
-    isUnfollowing: unfollowMutation.isPending,
+    follow: () => run(false),
+    unfollow: () => run(true),
+    isFollowing: toggle.isPending,
+    isUnfollowing: toggle.isPending,
   };
 }
