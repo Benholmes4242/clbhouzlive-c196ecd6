@@ -104,7 +104,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       {/* Big serif number */}
       <div
         style={{
-          fontFamily: 'Georgia, "Times New Roman", serif',
+          fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           fontWeight: 900,
           fontSize: 56,
           color: '#0F172A',
