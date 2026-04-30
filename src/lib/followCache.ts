@@ -182,6 +182,11 @@ export function patchFollow(
 ): void {
   const skip = options?.skipKeyPrefixes ?? [];
 
+  // First pass: queryKey-aware patches (need to inspect the actual key, not
+  // just the prefix). React Query's setQueriesData updater doesn't receive
+  // the queryKey, so we walk the cache manually for these.
+  const cache = queryClient.getQueryCache();
+
   for (const keyPrefix of FOLLOW_CACHE_KEYS) {
     const isSkipped = skip.some(
       (s) => s.length === keyPrefix.length && s.every((v, i) => v === keyPrefix[i]),
@@ -196,68 +201,80 @@ export function patchFollow(
     const isFollowStatusKey = keyPrefix[0] === 'follow-status';
     const isSocialCountsKey = keyPrefix[0] === 'social-counts';
 
-    queryClient.setQueriesData(
-      { queryKey: keyPrefix as readonly unknown[] },
-      (oldData: any, queryMeta?: any) => {
-        if (oldData === undefined || oldData === null) return oldData;
+    // Keys that need queryKey-aware patching: walk the cache manually.
+    if (isLegacyBooleanKey || isFollowStatusKey || isSocialCountsKey) {
+      const matches = cache.findAll({ queryKey: keyPrefix as readonly unknown[] });
+      for (const q of matches) {
+        const queryKey = q.queryKey as unknown[];
+        const oldData = q.state.data as any;
+        if (oldData === undefined || oldData === null) continue;
 
-        // Shape 5: legacy boolean records — overwrite directly. The query key
-        // already encodes which (viewer, target) pair, so we can't filter by
-        // target.targetActorId here. We rely on the queryKey being scoped.
-        if (isLegacyBooleanKey && typeof oldData === 'boolean') {
-          // Best effort: only patch if the key encodes our target id somewhere
-          const queryKey = (queryMeta?.queryKey ?? []) as unknown[];
+        if (isLegacyBooleanKey) {
           const matchesId =
             queryKey.includes(target.targetActorId) ||
             queryKey.includes(target.targetUserId);
-          return matchesId ? delta.isFollowing : oldData;
+          if (!matchesId) continue;
+          if (typeof oldData === 'boolean') {
+            queryClient.setQueryData(queryKey, delta.isFollowing);
+          } else if (oldData && typeof oldData === 'object' && !Array.isArray(oldData) && !oldData.pages) {
+            // boolean-ish object form (rare)
+            queryClient.setQueryData(queryKey, { ...oldData, isFollowing: delta.isFollowing });
+          }
+          continue;
         }
 
-        // Shape 4 specialized: canonical 5-element follow-status key
-        // ['follow-status', viewerActorType, viewerActorId, targetActorType, targetActorId]
         if (isFollowStatusKey) {
-          const queryKey = (queryMeta?.queryKey ?? []) as unknown[];
-          const keyTargetType = queryKey[3];
-          const keyTargetId = queryKey[4];
+          // ['follow-status', viewerActorType, viewerActorId, targetActorType, targetActorId]
           const keyViewerType = queryKey[1];
           const keyViewerId = queryKey[2];
-          const matches =
+          const keyTargetType = queryKey[3];
+          const keyTargetId = queryKey[4];
+          const ok =
             keyTargetType === target.targetActorType &&
             keyTargetId === target.targetActorId &&
             (target.viewerActorType ? keyViewerType === target.viewerActorType : true) &&
             (target.viewerActorId ? keyViewerId === target.viewerActorId : true);
-          if (!matches) return oldData;
-          if (typeof oldData === 'boolean') return delta.isFollowing;
-          if (oldData && typeof oldData === 'object') {
-            return { ...oldData, isFollowing: delta.isFollowing };
+          if (!ok) continue;
+          if (typeof oldData === 'boolean') {
+            queryClient.setQueryData(queryKey, delta.isFollowing);
+          } else {
+            queryClient.setQueryData(queryKey, {
+              ...(typeof oldData === 'object' ? oldData : {}),
+              isFollowing: delta.isFollowing,
+            });
           }
-          return { isFollowing: delta.isFollowing };
+          continue;
         }
 
-        // Shape 7: social-counts — only patch if the queryKey targets one of
-        // our two affected users (viewer or target).
-        if (isSocialCountsKey && oldData && typeof oldData === 'object' && !Array.isArray(oldData)) {
-          const queryKey = (queryMeta?.queryKey ?? []) as unknown[];
+        if (isSocialCountsKey) {
+          if (!oldData || typeof oldData !== 'object' || Array.isArray(oldData)) continue;
           const subjectId = queryKey[1];
           const dir = delta.isFollowing ? 1 : -1;
           if (subjectId === target.viewerUserId || subjectId === target.viewerActorId) {
             const cur = oldData.following ?? oldData.followingCount ?? 0;
-            return {
+            queryClient.setQueryData(queryKey, {
               ...oldData,
               following: Math.max(0, cur + dir),
               followingCount: Math.max(0, cur + dir),
-            };
-          }
-          if (subjectId === target.targetUserId || subjectId === target.targetActorId) {
+            });
+          } else if (subjectId === target.targetUserId || subjectId === target.targetActorId) {
             const cur = oldData.followers ?? oldData.followersCount ?? 0;
-            return {
+            queryClient.setQueryData(queryKey, {
               ...oldData,
               followers: Math.max(0, cur + dir),
               followersCount: Math.max(0, cur + dir),
-            };
+            });
           }
-          return oldData;
         }
+      }
+      continue;
+    }
+
+    // Generic prefix patch — feed/post shapes filter by post identity
+    queryClient.setQueriesData(
+      { queryKey: keyPrefix as readonly unknown[] },
+      (oldData: any) => {
+        if (oldData === undefined || oldData === null) return oldData;
 
         // Shape 1: infinite query
         if (oldData.pages && Array.isArray(oldData.pages)) {
