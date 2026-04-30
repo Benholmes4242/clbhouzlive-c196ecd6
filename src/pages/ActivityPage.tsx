@@ -46,7 +46,7 @@ const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
-const FONT_SERIF = 'Georgia, "Times New Roman", serif';
+const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
   <div

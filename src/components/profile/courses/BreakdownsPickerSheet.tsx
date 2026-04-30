@@ -16,7 +16,7 @@ interface BreakdownsPickerSheetProps {
   onPickCourse: (courseId: string) => void;
 }
 
-const FONT_SERIF = 'Georgia, "Times New Roman", serif';
+const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '';

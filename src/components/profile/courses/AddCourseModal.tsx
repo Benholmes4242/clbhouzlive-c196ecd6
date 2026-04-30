@@ -46,7 +46,7 @@ const AMBER_WASH = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
-const FONT_SERIF = 'Georgia, "Times New Roman", serif';
+const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface AddCourseModalProps {
   userId: string;

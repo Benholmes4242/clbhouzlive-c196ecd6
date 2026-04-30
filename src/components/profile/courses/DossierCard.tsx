@@ -11,7 +11,7 @@ import { getTierName, type RatedCourseData } from './my-ratings/myRatingsTiers';
  * Used uniformly across all rating tiers (no hero/compact split).
  */
 
-const FONT_SERIF = 'Georgia, "Times New Roman", serif';
+const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const FONT_SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
 
