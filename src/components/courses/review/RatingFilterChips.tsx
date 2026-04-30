@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
-import { Filter, X } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Filter, X, Check } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/button';
 import { ScoreTier } from '@/utils/getScoreTier';
 
 export type RatingFilterValue = ScoreTier | null;
@@ -17,13 +13,14 @@ interface RatingFilterChipsProps {
   counts?: Partial<Record<ScoreTier | 'all', number>>;
 }
 
+// Tier-only labels (no numeric ranges)
 const FILTER_OPTIONS: { key: ScoreTier | 'all'; label: string }[] = [
   { key: 'all', label: 'All ratings' },
-  { key: 'exceptional', label: 'Exceptional 9–10' },
-  { key: 'excellent', label: 'Excellent 7.5–8.9' },
-  { key: 'good', label: 'Good 6–7.4' },
-  { key: 'fair', label: 'Fair 4–5.9' },
-  { key: 'poor', label: 'Poor < 4' },
+  { key: 'exceptional', label: 'Exceptional' },
+  { key: 'excellent', label: 'Excellent' },
+  { key: 'good', label: 'Good' },
+  { key: 'fair', label: 'Fair' },
+  { key: 'poor', label: 'Poor' },
 ];
 
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
@@ -48,107 +45,98 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
     setOpen(false);
   };
 
-  const triggerStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    padding: '6px 12px',
-    borderRadius: 999,
-    background: activeLabel ? '#F7931E' : '#0F172A',
-    color: '#fff',
-    fontSize: 11.5,
-    fontWeight: 800,
-    border: 'none',
-    cursor: 'pointer',
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-  };
-
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => setOpen(true)}
         aria-label={activeLabel ? `Filter: ${activeLabel}. Tap to change.` : 'Filter reviews by rating'}
-        style={triggerStyle}
+        className="h-auto py-1 px-2 text-xs"
       >
-        <Filter className="w-3 h-3" />
-        <span>{activeLabel || 'Filter'}</span>
+        <Filter className="h-3 w-3 mr-1" />
+        {activeLabel || 'Filter'}
         {activeLabel ? (
           <span
             role="button"
             aria-label="Clear filter"
             onClick={handleClear}
-            style={{ display: 'inline-flex', alignItems: 'center', marginLeft: 2 }}
+            className="inline-flex items-center ml-1"
           >
-            <X className="w-3 h-3" />
+            <X className="h-3 w-3" />
           </span>
         ) : null}
-      </button>
+      </Button>
 
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="bottom"
-          className="bg-white p-0 rounded-t-2xl border-t border-[rgba(15,23,42,0.08)]"
-        >
-          <SheetHeader className="px-4 pt-4 pb-2">
-            <SheetTitle
-              style={{
-                fontSize: 16,
-                fontWeight: 800,
-                color: '#0F172A',
-                textAlign: 'left',
-              }}
-            >
-              Filter by rating
-            </SheetTitle>
-          </SheetHeader>
+      <BottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        ariaLabelledBy="rating-filter-title"
+      >
+        <div className="px-4 pt-4 pb-2">
+          <h2
+            id="rating-filter-title"
+            style={{
+              fontSize: 16,
+              fontWeight: 800,
+              color: '#0F172A',
+              textAlign: 'left',
+              margin: 0,
+            }}
+          >
+            Filter by rating
+          </h2>
+        </div>
 
-          <div role="radiogroup" aria-label="Filter reviews by rating" style={{ paddingBottom: 12 }}>
-            {FILTER_OPTIONS.map((option) => {
-              const isActive =
-                option.key === 'all' ? value === null : value === option.key;
-              const count = counts[option.key] ?? 0;
-              return (
-                <button
-                  key={option.key}
-                  type="button"
-                  role="radio"
-                  aria-checked={isActive}
-                  onClick={() => handleSelect(option.key)}
+        <div role="radiogroup" aria-label="Filter reviews by rating" style={{ paddingBottom: 12 }}>
+          {FILTER_OPTIONS.map((option) => {
+            const isActive =
+              option.key === 'all' ? value === null : value === option.key;
+            const count = counts[option.key] ?? 0;
+            return (
+              <button
+                key={option.key}
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                onClick={() => handleSelect(option.key)}
+                style={{
+                  width: '100%',
+                  padding: '14px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: isActive ? 'rgba(247,147,30,0.06)' : 'transparent',
+                  border: 'none',
+                  borderTop: '0.5px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer',
+                  fontSize: 15,
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? '#F7931E' : '#0F172A',
+                  textAlign: 'left',
+                }}
+              >
+                <span>{option.label}</span>
+                <span
                   style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    background: isActive ? 'rgba(247,147,30,0.06)' : 'transparent',
-                    border: 'none',
-                    borderTop: '0.5px solid rgba(15,23,42,0.07)',
-                    cursor: 'pointer',
-                    fontSize: 15,
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? '#F7931E' : '#0F172A',
-                    textAlign: 'left',
+                    gap: 8,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: isActive ? '#F7931E' : '#94A3B8',
+                    fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  <span>{option.label}</span>
-                  <span
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: isActive ? '#F7931E' : '#94A3B8',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    ({count})
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </SheetContent>
-      </Sheet>
+                  <span>{count}</span>
+                  {isActive && <Check className="h-4 w-4" />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </BottomSheet>
     </>
   );
 };
