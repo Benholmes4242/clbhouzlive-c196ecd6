@@ -27,7 +27,6 @@ import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsFollowingUser } from '@/hooks/useIsFollowingUser';
-import { useFollowStore } from '@/store/followStore';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 
 const FONTS = {
