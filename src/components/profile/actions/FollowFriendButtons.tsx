@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Check, UserPlus, Clock, UserCheck, X } from 'lucide-react';
-import { useFollow } from '@/hooks/useFollow';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendship } from '@/hooks/useFriendship';
 
 interface FollowFriendButtonsProps {
@@ -16,10 +18,20 @@ export const FollowFriendButtons: React.FC<FollowFriendButtonsProps> = ({
   targetUserId,
   compact = false,
 }) => {
-  const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(targetUserId);
-  const { 
-    status: friendStatus, 
-    isLoading: friendLoading, 
+  const { user } = useSupabaseSession();
+  const toggle = useToggleFollow();
+  const { isFollowing: cached } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: targetUserId,
+    viewerActorType: 'personal',
+    viewerActorId: user?.id,
+  });
+  const following = cached ?? false;
+  const followBusy = toggle.isPending;
+
+  const {
+    status: friendStatus,
+    isLoading: friendLoading,
     isUpdating: friendUpdating,
     sendRequest,
     cancelRequest,
@@ -27,13 +39,21 @@ export const FollowFriendButtons: React.FC<FollowFriendButtonsProps> = ({
     declineRequest,
   } = useFriendship(targetUserId);
 
-  // Initialize follow state on mount
-  useEffect(() => {
-    ensureInitial();
-  }, [ensureInitial]);
-
-  const isLoading = isFollowing === 'unknown' || friendLoading;
+  const isLoading = friendLoading;
   const isUpdating = followBusy || friendUpdating;
+
+  const handleToggleFollow = () => {
+    if (!user?.id || !targetUserId) return;
+    toggle.mutate({
+      targetActorType: 'personal',
+      targetActorId: targetUserId,
+      targetUserId: targetUserId,
+      viewerActorType: 'personal',
+      viewerActorId: user.id,
+      viewerUserId: user.id,
+      isFollowing: following,
+    });
+  };
 
   if (isLoading) {
     return (
