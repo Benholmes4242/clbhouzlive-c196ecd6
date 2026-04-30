@@ -25,7 +25,7 @@ import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
 } from '../hooks/useIntelligenceLifecycleState';
-import { usePickHistory } from '../hooks/usePickHistory';
+import { useIntelligenceHistoricalPicks } from '../hooks/useIntelligenceHistoricalPicks';
 import { usePredictionTracker } from '../hooks/usePredictionTracker';
 import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions';
 import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
