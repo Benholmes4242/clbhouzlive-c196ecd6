@@ -142,17 +142,21 @@ const BusinessProfilePage: React.FC = () => {
   // Check ownership
   const isOwner = membership?.canManage;
 
-  // Compute follow state
-  const isFollowing = isFollowingStatus === true;
-  const followBusy = statusLoading; // optimistic — no spinner during mutations
-  
+  // Compute follow state (canonical cache; no spinner during mutations)
+  const isFollowing = cachedFollowing ?? false;
+  const followBusy = false;
+
   const handleFollowToggle = () => {
-    if (!user) return;
-    if (isFollowing) {
-      unfollow();
-    } else {
-      follow();
-    }
+    if (!user?.id || !business?.id) return;
+    toggleFollow.mutate({
+      targetActorType: 'business',
+      targetActorId: business.id,
+      targetUserId: undefined,
+      viewerActorType: 'personal',
+      viewerActorId: user.id,
+      viewerUserId: user.id,
+      isFollowing,
+    });
   };
 
   // Track profile visit
