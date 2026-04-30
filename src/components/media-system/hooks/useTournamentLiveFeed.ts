@@ -226,6 +226,8 @@ export function useTournamentLiveFeed(userId?: string): {
       review:          null,
       isReview:        false,
       isLikedByMe:     counts.isLikedByMe,
+      // isFollowedByMe placeholder — actual follow state is read from cache
+      // by CreatorCapsule (Slice 3). Safe to leave as `false` here.
       isFollowedByMe:  false,
       postType:        'tournament_live',
       liveMeta:        meta,

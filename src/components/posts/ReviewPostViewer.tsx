@@ -153,7 +153,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
           // Required props (not shown in review mode)
           caption=""
           golfCourse={null}
-          isFollowing={false}
+          // isFollowing omitted — CreatorCapsule reads canonical cache directly (Slice 3)
           isOwnPost={false}
         />
       )}

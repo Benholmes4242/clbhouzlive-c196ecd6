@@ -2,7 +2,7 @@ import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFollowAsActor } from '@/hooks/useFollowAsActor';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useQuery } from '@tanstack/react-query';
+import { useFollowState } from '@/hooks/useFollowState';
 
 interface BusinessFollowButtonProps {
   businessId: string;
@@ -10,30 +10,36 @@ interface BusinessFollowButtonProps {
 }
 
 /**
- * Actor-aware BusinessFollowButton
- * Uses useFollowAsActor to handle follow/unfollow for both personal and business actors.
- * Re-checks follow status when active actor changes.
+ * Actor-aware BusinessFollowButton.
+ *
+ * Slice 3 migration: read side now subscribes to the canonical 5-element
+ * follow-status key via useFollowState (was the legacy 4-element
+ * ['business-follow-status', businessId, actorType, actorId] key).
+ *
+ * Write side intentionally retains useFollowAsActor — it handles the
+ * business→business case via `business_outbound_follows`, which the
+ * canonical useToggleFollow does not. patchFollow inside useToggleFollow
+ * keeps the canonical key in sync for the personal→business path.
  */
 export function BusinessFollowButton({ businessId, className }: BusinessFollowButtonProps) {
   const { user } = useSupabaseSession();
-  const { 
-    followBusiness, 
-    unfollowBusiness, 
-    checkIfFollowingBusiness,
+  const {
+    followBusiness,
+    unfollowBusiness,
     isFollowingBusiness: followPending,
     isUnfollowingBusiness: unfollowPending,
     actorType,
     actorId,
   } = useFollowAsActor();
 
-  // Actor-aware follow status query - re-fetches when actor changes
-  const { data: isFollowing, isLoading: statusLoading } = useQuery({
-    queryKey: ['business-follow-status', businessId, actorType, actorId],
-    enabled: !!businessId && !!user?.id,
-    queryFn: () => checkIfFollowingBusiness(businessId),
-    staleTime: 60_000,
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'business',
+    targetActorId: businessId,
+    viewerActorType: actorType,
+    viewerActorId: actorId,
   });
 
+  const isFollowing = cachedFollowing ?? false;
   const isPending = followPending || unfollowPending;
 
   const handleClick = async () => {
@@ -49,14 +55,6 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
     return (
       <Button variant="default" className={className} disabled>
         Follow
-      </Button>
-    );
-  }
-
-  if (statusLoading) {
-    return (
-      <Button variant="outline" className={className} disabled>
-        ...
       </Button>
     );
   }

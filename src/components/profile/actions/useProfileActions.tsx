@@ -1,5 +1,5 @@
 /**
- * @deprecated Use `useUserFollow` for ProfileSocialButtons.
+ * @deprecated Prefer `useToggleFollow` + `useFollowState` directly (see ProfileSocialButtons).
  * This hook is retained only for BusinessProfileActions and legacy consumers.
  * Internals now route through the canonical `useToggleFollow`.
  */

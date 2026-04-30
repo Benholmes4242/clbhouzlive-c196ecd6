@@ -11,7 +11,9 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
-import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMutation } from '@/hooks/useBusinessFollow';
+import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -72,8 +74,14 @@ const BusinessProfilePage: React.FC = () => {
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
-  const { data: isFollowingStatus, isLoading: statusLoading } = useIsFollowingBusiness(business?.id, user?.id);
-  const { follow, unfollow, isFollowing: followPending, isUnfollowing: unfollowPending } = useBusinessFollowMutation(business?.id || '', user?.id);
+  // Slice 3: canonical follow state + mutation (5-element key)
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'business',
+    targetActorId: business?.id,
+    viewerActorType: 'personal',
+    viewerActorId: user?.id,
+  });
+  const toggleFollow = useToggleFollow();
 
   // Image upload hooks (P7: owner affordances)
   const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business?.id);
@@ -134,17 +142,21 @@ const BusinessProfilePage: React.FC = () => {
   // Check ownership
   const isOwner = membership?.canManage;
 
-  // Compute follow state
-  const isFollowing = isFollowingStatus === true;
-  const followBusy = statusLoading; // optimistic — no spinner during mutations
-  
+  // Compute follow state (canonical cache; no spinner during mutations)
+  const isFollowing = cachedFollowing ?? false;
+  const followBusy = false;
+
   const handleFollowToggle = () => {
-    if (!user) return;
-    if (isFollowing) {
-      unfollow();
-    } else {
-      follow();
-    }
+    if (!user?.id || !business?.id) return;
+    toggleFollow.mutate({
+      targetActorType: 'business',
+      targetActorId: business.id,
+      targetUserId: undefined,
+      viewerActorType: 'personal',
+      viewerActorId: user.id,
+      viewerUserId: user.id,
+      isFollowing,
+    });
   };
 
   // Track profile visit

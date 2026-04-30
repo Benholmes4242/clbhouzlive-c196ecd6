@@ -15,6 +15,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
@@ -135,7 +137,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   golfCourse,
   musicTrack,
   isMusicPlaying = false,
-  isFollowing = false,
+  isFollowing: isFollowingProp = false,
   isOwnPost = false,
   isVisible,
   onFollow,
@@ -155,11 +157,31 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   carouselCount = 0,
   carouselActiveIndex = 0,
 }) => {
-  
+
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
+
+  // ── Slice 3 architectural fix ──────────────────────────────────
+  // Read live follow state from the canonical 5-element cache key.
+  // This overrides the `isFollowing` prop, which is often a stale
+  // placeholder (e.g. `false`) baked into synthesized FeedPost objects
+  // by data-shape constructors (Cloudflare Stream rows, course media,
+  // tournament live feed, editorial cards) that can't call hooks.
+  // Pattern mirrors LoopCard reading like state from cache.
+  // Falls back to prop, then `false`, when cache is empty.
+  const { user: viewer } = useSupabaseSession();
+  const targetActorType: 'personal' | 'business' = user.actorType ?? 'personal';
+  const targetActorId = user.actorId ?? user.id;
+  const { isFollowing: cachedIsFollowing } = useFollowState({
+    targetActorType,
+    targetActorId,
+    viewerActorType: 'personal',
+    viewerActorId: viewer?.id,
+  });
+  const isFollowing = cachedIsFollowing ?? isFollowingProp ?? false;
+
 
 
 

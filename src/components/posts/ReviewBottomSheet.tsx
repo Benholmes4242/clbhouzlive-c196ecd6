@@ -26,8 +26,8 @@ import {
 import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useIsFollowingUser } from '@/hooks/useIsFollowingUser';
-import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 
 const FONTS = {
   geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
@@ -112,19 +112,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
 
-  // ─── Follow wiring ────────────────────────────────────────────
+  // ─── Follow wiring (Slice 3: canonical hooks) ────────────────
   const { user: viewer } = useSupabaseSession();
   const isOwnReview = !!viewer?.id && viewer.id === user.id;
   const followEnabled = !isOwnReview && user.id !== 'preview' && !!viewer?.id;
 
-  const { data: serverIsFollowing } = useIsFollowingUser(
-    followEnabled ? viewer?.id : undefined,
-    followEnabled ? user.id : undefined,
-  );
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: followEnabled ? user.id : undefined,
+    viewerActorType: 'personal',
+    viewerActorId: followEnabled ? viewer?.id : undefined,
+  });
 
-  const isFollowing = !!serverIsFollowing;
+  const isFollowing = cachedFollowing ?? false;
 
-  const followMutation = useFollowMutation();
+  const toggleFollow = useToggleFollow();
 
   const handleToggleFollow = useCallback(
     (e: React.MouseEvent) => {
@@ -134,21 +136,19 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
         toast.error('Please sign in to follow users');
         return;
       }
-      if (followMutation.isPending) return;
+      if (toggleFollow.isPending) return;
 
-      // patchFollow (invoked inside useToggleFollow) handles optimistic
-      // propagation across every cache surface, including the
-      // ['user-follow-status', viewer.id, user.id] key that drives
-      // serverIsFollowing here. No local override needed.
-      followMutation.mutate({
-        targetUserId: user.id,
+      toggleFollow.mutate({
         targetActorType: 'personal',
         targetActorId: user.id,
-        currentUserId: viewer.id,
-        isFollowed: isFollowing,
+        targetUserId: user.id,
+        viewerActorType: 'personal',
+        viewerActorId: viewer.id,
+        viewerUserId: viewer.id,
+        isFollowing,
       });
     },
-    [isFollowing, isOwnReview, user.id, viewer?.id, followMutation],
+    [isFollowing, isOwnReview, user.id, viewer?.id, toggleFollow],
   );
 
   // ─── Drag scoping ─────────────────────────────────────────────
@@ -703,7 +703,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   <button
                     type="button"
                     onClick={handleToggleFollow}
-                    disabled={followMutation.isPending}
+                    disabled={toggleFollow.isPending}
                     aria-label={isFollowing ? `Unfollow ${user.name}` : `Follow ${user.name}`}
                     aria-pressed={isFollowing}
                     style={{
@@ -716,8 +716,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       color: isFollowing ? FROST.inkMute : FROST.ink,
                       fontSize: 12,
                       fontWeight: 600,
-                      cursor: followMutation.isPending ? 'default' : 'pointer',
-                      opacity: followMutation.isPending ? 0.6 : 1,
+                      cursor: toggleFollow.isPending ? 'default' : 'pointer',
+                      opacity: toggleFollow.isPending ? 0.6 : 1,
                       fontFamily: 'inherit',
                       flexShrink: 0,
                       display: 'inline-flex',
