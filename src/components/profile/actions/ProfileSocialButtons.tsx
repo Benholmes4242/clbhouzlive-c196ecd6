@@ -4,8 +4,10 @@ import { UserPlus, UserCheck, UserMinus, MoreVertical } from 'lucide-react';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useBlockActions } from '@/hooks/useBlockActions';
-import { useUserFollow } from '@/hooks/useUserFollow';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,11 +38,34 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
   isMobile = false
 }) => {
   const { data: relationship, isLoading } = useRelationshipStatus(profileUserId);
-  const {
-    isFollowing,
-    toggleFollow,
-    isFollowingPending,
-  } = useUserFollow(profileUserId);
+
+  // Slice 3: canonical follow state + mutation
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: profileUserId,
+    viewerActorType: 'personal',
+    viewerActorId: currentUserId,
+  });
+  const isFollowing = cachedFollowing ?? false;
+  const toggle = useToggleFollow();
+  const isFollowingPending = toggle.isPending;
+  const toggleFollow = () => {
+    if (!currentUserId || !profileUserId) return;
+    if (currentUserId === profileUserId) {
+      toast.error("You can't follow yourself");
+      return;
+    }
+    toggle.mutate({
+      targetActorType: 'personal',
+      targetActorId: profileUserId,
+      targetUserId: profileUserId,
+      viewerActorType: 'personal',
+      viewerActorId: currentUserId,
+      viewerUserId: currentUserId,
+      isFollowing,
+    });
+  };
+
   const {
     loading: friendLoading,
     sendFriendRequest,
@@ -50,6 +75,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     unfriend
   } = useFriendActions({ currentUserId });
   const { loading: blockLoading, blockUser, unblockUser } = useBlockActions({ currentUserId });
+
 
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showUnblockDialog, setShowUnblockDialog] = useState(false);
