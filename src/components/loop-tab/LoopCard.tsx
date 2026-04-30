@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -15,6 +15,8 @@ import { LoopCardMenu } from './LoopCardMenu';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 import { useQueryClient } from '@tanstack/react-query';
+import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface LoopCardProps {
   post: FeedPost;
@@ -96,48 +98,28 @@ export const LoopCard = React.memo(function LoopCard({
     return () => observer.disconnect();
   }, [hlsUrl]);
 
-  const [isLiked, setIsLiked] = useState(post.isLikedByMe);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
+  // Engagement state is read DIRECTLY from the post prop (cache-driven via
+  // patchEngagement). No frozen useState — every cache patch flows through to
+  // the parent feed query and re-renders this card with fresh values.
+  const isLiked = post.isLikedByMe;
+  const likeCount = post.likeCount;
   const [showComments, setShowComments] = useState(false);
   const [nudgeDismissedLocal, setNudgeDismissedLocal] = useState(false);
 
-  const cleanCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
-  const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
+  const likeMutation = useLikeMutation();
+  const { activeActor } = useActiveActor();
 
-  const courseName = post.review?.courseName || post.courseName || extractedCourse?.name;
-  const courseId = post.review?.courseId;
-
-  const toggleLike = async () => {
+  const toggleLike = useCallback(() => {
     if (!userId) return;
-    const newLiked = !isLiked;
-    setIsLiked(newLiked);
-    setLikeCount((prev) => (newLiked ? prev + 1 : Math.max(0, prev - 1)));
     navigator?.vibrate?.(10);
-
-    try {
-      if (newLiked) {
-        const { error } = await supabase
-          .from('post_likes')
-          .upsert(
-            { post_id: post.id, user_id: userId, actor_id: userId, actor_type: 'personal' },
-            { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true }
-          );
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('post_likes')
-          .delete()
-          .eq('post_id', post.id)
-          .eq('actor_id', userId)
-          .eq('actor_type', 'personal');
-        if (error) throw error;
-      }
-    } catch (err) {
-      if (import.meta.env.DEV) console.error('[LoopCard] Like toggle failed:', err);
-      setIsLiked(!newLiked);
-      setLikeCount((prev) => (newLiked ? Math.max(0, prev - 1) : prev + 1));
-    }
-  };
+    likeMutation.mutate({
+      postId: post.id,
+      userId,
+      actorId: activeActor?.id ?? userId,
+      actorType: activeActor?.type === 'business' ? 'business' : 'personal',
+      isLiked: post.isLikedByMe, // current state BEFORE toggle
+    });
+  }, [userId, post.id, post.isLikedByMe, activeActor, likeMutation]);
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/post/${post.id}`;
