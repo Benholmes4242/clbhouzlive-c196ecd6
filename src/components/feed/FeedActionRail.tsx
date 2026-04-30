@@ -233,7 +233,15 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
 
       {/* Creator avatar with follow+ badge */}
       {creator && (
-        <div style={{ position: 'relative', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+            filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))',
+          }}
+        >
           <button
             type="button"
             onClick={(e) => {
@@ -260,35 +268,66 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               alt={creator.displayName}
               fallback={creator.displayName?.[0] ?? '?'}
               hairlineRing
-              ringColor="rgba(255,255,255,0.95)"
+              ringColor={showJustFollowed ? '#F7931E' : 'rgba(255,255,255,0.95)'}
             />
           </button>
-          {showFollowPlus && (
+
+          {/* Follow region — single 44px tap target spanning the badge + caption.
+              Renders for not-following and just-followed states; hidden once
+              following has settled. */}
+          {(showFollowPlus || showJustFollowed) && (
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onFollow();
+                if (showFollowPlus) onFollow();
               }}
-              aria-label="Follow"
+              aria-label={showJustFollowed ? 'Following' : 'Follow'}
+              aria-pressed={showJustFollowed}
               style={{
-                position: 'absolute',
-                bottom: -6,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 22,
-                height: 22,
-                borderRadius: '50%',
-                background: '#F7931E',
-                border: '1.5px solid rgba(255,255,255,0.95)',
-                cursor: 'pointer',
+                marginTop: -7,
+                minHeight: 44,
                 padding: 0,
+                background: 'transparent',
+                border: 'none',
+                cursor: showFollowPlus ? 'pointer' : 'default',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
+                gap: 6,
               }}
             >
-              <Plus size={14} strokeWidth={2.5} color="rgba(255,255,255,0.95)" />
+              <span
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: '50%',
+                  background: '#F7931E',
+                  border: '1.5px solid rgba(255,255,255,0.95)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background 200ms ease',
+                }}
+              >
+                {showJustFollowed ? (
+                  <Check size={13} strokeWidth={3} color="rgba(255,255,255,0.95)" />
+                ) : (
+                  <Plus size={14} strokeWidth={2.5} color="rgba(255,255,255,0.95)" />
+                )}
+              </span>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: showJustFollowed ? '#F7931E' : '#fff',
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                  transition: 'color 200ms ease',
+                }}
+              >
+                {showJustFollowed ? 'Following' : 'Follow'}
+              </span>
             </button>
           )}
         </div>
