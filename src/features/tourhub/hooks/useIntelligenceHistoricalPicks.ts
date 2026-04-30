@@ -41,6 +41,8 @@ export interface IntelligenceHistoricalPick {
   status: string | null;
   /** Pre-formatted display string: "1", "T8", "MC", "WD", "—". */
   finalPosition: string;
+  /** Score to par from the leaderboard (null when missing or pre-cut). */
+  scoreToPar: number | null;
 }
 
 export interface IntelligenceHistoricalTournament {
@@ -54,6 +56,10 @@ export interface IntelligenceHistoricalTournament {
   isMajor: boolean;
   outcome: IntelligenceOutcome;
   picks: IntelligenceHistoricalPick[];
+  /** Best-finishing pick across rank 1-3. Null positions (MC/WD) treated as worst. */
+  bestPick: IntelligenceHistoricalPick | null;
+  /** ISO year of start_date, for display. */
+  year: string;
 }
 
 const SKIP_WORDS = new Set([
