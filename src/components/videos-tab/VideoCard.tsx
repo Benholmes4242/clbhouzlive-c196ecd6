@@ -13,6 +13,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from './VideoCardMenu';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
+import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface VideoCardProps {
   post: FeedPost;
@@ -65,8 +67,10 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   const duration = firstVideo?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
-  const [isLiked, setIsLiked] = useState(post.isLikedByMe);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
+  // Engagement state is read DIRECTLY from the post prop (cache-driven via
+  // patchEngagement in useLikeMutation). No frozen useState.
+  const isLiked = post.isLikedByMe;
+  const likeCount = post.likeCount;
   const [showComments, setShowComments] = useState(false);
 
   const cleanedCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
@@ -84,36 +88,20 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
     navigate(getActorRouteByType(post.actorType, post.actorId));
   }, [navigate, post.actorType, post.actorId]);
 
-  const toggleLike = async () => {
-    if (!userId) return;
-    const newLiked = !isLiked;
-    setIsLiked(newLiked);
-    setLikeCount(prev => newLiked ? prev + 1 : Math.max(0, prev - 1));
-    navigator?.vibrate?.(10);
+  const likeMutation = useLikeMutation();
+  const { activeActor } = useActiveActor();
 
-    try {
-      if (newLiked) {
-        const { error } = await supabase.from('post_likes').upsert(
-          { post_id: post.id, user_id: userId, actor_id: userId, actor_type: 'personal' },
-          { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true }
-        );
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('post_likes').delete()
-          .eq('post_id', post.id)
-          .eq('actor_id', userId)
-          .eq('actor_type', 'personal');
-        if (error) throw error;
-      }
-      // Refresh the LikesSheet for THIS post (gated by `enabled: isOpen`
-      // inside usePostLikes — cheap no-op when sheet is closed).
-      queryClient.invalidateQueries({ queryKey: ['post-likes', post.id, 'post'] });
-    } catch (err) {
-      if (import.meta.env.DEV) console.error('[VideoCard] Like toggle failed:', err);
-      setIsLiked(!newLiked);
-      setLikeCount(prev => newLiked ? Math.max(0, prev - 1) : prev + 1);
-    }
-  };
+  const toggleLike = useCallback(() => {
+    if (!userId) return;
+    navigator?.vibrate?.(10);
+    likeMutation.mutate({
+      postId: post.id,
+      userId,
+      actorId: activeActor?.id ?? userId,
+      actorType: activeActor?.type === 'business' ? 'business' : 'personal',
+      isLiked: post.isLikedByMe, // current state BEFORE toggle
+    });
+  }, [userId, post.id, post.isLikedByMe, activeActor, likeMutation]);
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/video/${post.id}`;
