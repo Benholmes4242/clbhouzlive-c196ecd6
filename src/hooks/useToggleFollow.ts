@@ -38,6 +38,8 @@ export function useToggleFollow() {
             .from('business_follows')
             .insert({
               follower_id: params.viewerUserId ?? '',
+              follower_actor_id: params.viewerUserId ?? '',
+              follower_actor_type: 'personal',
               business_id: params.targetActorId,
             });
           // 23505 = unique violation = already following = no-op
