@@ -703,7 +703,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   <button
                     type="button"
                     onClick={handleToggleFollow}
-                    disabled={followMutation.isPending}
+                    disabled={toggleFollow.isPending}
                     aria-label={isFollowing ? `Unfollow ${user.name}` : `Follow ${user.name}`}
                     aria-pressed={isFollowing}
                     style={{
@@ -716,8 +716,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       color: isFollowing ? FROST.inkMute : FROST.ink,
                       fontSize: 12,
                       fontWeight: 600,
-                      cursor: followMutation.isPending ? 'default' : 'pointer',
-                      opacity: followMutation.isPending ? 0.6 : 1,
+                      cursor: toggleFollow.isPending ? 'default' : 'pointer',
+                      opacity: toggleFollow.isPending ? 0.6 : 1,
                       fontFamily: 'inherit',
                       flexShrink: 0,
                       display: 'inline-flex',
