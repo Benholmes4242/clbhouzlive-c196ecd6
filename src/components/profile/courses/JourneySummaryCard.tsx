@@ -73,10 +73,10 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={cn('px-5 pt-6 pb-5', className)}
+      className={cn('px-5 pt-6 pb-5 flex flex-col items-center text-center', className)}
     >
       {/* Eyebrow with amber rule marker */}
-      <div className="flex items-center gap-1.5 mb-2">
+      <div className="flex items-center justify-center gap-1.5 mb-2">
         <div
           style={{
             width: 3,
@@ -101,7 +101,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         </span>
       </div>
 
-      {/* Big serif number */}
+      {/* Big number */}
       <div
         style={{
           fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -133,6 +133,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
             marginTop: 14,
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: 8,
             fontSize: 10,
             fontWeight: 700,
