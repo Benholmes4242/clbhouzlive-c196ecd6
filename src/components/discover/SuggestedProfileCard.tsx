@@ -200,7 +200,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
               : "bg-emerald-600 hover:bg-emerald-700 text-white"
           )}
           onClick={handleFollow}
-          disabled={isLoading || isFollowing}
+          disabled={isLoading}
         >
           {isLoading ? (
             <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
