@@ -106,6 +106,12 @@ export const LoopCard = React.memo(function LoopCard({
   const [showComments, setShowComments] = useState(false);
   const [nudgeDismissedLocal, setNudgeDismissedLocal] = useState(false);
 
+  const cleanCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
+  const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
+
+  const courseName = post.review?.courseName || post.courseName || extractedCourse?.name;
+  const courseId = post.review?.courseId;
+
   const likeMutation = useLikeMutation();
   const { activeActor } = useActiveActor();
 
