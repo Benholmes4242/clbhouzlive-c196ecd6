@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { toast } from 'sonner';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { SuggestedItem } from '@/types/suggestedItem';
@@ -43,56 +44,50 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const isGolfer = item.type === 'golfer';
   const isBusiness = item.type === 'business';
 
-  const handleFollow = async (e: React.MouseEvent) => {
+  const targetActorType: 'personal' | 'business' = isBusiness ? 'business' : 'personal';
+  const { isFollowing: cached } = useFollowState({
+    targetActorType,
+    targetActorId: item.id,
+    viewerActorType: 'personal',
+    viewerActorId: user?.id,
+  });
+  const isFollowing = cached ?? false;
+  const toggle = useToggleFollow();
+  const isLoading = toggle.isPending;
+
+  const handleFollow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (!user?.id) {
       toast.error('Please sign in to follow');
       return;
     }
-    
-    setIsLoading(true);
-    
+
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate([10]);
     }
-    
-    try {
-      if (isGolfer) {
-        const { error } = await supabase
-          .from('user_follows')
-          .insert({
-            follower_id: user.id,
-            following_id: item.id,
-          });
-        
-        if (error) throw error;
-      } else {
-        // Follow business account
-        const { error } = await supabase
-          .from('business_follows')
-          .insert({
-            follower_id: user.id,
-            business_id: item.id,
-          });
-        
-        if (error) throw error;
-      }
-      
-      setIsFollowing(true);
-      onFollow?.(item.id);
-    } catch (error) {
-      console.error('Follow error:', error);
-      toast.error('Failed to follow');
-    } finally {
-      setIsLoading(false);
-    }
+
+    toggle.mutate(
+      {
+        targetActorType,
+        targetActorId: item.id,
+        targetUserId: isGolfer ? item.id : undefined,
+        viewerActorType: 'personal',
+        viewerActorId: user.id,
+        viewerUserId: user.id,
+        isFollowing,
+      },
+      {
+        onSuccess: () => {
+          if (!isFollowing) onFollow?.(item.id);
+        },
+        onError: () => toast.error('Failed to follow'),
+      },
+    );
   };
 
   const handleCardClick = () => {
