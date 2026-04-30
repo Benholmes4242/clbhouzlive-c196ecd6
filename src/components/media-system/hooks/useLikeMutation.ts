@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { patchEngagement } from '@/lib/engagementCache';
 
 interface LikeMutationParams {
   postId: string;
@@ -43,23 +44,13 @@ export function useLikeMutation() {
       console.error('[Like] Mutation failed:', error);
     },
     onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
-      // Refresh the LikesSheet for THIS post. Active refetch is safe — the
-      // sheet is a modal (no scroll-snap concerns) and usePostLikes is gated
-      // by `enabled: isOpen`, so when closed this is a cheap no-op.
-      queryClient.invalidateQueries({ queryKey: ['post-likes', variables.postId, 'post'] });
-      // Mark feed caches stale without active refetch — optimistic state in
-      // useClubhouseLikes drives the UI. An active refetch here would re-order
-      // posts and combined with scroll-snap-type: y mandatory cause the feed
-      // to jump to a different slide. Next natural refetch (tab switch, PTR,
-      // route re-entry) will sync with the server.
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'], refetchType: 'none' });
-      queryClient.invalidateQueries({ queryKey: ['media-feed', 'friends'], refetchType: 'none' });
-      queryClient.invalidateQueries({ queryKey: ['explore-posts'], refetchType: 'none' });
-      queryClient.invalidateQueries({ queryKey: ['watch-feed'], refetchType: 'none' });
-      queryClient.invalidateQueries({ queryKey: ['profile-posts'], refetchType: 'none' });
-      queryClient.invalidateQueries({ queryKey: ['real-posts'], refetchType: 'none' });
-      queryClient.invalidateQueries({ queryKey: ['actor-posts'], refetchType: 'none' });
+      // Surgical cache patch across every feed key — no refetch, no scroll
+      // jump, every consumer surface stays in sync. See `engagementCache.ts`.
+      // `variables.isLiked` is the state BEFORE toggle; new state is opposite.
+      patchEngagement(queryClient, variables.postId, {
+        isLikedByMe: !variables.isLiked,
+        likeCountDelta: variables.isLiked ? -1 : +1,
+      });
     },
   });
 }
