@@ -238,7 +238,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 4,
+            gap: 0,
             filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))',
           }}
         >
@@ -285,8 +285,8 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               aria-label={showJustFollowed ? 'Following' : 'Follow'}
               aria-pressed={showJustFollowed}
               style={{
-                marginTop: -7,
-                minHeight: 44,
+                marginTop: -14,
+                minWidth: 44,
                 padding: 0,
                 background: 'transparent',
                 border: 'none',
@@ -294,7 +294,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 6,
+                gap: 3,
               }}
             >
               <span
