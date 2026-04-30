@@ -233,12 +233,18 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   };
 
   const handleFollowClick = async () => {
-    if (!user?.id || followBusy) return;
-    await toggleFollow();
+    if (!user?.id || !currentUser?.id || followBusy) return;
+    await toggle.mutateAsync({
+      targetActorType: 'personal',
+      targetActorId: user.id,
+      targetUserId: user.id,
+      viewerActorType: 'personal',
+      viewerActorId: currentUser.id,
+      viewerUserId: currentUser.id,
+      isFollowing,
+    });
     onFollow?.();
   };
-
-  const isFollowing = followState === 'following';
 
   const handlePostClick = (postItem: any) => {
     if (postItem.post_media?.length > 0) {
