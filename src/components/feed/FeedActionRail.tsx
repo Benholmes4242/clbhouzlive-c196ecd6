@@ -295,6 +295,8 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: 3,
+                position: 'relative',
+                zIndex: 1,
               }}
             >
               <span
