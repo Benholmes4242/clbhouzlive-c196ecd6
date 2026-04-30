@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { createMentionNotifications } from '@/utils/mentionExtractor';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { patchEngagement } from '@/lib/engagementCache';
 
 export interface PostComment {
   id: string;
@@ -166,16 +167,23 @@ export function usePostEngagement(postId: string | null) {
         queryClient.setQueryData(['post-engagement', postId, actorType, actorId], ctx.prev);
       }
     },
-    onSettled: () => {
-      // Refetch to sync with server
-      queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      // Invalidate all feed queries to update like counts across pages
-      queryClient.invalidateQueries({ queryKey: ['explore-content'] });
-      queryClient.invalidateQueries({ queryKey: ['watch-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['course-media'] });
-      queryClient.invalidateQueries({ queryKey: ['user-posts'] });
+    onSettled: (_data, _error, _vars, _ctx) => {
+      // Surgical cache patch across every feed surface (including the
+      // ['post-engagement', postId, ...] entry this hook itself reads).
+      // `engagementData?.hasLiked` here represents the NEW state because the
+      // optimistic update in onMutate already flipped it.
+      const newLiked = !!engagementData?.hasLiked;
+      if (postId) {
+        patchEngagement(queryClient, postId, {
+          isLikedByMe: newLiked,
+          // Patch contributes the delta vs the server-truth post; the
+          // optimistic update already adjusted the local engagement object,
+          // and patchEngagement reapplies +/-1 to OTHER caches that haven't
+          // been touched. Use the inverse of the new state to compute what
+          // the toggle just did.
+          likeCountDelta: newLiked ? +1 : -1,
+        });
+      }
     },
   });
 
