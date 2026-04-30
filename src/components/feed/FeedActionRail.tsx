@@ -305,7 +305,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                   height: 22,
                   borderRadius: '50%',
                   background: '#F7931E',
-                  border: '1.5px solid rgba(255,255,255,0.95)',
+                  border: '0.5px solid rgba(255,255,255,0.95)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
