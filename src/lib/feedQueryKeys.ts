@@ -104,6 +104,7 @@ export const DISCOVERY_QUERY_KEYS: readonly (readonly unknown[])[] = [
 /** Single-record engagement queries (post-engagement, post-likes, etc). */
 export const ENGAGEMENT_RECORD_KEYS: readonly (readonly unknown[])[] = [
   ['post-engagement'],
+  ['pga-card-counts'],
 ] as const;
 
 /** Single-record relationship queries. */
