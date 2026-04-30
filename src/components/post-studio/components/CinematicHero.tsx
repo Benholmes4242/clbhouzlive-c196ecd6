@@ -51,10 +51,31 @@ export function CinematicHero({
   const others = mediaItems.filter((m) => m.id !== cover?.id);
   const otherCount = others.length;
 
+  // Reset playback state whenever the cover changes
+  useEffect(() => {
+    setIsPlaying(false);
+    const v = videoRef.current;
+    if (v) {
+      try { v.pause(); v.currentTime = 0; } catch { /* noop */ }
+    }
+  }, [cover?.id]);
+
   if (!cover) return null;
 
   const coverSrc = previewSrc(cover);
   const isVideo = cover.mediaType === 'video';
+  const videoSrc = isVideo ? cover.previewUrl : '';
+
+  const handleVideoTap = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    } else {
+      v.pause();
+      setIsPlaying(false);
+    }
+  };
 
   return (
     <div style={{ fontFamily: FONT_STACK }}>
@@ -68,7 +89,39 @@ export function CinematicHero({
           background: '#000',
         }}
       >
-        {coverSrc ? (
+        {isVideo ? (
+          <>
+            {/* Poster image shown until playback starts (also visible on iOS before tap) */}
+            {coverSrc && !isPlaying && (
+              <img
+                src={coverSrc}
+                alt=""
+                style={{
+                  position: 'absolute', inset: 0,
+                  width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                  zIndex: 1,
+                }}
+              />
+            )}
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              poster={coverSrc || undefined}
+              playsInline
+              muted
+              preload="metadata"
+              onClick={handleVideoTap}
+              onEnded={() => setIsPlaying(false)}
+              onPause={() => setIsPlaying(false)}
+              onPlay={() => setIsPlaying(true)}
+              style={{
+                position: 'absolute', inset: 0,
+                width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                zIndex: 2, cursor: 'pointer', background: '#000',
+              }}
+            />
+          </>
+        ) : coverSrc ? (
           <img
             src={coverSrc}
             alt=""
