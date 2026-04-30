@@ -57,6 +57,11 @@ export const FEED_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['long-form-videos'],
   ['related-long-form-videos'],
 
+  // Tournament live (Clubhouse + Watch surfaces)
+  ['live-tournament-counts'],
+  ['live-tournament-post-ids'],
+  ['video-of-the-week'],
+
   // Shorts
   ['shorts-infinite-v2'],
   ['clubhouse-shorts'],
