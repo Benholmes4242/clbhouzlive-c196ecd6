@@ -2,7 +2,7 @@
 // rotated "pile" of non-cover thumbs that opens the ManageMediaSheet.
 // Replaces the horizontal carousel.
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pencil, Star, Play, Trash2, Plus } from 'lucide-react';
 import type { StudioMediaItem } from '../types';
 import { ManageMediaSheet } from './ManageMediaSheet';
