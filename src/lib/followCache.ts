@@ -23,6 +23,15 @@
  */
 
 import type { QueryClient } from '@tanstack/react-query';
+import {
+  FEED_QUERY_KEYS,
+  PROFILE_QUERY_KEYS,
+  DISCOVERY_QUERY_KEYS,
+  ENGAGEMENT_RECORD_KEYS,
+  RELATIONSHIP_RECORD_KEYS,
+  SOCIAL_COUNT_KEYS,
+  FOLLOW_ONLY_KEYS,
+} from './feedQueryKeys';
 
 export interface FollowTarget {
   /** 'business' writes to business_follows; 'personal' writes to user_follows */
@@ -63,60 +72,13 @@ interface PatchOptions {
  * shortest unique prefix is sufficient.
  */
 export const FOLLOW_CACHE_KEYS: readonly (readonly unknown[])[] = [
-  // Feed surfaces
-  ['media-feed', 'suggested'],
-  ['media-feed', 'friends'],
-  ['explore-posts'],
-  ['real-posts'],
-
-  // Watch surfaces
-  ['watch-feed'],
-  ['watch-feed-posts-by-ids'],
-  ['long-form-videos'],
-
-  // Profile + actor feeds
-  ['profile-posts'],
-  ['actor-posts'],
-  ['userPosts'],
-  ['user-posts-preview'],
-  ['followedUsersPosts'],
-  ['activity-posts'],
-  ['post-engagement'],
-
-  // Business surfaces
-  ['business-posts-infinite'],
-  ['business-tagged-posts'],
-  ['business-tagged-posts-infinite'],
-
-  // Course surfaces
-  ['course-media-feed'],
-
-  // Discover surfaces
-  ['suggested-creators'],
-  ['suggested-users-discover'],
-  ['golfers-discovery'],
-  ['nearby-golfers'],
-
-  // Direct follow-status queries (canonical 5-element key)
-  ['follow-status'],
-
-  // Legacy keys still in use (deprecate after PR 3 fully migrates)
-  ['user-follow-status'],
-  ['business-follow-status'],
-  ['relationship-status'],
-  ['relationship-statuses'],
-  ['user-follows'],
-  ['actor-following'],
-
-  // Counts + lists
-  ['social-counts'],
-  ['followers-list'],
-  ['following-list'],
-  ['followers-paginated'],
-  ['following-paginated'],
-
-  // Cross-cutting
-  ['discovery-exclusions'],
+  ...FEED_QUERY_KEYS,
+  ...PROFILE_QUERY_KEYS,
+  ...DISCOVERY_QUERY_KEYS,
+  ...ENGAGEMENT_RECORD_KEYS,
+  ...RELATIONSHIP_RECORD_KEYS,
+  ...SOCIAL_COUNT_KEYS,
+  ...FOLLOW_ONLY_KEYS,
 ];
 
 /* ─────────────────────────────── helpers ─────────────────────────────── */
