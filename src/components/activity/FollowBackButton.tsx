@@ -62,7 +62,7 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
     <div className="min-h-[44px] flex items-center">
       <button
         onClick={handleFollowBack}
-        disabled={busy}
+        disabled={toggle.isPending}
         className="disabled:opacity-60 disabled:cursor-not-allowed"
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -72,7 +72,7 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
           boxShadow: '0 2px 8px rgba(247,147,30,0.22)',
         }}
       >
-        {busy ? 'Following...' : 'Follow back'}
+        {toggle.isPending ? 'Following...' : 'Follow back'}
       </button>
     </div>
   );
