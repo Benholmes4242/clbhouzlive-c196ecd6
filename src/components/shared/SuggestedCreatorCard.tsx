@@ -2,8 +2,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
 function splitName(displayName: string): { first: string; last: string } {
@@ -27,8 +28,15 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [following, setFollowing] = useState(creator.isFollowed);
-  const [busy, setBusy] = useState(false);
+  const { isFollowing: cached } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: creator.userId,
+    viewerActorType: 'personal',
+    viewerActorId: currentUserId,
+  });
+  const following = cached ?? creator.isFollowed ?? false;
+  const toggle = useToggleFollow();
+  const busy = toggle.isPending;
   const [removing, setRemoving] = useState(false);
   const [removed, setRemoved] = useState(false);
 
@@ -42,40 +50,37 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
     .toUpperCase();
 
   const handleFollow = useCallback(
-    async (e: React.MouseEvent) => {
+    (e: React.MouseEvent) => {
       e.stopPropagation();
       if (busy) return;
       const wasFollowing = following;
-      setFollowing(!wasFollowing);
-      setBusy(true);
-      try {
-        if (wasFollowing) {
-          await supabase
-            .from('user_follows')
-            .delete()
-            .eq('follower_id', currentUserId)
-            .eq('following_id', creator.userId);
-        } else {
-          await supabase.from('user_follows').insert({
-            follower_id: currentUserId,
-            following_id: creator.userId,
-          });
-          onFollowed?.(creator.userId);
-          setTimeout(() => setRemoving(true), 1200);
-        }
-        queryClient.setQueryData(
-          ['suggested-creators', currentUserId],
-          (old: SuggestedCreator[] | undefined) =>
-            old ? old.filter((c) => c.userId !== creator.userId) : old,
-        );
-        queryClient.invalidateQueries({ queryKey: ['suggested-creators', currentUserId] });
-      } catch {
-        setFollowing(wasFollowing);
-      } finally {
-        setBusy(false);
-      }
+      toggle.mutate(
+        {
+          targetActorType: 'personal',
+          targetActorId: creator.userId,
+          targetUserId: creator.userId,
+          viewerActorType: 'personal',
+          viewerActorId: currentUserId,
+          viewerUserId: currentUserId,
+          isFollowing: wasFollowing,
+        },
+        {
+          onSuccess: () => {
+            if (!wasFollowing) {
+              onFollowed?.(creator.userId);
+              setTimeout(() => setRemoving(true), 1200);
+            }
+            queryClient.setQueryData(
+              ['suggested-creators', currentUserId],
+              (old: SuggestedCreator[] | undefined) =>
+                old ? old.filter((c) => c.userId !== creator.userId) : old,
+            );
+            queryClient.invalidateQueries({ queryKey: ['suggested-creators', currentUserId] });
+          },
+        },
+      );
     },
-    [busy, following, creator.userId, currentUserId, queryClient, onFollowed],
+    [busy, following, creator.userId, currentUserId, queryClient, onFollowed, toggle],
   );
 
   useEffect(() => {
