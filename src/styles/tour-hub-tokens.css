@@ -99,7 +99,7 @@
      ======================================== */
   --th-font-display: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --th-font-text: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --th-font-mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --th-font-mono: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 /* ============================================================================

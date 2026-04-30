@@ -107,7 +107,7 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Add badge emoji (simplified - in reality you'd want better rendering)
-    ctx.font = '120px serif';
+    ctx.font = '120px "Geist", -apple-system, BlinkMacSystemFont, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#ffffff';
     ctx.fillText(badge.emoji, canvas.width / 2, 200);
