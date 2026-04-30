@@ -112,19 +112,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
 
-  // ─── Follow wiring ────────────────────────────────────────────
+  // ─── Follow wiring (Slice 3: canonical hooks) ────────────────
   const { user: viewer } = useSupabaseSession();
   const isOwnReview = !!viewer?.id && viewer.id === user.id;
   const followEnabled = !isOwnReview && user.id !== 'preview' && !!viewer?.id;
 
-  const { data: serverIsFollowing } = useIsFollowingUser(
-    followEnabled ? viewer?.id : undefined,
-    followEnabled ? user.id : undefined,
-  );
+  const { isFollowing: cachedFollowing } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: followEnabled ? user.id : undefined,
+    viewerActorType: 'personal',
+    viewerActorId: followEnabled ? viewer?.id : undefined,
+  });
 
-  const isFollowing = !!serverIsFollowing;
+  const isFollowing = cachedFollowing ?? false;
 
-  const followMutation = useFollowMutation();
+  const toggleFollow = useToggleFollow();
 
   const handleToggleFollow = useCallback(
     (e: React.MouseEvent) => {
@@ -134,21 +136,19 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
         toast.error('Please sign in to follow users');
         return;
       }
-      if (followMutation.isPending) return;
+      if (toggleFollow.isPending) return;
 
-      // patchFollow (invoked inside useToggleFollow) handles optimistic
-      // propagation across every cache surface, including the
-      // ['user-follow-status', viewer.id, user.id] key that drives
-      // serverIsFollowing here. No local override needed.
-      followMutation.mutate({
-        targetUserId: user.id,
+      toggleFollow.mutate({
         targetActorType: 'personal',
         targetActorId: user.id,
-        currentUserId: viewer.id,
-        isFollowed: isFollowing,
+        targetUserId: user.id,
+        viewerActorType: 'personal',
+        viewerActorId: viewer.id,
+        viewerUserId: viewer.id,
+        isFollowing,
       });
     },
-    [isFollowing, isOwnReview, user.id, viewer?.id, followMutation],
+    [isFollowing, isOwnReview, user.id, viewer?.id, toggleFollow],
   );
 
   // ─── Drag scoping ─────────────────────────────────────────────
