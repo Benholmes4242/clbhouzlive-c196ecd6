@@ -336,6 +336,7 @@ export function FullscreenReviewPost({
           isVisible={true}
           caption={reviewText ?? ''}
           golfCourse={null}
+          // Own-post preview branch — no follow button is rendered (isOwnPost).
           isFollowing={false}
           isOwnPost={true}
           bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 56px)"
