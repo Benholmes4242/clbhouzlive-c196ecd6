@@ -93,7 +93,6 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
           {FILTER_OPTIONS.map((option) => {
             const isActive =
               option.key === 'all' ? value === null : value === option.key;
-            const count = counts[option.key] ?? 0;
             return (
               <button
                 key={option.key}
