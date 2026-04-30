@@ -430,10 +430,11 @@ function Masthead({
             padding: 0,
             flexShrink: 0,
             fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            fontStyle: 'italic',
             fontSize: 10,
             fontWeight: 700,
             lineHeight: 1,
+            textAlign: 'center',
+            textIndent: 0,
           }}
         >
           i
