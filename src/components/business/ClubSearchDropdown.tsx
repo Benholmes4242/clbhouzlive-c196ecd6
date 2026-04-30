@@ -185,7 +185,7 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
                         ) : null;
                       })()}
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">
+                        <div className="text-sm font-medium text-foreground truncate">
                           {club.name}
                         </div>
                         <div className="text-xs text-muted-foreground truncate">
