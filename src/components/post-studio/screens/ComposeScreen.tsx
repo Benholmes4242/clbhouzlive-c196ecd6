@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 
 import {
-  Camera, ImagePlus, AtSign, X, Play, Clock, FileText,
+  Camera, ImagePlus, AtSign, X, Play, Clock, FileText, MapPin, Trophy, Pencil, ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
