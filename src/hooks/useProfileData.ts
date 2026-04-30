@@ -1,52 +1,10 @@
-import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 export const useProfileData = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const queryClient = useQueryClient();
-
-  // Get current user from Supabase auth
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-          // Suppress expected auth errors on auth pages (no session is normal there)
-          const isAuthPage = window.location.pathname === '/auth' || 
-                            window.location.pathname.startsWith('/auth/');
-          const isExpectedError = error.name === 'AuthSessionMissingError' || 
-                                  error.message?.includes('Auth session missing');
-          
-          if (!isAuthPage || !isExpectedError) {
-            console.error('Error getting user:', error);
-          }
-        }
-        setUser(user);
-      } catch (error) {
-        // Suppress expected auth errors on auth pages
-        const isAuthPage = window.location.pathname === '/auth' || 
-                          window.location.pathname.startsWith('/auth/');
-        if (!isAuthPage) {
-          console.error('Error in getUser:', error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   // Get profile data using React Query
   const { 
@@ -72,7 +30,7 @@ export const useProfileData = () => {
 
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !sessionLoading && !!user?.id,
     staleTime: 0, // Always refetch after invalidation
   });
 
@@ -116,7 +74,7 @@ export const useProfileData = () => {
   return {
     user,
     profile,
-    loading: loading || (!!user?.id && profileLoading),
+    loading: sessionLoading || (!!user?.id && profileLoading),
     error: profileError,
     setProfile,
     fetchProfile: fetchProfileById, // Support calling with optional userId
