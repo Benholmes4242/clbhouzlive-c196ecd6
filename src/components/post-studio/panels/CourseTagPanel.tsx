@@ -19,6 +19,11 @@ export function CourseTagPanel() {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const dragControls = useDragControls();
 
+  // Mirror latest taggedCourses so async enrichment merges against current state,
+  // not a stale snapshot captured at the start of handleSelect.
+  const taggedCoursesRef = useRef(state.taggedCourses);
+  useEffect(() => { taggedCoursesRef.current = state.taggedCourses; }, [state.taggedCourses]);
+
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 100); }, []);
 
   useEffect(() => {
@@ -69,8 +74,11 @@ export function CourseTagPanel() {
 
       if (!imageUrl && !best) return;
 
+      // Merge against the latest taggedCourses (via ref), not the snapshot
+      // captured when handleSelect started — otherwise a second tap during
+      // enrichment would drop the newly-added course.
       setTaggedCourses(
-        [...state.taggedCourses, baseCourse].map((c) =>
+        taggedCoursesRef.current.map((c) =>
           c.courseId === course.id
             ? {
                 ...c,
