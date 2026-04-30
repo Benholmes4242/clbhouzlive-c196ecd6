@@ -685,20 +685,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG, minHeight: 0, overflow: 'hidden' }}>
       <StudioHeader
         centerContent={
-          <ActorSelector
-            compact
-            header
-            visibilityIcon={
-              state.visibility === 'anyone' ? '🌍'
-              : state.visibility === 'followers' ? '👥'
-              : '🔒'
-            }
-            visibilityLabel={
-              state.visibility === 'anyone' ? 'Everyone'
-              : state.visibility === 'followers' ? 'Friends'
-              : 'Only me'
-            }
-          />
+          <div className="flex items-center" style={{ gap: 6 }}>
+            <ActorSelector compact header mode="identity" />
+            <ActorSelector
+              compact
+              header
+              mode="visibility"
+              visibilityIcon={
+                state.visibility === 'anyone' ? '🌍'
+                : state.visibility === 'followers' ? '👥'
+                : '🔒'
+              }
+              visibilityLabel={
+                state.visibility === 'anyone' ? 'Everyone'
+                : state.visibility === 'followers' ? 'Friends'
+                : 'Only me'
+              }
+            />
+          </div>
         }
         step="COMPOSE"
         darkMode={true}
