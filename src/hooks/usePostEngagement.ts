@@ -333,10 +333,12 @@ export function usePostEngagement(postId: string | null) {
       }
     },
     onSuccess: () => {
-      // Refetch comments and engagement summary
+      // Refetch comments list for THIS post (visible thread).
       queryClient.invalidateQueries({ queryKey: ['post-comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Surgical cache patch: bump comment count across every feed surface.
+      if (postId) {
+        patchEngagement(queryClient, postId, { commentCountDelta: +1 });
+      }
     },
   });
 
