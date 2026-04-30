@@ -352,6 +352,8 @@ export function useFollowTestUserFromTarget() {
         .from('user_follows')
         .insert({
           follower_id: targetUserId,
+          follower_actor_id: targetUserId,
+          follower_actor_type: 'personal',
           following_id: testUser.id,
         });
 
@@ -871,6 +873,8 @@ export function useFollowSwapScenario() {
         .from('user_follows')
         .upsert({
           follower_id: targetUserId,
+          follower_actor_id: targetUserId,
+          follower_actor_type: 'personal',
           following_id: testUser.id,
         }, { onConflict: 'follower_id,following_id' });
 

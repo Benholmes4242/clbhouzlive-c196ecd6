@@ -216,6 +216,8 @@ export const useSuggestedUsersDiscover = () => {
           .from('user_follows')
           .insert({
             follower_id: currentUser.id,
+            follower_actor_id: currentUser.id,
+            follower_actor_type: 'personal',
             following_id: userId
           });
 

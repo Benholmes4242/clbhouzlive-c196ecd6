@@ -41,6 +41,8 @@ export function useGolferActions(golferId: string, initialFollowing = false, ind
           .from('user_follows')
           .insert({
             follower_id: user.id,
+            follower_actor_id: user.id,
+            follower_actor_type: 'personal',
             following_id: golferId
           });
         
