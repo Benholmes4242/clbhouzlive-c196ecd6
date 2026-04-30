@@ -86,7 +86,7 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
           {/* Cell */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, padding: 'clamp(4px, 1vh, 8px) 0' }}>
             <span style={{
-              fontFamily: "'JetBrains Mono','SF Mono',monospace",
+              fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontSize: 'clamp(28px, min(13vw, 6.5vh), 52px)', fontWeight: 900,
               color: cell.isAccent ? '#4ade80' : '#FFFFFF',
               lineHeight: 1,

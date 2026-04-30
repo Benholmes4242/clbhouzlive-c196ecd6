@@ -92,7 +92,7 @@ const BetaGatePage: React.FC = () => {
         {/* Headline */}
         <h1
           style={{
-            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontSize: 28,
             fontWeight: 700,
             color: '#ffffff',

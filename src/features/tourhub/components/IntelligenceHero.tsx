@@ -335,7 +335,7 @@ function Masthead({
             justifyContent: 'center',
             padding: 0,
             flexShrink: 0,
-            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontStyle: 'italic',
             fontSize: 10,
             fontWeight: 700,
