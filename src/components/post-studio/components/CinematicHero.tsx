@@ -2,7 +2,7 @@
 // rotated "pile" of non-cover thumbs that opens the ManageMediaSheet.
 // Replaces the horizontal carousel.
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pencil, Star, Play, Trash2, Plus } from 'lucide-react';
 import type { StudioMediaItem } from '../types';
 import { ManageMediaSheet } from './ManageMediaSheet';
@@ -43,16 +43,39 @@ export function CinematicHero({
 }: CinematicHeroProps) {
   const [pileOpen, setPileOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const cover =
     mediaItems.find((m) => m.id === coverMediaId) || mediaItems[0];
   const others = mediaItems.filter((m) => m.id !== cover?.id);
   const otherCount = others.length;
 
+  // Reset playback state whenever the cover changes
+  useEffect(() => {
+    setIsPlaying(false);
+    const v = videoRef.current;
+    if (v) {
+      try { v.pause(); v.currentTime = 0; } catch { /* noop */ }
+    }
+  }, [cover?.id]);
+
   if (!cover) return null;
 
   const coverSrc = previewSrc(cover);
   const isVideo = cover.mediaType === 'video';
+  const videoSrc = isVideo ? cover.previewUrl : '';
+
+  const handleVideoTap = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    } else {
+      v.pause();
+      setIsPlaying(false);
+    }
+  };
 
   return (
     <div style={{ fontFamily: FONT_STACK }}>
@@ -66,7 +89,39 @@ export function CinematicHero({
           background: '#000',
         }}
       >
-        {coverSrc ? (
+        {isVideo ? (
+          <>
+            {/* Poster image shown until playback starts (also visible on iOS before tap) */}
+            {coverSrc && !isPlaying && (
+              <img
+                src={coverSrc}
+                alt=""
+                style={{
+                  position: 'absolute', inset: 0,
+                  width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                  zIndex: 1,
+                }}
+              />
+            )}
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              poster={coverSrc || undefined}
+              playsInline
+              muted
+              preload="metadata"
+              onClick={handleVideoTap}
+              onEnded={() => setIsPlaying(false)}
+              onPause={() => setIsPlaying(false)}
+              onPlay={() => setIsPlaying(true)}
+              style={{
+                position: 'absolute', inset: 0,
+                width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                zIndex: 2, cursor: 'pointer', background: '#000',
+              }}
+            />
+          </>
+        ) : coverSrc ? (
           <img
             src={coverSrc}
             alt=""
@@ -193,42 +248,50 @@ export function CinematicHero({
         {/* Video play indicator + duration */}
         {isVideo && (
           <>
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                pointerEvents: 'none',
-              }}
-            >
-              <div
+            {!isPlaying && (
+              <button
+                type="button"
+                onClick={handleVideoTap}
+                aria-label="Play video"
                 style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.55)',
+                  position: 'absolute',
+                  inset: 0,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid rgba(255,255,255,0.18)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  zIndex: 5,
                 }}
               >
-                <Play
-                  className="text-white"
-                  style={{ width: 24, height: 24, marginLeft: 2 }}
-                  fill="white"
-                  strokeWidth={0}
-                />
-              </div>
-            </div>
-            {cover.duration != null && (
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.55)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                  }}
+                >
+                  <Play
+                    className="text-white"
+                    style={{ width: 24, height: 24, marginLeft: 2 }}
+                    fill="white"
+                    strokeWidth={0}
+                  />
+                </div>
+              </button>
+            )}
+            {!isPlaying && cover.duration != null && (
               <div
                 style={{
                   position: 'absolute',
-                  top: 12,
-                  right: 56,
+                  bottom: 12,
+                  left: 12,
                   background: 'rgba(0,0,0,0.55)',
                   border: '1px solid rgba(255,255,255,0.18)',
                   borderRadius: 6,
@@ -237,7 +300,8 @@ export function CinematicHero({
                   fontWeight: 700,
                   color: '#fff',
                   pointerEvents: 'none',
-                  zIndex: 3,
+                  zIndex: 5,
+                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
                 {formatDuration(cover.duration)}

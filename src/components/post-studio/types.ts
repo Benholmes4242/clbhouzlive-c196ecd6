@@ -97,6 +97,12 @@ export interface TaggedCourse {
   courseName: string;
   country?: string;
   region?: string;
+  /** Course thumbnail image URL (golf_courses.thumbnail_image). Optional. */
+  imageUrl?: string;
+  /** Best (most prestigious) Top 100 rank, if any. */
+  top100Rank?: number;
+  /** Slug of the Top 100 list the rank came from (e.g. 'gb-i', 'global'). */
+  top100List?: string;
 }
 
 // ============================================================================

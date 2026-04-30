@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 
 import {
-  Camera, ImagePlus, AtSign, X, Play, Clock, FileText,
+  Camera, ImagePlus, AtSign, X, Play, Clock, FileText, MapPin, Trophy, Pencil, ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -561,123 +561,241 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     openPanel('mention');
   }, [state.caption, setCaption, setMentionTriggerIndex, openPanel]);
 
-  const renderCourseTag = () => (
-    <div>
-      <AnimatePresence mode="wait">
-        {state.taggedCourses.length === 0 ? (
-          <motion.button
-            key="prompt"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.18 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => openPanel('course')}
-            className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
-            style={{
-              background: 'rgba(34,197,94,0.08)',
-              border: '1px solid rgba(34,197,94,0.18)',
-            }}
-          >
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.22)' }}
+  const renderCourseTag = () => {
+    const GREEN_DEEP = '#15803D';
+    const GREEN_TEXT = '#16A34A';
+    const CARD_BG = 'rgba(34,197,94,0.10)';
+    const CARD_BORDER = '1px solid rgba(22,163,74,0.30)';
+
+    return (
+      <div>
+        <AnimatePresence mode="wait">
+          {state.taggedCourses.length === 0 ? (
+            <motion.button
+              key="prompt"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => openPanel('course')}
+              className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
+              style={{ background: CARD_BG, border: CARD_BORDER }}
             >
-              <span className="text-base">⛳</span>
-            </div>
-            <span className="flex-1 text-left text-[14px]" style={{ color: DARK_TEXT3 }}>
-              Tag where you played
-            </span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
-              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </motion.button>
-        ) : (
-          <motion.div
-            key="tagged"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.18 }}
-            className="flex flex-col gap-1.5"
-          >
-            {state.taggedCourses.map((course, i) => (
-              <motion.button
-                key={course.courseId}
-                layout
-                initial={{ scale: 0.85, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.85, opacity: 0 }}
-                onClick={() => openPanel('course')}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
-                style={{
-                  background: 'rgba(34,197,94,0.08)',
-                  border: '1px solid rgba(34,197,94,0.18)',
-                }}
+              <div
+                className="rounded-xl flex items-center justify-center shrink-0"
+                style={{ width: 32, height: 32, background: 'rgba(34,197,94,0.18)' }}
               >
-                <div style={{
-                  width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                  background: 'rgba(34,197,94,0.12)',
-                  border: '1px solid rgba(34,197,94,0.20)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: state.taggedCourses.length > 1 ? 13 : 14,
-                  fontWeight: 700,
-                  color: state.taggedCourses.length > 1 ? 'rgba(34,197,94,0.80)' : undefined,
-                }}>
-                  {state.taggedCourses.length > 1 ? i + 1 : '⛳'}
-                </div>
-                <div className="text-left flex-1">
-                  <p className="text-[13px] font-semibold leading-none" style={{ color: DARK_TEXT }}>
-                    {course.courseName}
-                  </p>
-                  {course.country && (
-                    <p className="text-[10px] mt-0.5 leading-none" style={{ color: DARK_TEXT3 }}>
-                      {course.region ? `${course.region}, ${course.country}` : course.country}
-                    </p>
-                  )}
-                </div>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
-                  }}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
-                  className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                  style={{ background: 'rgba(15,23,42,0.06)' }}
+                <span className="text-base">⛳</span>
+              </div>
+              <div className="flex-1 text-left">
+                <p style={{ fontSize: 13.5, fontWeight: 700, color: DARK_TEXT, lineHeight: 1.15 }}>
+                  Tag where you played
+                </p>
+                <p style={{ fontSize: 10.5, fontWeight: 600, color: GREEN_DEEP, marginTop: 2, lineHeight: 1.2 }}>
+                  Make it part of the course&apos;s story
+                </p>
+              </div>
+              <ChevronRight style={{ width: 15, height: 15, color: GREEN_TEXT, flexShrink: 0 }} strokeWidth={2} />
+            </motion.button>
+          ) : (
+            <motion.div
+              key="tagged"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="flex flex-col gap-1.5"
+            >
+              {/* Primary course — rich card */}
+              {(() => {
+                const primary = state.taggedCourses[0];
+                const hasRank = typeof primary.top100Rank === 'number';
+                const locationText = [primary.region, primary.country].filter(Boolean).join(', ');
+                return (
+                  <motion.div
+                    key={primary.courseId}
+                    layout
+                    initial={{ scale: 0.96, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.96, opacity: 0 }}
+                    onClick={() => openPanel('course')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel('course'); } }}
+                    className="flex items-stretch w-full overflow-hidden cursor-pointer"
+                    style={{ background: CARD_BG, border: CARD_BORDER, borderRadius: 14 }}
+                  >
+                    {/* Thumbnail column */}
+                    <div
+                      className="shrink-0 relative"
+                      style={{
+                        width: 64,
+                        alignSelf: 'stretch',
+                        background: primary.imageUrl
+                          ? `center/cover url(${primary.imageUrl})`
+                          : 'rgba(34,197,94,0.18)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {!primary.imageUrl && <span style={{ fontSize: 22 }}>⛳</span>}
+                      {/* Bottom gradient over thumb */}
+                      {primary.imageUrl && (
+                        <div
+                          aria-hidden
+                          style={{
+                            position: 'absolute', inset: 0,
+                            background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.20) 100%)',
+                            pointerEvents: 'none',
+                          }}
+                        />
+                      )}
+                      {hasRank && (
+                        <div
+                          style={{
+                            position: 'absolute', top: 4, left: 4,
+                            background: 'rgba(0,0,0,0.65)',
+                            color: '#fff',
+                            fontSize: 9, fontWeight: 800, lineHeight: 1,
+                            padding: '3px 5px', borderRadius: 5,
+                          }}
+                        >
+                          #{primary.top100Rank}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Info column */}
+                    <div className="flex-1 min-w-0 flex items-center" style={{ padding: '10px 12px', gap: 8 }}>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          style={{
+                            fontSize: 13.5, fontWeight: 700, color: DARK_TEXT,
+                            lineHeight: 1.2,
+                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {primary.courseName}
+                        </p>
+                        <div
+                          className="flex items-center"
+                          style={{ marginTop: 3, gap: 6, fontSize: 10.5, fontWeight: 600, color: GREEN_DEEP, minWidth: 0 }}
+                        >
+                          {locationText && (
+                            <span className="flex items-center" style={{ gap: 3, minWidth: 0 }}>
+                              <MapPin style={{ width: 9, height: 9, flexShrink: 0 }} strokeWidth={2} />
+                              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {locationText}
+                              </span>
+                            </span>
+                          )}
+                          {hasRank && (
+                            <>
+                              {locationText && <span style={{ opacity: 0.45 }}>·</span>}
+                              <span className="flex items-center shrink-0" style={{ gap: 3 }}>
+                                <Trophy style={{ width: 9, height: 9 }} strokeWidth={2} />
+                                <span>Top 100</span>
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Edit button */}
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Edit tagged course"
+                        onClick={(e) => { e.stopPropagation(); openPanel('course'); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); openPanel('course'); } }}
+                        className="flex items-center justify-center shrink-0 cursor-pointer"
+                        style={{
+                          width: 28, height: 28, borderRadius: 8,
+                          background: 'rgba(255,255,255,0.55)',
+                        }}
+                      >
+                        <Pencil style={{ width: 11, height: 11, color: GREEN_DEEP }} strokeWidth={2} />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })()}
+
+              {/* Secondary courses — small chips */}
+              {state.taggedCourses.slice(1).map((course, i) => (
+                <motion.button
+                  key={course.courseId}
+                  layout
+                  initial={{ scale: 0.85, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.85, opacity: 0 }}
+                  onClick={() => openPanel('course')}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full"
+                  style={{ background: CARD_BG, border: CARD_BORDER }}
                 >
-                  <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
-                </div>
-              </motion.button>
-            ))}
-            {state.taggedCourses.length < 5 && (
-              <motion.button
-                layout
-                whileTap={{ scale: 0.95 }}
-                onClick={() => openPanel('course')}
-                className="flex items-center gap-2"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '7px 12px',
-                  borderRadius: 12,
-                  border: '1.5px dashed rgba(34,197,94,0.18)',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                }}
-              >
-                <span style={{ fontSize: 14 }}>⛳</span>
-                <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
-                  Add course
-                </span>
-              </motion.button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+                  <div
+                    style={{
+                      width: 24, height: 24, borderRadius: 7, flexShrink: 0,
+                      background: 'rgba(34,197,94,0.18)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12, fontWeight: 700, color: 'rgba(22,163,74,0.85)',
+                    }}
+                  >
+                    {i + 2}
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <p
+                      className="text-[12px] font-semibold leading-none"
+                      style={{ color: DARK_TEXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    >
+                      {course.courseName}
+                    </p>
+                  </div>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
+                    }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
+                    className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
+                    style={{ background: 'rgba(15,23,42,0.06)' }}
+                  >
+                    <X className="w-2.5 h-2.5" style={{ color: DARK_ICON }} strokeWidth={2.5} />
+                  </div>
+                </motion.button>
+              ))}
+
+              {state.taggedCourses.length < 5 && (
+                <motion.button
+                  layout
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => openPanel('course')}
+                  className="flex items-center gap-2"
+                  style={{
+                    padding: '7px 12px',
+                    borderRadius: 12,
+                    border: '1.5px dashed rgba(34,197,94,0.30)',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    alignSelf: 'flex-start',
+                  }}
+                >
+                  <span style={{ fontSize: 14 }}>⛳</span>
+                  <span className="text-[12.5px] font-semibold" style={{ color: GREEN_DEEP }}>
+                    Add another course
+                  </span>
+                </motion.button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  };
 
   
 
@@ -685,20 +803,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG, minHeight: 0, overflow: 'hidden' }}>
       <StudioHeader
         centerContent={
-          <ActorSelector
-            compact
-            header
-            visibilityIcon={
-              state.visibility === 'anyone' ? '🌍'
-              : state.visibility === 'followers' ? '👥'
-              : '🔒'
-            }
-            visibilityLabel={
-              state.visibility === 'anyone' ? 'Everyone'
-              : state.visibility === 'followers' ? 'Friends'
-              : 'Only me'
-            }
-          />
+          <div className="flex items-center" style={{ gap: 6 }}>
+            <ActorSelector compact header mode="identity" />
+            <ActorSelector
+              compact
+              header
+              mode="visibility"
+              visibilityIcon={
+                state.visibility === 'anyone' ? '🌍'
+                : state.visibility === 'followers' ? '👥'
+                : '🔒'
+              }
+              visibilityLabel={
+                state.visibility === 'anyone' ? 'Everyone'
+                : state.visibility === 'followers' ? 'Friends'
+                : 'Only me'
+              }
+            />
+          </div>
         }
         step="COMPOSE"
         darkMode={true}
@@ -820,7 +942,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               onAddMore={() => fileInputRef.current?.click()}
             />
           ) : !state.caption ? (
-            <div className="flex items-center justify-center" style={{ minHeight: 180 }}>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center justify-center w-full"
+              style={{
+                minHeight: 180,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+              aria-label="Add photos or a video"
+            >
               <div style={{ textAlign: 'center', opacity: 0.55 }}>
                 <div
                   style={{
@@ -836,7 +970,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                   Add photos or a video to bring your round to life
                 </div>
               </div>
-            </div>
+            </button>
           ) : null}
         </div>
 
