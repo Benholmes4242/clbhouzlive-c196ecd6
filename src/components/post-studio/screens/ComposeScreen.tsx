@@ -5,13 +5,14 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 
 import {
-  Camera, ImagePlus, AtSign, X, Pencil, Play, Plus, Clock, FileText,
+  Camera, ImagePlus, AtSign, X, Play, Clock, FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { StudioHeader } from '../components/StudioHeader';
 import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
+import { CinematicHero } from '../components/CinematicHero';
 import { usePostStudioContext } from '../usePostStudio';
 import { useSaveDraft } from '../hooks/useSaveDraft';
 import { useDrafts } from '@/hooks/useDrafts';
@@ -539,124 +540,29 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   }, [state.scheduledAt, handlePublish, schedulePublishRef, state.mediaItems.length, isValid]);
 
 
-  // ── Shared caption + course tag block ──
-  const renderCaptionBlock = (minH: number, maxH: number, pushCourseToBottom = false, includeCourseTag = true) => (
-    <>
-      {/* Caption area */}
-      <div className="px-4 relative">
-        {/* Mention highlight layer */}
-        {state.mentions.length > 0 && (
-          <div
-            ref={mentionOverlayRef}
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 16,
-              right: 16,
-              height: 97,
-              overflowY: 'auto',
-              WebkitOverflowScrolling: 'touch',
-              pointerEvents: 'none',
-              fontSize: 20,
-              fontWeight: 500,
-              lineHeight: 1.45,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              paddingTop: 10,
-              paddingRight: 68,
-              scrollbarWidth: 'none',
-            }}
-          >
-            {highlightedCaption}
-          </div>
-        )}
-        {state.caption === '' && !textareaFocused && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 10,
-              left: 16,
-              width: 1.5,
-              height: 29,
-              background: 'rgba(15,23,42,0.75)',
-              borderRadius: 0.75,
-              animation: 'blink 1s step-end infinite',
-              pointerEvents: 'none',
-              zIndex: 2,
-            }}
-          />
-        )}
-        <style>{`@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
-        <textarea
-          ref={textareaRef}
-          value={state.caption}
-          onFocus={() => setTextareaFocused(true)}
-          onBlur={() => setTextareaFocused(false)}
-          onChange={(e) => {
-            handleCaptionChange(e);
-          }}
-          onScroll={(e) => {
-            if (mentionOverlayRef.current) {
-              mentionOverlayRef.current.scrollTop = e.currentTarget.scrollTop;
-            }
-          }}
-          placeholder="What's on your mind?"
-          className="w-full resize-none outline-none placeholder:text-black/[.25]"
-          style={{
-            background: 'transparent',
-            fontSize: 20,
-            lineHeight: 1.45,
-            fontWeight: 500,
-            paddingTop: 10,
-            color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
-            caretColor: '#F7931E',
-            WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-            height: 97,
-            overflowY: 'auto',
-            resize: 'none',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
-            paddingRight: 68,
-          }}
-          maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
-        />
-        {/* Amber orb — opens library picker */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => fileInputRef.current?.click()}
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 16,
-            width: 42,
-            height: 42,
-            borderRadius: '50%',
-            background: 'rgba(15,23,42,0.05)',
-            border: '1px solid rgba(15,23,42,0.07)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 3,
-          }}
-        >
-          <ImagePlus className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.65)' }} strokeWidth={2} />
-        </motion.button>
-      </div>
+  // ── Caption auto-grow constants ──
+  const CAPTION_LINE_HEIGHT = 24; // matches lineHeight: 1.5 * fontSize: 16
+  const CAPTION_MAX_LINES = 6;
+  const CAPTION_MAX_HEIGHT = CAPTION_LINE_HEIGHT * CAPTION_MAX_LINES; // 144
 
-      {/* Hairline below textarea */}
-      <div className="mx-4" style={{ height: 1, background: 'rgba(15,23,42,0.07)', marginTop: 14 }} />
+  // Auto-resize textarea on caption change
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, CAPTION_MAX_HEIGHT)}px`;
+  }, [state.caption]);
 
-      {pushCourseToBottom && <div className="flex-1" />}
-
-      {/* Course tag */}
-      {includeCourseTag && renderCourseTag()}
-    </>
-  );
+  const handleMentionClick = useCallback(() => {
+    const pos = textareaRef.current?.selectionStart ?? state.caption.length;
+    const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
+    setCaption(newCaption);
+    setMentionTriggerIndex(pos);
+    openPanel('mention');
+  }, [state.caption, setCaption, setMentionTriggerIndex, openPanel]);
 
   const renderCourseTag = () => (
-    <div className="px-4 mt-3 mb-3">
+    <div>
       <AnimatePresence mode="wait">
         {state.taggedCourses.length === 0 ? (
           <motion.button
@@ -693,7 +599,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.18 }}
-            className="flex flex-col gap-1.5 py-1"
+            className="flex flex-col gap-1.5"
           >
             {state.taggedCourses.map((course, i) => (
               <motion.button
@@ -773,6 +679,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     </div>
   );
 
+  
+
   return (
     <div className="flex-1 flex flex-col" style={{ background: COMPOSE_BG, minHeight: 0, overflow: 'hidden' }}>
       <StudioHeader
@@ -809,222 +717,150 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
       <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
 
-      {/* ── Media state: caption at top, then carousel ── */}
-      {hasMedia ? (
-        <>
-          {/* Caption block — at top, directly below topbar */}
-          <div className="shrink-0">
-            {renderCaptionBlock(52, 72, false, false)}
-          </div>
+      {/* ── Scrolling body — single unified layout ── */}
+      <div
+        className="flex-1 overflow-y-auto"
+        style={{
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+        }}
+      >
+        {/* Caption */}
+        <div className="px-4 pt-4 relative">
+          {/* Mention highlight overlay */}
+          {state.mentions.length > 0 && (
+            <div
+              ref={mentionOverlayRef}
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                top: 16,
+                left: 16,
+                right: 24,
+                maxHeight: CAPTION_MAX_HEIGHT,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                pointerEvents: 'none',
+                fontSize: 16,
+                fontWeight: 500,
+                lineHeight: 1.5,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                scrollbarWidth: 'none',
+              }}
+            >
+              {highlightedCaption}
+            </div>
+          )}
+          <textarea
+            ref={textareaRef}
+            value={state.caption}
+            onFocus={() => setTextareaFocused(true)}
+            onBlur={() => setTextareaFocused(false)}
+            onChange={handleCaptionChange}
+            onScroll={(e) => {
+              if (mentionOverlayRef.current) {
+                mentionOverlayRef.current.scrollTop = e.currentTarget.scrollTop;
+              }
+            }}
+            placeholder="Tell us about your round."
+            className="w-full resize-none outline-none placeholder:italic placeholder:text-black/[.40]"
+            style={{
+              background: 'transparent',
+              fontSize: 16,
+              lineHeight: 1.5,
+              fontWeight: 500,
+              color: state.mentions.length > 0 ? 'transparent' : DARK_TEXT,
+              caretColor: '#F7931E',
+              WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
+              minHeight: CAPTION_LINE_HEIGHT,
+              maxHeight: CAPTION_MAX_HEIGHT,
+              overflowY: 'auto',
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch',
+              paddingRight: 8,
+            }}
+            maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
+          />
+        </div>
 
-          {/* 24px gap above carousel */}
-          <div style={{ flexShrink: 0, height: 24 }} />
+        {/* Hairline */}
+        <div className="mx-4" style={{ height: 1, background: 'rgba(15,23,42,0.07)', marginTop: 10 }} />
 
-          {/* ── Scrollable thumbnail carousel ── */}
-          <div style={{
-            flex: 1,
-            minHeight: 0,
-            display: 'flex',
-            alignItems: 'center',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            scrollbarWidth: 'none',
-            gap: 5,
-            padding: '0 16px',
-          }}>
-            {state.mediaItems.map((item, i) => {
-              const isActive = i === state.activeMediaIndex;
-              const isCover = i === coverIndex;
-              const stillSrc = getPreviewStillSrc(item);
-              const previewTransform = getPreviewTransform(item.edits);
-              return (
-                <motion.div
-                  key={item.id}
-                  onTap={() => {
-                    if (longPressFiredRef.current) return;
-                    setActiveMedia(i);
-                  }}
-                  onPointerDown={() => {
-                    longPressFiredRef.current = false;
-                    longPressTimerRef.current = setTimeout(() => {
-                      longPressFiredRef.current = true;
-                      handleSetCover(i);
-                    }, 400);
-                  }}
-                  onPointerUp={() => { if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; } }}
-                  onPointerCancel={() => { if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; } }}
+        {/* Course tag — always immediately below hairline */}
+        <div className="px-4 pt-3">
+          {renderCourseTag()}
+        </div>
+
+        {/* Media area: cinematic hero OR empty hint */}
+        <div className="px-4 pt-3.5">
+          {hasMedia ? (
+            <CinematicHero
+              mediaItems={state.mediaItems}
+              coverMediaId={coverMediaId}
+              taggedCourseName={state.taggedCourses[0]?.courseName}
+              onSetCover={(mediaId) => {
+                setCoverMedia(mediaId);
+                const idx = state.mediaItems.findIndex((m) => m.id === mediaId);
+                if (idx >= 0) setActiveMedia(idx);
+                toast.success('Cover updated');
+              }}
+              onRemove={(mediaId) => {
+                removeMedia(mediaId);
+              }}
+              onEdit={(mediaId) => {
+                const idx = state.mediaItems.findIndex((m) => m.id === mediaId);
+                if (idx >= 0) {
+                  setActiveMedia(idx);
+                  setActiveTool('filter');
+                  setShelfOpen(true);
+                }
+              }}
+              onAddMore={() => fileInputRef.current?.click()}
+            />
+          ) : !state.caption ? (
+            <div className="flex items-center justify-center" style={{ minHeight: 180 }}>
+              <div style={{ textAlign: 'center', opacity: 0.55 }}>
+                <div
                   style={{
-                    position: 'relative',
-                    flexShrink: 0,
-                    height: '80%',
-                    aspectRatio: '1',
-                    borderRadius: 12,
-                    overflow: 'hidden',
-                    outline: 'none',
-                    cursor: 'pointer',
+                    width: 56, height: 56, borderRadius: 16,
+                    background: 'rgba(15,23,42,0.05)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 12px',
                   }}
                 >
-                  {/* Media render */}
-                  {item.mediaType === 'video' ? (
-                    <>
-                      {stillSrc ? (
-                        <>
-                          <img src={stillSrc} alt="" className="w-full h-full object-cover" style={{ transform: previewTransform }} />
-                          {hasActiveFilter(item.edits) && (
-                            <img
-                              src={stillSrc}
-                              alt=""
-                              className={`absolute inset-0 w-full h-full object-cover ${getFilterClass(item.edits!.filter!)}`}
-                              style={{ opacity: (item.edits?.filterIntensity ?? 100) / 100, transform: previewTransform }}
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <video
-                          src={item.previewUrl}
-                          poster={item.thumbnailUrl || undefined}
-                          className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                          style={{ transform: previewTransform }}
-                          playsInline muted preload="metadata"
-                        />
-                      )}
-                      {/* Play icon */}
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.60)' }}>
-                          <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" strokeWidth={0} />
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <img
-                      src={item.thumbnailUrl || item.previewUrl}
-                      alt=""
-                      className={`w-full h-full object-cover ${item.edits?.filter ? getFilterClass(item.edits.filter) : ''}`}
-                      style={{ transform: previewTransform }}
-                    />
-                  )}
-
-                  {/* Inactive dim */}
-                  {!isActive && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.40)', pointerEvents: 'none' }} />}
-
-                  {/* Text overlay indicator — top-right */}
-                  {item.edits?.textOverlays && item.edits.textOverlays.length > 0 && (
-                    <div style={{
-                      position: 'absolute', top: 6, right: 6,
-                      width: 16, height: 16, borderRadius: 5,
-                      background: 'rgba(0,0,0,0.55)',
-                      backdropFilter: 'blur(6px)',
-                      border: '1px solid rgba(255,255,255,0.18)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.85)',
-                      pointerEvents: 'none', zIndex: 3,
-                    }}>
-                      T
-                    </div>
-                  )}
-
-
-                  {isCover && (
-                    <div style={{
-                      position: 'absolute', top: 7, left: 7,
-                      display: 'flex', alignItems: 'center', gap: 3,
-                      background: 'rgba(0,0,0,0.58)',
-                      backdropFilter: 'blur(8px)',
-                      WebkitBackdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255,255,255,0.20)',
-                      borderRadius: 7,
-                      padding: '3px 6px',
-                      pointerEvents: 'none',
-                      zIndex: 4,
-                    }}>
-                      <svg width="7" height="7" viewBox="0 0 24 24" fill="rgba(255,255,255,0.90)" stroke="none">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                      </svg>
-                      <span style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: 'rgba(255,255,255,0.90)' }}>
-                        Cover
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Edit button — bottom-right */}
-                  <button
-                    onPointerDown={e => e.stopPropagation()}
-                    onClick={e => { e.stopPropagation(); handleEdit(i); }}
-                    style={{
-                      position: 'absolute', bottom: 8, right: 8,
-                      display: 'flex', alignItems: 'center', gap: 4,
-                      background: 'rgba(0,0,0,0.58)',
-                      backdropFilter: 'blur(8px)',
-                      WebkitBackdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255,255,255,0.16)',
-                      borderRadius: 8, padding: '4px 8px',
-                      cursor: 'pointer', color: '#fff',
-                      zIndex: 4,
-                    }}
-                  >
-                    <Pencil className="w-[11px] h-[11px]" />
-                    <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.2 }}>Edit</span>
-                  </button>
-                </motion.div>
-              );
-            })}
-
-            {/* Add more tile */}
-            {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  flexShrink: 0,
-                  height: '80%',
-                  aspectRatio: '1',
-                  borderRadius: 12,
-                  background: 'rgba(15,23,42,0.03)',
-                  border: '1.5px dashed rgba(15,23,42,0.12)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <Plus className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.25)' }} />
-              </motion.button>
-            )}
-          </div>
-
-          {/* 24px gap below carousel */}
-          <div style={{ flexShrink: 0, height: 24 }} />
-
-          {/* Course tag — below carousel */}
-          <div className="shrink-0">
-            {renderCourseTag()}
-          </div>
-
-          {/* Processing indicator */}
-          <AnimatePresence>
-            {isProcessing && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="shrink-0 flex items-center gap-2 px-4 py-2 text-sm"
-                style={{ color: DARK_TEXT3 }}
-              >
-                <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(15,23,42,0.15)', borderTopColor: 'transparent' }} />
-                Processing…
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </>
-      ) : (
-        <div
-          className="flex-1 overflow-y-auto relative flex flex-col"
-          style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
-        >
-          <div className="pt-4 flex-1 flex flex-col">
-            {renderCaptionBlock(90, 210, true)}
-          </div>
+                  <ImagePlus style={{ width: 24, height: 24, color: 'rgba(15,23,42,0.55)' }} strokeWidth={1.5} />
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 500, color: 'rgba(15,23,42,0.50)' }}>
+                  Add photos or a video to bring your round to life
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
-      )}
 
-      {/* ── Bottom action rail — always dark ── */}
+        {/* Processing indicator */}
+        <AnimatePresence>
+          {isProcessing && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-2 px-4 py-2 text-sm"
+              style={{ color: DARK_TEXT3 }}
+            >
+              <div className="w-3.5 h-3.5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(15,23,42,0.15)', borderTopColor: 'transparent' }} />
+              Processing…
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Bottom padding so last item isn't flush with toolbar */}
+        <div style={{ height: 24 }} />
+      </div>
+
+      {/* ── Bottom toolbar — pinned ── */}
       <div
         className="shrink-0"
         style={{
@@ -1033,100 +869,98 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
         }}
       >
+        <div className="flex items-center px-3.5 gap-2.5" style={{ minHeight: 54, paddingTop: 8 }}>
+          {/* Library — outline pill with label */}
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isProcessing}
+            className="flex items-center justify-center gap-2 disabled:opacity-40"
+            style={{
+              padding: '9px 14px',
+              borderRadius: 12,
+              background: '#fff',
+              border: '1px solid rgba(15,23,42,0.10)',
+              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+              cursor: 'pointer',
+            }}
+          >
+            <ImagePlus style={{ width: 15, height: 15, color: '#0F172A' }} strokeWidth={2} />
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: '#0F172A', letterSpacing: 0.1 }}>Library</span>
+          </motion.button>
 
-        <div className="flex items-center px-4" style={{ minHeight: 54, gap: 0, paddingTop: 8 }}>
+          {/* Camera — outline pill with label */}
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={() => rearCameraInputRef.current?.click()}
+            disabled={isProcessing}
+            className="flex items-center justify-center gap-2 disabled:opacity-40"
+            style={{
+              padding: '9px 14px',
+              borderRadius: 12,
+              background: '#fff',
+              border: '1px solid rgba(15,23,42,0.10)',
+              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+              cursor: 'pointer',
+            }}
+          >
+            <Camera style={{ width: 15, height: 15, color: '#0F172A' }} strokeWidth={2} />
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: '#0F172A', letterSpacing: 0.1 }}>Camera</span>
+          </motion.button>
 
-          {/* Zone A — Library + Camera only */}
-          <div className="flex items-center" style={{ gap: 4 }}>
-            {/* Library — amber tinted, primary action */}
+          <div className="flex-1" />
+
+          {/* Secondary cluster — @ Schedule Drafts */}
+          <div
+            className="flex items-center"
+            style={{
+              gap: 1,
+              padding: 2,
+              borderRadius: 10,
+              background: 'rgba(15,23,42,0.05)',
+            }}
+          >
             <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex flex-col items-center justify-center disabled:opacity-40"
-              style={{ width: 52, height: 54, gap: 3 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={handleMentionClick}
+              style={{ width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 0, cursor: 'pointer' }}
+              aria-label="Mention"
             >
-              <div style={{
-                width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(15,23,42,0.05)',
-                border: '1px solid rgba(15,23,42,0.07)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <ImagePlus className="w-[18px] h-[18px]" style={{ color: 'rgba(15,23,42,0.65)' }} strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Library</span>
-            </motion.button>
-
-            {/* Camera */}
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => rearCameraInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex flex-col items-center justify-center disabled:opacity-40"
-              style={{ width: 52, height: 54, gap: 3 }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 13,
-                background: DARK_CARD,
-                border: `1px solid ${DARK_BORDER}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Camera className="w-[18px] h-[18px]" style={{ color: DARK_ICON }} strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: DARK_TEXT3, textTransform: 'uppercase' }}>Camera</span>
-            </motion.button>
-          </div>
-
-          {/* Divider */}
-          <div style={{ width: 1, height: 28, background: DARK_BORDER, margin: '0 10px' }} />
-
-          {/* Zone B — @ and Schedule */}
-          <div className="flex items-center" style={{ gap: 0 }}>
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => {
-                const pos = textareaRef.current?.selectionStart ?? state.caption.length;
-                const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
-                setCaption(newCaption);
-                setMentionTriggerIndex(pos);
-                openPanel('mention');
-              }}
-              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              <AtSign className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+              <AtSign style={{ width: 15, height: 15, color: 'rgba(15,23,42,0.55)' }} strokeWidth={2} />
             </motion.button>
 
             <motion.button
-              whileTap={{ scale: 0.88 }}
+              whileTap={{ scale: 0.92 }}
               onClick={() => openPanel('schedule')}
-              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 0, cursor: 'pointer' }}
+              aria-label="Schedule"
             >
-              <Clock className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+              <Clock style={{ width: 15, height: 15, color: 'rgba(15,23,42,0.55)' }} strokeWidth={2} />
             </motion.button>
 
             <motion.button
-              whileTap={{ scale: 0.88 }}
+              whileTap={{ scale: 0.92 }}
               onClick={() => openPanel('drafts')}
-              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+              style={{ width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 0, cursor: 'pointer', position: 'relative' }}
+              aria-label="Drafts"
             >
-              <FileText className="w-5 h-5" style={{ color: DARK_ICON }} strokeWidth={2} />
+              <FileText style={{ width: 15, height: 15, color: 'rgba(15,23,42,0.55)' }} strokeWidth={2} />
               {draftsCount > 0 && (
                 <div style={{
-                  position: 'absolute', top: 8, right: 8,
-                  width: 7, height: 7, borderRadius: '50%',
+                  position: 'absolute', top: 6, right: 6,
+                  width: 5, height: 5, borderRadius: '50%',
                   background: '#F7931E',
                 }} />
               )}
             </motion.button>
           </div>
 
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* Zone C — Character count */}
-          <div className="flex items-center justify-center" style={{ width: 36, height: 36, opacity: charCount === 0 ? 0 : 1, transition: 'opacity 0.15s' }}>
-            <CharacterRing count={charCount} />
-          </div>
+          {/* Char ring — only when typing */}
+          {charCount > 0 && (
+            <div className="flex items-center justify-center shrink-0" style={{ width: 28, height: 28 }}>
+              <CharacterRing count={charCount} size={28} />
+            </div>
+          )}
         </div>
       </div>
 
