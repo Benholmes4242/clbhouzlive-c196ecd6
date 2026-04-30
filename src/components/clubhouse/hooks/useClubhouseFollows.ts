@@ -83,4 +83,4 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
   };
 }
 
-const EMPTY_OVERRIDES: ReadonlyMap<string, boolean> = new Map();
+const EMPTY_OVERRIDES: Map<string, boolean> = new Map();
