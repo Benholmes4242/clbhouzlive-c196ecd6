@@ -82,6 +82,85 @@ function formatPositionParts(p: TrackedPrediction): { base: string; suffix: stri
   return { base, suffix: ordinalSuffix(p.actualPosition) };
 }
 
+/** Last whitespace-delimited token of a player name. "Min Woo Lee" → "Lee". */
+function getSurname(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  return parts[parts.length - 1] || fullName;
+}
+
+/**
+ * Build the live-state headline from the current tracker state.
+ *
+ * Precedence (top wins):
+ *   1. 2+ picks tied for the lead          → "Two of ours share the lead." / "All three share the lead."
+ *   2. 1 leader + 1+ other in T5           → "Young leads — Scheffler in the chase."
+ *   3. 1 leader, no other in T5            → "Young leads our picks."
+ *   4. 2+ picks in T5, no leader           → "Two of ours in the mix." / "All three in the mix."
+ *   5. 1 pick in T5, no leader             → "Young in the mix."
+ *   6. All 3 made the cut, round >= 3      → "All three still standing."
+ *   7. Fallback                            → "Live and in play."
+ *
+ * Returns null when there are no picks yet — caller falls back to the static
+ * editorial headline.
+ */
+function buildLiveHeadline(picks: TrackedPrediction[]): string | null {
+  if (!picks.length) return null;
+
+  const leaders = picks.filter(p => p.actualPosition === 1);
+  const top5 = picks.filter(p => p.actualPosition !== null && p.actualPosition <= 5);
+  const stillIn = picks.filter(
+    p =>
+      p.performanceStatus !== 'cut' &&
+      p.performanceStatus !== 'withdrawn' &&
+      p.actualPosition !== null,
+  );
+  const round = picks[0]?.currentRound ?? null;
+
+  // Rule 1 — tied leaders.
+  if (leaders.length >= 2) {
+    return leaders.length >= 3
+      ? 'All three share the lead.'
+      : 'Two of ours share the lead.';
+  }
+
+  // Rule 2/3 — sole leader.
+  if (leaders.length === 1) {
+    const leader = leaders[0];
+    const chasers = top5
+      .filter(p => p.playerId !== leader.playerId)
+      .sort((a, b) => {
+        const aPos = a.actualPosition ?? 999;
+        const bPos = b.actualPosition ?? 999;
+        if (aPos !== bPos) return aPos - bPos;
+        return a.predictedRank - b.predictedRank;
+      });
+    if (chasers.length >= 1) {
+      return `${getSurname(leader.playerName)} leads — ${getSurname(chasers[0].playerName)} in the chase.`;
+    }
+    return `${getSurname(leader.playerName)} leads our picks.`;
+  }
+
+  // Rule 4 — multi in the mix, no leader.
+  if (top5.length >= 2) {
+    return top5.length >= 3
+      ? 'All three in the mix.'
+      : 'Two of ours in the mix.';
+  }
+
+  // Rule 5 — single pick in the mix, no leader.
+  if (top5.length === 1) {
+    return `${getSurname(top5[0].playerName)} in the mix.`;
+  }
+
+  // Rule 6 — all three survived the cut. Gated on round >= 3.
+  if (round !== null && round >= 3 && stillIn.length === picks.length && picks.length === 3) {
+    return 'All three still standing.';
+  }
+
+  // Rule 7 — generic fallback.
+  return 'Live and in play.';
+}
+
 /** Date range for masthead state label. Always includes month on both sides for clarity. */
 function formatDateRange(startIso: string, endIso: string): string {
   const start = new Date(startIso);
@@ -461,10 +540,15 @@ function LiveStateBlock({
     });
   }, [tracker?.predictions]);
 
+  const dynamicHeadline = useMemo(
+    () => buildLiveHeadline(picks) ?? editorial.headline,
+    [picks, editorial.headline],
+  );
+
   return (
     <div>
       <Eyebrow>{editorial.eyebrow}</Eyebrow>
-      <Headline>{editorial.headline}</Headline>
+      <Headline>{dynamicHeadline}</Headline>
       <Standfirst>{editorial.standfirst}</Standfirst>
 
       {/* Performance band — honest zeros pre-tee-off (per refinement) */}

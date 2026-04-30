@@ -89,9 +89,10 @@ export const INTELLIGENCE_QUOTE_FALLBACK = {
 export const INTELLIGENCE_HERO_FALLBACK = {
   live: {
     eyebrow: 'LIVE INTELLIGENCE',
-    headline: 'Our picks are on the board.',
-    standfirst:
-      'Tracking how the board is reacting to our pre-tournament reads in real time.',
+    /** Static fallback. Used when no picks data has loaded yet. The dynamic
+     *  headline is computed in IntelligenceHero from live tracker state. */
+    headline: 'Live and in play.',
+    standfirst: 'Our picks, tracked in real time.',
   },
   results: {
     win: {
