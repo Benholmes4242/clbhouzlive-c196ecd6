@@ -20,7 +20,7 @@ interface Props {
   connectionCreatedAt: string | null;
 }
 
-const ICONS: Record<string, React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>> = {
+const ICONS: Record<string, React.ComponentType<any>> = {
   Trophy,
   Flame,
   TrendingDown,
