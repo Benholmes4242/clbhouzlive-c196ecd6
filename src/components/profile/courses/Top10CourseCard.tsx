@@ -185,12 +185,12 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                   initial={{ scale: 1 }}
                   animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
                   transition={{ duration: 0.3, ease: 'easeOut' }}
-                  className="text-sm leading-none"
+                  className="text-[13px] leading-none"
                 >
                   {config.emoji}
                 </motion.span>
                 {count > 0 && (
-                  <span className={`text-[10px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
+                  <span className={`text-[9px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
                     {count > 99 ? '99+' : count}
                   </span>
                 )}
