@@ -77,8 +77,10 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     return () => unregisterAudioSource(id);
   }, [feedIndex]);
 
-  const isLandscape = (width ?? 0) > (height ?? 1);
-  const objectFit = isLandscape ? 'contain' : 'cover';
+  const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
+    ? (height as number) / (width as number)
+    : 1.0;
+  const objectFit: 'cover' | 'contain' = aspect >= 1.5 ? 'cover' : 'contain';
 
   // ── Attach/detach HLS ──
   useEffect(() => {
@@ -295,18 +297,18 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       style={{ background: '#111' }}
       onClick={handleTap}
     >
-      {/* Blurred background for letterboxing */}
+      {/* Blur-fill background — extends the image visually beyond its native aspect */}
       {thumbnailUrl && (
         <>
           <img
             src={thumbnailUrl}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'blur(40px)', transform: 'scale(1.15)', opacity: 0.6 }}
+            style={{ filter: 'blur(60px)', transform: 'scale(1.4)', opacity: 0.9 }}
             draggable={false}
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-black/55" />
+          <div className="absolute inset-0 bg-black/25" />
         </>
       )}
       {/* Poster / thumbnail */}

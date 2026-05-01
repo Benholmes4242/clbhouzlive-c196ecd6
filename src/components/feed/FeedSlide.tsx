@@ -136,21 +136,23 @@ export const FeedSlide = memo(function FeedSlide({
     // Single image — apply pinch zoom
     if (media?.[0]?.type === 'image') {
       const first = media[0];
-      const isLandscape = (first.width ?? 0) > (first.height ?? 1);
-      const objectFit = 'contain';
+      const aspect = (first.height ?? 1) > 0 && (first.width ?? 0) > 0
+        ? (first.height as number) / (first.width as number)
+        : 1.0;
+      const objectFit: 'cover' | 'contain' = aspect >= 1.5 ? 'cover' : 'contain';
       const imgSrc = first.imageUrl || first.thumbnailUrl || '';
       return (
         <div className="absolute inset-0 overflow-hidden">
-          {/* Blurred background for letterboxing */}
+          {/* Blur-fill background — extends the image visually beyond its native aspect */}
           <img
             src={imgSrc}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'blur(40px)', transform: 'scale(1.15)', opacity: 0.6 }}
+            style={{ filter: 'blur(60px)', transform: 'scale(1.4)', opacity: 0.9 }}
             draggable={false}
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-black/55" />
+          <div className="absolute inset-0 bg-black/25" />
           {/* Main image with pinch zoom */}
           <div
             ref={zoomRef}
