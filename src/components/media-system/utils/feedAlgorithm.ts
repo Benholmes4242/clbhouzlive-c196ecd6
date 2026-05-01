@@ -156,6 +156,22 @@ export function capPerCreator(posts: FeedPost[]): FeedPost[] {
   });
 }
 
+// ── Per-Course Cap ────────────────────────────────────────────────────────────
+// Drops posts past MAX_POSTS_PER_COURSE for any single course across the
+// candidate pool. Posts without a courseId bypass the cap.
+// Editorial cards always bypass.
+export function capPerCourse(posts: FeedPost[]): FeedPost[] {
+  const courseCount = new Map<string, number>();
+  return posts.filter(post => {
+    if (isEditorialCard(post)) return true;
+    if (!post.courseId) return true;
+    const count = courseCount.get(post.courseId) ?? 0;
+    if (count >= MAX_POSTS_PER_COURSE) return false;
+    courseCount.set(post.courseId, count + 1);
+    return true;
+  });
+}
+
 // ── Orbit Score ───────────────────────────────────────────────────────────────
 function orbitScore(post: FeedPost): number {
   if (isEditorialCard(post)) return EDITORIAL_BASE_SCORE;
