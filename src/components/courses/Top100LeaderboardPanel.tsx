@@ -47,22 +47,28 @@ const Top100LeaderboardPanel = () => {
             borderBottom: '0.5px solid rgba(15,23,42,0.07)',
           }}
         >
-          <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex">
-            {tabs.map((tab) => (
-              <TabsTrigger
-                key={tab.id}
-                value={tab.id}
-                className="flex-1 min-h-[36px] px-2 sm:px-4 text-xs sm:text-sm font-semibold transition-all active:scale-[0.97] shadow-none after:hidden"
-                style={{
-                  borderRadius: 8,
-                  background: tab.id === view ? '#0F172A' : 'transparent',
-                  color: tab.id === view ? '#ffffff' : '#64748B',
-                  border: tab.id === view ? 'none' : '1px solid rgba(15,23,42,0.10)',
-                }}
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
+          <TabsList className="bg-transparent border-0 px-0 py-0 gap-1 w-full flex">
+            {tabs.map((tab) => {
+              const isActive = tab.id === view;
+              return (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className={cn(
+                    "relative flex-1 py-1.5 px-2 text-sm whitespace-nowrap min-h-[44px] transition-colors duration-200 active:scale-[0.98] bg-transparent border-0 shadow-none after:hidden data-[state=active]:bg-transparent data-[state=active]:shadow-none",
+                    isActive ? "font-extrabold" : "font-medium"
+                  )}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: isActive ? '#0F172A' : '#94A3B8',
+                    letterSpacing: isActive ? '-0.01em' : 0,
+                  }}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
         </div>
 
