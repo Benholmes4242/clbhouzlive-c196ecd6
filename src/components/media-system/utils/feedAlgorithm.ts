@@ -18,6 +18,14 @@ const MAX_POSTS_PER_CREATOR = 4;
 const MAX_REVIEWS_PER_CREATOR = 4;
 const MAX_POSTS_PER_COURSE = 3;
 const MAX_POSTS_PER_REGION_PER_PAGE = 6;
+
+// ── Friends Feed Caps (Phase F1) ──────────────────────────────────────────────
+// Looser than Suggested caps because the Friends universe is intentionally
+// narrow — the user already chose these people. The Suggested caps (4 / 3)
+// would silently drop legitimate friend content; F1 uses 6 / 5 with deferral.
+const FRIENDS_MAX_POSTS_PER_CREATOR = 6;
+const FRIENDS_MAX_POSTS_PER_COURSE = 5;
+const FRIENDS_PAGE_SIZE = 10;  // matches Clubhouse hook PAGE_SIZE
 const REGION_CAP_PAGE_SIZE = 10;
 const DECAY_LAMBDA = 0.035;
 const ENTROPY_FLOOR = 0.82;
@@ -300,6 +308,96 @@ function interleaveReviewsIntoFeed(regular: FeedPost[], reviews: FeedPost[]): Fe
     else break;
     slot = slot < 5 ? slot + 1 : 1;
   }
+  return out;
+}
+
+// ── Friends Feed: Adaptive Review Cadence (Phase F1) ──────────────────────────
+// Computes the natural review-to-total ratio in the candidate pool, then
+// interleaves reviews at that ratio. Cadence clamped to [2, 10].
+function adaptiveReviewInterleave(
+  regular: FeedPost[],
+  reviews: FeedPost[]
+): FeedPost[] {
+  if (reviews.length === 0) return regular;
+  if (regular.length === 0) return reviews;
+
+  const total = regular.length + reviews.length;
+  const reviewRatio = reviews.length / total;
+  const rawCadence = Math.round(1 / reviewRatio);
+  const cadence = Math.max(2, Math.min(10, rawCadence));
+
+  const out: FeedPost[] = [];
+  let ri = 0, regi = 0, slot = 1;
+  while (regi < regular.length || ri < reviews.length) {
+    if (slot === cadence && ri < reviews.length) {
+      out.push(reviews[ri++]);
+      slot = 1;
+    } else if (regi < regular.length) {
+      out.push(regular[regi++]);
+      slot++;
+    } else if (ri < reviews.length) {
+      out.push(reviews[ri++]);
+      slot = 1;
+    } else {
+      break;
+    }
+  }
+  return out;
+}
+
+// ── Friends Feed: Cap with Deferral (Phase F1) ────────────────────────────────
+// Walks the chronological feed in PAGE_SIZE windows. Posts exceeding per-creator
+// or per-course limits are deferred to the next page rather than dropped.
+function capWithDeferral(posts: FeedPost[]): FeedPost[] {
+  const out: FeedPost[] = [];
+  let queue: FeedPost[] = [...posts];
+
+  while (queue.length > 0) {
+    const pageBudget = FRIENDS_PAGE_SIZE;
+    const creatorCount = new Map<string, number>();
+    const courseCount = new Map<string, number>();
+    const deferred: FeedPost[] = [];
+    let placedThisPage = 0;
+
+    while (queue.length > 0 && placedThisPage < pageBudget) {
+      const post = queue.shift()!;
+
+      if (isEditorialCard(post)) {
+        out.push(post);
+        placedThisPage++;
+        continue;
+      }
+
+      const creatorKey = post.userId;
+      const courseKey = post.courseId;
+      const creatorN = creatorCount.get(creatorKey) ?? 0;
+      const courseN = courseKey ? (courseCount.get(courseKey) ?? 0) : 0;
+
+      if (creatorN >= FRIENDS_MAX_POSTS_PER_CREATOR) {
+        deferred.push(post);
+        continue;
+      }
+      if (courseKey && courseN >= FRIENDS_MAX_POSTS_PER_COURSE) {
+        deferred.push(post);
+        continue;
+      }
+
+      creatorCount.set(creatorKey, creatorN + 1);
+      if (courseKey) courseCount.set(courseKey, courseN + 1);
+      out.push(post);
+      placedThisPage++;
+    }
+
+    // Prepend deferred to the queue for the next page window.
+    queue = [...deferred, ...queue];
+
+    // Termination guard: if zero progress was made this round, append rest and exit.
+    if (deferred.length > 0 && placedThisPage === 0) {
+      out.push(...queue);
+      break;
+    }
+  }
+
   return out;
 }
 
