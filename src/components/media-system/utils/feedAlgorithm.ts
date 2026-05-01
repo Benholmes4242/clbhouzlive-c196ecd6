@@ -472,11 +472,12 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const capped = capPerCreator(filtered);
   const courseCapped = capPerCourse(capped);
 
-  // Score every post
-  const scored = courseCapped
-    .map(p => ({ post: p, score: orbitScore(p) }))
-    .sort((a, b) => b.score - a.score)
-    .map(({ post }) => post);
+  // Phase 3: posts arrive pre-sorted from the server by orbit score (carried in
+  // engagementScore). Editorials were merged in with EDITORIAL_BASE_SCORE — a
+  // single sort places them in their relative positions among server-scored posts.
+  const scored = [...courseCapped].sort((a, b) =>
+    (b.engagementScore ?? 0) - (a.engagementScore ?? 0)
+  );
 
   // Apply diversity and media balance
   const diverse = applyCreatorDiversity(scored);
