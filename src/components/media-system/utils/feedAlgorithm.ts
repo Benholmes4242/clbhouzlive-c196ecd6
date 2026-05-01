@@ -458,7 +458,7 @@ function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
   const firstPage = withEditorials.slice(0, REVIEW_FLOOR_PAGE_SIZE);
   const usedReviewIds = new Set(firstPage.filter(isReviewPost).map(p => p.id));
   const unusedReviews = reviews.filter(r => !usedReviewIds.has(r.id));
-  const { feed: floored, floorEnforced } = enforceReviewFloor(withEditorials, unusedReviews);
+  const { feed: floored, floorEnforced, displacedCount } = enforceReviewFloor(withEditorials, unusedReviews);
 
   // ── Observability (Session B): strip after ~2 weeks of clean telemetry ──
   if (process.env.NODE_ENV === 'development') {
@@ -468,6 +468,7 @@ function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
       reviewCount: pg.filter(isReviewPost).length,
       editorialCount: pg.filter(isEditorialCard).length,
       floorEnforced,
+      displacedCount,
       reviewBucketRemaining: unusedReviews.length,
     });
   }
