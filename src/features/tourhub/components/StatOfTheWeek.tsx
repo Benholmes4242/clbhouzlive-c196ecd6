@@ -210,7 +210,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               padding: 0,
               cursor: 'pointer',
               textAlign: 'left',
-              marginBottom: isPga ? 14 : 4,
+              marginBottom: 0,
             }}
             aria-label={`Change category. Current: ${category.gamifiedTitle}`}
           >
