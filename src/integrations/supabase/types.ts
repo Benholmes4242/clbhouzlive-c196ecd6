@@ -16733,9 +16733,21 @@ export type Database = {
       }
       get_suggested_feed: {
         Args: {
+          p_boost_country_match?: number
+          p_boost_followed?: number
+          p_boost_mutual_friends?: number
+          p_boost_rated_course?: number
+          p_boost_top100_list?: number
           p_cursor?: string
+          p_engagement_per_comment?: number
+          p_engagement_per_like?: number
+          p_entropy_floor?: number
+          p_entropy_range?: number
+          p_freshness_base?: number
+          p_freshness_half_life_hours?: number
           p_mode?: string
           p_page_size?: number
+          p_review_bonus?: number
           p_seen_post_ids?: string[]
           p_user_id: string
         }
