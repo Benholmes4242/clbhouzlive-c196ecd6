@@ -18,6 +18,7 @@ import FriendsLeaderboard from './sections/FriendsLeaderboard';
 import HeadToHeadCard from './sections/HeadToHeadCard';
 import AchievementsStrip from './sections/AchievementsStrip';
 import CourseFormCard from './sections/CourseFormCard';
+import TryNextCourses from './sections/TryNextCourses';
 import PredictionsCard from './sections/PredictionsCard';
 import InvitesSection from './sections/InvitesSection';
 
@@ -273,6 +274,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
 
       {/* NEW — course form + predictions */}
       <CourseFormCard connectionId={connection.id} currentHandicap={currentHandicap} />
+      <TryNextCourses userId={userId} />
       <PredictionsCard connectionId={connection.id} />
 
       {/* RECENT ROUNDS */}
