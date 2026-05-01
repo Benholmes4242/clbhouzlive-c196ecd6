@@ -6,6 +6,7 @@ import WatchSectionHeader from './WatchSectionHeader';
 // the page composition (UnifiedWatchFeed); rails no longer render their own.
 import { HRail } from './proshop/HRail';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface ContinueWatchingRailProps {
   userId: string | undefined;
@@ -18,7 +19,9 @@ interface ContinueWatchingRailProps {
  * Tapping a tile resumes the fullscreen viewer at the saved progress.
  */
 export default function ContinueWatchingRail({ userId }: ContinueWatchingRailProps) {
-  const { posts, isLoading } = useContinueWatching(userId, 10);
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
+  const { posts, isLoading } = useContinueWatching(userId, actor, 10);
 
   if (!userId || isLoading || posts.length === 0) return null;
 
