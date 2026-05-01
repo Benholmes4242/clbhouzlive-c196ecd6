@@ -1,5 +1,6 @@
 import React from 'react';
 import ProfileHandicapView from './handicap/ProfileHandicapView';
+import WhsHandicapTab from './handicap/whs/WhsHandicapTab';
 
 interface HandicapSectionProps {
   userId: string;
@@ -12,13 +13,19 @@ interface HandicapSectionProps {
   isOwnProfile?: boolean;
 }
 
-const HandicapSection: React.FC<HandicapSectionProps> = ({ 
-  userId, 
-  profile, 
-  isOwnProfile = false 
+const HandicapSection: React.FC<HandicapSectionProps> = ({
+  userId,
+  profile,
+  isOwnProfile = false,
 }) => {
+  // Own profile gets the new England Golf (WHS) connect / dashboard flow.
+  // Other users still see the read-only manual handicap view.
+  if (isOwnProfile && userId) {
+    return <WhsHandicapTab userId={userId} />;
+  }
+
   return (
-    <ProfileHandicapView 
+    <ProfileHandicapView
       userId={userId}
       profile={profile}
       isOwnProfile={isOwnProfile}

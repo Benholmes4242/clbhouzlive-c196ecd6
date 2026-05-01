@@ -14030,6 +14030,354 @@ export type Database = {
           },
         ]
       }
+      whs_connections: {
+        Row: {
+          consecutive_failures: number
+          created_at: string
+          id: string
+          initial_sync_complete: boolean
+          last_sync_error: string | null
+          last_sync_status: string | null
+          last_synced_at: string | null
+          membership_number: string
+          next_sync_after: string | null
+          passport_id: number
+          provider: Database["public"]["Enums"]["whs_provider"]
+          updated_at: string
+          user_id: string
+          vault_secret_id: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          created_at?: string
+          id?: string
+          initial_sync_complete?: boolean
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          last_synced_at?: string | null
+          membership_number: string
+          next_sync_after?: string | null
+          passport_id: number
+          provider?: Database["public"]["Enums"]["whs_provider"]
+          updated_at?: string
+          user_id: string
+          vault_secret_id: string
+        }
+        Update: {
+          consecutive_failures?: number
+          created_at?: string
+          id?: string
+          initial_sync_complete?: boolean
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          last_synced_at?: string | null
+          membership_number?: string
+          next_sync_after?: string | null
+          passport_id?: number
+          provider?: Database["public"]["Enums"]["whs_provider"]
+          updated_at?: string
+          user_id?: string
+          vault_secret_id?: string
+        }
+        Relationships: []
+      }
+      whs_courses: {
+        Row: {
+          country_code: string | null
+          country_name: string | null
+          created_at: string
+          id: string
+          is_linked_to_multi_course_club: boolean
+          last_seen_course_rating: number | null
+          last_seen_marker_name: string | null
+          last_seen_slope_rating: number | null
+          name: string
+          provider: Database["public"]["Enums"]["whs_provider"]
+          updated_at: string
+          upstream_course_id: number
+        }
+        Insert: {
+          country_code?: string | null
+          country_name?: string | null
+          created_at?: string
+          id?: string
+          is_linked_to_multi_course_club?: boolean
+          last_seen_course_rating?: number | null
+          last_seen_marker_name?: string | null
+          last_seen_slope_rating?: number | null
+          name: string
+          provider: Database["public"]["Enums"]["whs_provider"]
+          updated_at?: string
+          upstream_course_id: number
+        }
+        Update: {
+          country_code?: string | null
+          country_name?: string | null
+          created_at?: string
+          id?: string
+          is_linked_to_multi_course_club?: boolean
+          last_seen_course_rating?: number | null
+          last_seen_marker_name?: string | null
+          last_seen_slope_rating?: number | null
+          name?: string
+          provider?: Database["public"]["Enums"]["whs_provider"]
+          updated_at?: string
+          upstream_course_id?: number
+        }
+        Relationships: []
+      }
+      whs_friends: {
+        Row: {
+          connection_id: string
+          first_seen_at: string
+          friend_gender: string | null
+          friend_handicap_index: number | null
+          friend_home_club: string | null
+          friend_name: string
+          friend_passport_id: number
+          friend_privacy_mode: string | null
+          friend_thumbnail_url: string | null
+          id: string
+          last_round_adjusted_gross: number | null
+          last_round_course_name: string | null
+          last_round_played_at: string | null
+          last_seen_at: string
+        }
+        Insert: {
+          connection_id: string
+          first_seen_at?: string
+          friend_gender?: string | null
+          friend_handicap_index?: number | null
+          friend_home_club?: string | null
+          friend_name: string
+          friend_passport_id: number
+          friend_privacy_mode?: string | null
+          friend_thumbnail_url?: string | null
+          id?: string
+          last_round_adjusted_gross?: number | null
+          last_round_course_name?: string | null
+          last_round_played_at?: string | null
+          last_seen_at?: string
+        }
+        Update: {
+          connection_id?: string
+          first_seen_at?: string
+          friend_gender?: string | null
+          friend_handicap_index?: number | null
+          friend_home_club?: string | null
+          friend_name?: string
+          friend_passport_id?: number
+          friend_privacy_mode?: string | null
+          friend_thumbnail_url?: string | null
+          id?: string
+          last_round_adjusted_gross?: number | null
+          last_round_course_name?: string | null
+          last_round_played_at?: string | null
+          last_seen_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whs_handicap_snapshots: {
+        Row: {
+          connection_id: string
+          handicap_index: number
+          id: number
+          observed_at: string
+        }
+        Insert: {
+          connection_id: string
+          handicap_index: number
+          id?: number
+          observed_at?: string
+        }
+        Update: {
+          connection_id?: string
+          handicap_index?: number
+          id?: number
+          observed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_handicap_snapshots_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whs_score_holes: {
+        Row: {
+          actual_gross: number | null
+          adjusted_gross: number | null
+          distance_yards: number | null
+          hole_alias: string | null
+          hole_no: number
+          id: number
+          par: number
+          played: boolean
+          score_id: string
+          stroke_index: number | null
+          strokes_allowed: number
+        }
+        Insert: {
+          actual_gross?: number | null
+          adjusted_gross?: number | null
+          distance_yards?: number | null
+          hole_alias?: string | null
+          hole_no: number
+          id?: number
+          par: number
+          played?: boolean
+          score_id: string
+          stroke_index?: number | null
+          strokes_allowed?: number
+        }
+        Update: {
+          actual_gross?: number | null
+          adjusted_gross?: number | null
+          distance_yards?: number | null
+          hole_alias?: string | null
+          hole_no?: number
+          id?: number
+          par?: number
+          played?: boolean
+          score_id?: string
+          stroke_index?: number | null
+          strokes_allowed?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_score_holes_score_id_fkey"
+            columns: ["score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whs_scores: {
+        Row: {
+          actual_gross: number | null
+          adjusted_gross: number | null
+          all_holes_attempted: boolean
+          capture_date: string | null
+          connection_id: string
+          course_handicap: number | null
+          course_id: string | null
+          course_rating: number | null
+          created_at: string
+          handicap_differential: number | null
+          handicap_index_at_time: number | null
+          hole_by_hole_fetched: boolean
+          id: string
+          is_competition_score: boolean
+          is_considered: boolean
+          is_counter: boolean
+          is_eligible_for_handicapping: boolean
+          is_nine_hole: boolean
+          is_penalty_score: boolean
+          marker_name: string | null
+          pcc: number | null
+          permalink_url: string | null
+          play_date: string
+          raw_payload: Json | null
+          slope_rating: number | null
+          stableford_points: number | null
+          total_holes: number
+          updated_at: string
+          upstream_score_id: number | null
+          whs_score_uid: string | null
+        }
+        Insert: {
+          actual_gross?: number | null
+          adjusted_gross?: number | null
+          all_holes_attempted?: boolean
+          capture_date?: string | null
+          connection_id: string
+          course_handicap?: number | null
+          course_id?: string | null
+          course_rating?: number | null
+          created_at?: string
+          handicap_differential?: number | null
+          handicap_index_at_time?: number | null
+          hole_by_hole_fetched?: boolean
+          id?: string
+          is_competition_score?: boolean
+          is_considered?: boolean
+          is_counter?: boolean
+          is_eligible_for_handicapping?: boolean
+          is_nine_hole?: boolean
+          is_penalty_score?: boolean
+          marker_name?: string | null
+          pcc?: number | null
+          permalink_url?: string | null
+          play_date: string
+          raw_payload?: Json | null
+          slope_rating?: number | null
+          stableford_points?: number | null
+          total_holes: number
+          updated_at?: string
+          upstream_score_id?: number | null
+          whs_score_uid?: string | null
+        }
+        Update: {
+          actual_gross?: number | null
+          adjusted_gross?: number | null
+          all_holes_attempted?: boolean
+          capture_date?: string | null
+          connection_id?: string
+          course_handicap?: number | null
+          course_id?: string | null
+          course_rating?: number | null
+          created_at?: string
+          handicap_differential?: number | null
+          handicap_index_at_time?: number | null
+          hole_by_hole_fetched?: boolean
+          id?: string
+          is_competition_score?: boolean
+          is_considered?: boolean
+          is_counter?: boolean
+          is_eligible_for_handicapping?: boolean
+          is_nine_hole?: boolean
+          is_penalty_score?: boolean
+          marker_name?: string | null
+          pcc?: number | null
+          permalink_url?: string | null
+          play_date?: string
+          raw_payload?: Json | null
+          slope_rating?: number | null
+          stableford_points?: number | null
+          total_holes?: number
+          updated_at?: string
+          upstream_score_id?: number | null
+          whs_score_uid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_scores_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "whs_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       admin_audit_feed: {
@@ -18573,6 +18921,15 @@ export type Database = {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean
       }
+      vault_create_secret: {
+        Args: {
+          new_description?: string
+          new_name?: string
+          new_secret: string
+        }
+        Returns: string
+      }
+      vault_decrypt_secret: { Args: { secret_id: string }; Returns: string }
       verify_domain_code: {
         Args: { p_code: string; p_verification_id: string }
         Returns: Json
@@ -18653,6 +19010,7 @@ export type Database = {
         | "brand"
         | "creator"
         | "personal"
+      whs_provider: "england_golf"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -18865,6 +19223,7 @@ export const Constants = {
         "creator",
         "personal",
       ],
+      whs_provider: ["england_golf"],
     },
   },
 } as const
