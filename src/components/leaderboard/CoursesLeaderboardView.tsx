@@ -1,12 +1,10 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCourseLeaderboard, CourseSortType } from '@/hooks/useCourseLeaderboard';
-import { useSpotlightCourse } from '@/hooks/useSpotlightCourse';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
 import { RefreshCw, WifiOff } from 'lucide-react';
 
 const PAGE_SIZE = 20;
@@ -215,8 +213,7 @@ export function CoursesLeaderboardView() {
     };
   }, [masthead, sort]);
 
-  // ─── Spotlight ─────────────────────────────────────────────────────
-  const { data: spotlight, isLoading: spotlightLoading } = useSpotlightCourse();
+  // ─── (Spotlight removed in F1 — masthead course is the single hero) ──
 
   // ─── User played count + total in list ─────────────────────────────
   const { data: playedStats = { played: 0, total: 0 } } = useQuery<{ played: number; total: number }>({
