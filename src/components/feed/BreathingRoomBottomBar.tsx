@@ -261,23 +261,14 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               (t) => (t.end_index ?? 0) <= displayText.length,
             );
 
+            // Plain div wrapper — no interactive nesting. Mentions inside
+            // PostContentWithTags receive their own click events directly.
+            // The "more / less" toggle is a sibling button rendered only when long.
             return (
-              <button
-                type="button"
-                onClick={(e) => {
-                  if (!isLong) return;
-                  e.stopPropagation();
-                  setCaptionExpanded(!captionExpanded);
-                }}
+              <div
                 style={{
                   display: 'block',
                   width: '100%',
-                  textAlign: 'left',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  margin: 0,
-                  cursor: isLong ? 'pointer' : 'default',
                   color: '#fff',
                   fontSize: 13,
                   fontWeight: 400,
@@ -286,19 +277,37 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                   textShadow: '0 1px 3px rgba(0,0,0,0.55)',
                   wordBreak: 'break-word',
                 }}
-                aria-expanded={captionExpanded}
-                aria-label={isLong ? (showFull ? 'Show less' : 'Show more') : undefined}
               >
                 <PostContentWithTags content={displayText} tags={displayTags} />
                 {isLong && (
                   <>
                     {showFull ? ' ' : '… '}
-                    <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCaptionExpanded(!captionExpanded);
+                      }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0,
+                        margin: 0,
+                        cursor: 'pointer',
+                        color: 'rgba(255,255,255,0.6)',
+                        fontWeight: 600,
+                        fontSize: 'inherit',
+                        fontFamily: 'inherit',
+                        lineHeight: 'inherit',
+                      }}
+                      aria-expanded={captionExpanded}
+                      aria-label={showFull ? 'Show less' : 'Show more'}
+                    >
                       {showFull ? 'less' : 'more'}
-                    </span>
+                    </button>
                   </>
                 )}
-              </button>
+              </div>
             );
           })()}
       </div>

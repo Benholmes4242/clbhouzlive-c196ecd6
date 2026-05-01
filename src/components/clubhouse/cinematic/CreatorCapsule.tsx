@@ -260,13 +260,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {tags.length > 0 ? (
-            <div style={{ ['--mention-color' as any]: 'rgba(255,255,255,0.90)' }}>
-              <PostContentWithTags
-                content={cleanCaption}
-                tags={tags}
-                className="text-[13px] leading-relaxed text-white/90"
-              />
-            </div>
+            <PostContentWithTags
+              content={cleanCaption}
+              tags={tags}
+              className="text-[13px] leading-relaxed text-white/90"
+            />
           ) : (
             <p className="text-[13px] leading-relaxed text-white/90">{cleanCaption}</p>
           )}
@@ -580,7 +578,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
         {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
-          <div className="text-[11px] text-white line-clamp-1 mt-0.5" style={{ ['--mention-color' as any]: 'rgba(255,255,255,0.75)' }}>
+          <div className="text-[11px] text-white line-clamp-1 mt-0.5">
             {tags.length > 0 ? (
               <PostContentWithTags
                 content={truncatedCaption}

@@ -109,6 +109,19 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
   const tags = activePost.tags ?? [];
 
+  // TEMP DIAGNOSTIC — Suspect 1 verification. Remove once confirmed.
+  // Logs the tags array for the active post. If empty for posts known to
+  // have @mentions, RPC body is dropping post_tags and needs a SQL patch.
+  if (process.env.NODE_ENV !== 'production' && activePost.caption?.includes('@')) {
+    // eslint-disable-next-line no-console
+    console.log('[mentions-audit]', {
+      postId: activePost.id,
+      caption: activePost.caption,
+      tagsCount: tags.length,
+      tags,
+    });
+  }
+
   // Action rail creator — same data as bottom-bar author, slightly different shape
   const creator = {
     id: activePost.userId,
