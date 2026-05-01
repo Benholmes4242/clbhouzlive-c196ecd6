@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +9,8 @@ import { HRail } from '../proshop/HRail';
 import { Pin } from '../proshop/Pin';
 import type { ClipsMoodId } from './hooks/useClipsMood';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { fetchLikedPostIds } from '@/lib/likedPostIds';
 
 interface ClipsMostLovedRailProps {
   userId: string | undefined;
@@ -106,10 +108,29 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
     gcTime: 30 * 60 * 1000,
   });
 
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
+
+  const rows = useMemo(
+    () => (rowsRaw.length ? diversifyByCreator(rowsRaw).slice(0, 10) : []),
+    [rowsRaw],
+  );
+  const postIds = useMemo(() => rows.map((r) => r.post_id), [rows]);
+
+  const { data: likedIds = new Set<string>() } = useQuery({
+    queryKey: ['clips-most-loved-liked', actor?.id, actor?.type, postIds.join(',')],
+    queryFn: () => fetchLikedPostIds(postIds, actor),
+    enabled: postIds.length > 0,
+    staleTime: 60_000,
+  });
+
   if (isLoading || rowsRaw.length === 0) return null;
 
-  const rows = diversifyByCreator(rowsRaw).slice(0, 10);
-  const allPosts = rows.map(rowToFullscreenPost);
+  const allPosts = rows.map((r) => {
+    const p = rowToFullscreenPost(r);
+    p.isLikedByMe = likedIds.has(r.post_id);
+    return p;
+  });
 
   return (
     <section>
