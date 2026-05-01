@@ -182,7 +182,7 @@ export async function fetchFriendsLeaderboard(ownerUserId: string): Promise<WhsF
     .eq('owner_user_id', ownerUserId)
     .order('friend_handicap_index', { ascending: true, nullsFirst: false });
   if (error) throw error;
-  return (data ?? []) as WhsFriendMatch[];
+  return (data ?? []) as unknown as WhsFriendMatch[];
 }
 
 export async function fetchFriendsActivity(
@@ -197,7 +197,7 @@ export async function fetchFriendsActivity(
     .order('last_round_played_at', { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []) as WhsFriendMatch[];
+  return (data ?? []) as unknown as WhsFriendMatch[];
 }
 
 export async function fetchSentInvites(): Promise<WhsInviteStatus[]> {
@@ -206,7 +206,7 @@ export async function fetchSentInvites(): Promise<WhsInviteStatus[]> {
     .select('*')
     .order('sent_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []) as WhsInviteStatus[];
+  return (data ?? []) as unknown as WhsInviteStatus[];
 }
 
 export async function callCreateInvite(
