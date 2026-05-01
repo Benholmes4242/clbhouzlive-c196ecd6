@@ -178,7 +178,7 @@ function orbitScore(post: FeedPost): number {
   // Layer 4: Session entropy — ±16% jitter keeps feed feeling fresh each session
   const jitter = ENTROPY_FLOOR + seededRandom(post.id) * ENTROPY_RANGE;
 
-  return (freshnessScore + engagementBonus) * reviewMultiplier * jitter;
+  return (freshnessScore + engagementBonus) * reviewMultiplier * jitter * computePersonalBoost(post);
 }
 
 // ── Diversity Pass ────────────────────────────────────────────────────────────
