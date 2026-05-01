@@ -1126,7 +1126,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             borderTop: '3px double #0F172A',
             borderBottom: '3px double #0F172A',
             padding: '16px 4px',
-            background: '#fff',
+            background: 'transparent',
             position: 'relative',
           }}>
             <div style={{
