@@ -1,95 +1,231 @@
 import React from 'react';
 import { useCourseForm } from '@/lib/whs/hooks';
+import SectionHeader from './SectionHeader';
 
 interface Props {
   connectionId: string;
   currentHandicap: number | null | undefined;
 }
 
-const MAX_BAR = 5; // strokes either side
+const HAIRLINE = '1px solid rgba(15,23,42,0.10)';
+const GREEN = '#059669';
+const RED = '#9F1D1D';
+const MAX_BAR_STROKES = 5;
+const TOP_N = 5;
+
+const SkeletonRow: React.FC = () => (
+  <div
+    style={{
+      padding: '14px 20px',
+      borderBottom: HAIRLINE,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+      height: 56,
+    }}
+  >
+    <div
+      className="animate-pulse"
+      style={{
+        height: 14,
+        flex: 1,
+        maxWidth: 180,
+        background: 'rgba(15,23,42,0.06)',
+        borderRadius: 4,
+      }}
+    />
+    <div
+      className="animate-pulse"
+      style={{
+        height: 18,
+        width: 48,
+        background: 'rgba(15,23,42,0.06)',
+        borderRadius: 4,
+      }}
+    />
+  </div>
+);
 
 export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { data, isLoading } = useCourseForm(connectionId, currentHandicap);
 
   if (currentHandicap === null || currentHandicap === undefined) return null;
 
-  return (
-    <section className="px-5 mb-6">
-      <div className="mb-2">
-        <h3 className="text-[16px] font-bold text-foreground">Course form</h3>
-        <p className="text-[12px] text-muted-foreground">Where you play above your handicap</p>
-      </div>
-
-      {isLoading ? (
-        <div className="space-y-2 animate-pulse">
+  if (isLoading) {
+    return (
+      <section style={{ marginBottom: 32 }}>
+        <SectionHeader
+          eyebrow="Course Form"
+          title="How you play, course by course"
+          sub="Loading..."
+        />
+        <div style={{ borderTop: HAIRLINE }}>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-10 bg-muted/50 rounded" />
+            <SkeletonRow key={i} />
           ))}
         </div>
-      ) : !data || data.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground">
-          Play more rounds to see where you over-perform.
+      </section>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <section style={{ marginBottom: 32 }}>
+        <SectionHeader
+          eyebrow="Course Form"
+          title="How you play, course by course"
+        />
+        <p
+          style={{
+            padding: '24px 20px',
+            fontSize: 13,
+            color: 'rgba(15,23,42,0.55)',
+            fontStyle: 'italic',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
+          Play more rounds to see how each course suits your game.
         </p>
-      ) : (
-        <div className="space-y-3">
-          {data.slice(0, 3).map((c) => {
-            const better = c.delta < 0;
-            const magnitude = Math.min(Math.abs(c.delta), MAX_BAR);
-            const widthPct = (magnitude / MAX_BAR) * 50; // 50% half-line
-            return (
+      </section>
+    );
+  }
+
+  // Sort worst-first (largest positive delta first), then take top N
+  const rows = [...data]
+    .sort((a, b) => b.delta - a.delta)
+    .slice(0, TOP_N);
+
+  return (
+    <section style={{ marginBottom: 32 }}>
+      <SectionHeader
+        eyebrow="Course Form"
+        title="How you play, course by course"
+        sub="Your average vs your handicap. Worst form first."
+      />
+      <div style={{ borderTop: HAIRLINE }}>
+        {rows.map((c) => {
+          const isBetter = c.delta < 0;
+          const isZero = c.delta === 0;
+          const color = isZero ? 'rgba(15,23,42,0.45)' : isBetter ? GREEN : RED;
+          const magnitude = Math.min(Math.abs(c.delta), MAX_BAR_STROKES);
+          const fillPct = (magnitude / MAX_BAR_STROKES) * 50;
+          const sign = isBetter ? '−' : c.delta > 0 ? '+' : '';
+          return (
+            <div
+              key={c.course_id}
+              style={{
+                padding: '14px 20px',
+                borderBottom: HAIRLINE,
+              }}
+            >
+              {/* Top row */}
               <div
-                key={c.course_id}
-                className="rounded-xl border p-3"
-                style={{ borderColor: 'rgba(15,23,42,0.08)' }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  marginBottom: 6,
+                }}
               >
-                <div className="flex items-baseline justify-between mb-2">
-                  <p className="text-[15px] font-semibold text-foreground truncate">
-                    {c.course_name}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground tabular-nums flex-shrink-0 ml-2">
-                    {c.rounds_played} {c.rounds_played === 1 ? 'round' : 'rounds'}
-                  </p>
-                </div>
-
-                {/* Bar */}
-                <div className="relative h-2 mb-2">
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div
-                    className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px"
-                    style={{ background: 'rgba(15,23,42,0.10)' }}
-                  />
-                  <div
-                    className="absolute top-0 bottom-0 w-px"
                     style={{
-                      left: '50%',
-                      background: 'rgba(15,23,42,0.30)',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      letterSpacing: '-0.005em',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
-                  />
-                  <div
-                    className="absolute top-0 bottom-0 rounded-full"
-                    style={{
-                      ...(better
-                        ? { right: '50%', width: `${widthPct}%` }
-                        : { left: '50%', width: `${widthPct}%` }),
-                      background: better ? '#10B981' : '#DC2626',
-                      opacity: 0.8,
-                    }}
-                  />
-                </div>
-
-                <p className="text-[12px] text-muted-foreground">
-                  <span
-                    className="font-semibold tabular-nums"
-                    style={{ color: better ? '#059669' : '#B91C1C' }}
                   >
-                    {Math.abs(c.delta).toFixed(1)} strokes {better ? 'better' : 'worse'}
-                  </span>{' '}
-                  than your handicap
-                </p>
+                    {c.course_name}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'rgba(15,23,42,0.55)',
+                      marginTop: 2,
+                    }}
+                  >
+                    {c.rounds_played} {c.rounds_played === 1 ? 'round' : 'rounds'}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 18,
+                      fontWeight: 900,
+                      letterSpacing: '-0.02em',
+                      fontVariantNumeric: 'tabular-nums',
+                      color,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {sign}
+                    {Math.abs(c.delta).toFixed(1)}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      color: 'rgba(15,23,42,0.45)',
+                      letterSpacing: '0.12em',
+                      marginTop: 2,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    vs hcp
+                  </div>
+                </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              {/* Center-anchored magnitude bar */}
+              <div
+                style={{
+                  position: 'relative',
+                  height: 4,
+                  background: 'rgba(15,23,42,0.06)',
+                  borderRadius: 2,
+                }}
+              >
+                {/* Center line */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '50%',
+                    top: 0,
+                    bottom: 0,
+                    width: 1,
+                    background: 'rgba(15,23,42,0.25)',
+                  }}
+                />
+                {/* Fill */}
+                {!isZero && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      borderRadius: 2,
+                      background: color,
+                      width: `${fillPct}%`,
+                      ...(isBetter
+                        ? { left: `${50 - fillPct}%` }
+                        : { left: '50%' }),
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 };
