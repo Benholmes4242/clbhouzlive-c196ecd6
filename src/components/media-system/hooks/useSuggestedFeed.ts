@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { FeedPost, FeedRpcRow } from '../types/media';
-import { deduplicatePosts, initSessionSeed } from '../utils/feedAlgorithm';
+import { deduplicatePosts } from '../utils/feedAlgorithm';
 import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
 
 const PAGE_SIZE = 60;
@@ -14,9 +14,6 @@ export function useSuggestedFeed(userId: string | undefined) {
     queryKey: ['media-feed', 'suggested', userId],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined, rawRowCount: 0 };
-
-      // Seed the session entropy for this user+hour combination
-      if (userId) initSessionSeed(userId);
 
       try {
         const cursor = typeof pageParam === 'string' ? pageParam : undefined;

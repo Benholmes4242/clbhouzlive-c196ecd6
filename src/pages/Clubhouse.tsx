@@ -36,7 +36,7 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { usePGACard } from '@/components/media-system/hooks/usePGACard';
 import { useEditorialCards } from '@/components/media-system/hooks/useEditorialCards';
-import { buildSuggestedFeedWithEditorials, initSessionSeed } from '@/components/media-system/utils/feedAlgorithm';
+import { buildSuggestedFeedWithEditorials } from '@/components/media-system/utils/feedAlgorithm';
 import type { FeedPost, PGACardFeedPost, CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
@@ -176,9 +176,6 @@ const ClubhouseContent = () => {
   
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      // Seed session entropy here — userId is available in this scope
-      if (user?.id) initSessionSeed(user.id);
-
       return buildSuggestedFeedWithEditorials(
         activeFeed.posts,
         [
