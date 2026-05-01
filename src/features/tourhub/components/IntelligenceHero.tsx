@@ -579,8 +579,17 @@ function LiveStateBlock({
         {picks.length === 0 && data?.topContenders.slice(0, 3).map((p) => (
           <UpcomingPickRow key={p.playerId} contender={p} />
         ))}
-        {picks.slice(0, 3).map((p) => (
-          <LivePickRow key={p.playerId} pick={p} />
+        {picks.slice(0, 3).map((p, i) => (
+          <ExpandablePickRow
+            key={p.playerId}
+            playerId={p.playerId}
+            playerName={p.playerName}
+            reasons={p.reasons}
+            collapsedReasonPreview={p.reasons[0]}
+            defaultExpanded={i === 0}
+            tier={i === 0 ? 'TOP PICK' : i === 1 ? 'STRONG' : 'CONTENTION'}
+            trailing={<LiveTrailing pick={p} />}
+          />
         ))}
       </div>
     </div>
@@ -1322,6 +1331,43 @@ function ResultsTrailing({ pick }: { pick: TrackedPrediction }) {
         {positionStr}
       </div>
       <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+        {scoreStr}
+      </div>
+    </div>
+  );
+}
+
+function LiveTrailing({ pick }: { pick: TrackedPrediction }) {
+  const { base: positionBase, suffix: positionSuffix } = formatPositionParts(pick);
+  const scoreStr = formatScore(pick.score);
+
+  return (
+    <div
+      style={{
+        textAlign: 'right',
+        fontVariantNumeric: 'tabular-nums',
+        flexShrink: 0,
+        marginRight: 4,
+        minWidth: 44,
+      }}
+    >
+      <div style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+        {positionBase}
+        {positionSuffix && (
+          <span style={{ fontSize: 9, fontWeight: 700, marginLeft: 1 }}>
+            {positionSuffix}
+          </span>
+        )}
+      </div>
+      <div
+        style={{
+          marginTop: 4,
+          fontSize: 10,
+          fontWeight: 700,
+          color: 'rgba(255,255,255,0.55)',
+          lineHeight: 1,
+        }}
+      >
         {scoreStr}
       </div>
     </div>
