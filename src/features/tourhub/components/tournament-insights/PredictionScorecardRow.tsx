@@ -5,7 +5,7 @@
  * Live layout:      [Avatar] [Name + Score] ... [Position/Off Lead]
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
