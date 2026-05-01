@@ -30,6 +30,13 @@ const Top100LeaderboardPanel = () => {
     setSearchParams(nextParams, { replace: true });
   };
 
+  const tabs = [
+    { id: 'championship' as const, label: 'Top 100' },
+    { id: 'exploration' as const, label: 'Global' },
+    { id: 'courses' as const, label: 'Courses' },
+    { id: 'handicap' as const, label: 'Handicap' },
+  ];
+
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const [underlineStyle, setUnderlineStyle] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
 
