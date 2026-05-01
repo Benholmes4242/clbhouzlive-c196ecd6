@@ -65,7 +65,7 @@ function ClipOfTheWeekHeroInner() {
         shareCount: 0,
         review: null,
         isReview: false,
-        isLikedByMe: false,
+        isLikedByMe: isLiked,
         isFollowedByMe: false,
         courseName: pick.course_name ?? undefined,
         courseId: pick.course_id ?? undefined,
