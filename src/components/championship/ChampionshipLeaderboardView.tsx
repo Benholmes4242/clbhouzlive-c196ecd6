@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, RefreshCw, WifiOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, RefreshCw, WifiOff, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -872,113 +872,149 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           A CHAMPIONSHIP RECORD
         </div>
 
-        {/* Sponsor "presented by" line — only when sponsor exists and seasonal mode */}
-        {timeFilter === 'seasonal' && season?.sponsor_name && (
-          <button
-            type="button"
-            onClick={() => setShowSponsorSheet(true)}
-            aria-label={`Sponsored by ${season.sponsor_name}`}
-            disabled={!season.sponsor_url}
-            style={{
-              marginTop: 14,
-              paddingTop: 12,
-              borderTop: '1px solid rgba(15,23,42,0.15)',
-              borderBottom: 'none',
-              borderLeft: 'none',
-              borderRight: 'none',
-              width: '100%',
-              background: 'none',
-              cursor: season.sponsor_url ? 'pointer' : 'default',
-              padding: '12px 0 0',
-            }}
-            className={season.sponsor_url ? 'active:opacity-70 transition-opacity' : ''}
-          >
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 10,
-            }}>
-              <span style={{
-                fontSize: 9,
-                fontWeight: 700,
-                color: '#64748B',
-                letterSpacing: '0.22em',
-              }}>
-                PRESENTED BY
-              </span>
-
+        {/* Sponsor — Trophy Hero treatment.
+            Prize is the headline, sponsor is the partner credit beneath. */}
+        {timeFilter === 'seasonal' && season?.sponsor_name && (() => {
+          const sLabel = formatSeasonName(currentSeasonId);
+          const sLabelTitle = sLabel
+            .split(' ')
+            .map(w => w.charAt(0) + w.slice(1).toLowerCase())
+            .join(' ');
+          return (
+            <button
+              type="button"
+              onClick={() => setShowSponsorSheet(true)}
+              aria-label={`Sponsored by ${season.sponsor_name}. Tap to learn more.`}
+              disabled={!season.sponsor_url}
+              style={{
+                marginTop: 20,
+                marginLeft: 16,
+                marginRight: 16,
+                marginBottom: 0,
+                padding: 0,
+                width: 'calc(100% - 32px)',
+                background: 'linear-gradient(135deg, #fff 0%, rgba(247,147,30,0.10) 100%)',
+                border: '1px solid rgba(247,147,30,0.35)',
+                borderRadius: 16,
+                overflow: 'hidden',
+                cursor: season.sponsor_url ? 'pointer' : 'default',
+                display: 'block',
+                textAlign: 'left',
+              }}
+              className={season.sponsor_url ? 'active:opacity-90 transition-opacity' : ''}
+            >
+              {/* Eyebrow */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 6,
-                padding: season.sponsor_logo_url ? '5px 10px' : '4px 10px',
-                border: '1px solid rgba(15,23,42,0.12)',
-                borderRadius: 4,
-                background: '#fff',
+                padding: '12px 20px 0',
+                fontSize: 10,
+                letterSpacing: '0.18em',
+                fontWeight: 700,
+                color: '#C97211',
+                textTransform: 'uppercase',
               }}>
-                {season.sponsor_logo_url ? (
-                  <img
-                    src={season.sponsor_logo_url}
-                    alt={`${season.sponsor_name} logo`}
-                    style={{
-                      height: 20,
-                      width: 'auto',
-                      maxWidth: 140,
-                      objectFit: 'contain',
-                      display: 'block',
-                      flexShrink: 0,
-                    }}
-                  />
-                ) : (
-                  <>
-                    <div style={{
-                      width: 18,
-                      height: 18,
-                      background: '#0F172A',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 2,
-                      flexShrink: 0,
-                    }}>
+                <Trophy size={11} strokeWidth={2.5} />
+                The {seasonYear} {sLabelTitle} Prize
+              </div>
+
+              {/* Prize headline */}
+              <div style={{ padding: '8px 20px 0', textAlign: 'center' }}>
+                <div style={{
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                  fontSize: 32,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.1,
+                }}>
+                  {season.prize_description}
+                </div>
+                <div style={{ fontSize: 12, color: 'rgba(15,23,42,0.65)', marginTop: 6 }}>
+                  Awarded to the season leader
+                </div>
+              </div>
+
+              {/* Decorative divider */}
+              <div style={{
+                margin: '16px 24px 14px',
+                height: 1,
+                background: 'linear-gradient(90deg, transparent, rgba(15,23,42,0.15), transparent)',
+              }} />
+
+              {/* Sponsor credit row */}
+              <div style={{
+                padding: '0 20px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    padding: '6px 12px',
+                    background: '#fff',
+                    border: '1px solid rgba(15,23,42,0.10)',
+                    borderRadius: 6,
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    {season.sponsor_logo_url ? (
+                      <img
+                        src={season.sponsor_logo_url}
+                        alt={`${season.sponsor_name} logo`}
+                        style={{
+                          height: 32,
+                          width: 'auto',
+                          maxWidth: 160,
+                          objectFit: 'contain',
+                          display: 'block',
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : (
                       <span style={{
-                        fontSize: 11,
-                        fontWeight: 900,
-                        color: '#fff',
-                        letterSpacing: '-0.05em',
-                        lineHeight: 1,
+                        fontSize: 15,
+                        fontWeight: 800,
+                        color: '#0F172A',
+                        letterSpacing: '-0.01em',
                       }}>
-                        {season.sponsor_name.charAt(0).toUpperCase()}
+                        {season.sponsor_name}
                       </span>
+                    )}
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{
+                      fontSize: 10,
+                      letterSpacing: '0.16em',
+                      fontWeight: 700,
+                      color: 'rgba(15,23,42,0.45)',
+                      textTransform: 'uppercase',
+                    }}>
+                      In association with
                     </div>
-                    <span style={{
+                    <div style={{
                       fontSize: 13,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: '#0F172A',
+                      marginTop: 2,
                       letterSpacing: '-0.01em',
                     }}>
                       {season.sponsor_name}
-                    </span>
-                  </>
+                    </div>
+                  </div>
+                </div>
+                {season.sponsor_url && (
+                  <ChevronRight size={18} color="rgba(15,23,42,0.45)" />
                 )}
               </div>
-            </div>
-
-            {season.prize_description && (
-              <div style={{
-                marginTop: 8,
-                fontSize: 9,
-                fontWeight: 700,
-                color: '#94A3B8',
-                letterSpacing: '0.04em',
-                fontStyle: 'italic',
-              }}>
-                {season.prize_description} for season leader
-              </div>
-            )}
-          </button>
-        )}
+            </button>
+          );
+        })()}
       </div>
 
       {/* ── 2. TIME MODE TOGGLE ── */}
