@@ -1,28 +1,48 @@
 import React, { useMemo } from 'react';
-import { format } from 'date-fns';
+import { Zap, ChevronRight } from 'lucide-react';
 import { useCounters } from '@/lib/whs/hooks';
+import SectionHeader from './SectionHeader';
 
 interface Props {
   connectionId: string;
 }
+
+const AMBER = '#F7931E';
+const AMBER_INK = '#9A6116';
 
 export const PredictionsCard: React.FC<Props> = ({ connectionId }) => {
   const { data: counters, isLoading } = useCounters(connectionId);
 
   const worst = useMemo(() => {
     if (!counters || counters.length === 0) return null;
-    return [...counters]
-      .filter((c) => c.handicap_differential !== null && c.handicap_differential !== undefined)
-      .sort((a, b) => (b.handicap_differential ?? 0) - (a.handicap_differential ?? 0))[0] ?? null;
+    return (
+      [...counters]
+        .filter(
+          (c) =>
+            c.handicap_differential !== null &&
+            c.handicap_differential !== undefined,
+        )
+        .sort(
+          (a, b) =>
+            (b.handicap_differential ?? 0) - (a.handicap_differential ?? 0),
+        )[0] ?? null
+    );
   }, [counters]);
 
   if (isLoading) {
     return (
-      <section className="px-5 mb-6">
-        <div className="rounded-2xl border p-4 animate-pulse" style={{ borderColor: 'rgba(15,23,42,0.08)' }}>
-          <div className="h-3 w-32 bg-muted rounded mb-3" />
-          <div className="h-4 w-48 bg-muted rounded mb-3" />
-          <div className="h-10 bg-muted/50 rounded" />
+      <section style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Active Quest" title="Drop your worst counter" sub="Loading…" />
+        <div style={{ padding: '0 20px' }}>
+          <div
+            className="animate-pulse"
+            style={{
+              width: '100%',
+              height: 56,
+              background: 'rgba(247,147,30,0.10)',
+              borderRadius: 14,
+            }}
+          />
         </div>
       </section>
     );
@@ -30,58 +50,85 @@ export const PredictionsCard: React.FC<Props> = ({ connectionId }) => {
 
   if (!counters || counters.length < 8 || !worst) return null;
 
-  const sorted = [...counters].sort(
-    (a, b) => (a.handicap_differential ?? 0) - (b.handicap_differential ?? 0)
-  );
+  const diff = (worst.handicap_differential ?? 0).toFixed(1);
+  const courseName = worst.course?.name ?? 'a recent course';
+  const subText = `Beat ${diff} at ${courseName} on your next round and your handicap drops automatically.`;
 
   return (
-    <section className="px-5 mb-6">
-      <div className="rounded-2xl border p-4 bg-background" style={{ borderColor: 'rgba(15,23,42,0.08)' }}>
-        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-1">
-          Next Round Opportunity
-        </p>
-        <h3 className="text-[16px] font-bold text-foreground mb-2">Drop your worst counter</h3>
-        <p className="text-[13px] text-foreground/85 leading-snug mb-3">
-          Your worst counting round is{' '}
-          <span className="font-bold tabular-nums">{worst.handicap_differential?.toFixed(1)}</span>{' '}
-          at <span className="font-semibold">{worst.course?.name ?? 'a recent course'}</span> on{' '}
-          {format(new Date(worst.play_date), 'd MMM')}. Beat that with your next 18 holes and your
-          handicap will drop.
-        </p>
+    <section style={{ marginBottom: 24 }}>
+      <SectionHeader
+        eyebrow="Active Quest"
+        title="Drop your worst counter"
+        sub={subText}
+      />
+      <div style={{ padding: '0 20px' }}>
+        <button
+          type="button"
+          onClick={() => {
+            /* Brief 3: pill is visually tappable but no destination wired.
+               Future ticket: navigate to course detail or "plan next round" flow. */
+          }}
+          style={{
+            width: '100%',
+            padding: '14px 16px',
+            background: 'rgba(247, 147, 30, 0.08)',
+            border: '1px solid rgba(247, 147, 30, 0.30)',
+            borderRadius: 14,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            textAlign: 'left',
+          }}
+        >
+          {/* Icon block */}
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              background: AMBER,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Zap size={18} color="#FFFFFF" fill="#FFFFFF" strokeWidth={2.5} />
+          </div>
 
-        <div className="flex items-end gap-1.5">
-          {sorted.map((c) => {
-            const isWorst = c.id === worst.id;
-            return (
-              <div
-                key={c.id}
-                className="flex-1 px-1 py-1 rounded text-center text-[10px] font-semibold tabular-nums"
-                style={
-                  isWorst
-                    ? {
-                        background: 'rgba(220,38,38,0.08)',
-                        color: '#B91C1C',
-                        border: '1px solid rgba(220,38,38,0.4)',
-                        animation: 'whs-pulse 2s ease-in-out infinite',
-                      }
-                    : {
-                        background: 'rgba(15,23,42,0.05)',
-                        color: '#0F172A',
-                      }
-                }
-              >
-                {c.handicap_differential?.toFixed(1) ?? '—'}
-              </div>
-            );
-          })}
-        </div>
+          {/* Body */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#0F172A',
+                lineHeight: 1.25,
+              }}
+            >
+              Beat{' '}
+              <span style={{ color: AMBER_INK, fontWeight: 800 }}>{diff}</span>{' '}
+              on your next round
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: '#64748B',
+                marginTop: 2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {courseName} · 18 holes
+            </div>
+          </div>
+
+          <ChevronRight size={16} color="rgba(15,23,42,0.45)" style={{ flexShrink: 0 }} />
+        </button>
       </div>
-      <style>{`
-        @keyframes whs-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.65; }
-        }
-      `}</style>
     </section>
   );
 };
