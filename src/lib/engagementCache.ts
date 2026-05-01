@@ -126,27 +126,7 @@ export function patchEngagement(
         // These records don't carry `id`, so we patch unconditionally — the key
         // already scopes us to the right post.
         if (isEngagementRecord(oldData)) {
-          const patched = { ...oldData };
-          if (delta.isLikedByMe !== undefined) {
-            patched.isLikedByMe = delta.isLikedByMe;
-            patched.hasLiked = delta.isLikedByMe;
-            patched.has_liked = delta.isLikedByMe;
-          }
-          if (delta.likeCountDelta !== undefined) {
-            const current =
-              patched.likesCount ?? patched.likeCount ?? patched.likes_count ?? 0;
-            patched.likesCount = Math.max(0, current + delta.likeCountDelta);
-            patched.likeCount = patched.likesCount;
-            patched.likes_count = patched.likesCount;
-          }
-          if (delta.commentCountDelta !== undefined) {
-            const current =
-              patched.commentsCount ?? patched.commentCount ?? patched.comments_count ?? 0;
-            patched.commentsCount = Math.max(0, current + delta.commentCountDelta);
-            patched.commentCount = patched.commentsCount;
-            patched.comments_count = patched.commentsCount;
-          }
-          return patched;
+          return applyEngagementDelta(oldData, null, delta);
         }
 
         // Unknown shape — leave untouched (defensive).
@@ -162,4 +142,8 @@ export function patchEngagement(
   queryClient.invalidateQueries({ queryKey: ['post-likes', postId, 'post'] });
   queryClient.invalidateQueries({ queryKey: ['notifications'] });
   queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
+
+  // Notify non-RQ subscribers (e.g. zustand snapshots like useFullscreenFeedStore).
+  // Subscribers must apply the same delta to their own state via applyEngagementDelta.
+  engagementBus.emit({ postId, delta });
 }
