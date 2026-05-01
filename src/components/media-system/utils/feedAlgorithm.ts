@@ -238,7 +238,7 @@ function capPerRegionInPage(posts: FeedPost[]): FeedPost[] {
       pagePosition = 0;
     }
 
-    const region = post.review?.courseCountry ?? null;
+    const region = post.courseCountry ?? null;
     if (isEditorialCard(post) || !region) {
       result.push(post);
       pagePosition++;
