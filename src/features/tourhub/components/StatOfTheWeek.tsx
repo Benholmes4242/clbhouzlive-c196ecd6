@@ -55,11 +55,17 @@ function splitDisplay(display: string): SplitDisplay {
 
 // ── Sub-detail copy ──
 function buildSubDetail(
-  catKey: string,
+  marginValue: number | null,
   marginDisplay: string | null,
   surname: string,
   isLargestMargin: boolean,
+  tiedCount: number,
 ): string | null {
+  // Tied with the leader (gap to #2 is exactly 0)
+  if (marginValue !== null && marginValue === 0) {
+    if (tiedCount === 0) return `${surname} sets the pace.`;
+    return `Tied with ${tiedCount} ${tiedCount === 1 ? 'other' : 'others'}.`;
+  }
   if (!marginDisplay) return null;
   const year = new Date().getFullYear();
   if (isLargestMargin) {
@@ -148,17 +154,26 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
   const split = splitDisplay(leader.display);
   const Icon = category.icon;
 
+  // Tied count: entries (excluding leader) sharing the leader's value.
+  const tiedCount = entry.players
+    .slice(1)
+    .filter((p) => p.value === leader.value).length;
+
   // ── Standfirst: AI-cached or fallback template ──
+  // Fallback weaves the metric label in as the unit ("5 Top 10 Finishes",
+  // "78.6% Driving Accuracy") rather than repeating the brand name.
+  const metricUnit = category.unit === '%' ? '%' : '';
   const cachedStandfirst = standfirstMap?.get(category.key);
   const standfirst =
     cachedStandfirst ??
-    `${leader.lastName} leads ${category.gamifiedTitle} with ${leader.display}.`;
+    `${leader.lastName} leads with ${leader.display}${metricUnit} ${category.label}.`;
 
   const subDetail = buildSubDetail(
-    category.key,
+    entry.marginValue,
     entry.marginDisplay,
     leader.lastName,
     marginRank === 1,
+    tiedCount,
   );
 
   const chasers = entry.players.slice(1, 4);
@@ -195,7 +210,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               padding: 0,
               cursor: 'pointer',
               textAlign: 'left',
-              marginBottom: isPga ? 14 : 4,
+              marginBottom: 0,
             }}
             aria-label={`Change category. Current: ${category.gamifiedTitle}`}
           >
@@ -243,6 +258,23 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               CHANGE
             </span>
           </button>
+
+          {/* ── Subtitle: what the category measures ── */}
+          {category.label && (
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: SLATE_500,
+                letterSpacing: '0.01em',
+                marginTop: 2,
+                marginLeft: 30, // icon (22) + gap (8) — aligns with eyebrow text
+                marginBottom: isPga ? 12 : 4,
+              }}
+            >
+              {category.label}
+            </div>
+          )}
 
           {/* ── PGA TOUR LEADERS sub-label (non-PGA only) ── */}
           {!isPga && (
