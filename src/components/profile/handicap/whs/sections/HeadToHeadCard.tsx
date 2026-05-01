@@ -6,30 +6,56 @@ import { useFriendsLeaderboard, whsKeys } from '@/lib/whs/hooks';
 import { callCreateInvite } from '@/lib/whs/api';
 import { firstName, shareInvite } from '@/lib/whs/share';
 import type { WhsFriendMatch } from '@/lib/whs/types';
+import SectionHeader from './SectionHeader';
 
 interface Props {
   ownerUserId: string;
   currentUserHandicap: number | null | undefined;
 }
 
+const AMBER = '#F7931E';
+const AMBER_INK = '#9A6116';
+const GREEN = '#059669';
+const RED = '#9F1D1D';
+
 function initials(name: string): string {
   const fn = firstName(name);
   return fn.slice(0, 2).toUpperCase();
 }
 
-export const HeadToHeadCard: React.FC<Props> = ({ ownerUserId, currentUserHandicap }) => {
+const fmtSigned = (n: number) => {
+  if (n === 0) return '0.0';
+  if (n > 0) return `+${n.toFixed(1)}`;
+  return `\u2212${Math.abs(n).toFixed(1)}`;
+};
+
+export const HeadToHeadCard: React.FC<Props> = ({
+  ownerUserId,
+  currentUserHandicap,
+}) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: friends, isLoading } = useFriendsLeaderboard(ownerUserId);
 
   const closestRival = useMemo<WhsFriendMatch | null>(() => {
-    if (!friends || friends.length === 0 || currentUserHandicap === null || currentUserHandicap === undefined)
+    if (
+      !friends ||
+      friends.length === 0 ||
+      currentUserHandicap === null ||
+      currentUserHandicap === undefined
+    )
       return null;
     const candidates = friends
-      .filter((f) => f.friend_handicap_index !== null && f.friend_handicap_index !== undefined)
+      .filter(
+        (f) =>
+          f.friend_handicap_index !== null &&
+          f.friend_handicap_index !== undefined,
+      )
       .map((f) => ({
         f,
-        distance: Math.abs((f.friend_handicap_index ?? 0) - currentUserHandicap),
+        distance: Math.abs(
+          (f.friend_handicap_index ?? 0) - currentUserHandicap,
+        ),
       }))
       .sort((a, b) => a.distance - b.distance);
     return candidates[0]?.f ?? null;
@@ -37,30 +63,68 @@ export const HeadToHeadCard: React.FC<Props> = ({ ownerUserId, currentUserHandic
 
   if (isLoading) {
     return (
-      <section className="px-5 mb-6">
+      <section style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Closest Rival" title="Loading…" />
         <div
-          className="rounded-2xl border p-4 animate-pulse"
-          style={{ borderColor: 'rgba(15,23,42,0.08)' }}
+          style={{
+            padding: '0 20px 8px',
+            display: 'grid',
+            gridTemplateColumns: '1fr auto 1fr',
+            gap: 12,
+            alignItems: 'center',
+          }}
         >
-          <div className="h-3 w-24 bg-muted rounded mb-4" />
-          <div className="h-16 w-full bg-muted/60 rounded" />
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="animate-pulse"
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 14,
+                margin: '0 auto',
+                background: 'rgba(15,23,42,0.06)',
+              }}
+            />
+          ))}
         </div>
       </section>
     );
   }
 
-  if (!closestRival || currentUserHandicap === null || currentUserHandicap === undefined) {
+  if (
+    !closestRival ||
+    currentUserHandicap === null ||
+    currentUserHandicap === undefined
+  ) {
     return null;
   }
 
   const rivalH = closestRival.friend_handicap_index ?? 0;
   const delta = rivalH - currentUserHandicap;
+  const absDelta = Math.abs(delta);
   const rivalFirst = firstName(closestRival.friend_name);
 
-  // recent rounds in last 30d (we only have last_round_played_at; treat 1 if within window)
   const recentMissionAvailable =
-    closestRival.last_round_played_at &&
-    Date.now() - new Date(closestRival.last_round_played_at).getTime() < 30 * 86400_000;
+    !!closestRival.last_round_played_at &&
+    Date.now() - new Date(closestRival.last_round_played_at).getTime() <
+      30 * 86400_000;
+  const lastGross = closestRival.last_round_adjusted_gross;
+
+  const subText = (() => {
+    if (delta === 0) return 'Level pegging — every shot counts.';
+    const orientationLabel =
+      delta > 0
+        ? `${absDelta.toFixed(1)} behind you`
+        : `${absDelta.toFixed(1)} ahead of you`;
+    if (recentMissionAvailable && lastGross !== null && lastGross !== undefined) {
+      if (delta < 0) {
+        return `${orientationLabel} · Beat ${lastGross} on your next round to leapfrog.`;
+      }
+      return `${orientationLabel} · ${rivalFirst} won't stop chasing.`;
+    }
+    return `${orientationLabel} · ${rivalFirst} hasn't played in a while.`;
+  })();
 
   const handleInvite = async () => {
     const res = await callCreateInvite(closestRival.friend_passport_id, 'copy_link');
@@ -76,111 +140,187 @@ export const HeadToHeadCard: React.FC<Props> = ({ ownerUserId, currentUserHandic
     });
   };
 
-  const onCardClick = () => {
+  const onVsClick = () => {
     if (closestRival.is_clbhouz_user && closestRival.friend_user_id) {
       navigate(`/p/${closestRival.friend_user_id}`);
     }
   };
 
+  const isVsTappable =
+    !!closestRival.is_clbhouz_user && !!closestRival.friend_user_id;
+
+  const deltaColor =
+    delta === 0 ? 'rgba(15,23,42,0.45)' : delta > 0 ? GREEN : RED;
+
+  const handicapStyle: React.CSSProperties = {
+    fontSize: 26,
+    fontFamily: 'Georgia, serif',
+    fontWeight: 900,
+    letterSpacing: '-0.02em',
+    lineHeight: 1,
+    color: '#0F172A',
+    fontVariantNumeric: 'tabular-nums',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: 9,
+    letterSpacing: '0.18em',
+    fontWeight: 700,
+    color: 'rgba(15,23,42,0.45)',
+    textTransform: 'uppercase',
+    marginTop: 6,
+  };
+
   return (
-    <section className="px-5 mb-6">
+    <section style={{ marginBottom: 24 }}>
+      <SectionHeader
+        eyebrow="Closest Rival"
+        title={`You vs ${rivalFirst}`}
+        sub={subText}
+      />
+
+      {/* VS layout */}
       <div
-        className="rounded-2xl border p-4 bg-background"
-        style={{ borderColor: 'rgba(15,23,42,0.08)', cursor: closestRival.is_clbhouz_user ? 'pointer' : 'default' }}
-        onClick={onCardClick}
+        role={isVsTappable ? 'button' : undefined}
+        tabIndex={isVsTappable ? 0 : undefined}
+        onClick={isVsTappable ? onVsClick : undefined}
+        style={{
+          padding: '0 20px 8px',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto 1fr',
+          gap: 12,
+          alignItems: 'center',
+          cursor: isVsTappable ? 'pointer' : 'default',
+          transition: 'opacity 120ms ease',
+        }}
+        onMouseDown={(e) => {
+          if (isVsTappable) (e.currentTarget as HTMLDivElement).style.opacity = '0.7';
+        }}
+        onMouseUp={(e) => {
+          if (isVsTappable) (e.currentTarget as HTMLDivElement).style.opacity = '1';
+        }}
+        onMouseLeave={(e) => {
+          if (isVsTappable) (e.currentTarget as HTMLDivElement).style.opacity = '1';
+        }}
       >
-        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-3">
-          Closest Rival
-        </p>
-        <div className="flex items-center justify-between mb-4">
-          {/* You */}
-          <div className="flex flex-col items-center flex-1">
-            <div
-              className="w-12 h-12 flex items-center justify-center text-[12px] font-bold mb-2"
-              style={{
-                background: 'rgba(247,147,30,0.15)',
-                color: '#9A6116',
-                borderRadius: '34%',
-              }}
-            >
-              YOU
-            </div>
-            <p className="text-[20px] font-bold text-foreground tabular-nums leading-none">
-              {currentUserHandicap.toFixed(1)}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wide">You</p>
+        {/* YOU */}
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 14,
+              margin: '0 auto',
+              background: 'rgba(247, 147, 30, 0.12)',
+              border: `1.5px solid ${AMBER}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              color: AMBER_INK,
+            }}
+          >
+            YOU
           </div>
-
-          {/* Centre */}
-          <div className="flex flex-col items-center px-3">
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold text-muted-foreground"
-              style={{ background: 'rgba(15,23,42,0.05)' }}
-            >
-              vs
-            </div>
-            <span
-              className="mt-2 text-[11px] font-semibold tabular-nums"
-              style={{ color: delta >= 0 ? '#059669' : '#B91C1C' }}
-            >
-              {delta >= 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
-            </span>
+          <div style={{ ...handicapStyle, marginTop: 8 }}>
+            {currentUserHandicap.toFixed(1)}
           </div>
+          <div style={labelStyle}>YOU</div>
+        </div>
 
-          {/* Rival */}
-          <div className="flex flex-col items-center flex-1">
+        {/* GAP */}
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              fontSize: 9,
+              letterSpacing: '0.16em',
+              fontWeight: 700,
+              color: 'rgba(15,23,42,0.45)',
+              textTransform: 'uppercase',
+              marginBottom: 4,
+            }}
+          >
+            GAP
+          </div>
+          <div
+            style={{
+              fontSize: 22,
+              fontFamily: 'Georgia, serif',
+              fontWeight: 900,
+              letterSpacing: '-0.02em',
+              fontVariantNumeric: 'tabular-nums',
+              color: deltaColor,
+            }}
+          >
+            {fmtSigned(delta)}
+          </div>
+        </div>
+
+        {/* RIVAL */}
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 14,
+              margin: '0 auto',
+              overflow: 'hidden',
+              border: '1px solid rgba(15,23,42,0.10)',
+              background: 'rgba(15,23,42,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 12,
+              fontWeight: 800,
+              color: '#0F172A',
+            }}
+          >
             {closestRival.friend_thumbnail_url ? (
               <img
                 src={closestRival.friend_thumbnail_url}
                 alt={closestRival.friend_name}
-                className="w-12 h-12 object-cover mb-2"
-                style={{ borderRadius: '34%' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
-              <div
-                className="w-12 h-12 flex items-center justify-center text-[12px] font-bold text-muted-foreground mb-2"
-                style={{ background: 'rgba(15,23,42,0.06)', borderRadius: '34%' }}
-              >
-                {initials(closestRival.friend_name)}
-              </div>
+              initials(closestRival.friend_name)
             )}
-            <p className="text-[20px] font-bold text-foreground tabular-nums leading-none">
-              {rivalH.toFixed(1)}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-1 truncate max-w-[100px] uppercase tracking-wide">
-              {rivalFirst}
-            </p>
           </div>
+          <div style={{ ...handicapStyle, marginTop: 8 }}>
+            {rivalH.toFixed(1)}
+          </div>
+          <div style={labelStyle}>{rivalFirst.toUpperCase()}</div>
         </div>
+      </div>
 
-        {/* Mission */}
-        <div
-          className="rounded-xl p-3 text-[13px] leading-snug"
-          style={{ background: 'rgba(247,147,30,0.06)', color: '#0F172A' }}
-        >
-          {recentMissionAvailable && closestRival.last_round_adjusted_gross != null ? (
-            <>
-              Beat <span className="font-bold">{closestRival.last_round_adjusted_gross}</span> on
-              your next round to leapfrog {rivalFirst}.
-            </>
-          ) : (
-            <>{rivalFirst} hasn't played in a while — make your move.</>
-          )}
-        </div>
-
-        {!closestRival.is_clbhouz_user && (
+      {/* Invite link — only for non-clbhouz rival */}
+      {!closestRival.is_clbhouz_user && (
+        <div style={{ padding: '8px 20px 0', textAlign: 'center' }}>
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               handleInvite();
             }}
-            className="mt-2 text-[12px] font-semibold"
-            style={{ color: '#F7931E' }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 12,
+              fontWeight: 800,
+              color: AMBER,
+              letterSpacing: '0.04em',
+              padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
           >
-            Invite {rivalFirst} to see live rivalry →
+            Invite {rivalFirst} for live rivalry tracking →
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 };
