@@ -568,23 +568,28 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   return deduped;
 }
 
-// ── Friends Feed Pipeline ─────────────────────────────────────────────────────
+// ── Friends Feed Pipeline (Phase F1) ──────────────────────────────────────────
+// Chronological feed of posts from the user's social graph. Server returns
+// ordered by created_at DESC; client applies adaptive review cadence, caps
+// with deferral, and dedupes.
+//
+// Phase F1 changes:
+//   - Replaced fixed every-9th review insertion with adaptive cadence
+//   - Replaced hard caps (drop) with deferral caps (push to next page)
+//   - Looser per-creator / per-course caps (6 / 5 vs Suggested's 4 / 3)
+//
+// What's NOT here vs Suggested feed (deliberate):
+//   - No personalisation boosts (user already chose this circle)
+//   - No region caps (friends post wherever they post)
+//   - No editorial card injection (Friends is friends-only)
+//   - No session jitter (chronological is the contract)
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
-  const capped = capPerCreator(noLive);
-  const courseCapped = capPerCourse(capped);
-  const reviews = courseCapped.filter(p => isReviewPost(p));
-  const regular = courseCapped.filter(p => !isReviewPost(p));
-  const result: FeedPost[] = [];
-  let ri = 0, regi = 0, slot = 1;
-  while (regi < regular.length || ri < reviews.length) {
-    if (slot === 9 && ri < reviews.length) result.push(reviews[ri++]);
-    else if (regi < regular.length) result.push(regular[regi++]);
-    else if (ri < reviews.length) result.push(reviews[ri++]);
-    else break;
-    slot = slot < 10 ? slot + 1 : 1;
-  }
-  return deduplicatePosts(result);
+  const reviews = noLive.filter(p => isReviewPost(p));
+  const regular = noLive.filter(p => !isReviewPost(p));
+  const interleaved = adaptiveReviewInterleave(regular, reviews);
+  const capped = capWithDeferral(interleaved);
+  return deduplicatePosts(capped);
 }
 
 // ── Editorial Card Injection ──────────────────────────────────────────────────
