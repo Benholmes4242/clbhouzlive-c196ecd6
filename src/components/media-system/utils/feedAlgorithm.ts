@@ -217,6 +217,47 @@ function applyCreatorDiversity(posts: FeedPost[]): FeedPost[] {
   return result;
 }
 
+// ── Per-Region Per-Page Cap ───────────────────────────────────────────────────
+// Operates on the SCORED feed (after orbitScore + creator diversity).
+// Walks the feed in REGION_CAP_PAGE_SIZE windows; within each window,
+// drops posts past MAX_POSTS_PER_REGION_PER_PAGE for any single region.
+// Posts without a region bypass the cap. Editorial cards always bypass.
+//
+// Why per-page (not per-session): a session-scope cap would permanently
+// suppress non-home-region content for heavily personalised users. Page-scope
+// allows heavily home-region pages to be followed by more mixed pages,
+// preserving regional variety across infinite scroll.
+function capPerRegionInPage(posts: FeedPost[]): FeedPost[] {
+  const result: FeedPost[] = [];
+  let pageRegionCount = new Map<string, number>();
+  let pagePosition = 0;
+
+  for (const post of posts) {
+    if (pagePosition >= REGION_CAP_PAGE_SIZE) {
+      pageRegionCount = new Map<string, number>();
+      pagePosition = 0;
+    }
+
+    if (isEditorialCard(post) || !post.reviewCourseCountry) {
+      result.push(post);
+      pagePosition++;
+      continue;
+    }
+
+    const region = post.reviewCourseCountry;
+    const count = pageRegionCount.get(region) ?? 0;
+    if (count >= MAX_POSTS_PER_REGION_PER_PAGE) {
+      // Drop this post; do NOT increment pagePosition so the page stays full.
+      continue;
+    }
+    pageRegionCount.set(region, count + 1);
+    result.push(post);
+    pagePosition++;
+  }
+
+  return result;
+}
+
 // ── Editorial Gap Enforcement ─────────────────────────────────────────────────
 function enforceEditorialGap(posts: FeedPost[]): FeedPost[] {
   const result: FeedPost[] = [];
