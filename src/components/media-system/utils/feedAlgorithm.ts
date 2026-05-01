@@ -85,6 +85,13 @@ function isReviewPost(p: FeedPost): boolean {
  * Cold-start safe: returns 1.0 when no signals are present.
  * Multiplicative composition — a post strong on multiple signals stacks.
  * Max stack ≈ 3.9× when all 5 signals fire.
+ *
+ * @deprecated Phase 3 moved personal boost computation into the
+ * `get_suggested_feed` SQL RPC — the server now applies these boosts when
+ * scoring candidates and returns posts pre-sorted by orbit score. This
+ * function is retained as a fallback in case we ever need to score
+ * client-side again. Safe to remove after Phase 3 has run cleanly in
+ * production for an extended period.
  */
 function computePersonalBoost(post: FeedPost): number {
   return (
