@@ -14190,6 +14190,13 @@ export type Database = {
             referencedRelation: "whs_friend_matches"
             referencedColumns: ["friend_connection_id"]
           },
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
+          },
         ]
       }
       whs_handicap_snapshots: {
@@ -14225,6 +14232,55 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_friend_matches"
             referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_handicap_snapshots_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
+          },
+        ]
+      }
+      whs_invite_completions: {
+        Row: {
+          completed_at: string
+          id: string
+          invite_id: string
+          invitee_passport_id: number
+          invitee_user_id: string
+          inviter_user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          invite_id: string
+          invitee_passport_id: number
+          invitee_user_id: string
+          inviter_user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          invite_id?: string
+          invitee_passport_id?: number
+          invitee_user_id?: string
+          inviter_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_invite_completions_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: true
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_invite_completions_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: true
+            referencedRelation: "whs_invites"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -14288,6 +14344,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_friend_matches"
             referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_invites_inviter_connection_id_fkey"
+            columns: ["inviter_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
           },
         ]
       }
@@ -14452,6 +14515,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_friend_matches"
             referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
           },
           {
             foreignKeyName: "whs_scores_course_id_fkey"
@@ -15266,18 +15336,21 @@ export type Database = {
       }
       whs_friend_matches: {
         Row: {
-          clbhouz_status: string | null
+          first_seen_at: string | null
           friend_connection_id: string | null
           friend_handicap_index: number | null
           friend_home_club: string | null
           friend_name: string | null
           friend_passport_id: number | null
+          friend_privacy_mode: string | null
           friend_row_id: string | null
           friend_thumbnail_url: string | null
           friend_user_id: string | null
+          is_clbhouz_user: boolean | null
           last_round_adjusted_gross: number | null
           last_round_course_name: string | null
           last_round_played_at: string | null
+          last_seen_at: string | null
           owner_connection_id: string | null
           owner_user_id: string | null
         }
@@ -15296,7 +15369,31 @@ export type Database = {
             referencedRelation: "whs_friend_matches"
             referencedColumns: ["friend_connection_id"]
           },
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["owner_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
+          },
         ]
+      }
+      whs_invite_status: {
+        Row: {
+          id: string | null
+          invite_code: string | null
+          invitee_home_club: string | null
+          invitee_name: string | null
+          invitee_passport_id: number | null
+          inviter_user_id: string | null
+          redeemed_at: string | null
+          redeemed_by_user_id: string | null
+          redeemer_connection_id: string | null
+          sent_at: string | null
+          share_method: string | null
+          status: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {
