@@ -346,9 +346,10 @@ function interleaveReviewsIntoFeed(regular: FeedPost[], reviews: FeedPost[]): Fe
 // unused review bucket has >= MIN_BUCKET_SIZE candidates, force-swap reviews
 // into evenly-spaced non-review, non-editorial slots until the floor is met.
 //
-// Tradeoff: displaced non-review posts are dropped (Option A from brief). At
-// most 1-2 posts per page in the rare floor-activated scenario. Revisit with
-// a deferral queue if user feedback flags missing content.
+// Phase 4 (deferral queue): displaced posts are no longer dropped. They're
+// collected and appended between the floor-enforced page and the tail, so users
+// scrolling past slot REVIEW_FLOOR_PAGE_SIZE see the deferred content immediately.
+// Final feed shape: [page (floor met)] + [displaced] + [tail]. Zero content loss.
 const REVIEW_FLOOR_PAGE_SIZE = 30;
 const REVIEW_FLOOR = 4;
 const REVIEW_FLOOR_MIN_BUCKET = 4;
@@ -356,19 +357,19 @@ const REVIEW_FLOOR_MIN_BUCKET = 4;
 function enforceReviewFloor(
   feed: FeedPost[],
   unusedReviews: FeedPost[]
-): { feed: FeedPost[]; floorEnforced: boolean } {
+): { feed: FeedPost[]; floorEnforced: boolean; displacedCount: number } {
   if (feed.length < REVIEW_FLOOR_PAGE_SIZE) {
-    return { feed, floorEnforced: false };
+    return { feed, floorEnforced: false, displacedCount: 0 };
   }
   if (unusedReviews.length < REVIEW_FLOOR_MIN_BUCKET) {
-    return { feed, floorEnforced: false };
+    return { feed, floorEnforced: false, displacedCount: 0 };
   }
 
   const page = feed.slice(0, REVIEW_FLOOR_PAGE_SIZE);
   const tail = feed.slice(REVIEW_FLOOR_PAGE_SIZE);
   const currentReviews = page.filter(isReviewPost).length;
   if (currentReviews >= REVIEW_FLOOR) {
-    return { feed, floorEnforced: false };
+    return { feed, floorEnforced: false, displacedCount: 0 };
   }
 
   const needed = REVIEW_FLOOR - currentReviews;
@@ -382,17 +383,23 @@ function enforceReviewFloor(
   }
 
   if (candidateSlots.length === 0) {
-    return { feed, floorEnforced: false };
+    return { feed, floorEnforced: false, displacedCount: 0 };
   }
 
   const result = [...page];
+  const displaced: FeedPost[] = [];
   candidateSlots.forEach((slotIdx, i) => {
     if (i < unusedReviews.length) {
+      displaced.push(result[slotIdx]);
       result[slotIdx] = unusedReviews[i];
     }
   });
 
-  return { feed: [...result, ...tail], floorEnforced: true };
+  return {
+    feed: [...result, ...displaced, ...tail],
+    floorEnforced: true,
+    displacedCount: displaced.length,
+  };
 }
 
 // ── Pass 3: Place Editorial Cards ─────────────────────────────────────────────
