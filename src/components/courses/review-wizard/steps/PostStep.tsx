@@ -205,25 +205,26 @@ export function PostStep({
         ) : (
           <div>
             <Reorder.Group
-              axis="x"
+              axis="y"
               values={media}
               onReorder={onSetMediaOrder}
-              className="flex gap-2 overflow-x-auto pb-1"
+              className="grid grid-cols-3 gap-2"
               as="div"
             >
               {composerMedia.map((item, index) => (
                 <Reorder.Item
                   key={item.id}
                   value={media[index]}
-                  className="relative flex-shrink-0"
+                  className="relative"
                   as="div"
-                  whileDrag={{ scale: 1.05, zIndex: 10 }}
+                  whileDrag={{ scale: 1.05, zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
                 >
                   <MediaThumbnail
                     item={item}
                     index={index}
                     isCover={item.id === coverMediaId}
                     totalItems={media.length}
+                    size="grid"
                     onExpand={() => setPreviewMediaIndex(index)}
                     onRemove={() => onRemoveMedia(item.id)}
                     onSetCover={() => onSetCover(item.id)}
@@ -234,7 +235,9 @@ export function PostStep({
                 <button
                   type="button"
                   onClick={handlePickMedia}
-                  className="w-[72px] h-[72px] rounded-xl border-2 border-dashed border-border flex items-center justify-center flex-shrink-0 active:scale-[0.95] transition-all"
+                  className="rounded-2xl border-2 border-dashed border-border flex items-center justify-center active:scale-[0.95] transition-all"
+                  style={{ width: '100%', aspectRatio: '1 / 1' }}
+                  aria-label="Add more photos or videos"
                 >
                   <Plus className="w-5 h-5 text-muted-foreground" />
                 </button>
