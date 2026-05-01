@@ -1476,19 +1476,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           const isLast = i === allEntries.length - 1;
           const showStreak = timeFilter === 'seasonal' && p.streak_current >= 3;
 
-          // ── Chaser strip values (only for current user) ──
-          let chaserAbove: number | null = null;
-          let chaserBelow: number | null = null;
-          if (p.is_current_user && i > 0 && i < allEntries.length - 1) {
-            const above = allEntries[i - 1];
-            const below = allEntries[i + 1];
-            if (above && below) {
-              chaserAbove = Math.max(0, above.courses_this_season - p.courses_this_season);
-              chaserBelow = Math.max(0, p.courses_this_season - below.courses_this_season);
-            }
-          }
-          const showChaserStrip = chaserAbove !== null && chaserBelow !== null && (chaserAbove > 0 || chaserBelow > 0);
-
           return (
             <div
               key={p.user_id}
@@ -1609,35 +1596,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 {p.courses_this_season}
               </span>
 
-              {showChaserStrip && (
-                <div style={{
-                  gridColumn: '1 / -1',
-                  marginTop: 8,
-                  height: 4,
-                  display: 'flex',
-                  gap: 2,
-                  alignItems: 'stretch',
-                }}>
-                  <div style={{
-                    flex: Math.min(chaserAbove ?? 0, 6),
-                    background: 'rgba(159,29,29,0.30)',
-                    borderRadius: 1,
-                    minWidth: chaserAbove === 0 ? 4 : 8,
-                  }} />
-                  <div style={{
-                    width: 6,
-                    background: '#9F1D1D',
-                    borderRadius: 1,
-                    flexShrink: 0,
-                  }} />
-                  <div style={{
-                    flex: Math.min(chaserBelow ?? 0, 6),
-                    background: 'rgba(15,23,42,0.15)',
-                    borderRadius: 1,
-                    minWidth: chaserBelow === 0 ? 4 : 8,
-                  }} />
-                </div>
-              )}
             </div>
           );
         })}
