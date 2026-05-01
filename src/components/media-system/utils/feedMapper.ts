@@ -111,6 +111,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     tags,
     courseName: row.review_course_name || row.course_name || undefined,
     courseId: row.review_course_id || row.course_id || undefined,
+    courseCountry: row.review_course_country || undefined,
     courseThumbnailImage: row.course_thumbnail_image ?? null,
     courseLatitude: row.course_latitude ?? null,
     courseLongitude: row.course_longitude ?? null,
