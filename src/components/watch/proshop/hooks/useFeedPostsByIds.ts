@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
+import { fetchLikedPostIds, type LikedByMeActor } from '@/lib/likedPostIds';
 
 /**
  * Fetch a fixed set of posts by ID for the course-anchored rail.
@@ -13,9 +14,13 @@ import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media
  * trigger PGRST200 ("Could not find a relationship") errors. Each query
  * goes through the authenticated client so RLS policies apply individually.
  */
-export function useFeedPostsByIds(postIds: string[] | undefined, userId: string | undefined) {
+export function useFeedPostsByIds(
+  postIds: string[] | undefined,
+  userId: string | undefined,
+  actor: LikedByMeActor | null = null,
+) {
   return useQuery({
-    queryKey: ['watch-feed-posts-by-ids', (postIds ?? []).slice().sort().join(','), userId],
+    queryKey: ['watch-feed-posts-by-ids', (postIds ?? []).slice().sort().join(','), userId, actor?.id, actor?.type],
     enabled: !!postIds && postIds.length > 0,
     queryFn: async (): Promise<FeedPost[]> => {
       if (!postIds || postIds.length === 0) return [];
