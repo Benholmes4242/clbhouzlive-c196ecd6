@@ -869,7 +869,7 @@ const ProfilePageV2Content: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             </div>
-          </>
+          </div>
           )
         )}
       </div>
