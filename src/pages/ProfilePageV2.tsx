@@ -821,9 +821,9 @@ const ProfilePageV2Content: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <button 
                   className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
-                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                  style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
                 >
-                  <MoreHorizontal className="w-5 h-5 text-foreground" />
+                  <MoreHorizontal className="w-5 h-5" style={{ color: '#0F172A' }} />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
