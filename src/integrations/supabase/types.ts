@@ -14183,6 +14183,13 @@ export type Database = {
             referencedRelation: "whs_connections"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
         ]
       }
       whs_handicap_snapshots: {
@@ -14211,6 +14218,76 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_connections"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_handicap_snapshots_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+        ]
+      }
+      whs_invites: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+          invitee_home_club: string | null
+          invitee_name: string
+          invitee_passport_id: number
+          inviter_connection_id: string
+          inviter_user_id: string
+          redeemed_at: string | null
+          redeemed_by_user_id: string | null
+          sent_at: string
+          share_method: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code: string
+          invitee_home_club?: string | null
+          invitee_name: string
+          invitee_passport_id: number
+          inviter_connection_id: string
+          inviter_user_id: string
+          redeemed_at?: string | null
+          redeemed_by_user_id?: string | null
+          sent_at?: string
+          share_method?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          invitee_home_club?: string | null
+          invitee_name?: string
+          invitee_passport_id?: number
+          inviter_connection_id?: string
+          inviter_user_id?: string
+          redeemed_at?: string | null
+          redeemed_by_user_id?: string | null
+          sent_at?: string
+          share_method?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_invites_inviter_connection_id_fkey"
+            columns: ["inviter_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_invites_inviter_connection_id_fkey"
+            columns: ["inviter_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
           },
         ]
       }
@@ -14368,6 +14445,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_connections"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
           },
           {
             foreignKeyName: "whs_scores_course_id_fkey"
@@ -15179,6 +15263,40 @@ export type Database = {
           title: string | null
         }
         Relationships: []
+      }
+      whs_friend_matches: {
+        Row: {
+          clbhouz_status: string | null
+          friend_connection_id: string | null
+          friend_handicap_index: number | null
+          friend_home_club: string | null
+          friend_name: string | null
+          friend_passport_id: number | null
+          friend_row_id: string | null
+          friend_thumbnail_url: string | null
+          friend_user_id: string | null
+          last_round_adjusted_gross: number | null
+          last_round_course_name: string | null
+          last_round_played_at: string | null
+          owner_connection_id: string | null
+          owner_user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["owner_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["owner_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -16010,6 +16128,7 @@ export type Database = {
         Args: { p_players_per_group?: number; p_round_id: string }
         Returns: number
       }
+      generate_whs_invite_code: { Args: never; Returns: string }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -17924,6 +18043,10 @@ export type Database = {
           rivals_passed: string[]
           season_name: string
         }[]
+      }
+      redeem_whs_invite: {
+        Args: { p_invite_code: string; p_redeemed_by_user_id: string }
+        Returns: string
       }
       refresh_college_season_stats: {
         Args: { target_season_id?: string }
