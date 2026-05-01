@@ -723,12 +723,13 @@ const ProfilePageV2Content: React.FC = () => {
               Unavailable
             </div>
           ) : (
-          <>
+          <div className="flex flex-col gap-2 w-full">
+            {/* Row 1 — Message (primary CTA, full width) */}
             <button
               type="button"
               onClick={() => profileUserId && startDM(profileUserId)}
               disabled={dmStarting === profileUserId}
-              className="h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
+              className="h-11 w-full rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }}
               aria-label="Send message"
             >
@@ -741,6 +742,9 @@ const ProfilePageV2Content: React.FC = () => {
                 </>
               )}
             </button>
+
+            {/* Row 2 — Follow + Friend action + overflow menu */}
+            <div className="flex items-center gap-2 w-full">
             <button 
               className="h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
@@ -864,6 +868,7 @@ const ProfilePageV2Content: React.FC = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           </>
           )
         )}
