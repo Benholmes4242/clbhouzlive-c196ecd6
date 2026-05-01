@@ -5,6 +5,12 @@ import {
   fetchLastRound,
   fetchCounters,
   fetchRecentRounds,
+  fetchAllScores,
+  fetchHandicapHistory,
+  fetchFriendsLeaderboard,
+  fetchFriendsActivity,
+  fetchSentInvites,
+  fetchCourseForm,
 } from './api';
 
 export const whsKeys = {
@@ -13,6 +19,14 @@ export const whsKeys = {
   lastRound: (connectionId: string) => ['whs-last-round', connectionId] as const,
   counters: (connectionId: string) => ['whs-counters', connectionId] as const,
   recent: (connectionId: string) => ['whs-recent-rounds', connectionId] as const,
+  allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
+  history: (connectionId: string, daysBack: number) =>
+    ['whs-handicap-history', connectionId, daysBack] as const,
+  friendsLeaderboard: (userId: string) => ['whs-friends-leaderboard', userId] as const,
+  friendsActivity: (userId: string) => ['whs-friends-activity', userId] as const,
+  sentInvites: () => ['whs-sent-invites'] as const,
+  courseForm: (connectionId: string, currentHandicap: number) =>
+    ['whs-course-form', connectionId, currentHandicap] as const,
 };
 
 export function useWhsConnection(userId: string | undefined) {
@@ -56,6 +70,62 @@ export function useRecentRounds(connectionId: string | undefined) {
     queryKey: whsKeys.recent(connectionId ?? ''),
     queryFn: () => fetchRecentRounds(connectionId as string),
     enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useAllScores(connectionId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.allScores(connectionId ?? ''),
+    queryFn: () => fetchAllScores(connectionId as string),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useHandicapHistory(connectionId: string | undefined, daysBack: number) {
+  return useQuery({
+    queryKey: whsKeys.history(connectionId ?? '', daysBack),
+    queryFn: () => fetchHandicapHistory(connectionId as string, daysBack),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendsLeaderboard(ownerUserId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendsLeaderboard(ownerUserId ?? ''),
+    queryFn: () => fetchFriendsLeaderboard(ownerUserId as string),
+    enabled: !!ownerUserId,
+    staleTime: 30_000,
+  });
+}
+
+export function useFriendsActivity(ownerUserId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendsActivity(ownerUserId ?? ''),
+    queryFn: () => fetchFriendsActivity(ownerUserId as string, 20),
+    enabled: !!ownerUserId,
+    staleTime: 30_000,
+  });
+}
+
+export function useSentInvites() {
+  return useQuery({
+    queryKey: whsKeys.sentInvites(),
+    queryFn: fetchSentInvites,
+    staleTime: 30_000,
+  });
+}
+
+export function useCourseForm(
+  connectionId: string | undefined,
+  currentHandicap: number | null | undefined,
+) {
+  return useQuery({
+    queryKey: whsKeys.courseForm(connectionId ?? '', currentHandicap ?? NaN),
+    queryFn: () => fetchCourseForm(connectionId as string, currentHandicap as number, 3),
+    enabled: !!connectionId && currentHandicap !== undefined && currentHandicap !== null,
     staleTime: 60_000,
   });
 }

@@ -64,3 +64,80 @@ export interface SyncWhsResponse {
   handicap_changed?: boolean;
   handicap_index?: number;
 }
+
+// ─── Phase 6b additions ────────────────────────────────────────────────
+
+export interface WhsFriendMatch {
+  friend_row_id: string;
+  owner_connection_id: string;
+  owner_user_id: string;
+  friend_passport_id: number;
+  friend_name: string;
+  friend_home_club: string | null;
+  friend_handicap_index: number | null;
+  friend_thumbnail_url: string | null;
+  friend_privacy_mode: string | null;
+  last_round_played_at: string | null;
+  last_round_course_name: string | null;
+  last_round_adjusted_gross: number | null;
+  friend_user_id: string | null;
+  friend_connection_id: string | null;
+  is_clbhouz_user: boolean;
+}
+
+export interface WhsInviteStatus {
+  id: string;
+  inviter_user_id: string;
+  invitee_passport_id: number;
+  invitee_name: string;
+  invitee_home_club: string | null;
+  invite_code: string;
+  share_method: string | null;
+  sent_at: string;
+  redeemed_at: string | null;
+  redeemed_by_user_id: string | null;
+  status: 'pending' | 'redeemed' | 'expired';
+  redeemer_connection_id: string | null;
+}
+
+export interface CreateInviteResponse {
+  ok: boolean;
+  invite_id?: string;
+  invite_code?: string;
+  share_url?: string;
+  share_message?: string;
+  invitee_name?: string;
+  error_code?: string;
+  message?: string;
+}
+
+export interface HandicapPoint {
+  observed_at: string;
+  handicap_index: number;
+}
+
+export interface Achievement {
+  id: string;
+  type:
+    | 'career_low'
+    | 'first_sub_n'
+    | 'counter_streak'
+    | 'sub_handicap_streak'
+    | 'course_conquered'
+    | 'anniversary'
+    | 'milestone';
+  title: string;
+  subtitle: string;
+  achieved_at: string;
+  icon_name: string;
+  highlight: boolean;
+}
+
+export interface CourseForm {
+  course_id: string;
+  course_name: string;
+  rounds_played: number;
+  avg_differential: number;
+  expected_differential: number;
+  delta: number;
+}
