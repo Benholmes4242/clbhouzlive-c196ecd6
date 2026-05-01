@@ -719,6 +719,69 @@ export function CoursesLeaderboardView() {
         )}
       </div>
 
+      {/* ── FROM YOUR CIRCLE — moved below the list ───────────────── */}
+      {circleRecentRounds && circleRecentRounds.length > 0 && (
+        <div style={{ padding: '28px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
+            {circleRecentRounds.slice(0, 10).map((round: any) => {
+              const daysAgo = Math.max(0, Math.floor((Date.now() - new Date(round.created_at).getTime()) / 86400000));
+              const course = round.golf_courses;
+              const player = round.user_profiles;
+              if (!course || !player) return null;
+              return (
+                <button
+                  key={round.id}
+                  onClick={() => handleCourseClick(course.id)}
+                  style={{
+                    flexShrink: 0, width: 200,
+                    border: '1px solid rgba(15,23,42,0.08)', borderRadius: 4,
+                    background: '#fff', overflow: 'hidden',
+                    cursor: 'pointer', padding: 0, textAlign: 'left',
+                  }}
+                >
+                  <div style={{
+                    height: 80,
+                    background: course.thumbnail_image
+                      ? `url(${course.thumbnail_image}) center/cover`
+                      : 'linear-gradient(135deg, #2d5a3d, #1a3d2e)',
+                  }} />
+                  <div style={{ padding: '10px 12px' }}>
+                    <div style={{
+                      fontSize: 13, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.005em',
+                      marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {course.name}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: 11, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                        {player.display_name}
+                      </div>
+                      <div style={{
+                        fontSize: 12, fontWeight: 900, color: '#F7931E',
+                        fontVariantNumeric: 'tabular-nums lining-nums',
+                        letterSpacing: '-0.02em', marginLeft: 6, flexShrink: 0,
+                      }}>
+                        {round.rating?.toFixed(1) ?? '—'}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 3 }}>
+                      {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* ── FOOTER CAPTION ──────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic' }}>
