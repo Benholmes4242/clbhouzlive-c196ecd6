@@ -16738,14 +16738,13 @@ export type Database = {
           p_page_size?: number
           p_seen_post_ids?: string[]
           p_user_id: string
-          p_viewer_actor_id?: string
-          p_viewer_actor_type?: string
         }
         Returns: {
           business_is_verified: boolean
           business_logo_url: string
           business_name: string
           comment_count: number
+          country_match: boolean
           course_id: string
           course_name: string
           creator_avatar_url: string
@@ -16763,6 +16762,8 @@ export type Database = {
           media_id: string
           media_type: string
           media_url: string
+          mutual_friends_count: number
+          played_post_course: boolean
           post_actor_id: string
           post_actor_type: string
           post_content: string
@@ -16785,9 +16786,11 @@ export type Database = {
           review_facilities_score: number
           review_rating: number
           review_text: string
+          reviewed_post_course: boolean
           share_count: number
           source_review_id: string
           stream_id: string
+          top100_list_match: boolean
           tournament_meta: Json
           width: number
         }[]
