@@ -47,7 +47,6 @@ export interface ConnectWhsSuccess {
   home_club?: string | null;
   scores_imported?: number;
   friends_imported?: number;
-  [key: string]: unknown;
 }
 
 export interface ConnectWhsError {
