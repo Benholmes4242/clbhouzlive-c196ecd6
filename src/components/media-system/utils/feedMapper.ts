@@ -119,6 +119,11 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     isReview,
     isLikedByMe: !!row.is_liked_by_me,
     isFollowedByMe: !!row.is_followed_by_me,
+    // Phase 1 personalisation signals
+    mutualFriendsCount: row.mutual_friends_count ?? 0,
+    countryMatch: row.country_match ?? false,
+    top100ListMatch: row.top100_list_match ?? false,
+    ratedPostCourse: row.rated_post_course ?? false,
     engagementScore: Number(row.engagement_score) || 0,
     // Privacy-aware identity surfacing
     handicapIndex:

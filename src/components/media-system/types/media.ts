@@ -67,6 +67,11 @@ export interface FeedPost {
   isReview: boolean;
   isLikedByMe: boolean;
   isFollowedByMe: boolean;
+  // Phase 1 personalisation signals
+  mutualFriendsCount?: number;
+  countryMatch?: boolean;
+  top100ListMatch?: boolean;
+  ratedPostCourse?: boolean;
   tags?: FeedPostTag[];
   courseName?: string;
   courseId?: string;
@@ -471,6 +476,11 @@ export interface FeedRpcRow {
   review_condition_score?: number | null;
   review_facilities_score?: number | null;
   review_clubhouse_score?: number | null;
+  // NEW fields from Phase 1 v3 migration
+  mutual_friends_count?: number | null;
+  country_match?: boolean | null;
+  top100_list_match?: boolean | null;
+  rated_post_course?: boolean | null;
 }
 
 /** Timing constants */

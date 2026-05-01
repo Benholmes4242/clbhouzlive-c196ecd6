@@ -31,6 +31,16 @@ const ENGAGEMENT_BONUS_PER_LIKE = 4;  // each like adds 4 points on top of fresh
 const ENGAGEMENT_BONUS_PER_COMMENT = 7; // each comment adds 7 points
 const NEW_REVIEW_BONUS = 2.0;        // new reviews get extra boost — discovery of ratings is core to the app
 
+// ── Personal Signal Boosts (Phase 1) ──────────────────────────────────────────
+// Multiplicative boosts applied to orbitScore based on user-specific signals
+// from the suggested feed RPC. Cold-start safe: any signal absent → 1.0× (no boost).
+// Max stack: 1.5 × 1.2 × 1.15 × 1.25 × 1.5 ≈ 3.9×
+const BOOST_FOLLOWED         = 1.50;
+const BOOST_MUTUAL_FRIENDS   = 1.20;
+const BOOST_COUNTRY_MATCH    = 1.15;
+const BOOST_TOP100_LIST      = 1.25;
+const BOOST_RATED_COURSE     = 1.50;
+
 // ── Session seed ─────────────────────────────────────────────────────────────
 let _sessionSeed = 0;
 let _sessionUserId = '';
@@ -65,6 +75,22 @@ function isEditorialCard(p: FeedPost): boolean {
 
 function isReviewPost(p: FeedPost): boolean {
   return !!p.isReview;
+}
+
+/**
+ * Compute the personal-signal multiplier for a post.
+ * Cold-start safe: returns 1.0 when no signals are present.
+ * Multiplicative composition — a post strong on multiple signals stacks.
+ * Max stack ≈ 3.9× when all 5 signals fire.
+ */
+function computePersonalBoost(post: FeedPost): number {
+  return (
+    (post.isFollowedByMe                ? BOOST_FOLLOWED       : 1.0) *
+    ((post.mutualFriendsCount ?? 0) >= 1 ? BOOST_MUTUAL_FRIENDS : 1.0) *
+    (post.countryMatch                  ? BOOST_COUNTRY_MATCH  : 1.0) *
+    (post.top100ListMatch               ? BOOST_TOP100_LIST    : 1.0) *
+    (post.ratedPostCourse               ? BOOST_RATED_COURSE   : 1.0)
+  );
 }
 
 // ── Suggested Feed Filter (PASS-THROUGH SAFETY NET) ───────────────────────────
@@ -152,7 +178,7 @@ function orbitScore(post: FeedPost): number {
   // Layer 4: Session entropy — ±16% jitter keeps feed feeling fresh each session
   const jitter = ENTROPY_FLOOR + seededRandom(post.id) * ENTROPY_RANGE;
 
-  return (freshnessScore + engagementBonus) * reviewMultiplier * jitter;
+  return (freshnessScore + engagementBonus) * reviewMultiplier * jitter * computePersonalBoost(post);
 }
 
 // ── Diversity Pass ────────────────────────────────────────────────────────────
