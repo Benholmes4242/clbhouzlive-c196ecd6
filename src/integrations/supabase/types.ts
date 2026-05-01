@@ -16763,7 +16763,6 @@ export type Database = {
           media_type: string
           media_url: string
           mutual_friends_count: number
-          played_post_course: boolean
           post_actor_id: string
           post_actor_type: string
           post_content: string
@@ -16774,6 +16773,7 @@ export type Database = {
           post_type: string
           post_user_id: string
           poster_url: string
+          rated_post_course: boolean
           review_clubhouse_score: number
           review_condition_score: number
           review_course_country: string
@@ -16786,7 +16786,6 @@ export type Database = {
           review_facilities_score: number
           review_rating: number
           review_text: string
-          reviewed_post_course: boolean
           share_count: number
           source_review_id: string
           stream_id: string
