@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { fetchLikedPostIds, type LikedByMeActor } from '@/lib/likedPostIds';
 
 interface ContinueWatchingRow {
   post_id: string;
@@ -84,9 +85,13 @@ function rowToPost(row: ContinueWatchingRow): VideosContinueWatchingPost {
  * Long-form continue-watching feed (videos > 90s). Calls get_continue_watching
  * with p_format='video' so the Watch tab's mixed surface is unaffected.
  */
-export function useVideosContinueWatching(userId: string | undefined, limit = 8) {
+export function useVideosContinueWatching(
+  userId: string | undefined,
+  actor: LikedByMeActor | null,
+  limit = 8,
+) {
   return useQuery({
-    queryKey: ['videos-continue-watching', userId, limit],
+    queryKey: ['videos-continue-watching', userId, actor?.id, actor?.type, limit],
     enabled: !!userId,
     queryFn: async (): Promise<VideosContinueWatchingPost[]> => {
       if (!userId) return [];
@@ -102,7 +107,12 @@ export function useVideosContinueWatching(userId: string | undefined, limit = 8)
         }
         return [];
       }
-      return ((data as ContinueWatchingRow[] | null) ?? []).map(rowToPost);
+      const posts = ((data as ContinueWatchingRow[] | null) ?? []).map(rowToPost);
+      const likedIds = await fetchLikedPostIds(posts.map((p) => p.id), actor);
+      for (const p of posts) {
+        p.isLikedByMe = likedIds.has(p.id);
+      }
+      return posts;
     },
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
