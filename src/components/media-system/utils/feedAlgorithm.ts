@@ -31,6 +31,16 @@ const ENGAGEMENT_BONUS_PER_LIKE = 4;  // each like adds 4 points on top of fresh
 const ENGAGEMENT_BONUS_PER_COMMENT = 7; // each comment adds 7 points
 const NEW_REVIEW_BONUS = 2.0;        // new reviews get extra boost — discovery of ratings is core to the app
 
+// ── Personal Signal Boosts (Phase 1) ──────────────────────────────────────────
+// Multiplicative boosts applied to orbitScore based on user-specific signals
+// from the suggested feed RPC. Cold-start safe: any signal absent → 1.0× (no boost).
+// Max stack: 1.5 × 1.2 × 1.15 × 1.25 × 1.5 ≈ 3.9×
+const BOOST_FOLLOWED         = 1.50;
+const BOOST_MUTUAL_FRIENDS   = 1.20;
+const BOOST_COUNTRY_MATCH    = 1.15;
+const BOOST_TOP100_LIST      = 1.25;
+const BOOST_RATED_COURSE     = 1.50;
+
 // ── Session seed ─────────────────────────────────────────────────────────────
 let _sessionSeed = 0;
 let _sessionUserId = '';
