@@ -7,6 +7,7 @@ import { useFeedPostsByIds } from '../proshop/hooks/useFeedPostsByIds';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { VideoRailTile } from './VideoRailTile';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface VideosCourseAnchoredRailProps {
   userId: string | undefined;
@@ -50,9 +51,12 @@ function VideosCourseAnchoredRailInner({ userId }: VideosCourseAnchoredRailProps
   const topCourse = courses[0];
   const postIds = useMemo(() => topCourse?.recent_post_ids ?? [], [topCourse]);
 
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
   const { data: posts = [], isLoading: postsLoading } = useFeedPostsByIds(
     postIds,
     userId,
+    actor,
   );
 
   if (coursesLoading || postsLoading) return null;

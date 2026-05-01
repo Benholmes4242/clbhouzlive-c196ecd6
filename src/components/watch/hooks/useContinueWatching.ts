@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { fetchLikedPostIds, type LikedByMeActor } from '@/lib/likedPostIds';
 
 export interface ContinueWatchingPost extends FeedPost {
   progressSeconds: number;
@@ -100,9 +101,13 @@ function rowsToPost(rows: ContinueWatchingRow[]): ContinueWatchingPost {
   };
 }
 
-export function useContinueWatching(userId: string | undefined, limit = 10) {
+export function useContinueWatching(
+  userId: string | undefined,
+  actor: LikedByMeActor | null,
+  limit = 10,
+) {
   const query = useQuery({
-    queryKey: ['continue-watching', userId, limit],
+    queryKey: ['continue-watching', userId, actor?.id, actor?.type, limit],
     queryFn: async (): Promise<ContinueWatchingPost[]> => {
       if (!userId) return [];
       const { data, error } = await (supabase.rpc as any)('get_continue_watching', {
@@ -131,7 +136,14 @@ export function useContinueWatching(userId: string | undefined, limit = 10) {
         }
       }
 
-      return Array.from(grouped.values()).map(rowsToPost);
+      const postIds = Array.from(grouped.keys());
+      const likedIds = await fetchLikedPostIds(postIds, actor);
+
+      return Array.from(grouped.values()).map((rs) => {
+        const post = rowsToPost(rs);
+        post.isLikedByMe = likedIds.has(post.id);
+        return post;
+      });
     },
     enabled: !!userId,
     staleTime: 60 * 1000,

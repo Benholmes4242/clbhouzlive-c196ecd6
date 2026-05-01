@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
+import { fetchLikedPostIds, type LikedByMeActor } from '@/lib/likedPostIds';
 
 /**
  * Fetch a fixed set of posts by ID for the course-anchored rail.
@@ -13,9 +14,13 @@ import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media
  * trigger PGRST200 ("Could not find a relationship") errors. Each query
  * goes through the authenticated client so RLS policies apply individually.
  */
-export function useFeedPostsByIds(postIds: string[] | undefined, userId: string | undefined) {
+export function useFeedPostsByIds(
+  postIds: string[] | undefined,
+  userId: string | undefined,
+  actor: LikedByMeActor | null = null,
+) {
   return useQuery({
-    queryKey: ['watch-feed-posts-by-ids', (postIds ?? []).slice().sort().join(','), userId],
+    queryKey: ['watch-feed-posts-by-ids', (postIds ?? []).slice().sort().join(','), userId, actor?.id, actor?.type],
     enabled: !!postIds && postIds.length > 0,
     queryFn: async (): Promise<FeedPost[]> => {
       if (!postIds || postIds.length === 0) return [];
@@ -89,6 +94,8 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
         if (c?.id) courseMap.set(c.id, c);
       }
 
+      const likedIds = await fetchLikedPostIds(postRows.map((p) => p.id), actor);
+
       // One row per (post, media) pair so groupMultiMedia can collapse them.
       const flatRows: FeedRpcRow[] = [];
       for (const post of postRows) {
@@ -127,7 +134,7 @@ export function useFeedPostsByIds(postIds: string[] | undefined, userId: string 
             like_count: post.like_count ?? 0,
             comment_count: post.comment_count ?? 0,
             share_count: 0,
-            is_liked_by_me: false,
+            is_liked_by_me: likedIds.has(post.id),
             is_followed_by_me: false,
             review_id: null,
             review_overall_score: null,

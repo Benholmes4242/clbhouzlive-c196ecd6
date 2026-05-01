@@ -8,6 +8,7 @@ import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import WatchRailTile from '../WatchRailTile';
 import type { ClipsMoodId } from './hooks/useClipsMood';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface ClipsCourseAnchoredRailProps {
   userId: string | undefined;
@@ -64,9 +65,12 @@ function ClipsCourseAnchoredRailInner({ userId, mood }: ClipsCourseAnchoredRailP
   const topCourse = courses[0];
   const postIds = useMemo(() => topCourse?.recent_post_ids ?? [], [topCourse]);
 
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
   const { data: posts = [], isLoading: postsLoading } = useFeedPostsByIds(
     postIds,
     userId,
+    actor,
   );
 
   if (coursesLoading || postsLoading) return null;

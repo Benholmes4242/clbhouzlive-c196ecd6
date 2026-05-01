@@ -1,9 +1,12 @@
 import { memo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Clock } from 'lucide-react';
 import { useVideoOfTheWeek } from './hooks/useVideoOfTheWeek';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from '../proshop/Kicker';
 import { Pin } from '../proshop/Pin';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { isPostLikedByMe } from '@/lib/likedPostIds';
 
 function formatHMS(seconds: number | null): string {
   if (!seconds) return '';
@@ -23,6 +26,15 @@ function formatHMS(seconds: number | null): string {
  */
 function VideoOfTheWeekHeroInner() {
   const { data: pick, isLoading } = useVideoOfTheWeek();
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
+
+  const { data: isLiked = false } = useQuery({
+    queryKey: ['post-liked-by-me', pick?.post_id, actor?.id, actor?.type],
+    queryFn: () => isPostLikedByMe(pick!.post_id, actor),
+    enabled: !!pick?.post_id,
+    staleTime: 60_000,
+  });
 
   if (isLoading || !pick) return null;
 
@@ -55,7 +67,7 @@ function VideoOfTheWeekHeroInner() {
         shareCount: 0,
         review: null,
         isReview: false,
-        isLikedByMe: false,
+        isLikedByMe: isLiked,
         isFollowedByMe: false,
         courseName: pick.course_name ?? undefined,
         courseId: pick.course_id ?? undefined,

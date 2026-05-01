@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
 import { useWatchMood } from './hooks/useWatchMood';
@@ -6,6 +7,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { isPostLikedByMe } from '@/lib/likedPostIds';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
@@ -19,6 +22,15 @@ function WatchOfTheWeekHeroInner() {
   const { session } = useSupabaseSession();
   const { mood } = useWatchMood();
   const { data: pick, isLoading } = useWatchOfTheWeek(session?.user?.id, mood);
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
+
+  const { data: isLiked = false } = useQuery({
+    queryKey: ['post-liked-by-me', pick?.post_id, actor?.id, actor?.type],
+    queryFn: () => isPostLikedByMe(pick!.post_id, actor),
+    enabled: !!pick?.post_id,
+    staleTime: 60_000,
+  });
 
   if (isLoading || !pick) return null;
 
@@ -53,7 +65,7 @@ function WatchOfTheWeekHeroInner() {
         shareCount: 0,
         review: null,
         isReview: false,
-        isLikedByMe: false,
+        isLikedByMe: isLiked,
         isFollowedByMe: false,
         courseName: pick.course_name ?? undefined,
         courseId: pick.course_id ?? undefined,

@@ -3,6 +3,7 @@ import { useVideosContinueWatching } from './hooks/useVideosContinueWatching';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { VideoRailTile } from './VideoRailTile';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface VideosContinueWatchingRailProps {
   userId: string | undefined;
@@ -14,7 +15,9 @@ interface VideosContinueWatchingRailProps {
  * silently disappear when filtering changes.
  */
 function VideosContinueWatchingRailInner({ userId }: VideosContinueWatchingRailProps) {
-  const { data: posts = [], isLoading } = useVideosContinueWatching(userId, 8);
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
+  const { data: posts = [], isLoading } = useVideosContinueWatching(userId, actor, 8);
 
   if (isLoading) return null;
   if (posts.length === 0) return null;
