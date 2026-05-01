@@ -259,6 +259,23 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
             </span>
           </button>
 
+          {/* ── Subtitle: what the category measures ── */}
+          {category.label && (
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: SLATE_500,
+                letterSpacing: '0.01em',
+                marginTop: 2,
+                marginLeft: 30, // icon (22) + gap (8) — aligns with eyebrow text
+                marginBottom: isPga ? 12 : 4,
+              }}
+            >
+              {category.label}
+            </div>
+          )}
+
           {/* ── PGA TOUR LEADERS sub-label (non-PGA only) ── */}
           {!isPga && (
             <div
