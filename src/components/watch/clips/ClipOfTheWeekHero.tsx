@@ -24,6 +24,15 @@ function formatDuration(seconds: number | null): string {
  */
 function ClipOfTheWeekHeroInner() {
   const { data: pick, isLoading } = useClipOfTheWeek();
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
+
+  const { data: isLiked = false } = useQuery({
+    queryKey: ['post-liked-by-me', pick?.post_id, actor?.id, actor?.type],
+    queryFn: () => isPostLikedByMe(pick!.post_id, actor),
+    enabled: !!pick?.post_id,
+    staleTime: 60_000,
+  });
 
   if (isLoading || !pick) return null;
 
