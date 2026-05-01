@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { engagementBus } from '@/lib/engagementBus';
+import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 
 interface OpenOptions {
   openCommentsInitially?: boolean;
@@ -84,3 +86,16 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   setPaginationState: ({ hasNextPage, isFetchingNextPage }) =>
     set({ hasNextPage, isFetchingNextPage }),
 }));
+
+// Subscribe to engagement updates from the rest of the app. Keeps the
+// fullscreen snapshot in sync with React Query caches that are patched
+// by `patchEngagement`. No-op when the overlay isn't open.
+engagementBus.on(({ postId, delta }) => {
+  const state = useFullscreenFeedStore.getState();
+  if (!state.isOpen) return;
+  if (!state.posts.some((p) => p.id === postId)) return;
+
+  useFullscreenFeedStore.setState({
+    posts: state.posts.map((p) => applyEngagementDelta(p, postId, delta)),
+  });
+});
