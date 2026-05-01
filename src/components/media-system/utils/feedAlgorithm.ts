@@ -44,32 +44,6 @@ const BOOST_COUNTRY_MATCH    = 1.15;
 const BOOST_TOP100_LIST      = 1.25;
 const BOOST_RATED_COURSE     = 1.50;
 
-// ── Session seed ─────────────────────────────────────────────────────────────
-let _sessionSeed = 0;
-let _sessionUserId = '';
-let _sessionHour = 0;
-
-export function initSessionSeed(userId: string): void {
-  const currentHour = Math.floor(Date.now() / 3_600_000);
-  if (userId === _sessionUserId && currentHour === _sessionHour) return;
-  _sessionUserId = userId;
-  _sessionHour = currentHour;
-  let hash = 0;
-  const str = userId + String(currentHour);
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-  }
-  _sessionSeed = hash;
-}
-
-function seededRandom(postId: string): number {
-  let hash = _sessionSeed;
-  for (let i = 0; i < postId.length; i++) {
-    hash = (hash * 31 + postId.charCodeAt(i)) >>> 0;
-  }
-  return (hash >>> 0) / 0xFFFFFFFF;
-}
-
 // ── Type Guards ────────────────────────────────────────────────────────────────
 function isEditorialCard(p: FeedPost): boolean {
   return ['pga_card', 'course_of_week_card',
