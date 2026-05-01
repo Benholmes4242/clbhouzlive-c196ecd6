@@ -16,6 +16,9 @@ const SUGGESTED_MIN_VIDEO_DURATION = 4;
 const SUGGESTED_MAX_ASPECT_RATIO = 1.0;
 const MAX_POSTS_PER_CREATOR = 4;
 const MAX_REVIEWS_PER_CREATOR = 4;
+const MAX_POSTS_PER_COURSE = 3;
+const MAX_POSTS_PER_REGION_PER_PAGE = 6;
+const REGION_CAP_PAGE_SIZE = 10;
 const DECAY_LAMBDA = 0.035;
 const ENTROPY_FLOOR = 0.82;
 const ENTROPY_RANGE = 0.32;
@@ -153,6 +156,22 @@ export function capPerCreator(posts: FeedPost[]): FeedPost[] {
   });
 }
 
+// ── Per-Course Cap ────────────────────────────────────────────────────────────
+// Drops posts past MAX_POSTS_PER_COURSE for any single course across the
+// candidate pool. Posts without a courseId bypass the cap.
+// Editorial cards always bypass.
+export function capPerCourse(posts: FeedPost[]): FeedPost[] {
+  const courseCount = new Map<string, number>();
+  return posts.filter(post => {
+    if (isEditorialCard(post)) return true;
+    if (!post.courseId) return true;
+    const count = courseCount.get(post.courseId) ?? 0;
+    if (count >= MAX_POSTS_PER_COURSE) return false;
+    courseCount.set(post.courseId, count + 1);
+    return true;
+  });
+}
+
 // ── Orbit Score ───────────────────────────────────────────────────────────────
 function orbitScore(post: FeedPost): number {
   if (isEditorialCard(post)) return EDITORIAL_BASE_SCORE;
@@ -195,6 +214,47 @@ function applyCreatorDiversity(posts: FeedPost[]): FeedPost[] {
       result.push(remaining.splice(bestIdx, 1)[0]);
     }
   }
+  return result;
+}
+
+// ── Per-Region Per-Page Cap ───────────────────────────────────────────────────
+// Operates on the SCORED feed (after orbitScore + creator diversity).
+// Walks the feed in REGION_CAP_PAGE_SIZE windows; within each window,
+// drops posts past MAX_POSTS_PER_REGION_PER_PAGE for any single region.
+// Posts without a region bypass the cap. Editorial cards always bypass.
+//
+// Why per-page (not per-session): a session-scope cap would permanently
+// suppress non-home-region content for heavily personalised users. Page-scope
+// allows heavily home-region pages to be followed by more mixed pages,
+// preserving regional variety across infinite scroll.
+function capPerRegionInPage(posts: FeedPost[]): FeedPost[] {
+  const result: FeedPost[] = [];
+  let pageRegionCount = new Map<string, number>();
+  let pagePosition = 0;
+
+  for (const post of posts) {
+    if (pagePosition >= REGION_CAP_PAGE_SIZE) {
+      pageRegionCount = new Map<string, number>();
+      pagePosition = 0;
+    }
+
+    const region = post.review?.courseCountry ?? null;
+    if (isEditorialCard(post) || !region) {
+      result.push(post);
+      pagePosition++;
+      continue;
+    }
+
+    const count = pageRegionCount.get(region) ?? 0;
+    if (count >= MAX_POSTS_PER_REGION_PER_PAGE) {
+      // Drop this post; do NOT increment pagePosition so the page stays full.
+      continue;
+    }
+    pageRegionCount.set(region, count + 1);
+    result.push(post);
+    pagePosition++;
+  }
+
   return result;
 }
 
@@ -413,16 +473,18 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
+  const courseCapped = capPerCourse(capped);
 
   // Score every post
-  const scored = capped
+  const scored = courseCapped
     .map(p => ({ post: p, score: orbitScore(p) }))
     .sort((a, b) => b.score - a.score)
     .map(({ post }) => post);
 
   // Apply diversity and media balance
   const diverse = applyCreatorDiversity(scored);
-  const balanced = balanceMediaTypes(diverse);
+  const regionCapped = capPerRegionInPage(diverse);
+  const balanced = balanceMediaTypes(regionCapped);
   const gapped = enforceEditorialGap(balanced);
   const deduped = deduplicatePosts(gapped);
 
@@ -440,8 +502,9 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const capped = capPerCreator(noLive);
-  const reviews = capped.filter(p => isReviewPost(p));
-  const regular = capped.filter(p => !isReviewPost(p));
+  const courseCapped = capPerCourse(capped);
+  const reviews = courseCapped.filter(p => isReviewPost(p));
+  const regular = courseCapped.filter(p => !isReviewPost(p));
   const result: FeedPost[] = [];
   let ri = 0, regi = 0, slot = 1;
   while (regi < regular.length || ri < reviews.length) {
