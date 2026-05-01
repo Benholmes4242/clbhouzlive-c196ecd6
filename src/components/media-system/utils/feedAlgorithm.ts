@@ -547,8 +547,12 @@ export function buildSuggestedFeedWithEditorials(
   rawPosts: FeedPost[],
   editorialCards: (FeedPost | null)[]
 ): FeedPost[] {
-  // Merge editorial cards into the pool — filter nulls
-  const validEditorials = editorialCards.filter((c): c is FeedPost => c !== null);
+  // Merge editorial cards into the pool — filter nulls and stamp each with
+  // EDITORIAL_BASE_SCORE so the single sort inside buildSuggestedFeed places
+  // them at the right relative position alongside server-scored posts.
+  const validEditorials = editorialCards
+    .filter((c): c is FeedPost => c !== null)
+    .map(c => ({ ...c, engagementScore: EDITORIAL_BASE_SCORE }));
   const combined = [...rawPosts, ...validEditorials];
   // Run the full Orbit pipeline on the combined set
   return buildSuggestedFeed(combined);
