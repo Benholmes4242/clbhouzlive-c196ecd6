@@ -130,3 +130,54 @@ export function useCourseForm(
     staleTime: 60_000,
   });
 }
+
+export type TryNextCourse = {
+  id: string;
+  name: string;
+  region: string | null;
+  country: string;
+  country_rank: number | null;
+  regional_rank: number | null;
+  course_type: string | null;
+};
+
+async function fetchTryNextCourses(
+  userId: string,
+  countryCode: string,
+  limit: number,
+): Promise<TryNextCourse[]> {
+  const { data: playedRows, error: playedErr } = await supabase
+    .from('user_courses')
+    .select('course_id')
+    .eq('user_id', userId)
+    .eq('played', true);
+  if (playedErr) throw playedErr;
+  const playedIds = new Set((playedRows ?? []).map((r: any) => r.course_id));
+
+  const { data: courses, error } = await supabase
+    .from('golf_courses')
+    .select('id, name, region, country, country_rank, regional_rank, course_type')
+    .eq('country_code', countryCode)
+    .not('country_rank', 'is', null)
+    .order('country_rank', { ascending: true })
+    .limit(50);
+  if (error) throw error;
+
+  const filtered = (courses ?? [])
+    .filter((c: any) => !playedIds.has(c.id))
+    .slice(0, limit);
+  return filtered as TryNextCourse[];
+}
+
+export function useTryNextCourses(
+  userId: string | undefined,
+  countryCode: string | null | undefined = 'GB',
+  limit: number = 5,
+) {
+  return useQuery({
+    queryKey: ['try-next-courses', userId ?? '', countryCode ?? 'GB', limit],
+    queryFn: () => fetchTryNextCourses(userId as string, countryCode ?? 'GB', limit),
+    enabled: !!userId,
+    staleTime: 5 * 60_000,
+  });
+}
