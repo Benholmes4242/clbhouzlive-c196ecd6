@@ -16,6 +16,9 @@ interface MediaThumbnailProps {
   onStudio?: () => void;
   onSetCover?: () => void;
   isViewerOpen?: boolean;
+  /** Layout context. 'strip' = legacy horizontal strip with fixed clamp size.
+   *  'grid' = fills its grid cell (square, 1:1 aspect ratio). Default 'strip'. */
+  size?: 'strip' | 'grid';
 }
 
 export function MediaThumbnail({
@@ -26,14 +29,19 @@ export function MediaThumbnail({
   onRemove,
   onExpand,
   onSetCover,
+  size = 'strip',
 }: MediaThumbnailProps) {
   const src = item.thumbnailUrl || item.previewUrl;
   const isVideo = item.type === 'video';
 
   return (
     <div
-      className="relative flex-shrink-0 rounded-2xl overflow-hidden bg-muted"
-      style={{ width: 'clamp(160px, 45vw, 208px)', height: 'clamp(160px, 45vw, 208px)' }}
+      className="relative rounded-2xl overflow-hidden bg-muted"
+      style={
+        size === 'grid'
+          ? { width: '100%', aspectRatio: '1 / 1' }
+          : { width: 'clamp(160px, 45vw, 208px)', height: 'clamp(160px, 45vw, 208px)' }
+      }
     >
       <button onClick={onExpand} className="w-full h-full">
         {isVideo && !item.thumbnailUrl ? (
