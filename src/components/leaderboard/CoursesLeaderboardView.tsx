@@ -1,12 +1,10 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCourseLeaderboard, CourseSortType } from '@/hooks/useCourseLeaderboard';
-import { useSpotlightCourse } from '@/hooks/useSpotlightCourse';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { EditorialLedeSkeleton } from '@/components/leaderboards/shared/EditorialLedeSkeleton';
 import { RefreshCw, WifiOff } from 'lucide-react';
 
 const PAGE_SIZE = 20;
@@ -215,8 +213,7 @@ export function CoursesLeaderboardView() {
     };
   }, [masthead, sort]);
 
-  // ─── Spotlight ─────────────────────────────────────────────────────
-  const { data: spotlight, isLoading: spotlightLoading } = useSpotlightCourse();
+  // ─── (Spotlight removed in F1 — masthead course is the single hero) ──
 
   // ─── User played count + total in list ─────────────────────────────
   const { data: playedStats = { played: 0, total: 0 } } = useQuery<{ played: number; total: number }>({
@@ -451,124 +448,81 @@ export function CoursesLeaderboardView() {
         ))}
       </div>
 
-      {/* ── FRONT-PAGE LEDE ──────────────────────────────────────── */}
-      {isLoading && !masthead ? (
-        <EditorialLedeSkeleton />
-      ) : mastheadCopy ? (
-        <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
-          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
-            {personalisedEyebrow}
-          </div>
-          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
-            {mastheadCopy.headline}
-            {mastheadCopy.headlineTwo && (
-              <>
-                <br />
-                <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
-                  {mastheadCopy.headlineTwo}
-                </span>
-              </>
-            )}
-          </h2>
-          <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
-            {mastheadCopy.standfirst}
-          </p>
-        </div>
-      ) : null}
-
-      {/* ── BOX SCORE ────────────────────────────────────────────── */}
-      <div style={{ padding: '20px 20px 0' }}>
-        <div style={{
-          borderTop: '1px solid #0F172A', borderBottom: '1px solid #0F172A',
-          padding: '16px 0',
-          display: 'grid', gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
-          alignItems: 'center',
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>PLAYED</div>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-              {userPlayedCount}
-            </div>
-          </div>
-          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>OF LIST</div>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-              {pctOfList}<span style={{ fontSize: 18, color: '#475569' }}>%</span>
-            </div>
-          </div>
-          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>TO GO</div>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#0F172A', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-              {totalInList === 0 ? '—' : (toGoCount === 0 ? '—' : toGoCount)}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── THIS SEASON'S HOTTEST ───────────────────────────────── */}
-      <div style={{ padding: '20px 20px 0' }}>
-        {spotlightLoading ? (
+      {/* ── COMBINED HERO ──────────────────────────────────────────
+          Sort-aware editorial copy + photo + rating + plays of the
+          #1 course in the current list. Replaces the previous separate
+          editorial lede and slate spotlight sections. */}
+      <div style={{ padding: '22px 20px 0' }}>
+        {isLoading && !masthead ? (
           <div style={{
-            width: '100%', height: 260, background: '#0F172A', borderRadius: 4,
+            width: '100%', height: 240, background: '#0F172A', borderRadius: 8,
             position: 'relative', overflow: 'hidden',
           }}>
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0, height: 160,
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-            }} />
-            <div style={{ padding: '180px 18px 14px' }}>
+            <div style={{ padding: '160px 18px 14px' }}>
               <Skeleton style={{ height: 22, width: '65%', marginBottom: 6 }} />
               <Skeleton style={{ height: 11, width: '40%' }} />
             </div>
           </div>
-        ) : spotlight ? (
+        ) : mastheadCopy && masthead ? (
           <button
-            onClick={() => handleCourseClick(spotlight.course_id)}
+            onClick={() => handleCourseClick(masthead.course_id)}
             style={{
               width: '100%',
-              background: '#0F172A', color: '#fff', borderRadius: 4,
+              background: '#0F172A', color: '#fff', borderRadius: 8,
               overflow: 'hidden', position: 'relative',
               border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0,
             }}
           >
+            {/* Photo strip with eyebrow overlay */}
             <div style={{
               height: 140,
-              background: spotlight.image_url
-                ? `linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.7) 100%), url(${spotlight.image_url}) center/cover`
+              background: masthead.thumbnail_url
+                ? `linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.7) 100%), url(${masthead.thumbnail_url}) center/cover`
                 : 'linear-gradient(180deg, #2d5a3d, #1a3d2e)',
               position: 'relative',
             }}>
               <div style={{
-                position: 'absolute', top: 22, left: 12,
-                fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
+                position: 'absolute', top: 14, left: 14,
+                fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
                 background: 'rgba(0,0,0,0.4)',
                 padding: '4px 8px', borderRadius: 2,
-                backdropFilter: 'blur(6px)',
-                WebkitBackdropFilter: 'blur(6px)',
                 border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-                transform: 'rotate(-4deg)',
-                transformOrigin: 'left center',
               }}>
-                THIS SEASON'S HOTTEST
+                {personalisedEyebrow}
               </div>
             </div>
-            <div style={{ padding: '12px 18px 13px' }}>
-              <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 4 }}>
-                {spotlight.course_name}
-              </div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginBottom: 12 }}>
-                {[spotlight.city, spotlight.country].filter(Boolean).join(', ')}
-              </div>
-              <div style={{ display: 'flex', gap: 16, paddingTop: 9, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+
+            {/* Editorial body */}
+            <div style={{ padding: '14px 18px 16px' }}>
+              <h2 style={{
+                fontSize: 24, fontWeight: 900, color: '#fff',
+                letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05,
+              }}>
+                {mastheadCopy.headline}
+                {mastheadCopy.headlineTwo && (
+                  <>
+                    <br />
+                    <span style={{ fontStyle: 'italic', fontWeight: 900, color: 'rgba(255,255,255,0.7)' }}>
+                      {mastheadCopy.headlineTwo}
+                    </span>
+                  </>
+                )}
+              </h2>
+              <p style={{
+                fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5,
+                marginTop: 8, marginBottom: 12, fontStyle: 'italic',
+              }}>
+                {mastheadCopy.standfirst}
+              </p>
+
+              {/* Stats footer */}
+              <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
                 <div>
                   <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
                     RATING
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {spotlight.avg_rating ? spotlight.avg_rating.toFixed(1) : '—'}
+                    {masthead.avg_rating != null ? masthead.avg_rating.toFixed(1) : '—'}
                   </div>
                 </div>
                 <div style={{ width: 1, background: 'rgba(255,255,255,0.12)' }} />
@@ -577,7 +531,7 @@ export function CoursesLeaderboardView() {
                     PLAYS
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {spotlight.total_rounds ?? 0}
+                    {masthead.times_played ?? 0}
                     <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, marginLeft: 4 }}>this season</span>
                   </div>
                 </div>
@@ -587,16 +541,31 @@ export function CoursesLeaderboardView() {
         ) : null}
       </div>
 
-      {/* ── BY REGION ────────────────────────────────────────────── */}
-      <div style={{ padding: '22px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
-          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
-          <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>BY REGION</span>
-          <div style={{ width: 12, height: 1, background: '#0F172A' }} />
-          <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
-        </div>
-        <div style={{ display: 'flex', gap: 5, overflowX: 'auto', paddingBottom: 2, WebkitOverflowScrolling: 'touch', justifyContent: 'center', flexWrap: 'wrap' }}>
+      {/* ── YOUR PROGRESS — slim one-line stat strip ──────────────── */}
+      <div style={{
+        padding: '14px 20px 0',
+        textAlign: 'center',
+        fontSize: 12,
+        color: '#64748B',
+        fontVariantNumeric: 'tabular-nums lining-nums',
+      }}>
+        <span style={{ fontWeight: 900, color: '#9F1D1D' }}>{userPlayedCount}</span>
+        <span> played · </span>
+        <span style={{ fontWeight: 900, color: '#9F1D1D' }}>{pctOfList}%</span>
+        <span> of list · </span>
+        <span style={{ fontWeight: 900, color: '#0F172A' }}>
+          {totalInList === 0 ? '—' : (toGoCount === 0 ? '—' : toGoCount)}
+        </span>
+        <span> to go</span>
+      </div>
+
+      {/* ── THE FULL LIST ───────────────────────────────────────── */}
+      <div style={{ padding: '24px 20px 0' }}>
+        {/* Region filter chips — replaces the standalone BY REGION section */}
+        <div style={{
+          display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4,
+          WebkitOverflowScrolling: 'touch', marginBottom: 14,
+        }}>
           {[
             { key: 'global' as const, label: 'Global' },
             { key: 'gb-i' as const, label: 'GB&I' },
@@ -608,7 +577,7 @@ export function CoursesLeaderboardView() {
               key={r.key}
               onClick={() => setQuickRegion(r.key)}
               style={{
-                padding: '6px 12px', borderRadius: 8, whiteSpace: 'nowrap',
+                padding: '6px 12px', borderRadius: 999, whiteSpace: 'nowrap',
                 background: quickRegion === r.key ? '#0F172A' : 'transparent',
                 color: quickRegion === r.key ? '#fff' : '#64748B',
                 border: quickRegion === r.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
@@ -620,73 +589,8 @@ export function CoursesLeaderboardView() {
             </button>
           ))}
         </div>
-      </div>
 
-      {/* ── FROM YOUR CIRCLE ────────────────────────────────────── */}
-      {circleRecentRounds && circleRecentRounds.length > 0 && (
-        <div style={{ padding: '22px 20px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
-            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
-            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
-            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
-          </div>
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
-            {circleRecentRounds.slice(0, 10).map((round: any) => {
-              const daysAgo = Math.max(0, Math.floor((Date.now() - new Date(round.created_at).getTime()) / 86400000));
-              const course = round.golf_courses;
-              const player = round.user_profiles;
-              if (!course || !player) return null;
-              return (
-                <button
-                  key={round.id}
-                  onClick={() => handleCourseClick(course.id)}
-                  style={{
-                    flexShrink: 0, width: 200,
-                    border: '1px solid rgba(15,23,42,0.08)', borderRadius: 4,
-                    background: '#fff', overflow: 'hidden',
-                    cursor: 'pointer', padding: 0, textAlign: 'left',
-                  }}
-                >
-                  <div style={{
-                    height: 80,
-                    background: course.thumbnail_image
-                      ? `url(${course.thumbnail_image}) center/cover`
-                      : 'linear-gradient(135deg, #2d5a3d, #1a3d2e)',
-                  }} />
-                  <div style={{ padding: '10px 12px' }}>
-                    <div style={{
-                      fontSize: 13, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.005em',
-                      marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>
-                      {course.name}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ fontSize: 11, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                        {player.display_name}
-                      </div>
-                      <div style={{
-                        fontSize: 12, fontWeight: 900, color: '#F7931E',
-                        fontVariantNumeric: 'tabular-nums lining-nums',
-                        letterSpacing: '-0.02em', marginLeft: 6, flexShrink: 0,
-                      }}>
-                        {round.rating?.toFixed(1) ?? '—'}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 3 }}>
-                      {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ── THE FULL LIST ───────────────────────────────────────── */}
-      <div style={{ padding: '26px 20px 0' }}>
+        {/* THE FULL LIST label divider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           <div style={{ width: 12, height: 1, background: '#0F172A' }} />
@@ -814,6 +718,69 @@ export function CoursesLeaderboardView() {
           <InlineRetryCard onRetry={() => fetchNextPage()} />
         )}
       </div>
+
+      {/* ── FROM YOUR CIRCLE — moved below the list ───────────────── */}
+      {circleRecentRounds && circleRecentRounds.length > 0 && (
+        <div style={{ padding: '28px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
+            <div style={{ width: 12, height: 1, background: '#0F172A' }} />
+            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
+            {circleRecentRounds.slice(0, 10).map((round: any) => {
+              const daysAgo = Math.max(0, Math.floor((Date.now() - new Date(round.created_at).getTime()) / 86400000));
+              const course = round.golf_courses;
+              const player = round.user_profiles;
+              if (!course || !player) return null;
+              return (
+                <button
+                  key={round.id}
+                  onClick={() => handleCourseClick(course.id)}
+                  style={{
+                    flexShrink: 0, width: 200,
+                    border: '1px solid rgba(15,23,42,0.08)', borderRadius: 4,
+                    background: '#fff', overflow: 'hidden',
+                    cursor: 'pointer', padding: 0, textAlign: 'left',
+                  }}
+                >
+                  <div style={{
+                    height: 80,
+                    background: course.thumbnail_image
+                      ? `url(${course.thumbnail_image}) center/cover`
+                      : 'linear-gradient(135deg, #2d5a3d, #1a3d2e)',
+                  }} />
+                  <div style={{ padding: '10px 12px' }}>
+                    <div style={{
+                      fontSize: 13, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.005em',
+                      marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {course.name}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: 11, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                        {player.display_name}
+                      </div>
+                      <div style={{
+                        fontSize: 12, fontWeight: 900, color: '#F7931E',
+                        fontVariantNumeric: 'tabular-nums lining-nums',
+                        letterSpacing: '-0.02em', marginLeft: 6, flexShrink: 0,
+                      }}>
+                        {round.rating?.toFixed(1) ?? '—'}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 3 }}>
+                      {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── FOOTER CAPTION ──────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 32px', textAlign: 'center' }}>
