@@ -502,8 +502,9 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const capped = capPerCreator(noLive);
-  const reviews = capped.filter(p => isReviewPost(p));
-  const regular = capped.filter(p => !isReviewPost(p));
+  const courseCapped = capPerCourse(capped);
+  const reviews = courseCapped.filter(p => isReviewPost(p));
+  const regular = courseCapped.filter(p => !isReviewPost(p));
   const result: FeedPost[] = [];
   let ri = 0, regi = 0, slot = 1;
   while (regi < regular.length || ri < reviews.length) {
