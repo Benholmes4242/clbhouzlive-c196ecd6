@@ -94,6 +94,8 @@ export function useFeedPostsByIds(
         if (c?.id) courseMap.set(c.id, c);
       }
 
+      const likedIds = await fetchLikedPostIds(postRows.map((p) => p.id), actor);
+
       // One row per (post, media) pair so groupMultiMedia can collapse them.
       const flatRows: FeedRpcRow[] = [];
       for (const post of postRows) {
@@ -132,7 +134,7 @@ export function useFeedPostsByIds(
             like_count: post.like_count ?? 0,
             comment_count: post.comment_count ?? 0,
             share_count: 0,
-            is_liked_by_me: false,
+            is_liked_by_me: likedIds.has(post.id),
             is_followed_by_me: false,
             review_id: null,
             review_overall_score: null,
