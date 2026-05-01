@@ -7,6 +7,7 @@ import { useWatchMood } from './hooks/useWatchMood';
 import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import WatchRailTile from '../WatchRailTile';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 /**
  * "From your courses" rail — surfaces fresh clips/videos from a course
@@ -30,9 +31,12 @@ function CourseAnchoredRailInner() {
   const topCourse = courses[0];
   const postIds = useMemo(() => topCourse?.recent_post_ids ?? [], [topCourse]);
 
+  const { activeActor } = useActiveActor();
+  const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
   const { data: posts = [], isLoading: postsLoading } = useFeedPostsByIds(
     postIds,
     userId,
+    actor,
   );
 
   if (coursesLoading || postsLoading) return null;
