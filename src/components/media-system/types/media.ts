@@ -68,10 +68,10 @@ export interface FeedPost {
   isLikedByMe: boolean;
   isFollowedByMe: boolean;
   // Phase 1 personalisation signals
-  mutualFriendsCount: number;
-  countryMatch: boolean;
-  top100ListMatch: boolean;
-  ratedPostCourse: boolean;
+  mutualFriendsCount?: number;
+  countryMatch?: boolean;
+  top100ListMatch?: boolean;
+  ratedPostCourse?: boolean;
   tags?: FeedPostTag[];
   courseName?: string;
   courseId?: string;
