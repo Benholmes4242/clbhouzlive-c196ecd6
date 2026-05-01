@@ -473,16 +473,18 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
+  const courseCapped = capPerCourse(capped);
 
   // Score every post
-  const scored = capped
+  const scored = courseCapped
     .map(p => ({ post: p, score: orbitScore(p) }))
     .sort((a, b) => b.score - a.score)
     .map(({ post }) => post);
 
   // Apply diversity and media balance
   const diverse = applyCreatorDiversity(scored);
-  const balanced = balanceMediaTypes(diverse);
+  const regionCapped = capPerRegionInPage(diverse);
+  const balanced = balanceMediaTypes(regionCapped);
   const gapped = enforceEditorialGap(balanced);
   const deduped = deduplicatePosts(gapped);
 
