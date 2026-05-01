@@ -5,7 +5,7 @@
  * Live layout:      [Avatar] [Name + Score] ... [Position/Off Lead]
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
@@ -49,6 +49,11 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
     ? prediction.score - leaderScore
     : null;
 
+  // Live state: allow expand to show pick reasons (top 3)
+  const bullets = !isCompleted ? (prediction.reasons ?? []).slice(0, 3) : [];
+  const canExpand = !isCompleted && bullets.length > 0;
+  const [open, setOpen] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -59,26 +64,40 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         delay: index * 0.05,
       }}
       style={{
-        padding: '12px 16px',
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
         borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)',
         borderLeft: (!isCompleted && isLeader) ? '3px solid #F7931E' : '3px solid transparent',
         background: (!isCompleted && isLeader) ? 'rgba(247,147,30,0.03)' : 'transparent',
-        cursor: 'pointer',
         transition: 'background-color 100ms ease',
       }}
-      onPointerDown={(e) => {
-        const el = e.currentTarget;
-        el.style.backgroundColor = 'hsl(var(--muted) / 0.3)';
-      }}
-      onPointerUp={(e) => {
-        const el = e.currentTarget;
-        setTimeout(() => { el.style.backgroundColor = 'transparent'; }, 100);
-      }}
-      onPointerLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
     >
+      <div
+        role={canExpand ? 'button' : undefined}
+        tabIndex={canExpand ? 0 : undefined}
+        onClick={canExpand ? () => setOpen(o => !o) : undefined}
+        onKeyDown={canExpand ? (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen(o => !o);
+          }
+        } : undefined}
+        style={{
+          padding: '12px 16px',
+          cursor: canExpand ? 'pointer' : 'pointer',
+          position: 'relative',
+        }}
+        onPointerDown={(e) => {
+          const el = e.currentTarget;
+          el.style.backgroundColor = 'hsl(var(--muted) / 0.3)';
+        }}
+        onPointerUp={(e) => {
+          const el = e.currentTarget;
+          setTimeout(() => { el.style.backgroundColor = 'transparent'; }, 100);
+        }}
+        onPointerLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
+      >
       {/* Winner badge */}
       {isCompleted && isWinner && (
         <div
@@ -204,7 +223,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
         </div>
 
         {/* RIGHT SECTION */}
-        <div className="flex-shrink-0 ml-auto">
+        <div className="flex-shrink-0 ml-auto flex items-center gap-2">
           {isCompleted ? (
             <span
               className={prediction.score !== null && prediction.score < 0 ? 'text-foreground' : 'text-muted-foreground'}
@@ -225,8 +244,46 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               score={prediction.score}
             />
           )}
+          {canExpand && (
+            <span
+              aria-hidden="true"
+              style={{
+                fontSize: 14,
+                color: '#CBD5E1',
+                transform: open ? 'rotate(90deg)' : 'none',
+                transition: 'transform 0.15s',
+                display: 'inline-block',
+                flexShrink: 0,
+                lineHeight: 1,
+              }}
+            >
+              ›
+            </span>
+          )}
         </div>
       </div>
+      </div>
+
+      {/* Expanded reasons — live state only */}
+      {canExpand && open && (
+        <div style={{ background: 'rgba(15,23,42,0.01)', borderTop: '0.5px solid rgba(15,23,42,0.05)' }}>
+          {bullets.map((b, bi) => (
+            <div
+              key={bi}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 9,
+                padding: '7px 16px 7px 19px',
+                borderBottom: bi < bullets.length - 1 ? '0.5px solid rgba(15,23,42,0.05)' : 'none',
+              }}
+            >
+              <div style={{ width: 3, height: 3, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />
+              <span style={{ fontSize: 11, color: '#475569', lineHeight: 1.4 }}>{b}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 };
