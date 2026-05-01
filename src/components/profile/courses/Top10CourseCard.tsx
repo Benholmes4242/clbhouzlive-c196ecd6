@@ -92,7 +92,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 
         {/* Rank badge - frosted glass style (top left) */}
         <div 
-          className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full"
           style={{
             background: 'rgba(255,255,255,0.15)',
             backdropFilter: 'blur(20px)',
@@ -100,14 +100,14 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             border: '1px solid rgba(255,255,255,0.2)',
           }}
         >
-          <span className="text-white font-bold text-[13px]">#{position}</span>
+          <span className="text-white font-bold text-[12px]">#{position}</span>
         </div>
 
         {/* Content overlay - bottom (above reaction strip) */}
-        <div className="absolute bottom-[52px] left-0 right-0 px-4 pb-3 pt-8">
+        <div className="absolute bottom-[47px] left-0 right-0 px-3 pb-2.5 pt-6">
           {/* Course name */}
           <h3 
-            className="text-white font-semibold text-xl leading-tight mb-1 line-clamp-2"
+            className="text-white font-semibold text-lg leading-tight mb-0.5 line-clamp-2"
             style={{
               textShadow: '0 1px 8px rgba(0,0,0,0.3)',
             }}
@@ -117,7 +117,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           
           {/* Location */}
           <p 
-            className="text-white/70 text-sm mb-2.5 line-clamp-1"
+            className="text-white/70 text-[13px] mb-2 line-clamp-1"
             style={{
               textShadow: '0 1px 4px rgba(0,0,0,0.2)',
             }}
@@ -128,7 +128,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {/* Rating chip - frosted glass */}
           {rating !== undefined && tierData && (
             <div 
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
               style={{
                 background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(20px)',
@@ -138,13 +138,13 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               }}
             >
               <span 
-                className="font-bold text-sm"
+                className="font-bold text-[13px]"
                 style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
-                className="text-[11px] font-medium tracking-wide uppercase"
+                className="text-[10px] font-medium tracking-wide uppercase"
                 style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
@@ -155,7 +155,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 
         {/* Reaction strip — overlaid at bottom of card image */}
         <div
-          className="absolute bottom-0 left-0 right-0 flex h-[52px] glass-dark !rounded-none !rounded-b-[24px] !border-t-[1px] !border-t-white/[0.06] !border-b-0 !border-x-0"
+          className="absolute bottom-0 left-0 right-0 flex h-[47px] glass-dark !rounded-none !rounded-b-[24px] !border-t-[1px] !border-t-white/[0.06] !border-b-0 !border-x-0"
         >
           {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config], idx) => {
             const count = counts[type] ?? 0;
