@@ -1596,35 +1596,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 {p.courses_this_season}
               </span>
 
-              {showChaserStrip && (
-                <div style={{
-                  gridColumn: '1 / -1',
-                  marginTop: 8,
-                  height: 4,
-                  display: 'flex',
-                  gap: 2,
-                  alignItems: 'stretch',
-                }}>
-                  <div style={{
-                    flex: Math.min(chaserAbove ?? 0, 6),
-                    background: 'rgba(159,29,29,0.30)',
-                    borderRadius: 1,
-                    minWidth: chaserAbove === 0 ? 4 : 8,
-                  }} />
-                  <div style={{
-                    width: 6,
-                    background: '#9F1D1D',
-                    borderRadius: 1,
-                    flexShrink: 0,
-                  }} />
-                  <div style={{
-                    flex: Math.min(chaserBelow ?? 0, 6),
-                    background: 'rgba(15,23,42,0.15)',
-                    borderRadius: 1,
-                    minWidth: chaserBelow === 0 ? 4 : 8,
-                  }} />
-                </div>
-              )}
             </div>
           );
         })}
