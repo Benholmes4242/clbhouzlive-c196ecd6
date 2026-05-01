@@ -54,7 +54,7 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
     try {
       const data = await callConnectWhs(membershipNumber.trim(), password);
       if (!data.ok) {
-        const code = data.error_code ?? 'internal_error';
+        const code: string = data.error_code ?? 'internal_error';
         setError(ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
         return;
       }
