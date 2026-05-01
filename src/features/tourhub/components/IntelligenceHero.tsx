@@ -1337,6 +1337,43 @@ function ResultsTrailing({ pick }: { pick: TrackedPrediction }) {
   );
 }
 
+function LiveTrailing({ pick }: { pick: TrackedPrediction }) {
+  const { base: positionBase, suffix: positionSuffix } = formatPositionParts(pick);
+  const scoreStr = formatScore(pick.score);
+
+  return (
+    <div
+      style={{
+        textAlign: 'right',
+        fontVariantNumeric: 'tabular-nums',
+        flexShrink: 0,
+        marginRight: 4,
+        minWidth: 44,
+      }}
+    >
+      <div style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+        {positionBase}
+        {positionSuffix && (
+          <span style={{ fontSize: 9, fontWeight: 700, marginLeft: 1 }}>
+            {positionSuffix}
+          </span>
+        )}
+      </div>
+      <div
+        style={{
+          marginTop: 4,
+          fontSize: 10,
+          fontWeight: 700,
+          color: 'rgba(255,255,255,0.55)',
+          lineHeight: 1,
+        }}
+      >
+        {scoreStr}
+      </div>
+    </div>
+  );
+}
+
 // ─── Atoms ───────────────────────────────────────────────────────────────────
 
 function Eyebrow({
