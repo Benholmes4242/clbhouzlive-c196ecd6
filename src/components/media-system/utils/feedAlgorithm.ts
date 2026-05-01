@@ -238,13 +238,13 @@ function capPerRegionInPage(posts: FeedPost[]): FeedPost[] {
       pagePosition = 0;
     }
 
-    if (isEditorialCard(post) || !post.reviewCourseCountry) {
+    const region = post.review?.courseCountry ?? null;
+    if (isEditorialCard(post) || !region) {
       result.push(post);
       pagePosition++;
       continue;
     }
 
-    const region = post.reviewCourseCountry;
     const count = pageRegionCount.get(region) ?? 0;
     if (count >= MAX_POSTS_PER_REGION_PER_PAGE) {
       // Drop this post; do NOT increment pagePosition so the page stays full.
