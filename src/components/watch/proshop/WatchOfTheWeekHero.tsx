@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
 import { useWatchMood } from './hooks/useWatchMood';
@@ -6,6 +7,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { isPostLikedByMe } from '@/lib/likedPostIds';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
