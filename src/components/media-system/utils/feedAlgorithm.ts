@@ -18,6 +18,14 @@ const MAX_POSTS_PER_CREATOR = 4;
 const MAX_REVIEWS_PER_CREATOR = 4;
 const MAX_POSTS_PER_COURSE = 3;
 const MAX_POSTS_PER_REGION_PER_PAGE = 6;
+
+// ── Friends Feed Caps (Phase F1) ──────────────────────────────────────────────
+// Looser than Suggested caps because the Friends universe is intentionally
+// narrow — the user already chose these people. The Suggested caps (4 / 3)
+// would silently drop legitimate friend content; F1 uses 6 / 5 with deferral.
+const FRIENDS_MAX_POSTS_PER_CREATOR = 6;
+const FRIENDS_MAX_POSTS_PER_COURSE = 5;
+const FRIENDS_PAGE_SIZE = 10;  // matches Clubhouse hook PAGE_SIZE
 const REGION_CAP_PAGE_SIZE = 10;
 const DECAY_LAMBDA = 0.035;
 const ENTROPY_FLOOR = 0.82;
@@ -303,6 +311,96 @@ function interleaveReviewsIntoFeed(regular: FeedPost[], reviews: FeedPost[]): Fe
   return out;
 }
 
+// ── Friends Feed: Adaptive Review Cadence (Phase F1) ──────────────────────────
+// Computes the natural review-to-total ratio in the candidate pool, then
+// interleaves reviews at that ratio. Cadence clamped to [2, 10].
+function adaptiveReviewInterleave(
+  regular: FeedPost[],
+  reviews: FeedPost[]
+): FeedPost[] {
+  if (reviews.length === 0) return regular;
+  if (regular.length === 0) return reviews;
+
+  const total = regular.length + reviews.length;
+  const reviewRatio = reviews.length / total;
+  const rawCadence = Math.round(1 / reviewRatio);
+  const cadence = Math.max(2, Math.min(10, rawCadence));
+
+  const out: FeedPost[] = [];
+  let ri = 0, regi = 0, slot = 1;
+  while (regi < regular.length || ri < reviews.length) {
+    if (slot === cadence && ri < reviews.length) {
+      out.push(reviews[ri++]);
+      slot = 1;
+    } else if (regi < regular.length) {
+      out.push(regular[regi++]);
+      slot++;
+    } else if (ri < reviews.length) {
+      out.push(reviews[ri++]);
+      slot = 1;
+    } else {
+      break;
+    }
+  }
+  return out;
+}
+
+// ── Friends Feed: Cap with Deferral (Phase F1) ────────────────────────────────
+// Walks the chronological feed in PAGE_SIZE windows. Posts exceeding per-creator
+// or per-course limits are deferred to the next page rather than dropped.
+function capWithDeferral(posts: FeedPost[]): FeedPost[] {
+  const out: FeedPost[] = [];
+  let queue: FeedPost[] = [...posts];
+
+  while (queue.length > 0) {
+    const pageBudget = FRIENDS_PAGE_SIZE;
+    const creatorCount = new Map<string, number>();
+    const courseCount = new Map<string, number>();
+    const deferred: FeedPost[] = [];
+    let placedThisPage = 0;
+
+    while (queue.length > 0 && placedThisPage < pageBudget) {
+      const post = queue.shift()!;
+
+      if (isEditorialCard(post)) {
+        out.push(post);
+        placedThisPage++;
+        continue;
+      }
+
+      const creatorKey = post.userId;
+      const courseKey = post.courseId;
+      const creatorN = creatorCount.get(creatorKey) ?? 0;
+      const courseN = courseKey ? (courseCount.get(courseKey) ?? 0) : 0;
+
+      if (creatorN >= FRIENDS_MAX_POSTS_PER_CREATOR) {
+        deferred.push(post);
+        continue;
+      }
+      if (courseKey && courseN >= FRIENDS_MAX_POSTS_PER_COURSE) {
+        deferred.push(post);
+        continue;
+      }
+
+      creatorCount.set(creatorKey, creatorN + 1);
+      if (courseKey) courseCount.set(courseKey, courseN + 1);
+      out.push(post);
+      placedThisPage++;
+    }
+
+    // Prepend deferred to the queue for the next page window.
+    queue = [...deferred, ...queue];
+
+    // Termination guard: if zero progress was made this round, append rest and exit.
+    if (deferred.length > 0 && placedThisPage === 0) {
+      out.push(...queue);
+      break;
+    }
+  }
+
+  return out;
+}
+
 // ── Pass 4: Per-Page Review Floor Guarantee ───────────────────────────────────
 // Final safety-net pass. After cadence + editorial placement, if the assembled
 // feed contains fewer than REVIEW_FLOOR reviews per PAGE_SIZE-window AND the
@@ -470,23 +568,28 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   return deduped;
 }
 
-// ── Friends Feed Pipeline ─────────────────────────────────────────────────────
+// ── Friends Feed Pipeline (Phase F1) ──────────────────────────────────────────
+// Chronological feed of posts from the user's social graph. Server returns
+// ordered by created_at DESC; client applies adaptive review cadence, caps
+// with deferral, and dedupes.
+//
+// Phase F1 changes:
+//   - Replaced fixed every-9th review insertion with adaptive cadence
+//   - Replaced hard caps (drop) with deferral caps (push to next page)
+//   - Looser per-creator / per-course caps (6 / 5 vs Suggested's 4 / 3)
+//
+// What's NOT here vs Suggested feed (deliberate):
+//   - No personalisation boosts (user already chose this circle)
+//   - No region caps (friends post wherever they post)
+//   - No editorial card injection (Friends is friends-only)
+//   - No session jitter (chronological is the contract)
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
-  const capped = capPerCreator(noLive);
-  const courseCapped = capPerCourse(capped);
-  const reviews = courseCapped.filter(p => isReviewPost(p));
-  const regular = courseCapped.filter(p => !isReviewPost(p));
-  const result: FeedPost[] = [];
-  let ri = 0, regi = 0, slot = 1;
-  while (regi < regular.length || ri < reviews.length) {
-    if (slot === 9 && ri < reviews.length) result.push(reviews[ri++]);
-    else if (regi < regular.length) result.push(regular[regi++]);
-    else if (ri < reviews.length) result.push(reviews[ri++]);
-    else break;
-    slot = slot < 10 ? slot + 1 : 1;
-  }
-  return deduplicatePosts(result);
+  const reviews = noLive.filter(p => isReviewPost(p));
+  const regular = noLive.filter(p => !isReviewPost(p));
+  const interleaved = adaptiveReviewInterleave(regular, reviews);
+  const capped = capWithDeferral(interleaved);
+  return deduplicatePosts(capped);
 }
 
 // ── Editorial Card Injection ──────────────────────────────────────────────────
