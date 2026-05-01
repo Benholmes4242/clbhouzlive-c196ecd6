@@ -52,6 +52,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
                 alignItems: 'center',
                 gap: 6,
                 transition: 'color 0.18s',
+                whiteSpace: 'nowrap',
               }}
             >
               {tab.icon && <span>{tab.icon}</span>}
