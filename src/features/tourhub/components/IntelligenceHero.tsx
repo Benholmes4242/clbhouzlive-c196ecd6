@@ -579,8 +579,17 @@ function LiveStateBlock({
         {picks.length === 0 && data?.topContenders.slice(0, 3).map((p) => (
           <UpcomingPickRow key={p.playerId} contender={p} />
         ))}
-        {picks.slice(0, 3).map((p) => (
-          <LivePickRow key={p.playerId} pick={p} />
+        {picks.slice(0, 3).map((p, i) => (
+          <ExpandablePickRow
+            key={p.playerId}
+            playerId={p.playerId}
+            playerName={p.playerName}
+            reasons={p.reasons}
+            collapsedReasonPreview={p.reasons[0]}
+            defaultExpanded={i === 0}
+            tier={i === 0 ? 'TOP PICK' : i === 1 ? 'STRONG' : 'CONTENTION'}
+            trailing={<LiveTrailing pick={p} />}
+          />
         ))}
       </div>
     </div>
