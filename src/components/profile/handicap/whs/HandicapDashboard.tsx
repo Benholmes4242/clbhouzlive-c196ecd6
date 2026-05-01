@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowDown, ArrowUp, AlertTriangle, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { callSyncWhsOne } from '@/lib/whs/api';
 import {
   useHandicapTrend,
@@ -12,13 +12,20 @@ import {
   whsKeys,
 } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
+import HeroHandicapCard from './sections/HeroHandicapCard';
+import ActivityFeedStrip from './sections/ActivityFeedStrip';
+import FriendsLeaderboard from './sections/FriendsLeaderboard';
+import HeadToHeadCard from './sections/HeadToHeadCard';
+import AchievementsStrip from './sections/AchievementsStrip';
+import CourseFormCard from './sections/CourseFormCard';
+import PredictionsCard from './sections/PredictionsCard';
+import InvitesSection from './sections/InvitesSection';
 
 interface Props {
   connection: WhsConnection;
   userId: string;
 }
 
-const fmtDelta = (n: number) => Math.abs(n).toFixed(1);
 const fmtDiff = (n: number | null | undefined) => {
   if (n === null || n === undefined) return '—';
   if (n > 0) return `+${n.toFixed(1)}`;
@@ -35,14 +42,6 @@ const relativeDay = (iso: string) => {
   if (days < 7) return `${days} days ago`;
   return format(d, 'd MMM');
 };
-
-const HeroSkeleton = () => (
-  <div className="px-5 pt-8 pb-7 animate-pulse">
-    <div className="h-3 w-44 bg-muted/60 rounded mb-5" />
-    <div className="h-16 w-28 bg-muted rounded mb-3" />
-    <div className="h-4 w-36 bg-muted/60 rounded" />
-  </div>
-);
 
 const RowSkeleton = () => (
   <div className="px-5 py-3 animate-pulse flex items-center justify-between">
@@ -61,7 +60,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
     connection.last_sync_status === 'auth_failed'
   );
 
-  const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
+  const { data: trend } = useHandicapTrend(connection.id);
   const { data: lastRound, isLoading: lastLoading } = useLastRound(connection.id);
   const { data: counters, isLoading: countersLoading } = useCounters(connection.id);
   const { data: recent, isLoading: recentLoading } = useRecentRounds(connection.id);
@@ -85,6 +84,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
       queryClient.invalidateQueries({ queryKey: whsKeys.lastRound(connection.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.counters(connection.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.recent(connection.id) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.allScores(connection.id) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendsLeaderboard(userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendsActivity(userId) });
       if (data.handicap_changed && typeof data.handicap_index === 'number') {
         toast.success(`Handicap updated to ${data.handicap_index.toFixed(1)}!`);
       } else {
@@ -104,41 +106,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
     Date.now() - lastSyncedAt.getTime() > 24 * 3600_000 &&
     connection.last_sync_status !== 'auth_failed';
 
-  // Trend label
-  let trendNode: React.ReactNode = null;
-  if (trendLoading) {
-    trendNode = <span className="h-4 w-28 bg-muted/60 rounded inline-block" />;
-  } else if (trend) {
-    if (trend.delta === null && !trend.hasHistory) {
-      trendNode = (
-        <span className="text-[13px] text-muted-foreground">New connection — trend coming soon</span>
-      );
-    } else if (trend.delta !== null && Math.abs(trend.delta) < 0.05) {
-      trendNode = <span className="text-[13px] text-muted-foreground">— No change in 30 days</span>;
-    } else if (trend.delta !== null && trend.delta < 0) {
-      trendNode = (
-        <span
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[13px] font-semibold"
-          style={{ background: 'rgba(16,185,129,0.10)', color: '#059669' }}
-        >
-          <ArrowDown className="h-3 w-3" /> {fmtDelta(trend.delta)} in 30 days
-        </span>
-      );
-    } else if (trend.delta !== null && trend.delta > 0) {
-      trendNode = (
-        <span
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[13px] font-semibold"
-          style={{ background: 'rgba(220,38,38,0.10)', color: '#B91C1C' }}
-        >
-          <ArrowUp className="h-3 w-3" /> {fmtDelta(trend.delta)} in 30 days
-        </span>
-      );
-    }
-  }
-
-  const memberSince = connection.created_at
-    ? `Member since ${format(new Date(connection.created_at), 'MMM yyyy')}`
-    : 'England Golf member';
+  const currentHandicap = trend?.current ?? null;
 
   return (
     <div className="pb-10">
@@ -167,30 +135,19 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
         </div>
       ) : null}
 
-      {/* HERO */}
-      {trendLoading && !trend ? (
-        <HeroSkeleton />
-      ) : (
-        <section className="px-5 pt-8 pb-7">
-          <p className="text-[12px] text-muted-foreground mb-3">{memberSince}</p>
-          <div className="flex items-end gap-3 mb-2">
-            <span
-              className="font-extrabold text-foreground tabular-nums leading-none"
-              style={{ fontSize: 64, letterSpacing: '-0.02em' }}
-            >
-              {trend?.current !== null && trend?.current !== undefined
-                ? trend.current.toFixed(1)
-                : '—'}
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-[14px] font-medium text-muted-foreground">Handicap Index</span>
-            <span>{trendNode}</span>
-          </div>
-        </section>
-      )}
+      {/* HERO with sparkline */}
+      <HeroHandicapCard connection={connection} />
 
       <div className="h-px mx-5 mb-5" style={{ background: 'rgba(15,23,42,0.08)' }} />
+
+      {/* NEW — rivalry & activity */}
+      <ActivityFeedStrip ownerUserId={userId} />
+      <FriendsLeaderboard ownerUserId={userId} currentUserHandicap={currentHandicap} />
+      <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
+      <AchievementsStrip
+        connectionId={connection.id}
+        connectionCreatedAt={connection.created_at}
+      />
 
       {/* LAST ROUND */}
       <section className="px-5 mb-7">
@@ -276,6 +233,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none',
+              willChange: 'transform',
             }}
           >
             {countersLoading
@@ -312,6 +270,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
           </div>
         </section>
       )}
+
+      {/* NEW — course form + predictions */}
+      <CourseFormCard connectionId={connection.id} currentHandicap={currentHandicap} />
+      <PredictionsCard connectionId={connection.id} />
 
       {/* RECENT ROUNDS */}
       <section className="mb-6">
@@ -363,6 +325,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
           )}
         </div>
       </section>
+
+      {/* NEW — invites */}
+      <InvitesSection ownerUserId={userId} />
 
       {/* FOOTER */}
       <div className="px-5 pt-2 flex flex-col items-center gap-3">
