@@ -25,15 +25,8 @@ import {
   ENGAGEMENT_RECORD_KEYS,
   ENGAGEMENT_ONLY_KEYS,
 } from './feedQueryKeys';
-
-interface EngagementDelta {
-  /** New value for `isLikedByMe`. Omit to leave unchanged. */
-  isLikedByMe?: boolean;
-  /** Apply +1 / -1 to like count. Omit to leave unchanged. */
-  likeCountDelta?: number;
-  /** Apply +1 / -1 to comment count. Omit to leave unchanged. */
-  commentCountDelta?: number;
-}
+import { applyEngagementDelta, type EngagementDelta } from './applyEngagementDelta';
+import { engagementBus } from './engagementBus';
 
 interface PatchOptions {
   /**
@@ -76,48 +69,7 @@ export function patchEngagement(
   options?: PatchOptions,
 ): void {
   const skip = options?.skipKeyPrefixes ?? [];
-  const updatePostObject = (post: any): any => {
-    if (!post || post.id !== postId) return post;
-
-    const patched = { ...post };
-
-    if (delta.isLikedByMe !== undefined) {
-      patched.isLikedByMe = delta.isLikedByMe;
-      patched.is_liked_by_me = delta.isLikedByMe;
-      patched.hasLiked = delta.isLikedByMe;
-      patched.has_liked = delta.isLikedByMe;
-    }
-
-    if (delta.likeCountDelta !== undefined) {
-      const current =
-        patched.likeCount ??
-        patched.like_count ??
-        patched.likesCount ??
-        patched.likes_count ??
-        0;
-      const next = Math.max(0, current + delta.likeCountDelta);
-      patched.likeCount = next;
-      patched.like_count = next;
-      patched.likesCount = next;
-      patched.likes_count = next;
-    }
-
-    if (delta.commentCountDelta !== undefined) {
-      const current =
-        patched.commentCount ??
-        patched.comment_count ??
-        patched.commentsCount ??
-        patched.comments_count ??
-        0;
-      const next = Math.max(0, current + delta.commentCountDelta);
-      patched.commentCount = next;
-      patched.comment_count = next;
-      patched.commentsCount = next;
-      patched.comments_count = next;
-    }
-
-    return patched;
-  };
+  const updatePostObject = (post: any) => applyEngagementDelta(post, postId, delta);
 
   /** Detects whether an object is a post-engagement single record. */
   const isEngagementRecord = (obj: any): boolean =>
