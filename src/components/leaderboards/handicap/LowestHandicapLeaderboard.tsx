@@ -750,7 +750,7 @@ export function LowestHandicapLeaderboard({
               borderTop: `3px double ${INK}`,
               borderBottom: `3px double ${INK}`,
               padding: '16px 4px',
-              background: '#fff',
+              background: 'transparent',
               position: 'relative',
             }}
           >
