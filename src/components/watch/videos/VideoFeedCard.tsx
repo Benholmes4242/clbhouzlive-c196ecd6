@@ -10,6 +10,7 @@ import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
 import { haptic } from '@/utils/haptics';
+import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 
 function formatHMS(seconds: number | null | undefined): string {
   if (!seconds || seconds <= 0) return '';
@@ -155,21 +156,18 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
         </button>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div
+          <ExpandableCaption
+            lines={2}
             style={{
               fontSize: 14,
               fontWeight: 700,
               lineHeight: 1.3,
               color: '#0F172A',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
               letterSpacing: '-0.01em',
             }}
           >
             {post.caption || `${post.displayName} on Clbhouz`}
-          </div>
+          </ExpandableCaption>
           <div
             style={{
               fontSize: 11,

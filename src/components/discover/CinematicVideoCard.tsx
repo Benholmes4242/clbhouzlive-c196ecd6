@@ -9,6 +9,7 @@ import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { clsx } from 'clsx';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
+import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 
 
 interface CinematicVideoCardProps {
@@ -138,10 +139,10 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
       {/* Meta Block - Below Video */}
       <div className="px-4 pt-2 pb-3">
-        {/* Caption (one line) */}
-        <h3 className="text-heading-md font-semibold leading-snug line-clamp-2 text-foreground">
+        {/* Caption — clamps to 2 lines, expandable inline when overflowing */}
+        <ExpandableCaption lines={2} className="text-heading-md font-semibold leading-snug text-foreground">
           {item.title || 'No caption'}
-        </h3>
+        </ExpandableCaption>
 
         {/* Meta row: left = handle, center = date, right = likes */}
         <div className="mt-1 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-body-md text-muted-foreground">

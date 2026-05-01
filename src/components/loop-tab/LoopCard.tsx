@@ -13,6 +13,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { LoopCardMenu } from './LoopCardMenu';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
+import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
@@ -372,14 +373,15 @@ export const LoopCard = React.memo(function LoopCard({
           />
         </div>
 
-        {/* 3. CAPTION — two lines max, truncated */}
+        {/* 3. CAPTION — two lines by default, expandable inline when overflowing */}
         {cleanCaption && (
           <div className="px-4 pt-2 pb-0">
-            <PostContentWithTags
-              content={cleanCaption}
-              tags={post.tags || []}
-              className="text-[14px] text-foreground line-clamp-2"
-            />
+            <ExpandableCaption lines={2} className="text-[14px] text-foreground">
+              <PostContentWithTags
+                content={cleanCaption}
+                tags={post.tags || []}
+              />
+            </ExpandableCaption>
           </div>
         )}
 
