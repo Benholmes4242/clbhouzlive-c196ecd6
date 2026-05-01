@@ -448,124 +448,81 @@ export function CoursesLeaderboardView() {
         ))}
       </div>
 
-      {/* ── FRONT-PAGE LEDE ──────────────────────────────────────── */}
-      {isLoading && !masthead ? (
-        <EditorialLedeSkeleton />
-      ) : mastheadCopy ? (
-        <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
-          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.28em', color: '#9F1D1D', marginBottom: 10 }}>
-            {personalisedEyebrow}
-          </div>
-          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05, color: '#0F172A' }}>
-            {mastheadCopy.headline}
-            {mastheadCopy.headlineTwo && (
-              <>
-                <br />
-                <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
-                  {mastheadCopy.headlineTwo}
-                </span>
-              </>
-            )}
-          </h2>
-          <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.55, marginTop: 12, marginBottom: 0, fontStyle: 'italic' }}>
-            {mastheadCopy.standfirst}
-          </p>
-        </div>
-      ) : null}
-
-      {/* ── BOX SCORE ────────────────────────────────────────────── */}
-      <div style={{ padding: '20px 20px 0' }}>
-        <div style={{
-          borderTop: '1px solid #0F172A', borderBottom: '1px solid #0F172A',
-          padding: '16px 0',
-          display: 'grid', gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
-          alignItems: 'center',
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>PLAYED</div>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-              {userPlayedCount}
-            </div>
-          </div>
-          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>OF LIST</div>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#9F1D1D', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-              {pctOfList}<span style={{ fontSize: 18, color: '#475569' }}>%</span>
-            </div>
-          </div>
-          <div style={{ height: 36, background: 'rgba(15,23,42,0.1)' }} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em', marginBottom: 4 }}>TO GO</div>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: '#0F172A', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-              {totalInList === 0 ? '—' : (toGoCount === 0 ? '—' : toGoCount)}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── THIS SEASON'S HOTTEST ───────────────────────────────── */}
-      <div style={{ padding: '20px 20px 0' }}>
-        {spotlightLoading ? (
+      {/* ── COMBINED HERO ──────────────────────────────────────────
+          Sort-aware editorial copy + photo + rating + plays of the
+          #1 course in the current list. Replaces the previous separate
+          editorial lede and slate spotlight sections. */}
+      <div style={{ padding: '22px 20px 0' }}>
+        {isLoading && !masthead ? (
           <div style={{
-            width: '100%', height: 260, background: '#0F172A', borderRadius: 4,
+            width: '100%', height: 240, background: '#0F172A', borderRadius: 8,
             position: 'relative', overflow: 'hidden',
           }}>
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0, height: 160,
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-            }} />
-            <div style={{ padding: '180px 18px 14px' }}>
+            <div style={{ padding: '160px 18px 14px' }}>
               <Skeleton style={{ height: 22, width: '65%', marginBottom: 6 }} />
               <Skeleton style={{ height: 11, width: '40%' }} />
             </div>
           </div>
-        ) : spotlight ? (
+        ) : mastheadCopy && masthead ? (
           <button
-            onClick={() => handleCourseClick(spotlight.course_id)}
+            onClick={() => handleCourseClick(masthead.course_id)}
             style={{
               width: '100%',
-              background: '#0F172A', color: '#fff', borderRadius: 4,
+              background: '#0F172A', color: '#fff', borderRadius: 8,
               overflow: 'hidden', position: 'relative',
               border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0,
             }}
           >
+            {/* Photo strip with eyebrow overlay */}
             <div style={{
               height: 140,
-              background: spotlight.image_url
-                ? `linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.7) 100%), url(${spotlight.image_url}) center/cover`
+              background: masthead.thumbnail_url
+                ? `linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.7) 100%), url(${masthead.thumbnail_url}) center/cover`
                 : 'linear-gradient(180deg, #2d5a3d, #1a3d2e)',
               position: 'relative',
             }}>
               <div style={{
-                position: 'absolute', top: 22, left: 12,
-                fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
+                position: 'absolute', top: 14, left: 14,
+                fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
                 background: 'rgba(0,0,0,0.4)',
                 padding: '4px 8px', borderRadius: 2,
-                backdropFilter: 'blur(6px)',
-                WebkitBackdropFilter: 'blur(6px)',
                 border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-                transform: 'rotate(-4deg)',
-                transformOrigin: 'left center',
               }}>
-                THIS SEASON'S HOTTEST
+                {personalisedEyebrow}
               </div>
             </div>
-            <div style={{ padding: '12px 18px 13px' }}>
-              <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 4 }}>
-                {spotlight.course_name}
-              </div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginBottom: 12 }}>
-                {[spotlight.city, spotlight.country].filter(Boolean).join(', ')}
-              </div>
-              <div style={{ display: 'flex', gap: 16, paddingTop: 9, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+
+            {/* Editorial body */}
+            <div style={{ padding: '14px 18px 16px' }}>
+              <h2 style={{
+                fontSize: 24, fontWeight: 900, color: '#fff',
+                letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05,
+              }}>
+                {mastheadCopy.headline}
+                {mastheadCopy.headlineTwo && (
+                  <>
+                    <br />
+                    <span style={{ fontStyle: 'italic', fontWeight: 900, color: 'rgba(255,255,255,0.7)' }}>
+                      {mastheadCopy.headlineTwo}
+                    </span>
+                  </>
+                )}
+              </h2>
+              <p style={{
+                fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5,
+                marginTop: 8, marginBottom: 12, fontStyle: 'italic',
+              }}>
+                {mastheadCopy.standfirst}
+              </p>
+
+              {/* Stats footer */}
+              <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
                 <div>
                   <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
                     RATING
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {spotlight.avg_rating ? spotlight.avg_rating.toFixed(1) : '—'}
+                    {masthead.avg_rating != null ? masthead.avg_rating.toFixed(1) : '—'}
                   </div>
                 </div>
                 <div style={{ width: 1, background: 'rgba(255,255,255,0.12)' }} />
@@ -574,7 +531,7 @@ export function CoursesLeaderboardView() {
                     PLAYS
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {spotlight.total_rounds ?? 0}
+                    {masthead.times_played ?? 0}
                     <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, marginLeft: 4 }}>this season</span>
                   </div>
                 </div>
@@ -582,6 +539,24 @@ export function CoursesLeaderboardView() {
             </div>
           </button>
         ) : null}
+      </div>
+
+      {/* ── YOUR PROGRESS — slim one-line stat strip ──────────────── */}
+      <div style={{
+        padding: '14px 20px 0',
+        textAlign: 'center',
+        fontSize: 12,
+        color: '#64748B',
+        fontVariantNumeric: 'tabular-nums lining-nums',
+      }}>
+        <span style={{ fontWeight: 900, color: '#9F1D1D' }}>{userPlayedCount}</span>
+        <span> played · </span>
+        <span style={{ fontWeight: 900, color: '#9F1D1D' }}>{pctOfList}%</span>
+        <span> of list · </span>
+        <span style={{ fontWeight: 900, color: '#0F172A' }}>
+          {totalInList === 0 ? '—' : (toGoCount === 0 ? '—' : toGoCount)}
+        </span>
+        <span> to go</span>
       </div>
 
       {/* ── BY REGION ────────────────────────────────────────────── */}
