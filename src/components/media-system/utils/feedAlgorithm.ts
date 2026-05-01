@@ -179,32 +179,14 @@ export function capPerCourse(posts: FeedPost[]): FeedPost[] {
   });
 }
 
-// ── Orbit Score ───────────────────────────────────────────────────────────────
+// ── Orbit Score (Phase 3: server-computed) ───────────────────────────────────
+// Orbit score is now computed inside the get_suggested_feed RPC and returned
+// in the engagement_score column → mapped to FeedPost.engagementScore.
+// This thin accessor is retained so dev-mode telemetry (and any future
+// inspector UI) keeps working without changes. The full scoring formula
+// (freshness × engagement × review × jitter × personal boosts) lives in SQL.
 function orbitScore(post: FeedPost): number {
-  if (isEditorialCard(post)) return EDITORIAL_BASE_SCORE;
-
-  const likes = post.likeCount ?? 0;
-  const comments = post.commentCount ?? 0;
-
-  // Layer 1: Freshness is the primary score
-  // New posts start at FRESHNESS_BASE and decay with a half-life of 36 hours.
-  // This means a brand new post always outscores any stale content regardless of likes.
-  const ageMs = Date.now() - new Date(post.createdAt).getTime();
-  const ageHours = ageMs / (1000 * 60 * 60);
-  const freshnessScore = FRESHNESS_BASE * Math.pow(0.5, ageHours / FRESHNESS_HALF_LIFE_HOURS);
-
-  // Layer 2: Engagement is additive — it extends a post's lifespan but doesn't override freshness
-  // A post with 10 likes + 2 comments gets +54 points on top of its freshness score.
-  // This lets viral posts stay visible longer, but never buries new content.
-  const engagementBonus = (likes * ENGAGEMENT_BONUS_PER_LIKE) + (comments * ENGAGEMENT_BONUS_PER_COMMENT);
-
-  // Layer 3: Review bonus — course reviews are core to Clbhouz, boost them significantly
-  const reviewMultiplier = isReviewPost(post) ? NEW_REVIEW_BONUS : 1.0;
-
-  // Layer 4: Session entropy — ±16% jitter keeps feed feeling fresh each session
-  const jitter = ENTROPY_FLOOR + seededRandom(post.id) * ENTROPY_RANGE;
-
-  return (freshnessScore + engagementBonus) * reviewMultiplier * jitter * computePersonalBoost(post);
+  return post.engagementScore ?? 0;
 }
 
 // ── Diversity Pass ────────────────────────────────────────────────────────────
