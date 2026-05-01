@@ -77,6 +77,22 @@ function isReviewPost(p: FeedPost): boolean {
   return !!p.isReview;
 }
 
+/**
+ * Compute the personal-signal multiplier for a post.
+ * Cold-start safe: returns 1.0 when no signals are present.
+ * Multiplicative composition — a post strong on multiple signals stacks.
+ * Max stack ≈ 3.9× when all 5 signals fire.
+ */
+function computePersonalBoost(post: FeedPost): number {
+  return (
+    (post.isFollowedByMe                ? BOOST_FOLLOWED       : 1.0) *
+    ((post.mutualFriendsCount ?? 0) >= 1 ? BOOST_MUTUAL_FRIENDS : 1.0) *
+    (post.countryMatch                  ? BOOST_COUNTRY_MATCH  : 1.0) *
+    (post.top100ListMatch               ? BOOST_TOP100_LIST    : 1.0) *
+    (post.ratedPostCourse               ? BOOST_RATED_COURSE   : 1.0)
+  );
+}
+
 // ── Suggested Feed Filter (PASS-THROUGH SAFETY NET) ───────────────────────────
 // The get_suggested_feed RPC now filters non-renderable posts server-side.
 // This client-side function is kept as a safety net: if an unexpected post shape
