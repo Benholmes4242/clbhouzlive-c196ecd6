@@ -1407,10 +1407,12 @@ function ResultsStateBlock({
   data,
   tracker,
   pulse,
+  framingSentence,
 }: {
   data: AIPredictionData | null | undefined;
   tracker: PredictionTrackerData | undefined;
   pulse: boolean;
+  framingSentence: string | null;
 }) {
   const picks = tracker?.predictions ?? [];
   const topPick = picks.find(p => p.predictedRank === 1) ?? picks[0] ?? null;
