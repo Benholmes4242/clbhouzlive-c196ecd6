@@ -15,6 +15,7 @@ import type {
   WhsScoreHole,
   WhsFriendCourseBest,
   WhsFriendActivityWithImage,
+  WhsFriendWindowRanking,
 } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
