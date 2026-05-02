@@ -142,7 +142,7 @@ const PodiumSlotEl: React.FC<{
             lineHeight: 1,
           }}
         >
-          {handicap !== null && handicap !== undefined ? handicap.toFixed(1) : '—'}
+          {rankingValue !== null && rankingValue !== undefined ? rankingValue.toFixed(1) : '—'}
         </p>
       </div>
     </div>
