@@ -12,6 +12,7 @@ import {
   fetchFriendsActivity,
   fetchSentInvites,
   fetchCourseForm,
+  fetchLastRoundDetail,
 } from './api';
 
 export const whsKeys = {
@@ -28,7 +29,21 @@ export const whsKeys = {
   sentInvites: () => ['whs-sent-invites'] as const,
   courseForm: (connectionId: string, currentHandicap: number) =>
     ['whs-course-form', connectionId, currentHandicap] as const,
+  lastRoundDetail: (connectionId: string) =>
+    ['whs-last-round-detail', connectionId] as const,
 };
+
+export function useLastRoundDetail(
+  connectionId: string | undefined,
+  enabled: boolean = true,
+) {
+  return useQuery({
+    queryKey: whsKeys.lastRoundDetail(connectionId ?? ''),
+    queryFn: () => fetchLastRoundDetail(connectionId as string),
+    enabled: !!connectionId && enabled,
+    staleTime: 60_000,
+  });
+}
 
 export function useWhsConnection(userId: string | undefined) {
   return useQuery({

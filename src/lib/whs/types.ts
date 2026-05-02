@@ -141,3 +141,40 @@ export interface CourseForm {
   expected_differential: number;
   delta: number;
 }
+
+// ─── Hole-level detail ──────────────────────────────────────────────────
+export interface WhsScoreHole {
+  hole_no: number;
+  par: number;
+  actual_gross: number | null;
+  adjusted_gross: number | null;
+  distance_yards: number | null;
+  stroke_index: number | null;
+  played: boolean;
+  hole_alias: string | null;
+}
+
+export interface WhsLastRoundDetail {
+  id: string;
+  play_date: string;
+  adjusted_gross: number | null;
+  actual_gross: number | null;
+  stableford_points: number | null;
+  handicap_differential: number | null;
+  handicap_index_at_time: number | null;
+  course_handicap: number | null;
+  course_rating: number | null;
+  slope_rating: number | null;
+  pcc: number | null;
+  marker_name: string | null;
+  is_counter: boolean;
+  is_competition_score: boolean;
+  is_nine_hole: boolean;
+  total_holes: number;
+  hole_by_hole_fetched: boolean;
+  permalink_url: string | null;
+  course: WhsCourseRef | null;
+  course_header_image: string | null;
+  course_thumbnail_image: string | null;
+  holes: WhsScoreHole[] | null;
+}
