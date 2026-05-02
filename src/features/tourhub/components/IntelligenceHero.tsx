@@ -1282,10 +1282,12 @@ function LiveStateBlock({
   data,
   tracker,
   pulse,
+  framingSentence,
 }: {
   data: AIPredictionData | null | undefined;
   tracker: PredictionTrackerData | undefined;
   pulse: boolean;
+  framingSentence: string | null;
 }) {
   const picks = useMemo(() => {
     const raw = tracker?.predictions ?? [];
