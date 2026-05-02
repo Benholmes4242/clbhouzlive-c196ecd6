@@ -48,10 +48,7 @@ import { useIntelligenceHistoricalPicks } from '../hooks/useIntelligenceHistoric
 import { usePredictionTracker } from '../hooks/usePredictionTracker';
 import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions';
 import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
-import {
-  INTELLIGENCE_HERO_FALLBACK,
-  getVenueRequirements,
-} from '../utils/editorialFallbacks';
+import { getVenueRequirements } from '../utils/editorialFallbacks';
 import { IntelligenceAllPicksSheet } from './IntelligenceAllPicksSheet';
 import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
