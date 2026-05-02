@@ -55,6 +55,11 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
     try {
       const data = await callSyncWhsOne();
       if (!data.ok) {
+        if (data.error === 'credentials_invalid') {
+          setReauthRequired(true);
+          toast.error('Your England Golf password changed. Please disconnect and reconnect.');
+          return;
+        }
         toast.error(data.message ?? "Couldn't sync right now. Try again later.");
         return;
       }
