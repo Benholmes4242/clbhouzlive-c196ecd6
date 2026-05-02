@@ -548,7 +548,7 @@ function Masthead({
             borderRadius: '50%',
             background: dotColor,
             boxShadow: isLive ? `0 0 8px ${dotColor}` : 'none',
-            animation: isLive ? 'clbhouz-pulse-dot 1.6s ease-in-out infinite' : 'none',
+            animation: isLive ? 'pulseDot 1.6s ease-in-out infinite' : 'none',
             display: 'inline-block',
           }}
         />
