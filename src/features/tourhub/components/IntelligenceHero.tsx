@@ -48,6 +48,83 @@ const GREEN_MID = '#0A5238';
 const GREEN_DARK = '#042418';
 const GREEN_ACCENT = '#2DBB78';
 const AMBER_ACCENT = '#F7931E';
+const PAPER = '#F4EFE3';
+const PAPER_MUTE = 'rgba(244,239,227,0.50)';
+const PANEL_RAISED = '#0E4632';
+const PANEL_DARK = '#0A2A1E';
+const HAIRLINE = 'rgba(244,239,227,0.10)';
+
+const serifTitle: React.CSSProperties = {
+  fontFamily: '"Tiempos Headline", "Source Serif Pro", Georgia, serif',
+  fontWeight: 700,
+  lineHeight: 1.1,
+  letterSpacing: '-0.015em',
+  color: PAPER,
+  margin: 0,
+};
+
+const monoLabel: React.CSSProperties = {
+  fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+};
+
+/** First whitespace-delimited token of a player name. "Cam Smith" → "Cam". */
+function getFirstName(fullName: string): string {
+  const parts = (fullName ?? '').trim().split(/\s+/);
+  return parts[0] || fullName || '';
+}
+
+type MissTone = {
+  eyebrow: string;
+  eyebrowColor: string;
+  headlineMain: (winnerFirstName: string) => React.ReactNode;
+  headlineSub: (bestPickFirstName: string, bestPickPosition: string) => React.ReactNode;
+  contextLine: (numInTop10: number, missedCuts: number) => string;
+};
+
+function getMissTone(outcome: IntelligenceOutcome): MissTone {
+  if (outcome === 'top5') {
+    return {
+      eyebrow: 'Closest call.',
+      eyebrowColor: '#F2A24E',
+      headlineMain: (winner) => <>{winner} won.</>,
+      headlineSub: (firstName, pos) => (
+        <span style={{ color: PAPER_MUTE, fontWeight: 600 }}>
+          {firstName} took {pos} — a stroke off the playoff.
+        </span>
+      ),
+      contextLine: (top10, mc) =>
+        `Strong contender finish · ${top10} pick(s) in T10 · ${mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`}`,
+    };
+  }
+  if (outcome === 'partial') {
+    return {
+      eyebrow: 'Solid week.',
+      eyebrowColor: '#A8B5AD',
+      headlineMain: (winner) => <>{winner} won.</>,
+      headlineSub: (firstName, pos) => (
+        <span style={{ color: PAPER_MUTE, fontWeight: 600 }}>
+          {firstName} finished {pos}.
+        </span>
+      ),
+      contextLine: (top10, mc) =>
+        `Top pick in form · ${top10} pick(s) in T10 · ${mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`}`,
+    };
+  }
+  return {
+    eyebrow: 'Tough one.',
+    eyebrowColor: '#A8B5AD',
+    headlineMain: (winner) => <>{winner} won —</>,
+    headlineSub: (firstName, pos) => (
+      <span style={{ color: PAPER_MUTE, fontWeight: 600 }}>
+        we had {firstName} at {pos}.
+      </span>
+    ),
+    contextLine: (top10, mc) =>
+      `Winner not in our top 3 · ${top10} pick(s) in T10 · ${mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`}`,
+  };
+}
 
 function formatPosition(p: TrackedPrediction): string {
   if (p.performanceStatus === 'cut') return 'MC';
