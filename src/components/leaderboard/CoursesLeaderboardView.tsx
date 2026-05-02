@@ -561,10 +561,11 @@ export function CoursesLeaderboardView() {
 
       {/* ── THE FULL LIST ───────────────────────────────────────── */}
       <div style={{ padding: '24px 20px 0' }}>
-        {/* Region filter chips — replaces the standalone BY REGION section */}
+        {/* Region filter tabs — text-only, centered, matches profile tab pattern */}
         <div style={{
-          display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4,
-          WebkitOverflowScrolling: 'touch', marginBottom: 14,
+          display: 'flex', gap: 18, justifyContent: 'center', overflowX: 'auto',
+          paddingBottom: 4, WebkitOverflowScrolling: 'touch', marginBottom: 14,
+          scrollbarWidth: 'none',
         }}>
           {[
             { key: 'global' as const, label: 'Global' },
@@ -572,22 +573,28 @@ export function CoursesLeaderboardView() {
             { key: 'usa' as const, label: 'USA' },
             { key: 'europe' as const, label: 'Europe' },
             { key: 'row' as const, label: 'Rest of World' },
-          ].map(r => (
-            <button
-              key={r.key}
-              onClick={() => setQuickRegion(r.key)}
-              style={{
-                padding: '6px 12px', borderRadius: 999, whiteSpace: 'nowrap',
-                background: quickRegion === r.key ? '#0F172A' : 'transparent',
-                color: quickRegion === r.key ? '#fff' : '#64748B',
-                border: quickRegion === r.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-                fontSize: 11, fontWeight: 700, cursor: 'pointer',
-                flexShrink: 0,
-              }}
-            >
-              {r.label}
-            </button>
-          ))}
+          ].map(r => {
+            const isActive = quickRegion === r.key;
+            return (
+              <button
+                key={r.key}
+                onClick={() => setQuickRegion(r.key)}
+                style={{
+                  padding: '6px 4px', whiteSpace: 'nowrap',
+                  background: 'transparent', border: 'none', cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: isActive ? 800 : 500,
+                  color: isActive ? '#0F172A' : '#94A3B8',
+                  letterSpacing: isActive ? '-0.01em' : 0,
+                  flexShrink: 0,
+                  minHeight: 34,
+                  transition: 'color 0.15s ease',
+                }}
+              >
+                {r.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* THE FULL LIST label divider */}
