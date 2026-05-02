@@ -1676,9 +1676,6 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
         </>
       )}
 
-      {/* Suppress unused-import noise in editorial fallback while still
-          consuming it for forward compatibility. */}
-      <span style={{ display: 'none' }}>{INTELLIGENCE_HERO_FALLBACK.upcoming?.headline ?? ''}</span>
     </div>
   );
 }
