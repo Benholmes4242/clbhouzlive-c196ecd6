@@ -14,6 +14,7 @@ import {
   fetchSentInvites,
   fetchCourseForm,
   fetchLastRoundDetail,
+  fetchFriendWindowRankings,
 } from './api';
 
 export const whsKeys = {
