@@ -1373,7 +1373,7 @@ function LiveStateBlock({
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
           subtitle={`Pre-rank #${heroPick.predictedRank} → Live ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
-          pulledQuote={heroPick.reasons[0] ?? null}
+          pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
           positionAccent={heroPick.actualPosition === 1 ? 'amber' : 'ink'}
