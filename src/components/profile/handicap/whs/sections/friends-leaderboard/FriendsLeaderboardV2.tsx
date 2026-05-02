@@ -2,13 +2,21 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { useFriendsLeaderboard, whsKeys } from '@/lib/whs/hooks';
+import {
+  useFriendsLeaderboard,
+  useFriendWindowRankings,
+  whsKeys,
+} from '@/lib/whs/hooks';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
-import type { WhsFriendMatch } from '@/lib/whs/types';
+import type { WhsFriendMatch, WhsFriendWindowRanking } from '@/lib/whs/types';
+import {
+  getAvgDiffForScope,
+  type LeaderboardScope,
+} from '@/lib/whs/utils/leaderboardScopes';
 import SectionHeader from '../SectionHeader';
 import Paged8 from '../_shared/Paged8';
-import LeaderboardScopeChips, { type LeaderboardScope } from './LeaderboardScopeChips';
+import LeaderboardScopeChips from './LeaderboardScopeChips';
 import LeaderboardRow from './LeaderboardRow';
 import PodiumStack from './PodiumStack';
 import EmptyScopeState from './EmptyScopeState';
@@ -20,8 +28,19 @@ interface Props {
 }
 
 export type LeaderboardItem =
-  | { id: 'self'; kind: 'self'; handicap: number | null; name: string }
-  | { id: string; kind: 'friend'; friend: WhsFriendMatch };
+  | {
+      id: 'self';
+      kind: 'self';
+      handicap: number | null;
+      name: string;
+      rankingValue: number | null;
+    }
+  | {
+      id: string;
+      kind: 'friend';
+      friend: WhsFriendMatch;
+      rankingValue: number | null;
+    };
 
 export const FriendsLeaderboardV2: React.FC<Props> = ({
   ownerUserId,
@@ -31,29 +50,62 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: friends, isLoading } = useFriendsLeaderboard(ownerUserId);
+  const { data: windowRankings, isLoading: rankingsLoading } =
+    useFriendWindowRankings(ownerUserId);
 
   const [scope, setScope] = useState<LeaderboardScope>('all');
 
+  const rankingByRowId = useMemo(() => {
+    const map = new Map<string, WhsFriendWindowRanking>();
+    for (const r of windowRankings ?? []) {
+      map.set(r.friend_row_id, r);
+    }
+    return map;
+  }, [windowRankings]);
+
   const rows: LeaderboardItem[] = useMemo(() => {
-    const friendRows: LeaderboardItem[] = (friends ?? []).map((f) => ({
-      id: f.friend_row_id,
-      kind: 'friend' as const,
-      friend: f,
-    }));
+    const friendRows: LeaderboardItem[] = (friends ?? []).map((f) => {
+      if (scope === 'all') {
+        return {
+          id: f.friend_row_id,
+          kind: 'friend' as const,
+          friend: f,
+          rankingValue: f.friend_handicap_index ?? null,
+        };
+      }
+      const r = rankingByRowId.get(f.friend_row_id);
+      return {
+        id: f.friend_row_id,
+        kind: 'friend' as const,
+        friend: f,
+        rankingValue: getAvgDiffForScope(r, scope),
+      };
+    });
+
+    const selfRanking =
+      scope === 'all' ? currentUserHandicap ?? null : null;
+
     const selfRow: LeaderboardItem = {
       id: 'self',
       kind: 'self',
-      handicap: currentUserHandicap ?? null,
+      handicap: selfRanking,
       name: currentUserName,
+      rankingValue: selfRanking,
     };
-    const all = [...friendRows, selfRow];
-    all.sort((a, b) => {
-      const av = a.kind === 'self' ? a.handicap ?? 999 : a.friend.friend_handicap_index ?? 999;
-      const bv = b.kind === 'self' ? b.handicap ?? 999 : b.friend.friend_handicap_index ?? 999;
+
+    const visible =
+      scope === 'all'
+        ? [...friendRows, selfRow]
+        : [...friendRows.filter((r) => r.rankingValue !== null), selfRow];
+
+    visible.sort((a, b) => {
+      const av = a.rankingValue ?? 999;
+      const bv = b.rankingValue ?? 999;
       return av - bv;
     });
-    return all;
-  }, [friends, currentUserHandicap, currentUserName]);
+
+    return visible;
+  }, [friends, currentUserHandicap, currentUserName, scope, rankingByRowId]);
 
   const totalCount = rows.length;
   const selfRow = rows.find((r) => r.kind === 'self') as LeaderboardItem | undefined;
@@ -79,12 +131,19 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
   }, [friends, currentUserHandicap]);
 
   const subText = useMemo(() => {
-    if (isLoading) return 'Loading…';
+    if (isLoading || (scope !== 'all' && rankingsLoading)) return 'Loading…';
     if (totalCount === 0) return undefined;
-    if (currentUserHandicap == null) return `${friends?.length ?? 0} friends`;
-    if (yourRank === 1) return `#1 of ${totalCount} · ${totalCount - 1} chasing you`;
-    return `${friends?.length ?? 0} friends · you're #${yourRank}`;
-  }, [isLoading, totalCount, currentUserHandicap, yourRank, friends]);
+
+    const friendCount = rows.filter((r) => r.kind === 'friend').length;
+
+    if (scope === 'all') {
+      if (currentUserHandicap == null) return `${friendCount} friends`;
+      if (yourRank === 1) return `#1 of ${totalCount} · ${totalCount - 1} chasing you`;
+      return `${friendCount} friends · you're #${yourRank}`;
+    }
+
+    return `${friendCount} ${friendCount === 1 ? 'friend' : 'friends'} · ranked by avg differential`;
+  }, [isLoading, rankingsLoading, totalCount, currentUserHandicap, yourRank, rows, scope]);
 
   const handleInvite = async (f: WhsFriendMatch) => {
     const res = await callCreateInvite(f.friend_passport_id, 'copy_link');
@@ -100,7 +159,12 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
     });
   };
 
-  if (scope !== 'all') {
+  // Time-scoped empty state: no qualifying friends
+  if (
+    scope !== 'all' &&
+    !rankingsLoading &&
+    rows.filter((r) => r.kind === 'friend').length === 0
+  ) {
     return (
       <section style={{ padding: '20px 0 24px' }}>
         <SectionHeader eyebrow="LEADERBOARD" title="Friends" sub={subText} />
