@@ -25,6 +25,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSyncing, setIsSyncing] = useState(false);
+  const [reauthRequired, setReauthRequired] = useState(
+    connection.last_sync_status === 'auth_failed'
+  );
 
   // ── URL-state for the active subtab ─────────────────────────────────────
   const rawSubtab = searchParams.get('subtab');
@@ -52,6 +55,11 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
     try {
       const data = await callSyncWhsOne();
       if (!data.ok) {
+        if (data.error === 'credentials_invalid') {
+          setReauthRequired(true);
+          toast.error('Your England Golf password changed. Please disconnect and reconnect.');
+          return;
+        }
         toast.error(data.message ?? "Couldn't sync right now. Try again later.");
         return;
       }
@@ -84,8 +92,19 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
 
   return (
     <div className="pb-10">
-      {/* PERSISTENT — stale warning */}
-      {isStale && lastSyncedAt ? (
+      {/* PERSISTENT — warnings (re-auth takes priority over stale) */}
+      {reauthRequired ? (
+        <div
+          className="mx-5 mt-5 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
+          style={{ background: 'rgba(220,38,38,0.06)', color: '#B91C1C' }}
+        >
+          <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+          <p className="leading-snug">
+            Your stored England Golf password no longer works. We can't refresh your data. Please
+            disconnect and reconnect.
+          </p>
+        </div>
+      ) : isStale && lastSyncedAt ? (
         <div
           className="mx-5 mt-5 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
           style={{ background: 'rgba(247,147,30,0.08)', color: '#9A6116' }}
