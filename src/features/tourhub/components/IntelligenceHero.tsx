@@ -1626,12 +1626,17 @@ function ExpandablePickRow({
     : 'rgba(255,255,255,0.65)';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
+  const isTopPick = tier === 'TOP PICK';
   return (
     <div
       style={{
         borderRadius: 12,
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.10)',
+        background: isTopPick
+          ? `linear-gradient(135deg, rgba(247,147,30,0.16) 0%, transparent 60%), ${PANEL_RAISED}`
+          : PANEL_RAISED,
+        border: isTopPick
+          ? `1px solid ${AMBER_ACCENT}`
+          : `1px solid ${HAIRLINE}`,
         overflow: 'hidden',
       }}
     >
