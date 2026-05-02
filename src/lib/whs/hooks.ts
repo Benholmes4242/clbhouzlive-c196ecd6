@@ -27,6 +27,8 @@ export const whsKeys = {
   history: (connectionId: string, daysBack: number) =>
     ['whs-handicap-history', connectionId, daysBack] as const,
   friendsLeaderboard: (userId: string) => ['whs-friends-leaderboard', userId] as const,
+  friendWindowRankings: (ownerUserId: string) =>
+    ['whs-friend-window-rankings', ownerUserId] as const,
   friendsActivity: (userId: string) => ['whs-friends-activity', userId] as const,
   friendCourseBests: (ownerUserId: string) =>
     ['whs-friend-course-bests', ownerUserId] as const,
