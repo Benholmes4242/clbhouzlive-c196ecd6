@@ -63,10 +63,6 @@ import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// Lead surface — quiet cream, NOT a card; visual elevation only
-const LEAD_BG = '#FAF8F1';
-const LEAD_HAIR = '#EDE7D6';
-
 // Page-canon ink + slates
 const INK = '#0F172A';
 const SLATE_700 = '#334155';
