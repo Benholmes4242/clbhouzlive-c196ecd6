@@ -106,10 +106,6 @@ const Top100LeaderboardPanel = () => {
         <TabsContent value="exploration" className="mt-0 -mx-4">
           <ExplorationTab />
         </TabsContent>
-
-        <TabsContent value="handicap" className="mt-0 -mx-4">
-          <HandicapTab />
-        </TabsContent>
       </Tabs>
     </div>
   );
