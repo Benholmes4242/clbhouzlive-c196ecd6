@@ -1391,7 +1391,7 @@ function LiveStateBlock({
       <FramingSentence text={framingSentence} />
       <EditorialHeadline>{headlineNode}</EditorialHeadline>
       <ContextLine>
-        {`PRE-RANK #${topPickPreRank} → LIVE ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound} IN PROGRESS`}
+        {`OUR #${topPickPreRank} PICK · NOW ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound}`}
       </ContextLine>
       {data?.tournament?.name && (
         <TournamentLabel>{data.tournament.name}</TournamentLabel>
@@ -1401,7 +1401,7 @@ function LiveStateBlock({
         <HeroPick
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
-          subtitle={`Pre-rank #${heroPick.predictedRank} → Live ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
+          subtitle={`Our #${heroPick.predictedRank} pick · Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
@@ -1583,7 +1583,7 @@ function ResultsStateBlock({
         <HeroPick
           initials={getInitials(heroPickResolved.playerName)}
           name={heroPickResolved.playerName}
-          subtitle={`Pre-rank #${heroPickResolved.predictedRank} → Final ${formatPosition(heroPickResolved)}`}
+          subtitle={`Our #${heroPickResolved.predictedRank} pick · Final ${formatPosition(heroPickResolved)}`}
           pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
