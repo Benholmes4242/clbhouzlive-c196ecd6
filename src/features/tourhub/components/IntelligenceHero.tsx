@@ -12,7 +12,7 @@
  * spec is overridden — sentence headlines render in Geist 700 with tight
  * letter-spacing instead.
  *
- * Phase A (this revision):
+ * Phase A:
  *   - Cream LEAD_BG outer surface with hairline borders top + bottom
  *   - LeadSectionHeader (3×14 amber bar + Sparkles glyph + status pill)
  *   - CredibilityBand directly below the header, amber-tint stat strip
@@ -25,7 +25,14 @@
  *   - Single unified CTA: "All Intelligence picks"
  *   - Live-state pulse on hero pick position number
  *
- * Phase B / C deferred: framing-sentence + per-pick pulled-quote pipeline.
+ * Phase B: CredibilityBand + TrackRecordPanel wired to existing useMemo.
+ *
+ * Phase C — Editorial layer:
+ *   - `framingSentence` — per-tournament italic preface above the headline.
+ *     Sourced from `data.editorialFraming`. Renders null if the data layer
+ *     hasn't populated it. Daily editorial production is out of scope here.
+ *   - `pulledQuote` (per pick) — Hero pick's reasoning shown as italic
+ *     pulled-quote. Falls back to `pick.reasons[0]` if not populated.
  */
 
 import React, { memo, useEffect, useMemo, useState } from 'react';
