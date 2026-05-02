@@ -125,7 +125,7 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
         currentUserName={currentUserName}
       />
 
-      <Paged8<LeaderboardItem>
+      <Paged8
         items={rest}
         ariaLabel="Friends ranked 4 onwards"
         pinnedItem={yourRankIndex >= 3 && selfRow ? selfRow : null}
