@@ -266,3 +266,105 @@ export async function fetchCourseForm(
   }
   return result.sort((a, b) => a.delta - b.delta);
 }
+
+// ─── Last round detail (Phase 1.5 sheet) ──────────────────────────────
+export async function fetchLastRoundDetail(
+  connectionId: string,
+): Promise<WhsLastRoundDetail | null> {
+  const { data: round, error: roundErr } = await supabase
+    .from('whs_scores' as any)
+    .select(`
+      id,
+      play_date,
+      adjusted_gross,
+      actual_gross,
+      stableford_points,
+      handicap_differential,
+      handicap_index_at_time,
+      course_handicap,
+      course_rating,
+      slope_rating,
+      pcc,
+      marker_name,
+      is_counter,
+      is_competition_score,
+      is_nine_hole,
+      total_holes,
+      hole_by_hole_fetched,
+      permalink_url,
+      course:whs_courses(name, country_name)
+    `)
+    .eq('connection_id', connectionId)
+    .order('play_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (roundErr) throw roundErr;
+  if (!round) return null;
+
+  const r = round as any;
+
+  // Course image join — best-effort name match against golf_courses
+  let courseHeaderImage: string | null = null;
+  let courseThumbnailImage: string | null = null;
+  if (r.course?.name) {
+    const { data: gc } = await supabase
+      .from('golf_courses')
+      .select('thumbnail_image')
+      .ilike('name', r.course.name)
+      .limit(1)
+      .maybeSingle();
+    if (gc) {
+      // golf_courses currently exposes only thumbnail_image; reuse it as hero source
+      courseThumbnailImage = (gc as any).thumbnail_image ?? null;
+      courseHeaderImage = courseThumbnailImage;
+    }
+  }
+
+  let holes: WhsScoreHole[] | null = null;
+  if (r.hole_by_hole_fetched) {
+    const { data: holeRows, error: holesErr } = await supabase
+      .from('whs_score_holes' as any)
+      .select(`
+        hole_no,
+        par,
+        actual_gross,
+        adjusted_gross,
+        distance_yards,
+        stroke_index,
+        played,
+        hole_alias
+      `)
+      .eq('score_id', r.id)
+      .order('hole_no', { ascending: true });
+
+    if (holesErr) throw holesErr;
+    holes = (holeRows as any[] | null) ?? [];
+    if (holes.length === 0) holes = null;
+  }
+
+  return {
+    id: r.id,
+    play_date: r.play_date,
+    adjusted_gross: r.adjusted_gross,
+    actual_gross: r.actual_gross,
+    stableford_points: r.stableford_points,
+    handicap_differential: r.handicap_differential,
+    handicap_index_at_time: r.handicap_index_at_time,
+    course_handicap: r.course_handicap,
+    course_rating: r.course_rating,
+    slope_rating: r.slope_rating,
+    pcc: r.pcc,
+    marker_name: r.marker_name,
+    is_counter: r.is_counter,
+    is_competition_score: r.is_competition_score,
+    is_nine_hole: r.is_nine_hole,
+    total_holes: r.total_holes,
+    hole_by_hole_fetched: r.hole_by_hole_fetched,
+    permalink_url: r.permalink_url,
+    course: r.course,
+    course_header_image: courseHeaderImage,
+    course_thumbnail_image: courseThumbnailImage,
+    holes,
+  };
+}
