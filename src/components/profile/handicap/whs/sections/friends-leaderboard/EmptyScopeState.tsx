@@ -9,16 +9,16 @@ interface Props {
 const COPY: Record<LeaderboardScope, { title: string; body: string }> = {
   all: { title: '', body: '' },
   year: {
-    title: 'Coming soon',
-    body: 'This Year leaderboards land in a future update. For now, switch back to All-Time.',
+    title: 'No rounds this year yet',
+    body: 'Friends need at least 3 rounds in 2026 to appear here. Check back as the season ramps up.',
   },
   month: {
-    title: 'Coming soon',
-    body: 'This Month leaderboards land in a future update. For now, switch back to All-Time.',
+    title: 'No rounds this month yet',
+    body: 'Friends need at least 3 rounds this month to appear. The board fills up as everyone plays.',
   },
   last8: {
-    title: 'Coming soon',
-    body: 'Last 8 leaderboards land in a future update. For now, switch back to All-Time.',
+    title: 'Not enough recent rounds',
+    body: 'Friends need at least 3 of their last 8 rounds with a differential. Check back soon.',
   },
 };
 
