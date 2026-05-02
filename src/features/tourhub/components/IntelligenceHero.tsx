@@ -1449,6 +1449,7 @@ function ResultsStateBlock({
           color={GREEN_DEEP_INK}
           icon={<Check size={11} strokeWidth={3} />}
         />
+        <FramingSentence text={framingSentence} />
         <EditorialHeadline>
           <span style={{ color: AMBER_DEEP }}>{winnerFirstName}</span>{' '}
           {margin === 0 ? (
