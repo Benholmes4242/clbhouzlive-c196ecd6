@@ -10,6 +10,7 @@ import {
   fetchHandicapHistory,
   fetchFriendsLeaderboard,
   fetchFriendsActivity,
+  fetchFriendCourseBests,
   fetchSentInvites,
   fetchCourseForm,
   fetchLastRoundDetail,
@@ -26,6 +27,8 @@ export const whsKeys = {
     ['whs-handicap-history', connectionId, daysBack] as const,
   friendsLeaderboard: (userId: string) => ['whs-friends-leaderboard', userId] as const,
   friendsActivity: (userId: string) => ['whs-friends-activity', userId] as const,
+  friendCourseBests: (ownerUserId: string) =>
+    ['whs-friend-course-bests', ownerUserId] as const,
   sentInvites: () => ['whs-sent-invites'] as const,
   courseForm: (connectionId: string, currentHandicap: number) =>
     ['whs-course-form', connectionId, currentHandicap] as const,
@@ -123,6 +126,15 @@ export function useFriendsActivity(ownerUserId: string | undefined) {
     queryFn: () => fetchFriendsActivity(ownerUserId as string, 20),
     enabled: !!ownerUserId,
     staleTime: 30_000,
+  });
+}
+
+export function useFriendCourseBests(ownerUserId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendCourseBests(ownerUserId ?? ''),
+    queryFn: () => fetchFriendCourseBests(ownerUserId as string),
+    enabled: !!ownerUserId,
+    staleTime: 60_000,
   });
 }
 
