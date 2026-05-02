@@ -48,11 +48,9 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       style={{
         // Lock card height to match prior layout (21:9 media + ~80px body slab).
         // On a typical mobile width (~375px) this preserves the prior visual footprint.
-        minHeight: 336,
+        minHeight: 302,
         color: '#fff',
         background: heroBg,
-        borderTop: '0.5px solid rgba(247,147,30,0.25)',
-        borderBottom: '0.5px solid rgba(247,147,30,0.25)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
