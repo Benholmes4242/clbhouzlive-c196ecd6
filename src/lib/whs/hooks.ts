@@ -123,6 +123,15 @@ export function useFriendsLeaderboard(ownerUserId: string | undefined) {
   });
 }
 
+export function useFriendWindowRankings(ownerUserId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendWindowRankings(ownerUserId ?? ''),
+    queryFn: () => fetchFriendWindowRankings(ownerUserId as string),
+    enabled: !!ownerUserId,
+    staleTime: 60_000,
+  });
+}
+
 export function useFriendsActivity(ownerUserId: string | undefined) {
   return useQuery({
     queryKey: whsKeys.friendsActivity(ownerUserId ?? ''),
