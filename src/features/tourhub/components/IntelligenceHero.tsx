@@ -389,91 +389,124 @@ function LeadSectionHeader({
     : SLATE_500;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        marginBottom: 14,
-      }}
-    >
-      <button
-        type="button"
-        onClick={onInfoTap}
-        aria-label="About clbhouz Intelligence"
+    <div style={{ marginBottom: 18 }}>
+      {/* Top row: eyebrow + status pill */}
+      <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
+          justifyContent: 'space-between',
+          gap: 12,
+          marginBottom: 10,
         }}
       >
-        <div
+        <button
+          type="button"
+          onClick={onInfoTap}
+          aria-label="About clbhouz Intelligence"
           style={{
-            width: 3,
-            height: 14,
-            background: AMBER_ACCENT,
-            borderRadius: 2,
-            flexShrink: 0,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 900,
-            color: AMBER_ACCENT,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 10,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
           }}
         >
-          clbhouz Intelligence
-          <Sparkles
-            size={11}
-            color={AMBER_ACCENT}
-            fill={AMBER_ACCENT}
-            strokeWidth={2}
-            style={{ marginLeft: 1 }}
+          <div
+            style={{
+              width: 3,
+              height: 14,
+              background: AMBER_ACCENT,
+              borderRadius: 2,
+              flexShrink: 0,
+            }}
           />
-        </span>
-      </button>
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '4px 8px',
-          background: 'transparent',
-          border: `1px solid ${SLATE_150}`,
-          borderRadius: 4,
-        }}
-      >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 900,
+              color: AMBER_ACCENT,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            clbhouz Intelligence
+            <Sparkles
+              size={11}
+              color={AMBER_ACCENT}
+              fill={AMBER_ACCENT}
+              strokeWidth={2}
+              style={{ marginLeft: 1 }}
+            />
+          </span>
+        </button>
         <div
           style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: dotColor,
-            animation: state === 'live' ? 'intel_liveDot 1.6s ease-in-out infinite' : 'none',
-          }}
-        />
-        <span
-          style={{
-            ...monoLabel,
-            fontSize: 9,
-            color: dotColor,
-            letterSpacing: '0.16em',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '4px 8px',
+            background: 'transparent',
+            border: `1px solid ${SLATE_150}`,
+            borderRadius: 4,
           }}
         >
-          {statusLabel}
-        </span>
+          <div
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: dotColor,
+              animation: state === 'live' ? 'intel_liveDot 1.6s ease-in-out infinite' : 'none',
+            }}
+          />
+          <span
+            style={{
+              ...monoLabel,
+              fontSize: 9,
+              color: dotColor,
+              letterSpacing: '0.16em',
+            }}
+          >
+            {statusLabel}
+          </span>
+        </div>
       </div>
+
+      {/* Section title — Geist 700 (project memory: no serifs) */}
+      <h2
+        style={{
+          margin: 0,
+          fontFamily: headlineFont,
+          fontSize: 24,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.025em',
+          lineHeight: 1.1,
+          marginBottom: 6,
+        }}
+      >
+        Tournament picks, signed and dated.
+      </h2>
+
+      {/* Explainer line */}
+      <p
+        style={{
+          margin: 0,
+          fontSize: 13,
+          fontWeight: 400,
+          color: SLATE_600,
+          lineHeight: 1.5,
+          maxWidth: 480,
+        }}
+      >
+        Our in-house AI picks three players each tournament — using form, course fit, weather, and news.
+      </p>
     </div>
   );
 }
