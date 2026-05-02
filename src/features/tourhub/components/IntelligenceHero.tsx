@@ -1534,6 +1534,7 @@ function ResultsStateBlock({
   return (
     <div>
       <ResultsEyebrow text={tone.eyebrow} color={tone.eyebrowColor} />
+      <FramingSentence text={framingSentence} />
       <EditorialHeadline>
         {tone.headlineRender(winnerFirstName, headlinePickFirstName, headlinePickPos)}
       </EditorialHeadline>
