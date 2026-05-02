@@ -1509,6 +1509,8 @@ function LiveStateBlock({
           name={heroPick.playerName}
           subtitle={`Our #${heroPick.predictedRank} pick · Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
+          reasons={heroPick.reasons}
+          defaultExpanded={true}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
           positionAccent={heroPick.actualPosition === 1 ? 'amber' : 'ink'}
@@ -1613,6 +1615,8 @@ function ResultsStateBlock({
           name={topPick.playerName}
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
           pulledQuote={topPick.pulledQuote ?? topPick.reasons[0] ?? null}
+          reasons={topPick.reasons}
+          defaultExpanded={true}
           position="1"
           positionLabel={formatScore(topPick.score)}
           positionAccent="amber"
@@ -1691,6 +1695,8 @@ function ResultsStateBlock({
           name={heroPickResolved.playerName}
           subtitle={`Our #${heroPickResolved.predictedRank} pick · Final ${formatPosition(heroPickResolved)}`}
           pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
+          reasons={heroPickResolved.reasons}
+          defaultExpanded={true}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
           positionAccent={heroAccent}
@@ -1843,6 +1849,8 @@ function UpcomingStateBlock({
           name={topContender.playerName}
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
           pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
+          reasons={topContender.reasons}
+          defaultExpanded={true}
           position="—"
           positionLabel="TO PLAY"
           positionAccent="amber"
