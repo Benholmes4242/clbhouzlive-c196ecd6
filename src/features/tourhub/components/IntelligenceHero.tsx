@@ -18,8 +18,9 @@
  * move per-tournament copy to a Claude-driven daily pipeline.
  */
 
-import { memo, useMemo, useState } from 'react';
-import { Brain, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { memo, useMemo, useState } from 'react';
+import { Brain, ChevronRight, ChevronDown, ChevronUp, Check, Award, Trophy } from 'lucide-react';
+import type { IntelligenceOutcome } from '../utils/outcomeClassifier';
 import { useCountdown } from '@/hooks/useCountdown';
 import {
   useIntelligenceLifecycleState,
