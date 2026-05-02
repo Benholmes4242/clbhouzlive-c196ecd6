@@ -25,6 +25,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSyncing, setIsSyncing] = useState(false);
+  const [reauthRequired, setReauthRequired] = useState(
+    connection.last_sync_status === 'auth_failed'
+  );
 
   // ── URL-state for the active subtab ─────────────────────────────────────
   const rawSubtab = searchParams.get('subtab');
