@@ -476,7 +476,7 @@ export function CoursesLeaderboardView() {
             onClick={() => handleCourseClick(masthead.course_id)}
             style={{
               width: '100%',
-              minHeight: 420,
+              minHeight: 336,
               color: '#fff', borderRadius: 8,
               overflow: 'hidden', position: 'relative',
               border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0,
@@ -486,26 +486,28 @@ export function CoursesLeaderboardView() {
               display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
             }}
           >
-            <div style={{ padding: '14px 14px 0' }}>
+            {/* Featured-style glass pill — matches Course Media Featured badge */}
+            <div style={{ padding: '16px 16px 0' }}>
               <div
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '5px 10px',
-                  borderRadius: '34%',
-                  background: 'rgba(15, 20, 30, 0.42)',
-                  backdropFilter: 'blur(32px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(32px) saturate(180%)',
-                  border: '1px solid rgba(255,255,255,0.14)',
-                  boxShadow: '0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18)',
-                  transform: 'translateZ(0)',
-                  willChange: 'backdrop-filter',
-                  fontSize: 10, fontWeight: 800, color: '#fff',
-                  letterSpacing: '0.22em',
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  background: 'rgba(0, 0, 0, 0.28)',
+                  backdropFilter: 'blur(22px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+                  borderRadius: 4,
+                  padding: '4px 10px',
+                  fontSize: 10, fontWeight: 800, color: '#FFFFFF',
+                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                  transform: 'rotate(-6deg)', transformOrigin: 'top left',
                 }}
               >
+                <span style={{ fontSize: 11, lineHeight: 1 }}>🔥</span>
                 {personalisedEyebrow}
               </div>
             </div>
+
 
             <div style={{ padding: '14px 18px 16px' }}>
               <h2 style={{
