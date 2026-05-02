@@ -538,6 +538,31 @@ function CredibilityBand({
 
 // ─── Editorial headline + context line atoms ─────────────────────────────────
 
+/**
+ * Phase C — per-tournament italic framing sentence above the headline.
+ * Renders nothing when `text` is null, so the headline lands directly under
+ * the credibility band when no editorial copy is provided.
+ */
+function FramingSentence({ text }: { text: string | null | undefined }) {
+  if (!text) return null;
+  return (
+    <p
+      style={{
+        margin: '0 0 8px',
+        fontFamily: headlineFont,
+        fontStyle: 'italic',
+        fontSize: 14,
+        fontWeight: 500,
+        color: SLATE_600,
+        letterSpacing: '-0.005em',
+        lineHeight: 1.4,
+      }}
+    >
+      {text}
+    </p>
+  );
+}
+
 function EditorialHeadline({ children }: { children: React.ReactNode }) {
   return (
     <h1
