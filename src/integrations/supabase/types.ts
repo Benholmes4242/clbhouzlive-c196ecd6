@@ -14194,6 +14194,13 @@ export type Database = {
             foreignKeyName: "whs_friends_connection_id_fkey"
             columns: ["connection_id"]
             isOneToOne: false
+            referencedRelation: "whs_friend_window_rankings"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
             referencedRelation: "whs_invite_status"
             referencedColumns: ["redeemer_connection_id"]
           },
@@ -14231,6 +14238,13 @@ export type Database = {
             columns: ["connection_id"]
             isOneToOne: false
             referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_handicap_snapshots_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_window_rankings"
             referencedColumns: ["friend_connection_id"]
           },
           {
@@ -14343,6 +14357,13 @@ export type Database = {
             columns: ["inviter_connection_id"]
             isOneToOne: false
             referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_invites_inviter_connection_id_fkey"
+            columns: ["inviter_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_window_rankings"
             referencedColumns: ["friend_connection_id"]
           },
           {
@@ -14521,6 +14542,13 @@ export type Database = {
             columns: ["connection_id"]
             isOneToOne: false
             referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_window_rankings"
             referencedColumns: ["friend_connection_id"]
           },
           {
@@ -15368,6 +15396,13 @@ export type Database = {
             foreignKeyName: "whs_scores_connection_id_fkey"
             columns: ["friend_connection_id"]
             isOneToOne: false
+            referencedRelation: "whs_friend_window_rankings"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["friend_connection_id"]
+            isOneToOne: false
             referencedRelation: "whs_invite_status"
             referencedColumns: ["redeemer_connection_id"]
           },
@@ -15419,10 +15454,31 @@ export type Database = {
             foreignKeyName: "whs_friends_connection_id_fkey"
             columns: ["owner_connection_id"]
             isOneToOne: false
+            referencedRelation: "whs_friend_window_rankings"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_friends_connection_id_fkey"
+            columns: ["owner_connection_id"]
+            isOneToOne: false
             referencedRelation: "whs_invite_status"
             referencedColumns: ["redeemer_connection_id"]
           },
         ]
+      }
+      whs_friend_window_rankings: {
+        Row: {
+          friend_connection_id: string | null
+          friend_row_id: string | null
+          last_8_avg_diff: number | null
+          last_8_rounds: number | null
+          owner_user_id: string | null
+          this_month_avg_diff: number | null
+          this_month_rounds: number | null
+          this_year_avg_diff: number | null
+          this_year_rounds: number | null
+        }
+        Relationships: []
       }
       whs_invite_status: {
         Row: {
