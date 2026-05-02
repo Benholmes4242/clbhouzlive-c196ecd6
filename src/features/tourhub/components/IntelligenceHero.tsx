@@ -301,8 +301,8 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
       style={{
         background: LEAD_BG,
         padding: '24px 16px 22px',
-        borderTop: `1px solid ${LEAD_HAIR}`,
-        borderBottom: `1px solid ${LEAD_HAIR}`,
+        borderTop: `1px solid ${SLATE_150}`,
+        borderBottom: `1px solid ${SLATE_150}`,
         marginLeft: -16,
         marginRight: -16,
       }}
@@ -454,7 +454,7 @@ function LeadSectionHeader({
           gap: 6,
           padding: '4px 8px',
           background: 'transparent',
-          border: `1px solid ${LEAD_HAIR}`,
+          border: `1px solid ${SLATE_150}`,
           borderRadius: 4,
         }}
       >
@@ -682,8 +682,8 @@ function HeroPick({
     <div
       style={{
         padding: '20px 0 18px',
-        borderTop: `1px solid ${LEAD_HAIR}`,
-        borderBottom: `1px solid ${LEAD_HAIR}`,
+        borderTop: `1px solid ${SLATE_150}`,
+        borderBottom: `1px solid ${SLATE_150}`,
         marginBottom: 14,
       }}
     >
@@ -857,7 +857,7 @@ function CompactPick({
     <div
       style={{
         borderLeft: `3px solid ${accent}`,
-        borderBottom: `1px solid ${LEAD_HAIR}`,
+        borderBottom: `1px solid ${SLATE_150}`,
       }}
     >
       <button
@@ -1041,7 +1041,7 @@ function TournamentWinnerCard({
         marginBottom: 4,
         padding: '12px 14px',
         background: '#fff',
-        border: `1px solid ${LEAD_HAIR}`,
+        border: `1px solid ${SLATE_150}`,
         borderRadius: 10,
       }}
     >
@@ -1255,7 +1255,7 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
         marginTop: 18,
         padding: 14,
         background: '#fff',
-        border: `1px solid ${LEAD_HAIR}`,
+        border: `1px solid ${SLATE_150}`,
         borderRadius: 10,
         color: INK,
         fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
@@ -1384,7 +1384,7 @@ function LiveStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1487,7 +1487,7 @@ function ResultsStateBlock({
         {supporting.length > 0 && (
           <>
             <SupportingLabel />
-            <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+            <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
               {supporting.map((p, i) => (
                 <CompactPick
                   key={p.playerId}
@@ -1565,7 +1565,7 @@ function ResultsStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1627,7 +1627,7 @@ function UpcomingStateBlock({
             padding: '12px 14px',
             borderRadius: 10,
             background: '#fff',
-            border: `1px solid ${LEAD_HAIR}`,
+            border: `1px solid ${SLATE_150}`,
           }}
         >
           <div
@@ -1717,7 +1717,7 @@ function UpcomingStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
