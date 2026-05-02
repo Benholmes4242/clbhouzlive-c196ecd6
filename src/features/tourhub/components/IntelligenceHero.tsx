@@ -347,21 +347,20 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   return (
     <section
       aria-label="clbhouz Intelligence"
-      style={{ paddingLeft: 16, paddingRight: 16 }}
+      style={{ marginLeft: -16, marginRight: -16 }}
     >
       <div
         style={{
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: 20,
-          padding: '24px 18px 18px',
+          borderRadius: 0,
           background:
             `linear-gradient(135deg, ${GREEN_DEEP} 0%, ${GREEN_MID} 50%, ${GREEN_DARK} 100%)`,
           boxShadow:
             '0 8px 30px -10px rgba(6,58,38,0.55), inset 0 1px 0 rgba(255,255,255,0.10)',
         }}
       >
-        {/* ── Decorative orbs (preserved per Phase A refinement) ── */}
+        {/* ── Decorative orbs ── */}
         <div
           aria-hidden
           style={{
@@ -372,7 +371,8 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 220,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(45,187,120,0.18) 0%, transparent 60%)',
+              'radial-gradient(circle, rgba(45,187,120,0.40) 0%, transparent 60%)',
+            opacity: 0.5,
             pointerEvents: 'none',
           }}
         />
@@ -386,40 +386,54 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 240,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(247,147,30,0.10) 0%, transparent 60%)',
+              'radial-gradient(circle, rgba(247,147,30,0.35) 0%, transparent 60%)',
+            opacity: 0.4,
             pointerEvents: 'none',
           }}
         />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <Masthead stateLabel={stateLabel} onInfoTap={handleOpenAbout} />
-
-          <Divider top={14} bottom={16} />
-
-          {/* ── State-conditional content ── */}
-          {isLoading ? (
-            <StateMessage label="Loading Intelligence…" />
-          ) : (
-            <>
-              {state === 'live' && (
-                <LiveStateBlock data={data} tracker={tracker} />
-              )}
-              {state === 'results' && (
-                <ResultsStateBlock data={data} tracker={tracker} />
-              )}
-              {state === 'upcoming' && (
-                <UpcomingStateBlock data={nextTournamentPredictions ?? data ?? null} />
-              )}
-            </>
-          )}
-
-          {/* ── Track record stat strip ── */}
-          <div style={{ marginTop: 18 }}>
-            <TrackRecord wins={wins} topFives={topFives} topFiveRate={topFiveRate} />
+          {/* Status bar (top) */}
+          <div style={{ padding: '20px 20px 0' }}>
+            <Masthead stateLabel={stateLabel} onInfoTap={handleOpenAbout} state={state} />
           </div>
 
+          {/* Credibility band — always visible, directly below status bar */}
+          <div style={{ marginTop: 14 }}>
+            <CredibilityBand wins={wins} topFives={topFives} topFiveRate={topFiveRate} />
+          </div>
+
+          {/* ── State-conditional content ── */}
+          <div style={{ padding: '6px 20px 0' }}>
+            {isLoading ? (
+              <StateMessage label="Loading Intelligence…" />
+            ) : (
+              <>
+                {state === 'live' && (
+                  <LiveStateBlock data={data} tracker={tracker} />
+                )}
+                {state === 'results' && (
+                  <ResultsStateBlock data={data} tracker={tracker} />
+                )}
+                {state === 'upcoming' && (
+                  <UpcomingStateBlock data={nextTournamentPredictions ?? data ?? null} />
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Why trust us panel */}
+          <TrackRecordPanel
+            wins={wins}
+            topFives={topFives}
+            topFiveRate={topFiveRate}
+            totalTournaments={tournaments.length}
+          />
+
           {/* ── CTA ── */}
-          <CTA onOpenSheet={handleOpenSheet} />
+          <div style={{ padding: '20px 20px 22px' }}>
+            <CTA onOpenSheet={handleOpenSheet} />
+          </div>
         </div>
       </div>
 
