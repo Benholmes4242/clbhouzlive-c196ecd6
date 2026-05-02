@@ -1359,6 +1359,7 @@ function LiveStateBlock({
 
   return (
     <div>
+      <FramingSentence text={framingSentence} />
       <EditorialHeadline>{headlineNode}</EditorialHeadline>
       <ContextLine>
         {`PRE-RANK #${topPickPreRank} → LIVE ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound} IN PROGRESS`}
