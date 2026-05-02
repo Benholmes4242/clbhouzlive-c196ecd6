@@ -34,14 +34,28 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     .filter(Boolean)
     .join(' · ');
 
+  // Editorial 4-stop gradient + image background — mirrors the
+  // "Highest Rated" hero in CoursesLeaderboardView. No slate body slab.
+  const fallbackBg = 'linear-gradient(135deg, #2d5a3d, #1a3d2e)';
+  const heroBg = courseImageUrl
+    ? `linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 38%, rgba(0,0,0,0.55) 78%, rgba(0,0,0,0.85) 100%), url(${courseImageUrl}) center/cover`
+    : fallbackBg;
+
   return (
     <div
       ref={tileRef}
       className="relative overflow-hidden cursor-pointer"
       style={{
-        background: '#0F172A',
+        // Lock card height to match prior layout (21:9 media + ~80px body slab).
+        // On a typical mobile width (~375px) this preserves the prior visual footprint.
+        minHeight: 336,
+        color: '#fff',
+        background: heroBg,
         borderTop: '0.5px solid rgba(247,147,30,0.25)',
         borderBottom: '0.5px solid rgba(247,147,30,0.25)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
       }}
       onClick={() => {
         if (allPosts && postIndex != null) {
@@ -49,31 +63,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         }
       }}
     >
-      {/* Amber accent bar */}
-      <div
-        style={{
-          height: 2,
-          background: 'linear-gradient(90deg, #F7931E 0%, transparent 70%)',
-        }}
-      />
-
-      {/* Media — 21:9 cinemascope */}
-      <div className="relative w-full bg-slate-700" style={{ aspectRatio: '21 / 9' }}>
-        {courseImageUrl && (
-          <img
-            src={courseImageUrl}
-            alt=""
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        )}
-
-        {/* Scrim */}
+      {/* Top accent + rating */}
+      <div style={{ position: 'relative' }}>
+        {/* Amber accent bar */}
         <div
-          className="absolute inset-0 pointer-events-none"
           style={{
-            background:
-              'linear-gradient(0deg, rgba(15,23,42,0.92) 0%, rgba(15,23,42,0.2) 50%, transparent 100%)',
+            height: 2,
+            background: 'linear-gradient(90deg, #F7931E 0%, transparent 70%)',
           }}
         />
 
@@ -101,57 +97,65 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
             /10
           </span>
         </div>
-
-        {/* Course name + location — bottom-left */}
-        <div className="absolute" style={{ left: 14, right: 100, bottom: 12 }}>
-          <div
-            className="text-white font-black"
-            style={{
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              fontSize: 22,
-              lineHeight: 1.1,
-              letterSpacing: '-0.02em',
-              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-            }}
-          >
-            {review.courseName}
-          </div>
-          {locationLine && (
-            <div
-              className="text-white/70"
-              style={{
-                fontSize: 11,
-                marginTop: 2,
-                textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-              }}
-            >
-              {locationLine}
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Body — excerpt + read row */}
-      <div
-        className="px-3.5 pt-2.5 pb-3.5"
-        style={{
-          background: 'linear-gradient(180deg, #0F172A 0%, #0B1220 100%)',
-        }}
-      >
+      {/* Bottom content block — sits directly on the gradient (no slate slab) */}
+      <div style={{ padding: '14px 18px 16px' }}>
+        {/* Course name + location */}
+        <div
+          className="text-white font-black"
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 22,
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            textShadow: '0 2px 18px rgba(0,0,0,0.55)',
+          }}
+        >
+          {review.courseName}
+        </div>
+        {locationLine && (
+          <div
+            className="text-white/70"
+            style={{
+              fontSize: 11,
+              marginTop: 2,
+              textShadow: '0 1px 10px rgba(0,0,0,0.55)',
+            }}
+          >
+            {locationLine}
+          </div>
+        )}
+
+        {/* Excerpt */}
         {review.reviewText && (
           <div
-            className="text-white/70 italic line-clamp-2"
-            style={{ fontSize: 13, lineHeight: 1.5 }}
+            className="italic line-clamp-2"
+            style={{
+              fontSize: 13,
+              lineHeight: 1.5,
+              marginTop: 10,
+              color: 'rgba(255,255,255,0.82)',
+              textShadow: '0 1px 10px rgba(0,0,0,0.55)',
+            }}
           >
             "{review.reviewText}"
           </div>
         )}
+
+        {/* Read row */}
         <div
           className="flex items-center justify-between"
-          style={{ marginTop: 8 }}
+          style={{ marginTop: 10 }}
         >
           <span
-            style={{ fontSize: 11, color: '#F7931E', fontWeight: 600 }}
+            style={{
+              fontSize: 11,
+              color: '#F7931E',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              textShadow: '0 1px 6px rgba(0,0,0,0.45)',
+            }}
           >
             Read review →
           </span>
@@ -167,12 +171,12 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
                 width: 28,
                 height: 28,
                 borderRadius: '50%',
-                background: 'rgba(255,255,255,0.06)',
+                background: 'rgba(255,255,255,0.12)',
                 border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'rgba(255,255,255,0.5)',
+                color: 'rgba(255,255,255,0.8)',
                 cursor: 'pointer',
                 flexShrink: 0,
               }}
