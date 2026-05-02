@@ -176,7 +176,7 @@ export const LeaderboardRow: React.FC<Props> = ({
           flexShrink: 0,
         }}
       >
-        {handicap !== null && handicap !== undefined ? handicap.toFixed(1) : '—'}
+        {item.rankingValue !== null && item.rankingValue !== undefined ? item.rankingValue.toFixed(1) : '—'}
       </span>
     </button>
   );
