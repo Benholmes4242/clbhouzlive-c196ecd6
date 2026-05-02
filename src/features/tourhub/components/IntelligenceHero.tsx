@@ -688,169 +688,275 @@ function HeroPick({
   name,
   subtitle,
   pulledQuote,
+  reasons,
   position,
   positionLabel,
   positionAccent = 'amber',
   pulse = false,
+  defaultExpanded = false,
 }: {
   initials: string;
   name: string;
   subtitle?: string | null;
   pulledQuote?: string | null;
+  reasons?: string[];
   position: string;
   positionLabel: string;
   positionAccent?: PositionAccent;
   pulse?: boolean;
+  defaultExpanded?: boolean;
 }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const accent =
     positionAccent === 'amber' ? AMBER_DEEP
     : positionAccent === 'green' ? GREEN_LIGHT
     : INK;
+  const visibleReasons = (reasons ?? []).filter(Boolean).slice(0, 3);
 
   return (
     <div
       style={{
-        padding: '20px 0 18px',
         borderTop: `1px solid ${SLATE_150}`,
         borderBottom: `1px solid ${SLATE_150}`,
         marginBottom: 14,
       }}
     >
-      <div
+      <button
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+        aria-expanded={expanded}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 14,
-          marginBottom: pulledQuote ? 14 : 0,
+          width: '100%',
+          padding: '20px 0 18px',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
         }}
       >
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 14,
-            background: AMBER_TINT,
-            border: `1px solid ${AMBER_TINT_STRONG}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: '"SF Mono", monospace',
-            fontSize: 17,
-            fontWeight: 700,
-            color: AMBER_DEEP,
-            flexShrink: 0,
-          }}
-        >
-          {initials}
-        </div>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             style={{
-              ...monoLabel,
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              background: AMBER_TINT,
+              border: `1px solid ${AMBER_TINT_STRONG}`,
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
-              fontSize: 8,
-              color: AMBER_DEEP,
-              letterSpacing: '0.18em',
-              marginBottom: 5,
-            }}
-          >
-            <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
-            TOP PICK
-          </div>
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 20,
+              justifyContent: 'center',
+              fontFamily: '"SF Mono", monospace',
+              fontSize: 17,
               fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.15,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              color: AMBER_DEEP,
+              flexShrink: 0,
             }}
           >
-            {name}
+            {initials}
           </div>
-          {subtitle && (
+
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 12,
-                color: SLATE_500,
-                marginTop: 4,
+                ...monoLabel,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                fontSize: 8,
+                color: AMBER_DEEP,
+                letterSpacing: '0.18em',
+                marginBottom: 5,
+              }}
+            >
+              <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
+              TOP PICK
+            </div>
+            <div
+              style={{
+                fontFamily: headlineFont,
+                fontSize: 20,
+                fontWeight: 700,
+                color: INK,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
-              {subtitle}
+              {name}
+            </div>
+            {subtitle && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: SLATE_500,
+                  marginTop: 4,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {subtitle}
+              </div>
+            )}
+          </div>
+
+          <div
+            style={{
+              textAlign: 'right',
+              transform: pulse ? 'scale(1.06)' : 'scale(1)',
+              transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: headlineFont,
+                fontSize: 30,
+                fontWeight: 700,
+                color: accent,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.025em',
+                lineHeight: 1,
+                textShadow: pulse ? `0 0 12px ${AMBER_TINT_STRONG}` : 'none',
+                transition: 'text-shadow 400ms ease',
+              }}
+            >
+              {position}
+            </div>
+            <div
+              style={{
+                ...monoLabel,
+                fontSize: 8,
+                color: SLATE_500,
+                letterSpacing: '0.16em',
+                marginTop: 4,
+              }}
+            >
+              {positionLabel}
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginLeft: 4,
+              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 240ms ease',
+              flexShrink: 0,
+            }}
+          >
+            <ChevronDown size={18} color={SLATE_400} strokeWidth={2.5} />
+          </div>
+        </div>
+
+        {!expanded && pulledQuote && (
+          <div style={{ position: 'relative', paddingLeft: 24, paddingTop: 14 }}>
+            <Quote
+              size={16}
+              color={AMBER_ACCENT}
+              fill={AMBER_ACCENT}
+              strokeWidth={0}
+              style={{ position: 'absolute', left: 0, top: 16, transform: 'scaleX(-1)' }}
+            />
+            <div
+              style={{
+                fontFamily: headlineFont,
+                fontSize: 14.5,
+                fontWeight: 500,
+                fontStyle: 'italic',
+                color: SLATE_700,
+                lineHeight: 1.45,
+                letterSpacing: '-0.005em',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {pulledQuote}
+            </div>
+          </div>
+        )}
+      </button>
+
+      <div
+        style={{
+          maxHeight: expanded ? 240 : 0,
+          opacity: expanded ? 1 : 0,
+          overflow: 'hidden',
+          transition: 'max-height 320ms ease, opacity 240ms ease',
+        }}
+      >
+        <div style={{ padding: '0 0 16px 0' }}>
+          {pulledQuote && (
+            <div style={{ position: 'relative', paddingLeft: 24, marginBottom: 12 }}>
+              <Quote
+                size={16}
+                color={AMBER_ACCENT}
+                fill={AMBER_ACCENT}
+                strokeWidth={0}
+                style={{ position: 'absolute', left: 0, top: 2, transform: 'scaleX(-1)' }}
+              />
+              <div
+                style={{
+                  fontFamily: headlineFont,
+                  fontSize: 14.5,
+                  fontWeight: 500,
+                  fontStyle: 'italic',
+                  color: SLATE_700,
+                  lineHeight: 1.45,
+                  letterSpacing: '-0.005em',
+                }}
+              >
+                {pulledQuote}
+              </div>
+            </div>
+          )}
+
+          {visibleReasons.length > 0 && (
+            <div
+              style={{
+                background: '#FFFFFF',
+                borderRadius: 8,
+                borderLeft: `2px solid ${AMBER_ACCENT}`,
+                padding: '10px 12px',
+              }}
+            >
+              {visibleReasons.map((r, i, arr) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 8,
+                    marginBottom: i < arr.length - 1 ? 8 : 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: '50%',
+                      background: AMBER_DEEP,
+                      marginTop: 6,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: SLATE_700,
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {r}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
-
-        <div
-          style={{
-            textAlign: 'right',
-            transform: pulse ? 'scale(1.06)' : 'scale(1)',
-            transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 30,
-              fontWeight: 700,
-              color: accent,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.025em',
-              lineHeight: 1,
-              textShadow: pulse ? `0 0 12px ${AMBER_TINT_STRONG}` : 'none',
-              transition: 'text-shadow 400ms ease',
-            }}
-          >
-            {position}
-          </div>
-          <div
-            style={{
-              ...monoLabel,
-              fontSize: 8,
-              color: SLATE_500,
-              letterSpacing: '0.16em',
-              marginTop: 4,
-            }}
-          >
-            {positionLabel}
-          </div>
-        </div>
       </div>
-
-      {pulledQuote && (
-        <div style={{ position: 'relative', paddingLeft: 24 }}>
-          <Quote
-            size={16}
-            color={AMBER_ACCENT}
-            fill={AMBER_ACCENT}
-            strokeWidth={0}
-            style={{ position: 'absolute', left: 0, top: 2, transform: 'scaleX(-1)' }}
-          />
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 14.5,
-              fontWeight: 500,
-              color: SLATE_700,
-              lineHeight: 1.45,
-              letterSpacing: '-0.005em',
-            }}
-          >
-            {pulledQuote}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
