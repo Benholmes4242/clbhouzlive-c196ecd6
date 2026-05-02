@@ -295,7 +295,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     <section
       aria-label="clbhouz Intelligence"
       style={{
-        background: LEAD_BG,
+        // No background — sits directly on page slate-50 bg
         padding: '24px 16px 22px',
         borderTop: `1px solid ${SLATE_150}`,
         borderBottom: `1px solid ${SLATE_150}`,
