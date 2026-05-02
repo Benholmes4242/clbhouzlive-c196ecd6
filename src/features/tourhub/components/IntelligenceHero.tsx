@@ -1607,6 +1607,7 @@ function UpcomingStateBlock({
 
   return (
     <div>
+      <FramingSentence text={framingSentence} />
       {topPickFirstName ? (
         <EditorialHeadline>
           <span style={{ color: AMBER_DEEP }}>{topPickFirstName}</span> is our pick to win.
