@@ -32,9 +32,9 @@ const Top100LeaderboardPanel = () => {
   };
 
   const tabs = [
+    { id: 'courses' as const, label: 'Courses' },
     { id: 'championship' as const, label: 'Top 100' },
     { id: 'exploration' as const, label: 'Global' },
-    { id: 'courses' as const, label: 'Courses' },
   ];
 
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
