@@ -63,13 +63,6 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     >
       {/* Top accent + rating */}
       <div style={{ position: 'relative' }}>
-        {/* Amber accent bar */}
-        <div
-          style={{
-            height: 2,
-            background: 'linear-gradient(90deg, #F7931E 0%, transparent 70%)',
-          }}
-        />
 
         {/* Rating — top-right, huge serif */}
         <div
