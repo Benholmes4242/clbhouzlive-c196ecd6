@@ -1874,6 +1874,38 @@ function Standfirst({ children }: { children: React.ReactNode }) {
   );
 }
 
+function EditorialHeadline({ children }: { children: React.ReactNode }) {
+  return (
+    <h1
+      style={{
+        ...serifTitle,
+        fontSize: 32,
+        margin: 0,
+      }}
+    >
+      {children}
+    </h1>
+  );
+}
+
+function ContextLine({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        ...monoLabel,
+        fontWeight: 600,
+        fontSize: 10,
+        color: PAPER_MUTE,
+        letterSpacing: '0.06em',
+        marginTop: 12,
+        textTransform: 'none',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function PerformanceChip({ label }: { label: string }) {
   return (
     <span
