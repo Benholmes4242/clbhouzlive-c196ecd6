@@ -1,12 +1,6 @@
-import React, { useMemo } from 'react';
-import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
-import { ArrowDown, ArrowUp, Trophy, Flame } from 'lucide-react';
-import {
-  useHandicapHistory,
-  useHandicapTrend,
-  useCounters,
-  useRecentRounds,
-} from '@/lib/whs/hooks';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown, ArrowUp, Trophy } from 'lucide-react';
+import { useHandicapHistory, useHandicapTrend } from '@/lib/whs/hooks';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 
 interface Props {
@@ -15,11 +9,18 @@ interface Props {
 
 type Range = 30 | 90 | 365;
 
-const fmtDelta = (n: number) => Math.abs(n).toFixed(1);
+// ── Tokens ────────────────────────────────────────────────────────────────
+const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97211';
+const INK = '#0F172A';
+const INK_MUTE = 'rgba(15,23,42,0.55)';
+const INK_HAIR = 'rgba(15,23,42,0.10)';
+const GREEN = '#059669';
+const RED = '#9F1D1D';
 
-const HAIRLINE = '1px solid rgba(15,23,42,0.10)';
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
-// ── Career-low detection ──────────────────────────────────────────────────
+// ── Career-low badge — honest dating ──────────────────────────────────────
 function useCareerLowBadge(
   currentValue: number | null | undefined,
   yearHistory: HandicapPoint[] | undefined,
@@ -41,470 +42,375 @@ function useCareerLowBadge(
     const observed = new Date(min.at).getTime();
     const now = Date.now();
     const days = Math.floor((now - observed) / 86_400_000);
-    if (days < 0 || days > 30) return null;
+    if (days < 0) return null;
     if (days === 0) return 'TODAY';
     if (days === 1) return 'YESTERDAY';
-    return `${days} DAYS AGO`;
+    if (days <= 7) return `${days} DAYS AGO`;
+    const d = new Date(min.at);
+    return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
   }, [currentValue, yearHistory]);
 }
 
-// ── Weekly streak computation ─────────────────────────────────────────────
-function isoWeek(d: Date): string {
-  const t = new Date(d);
-  t.setHours(0, 0, 0, 0);
-  t.setDate(t.getDate() + 3 - ((t.getDay() + 6) % 7));
-  const week1 = new Date(t.getFullYear(), 0, 4);
-  const wk =
-    1 +
-    Math.round(
-      ((t.getTime() - week1.getTime()) / 86400000 -
-        3 +
-        ((week1.getDay() + 6) % 7)) /
-        7,
-    );
-  return `${t.getFullYear()}-W${wk.toString().padStart(2, '0')}`;
+// ── Scrub date label ──────────────────────────────────────────────────────
+function scrubDateLabel(point: HandicapPoint, range: Range): string {
+  const d = new Date(point.observed_at);
+  if (range === 365) return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
 }
 
-function useWeeklyStreak(connectionId: string | undefined): number {
-  const { data: recent } = useRecentRounds(connectionId);
-  return useMemo(() => {
-    if (!recent || recent.length === 0) return 0;
-    const weekSet = new Set<string>();
-    for (const r of recent) {
-      if (r.play_date) weekSet.add(isoWeek(new Date(r.play_date)));
-    }
-    const weeks = Array.from(weekSet).sort().reverse();
-    if (weeks.length === 0) return 0;
+// ── Component ─────────────────────────────────────────────────────────────
+const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
+  const [range, setRange] = useState<Range>(90);
+  const [scrubIdx, setScrubIdx] = useState<number | null>(null);
+  const [drawn, setDrawn] = useState(false);
+  const [showHint, setShowHint] = useState(true);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
-    const thisWeek = isoWeek(new Date());
-    const lastWeekDate = new Date();
-    lastWeekDate.setDate(lastWeekDate.getDate() - 7);
-    const lastWeek = isoWeek(lastWeekDate);
-
-    if (weeks[0] !== thisWeek && weeks[0] !== lastWeek) return 0;
-
-    let streak = 1;
-    for (let i = 1; i < weeks.length; i++) {
-      const prevWeekStr = weeks[i - 1];
-      const [yearStr, weekPart] = prevWeekStr.split('-W');
-      const year = parseInt(yearStr, 10);
-      const wk = parseInt(weekPart, 10);
-      const jan4 = new Date(year, 0, 4);
-      const dayOfWeek = (jan4.getDay() + 6) % 7;
-      const week1Mon = new Date(jan4.getTime() - dayOfWeek * 86400000);
-      const targetMon = new Date(week1Mon.getTime() + (wk - 1) * 7 * 86400000);
-      const expectedPrev = isoWeek(
-        new Date(targetMon.getTime() - 7 * 86400000),
-      );
-      if (weeks[i] === expectedPrev) streak++;
-      else break;
-    }
-    return streak;
-  }, [recent]);
-}
-
-// ── Counting rounds ───────────────────────────────────────────────────────
-function useCountingRounds(connectionId: string | undefined): {
-  used: number;
-  max: number;
-} {
-  const { data: counters } = useCounters(connectionId);
-  return useMemo(() => {
-    if (!counters) return { used: 0, max: 8 };
-    const used = counters.filter((c) => c.handicap_differential !== null).length;
-    return { used, max: 8 };
-  }, [counters]);
-}
-
-export const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
-  const [range, setRange] = React.useState<Range>(90);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
-  const { data: history, isLoading: historyLoading } = useHandicapHistory(
-    connection.id,
-    range,
-  );
+  const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
   const { data: yearHistory } = useHandicapHistory(connection.id, 365);
 
-  const counting = useCountingRounds(connection.id);
-  const streak = useWeeklyStreak(connection.id);
-  const careerLowLabel = useCareerLowBadge(trend?.current, yearHistory);
+  const current = trend?.current ?? null;
+  const careerLowLabel = useCareerLowBadge(current, yearHistory);
 
-  const isTrendLoading = trendLoading && !trend;
+  // ── Sparkline geometry ──────────────────────────────────────────────────
+  const W = 360;
+  const H = 90;
+  const PAD_TOP = 8;
+  const PAD_BOTTOM = 8;
 
-  // Trend rendering — arrow + delta inline
-  let trendNode: React.ReactNode = null;
-  if (trend && trend.delta !== null && Math.abs(trend.delta) >= 0.05) {
-    const isImprovement = trend.delta < 0;
-    const Arrow = isImprovement ? ArrowDown : ArrowUp;
-    const color = isImprovement ? '#059669' : '#9F1D1D';
-    trendNode = (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          color,
-          paddingBottom: 10,
-        }}
-      >
-        <Arrow size={16} strokeWidth={2.5} />
-        <span
-          style={{
-            fontSize: 16,
-            fontWeight: 800,
-            fontFamily: 'system-ui, sans-serif',
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-          }}
-        >
-          {fmtDelta(trend.delta)}
-        </span>
-      </span>
+  const points: HandicapPoint[] = history ?? [];
+
+  const coords = useMemo(() => {
+    if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
+    const values = points.map(p => p.handicap_index);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min || 1;
+    return points.map((p, i) => {
+      const x = points.length === 1 ? W / 2 : (i / (points.length - 1)) * W;
+      const y = H - PAD_BOTTOM - ((max - p.handicap_index) / range) * (H - PAD_TOP - PAD_BOTTOM);
+      return { x, y, idx: i };
+    });
+  }, [points]);
+
+  const pathD = useMemo(() => {
+    if (coords.length === 0) return '';
+    return coords.reduce(
+      (acc, c, i) => acc + (i === 0 ? `M ${c.x} ${c.y}` : ` L ${c.x} ${c.y}`),
+      '',
+    );
+  }, [coords]);
+
+  const areaD = useMemo(() => {
+    if (coords.length === 0) return '';
+    const last = coords[coords.length - 1];
+    const first = coords[0];
+    return `${pathD} L ${last.x} ${H} L ${first.x} ${H} Z`;
+  }, [coords, pathD]);
+
+  // ── Draw-in animation re-trigger on range/data change ──────────────────
+  useEffect(() => {
+    setDrawn(false);
+    const t = setTimeout(() => setDrawn(true), 50);
+    return () => clearTimeout(t);
+  }, [range, points.length]);
+
+  // ── Pointer handlers ────────────────────────────────────────────────────
+  const updateScrubFromEvent = (clientX: number) => {
+    if (!svgRef.current || coords.length === 0) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const xInViewBox = ((clientX - rect.left) / rect.width) * W;
+    let nearest = 0;
+    let nearestDist = Infinity;
+    coords.forEach((c, i) => {
+      const dist = Math.abs(c.x - xInViewBox);
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearest = i;
+      }
+    });
+    setScrubIdx(nearest);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (showHint) setShowHint(false);
+    updateScrubFromEvent(e.clientX);
+  };
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (showHint) setShowHint(false);
+    updateScrubFromEvent(e.clientX);
+  };
+  const clearScrub = () => setScrubIdx(null);
+
+  // ── Loading state ───────────────────────────────────────────────────────
+  if (trendLoading || historyLoading) {
+    return (
+      <section style={{ padding: '20px 20px 18px', marginBottom: 24 }}>
+        <div style={{ height: 12, width: 80, background: INK_HAIR, borderRadius: 2, marginBottom: 14 }} />
+        <div style={{ height: 72, width: 180, background: INK_HAIR, borderRadius: 4, marginBottom: 14 }} />
+        <div style={{ height: 12, width: 130, background: INK_HAIR, borderRadius: 2, marginBottom: 18 }} />
+        <div style={{ height: 90, width: '100%', background: INK_HAIR, borderRadius: 4 }} />
+      </section>
     );
   }
 
-  // Career low value (for stat strip column 3)
-  const careerLowValue = useMemo(() => {
-    if (!yearHistory || yearHistory.length === 0) return null;
-    const min = yearHistory.reduce(
-      (acc, p) => (p.handicap_index < acc ? p.handicap_index : acc),
-      Infinity,
-    );
-    return min === Infinity ? null : min;
-  }, [yearHistory]);
-
-  // Spark colour
-  const points = history ?? [];
-  const sparkColor = (() => {
-    if (points.length < 2) return '#94A3B8';
-    const first = points[0].handicap_index;
-    const last = points[points.length - 1].handicap_index;
-    if (Math.abs(last - first) < 0.05) return '#94A3B8';
-    return last < first ? '#059669' : '#9F1D1D';
-  })();
-
-  return (
-    <section style={{ padding: '24px 20px' }}>
-      {/* Eyebrow */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <span
-          aria-hidden
-          style={{
-            display: 'inline-block',
-            width: 3,
-            height: 8,
-            borderRadius: 1,
-            background: '#F7931E',
-          }}
-        />
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 900,
-            color: '#F7931E',
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Your Handicap Index
-        </span>
-      </div>
-
-      {/* Big number + delta */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          gap: 12,
-          marginBottom: careerLowLabel ? 10 : 14,
-        }}
-      >
-        {isTrendLoading ? (
-          <div
-            style={{
-              height: 64,
-              width: 120,
-              borderRadius: 6,
-              background: 'rgba(247,147,30,0.12)',
-            }}
-            className="animate-pulse"
-          />
-        ) : (
+  // ── Empty state ─────────────────────────────────────────────────────────
+  if (current === null) {
+    return (
+      <section style={{ padding: '20px 20px 18px', marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <span
             style={{
-              fontSize: 64,
-              fontWeight: 900,
-              fontFamily: 'Georgia, serif',
-              color: '#F7931E',
-              letterSpacing: '-0.04em',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
+              width: 6, height: 6, borderRadius: '50%', background: AMBER,
+              animation: 'liveDot 2s ease-in-out infinite',
             }}
-          >
-            {trend?.current !== null && trend?.current !== undefined
-              ? trend.current.toFixed(1)
-              : '—'}
+          />
+          <span style={{ fontSize: 11, fontWeight: 800, color: INK, letterSpacing: '0.18em' }}>
+            YOUR INDEX
           </span>
-        )}
-        {trendNode}
+        </div>
+        <p style={{ fontSize: 14, color: INK_MUTE, fontStyle: 'italic', lineHeight: 1.5, margin: 0 }}>
+          We're waiting for your first handicap snapshot. Play a round and your index will appear here.
+        </p>
+        <style>{keyframes}</style>
+      </section>
+    );
+  }
+
+  const scrubPoint = scrubIdx !== null ? points[scrubIdx] : null;
+  const scrubValue = scrubPoint?.handicap_index ?? current;
+  const isScrubbing = scrubIdx !== null && scrubPoint !== null;
+
+  // ── Trend pill (live mode only) ─────────────────────────────────────────
+  const trendNode =
+    trend && trend.delta !== null && trend.delta !== undefined && Math.abs(trend.delta) >= 0.05
+      ? (() => {
+          const isImprovement = trend.delta < 0;
+          const Arrow = isImprovement ? ArrowDown : ArrowUp;
+          const color = isImprovement ? GREEN : RED;
+          const bgColor = isImprovement ? 'rgba(5,150,105,0.10)' : 'rgba(159,29,29,0.10)';
+          const borderColor = isImprovement ? 'rgba(5,150,105,0.25)' : 'rgba(159,29,29,0.25)';
+          return (
+            <div
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '4px 10px', borderRadius: 999,
+                background: bgColor, border: `1px solid ${borderColor}`,
+                color, fontSize: 13, fontWeight: 700,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              <Arrow size={14} strokeWidth={2.5} />
+              <span>{Math.abs(trend.delta).toFixed(1)}</span>
+            </div>
+          );
+        })()
+      : null;
+
+  return (
+    <section style={{ padding: '20px 20px 18px', marginBottom: 24 }}>
+      {/* Eyebrow row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span
+            style={{
+              width: 6, height: 6, borderRadius: '50%', background: AMBER,
+              animation: 'liveDot 2s ease-in-out infinite',
+            }}
+          />
+          <span style={{ fontSize: 11, fontWeight: 800, color: INK, letterSpacing: '0.18em' }}>
+            YOUR INDEX
+          </span>
+        </div>
+        <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: 'rgba(15,23,42,0.04)', borderRadius: 999 }}>
+          {([30, 90, 365] as Range[]).map(r => {
+            const active = r === range;
+            return (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                style={{
+                  padding: '4px 10px', fontSize: 10, fontWeight: 800,
+                  border: 'none', borderRadius: 999, cursor: 'pointer',
+                  background: active ? INK : 'transparent',
+                  color: active ? '#fff' : INK_MUTE,
+                  letterSpacing: '0.02em',
+                  transition: 'background 150ms ease, color 150ms ease',
+                }}
+              >
+                {r === 365 ? '1y' : `${r}d`}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Conditional career-low badge */}
+      {/* Headline */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 8, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+            fontSize: 88, fontWeight: 200, lineHeight: 1,
+            color: isScrubbing ? INK : AMBER,
+            letterSpacing: '-0.04em',
+            transition: 'color 200ms ease',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {scrubValue.toFixed(1)}
+        </span>
+        {!isScrubbing && trendNode}
+        {isScrubbing && scrubPoint && (
+          <span
+            style={{
+              fontSize: 11, fontWeight: 800, color: INK_MUTE,
+              letterSpacing: '0.18em',
+              padding: '4px 10px', borderRadius: 999,
+              background: 'rgba(15,23,42,0.06)',
+            }}
+          >
+            {scrubDateLabel(scrubPoint, range)}
+          </span>
+        )}
+      </div>
+
+      {/* Career-low row */}
       {careerLowLabel && (
         <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            marginBottom: 14,
+            display: 'flex', alignItems: 'center', gap: 6,
+            marginBottom: 18,
+            opacity: isScrubbing ? 0 : 1,
+            transition: 'opacity 200ms ease',
           }}
         >
-          <Trophy size={11} fill="#B45309" stroke="#B45309" />
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: '#B45309',
-              letterSpacing: '0.10em',
-              textTransform: 'uppercase',
-            }}
-          >
-            New Career Low · {careerLowLabel}
+          <Trophy size={12} color={AMBER_DEEP} strokeWidth={2.4} />
+          <span style={{ fontSize: 10, fontWeight: 800, color: AMBER_DEEP, letterSpacing: '0.18em' }}>
+            CAREER LOW · {careerLowLabel}
           </span>
         </div>
       )}
-
-      {/* Stat strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          borderTop: HAIRLINE,
-          borderBottom: HAIRLINE,
-          marginBottom: 18,
-        }}
-      >
-        {/* Counting */}
-        <div
-          style={{
-            padding: '12px 4px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-            <span
-              style={{
-                fontSize: 18,
-                fontWeight: 900,
-                fontFamily: 'Georgia, serif',
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                color: '#0F172A',
-                lineHeight: 1,
-              }}
-            >
-              {counting.used}
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: '#94A3B8',
-                lineHeight: 1,
-              }}
-            >
-              / {counting.max}
-            </span>
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: '#94A3B8',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginTop: 6,
-            }}
-          >
-            Counting
-          </div>
-        </div>
-
-        {/* Streak */}
-        <div
-          style={{
-            padding: '12px 4px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderLeft: HAIRLINE,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            <Flame
-              size={11}
-              fill="#F7931E"
-              stroke="#F7931E"
-              style={{ position: 'relative', top: 1 }}
-            />
-            <span
-              style={{
-                fontSize: 18,
-                fontWeight: 900,
-                fontFamily: 'Georgia, serif',
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                color: '#0F172A',
-                lineHeight: 1,
-              }}
-            >
-              {streak}
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: '#94A3B8',
-                lineHeight: 1,
-              }}
-            >
-              w
-            </span>
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: '#94A3B8',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginTop: 6,
-            }}
-          >
-            Streak
-          </div>
-        </div>
-
-        {/* Career low (Brief 1 fallback for friend rank) */}
-        <div
-          style={{
-            padding: '12px 4px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderLeft: HAIRLINE,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline' }}>
-            <span
-              style={{
-                fontSize: 18,
-                fontWeight: 900,
-                fontFamily: 'Georgia, serif',
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                color: '#0F172A',
-                lineHeight: 1,
-              }}
-            >
-              {careerLowValue !== null ? careerLowValue.toFixed(1) : '—'}
-            </span>
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: '#94A3B8',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginTop: 6,
-            }}
-          >
-            Career low
-          </div>
-        </div>
-      </div>
+      {!careerLowLabel && <div style={{ marginBottom: 18 }} />}
 
       {/* Sparkline */}
-      <div style={{ height: 90, marginBottom: 12 }}>
-        {historyLoading ? (
-          <div className="w-full h-full bg-muted/40 rounded-md animate-pulse" />
-        ) : points.length === 0 ? (
-          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>
-              Snapshots will populate as your handicap changes.
-            </p>
-          </div>
-        ) : points.length === 1 ? (
-          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <div
-              style={{ height: 1, width: '100%', opacity: 0.4, background: sparkColor }}
-            />
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={points} margin={{ top: 6, right: 4, bottom: 6, left: 4 }}>
-              <defs>
-                <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={sparkColor} stopOpacity={0.18} />
-                  <stop offset="100%" stopColor={sparkColor} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <YAxis hide domain={['auto', 'auto']} />
-              <Line
-                type="monotone"
-                dataKey="handicap_index"
-                stroke={sparkColor}
-                strokeWidth={2.25}
-                dot={false}
-                isAnimationActive={true}
-                animationDuration={300}
-                fill="url(#sparkFill)"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
-      </div>
-
-      {/* Range toggle */}
-      <div
-        style={{
-          display: 'inline-flex',
-          padding: 2,
-          borderRadius: 999,
-          background: 'rgba(15,23,42,0.04)',
-        }}
+      <svg
+        ref={svgRef}
+        width="100%"
+        height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        style={{ display: 'block', touchAction: 'none', cursor: 'crosshair' }}
+        onPointerMove={handlePointerMove}
+        onPointerDown={handlePointerDown}
+        onPointerLeave={clearScrub}
+        onPointerCancel={clearScrub}
       >
-        {([30, 90, 365] as Range[]).map((r) => {
-          const active = r === range;
-          return (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
+        <defs>
+          <linearGradient id="heroSparkFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={AMBER} stopOpacity={0.28} />
+            <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+
+        {coords.length >= 2 && (
+          <>
+            <path d={areaD} fill="url(#heroSparkFill)" />
+            <path
+              d={pathD}
+              fill="none"
+              stroke={AMBER}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
               style={{
-                padding: '4px 12px',
-                borderRadius: 999,
-                fontSize: 12,
-                fontWeight: 700,
-                background: active ? '#F7931E' : 'transparent',
-                color: active ? '#fff' : '#64748B',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'background 0.15s, color 0.15s',
+                strokeDasharray: 2000,
+                strokeDashoffset: drawn ? 0 : 2000,
+                transition: 'stroke-dashoffset 1200ms cubic-bezier(0.22, 0.61, 0.36, 1)',
               }}
-            >
-              {r === 365 ? '1y' : `${r}d`}
-            </button>
+            />
+          </>
+        )}
+
+        {coords.length === 1 && (
+          <line
+            x1={0} y1={coords[0].y} x2={W} y2={coords[0].y}
+            stroke={AMBER} strokeWidth={2} strokeLinecap="round" opacity={0.7}
+          />
+        )}
+
+        {coords.length === 0 && (
+          <line
+            x1={0} y1={H / 2} x2={W} y2={H / 2}
+            stroke={INK} strokeWidth={1} opacity={0.3}
+          />
+        )}
+
+        {/* Endpoint dot — live mode */}
+        {!isScrubbing && coords.length > 0 && (() => {
+          const last = coords[coords.length - 1];
+          return (
+            <g>
+              <circle
+                cx={last.x} cy={last.y} r={4}
+                fill={AMBER} stroke="#fff" strokeWidth={2}
+              />
+              <circle
+                cx={last.x} cy={last.y} r={4}
+                fill="none" stroke={AMBER} strokeWidth={1.5}
+                style={{
+                  transformOrigin: `${last.x}px ${last.y}px`,
+                  animation: 'pulseRing 1.6s ease-out infinite',
+                }}
+              />
+            </g>
           );
-        })}
-      </div>
+        })()}
+
+        {/* Scrub crosshair */}
+        {isScrubbing && coords[scrubIdx!] && (
+          <g>
+            <line
+              x1={coords[scrubIdx!].x} y1={0}
+              x2={coords[scrubIdx!].x} y2={H}
+              stroke={INK} strokeWidth={1}
+              strokeDasharray="3 3" opacity={0.4}
+            />
+            <circle
+              cx={coords[scrubIdx!].x} cy={coords[scrubIdx!].y} r={5}
+              fill="#fff" stroke={INK} strokeWidth={2}
+            />
+          </g>
+        )}
+      </svg>
+
+      {/* Drag hint */}
+      {showHint && coords.length >= 2 && (
+        <div
+          style={{
+            textAlign: 'center', marginTop: 10,
+            fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.22em',
+          }}
+        >
+          DRAG TO EXPLORE PAST HANDICAP
+        </div>
+      )}
+
+      <style>{keyframes}</style>
     </section>
   );
 };
 
+const keyframes = `
+@keyframes liveDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+`;
+
 export default HeroHandicapCard;
+export { HeroHandicapCard };
