@@ -331,13 +331,28 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
       ) : (
         <>
           {state === 'live' && (
-            <LiveStateBlock data={data} tracker={tracker} pulse={pulse} />
+            <LiveStateBlock
+              data={data}
+              tracker={tracker}
+              pulse={pulse}
+              framingSentence={data?.editorialFraming ?? null}
+            />
           )}
           {state === 'results' && (
-            <ResultsStateBlock data={data} tracker={tracker} pulse={pulse} />
+            <ResultsStateBlock
+              data={data}
+              tracker={tracker}
+              pulse={pulse}
+              framingSentence={data?.editorialFraming ?? null}
+            />
           )}
           {state === 'upcoming' && (
-            <UpcomingStateBlock data={nextTournamentPredictions ?? data ?? null} />
+            <UpcomingStateBlock
+              data={nextTournamentPredictions ?? data ?? null}
+              framingSentence={
+                (nextTournamentPredictions ?? data)?.editorialFraming ?? null
+              }
+            />
           )}
         </>
       )}
