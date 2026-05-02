@@ -31,6 +31,12 @@ export interface AITopContender {
   reasons: string[];
   concern: string;
   promoted?: boolean;
+  /**
+   * Phase C — Editorial layer: per-pick pulled-quote rendered as the HeroPick's
+   * featured reasoning. Falls back to `reasons[0]` when not populated by the
+   * editorial pipeline.
+   */
+  pulledQuote?: string | null;
 }
 
 export interface AIDarkHorse {
