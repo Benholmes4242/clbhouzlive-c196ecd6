@@ -1555,7 +1555,7 @@ function ResultsStateBlock({
           initials={getInitials(heroPickResolved.playerName)}
           name={heroPickResolved.playerName}
           subtitle={`Pre-rank #${heroPickResolved.predictedRank} → Final ${formatPosition(heroPickResolved)}`}
-          pulledQuote={heroPickResolved.reasons[0] ?? null}
+          pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
           positionAccent={heroAccent}
