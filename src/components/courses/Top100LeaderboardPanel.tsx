@@ -4,18 +4,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
-import { ExplorationTab, HandicapTab } from '@/components/leaderboards';
+import { ExplorationTab } from '@/components/leaderboards';
 
-type LeaderboardView = 'championship' | 'courses' | 'exploration' | 'handicap';
+type LeaderboardView = 'championship' | 'courses' | 'exploration';
 
 const Top100LeaderboardPanel = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const getInitialView = (): LeaderboardView => {
     const param = searchParams.get('view');
-    if (param === 'courses' || param === 'championship' || param === 'exploration' || param === 'handicap') {
+    if (param === 'courses' || param === 'championship' || param === 'exploration') {
       return param;
     }
+    if (param === 'handicap') return 'championship';
     if (param === 'players') return 'championship';
     return 'championship';
   };
@@ -34,7 +35,6 @@ const Top100LeaderboardPanel = () => {
     { id: 'championship' as const, label: 'Top 100' },
     { id: 'exploration' as const, label: 'Global' },
     { id: 'courses' as const, label: 'Courses' },
-    { id: 'handicap' as const, label: 'Handicap' },
   ];
 
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
@@ -105,10 +105,6 @@ const Top100LeaderboardPanel = () => {
 
         <TabsContent value="exploration" className="mt-0 -mx-4">
           <ExplorationTab />
-        </TabsContent>
-
-        <TabsContent value="handicap" className="mt-0 -mx-4">
-          <HandicapTab />
         </TabsContent>
       </Tabs>
     </div>
