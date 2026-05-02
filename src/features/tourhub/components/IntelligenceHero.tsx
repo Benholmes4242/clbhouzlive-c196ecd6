@@ -569,26 +569,204 @@ function Masthead({
   );
 }
 
-function TrackRecord({
+function CredibilityBand({
   wins,
   topFives,
   topFiveRate,
+  season = '2026 SEASON',
 }: {
   wins: number;
   topFives: number;
   topFiveRate: number;
+  season?: string;
 }) {
+  const stats = [
+    { val: `${wins}`, label: 'WINS' },
+    { val: `${topFives}`, label: 'TOP-5s' },
+    { val: `${topFiveRate}%`, label: 'HIT RATE' },
+  ];
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
-        gap: 8,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '11px 20px',
+        background:
+          'linear-gradient(90deg, rgba(247,147,30,0.16) 0%, transparent 50%, rgba(247,147,30,0.16) 100%)',
+        borderTop: `1px solid ${HAIRLINE}`,
+        borderBottom: `1px solid ${HAIRLINE}`,
+        gap: 12,
+        flexWrap: 'wrap',
       }}
     >
-      <StatPill value={String(wins)} label="Wins" highlight />
-      <StatPill value={String(topFives)} label="Top-5s" />
-      <StatPill value={`${topFiveRate}%`} label="Top-5 Rate" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <Award size={11} color={AMBER_ACCENT} strokeWidth={2.5} />
+        <span style={{ ...monoLabel, fontSize: 9, color: AMBER_ACCENT, letterSpacing: '0.20em' }}>
+          {season}
+        </span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {stats.map((s, i) => (
+          <React.Fragment key={s.label}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span
+                style={{
+                  fontFamily: '"SF Pro Display", -apple-system, sans-serif',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: PAPER,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {s.val}
+              </span>
+              <span style={{ ...monoLabel, fontSize: 8, color: PAPER_MUTE, letterSpacing: '0.16em' }}>
+                {s.label}
+              </span>
+            </div>
+            {i < stats.length - 1 && (
+              <div style={{ width: 1, height: 10, background: HAIRLINE }} />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TrackRecordPanel({
+  wins,
+  topFives,
+  topFiveRate,
+  totalTournaments,
+}: {
+  wins: number;
+  topFives: number;
+  topFiveRate: number;
+  totalTournaments: number;
+}) {
+  const tiles = [
+    { val: `${wins}`, label: 'WINNERS\nCALLED' },
+    { val: `${topFives}`, label: 'TOP-5\nFINISHES' },
+    { val: `${topFiveRate}%`, label: 'TOP-5\nHIT RATE' },
+  ];
+  return (
+    <div
+      style={{
+        margin: '24px 20px 0',
+        padding: '16px 18px',
+        background: PANEL_DARK,
+        border: `1px solid ${HAIRLINE}`,
+        borderRadius: 14,
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 3,
+          background: `linear-gradient(180deg, ${AMBER_ACCENT}, transparent)`,
+        }}
+      />
+      <div
+        style={{
+          ...monoLabel,
+          fontSize: 9,
+          color: AMBER_ACCENT,
+          letterSpacing: '0.24em',
+          marginBottom: 10,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
+        <Award size={10} strokeWidth={2.5} />
+        Why trust us
+      </div>
+      <div
+        style={{
+          ...serifTitle,
+          fontSize: 16,
+          fontWeight: 700,
+          marginBottom: 14,
+          lineHeight: 1.3,
+        }}
+      >
+        We've called{' '}
+        <span style={{ color: AMBER_ACCENT }}>
+          {wins} winner{wins !== 1 ? 's' : ''}
+        </span>{' '}
+        and{' '}
+        <span style={{ color: AMBER_ACCENT }}>
+          {topFives} top-5{topFives !== 1 ? 's' : ''}
+        </span>{' '}
+        this season.
+      </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 8,
+          marginBottom: 12,
+        }}
+      >
+        {tiles.map((t) => (
+          <div
+            key={t.label}
+            style={{
+              padding: '10px 8px',
+              background: 'rgba(255,255,255,0.04)',
+              border: `1px solid ${HAIRLINE}`,
+              borderRadius: 8,
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: '"SF Pro Display", -apple-system, sans-serif',
+                fontSize: 22,
+                fontWeight: 300,
+                color: AMBER_ACCENT,
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+                marginBottom: 4,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {t.val}
+            </div>
+            <div
+              style={{
+                ...monoLabel,
+                fontSize: 8,
+                color: PAPER_MUTE,
+                letterSpacing: '0.14em',
+                whiteSpace: 'pre-line',
+                lineHeight: 1.3,
+              }}
+            >
+              {t.label}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          color: PAPER_MUTE,
+          lineHeight: 1.5,
+          fontStyle: 'italic',
+        }}
+      >
+        Our model has called the winner in {wins} of the last {totalTournaments} PGA tournaments.
+      </div>
     </div>
   );
 }
@@ -599,26 +777,26 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
       type="button"
       onClick={onOpenSheet}
       style={{
-        marginTop: 16,
         width: '100%',
-        padding: '13px 16px',
-        borderRadius: 12,
-        border: 'none',
+        padding: '14px',
+        background: 'transparent',
+        border: '1px solid rgba(244,239,227,0.16)',
+        borderRadius: 10,
+        color: PAPER,
+        fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: '0.20em',
+        textTransform: 'uppercase',
         cursor: 'pointer',
-        background: AMBER_ACCENT,
-        color: GREEN_DEEP,
-        fontSize: 13,
-        fontWeight: 900,
-        letterSpacing: '-0.1px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-        boxShadow: '0 2px 12px rgba(247,147,30,0.25)',
+        gap: 8,
       }}
     >
-      <span>See all Intelligence picks</span>
-      <ChevronRight size={15} strokeWidth={3} />
+      All Intelligence picks
+      <ChevronRight size={12} strokeWidth={2.5} />
     </button>
   );
 }
