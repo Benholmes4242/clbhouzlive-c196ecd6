@@ -1707,7 +1707,7 @@ function UpcomingStateBlock({
           initials={getInitials(topContender.playerName)}
           name={topContender.playerName}
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
-          pulledQuote={topContender.reasons[0] ?? null}
+          pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
           position="—"
           positionLabel="TO PLAY"
           positionAccent="amber"
