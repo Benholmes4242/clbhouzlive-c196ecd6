@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
+  useAllScores,
   useFriendsLeaderboard,
   useFriendWindowRankings,
   whsKeys,
 } from '@/lib/whs/hooks';
+import { computeSelfRanking } from './computeSelfRanking';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import type { WhsFriendMatch, WhsFriendWindowRanking } from '@/lib/whs/types';
@@ -25,6 +27,7 @@ interface Props {
   ownerUserId: string;
   currentUserHandicap: number | null | undefined;
   currentUserName?: string;
+  connectionId: string;
 }
 
 export type LeaderboardItem =
@@ -46,12 +49,14 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
   ownerUserId,
   currentUserHandicap,
   currentUserName = 'You',
+  connectionId,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: friends, isLoading } = useFriendsLeaderboard(ownerUserId);
   const { data: windowRankings, isLoading: rankingsLoading } =
     useFriendWindowRankings(ownerUserId);
+  const { data: ownScores } = useAllScores(connectionId);
 
   const [scope, setScope] = useState<LeaderboardScope>('all');
 
@@ -82,13 +87,17 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
       };
     });
 
-    const selfRanking =
-      scope === 'all' ? currentUserHandicap ?? null : null;
+    let selfRanking: number | null;
+    if (scope === 'all') {
+      selfRanking = currentUserHandicap ?? null;
+    } else {
+      selfRanking = computeSelfRanking(scope, ownScores).avgDiff;
+    }
 
     const selfRow: LeaderboardItem = {
       id: 'self',
       kind: 'self',
-      handicap: selfRanking,
+      handicap: scope === 'all' ? (currentUserHandicap ?? null) : null,
       name: currentUserName,
       rankingValue: selfRanking,
     };
@@ -105,7 +114,7 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
     });
 
     return visible;
-  }, [friends, currentUserHandicap, currentUserName, scope, rankingByRowId]);
+  }, [friends, currentUserHandicap, currentUserName, scope, rankingByRowId, ownScores]);
 
   const totalCount = rows.length;
   const selfRow = rows.find((r) => r.kind === 'self') as LeaderboardItem | undefined;
@@ -159,11 +168,15 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
     });
   };
 
-  // Time-scoped empty state: no qualifying friends
+  // Time-scoped empty state: nobody (including self) qualifies
+  const hasAnyRanking = rows.some(
+    (r) => r.rankingValue !== null && r.rankingValue !== undefined,
+  );
+
   if (
     scope !== 'all' &&
     !rankingsLoading &&
-    rows.filter((r) => r.kind === 'friend').length === 0
+    !hasAnyRanking
   ) {
     return (
       <section style={{ padding: '20px 0 24px' }}>
