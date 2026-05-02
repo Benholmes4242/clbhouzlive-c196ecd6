@@ -18,8 +18,9 @@
  * move per-tournament copy to a Claude-driven daily pipeline.
  */
 
-import { memo, useMemo, useState } from 'react';
-import { Brain, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { memo, useMemo, useState } from 'react';
+import { Brain, ChevronRight, ChevronDown, ChevronUp, Check, Award, Trophy } from 'lucide-react';
+import type { IntelligenceOutcome } from '../utils/outcomeClassifier';
 import { useCountdown } from '@/hooks/useCountdown';
 import {
   useIntelligenceLifecycleState,
@@ -47,6 +48,83 @@ const GREEN_MID = '#0A5238';
 const GREEN_DARK = '#042418';
 const GREEN_ACCENT = '#2DBB78';
 const AMBER_ACCENT = '#F7931E';
+const PAPER = '#F4EFE3';
+const PAPER_MUTE = 'rgba(244,239,227,0.50)';
+const PANEL_RAISED = '#0E4632';
+const PANEL_DARK = '#0A2A1E';
+const HAIRLINE = 'rgba(244,239,227,0.10)';
+
+const serifTitle: React.CSSProperties = {
+  fontFamily: '"Tiempos Headline", "Source Serif Pro", Georgia, serif',
+  fontWeight: 700,
+  lineHeight: 1.1,
+  letterSpacing: '-0.015em',
+  color: PAPER,
+  margin: 0,
+};
+
+const monoLabel: React.CSSProperties = {
+  fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+};
+
+/** First whitespace-delimited token of a player name. "Cam Smith" → "Cam". */
+function getFirstName(fullName: string): string {
+  const parts = (fullName ?? '').trim().split(/\s+/);
+  return parts[0] || fullName || '';
+}
+
+type MissTone = {
+  eyebrow: string;
+  eyebrowColor: string;
+  headlineMain: (winnerFirstName: string) => React.ReactNode;
+  headlineSub: (bestPickFirstName: string, bestPickPosition: string) => React.ReactNode;
+  contextLine: (numInTop10: number, missedCuts: number) => string;
+};
+
+function getMissTone(outcome: IntelligenceOutcome): MissTone {
+  if (outcome === 'top5') {
+    return {
+      eyebrow: 'Closest call.',
+      eyebrowColor: '#F2A24E',
+      headlineMain: (winner) => <>{winner} won.</>,
+      headlineSub: (firstName, pos) => (
+        <span style={{ color: PAPER_MUTE, fontWeight: 600 }}>
+          {firstName} took {pos} — a stroke off the playoff.
+        </span>
+      ),
+      contextLine: (top10, mc) =>
+        `Strong contender finish · ${top10} pick(s) in T10 · ${mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`}`,
+    };
+  }
+  if (outcome === 'partial') {
+    return {
+      eyebrow: 'Solid week.',
+      eyebrowColor: '#A8B5AD',
+      headlineMain: (winner) => <>{winner} won.</>,
+      headlineSub: (firstName, pos) => (
+        <span style={{ color: PAPER_MUTE, fontWeight: 600 }}>
+          {firstName} finished {pos}.
+        </span>
+      ),
+      contextLine: (top10, mc) =>
+        `Top pick in form · ${top10} pick(s) in T10 · ${mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`}`,
+    };
+  }
+  return {
+    eyebrow: 'Tough one.',
+    eyebrowColor: '#A8B5AD',
+    headlineMain: (winner) => <>{winner} won —</>,
+    headlineSub: (firstName, pos) => (
+      <span style={{ color: PAPER_MUTE, fontWeight: 600 }}>
+        we had {firstName} at {pos}.
+      </span>
+    ),
+    contextLine: (top10, mc) =>
+      `Winner not in our top 3 · ${top10} pick(s) in T10 · ${mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`}`,
+  };
+}
 
 function formatPosition(p: TrackedPrediction): string {
   if (p.performanceStatus === 'cut') return 'MC';
@@ -269,21 +347,20 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   return (
     <section
       aria-label="clbhouz Intelligence"
-      style={{ paddingLeft: 16, paddingRight: 16 }}
+      style={{ marginLeft: -16, marginRight: -16 }}
     >
       <div
         style={{
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: 20,
-          padding: '24px 18px 18px',
+          borderRadius: 0,
           background:
             `linear-gradient(135deg, ${GREEN_DEEP} 0%, ${GREEN_MID} 50%, ${GREEN_DARK} 100%)`,
           boxShadow:
             '0 8px 30px -10px rgba(6,58,38,0.55), inset 0 1px 0 rgba(255,255,255,0.10)',
         }}
       >
-        {/* ── Decorative orbs (preserved per Phase A refinement) ── */}
+        {/* ── Decorative orbs ── */}
         <div
           aria-hidden
           style={{
@@ -294,7 +371,8 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 220,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(45,187,120,0.18) 0%, transparent 60%)',
+              'radial-gradient(circle, rgba(45,187,120,0.40) 0%, transparent 60%)',
+            opacity: 0.5,
             pointerEvents: 'none',
           }}
         />
@@ -308,40 +386,54 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
             height: 240,
             borderRadius: '50%',
             background:
-              'radial-gradient(circle, rgba(247,147,30,0.10) 0%, transparent 60%)',
+              'radial-gradient(circle, rgba(247,147,30,0.35) 0%, transparent 60%)',
+            opacity: 0.4,
             pointerEvents: 'none',
           }}
         />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <Masthead stateLabel={stateLabel} onInfoTap={handleOpenAbout} />
-
-          <Divider top={14} bottom={16} />
-
-          {/* ── State-conditional content ── */}
-          {isLoading ? (
-            <StateMessage label="Loading Intelligence…" />
-          ) : (
-            <>
-              {state === 'live' && (
-                <LiveStateBlock data={data} tracker={tracker} />
-              )}
-              {state === 'results' && (
-                <ResultsStateBlock data={data} tracker={tracker} />
-              )}
-              {state === 'upcoming' && (
-                <UpcomingStateBlock data={nextTournamentPredictions ?? data ?? null} />
-              )}
-            </>
-          )}
-
-          {/* ── Track record stat strip ── */}
-          <div style={{ marginTop: 18 }}>
-            <TrackRecord wins={wins} topFives={topFives} topFiveRate={topFiveRate} />
+          {/* Status bar (top) */}
+          <div style={{ padding: '20px 20px 0' }}>
+            <Masthead stateLabel={stateLabel} onInfoTap={handleOpenAbout} state={state} />
           </div>
 
+          {/* Credibility band — always visible, directly below status bar */}
+          <div style={{ marginTop: 14 }}>
+            <CredibilityBand wins={wins} topFives={topFives} topFiveRate={topFiveRate} />
+          </div>
+
+          {/* ── State-conditional content ── */}
+          <div style={{ padding: '6px 20px 0' }}>
+            {isLoading ? (
+              <StateMessage label="Loading Intelligence…" />
+            ) : (
+              <>
+                {state === 'live' && (
+                  <LiveStateBlock data={data} tracker={tracker} />
+                )}
+                {state === 'results' && (
+                  <ResultsStateBlock data={data} tracker={tracker} />
+                )}
+                {state === 'upcoming' && (
+                  <UpcomingStateBlock data={nextTournamentPredictions ?? data ?? null} />
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Why trust us panel */}
+          <TrackRecordPanel
+            wins={wins}
+            topFives={topFives}
+            topFiveRate={topFiveRate}
+            totalTournaments={tournaments.length}
+          />
+
           {/* ── CTA ── */}
-          <CTA onOpenSheet={handleOpenSheet} />
+          <div style={{ padding: '20px 20px 22px' }}>
+            <CTA onOpenSheet={handleOpenSheet} />
+          </div>
         </div>
       </div>
 
@@ -363,10 +455,17 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
 function Masthead({
   stateLabel,
   onInfoTap,
+  state,
 }: {
   stateLabel: string;
   onInfoTap: () => void;
+  state: IntelligenceLifecycleState;
 }) {
+  const dotColor =
+    state === 'live' ? GREEN_ACCENT
+    : state === 'upcoming' ? AMBER_ACCENT
+    : '#A8B5AD';
+  const isLive = state === 'live';
   return (
     <div
       style={{
@@ -440,43 +539,234 @@ function Masthead({
           i
         </button>
       </div>
-      <span
-        style={{
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.55)',
-          fontVariantNumeric: 'tabular-nums',
-          flexShrink: 0,
-        }}
-      >
-        {stateLabel}
-      </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+        <span
+          aria-hidden
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: dotColor,
+            boxShadow: isLive ? `0 0 8px ${dotColor}` : 'none',
+            animation: isLive ? 'pulseDot 1.6s ease-in-out infinite' : 'none',
+            display: 'inline-block',
+          }}
+        />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.55)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {stateLabel}
+        </span>
+      </div>
     </div>
   );
 }
 
-function TrackRecord({
+function CredibilityBand({
   wins,
   topFives,
   topFiveRate,
+  season = '2026 SEASON',
 }: {
   wins: number;
   topFives: number;
   topFiveRate: number;
+  season?: string;
 }) {
+  const stats = [
+    { val: `${wins}`, label: 'WINS' },
+    { val: `${topFives}`, label: 'TOP-5s' },
+    { val: `${topFiveRate}%`, label: 'HIT RATE' },
+  ];
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
-        gap: 8,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '11px 20px',
+        background:
+          'linear-gradient(90deg, rgba(247,147,30,0.16) 0%, transparent 50%, rgba(247,147,30,0.16) 100%)',
+        borderTop: `1px solid ${HAIRLINE}`,
+        borderBottom: `1px solid ${HAIRLINE}`,
+        gap: 12,
+        flexWrap: 'wrap',
       }}
     >
-      <StatPill value={String(wins)} label="Wins" highlight />
-      <StatPill value={String(topFives)} label="Top-5s" />
-      <StatPill value={`${topFiveRate}%`} label="Top-5 Rate" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <Award size={11} color={AMBER_ACCENT} strokeWidth={2.5} />
+        <span style={{ ...monoLabel, fontSize: 9, color: AMBER_ACCENT, letterSpacing: '0.20em' }}>
+          {season}
+        </span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {stats.map((s, i) => (
+          <React.Fragment key={s.label}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span
+                style={{
+                  fontFamily: '"SF Pro Display", -apple-system, sans-serif',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: PAPER,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {s.val}
+              </span>
+              <span style={{ ...monoLabel, fontSize: 8, color: PAPER_MUTE, letterSpacing: '0.16em' }}>
+                {s.label}
+              </span>
+            </div>
+            {i < stats.length - 1 && (
+              <div style={{ width: 1, height: 10, background: HAIRLINE }} />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TrackRecordPanel({
+  wins,
+  topFives,
+  topFiveRate,
+  totalTournaments,
+}: {
+  wins: number;
+  topFives: number;
+  topFiveRate: number;
+  totalTournaments: number;
+}) {
+  const tiles = [
+    { val: `${wins}`, label: 'WINNERS\nCALLED' },
+    { val: `${topFives}`, label: 'TOP-5\nFINISHES' },
+    { val: `${topFiveRate}%`, label: 'TOP-5\nHIT RATE' },
+  ];
+  return (
+    <div
+      style={{
+        margin: '24px 20px 0',
+        padding: '16px 18px',
+        background: PANEL_DARK,
+        border: `1px solid ${HAIRLINE}`,
+        borderRadius: 14,
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 3,
+          background: `linear-gradient(180deg, ${AMBER_ACCENT}, transparent)`,
+        }}
+      />
+      <div
+        style={{
+          ...monoLabel,
+          fontSize: 9,
+          color: AMBER_ACCENT,
+          letterSpacing: '0.24em',
+          marginBottom: 10,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
+        <Award size={10} strokeWidth={2.5} />
+        Why trust us
+      </div>
+      <div
+        style={{
+          ...serifTitle,
+          fontSize: 16,
+          fontWeight: 700,
+          marginBottom: 14,
+          lineHeight: 1.3,
+        }}
+      >
+        We've called{' '}
+        <span style={{ color: AMBER_ACCENT }}>
+          {wins} winner{wins !== 1 ? 's' : ''}
+        </span>{' '}
+        and{' '}
+        <span style={{ color: AMBER_ACCENT }}>
+          {topFives} top-5{topFives !== 1 ? 's' : ''}
+        </span>{' '}
+        this season.
+      </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 8,
+          marginBottom: 12,
+        }}
+      >
+        {tiles.map((t) => (
+          <div
+            key={t.label}
+            style={{
+              padding: '10px 8px',
+              background: 'rgba(255,255,255,0.04)',
+              border: `1px solid ${HAIRLINE}`,
+              borderRadius: 8,
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: '"SF Pro Display", -apple-system, sans-serif',
+                fontSize: 22,
+                fontWeight: 300,
+                color: AMBER_ACCENT,
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+                marginBottom: 4,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {t.val}
+            </div>
+            <div
+              style={{
+                ...monoLabel,
+                fontSize: 8,
+                color: PAPER_MUTE,
+                letterSpacing: '0.14em',
+                whiteSpace: 'pre-line',
+                lineHeight: 1.3,
+              }}
+            >
+              {t.label}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          color: PAPER_MUTE,
+          lineHeight: 1.5,
+          fontStyle: 'italic',
+        }}
+      >
+        Our model has called the winner in {wins} of the last {totalTournaments} PGA tournaments.
+      </div>
     </div>
   );
 }
@@ -487,26 +777,26 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
       type="button"
       onClick={onOpenSheet}
       style={{
-        marginTop: 16,
         width: '100%',
-        padding: '13px 16px',
-        borderRadius: 12,
-        border: 'none',
+        padding: '14px',
+        background: 'transparent',
+        border: '1px solid rgba(244,239,227,0.16)',
+        borderRadius: 10,
+        color: PAPER,
+        fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: '0.20em',
+        textTransform: 'uppercase',
         cursor: 'pointer',
-        background: AMBER_ACCENT,
-        color: GREEN_DEEP,
-        fontSize: 13,
-        fontWeight: 900,
-        letterSpacing: '-0.1px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-        boxShadow: '0 2px 12px rgba(247,147,30,0.25)',
+        gap: 8,
       }}
     >
-      <span>See all Intelligence picks</span>
-      <ChevronRight size={15} strokeWidth={3} />
+      All Intelligence picks
+      <ChevronRight size={12} strokeWidth={2.5} />
     </button>
   );
 }
@@ -525,34 +815,75 @@ function LiveStateBlock({
   const picks = useMemo(() => {
     const raw = tracker?.predictions ?? [];
     return [...raw].sort((a, b) => {
-      // MC / WD sink to the bottom but stay visible as picks.
       const aOut = a.performanceStatus === 'cut' || a.performanceStatus === 'withdrawn';
       const bOut = b.performanceStatus === 'cut' || b.performanceStatus === 'withdrawn';
       if (aOut !== bOut) return aOut ? 1 : -1;
-      // Players with a live leaderboard position come first, sorted ASC.
       const aPos = a.actualPosition;
       const bPos = b.actualPosition;
       if (aPos === null && bPos === null) return a.predictedRank - b.predictedRank;
       if (aPos === null) return 1;
       if (bPos === null) return -1;
       if (aPos !== bPos) return aPos - bPos;
-      // Same leaderboard position → predicted rank breaks the tie for stable ordering.
       return a.predictedRank - b.predictedRank;
     });
   }, [tracker?.predictions]);
 
-  const dynamicHeadline = useMemo(
-    () => buildLiveHeadline(picks) ?? editorial.headline,
-    [picks, editorial.headline],
+  // Top pick = predicted rank 1 (regardless of live position).
+  const topPick = useMemo(
+    () => (tracker?.predictions ?? []).find(p => p.predictedRank === 1) ?? null,
+    [tracker?.predictions],
   );
+  // Best pick = best-performing pick currently (already first in sorted picks if any has a position).
+  const bestPick = useMemo(() => {
+    const inPlay = picks.filter(p => p.actualPosition !== null && p.performanceStatus !== 'cut' && p.performanceStatus !== 'withdrawn');
+    return inPlay[0] ?? null;
+  }, [picks]);
+
+  const headlineNode = useMemo<React.ReactNode>(() => {
+    if (!topPick && !bestPick) return 'Our picks are in play.';
+    // If top pick is the best performer (or only one in play), use the top-pick headline.
+    if (topPick && bestPick && topPick.playerId === bestPick.playerId) {
+      return (
+        <>
+          {getFirstName(topPick.playerName)} leads{' '}
+          <span style={{ color: AMBER_ACCENT }}>our picks</span> at{' '}
+          <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 800 }}>
+            {formatScore(topPick.score)}
+          </span>
+          .
+        </>
+      );
+    }
+    if (bestPick) {
+      return (
+        <>
+          {getFirstName(bestPick.playerName)} leads our picks at{' '}
+          <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 800 }}>
+            {formatScore(bestPick.score)}
+          </span>
+          .
+        </>
+      );
+    }
+    return 'Our picks are in play.';
+  }, [topPick, bestPick]);
+
+  const numInTop5 = useMemo(
+    () => picks.filter(p => p.actualPosition !== null && p.actualPosition <= 5).length,
+    [picks],
+  );
+  const currentRound = picks[0]?.currentRound ?? 1;
+  const topPickPreRank = topPick?.predictedRank ?? 1;
+  const topPickLivePos = topPick ? formatPosition(topPick) : '—';
 
   return (
-    <div>
-      <Eyebrow>{editorial.eyebrow}</Eyebrow>
-      <Headline>{dynamicHeadline}</Headline>
-      <Standfirst>{editorial.standfirst}</Standfirst>
+    <div style={{ paddingTop: 14 }}>
+      <EditorialHeadline>{headlineNode}</EditorialHeadline>
+      <ContextLine>
+        {`Pre-rank #${topPickPreRank} → Live ${topPickLivePos} · ${numInTop5} in T5 · Round ${currentRound} in progress`}
+      </ContextLine>
 
-      {/* Performance band — honest zeros pre-tee-off (per refinement) */}
+      {/* Performance band — preserved */}
       {accuracy && (
         <div
           style={{
@@ -575,7 +906,7 @@ function LiveStateBlock({
       )}
 
       {/* Picks list */}
-      <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         {picks.length === 0 && data?.topContenders.slice(0, 3).map((p) => (
           <UpcomingPickRow key={p.playerId} contender={p} />
         ))}
@@ -604,76 +935,74 @@ function ResultsStateBlock({
   tracker: PredictionTrackerData | undefined;
 }) {
   const picks = tracker?.predictions ?? [];
-  const topPick = picks[0];
+  const topPick = picks.find(p => p.predictedRank === 1) ?? picks[0];
   const topPickWon = !!topPick && topPick.actualPosition === 1;
 
-  // "WE CALLED IT" recap — only when our Top Pick actually won.
-  if (topPickWon && topPick) {
-    const editorial = INTELLIGENCE_HERO_FALLBACK.results.win;
-    return (
-      <div>
-        <Eyebrow color={AMBER_ACCENT} glow>{editorial.eyebrow}</Eyebrow>
-        <Headline>{editorial.headline}</Headline>
-        <Standfirst>{editorial.standfirst}</Standfirst>
+  // Derive winner — try tracker leader first, fall back to top pick if they won.
+  const winnerFromTracker = picks.find(p => p.actualPosition === 1) ?? null;
+  const winnerName = winnerFromTracker?.playerName ?? (topPickWon ? topPick.playerName : 'The winner');
+  const winnerFirstName = getFirstName(winnerName);
 
-        {/* Hero slot — 56px squircle wrapper around lg avatar with amber ring */}
+  // Counters used by both branches.
+  const numInTop10 = picks.filter(
+    p => p.actualPosition !== null && p.actualPosition <= 10,
+  ).length;
+  const missedCutCount = picks.filter(
+    p => p.performanceStatus === 'cut' || p.performanceStatus === 'withdrawn',
+  ).length;
+
+  // ── WIN branch: our top pick won. ─────────────────────────────────────────
+  if (topPickWon && topPick) {
+    // Margin = 2nd place score minus winner score (positive integer).
+    const others = picks.filter(p => p.playerId !== topPick.playerId);
+    const second = others
+      .filter(p => p.actualPosition !== null)
+      .sort((a, b) => (a.actualPosition! - b.actualPosition!))[0];
+    const winnerScore = topPick.score ?? 0;
+    const secondScore = second?.score ?? winnerScore;
+    const margin = Math.max(0, secondScore - winnerScore);
+
+    return (
+      <div style={{ paddingTop: 14 }}>
         <div
           style={{
-            marginTop: 16,
+            ...monoLabel,
+            fontSize: 9,
+            color: '#4DB377',
+            letterSpacing: '0.24em',
+            marginBottom: 10,
             display: 'flex',
             alignItems: 'center',
-            gap: 14,
+            gap: 6,
           }}
         >
-          <div
-            style={{
-              padding: 2,
-              borderRadius: '38%',
-              background:
-                'linear-gradient(135deg, rgba(247,147,30,1) 0%, rgba(247,147,30,0.4) 100%)',
-              boxShadow: '0 0 18px rgba(247,147,30,0.5)',
-              flexShrink: 0,
-            }}
-          >
-            <PlayerAvatar
-              playerId={topPick.playerId}
-              playerName={topPick.playerName}
-              tourCode="pga"
-              size="md"
-            />
-          </div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div
-              style={{
-                fontSize: 17,
-                fontWeight: 800,
-                color: '#ffffff',
-                letterSpacing: '-0.3px',
-                lineHeight: 1.1,
-              }}
-            >
-              {topPick.playerName}
-            </div>
-            <div
-              style={{
-                marginTop: 4,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: AMBER_ACCENT,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              WINNER · {formatScore(topPick.score)}
-            </div>
-          </div>
+          <Check size={11} strokeWidth={3} />
+          We called it.
         </div>
+        <EditorialHeadline>
+          <span style={{ color: AMBER_ACCENT }}>{winnerFirstName}</span>{' '}
+          {margin === 0 ? (
+            <>won in a playoff.</>
+          ) : (
+            <>
+              won by{' '}
+              <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 800 }}>
+                {margin}
+              </span>
+              .
+            </>
+          )}
+        </EditorialHeadline>
+        <ContextLine>
+          {`Top pick won · ${Math.max(0, numInTop10 - 1)} other picks in T10 · ${
+            missedCutCount === 0 ? 'No missed cuts' : `${missedCutCount} missed cut${missedCutCount > 1 ? 's' : ''}`
+          }`}
+        </ContextLine>
 
         {/* Other picks — compact rows */}
         {picks.length > 1 && (
-          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {picks.slice(1, 3).map((p) => (
+          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {picks.filter(p => p.playerId !== topPick.playerId).slice(0, 2).map((p) => (
               <ResultsPickRow key={p.playerId} pick={p} />
             ))}
           </div>
@@ -682,15 +1011,109 @@ function ResultsStateBlock({
     );
   }
 
-  // Honest "FINAL STANDINGS" — Top Pick did not win.
-  const editorial = INTELLIGENCE_HERO_FALLBACK.results.standings;
-  return (
-    <div>
-      <Eyebrow>{editorial.eyebrow}</Eyebrow>
-      <Headline>{editorial.headline}</Headline>
-      <Standfirst>{editorial.standfirst}</Standfirst>
+  // ── MISS branches: top5 / partial / miss tone, derived from picks. ────────
+  const positions = picks
+    .map(p => p.actualPosition)
+    .filter((n): n is number => n !== null);
+  const bestPosition = positions.length ? Math.min(...positions) : null;
+  const outcome: IntelligenceOutcome =
+    bestPosition === null ? 'miss'
+    : bestPosition === 1 ? 'win'
+    : bestPosition <= 5 ? 'top5'
+    : bestPosition <= 15 ? 'partial'
+    : 'miss';
 
-      <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+  const bestPick = picks.find(p => p.actualPosition === bestPosition) ?? picks[0] ?? null;
+  const bestPickFirstName = bestPick ? getFirstName(bestPick.playerName) : '';
+  const bestPickPositionLabel = bestPick ? formatPosition(bestPick) : '—';
+
+  const tone = getMissTone(outcome);
+
+  return (
+    <div style={{ paddingTop: 14 }}>
+      <div
+        style={{
+          ...monoLabel,
+          fontSize: 9,
+          color: tone.eyebrowColor,
+          letterSpacing: '0.24em',
+          marginBottom: 10,
+        }}
+      >
+        {tone.eyebrow}
+      </div>
+      <EditorialHeadline>
+        <span style={{ color: PAPER }}>{tone.headlineMain(winnerFirstName)}</span>{' '}
+        {tone.headlineSub(bestPickFirstName, bestPickPositionLabel)}
+      </EditorialHeadline>
+      <ContextLine>{tone.contextLine(numInTop10, missedCutCount)}</ContextLine>
+
+      {/* Tournament Winner panel — softened framing, only in non-win results */}
+      {winnerFromTracker && (
+        <div
+          style={{
+            margin: '20px 0 0',
+            padding: '14px 16px',
+            background: PANEL_RAISED,
+            border: `1px solid ${HAIRLINE}`,
+            borderRadius: 14,
+          }}
+        >
+          <div
+            style={{
+              ...monoLabel,
+              fontSize: 8,
+              color: PAPER_MUTE,
+              letterSpacing: '0.24em',
+              marginBottom: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            <Trophy size={9} strokeWidth={2.5} />
+            Tournament Winner
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <PlayerAvatar
+              playerId={winnerFromTracker.playerId}
+              playerName={winnerFromTracker.playerName}
+              tourCode="pga"
+              size="sm"
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: PAPER,
+                  letterSpacing: '-0.2px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {winnerFromTracker.playerName}
+              </div>
+              <div
+                style={{
+                  marginTop: 2,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: PAPER_MUTE,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                {formatScore(winnerFromTracker.score)}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Our picks list */}
+      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         {picks.slice(0, 3).map((p, i) => (
           <ExpandablePickRow
             key={p.playerId}
@@ -708,19 +1131,36 @@ function ResultsStateBlock({
 }
 
 function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
-  const editorial = INTELLIGENCE_HERO_FALLBACK.upcoming;
   const tournament = data?.tournament;
   const venueName = tournament?.venueName ?? 'Venue TBC';
   const tournamentName = tournament?.name ?? 'Next Tournament';
-  const headline = buildUpcomingHeadline(tournamentName);
   const locationLine = tournament ? formatLocation(tournament) : '';
   const bullets = tournament ? getVenueBullets(tournament) : [];
 
+  // Top pick = first contender (predicted rank order).
+  const topContender = data?.topContenders?.[0] ?? null;
+  const topPickFirstName = topContender ? getFirstName(topContender.playerName) : '';
+  const numPicks = Math.min(3, data?.topContenders?.length ?? 0);
+
+  // Optional context segments — only render when defined (per brief).
+  const contextSegments: string[] = [];
+  if (numPicks > 0) contextSegments.push(`${numPicks} picks`);
+  if (tournamentName && tournamentName !== 'Next Tournament') {
+    contextSegments.push(tournamentName);
+  }
+
   return (
-    <div>
-      <Eyebrow color={AMBER_ACCENT}>{editorial.eyebrow}</Eyebrow>
-      <Headline>{headline}</Headline>
-      <Standfirst>{editorial.standfirst}</Standfirst>
+    <div style={{ paddingTop: 14 }}>
+      {topPickFirstName ? (
+        <EditorialHeadline>
+          <span style={{ color: AMBER_ACCENT }}>{topPickFirstName}</span> is our pick to win.
+        </EditorialHeadline>
+      ) : (
+        <EditorialHeadline>Our picks are locked in.</EditorialHeadline>
+      )}
+      {contextSegments.length > 0 && (
+        <ContextLine>{contextSegments.join(' · ')}</ContextLine>
+      )}
 
       {/* Venue card */}
       <div
@@ -1186,12 +1626,17 @@ function ExpandablePickRow({
     : 'rgba(255,255,255,0.65)';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
+  const isTopPick = tier === 'TOP PICK';
   return (
     <div
       style={{
         borderRadius: 12,
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.10)',
+        background: isTopPick
+          ? `linear-gradient(135deg, rgba(247,147,30,0.16) 0%, transparent 60%), ${PANEL_RAISED}`
+          : PANEL_RAISED,
+        border: isTopPick
+          ? `1px solid ${AMBER_ACCENT}`
+          : `1px solid ${HAIRLINE}`,
         overflow: 'hidden',
       }}
     >
@@ -1270,7 +1715,11 @@ function ExpandablePickRow({
       {expanded && visibleReasons.length > 0 && (
         <div
           style={{
-            padding: '4px 14px 12px 56px',
+            margin: '4px 12px 12px 56px',
+            padding: '10px 12px',
+            background: PANEL_DARK,
+            borderLeft: `2px solid ${tierColor}`,
+            borderRadius: 6,
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
@@ -1431,6 +1880,38 @@ function Standfirst({ children }: { children: React.ReactNode }) {
     >
       {children}
     </p>
+  );
+}
+
+function EditorialHeadline({ children }: { children: React.ReactNode }) {
+  return (
+    <h1
+      style={{
+        ...serifTitle,
+        fontSize: 32,
+        margin: 0,
+      }}
+    >
+      {children}
+    </h1>
+  );
+}
+
+function ContextLine({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        ...monoLabel,
+        fontWeight: 600,
+        fontSize: 10,
+        color: PAPER_MUTE,
+        letterSpacing: '0.06em',
+        marginTop: 12,
+        textTransform: 'none',
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
