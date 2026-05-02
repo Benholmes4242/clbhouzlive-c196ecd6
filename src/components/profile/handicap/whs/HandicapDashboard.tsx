@@ -146,7 +146,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
           />
         )}
         {activeSubtab === 'friends' && (
-          <FriendsView userId={userId} currentHandicap={currentHandicap} />
+          <FriendsView userId={userId} currentHandicap={currentHandicap} connectionId={connection.id} />
         )}
       </div>
 

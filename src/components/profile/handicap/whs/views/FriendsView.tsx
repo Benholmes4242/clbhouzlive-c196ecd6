@@ -6,9 +6,10 @@ import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
 interface Props {
   userId: string;
   currentHandicap: number | null;
+  connectionId: string;
 }
 
-export const FriendsView: React.FC<Props> = ({ userId, currentHandicap }) => {
+export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connectionId }) => {
   return (
     <div
       role="tabpanel"
@@ -18,6 +19,7 @@ export const FriendsView: React.FC<Props> = ({ userId, currentHandicap }) => {
       <FriendsLeaderboardV2
         ownerUserId={userId}
         currentUserHandicap={currentHandicap}
+        connectionId={connectionId}
       />
       <RecentlyPlayedFeed ownerUserId={userId} />
       <InviteToClbhouzV2 ownerUserId={userId} />
