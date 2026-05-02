@@ -455,10 +455,17 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
 function Masthead({
   stateLabel,
   onInfoTap,
+  state,
 }: {
   stateLabel: string;
   onInfoTap: () => void;
+  state: IntelligenceLifecycleState;
 }) {
+  const dotColor =
+    state === 'live' ? GREEN_ACCENT
+    : state === 'upcoming' ? AMBER_ACCENT
+    : '#A8B5AD';
+  const isLive = state === 'live';
   return (
     <div
       style={{
