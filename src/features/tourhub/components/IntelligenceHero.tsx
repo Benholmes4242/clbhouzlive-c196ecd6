@@ -63,10 +63,6 @@ import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
 
 const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// Lead surface — quiet cream, NOT a card; visual elevation only
-const LEAD_BG = '#FAF8F1';
-const LEAD_HAIR = '#EDE7D6';
-
 // Page-canon ink + slates
 const INK = '#0F172A';
 const SLATE_700 = '#334155';
@@ -299,10 +295,10 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     <section
       aria-label="clbhouz Intelligence"
       style={{
-        background: LEAD_BG,
+        // No background — sits directly on page slate-50 bg
         padding: '24px 16px 22px',
-        borderTop: `1px solid ${LEAD_HAIR}`,
-        borderBottom: `1px solid ${LEAD_HAIR}`,
+        borderTop: `1px solid ${SLATE_150}`,
+        borderBottom: `1px solid ${SLATE_150}`,
         marginLeft: -16,
         marginRight: -16,
       }}
@@ -393,91 +389,124 @@ function LeadSectionHeader({
     : SLATE_500;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        marginBottom: 14,
-      }}
-    >
-      <button
-        type="button"
-        onClick={onInfoTap}
-        aria-label="About clbhouz Intelligence"
+    <div style={{ marginBottom: 18 }}>
+      {/* Top row: eyebrow + status pill */}
+      <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
+          justifyContent: 'space-between',
+          gap: 12,
+          marginBottom: 10,
         }}
       >
-        <div
+        <button
+          type="button"
+          onClick={onInfoTap}
+          aria-label="About clbhouz Intelligence"
           style={{
-            width: 3,
-            height: 14,
-            background: AMBER_ACCENT,
-            borderRadius: 2,
-            flexShrink: 0,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 900,
-            color: AMBER_ACCENT,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 10,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
           }}
         >
-          clbhouz Intelligence
-          <Sparkles
-            size={11}
-            color={AMBER_ACCENT}
-            fill={AMBER_ACCENT}
-            strokeWidth={2}
-            style={{ marginLeft: 1 }}
+          <div
+            style={{
+              width: 3,
+              height: 14,
+              background: AMBER_ACCENT,
+              borderRadius: 2,
+              flexShrink: 0,
+            }}
           />
-        </span>
-      </button>
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '4px 8px',
-          background: 'transparent',
-          border: `1px solid ${LEAD_HAIR}`,
-          borderRadius: 4,
-        }}
-      >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 900,
+              color: AMBER_ACCENT,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            clbhouz Intelligence
+            <Sparkles
+              size={11}
+              color={AMBER_ACCENT}
+              fill={AMBER_ACCENT}
+              strokeWidth={2}
+              style={{ marginLeft: 1 }}
+            />
+          </span>
+        </button>
         <div
           style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: dotColor,
-            animation: state === 'live' ? 'intel_liveDot 1.6s ease-in-out infinite' : 'none',
-          }}
-        />
-        <span
-          style={{
-            ...monoLabel,
-            fontSize: 9,
-            color: dotColor,
-            letterSpacing: '0.16em',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '4px 8px',
+            background: 'transparent',
+            border: `1px solid ${SLATE_150}`,
+            borderRadius: 4,
           }}
         >
-          {statusLabel}
-        </span>
+          <div
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: dotColor,
+              animation: state === 'live' ? 'intel_liveDot 1.6s ease-in-out infinite' : 'none',
+            }}
+          />
+          <span
+            style={{
+              ...monoLabel,
+              fontSize: 9,
+              color: dotColor,
+              letterSpacing: '0.16em',
+            }}
+          >
+            {statusLabel}
+          </span>
+        </div>
       </div>
+
+      {/* Section title — Geist 700 (project memory: no serifs) */}
+      <h2
+        style={{
+          margin: 0,
+          fontFamily: headlineFont,
+          fontSize: 24,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.025em',
+          lineHeight: 1.1,
+          marginBottom: 6,
+        }}
+      >
+        Tournament picks, signed and dated.
+      </h2>
+
+      {/* Explainer line */}
+      <p
+        style={{
+          margin: 0,
+          fontSize: 13,
+          fontWeight: 400,
+          color: SLATE_600,
+          lineHeight: 1.5,
+          maxWidth: 480,
+        }}
+      >
+        Our in-house AI picks three players each tournament — using form, course fit, weather, and news.
+      </p>
     </div>
   );
 }
@@ -659,169 +688,275 @@ function HeroPick({
   name,
   subtitle,
   pulledQuote,
+  reasons,
   position,
   positionLabel,
   positionAccent = 'amber',
   pulse = false,
+  defaultExpanded = false,
 }: {
   initials: string;
   name: string;
   subtitle?: string | null;
   pulledQuote?: string | null;
+  reasons?: string[];
   position: string;
   positionLabel: string;
   positionAccent?: PositionAccent;
   pulse?: boolean;
+  defaultExpanded?: boolean;
 }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const accent =
     positionAccent === 'amber' ? AMBER_DEEP
     : positionAccent === 'green' ? GREEN_LIGHT
     : INK;
+  const visibleReasons = (reasons ?? []).filter(Boolean).slice(0, 3);
 
   return (
     <div
       style={{
-        padding: '20px 0 18px',
-        borderTop: `1px solid ${LEAD_HAIR}`,
-        borderBottom: `1px solid ${LEAD_HAIR}`,
+        borderTop: `1px solid ${SLATE_150}`,
+        borderBottom: `1px solid ${SLATE_150}`,
         marginBottom: 14,
       }}
     >
-      <div
+      <button
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+        aria-expanded={expanded}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 14,
-          marginBottom: pulledQuote ? 14 : 0,
+          width: '100%',
+          padding: '20px 0 18px',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
         }}
       >
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 14,
-            background: AMBER_TINT,
-            border: `1px solid ${AMBER_TINT_STRONG}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: '"SF Mono", monospace',
-            fontSize: 17,
-            fontWeight: 700,
-            color: AMBER_DEEP,
-            flexShrink: 0,
-          }}
-        >
-          {initials}
-        </div>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             style={{
-              ...monoLabel,
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              background: AMBER_TINT,
+              border: `1px solid ${AMBER_TINT_STRONG}`,
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
-              fontSize: 8,
-              color: AMBER_DEEP,
-              letterSpacing: '0.18em',
-              marginBottom: 5,
-            }}
-          >
-            <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
-            TOP PICK
-          </div>
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 20,
+              justifyContent: 'center',
+              fontFamily: '"SF Mono", monospace',
+              fontSize: 17,
               fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.15,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              color: AMBER_DEEP,
+              flexShrink: 0,
             }}
           >
-            {name}
+            {initials}
           </div>
-          {subtitle && (
+
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 12,
-                color: SLATE_500,
-                marginTop: 4,
+                ...monoLabel,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                fontSize: 8,
+                color: AMBER_DEEP,
+                letterSpacing: '0.18em',
+                marginBottom: 5,
+              }}
+            >
+              <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
+              TOP PICK
+            </div>
+            <div
+              style={{
+                fontFamily: headlineFont,
+                fontSize: 20,
+                fontWeight: 700,
+                color: INK,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
-              {subtitle}
+              {name}
+            </div>
+            {subtitle && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: SLATE_500,
+                  marginTop: 4,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {subtitle}
+              </div>
+            )}
+          </div>
+
+          <div
+            style={{
+              textAlign: 'right',
+              transform: pulse ? 'scale(1.06)' : 'scale(1)',
+              transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: headlineFont,
+                fontSize: 30,
+                fontWeight: 700,
+                color: accent,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.025em',
+                lineHeight: 1,
+                textShadow: pulse ? `0 0 12px ${AMBER_TINT_STRONG}` : 'none',
+                transition: 'text-shadow 400ms ease',
+              }}
+            >
+              {position}
+            </div>
+            <div
+              style={{
+                ...monoLabel,
+                fontSize: 8,
+                color: SLATE_500,
+                letterSpacing: '0.16em',
+                marginTop: 4,
+              }}
+            >
+              {positionLabel}
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginLeft: 4,
+              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 240ms ease',
+              flexShrink: 0,
+            }}
+          >
+            <ChevronDown size={18} color={SLATE_400} strokeWidth={2.5} />
+          </div>
+        </div>
+
+        {!expanded && pulledQuote && (
+          <div style={{ position: 'relative', paddingLeft: 24, paddingTop: 14 }}>
+            <Quote
+              size={16}
+              color={AMBER_ACCENT}
+              fill={AMBER_ACCENT}
+              strokeWidth={0}
+              style={{ position: 'absolute', left: 0, top: 16, transform: 'scaleX(-1)' }}
+            />
+            <div
+              style={{
+                fontFamily: headlineFont,
+                fontSize: 14.5,
+                fontWeight: 500,
+                fontStyle: 'italic',
+                color: SLATE_700,
+                lineHeight: 1.45,
+                letterSpacing: '-0.005em',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {pulledQuote}
+            </div>
+          </div>
+        )}
+      </button>
+
+      <div
+        style={{
+          maxHeight: expanded ? 240 : 0,
+          opacity: expanded ? 1 : 0,
+          overflow: 'hidden',
+          transition: 'max-height 320ms ease, opacity 240ms ease',
+        }}
+      >
+        <div style={{ padding: '0 0 16px 0' }}>
+          {pulledQuote && (
+            <div style={{ position: 'relative', paddingLeft: 24, marginBottom: 12 }}>
+              <Quote
+                size={16}
+                color={AMBER_ACCENT}
+                fill={AMBER_ACCENT}
+                strokeWidth={0}
+                style={{ position: 'absolute', left: 0, top: 2, transform: 'scaleX(-1)' }}
+              />
+              <div
+                style={{
+                  fontFamily: headlineFont,
+                  fontSize: 14.5,
+                  fontWeight: 500,
+                  fontStyle: 'italic',
+                  color: SLATE_700,
+                  lineHeight: 1.45,
+                  letterSpacing: '-0.005em',
+                }}
+              >
+                {pulledQuote}
+              </div>
+            </div>
+          )}
+
+          {visibleReasons.length > 0 && (
+            <div
+              style={{
+                background: '#FFFFFF',
+                borderRadius: 8,
+                borderLeft: `2px solid ${AMBER_ACCENT}`,
+                padding: '10px 12px',
+              }}
+            >
+              {visibleReasons.map((r, i, arr) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 8,
+                    marginBottom: i < arr.length - 1 ? 8 : 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: '50%',
+                      background: AMBER_DEEP,
+                      marginTop: 6,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: SLATE_700,
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {r}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
-
-        <div
-          style={{
-            textAlign: 'right',
-            transform: pulse ? 'scale(1.06)' : 'scale(1)',
-            transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 30,
-              fontWeight: 700,
-              color: accent,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.025em',
-              lineHeight: 1,
-              textShadow: pulse ? `0 0 12px ${AMBER_TINT_STRONG}` : 'none',
-              transition: 'text-shadow 400ms ease',
-            }}
-          >
-            {position}
-          </div>
-          <div
-            style={{
-              ...monoLabel,
-              fontSize: 8,
-              color: SLATE_500,
-              letterSpacing: '0.16em',
-              marginTop: 4,
-            }}
-          >
-            {positionLabel}
-          </div>
-        </div>
       </div>
-
-      {pulledQuote && (
-        <div style={{ position: 'relative', paddingLeft: 24 }}>
-          <Quote
-            size={16}
-            color={AMBER_ACCENT}
-            fill={AMBER_ACCENT}
-            strokeWidth={0}
-            style={{ position: 'absolute', left: 0, top: 2, transform: 'scaleX(-1)' }}
-          />
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 14.5,
-              fontWeight: 500,
-              color: SLATE_700,
-              lineHeight: 1.45,
-              letterSpacing: '-0.005em',
-            }}
-          >
-            {pulledQuote}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -857,7 +992,7 @@ function CompactPick({
     <div
       style={{
         borderLeft: `3px solid ${accent}`,
-        borderBottom: `1px solid ${LEAD_HAIR}`,
+        borderBottom: `1px solid ${SLATE_150}`,
       }}
     >
       <button
@@ -1041,7 +1176,7 @@ function TournamentWinnerCard({
         marginBottom: 4,
         padding: '12px 14px',
         background: '#fff',
-        border: `1px solid ${LEAD_HAIR}`,
+        border: `1px solid ${SLATE_150}`,
         borderRadius: 10,
       }}
     >
@@ -1255,7 +1390,7 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
         marginTop: 18,
         padding: 14,
         background: '#fff',
-        border: `1px solid ${LEAD_HAIR}`,
+        border: `1px solid ${SLATE_150}`,
         borderRadius: 10,
         color: INK,
         fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
@@ -1362,7 +1497,7 @@ function LiveStateBlock({
       <FramingSentence text={framingSentence} />
       <EditorialHeadline>{headlineNode}</EditorialHeadline>
       <ContextLine>
-        {`PRE-RANK #${topPickPreRank} → LIVE ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound} IN PROGRESS`}
+        {`OUR #${topPickPreRank} PICK · NOW ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound}`}
       </ContextLine>
       {data?.tournament?.name && (
         <TournamentLabel>{data.tournament.name}</TournamentLabel>
@@ -1372,8 +1507,10 @@ function LiveStateBlock({
         <HeroPick
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
-          subtitle={`Pre-rank #${heroPick.predictedRank} → Live ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
+          subtitle={`Our #${heroPick.predictedRank} pick · Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
+          reasons={heroPick.reasons}
+          defaultExpanded={true}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
           positionAccent={heroPick.actualPosition === 1 ? 'amber' : 'ink'}
@@ -1384,7 +1521,7 @@ function LiveStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1478,6 +1615,8 @@ function ResultsStateBlock({
           name={topPick.playerName}
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
           pulledQuote={topPick.pulledQuote ?? topPick.reasons[0] ?? null}
+          reasons={topPick.reasons}
+          defaultExpanded={true}
           position="1"
           positionLabel={formatScore(topPick.score)}
           positionAccent="amber"
@@ -1487,7 +1626,7 @@ function ResultsStateBlock({
         {supporting.length > 0 && (
           <>
             <SupportingLabel />
-            <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+            <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
               {supporting.map((p, i) => (
                 <CompactPick
                   key={p.playerId}
@@ -1554,8 +1693,10 @@ function ResultsStateBlock({
         <HeroPick
           initials={getInitials(heroPickResolved.playerName)}
           name={heroPickResolved.playerName}
-          subtitle={`Pre-rank #${heroPickResolved.predictedRank} → Final ${formatPosition(heroPickResolved)}`}
+          subtitle={`Our #${heroPickResolved.predictedRank} pick · Final ${formatPosition(heroPickResolved)}`}
           pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
+          reasons={heroPickResolved.reasons}
+          defaultExpanded={true}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
           positionAccent={heroAccent}
@@ -1565,7 +1706,7 @@ function ResultsStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1627,7 +1768,7 @@ function UpcomingStateBlock({
             padding: '12px 14px',
             borderRadius: 10,
             background: '#fff',
-            border: `1px solid ${LEAD_HAIR}`,
+            border: `1px solid ${SLATE_150}`,
           }}
         >
           <div
@@ -1708,6 +1849,8 @@ function UpcomingStateBlock({
           name={topContender.playerName}
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
           pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
+          reasons={topContender.reasons}
+          defaultExpanded={true}
           position="—"
           positionLabel="TO PLAY"
           positionAccent="amber"
@@ -1717,7 +1860,7 @@ function UpcomingStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${LEAD_HAIR}` }}>
+          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
