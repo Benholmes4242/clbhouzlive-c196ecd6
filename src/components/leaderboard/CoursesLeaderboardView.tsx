@@ -422,30 +422,38 @@ export function CoursesLeaderboardView() {
         </div>
       </div>
 
-      {/* ── SORT TOGGLE ──────────────────────────────────────────── */}
-      <div style={{ padding: '14px 20px 0', display: 'flex', gap: 8 }}>
+      {/* ── SORT TABS — text-only, centered, matches profile tabs ── */}
+      <div style={{
+        padding: '14px 20px 0', display: 'flex', gap: 18,
+        justifyContent: 'center',
+      }}>
         {[
           { key: 'highest_rated' as const, label: 'Highest Rated' },
           { key: 'most_played' as const, label: 'Most Played' },
           { key: 'rising' as const, label: 'Trending' },
-        ].map(opt => (
-          <button
-            key={opt.key}
-            onClick={() => setSort(opt.key)}
-            style={{
-              flex: 1,
-              padding: '10px 0',
-              borderRadius: 8,
-              background: sort === opt.key ? '#0F172A' : 'transparent',
-              color: sort === opt.key ? '#fff' : '#64748B',
-              border: sort === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-              fontSize: 12, fontWeight: 800, letterSpacing: '0.04em',
-              cursor: 'pointer', transition: 'all 0.15s',
-            }}
-          >
-            {opt.label}
-          </button>
-        ))}
+        ].map(opt => {
+          const isActive = sort === opt.key;
+          return (
+            <button
+              key={opt.key}
+              onClick={() => setSort(opt.key)}
+              style={{
+                padding: '6px 4px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: isActive ? 800 : 500,
+                color: isActive ? '#0F172A' : '#94A3B8',
+                letterSpacing: isActive ? '-0.01em' : 0,
+                minHeight: 34,
+                transition: 'color 0.15s ease',
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── COMBINED HERO ──────────────────────────────────────────
@@ -468,71 +476,78 @@ export function CoursesLeaderboardView() {
             onClick={() => handleCourseClick(masthead.course_id)}
             style={{
               width: '100%',
-              background: '#0F172A', color: '#fff', borderRadius: 8,
+              minHeight: 420,
+              color: '#fff', borderRadius: 8,
               overflow: 'hidden', position: 'relative',
               border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0,
+              background: masthead.thumbnail_url
+                ? `linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 38%, rgba(0,0,0,0.55) 78%, rgba(0,0,0,0.85) 100%), url(${masthead.thumbnail_url}) center/cover`
+                : 'linear-gradient(180deg, #2d5a3d, #1a3d2e)',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
             }}
           >
-            {/* Photo strip with eyebrow overlay */}
-            <div style={{
-              height: 140,
-              background: masthead.thumbnail_url
-                ? `linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.7) 100%), url(${masthead.thumbnail_url}) center/cover`
-                : 'linear-gradient(180deg, #2d5a3d, #1a3d2e)',
-              position: 'relative',
-            }}>
-              <div style={{
-                position: 'absolute', top: 14, left: 14,
-                fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.22em',
-                background: 'rgba(0,0,0,0.4)',
-                padding: '4px 8px', borderRadius: 2,
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}>
+            <div style={{ padding: '14px 14px 0' }}>
+              <div
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '5px 10px',
+                  borderRadius: '34%',
+                  background: 'rgba(15, 20, 30, 0.42)',
+                  backdropFilter: 'blur(32px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(32px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.14)',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18)',
+                  transform: 'translateZ(0)',
+                  willChange: 'backdrop-filter',
+                  fontSize: 10, fontWeight: 800, color: '#fff',
+                  letterSpacing: '0.22em',
+                }}
+              >
                 {personalisedEyebrow}
               </div>
             </div>
 
-            {/* Editorial body */}
             <div style={{ padding: '14px 18px 16px' }}>
               <h2 style={{
                 fontSize: 24, fontWeight: 900, color: '#fff',
                 letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05,
+                textShadow: '0 2px 18px rgba(0,0,0,0.55)',
               }}>
                 {mastheadCopy.headline}
                 {mastheadCopy.headlineTwo && (
                   <>
                     <br />
-                    <span style={{ fontStyle: 'italic', fontWeight: 900, color: 'rgba(255,255,255,0.7)' }}>
+                    <span style={{ fontStyle: 'italic', fontWeight: 900, color: 'rgba(255,255,255,0.78)' }}>
                       {mastheadCopy.headlineTwo}
                     </span>
                   </>
                 )}
               </h2>
               <p style={{
-                fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5,
+                fontSize: 12, color: 'rgba(255,255,255,0.78)', lineHeight: 1.5,
                 marginTop: 8, marginBottom: 12, fontStyle: 'italic',
+                textShadow: '0 1px 10px rgba(0,0,0,0.55)',
               }}>
                 {mastheadCopy.standfirst}
               </p>
 
-              {/* Stats footer */}
-              <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+              <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.18)' }}>
                 <div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.22em', marginBottom: 2 }}>
                     RATING
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {masthead.avg_rating != null ? masthead.avg_rating.toFixed(1) : '—'}
                   </div>
                 </div>
-                <div style={{ width: 1, background: 'rgba(255,255,255,0.12)' }} />
+                <div style={{ width: 1, background: 'rgba(255,255,255,0.18)' }} />
                 <div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.22em', marginBottom: 2 }}>
                     PLAYS
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {masthead.times_played ?? 0}
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, marginLeft: 4 }}>this season</span>
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: 700, marginLeft: 4 }}>this season</span>
                   </div>
                 </div>
               </div>

@@ -1017,27 +1017,36 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         })()}
       </div>
 
-      {/* ── 2. TIME MODE TOGGLE ── */}
-      <div style={{ padding: '14px 20px 0', display: 'flex', gap: 8 }}>
+      {/* ── 2. TIME MODE TABS — text-only, centered, matches profile tabs ── */}
+      <div style={{
+        padding: '14px 20px 0', display: 'flex', gap: 18, justifyContent: 'center',
+      }}>
         {([
           { key: 'seasonal' as const, label: seasonLabel },
           { key: 'all_time' as const, label: 'All-Time' },
-        ]).map((opt) => (
-          <button
-            key={opt.key}
-            onClick={() => setTimeFilter(opt.key)}
-            style={{
-              flex: 1, padding: '10px 0', borderRadius: 8,
-              background: timeFilter === opt.key ? '#0F172A' : 'transparent',
-              color: timeFilter === opt.key ? '#fff' : '#64748B',
-              border: timeFilter === opt.key ? 'none' : '1px solid rgba(15,23,42,0.15)',
-              fontSize: 12, fontWeight: 800, letterSpacing: '0.04em',
-              cursor: 'pointer', transition: 'all 0.15s',
-            }}
-          >
-            {opt.label}
-          </button>
-        ))}
+        ]).map((opt) => {
+          const isActive = timeFilter === opt.key;
+          return (
+            <button
+              key={opt.key}
+              onClick={() => setTimeFilter(opt.key)}
+              style={{
+                padding: '6px 4px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: isActive ? 800 : 500,
+                color: isActive ? '#0F172A' : '#94A3B8',
+                letterSpacing: isActive ? '-0.01em' : 0,
+                minHeight: 34,
+                transition: 'color 0.15s ease',
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── WIRE TICKER removed ── */}
