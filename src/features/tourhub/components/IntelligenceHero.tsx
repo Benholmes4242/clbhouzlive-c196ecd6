@@ -1715,7 +1715,11 @@ function ExpandablePickRow({
       {expanded && visibleReasons.length > 0 && (
         <div
           style={{
-            padding: '4px 14px 12px 56px',
+            margin: '4px 12px 12px 56px',
+            padding: '10px 12px',
+            background: PANEL_DARK,
+            borderLeft: `2px solid ${tierColor}`,
+            borderRadius: 6,
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
