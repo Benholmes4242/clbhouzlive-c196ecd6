@@ -1477,7 +1477,7 @@ function ResultsStateBlock({
           initials={getInitials(topPick.playerName)}
           name={topPick.playerName}
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
-          pulledQuote={topPick.reasons[0] ?? null}
+          pulledQuote={topPick.pulledQuote ?? topPick.reasons[0] ?? null}
           position="1"
           positionLabel={formatScore(topPick.score)}
           positionAccent="amber"
