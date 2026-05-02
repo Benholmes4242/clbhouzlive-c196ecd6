@@ -14399,6 +14399,13 @@ export type Database = {
             foreignKeyName: "whs_score_holes_score_id_fkey"
             columns: ["score_id"]
             isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "whs_score_holes_score_id_fkey"
+            columns: ["score_id"]
+            isOneToOne: false
             referencedRelation: "whs_scores"
             referencedColumns: ["id"]
           },
@@ -15333,6 +15340,45 @@ export type Database = {
           title: string | null
         }
         Relationships: []
+      }
+      whs_friend_course_bests: {
+        Row: {
+          best_gross: number | null
+          best_play_date: string | null
+          best_score_id: string | null
+          course_id: string | null
+          friend_connection_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["friend_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["friend_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_scores_connection_id_fkey"
+            columns: ["friend_connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_scores_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "whs_courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       whs_friend_matches: {
         Row: {

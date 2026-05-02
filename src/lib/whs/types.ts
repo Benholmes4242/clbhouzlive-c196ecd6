@@ -143,6 +143,40 @@ export interface CourseForm {
 }
 
 // ─── Hole-level detail ──────────────────────────────────────────────────
+// ─── Phase 2: Friend course bests (PR rosette) ──────────────────────────
+export interface WhsFriendCourseBest {
+  /** The friend's connection_id (NOT the owner's). */
+  friend_connection_id: string;
+  /** The course id from whs_courses. */
+  course_id: string;
+  /** Their best adjusted_gross at this course in the last 90 days. */
+  best_gross: number;
+  /** The score_id of that best round. */
+  best_score_id: string;
+  /** When the best was achieved. */
+  best_play_date: string;
+}
+
+// ─── Phase 2: Recently played enriched with course image ────────────────
+export interface WhsFriendActivityWithImage {
+  friend_row_id: string;
+  friend_passport_id: number;
+  friend_name: string;
+  friend_thumbnail_url: string | null;
+  friend_user_id: string | null;
+  is_clbhouz_user: boolean;
+  last_round_played_at: string | null;
+  last_round_course_name: string | null;
+  last_round_adjusted_gross: number | null;
+  last_round_stableford: number | null;
+  last_round_differential: number | null;
+  last_round_score_id: string | null;
+  course_thumbnail_image: string | null;
+  /** True when last_round equals the friend's 90-day best for that course. */
+  is_course_best: boolean;
+}
+
+// ─── Hole-level detail ──────────────────────────────────────────────────
 export interface WhsScoreHole {
   hole_no: number;
   par: number;

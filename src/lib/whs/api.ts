@@ -13,6 +13,8 @@ import type {
   CourseForm,
   WhsLastRoundDetail,
   WhsScoreHole,
+  WhsFriendCourseBest,
+  WhsFriendActivityWithImage,
 } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
@@ -187,11 +189,36 @@ export async function fetchFriendsLeaderboard(ownerUserId: string): Promise<WhsF
   return (data ?? []) as unknown as WhsFriendMatch[];
 }
 
+export async function fetchFriendCourseBests(
+  ownerUserId: string,
+): Promise<WhsFriendCourseBest[]> {
+  const { data: friends, error: friendsErr } = await supabase
+    .from('whs_friend_matches' as any)
+    .select('friend_connection_id')
+    .eq('owner_user_id', ownerUserId)
+    .not('friend_connection_id', 'is', null);
+
+  if (friendsErr) throw friendsErr;
+  const friendConnIds = ((friends as any[]) ?? [])
+    .map((f) => f.friend_connection_id)
+    .filter(Boolean);
+
+  if (friendConnIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from('whs_friend_course_bests' as any)
+    .select('*')
+    .in('friend_connection_id', friendConnIds);
+
+  if (error) throw error;
+  return (data as unknown as WhsFriendCourseBest[]) ?? [];
+}
+
 export async function fetchFriendsActivity(
   ownerUserId: string,
   limit: number = 20,
-): Promise<WhsFriendMatch[]> {
-  const { data, error } = await supabase
+): Promise<WhsFriendActivityWithImage[]> {
+  const { data: rows, error } = await supabase
     .from('whs_friend_matches' as any)
     .select('*')
     .eq('owner_user_id', ownerUserId)
@@ -199,7 +226,78 @@ export async function fetchFriendsActivity(
     .order('last_round_played_at', { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []) as unknown as WhsFriendMatch[];
+  const friends = ((rows as any[]) ?? []);
+
+  if (friends.length === 0) return [];
+
+  const friendConnIds = friends
+    .map((f) => f.friend_connection_id)
+    .filter(Boolean);
+  const scoresByConn: Record<string, any> = {};
+  if (friendConnIds.length > 0) {
+    const { data: scoreRows } = await supabase
+      .from('whs_scores' as any)
+      .select(`
+        id,
+        connection_id,
+        play_date,
+        adjusted_gross,
+        stableford_points,
+        handicap_differential,
+        course_id,
+        course:whs_courses(name)
+      `)
+      .in('connection_id', friendConnIds)
+      .order('play_date', { ascending: false });
+    for (const s of ((scoreRows as any[]) ?? [])) {
+      if (!scoresByConn[s.connection_id]) {
+        scoresByConn[s.connection_id] = s;
+      }
+    }
+  }
+
+  const courseNames = new Set<string>();
+  Object.values(scoresByConn).forEach((s: any) => {
+    if (s.course?.name) courseNames.add(s.course.name);
+  });
+  const thumbsByName: Record<string, string | null> = {};
+  if (courseNames.size > 0) {
+    const { data: gcRows } = await supabase
+      .from('golf_courses')
+      .select('name, thumbnail_image')
+      .in('name', Array.from(courseNames));
+    for (const r of ((gcRows as any[]) ?? [])) {
+      thumbsByName[r.name.toLowerCase()] = r.thumbnail_image ?? null;
+    }
+  }
+
+  const bests = await fetchFriendCourseBests(ownerUserId);
+  const bestKeyed = new Set(
+    bests.map((b) => `${b.friend_connection_id}:${b.best_score_id}`),
+  );
+
+  return friends.map((f): WhsFriendActivityWithImage => {
+    const score = scoresByConn[f.friend_connection_id];
+    const courseNameKey = (f.last_round_course_name ?? '').toLowerCase();
+    return {
+      friend_row_id: f.friend_row_id,
+      friend_passport_id: f.friend_passport_id,
+      friend_name: f.friend_name,
+      friend_thumbnail_url: f.friend_thumbnail_url,
+      friend_user_id: f.friend_user_id,
+      is_clbhouz_user: !!f.is_clbhouz_user,
+      last_round_played_at: f.last_round_played_at,
+      last_round_course_name: f.last_round_course_name,
+      last_round_adjusted_gross: f.last_round_adjusted_gross,
+      last_round_stableford: score?.stableford_points ?? null,
+      last_round_differential: score?.handicap_differential ?? null,
+      last_round_score_id: score?.id ?? null,
+      course_thumbnail_image: thumbsByName[courseNameKey] ?? null,
+      is_course_best: score
+        ? bestKeyed.has(`${f.friend_connection_id}:${score.id}`)
+        : false,
+    };
+  });
 }
 
 export async function fetchSentInvites(): Promise<WhsInviteStatus[]> {
