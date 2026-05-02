@@ -539,19 +539,32 @@ function Masthead({
           i
         </button>
       </div>
-      <span
-        style={{
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.55)',
-          fontVariantNumeric: 'tabular-nums',
-          flexShrink: 0,
-        }}
-      >
-        {stateLabel}
-      </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+        <span
+          aria-hidden
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: dotColor,
+            boxShadow: isLive ? `0 0 8px ${dotColor}` : 'none',
+            animation: isLive ? 'clbhouz-pulse-dot 1.6s ease-in-out infinite' : 'none',
+            display: 'inline-block',
+          }}
+        />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.55)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {stateLabel}
+        </span>
+      </div>
     </div>
   );
 }
